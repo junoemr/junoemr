@@ -23,34 +23,29 @@
  */
 package org.oscarehr.research.eaaps;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import ca.uhn.hl7v2.HL7Exception;
+import com.lowagie.text.pdf.PdfReader;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProgramDao;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.PMmodule.model.Program;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
-import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.dao.UserDSMessagePrefsDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Dxresearch;
+import org.oscarehr.common.model.OscarMsgType;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.SecRole;
 import org.oscarehr.common.model.UserDSMessagePrefs;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.CaseManagementNoteLink;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.inbox.service.InboxManager;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 import oscar.dms.EDoc;
@@ -62,10 +57,15 @@ import oscar.oscarMessenger.data.MsgMessageData;
 import oscar.oscarMessenger.data.MsgProviderData;
 import oscar.oscarMessenger.util.MsgDemoMap;
 import oscar.util.ConversionUtils;
-import ca.uhn.hl7v2.HL7Exception;
 
-import com.lowagie.text.pdf.PdfReader;
-import org.oscarehr.common.model.OscarMsgType;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Handler class for uploading eAAPs PDF documents.
@@ -86,14 +86,10 @@ public class EaapsHandler extends DefaultGenericHandler implements oscar.oscarLa
 
 	private final InboxManager inboxManager = SpringUtils.getBean(InboxManager.class);
 
-	private CaseManagementManager caseManagementManager = SpringUtils.getBean(CaseManagementManager.class);
-
 	private UserDSMessagePrefsDao userDsMessagePrefsDao = SpringUtils.getBean(UserDSMessagePrefsDao.class);
 
 	private ProgramDao programDao = SpringUtils.getBean(ProgramDao.class);
 
-	private SecRoleDao secRoleDao = SpringUtils.getBean(SecRoleDao.class);
-	
 	private DxresearchDAO dxresearchDAO = SpringUtils.getBean(DxresearchDAO.class);
 
 	@Override
@@ -361,42 +357,35 @@ public class EaapsHandler extends DefaultGenericHandler implements oscar.oscarLa
 		return -1;
 	}
 
-	private void addCaseManagementNote(Demographic demo, String description, int noteLink, boolean isSigned, String providerNumber) {
+	private void addCaseManagementNote(Demographic demo, String description, int noteLink, boolean isSigned, String providerNumber)
+	{
+		EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
+		org.oscarehr.demographic.dao.DemographicDao demographicDao = (org.oscarehr.demographic.dao.DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+		ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
+
+		ProviderData provider = providerDao.find(providerNumber);
+
 		CaseManagementNote cmn = new CaseManagementNote();
-		cmn.setObservation_date(new Date());
-		cmn.setUpdate_date(new Date());
-		cmn.setDemographic_no("" + demo.getDemographicNo());
-		cmn.setProviderNo(providerNumber);
+		cmn.setDemographic(demographicDao.find(demo.getDemographicNo()));
+		cmn.setProvider(provider);
 		cmn.setNote(description);
+		cmn.setHistory(description);
 		cmn.setSigned(isSigned);
-		cmn.setSigning_provider_no(providerNumber);
-		try {
-			String programNumber = getOscarProgramNumber();
-			cmn.setProgram_no(programNumber);
-		} catch (Exception e) {
-			if (logger.isInfoEnabled()) {
-				logger.info("Unable to load OSCAR program", e);
-			}
-			cmn.setProgram_no("");
+		if(isSigned)
+		{
+			cmn.setSigningProvider(provider);
 		}
 
-		SecRole doctorRole = secRoleDao.findByName("doctor");
-		cmn.setReporter_caisi_role(doctorRole.getId().toString());
-
-		cmn.setReporter_program_team("0");
-		cmn.setPassword("NULL");
-		cmn.setLocked(false);
-		cmn.setHistory(description);
-		cmn.setPosition(0);
-		caseManagementManager.saveNoteSimple(cmn);
-
-		// Add a noteLink to casemgmt_note_link
-		CaseManagementNoteLink cmnl = new CaseManagementNoteLink();
-		cmnl.setTableName(noteLink);
-		cmnl.setTableId(Long.parseLong(EDocUtil.getLastDocumentNo()));
-		cmnl.setNoteId(cmn.getId());
-
-		EDocUtil.addCaseMgmtNoteLink(cmnl);
+		if(CaseManagementNoteLink.DOCUMENT == noteLink)
+		{
+			// this is refactored from legacy logic
+			DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
+			encounterNoteService.saveDocumentNote(cmn, documentDao.find(EDocUtil.getLastDocumentNo()));
+		}
+		else
+		{
+			encounterNoteService.saveChartNote(cmn);
+		}
 	}
 
 	private String getOscarProgramNumber() {

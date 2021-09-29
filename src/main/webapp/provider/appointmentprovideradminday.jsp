@@ -473,6 +473,8 @@ public boolean isBirthday(String schedDate,String demBday){
 <%@page import="org.oscarehr.eform.model.EForm"%>
 <%@ page import="org.oscarehr.common.model.ProviderSite" %>
 <%@ page import="org.oscarehr.common.dao.ProviderPreferenceDao" %>
+<%@ page import="org.oscarehr.security.model.SecObjectName" %>
+<%@ page import="org.oscarehr.security.model.Permission" %>
 <html:html locale="true">
 	<head>
 		<script>
@@ -937,12 +939,6 @@ public boolean isBirthday(String schedDate,String demBday){
 									</caisi:isModuleLoad>
 								</li>
 							</security:oscarSec>
-							<oscar:oscarPropertiesCheck property="OSCAR_LEARNING" value="yes">
-								<li>
-									<a HREF="#" ONCLICK ="popupPage2('../oscarLearning/CourseView.jsp','<bean:message key="global.courseview"/>');return false;" TITLE='<bean:message key="global.courseview"/>'>
-										<span id="oscar_courseview"><bean:message key="global.btncourseview"/></span></a>
-								</li>
-							</oscar:oscarPropertiesCheck>
 
 							<oscar:oscarPropertiesCheck property="referral_menu" value="yes">
 								<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.misc" rights="r">
@@ -1733,7 +1729,8 @@ public boolean isBirthday(String schedDate,String demBday){
                   tickler_no = "";
                   tickler_note="";
                   
-                 if(securityInfoManager.hasPrivilege(loggedInInfo1, "_tickler", "r", demographic_no)) {
+                 if(securityInfoManager.hasPrivileges(loggedInInfo1.getLoggedInProviderNo(), demographic_no, Permission.TICKLER_READ))
+                 {
 	                  for(Tickler t: ticklerManager.search_tickler(loggedInInfo1, demographic_no,MyDateFormat.getSysDate(strDate))) {
 	                	  tickler_no = t.getId().toString();
 	                      tickler_note = t.getMessage()==null?tickler_note:tickler_note + "\n" + t.getMessage();

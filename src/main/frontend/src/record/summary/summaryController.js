@@ -23,6 +23,8 @@
     Ontario, Canada
 
 */
+import {SecurityPermissions} from "../../common/security/securityConstants";
+
 angular.module('Record.Summary').controller('Record.Summary.SummaryController', [
 
 	'$rootScope',
@@ -35,9 +37,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 	'$uibModal',
 	'$interval',
 	'user',
-	'noteService',
 	'summaryService',
-	'securityService',
+	'securityRolesService',
 	'formService',
 
 	function(
@@ -51,13 +52,13 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		$uibModal,
 		$interval,
 		user,
-		noteService,
 		summaryService,
-		securityService,
+		securityRolesService,
 		formService)
 	{
 
 		var controller = this;
+		controller.SecurityPermissions = SecurityPermissions;
 
 		controller.page = {};
 		controller.page.columnOne = {};
@@ -66,6 +67,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		controller.page.columnThree = {};
 		controller.page.columnThree.modules = {};
 		controller.page.selectedNoteHash = {};
+
+		controller.summaryLists = {};
 
 		controller.index = 0;
 		controller.busy = false;
@@ -76,65 +79,54 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		// store the child component refresh function so that this controller can trigger it.
 		controller.noteListComponentRefreshFunction = null;
 
-		//get access rights
-		securityService.hasRight("_eChart", "r", $stateParams.demographicNo).then(
-			function success(results)
+		controller.$onInit = () =>
+		{
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EchartRead))
 			{
-				controller.page.canRead = results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-		securityService.hasRight("_eChart", "u", $stateParams.demographicNo).then(
-			function success(results)
-			{
-				controller.page.cannotChange = !results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-		securityService.hasRight("_eChart", "w", $stateParams.demographicNo).then(
-			function success(results)
-			{
-				controller.page.cannotAdd = !results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
+				controller.getLeftItems();
+				controller.getRightItems();
+			}
+		}
 
 		//disable click and keypress if user only has read-access
 		controller.checkAction = function checkAction(event)
 		{
-			if (controller.page.cannotChange)
+			if (!controller.canEdit())
 			{
 				event.preventDefault();
 				event.stopPropagation();
 			}
 		};
 
+		controller.canEdit = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EchartUpdate);
+		}
+		controller.canCreate = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EchartCreate);
+		}
+
 		controller.openRx = function openRx(demoNo)
 		{
-			win = "Rx" + demoNo;
-			var url = "../oscarRx/choosePatient.do?demographicNo=" + demoNo;
-			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
+			let win = "Rx" + demoNo;
+			let url = "../oscarRx/choosePatient.do?demographicNo=" + demoNo;
+			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600");
 		};
 
 		controller.openAllergies = function openAllergies(demoNo)
 		{
-			win = "Allergy" + demoNo;
-			var url = "../oscarRx/showAllergy.do?demographicNo=" + demoNo;
-			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
+			let win = "Allergy" + demoNo;
+			let url = "../oscarRx/showAllergy.do?demographicNo=" + demoNo;
+			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600");
 			return false;
 		};
 
 		controller.openPreventions = function openPreventions(demoNo)
 		{
-			win = "prevention" + demoNo;
-			var url = "../oscarPrevention/index.jsp?demographic_no=" + demoNo;
-			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600", "");
+			let win = "prevention" + demoNo;
+			let url = "../oscarPrevention/index.jsp?demographic_no=" + demoNo;
+			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600");
 			return false;
 		};
 
@@ -177,20 +169,34 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			$scope.$emit('loadNoteForEdit', note);
 		};
 
-		controller.trackerUrl = "";
-
-		controller.getTrackerUrl = function getTrackerUrl(demographicNo)
+		controller.onOpenTrackerTab = () =>
 		{
-			controller.trackerUrl = '../oscarEncounter/oscarMeasurements/HealthTrackerPage.jspf?template=tracker&demographic_no=' + demographicNo + '&numEle=4&tracker=slim';
-		};
+			if(!$state.includes("**.tracker") || !$state.includes("**.tracker.**"))
+			{
+				$state.go("record.summary.tracker",
+					{
+						demographicNo: $stateParams.demographicNo,
+					});
+			}
+		}
+		controller.onOpenNotesTab = () =>
+		{
+			if(!$state.is("record.summary"))
+			{
+				$state.go("record.summary",
+					{
+						demographicNo: $stateParams.demographicNo,
+					});
+			}
+		}
 
-		function getLeftItems()
+		controller.getLeftItems = () =>
 		{
 			summaryService.getSummaryHeaders($stateParams.demographicNo, 'left').then(
 				function success(results)
 				{
 					controller.page.columnOne.modules = results;
-					fillItems(controller.page.columnOne.modules);
+					controller.fillItems(controller.page.columnOne.modules);
 				},
 				function error(errors)
 				{
@@ -199,16 +205,13 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				});
 		}
 
-		getLeftItems();
-
-
-		function getRightItems()
+		controller.getRightItems = () =>
 		{
 			summaryService.getSummaryHeaders($stateParams.demographicNo, 'right').then(
 				function success(results)
 				{
 					controller.page.columnThree.modules = results;
-					fillItems(controller.page.columnThree.modules);
+					controller.fillItems(controller.page.columnThree.modules);
 				},
 				function error(errors)
 				{
@@ -217,16 +220,11 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				});
 		}
 
-		getRightItems();
-
-		var summaryLists = {};
-
-		function fillItems(itemsToFill)
+		controller.fillItems = (itemsToFill) =>
 		{
-
 			for (var i = 0; i < itemsToFill.length; i++)
 			{
-				summaryLists[itemsToFill[i].summaryCode] = itemsToFill[i];
+				controller.summaryLists[itemsToFill[i].summaryCode] = itemsToFill[i];
 
 				summaryService.getFullSummary($stateParams.demographicNo, itemsToFill[i].summaryCode).then(
 					function success(results)
@@ -235,11 +233,11 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 						{
 							if (results.summaryItem instanceof Array)
 							{
-								summaryLists[results.summaryCode].summaryItem = results.summaryItem;
+								controller.summaryLists[results.summaryCode].summaryItem = results.summaryItem;
 							}
 							else
 							{
-								summaryLists[results.summaryCode].summaryItem = [results.summaryItem];
+								controller.summaryLists[results.summaryCode].summaryItem = [results.summaryItem];
 							}
 						}
 					},
@@ -344,8 +342,8 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			{
 				controller.noteListComponentRefreshFunction();
 			}
-			getLeftItems();
-			getRightItems();
+			controller.getLeftItems();
+			controller.getRightItems();
 		};
 
 		$scope.$on('summary_page_refresh', function (refresh)
@@ -372,7 +370,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 			else if (item.type == 'lab' || item.type == 'document' || item.type == 'rx' || item.type == 'allergy' || item.type == 'prevention' || item.type == 'dsguideline')
 			{
-
+				let win;
 				if (item.type == 'rx')
 				{
 					win = "Rx" + $stateParams.demographicNo;
@@ -392,7 +390,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					win = "win_item.type_";
 				}
 
-				window.open(item.action, win, "scrollbars=yes, location=no, width=900, height=600", "");
+				window.open(item.action, win, "scrollbars=yes, location=no, width=900, height=600");
 				return false;
 			}
 			else if (item.type === 'eform')
@@ -446,7 +444,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		controller.viewDocument = function viewDocument(documentId)
 		{
 			// get only document summary items
-			let itemArray = summaryLists['incoming'].summaryItem;
+			let itemArray = controller.summaryLists['incoming'].summaryItem;
 			let item = null;
 
 			// find the summary item that matches the document id
@@ -468,6 +466,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			}
 		};
 
+		controller.showSummaryPrintButton = () =>
+		{
+			return $state.is("record.summary");
+		}
 
 		controller.showPrintModal = function showPrintModal()
 		{
@@ -511,6 +513,39 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				});
 		};
 
+		controller.summaryModAddEnabled = (module) =>
+		{
+			let enabled = false;
+			if (module.summaryCode === 'othermeds' ||
+				module.summaryCode === 'ongoingconcerns' ||
+				module.summaryCode === 'medhx' ||
+				module.summaryCode === 'sochx' ||
+				module.summaryCode === 'famhx' ||
+				module.summaryCode === 'reminders' ||
+				module.summaryCode === 'riskfactors')
+			{
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.CppNoteCreate)
+					&& securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterIssueCreate);
+			}
+			else if (module.summaryCode === 'meds')
+			{
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.RxCreate);
+			}
+			else if (module.summaryCode === 'allergies')
+			{
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.AllergyCreate);
+			}
+			else if (module.summaryCode === 'forms')
+			{
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.FormCreate)
+					|| securityRolesService.hasSecurityPrivileges(SecurityPermissions.EformCreate);
+			}
+			else if (module.summaryCode === 'preventions')
+			{
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.PreventionCreate);
+			}
+			return enabled;
+		}
 		controller.onSummaryModAdd = function onSummaryModAdd(module, successCallback, dismissCallback)
 		{
 			if (module.summaryCode === 'othermeds' ||

@@ -23,29 +23,8 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -54,16 +33,17 @@ import org.oscarehr.app.OAuth1Utils;
 import org.oscarehr.common.dao.AppDefinitionDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
-import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
 import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.EncounterForm;
+import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
 import org.oscarehr.eform.model.EForm;
 import org.oscarehr.eform.model.EFormData;
-import org.oscarehr.common.model.EncounterForm;
 import org.oscarehr.eform.service.EFormDataService;
 import org.oscarehr.managers.FormsManager;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -80,11 +60,29 @@ import org.oscarehr.ws.rest.to.model.SummaryItemTo1;
 import org.oscarehr.ws.rest.to.model.SummaryTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import org.springframework.transaction.annotation.Transactional;
 import oscar.eform.EFormExportZip;
 import oscar.oscarEncounter.data.EctFormData;
 import oscar.oscarProvider.data.ProviderMyOscarIdData;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.ResourceBundle;
 
 
 /**
@@ -117,9 +115,13 @@ public class FormsService extends AbstractServiceImpl {
 	@GET
 	@Path("/{demographicNo}/all")
 	@Produces("application/json")
-	public FormListTo1 getFormsForHeading(@PathParam("demographicNo") Integer demographicNo ,@QueryParam("heading") String heading){
+	public FormListTo1 getFormsForHeading(@PathParam("demographicNo") Integer demographicNo, @QueryParam("heading") String heading)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.FORM_READ, Permission.EFORM_READ);
+
 		FormListTo1 formListTo1 = new FormListTo1();
-		if(heading.equals("Completed")){
+		if(heading.equals("Completed"))
+		{
 			List<EFormData> completedEforms = formsManager.findInstancedByDemographicId(getLoggedInInfo(),demographicNo);
 			Collections.sort(completedEforms, Collections.reverseOrder(EFormData.FORM_DATE_COMPARATOR));
 			populateFormListTo1WithEForms(formListTo1, completedEforms, demographicNo);
@@ -166,6 +168,8 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public FormListTo1 getAllCompletedForms(@PathParam("demographicNo") Integer demographicNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.FORM_READ, Permission.EFORM_READ);
+
 		FormListTo1 formListTo1 = new FormListTo1();
 
 		// get eforms
@@ -189,6 +193,8 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public FormListTo1 getAllFormRevisions(@PathParam("demographicNo") Integer demographicNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.FORM_READ, Permission.EFORM_READ);
+
 		FormListTo1 formListTo1 = new FormListTo1();
 
 		// get eforms
@@ -212,6 +218,8 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public FormListTo1 getAllDeletedForms(@PathParam("demographicNo") Integer demographicNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.FORM_READ, Permission.EFORM_READ);
+
 		FormListTo1 formListTo1 = new FormListTo1();
 
 		List<EFormData> eformRevisions = formsManager.getDeletedEFormInstances(demographicNo);
@@ -229,6 +237,8 @@ public class FormsService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public FormListTo1 getAllNewForms()
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FORM_READ, Permission.EFORM_READ);
+
 		FormListTo1 formListTo1 = new FormListTo1();
 
 		// get eforms
@@ -256,7 +266,8 @@ public class FormsService extends AbstractServiceImpl {
 	@GET
 	@Path("/allEForms")
 	@Produces("application/json")
-	public AbstractSearchResponse<EFormTo1> getAllEFormNames(){
+	public AbstractSearchResponse<EFormTo1> getAllEFormNames()
+	{
 		AbstractSearchResponse<EFormTo1> response = new AbstractSearchResponse<EFormTo1>();
 		response.setContent(new EFormConverter(true).getAllAsTransferObjects(getLoggedInInfo(),formsManager.findByStatus(getLoggedInInfo(), true, EFormSortOrder.NAME)));
 		response.setTotal(response.getContent().size());
@@ -267,7 +278,8 @@ public class FormsService extends AbstractServiceImpl {
 	@GET
 	@Path("/allEncounterForms")
 	@Produces("application/json")
-	public AbstractSearchResponse<EncounterFormTo1> getAllFormNames(){
+	public AbstractSearchResponse<EncounterFormTo1> getAllFormNames()
+	{
 		AbstractSearchResponse<EncounterFormTo1> response = new AbstractSearchResponse<EncounterFormTo1>();
 		response.setContent(new EncounterFormConverter().getAllAsTransferObjects(getLoggedInInfo(),formsManager.getAllEncounterForms()));
 		response.setTotal(response.getContent().size());
@@ -278,7 +290,10 @@ public class FormsService extends AbstractServiceImpl {
 	@GET
 	@Path("/selectedEncounterForms")
 	@Produces("application/json")
-	public AbstractSearchResponse<EncounterFormTo1> getSelectedFormNames(){
+	public AbstractSearchResponse<EncounterFormTo1> getSelectedFormNames()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FORM_READ, Permission.EFORM_READ);
+
 		AbstractSearchResponse<EncounterFormTo1> response = new AbstractSearchResponse<EncounterFormTo1>();
 		response.setContent(new EncounterFormConverter().getAllAsTransferObjects(getLoggedInInfo(),formsManager.getSelectedEncounterForms()));
 		response.setTotal(response.getContent().size());
@@ -292,7 +307,7 @@ public class FormsService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public RestResponse<Boolean> deleteForm(@PathParam("id") Integer id, @QueryParam("type") String type)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), "W", null, "_eform");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FORM_DELETE, Permission.EFORM_DELETE);
 
 		FORM_TYPE fType = FORM_TYPE.valueOf(type.toUpperCase());
 		if (fType == FORM_TYPE.EFORM)
@@ -313,7 +328,7 @@ public class FormsService extends AbstractServiceImpl {
 	@Consumes("application/json")
 	public RestResponse<Boolean> restoreForm(@PathParam("id") Integer id, @QueryParam("type") String type)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), "W", null, "_eform");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FORM_UPDATE, Permission.EFORM_UPDATE);
 
 		FORM_TYPE fType = FORM_TYPE.valueOf(type.toUpperCase());
 		if (fType == FORM_TYPE.EFORM)
@@ -332,7 +347,10 @@ public class FormsService extends AbstractServiceImpl {
 	@GET
 	@Path("/{demographicNo}/completedEncounterForms")
 	@Produces("application/json")
-	public RestResponse<List<FormTo1>> getCompletedFormNames(@PathParam("demographicNo") String demographicNo){
+	public RestResponse<List<FormTo1>> getCompletedFormNames(@PathParam("demographicNo") Integer demographicNo)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.FORM_READ);
+
 		List<FormTo1> formList = new ArrayList<FormTo1>();
 
 		List<EncounterForm> encounterForms = formsManager.getAllEncounterForms();
@@ -342,7 +360,7 @@ public class FormsService extends AbstractServiceImpl {
 			String table = StringUtils.trimToNull(encounterForm.getFormTable());
 			if (table != null) {
 			
-				EctFormData.PatientForm[] pforms = EctFormData.getPatientFormsFromLocalAndRemote(getLoggedInInfo(), demographicNo, table);
+				EctFormData.PatientForm[] pforms = EctFormData.getPatientFormsFromLocalAndRemote(getLoggedInInfo(), String.valueOf(demographicNo), table);
 				int formId = 0;
 				String name = encounterForm.getFormName();
 				
@@ -361,7 +379,7 @@ public class FormsService extends AbstractServiceImpl {
 						date = null;
 					}
 
-					formList.add(FormTo1.create(null, Integer.parseInt(demographicNo), formId, FormsManager.FORM, name, null, null, date, null,false ));
+					formList.add(FormTo1.create(null, demographicNo, formId, FormsManager.FORM, name, null, null, date, null,false ));
 
 				}
 
@@ -374,7 +392,8 @@ public class FormsService extends AbstractServiceImpl {
 	@GET
 	@Path("/groupNames")
 	@Produces("application/json")
-	public AbstractSearchResponse<String> getGroupNames(){
+	public AbstractSearchResponse<String> getGroupNames()
+	{
 		AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
 
 		response.setContent(formsManager.getGroupNames());
@@ -386,7 +405,10 @@ public class FormsService extends AbstractServiceImpl {
 	@GET
 	@Path("/getFavouriteFormGroup")
 	@Produces("application/json")
-	public SummaryTo1 getFavouriteFormGroups(){
+	public SummaryTo1 getFavouriteFormGroups()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FORM_READ);
+
 		UserPropertyDAO userPropertyDao =(UserPropertyDAO)SpringUtils.getBean("UserPropertyDAO");
 		String groupName = userPropertyDao.getStringValue(getLoggedInInfo().getLoggedInProviderNo(),"favourite_eform_group");
 		logger.debug("favourite eform group name "+groupName);
@@ -405,7 +427,10 @@ public class FormsService extends AbstractServiceImpl {
 	@GET
 	@Path("/getFormGroups")
 	@Produces("application/json")
-	public List<SummaryTo1> getGroupsWithForms(){
+	public List<SummaryTo1> getGroupsWithForms()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FORM_READ);
+
 		int count = 0;
 		List<SummaryTo1> summaryList = new ArrayList<SummaryTo1>();
 		List<String> groupNames = formsManager.getGroupNames();
@@ -430,7 +455,10 @@ public class FormsService extends AbstractServiceImpl {
 	@Path("/getK2AEForm")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public AbstractSearchResponse<String> getK2AEForm(String id) {
+	public AbstractSearchResponse<String> getK2AEForm(String id)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FORM_READ, Permission.K2A_READ);
+
 		AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
 		MiscUtils.getLogger().info("EForm id is: " + id);
 		
@@ -456,8 +484,11 @@ public class FormsService extends AbstractServiceImpl {
 	@Path("/getAllK2AEForms")
 	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
-	public AbstractSearchResponse<String> getAllK2AEForms(String jsonString) {
-		try {
+	public AbstractSearchResponse<String> getAllK2AEForms(String jsonString)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.EFORM_READ, Permission.K2A_READ);
+		try
+		{
 			AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
 			JSONArray jsonArray = JSONArray.fromObject(jsonString);
 			List<String> errors = new ArrayList<String>();
@@ -490,7 +521,10 @@ public class FormsService extends AbstractServiceImpl {
 	@GET
 	@Path("/{demographicNo}/formOptions")
 	@Produces("application/json")
-	public MenuTo1 getFormOptions(@PathParam("demographicNo") String demographicNo){
+	public MenuTo1 getFormOptions(@PathParam("demographicNo") Integer demographicNo)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.FORM_READ);
+
 		ResourceBundle bundle = getResourceBundle();
 		MenuTo1 formMenu = new MenuTo1();
 		int idCounter =0;

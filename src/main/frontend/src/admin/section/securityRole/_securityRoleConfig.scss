@@ -1,0 +1,94 @@
+.security-role-config {
+  @include juno-table-default;
+  .button-wrapper {
+    width: 128px;
+
+    .role-extend-button {
+      width: 32px;
+    }
+  }
+  .col-role-actions {
+    display: flex;
+    flex-direction: row;
+  }
+}
+
+.security-role-config-modal {
+  .role-details,
+  .role-access {
+    h3 {
+      color: var(--color-neutral-darkest);
+      text-align: center;
+    }
+
+    .system-managed,
+    .inherits-role {
+      text-align: center;
+      i {
+        font-size: 18px;
+      }
+    }
+
+    .system-managed {
+      color: var(--color-red-base);
+    }
+    .inherits-role {
+      color: var(--color-primary-base);
+      position: absolute;
+    }
+
+    label {
+      min-width: 312px;
+    }
+  }
+
+  .role-details {
+    padding: 16px;
+
+    .juno-input {
+      margin-bottom: 4px;
+    }
+  }
+
+  .role-access {
+    padding: 0 16px;
+
+    .access-description {
+      margin-left: 16px;
+    }
+  }
+}
+
+.security-role-set-modal {
+  .provider-selection-container {
+    padding: 16px;
+  }
+  .set-selection-container {
+    padding: 16px;
+  }
+}
+
+.security-role-config-modal,
+.security-role-set-modal {
+  .footer-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 16px;
+
+    .button-group-wrapper {
+      display: flex;
+      flex-direction: row;
+      flex-grow: 1;
+      justify-content: flex-end;
+      margin: 0 -4px;
+      .button-wrapper {
+        margin: 0 4px;
+        width: 128px;
+      }
+    }
+  }
+}

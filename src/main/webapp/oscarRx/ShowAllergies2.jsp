@@ -43,9 +43,12 @@
 <%@ page import="org.oscarehr.demographic.model.Demographic" %>
 <%@ page import="java.time.LocalDate" %>
 <%@ page import="java.time.Period" %>
+<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
+<%@ page import="org.oscarehr.security.model.Permission" %>
 
 <%
 	String roleName2$ = session.getAttribute("userrole") + "," + session.getAttribute("user");
+	String currrentUserId = (String) session.getAttribute("user");
 	boolean authenticated = true;
 %>
 <security:oscarSec roleName="<%=roleName2$%>" objectName="_allergy" rights="r" reverse="<%=true%>">
@@ -74,7 +77,7 @@
 <%
 	RxSessionBean sessionBean = (RxSessionBean)pageContext.findAttribute("sessionBean");
 	String annotation_display = CaseManagementNoteLink.DISP_ALLERGY;
-	com.quatro.service.security.SecurityManager securityManager = new com.quatro.service.security.SecurityManager();
+	SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
 	String demographicNo = request.getParameter("demographicNo");
 
@@ -92,9 +95,12 @@
 		demographicNo = String.valueOf(sessionBean.getDemographicNo());
 	}
 
-	Demographic demographic = demographicDao.find(Integer.parseInt(demographicNo));
+	Integer demographicId = Integer.parseInt(demographicNo);
+	Demographic demographic = demographicDao.find(demographicId);
 	String demoBirthday = demographic.getDateOfBirth().toString();
 	int demoAge = Period.between(demographic.getDateOfBirth(), LocalDate.now()).getYears();
+
+	boolean hasAllergyCreatePermission = securityInfoManager.hasPrivileges(currrentUserId, demographicId, Permission.ALLERGY_CREATE);
 
 %>
 <html:html locale="true">
@@ -862,7 +868,7 @@
 												%>
 												<td>
 													<%
-														if (!allergy.isIntegratorResult())
+														if (!allergy.isIntegratorResult() && securityInfoManager.hasPrivileges(currrentUserId, demographicId, Permission.ENCOUNTER_NOTE_CREATE))
 														{
 													%>
 													<a href="#" title="Annotation" onclick="window.open('../annotation/annotation.jsp?display=<%=annotation_display%>&table_id=<%=String.valueOf(allergy.getAllergyId())%>&demo=<jsp:getProperty name="patient" property="demographicNo"/>','anwin','width=400,height=500');">
@@ -884,9 +890,9 @@
 
 												<td>
 													<%
-														if (!allergy.isIntegratorResult() && securityManager.hasDeleteAccess("_allergies", roleName$))
+														if (!allergy.isIntegratorResult())
 														{
-															if (intArchived == 0)
+															if (intArchived == 0 && securityInfoManager.hasPrivileges(currrentUserId, demographicId, Permission.ALLERGY_DELETE))
 															{
 													%>
 													<a href="#"
@@ -895,12 +901,21 @@
 														<%=labelAction%></a>
 
 													|
-													<%		} %>
+													<%		}
+															if (securityInfoManager.hasPrivileges(currrentUserId, demographicId, Permission.ALLERGY_UPDATE))
+															{%>
 													<a href="#" class="modifyAllergyLink"
 													   id="modifyAllergy:<%= labelAction %>_ID=<%=allergy.getDrugrefId() %>&name=<%=allergy.getDescription() %>&type=<%=allergy.getTypeCode() %>&allergyToArchive=<%=allergy.getId() %>" >
 														<%=intArchived==0 ? "Modify" : labelAction%>
 													</a>
-													<%	} %>
+														<%	}
+															else
+															{ %>
+													<input type="hidden"
+													   id="modifyAllergy:<%= labelAction %>_ID=<%=allergy.getDrugrefId() %>&name=<%=allergy.getDescription() %>&type=<%=allergy.getTypeCode() %>&allergyToArchive=<%=allergy.getId() %>" >
+													</input>
+														  <%}
+														} %>
 												</td>
 											</tr>
 											<%
@@ -937,6 +952,8 @@
 								<tr>
 									<th>Add an Allergy</th>
 								</tr>
+								<% if (hasAllergyCreatePermission)
+								{ %>
 								<tr id="allergyQuickButtonRow">
 									<td>
 										<button type=button class="ControlPushButton" onclick="addCustomNKDA();">
@@ -950,12 +967,13 @@
 										</button>
 									</td>
 								</tr>
+								<% } %>
 								<tr>
 									<td id="addAllergyDialogue"></td>
 								</tr>
 								<tr id="allergySearchCriteriaRow">
 									<td>
-										<div id="allergySearchSelectors">
+										<div id="allergySearchSelectors" style="<%=(!hasAllergyCreatePermission) ? "display: none" : ""%>">
 											<input type="checkbox" checked name="typeDrugClass" id="typeDrugClass" onchange="toggleInput('inputDrugClass', this)"/>
 											<label for="typeDrugClass" >Drug Classes</label>
 											<input type="checkbox" name="typeIngredient" id="typeIngredient" onchange="toggleInput('inputIngredient', this)"/>
@@ -967,6 +985,9 @@
 											<input type="checkbox" name="typeSelectAll" id="typeSelectAll" />
 											<label for="typeSelectAll" >All</label>
 										</div>
+
+										<% if (hasAllergyCreatePermission)
+										{ %>
 										<input type="text" name="searchString" value="" size="16" id="searchString" maxlength="16" />
 										<button type="submit" value="Search" id="searchStringButton" class="ControlPushButton">
 											Search
@@ -975,6 +996,7 @@
 										<button type=button class="ControlPushButton" onclick="addCustomAllergy();" value="Custom Allergy">
 											Custom Allergy
 										</button>
+										<% } %>
 									</td>
 								</tr>
 							</table>
@@ -984,7 +1006,6 @@
 					<tr>
 						<td id="searchResultsContainer" ></td>
 					</tr>
-
 				</table>
 			</td>
 		</tr>

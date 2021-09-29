@@ -1,3 +1,5 @@
+import {SecurityPermissions} from "../common/security/securityConstants";
+
 angular.module('Consults').controller('Consults.ConsultResponseListController', [
 
 	'$scope',
@@ -9,7 +11,7 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 	'providerService',
 	'demographicService',
 	'demographicsService',
-	'securityService',
+	'securityRolesService',
 	'staticDataService',
 
 	function(
@@ -22,7 +24,7 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 		providerService,
 		demographicService,
 		demographicsService,
-		securityService,
+		securityRolesService,
 		staticDataService)
 	{
 
@@ -43,10 +45,10 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 			numToReturn: 10
 		};
 
-
+		controller.SecurityPermissions = SecurityPermissions;
 
 		// Initialize the controller
-		controller.init = function init()
+		controller.$onInit = () =>
 		{
 			if($state.params.demographicNo){
 				controller.demographicNo = parseInt($state.params.demographicNo);
@@ -54,42 +56,21 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 				controller.search.list = "patient";
 			}
 
-			controller.getAccessRights();
 			controller.getTeams();
 		};
 
-		controller.getAccessRights = function getAccessRights()
+		controller.canEditConsults = () =>
 		{
-			//get access rights
-			securityService.hasRight("_con", "r").then(
-				function success(results)
-				{
-					controller.consultReadAccess = results;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-			securityService.hasRight("_con", "u").then(
-				function success(results)
-				{
-					controller.consultUpdateAccess = results; //to be used with batch operations (not yet implemented)
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-			securityService.hasRight("_con", "w").then(
-				function success(results)
-				{
-					controller.consultWriteAccess = results;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-		};
-
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationUpdate);
+		}
+		controller.canCreateConsults = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationCreate);
+		}
+		controller.canAccessDemographics = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead);
+		}
 
 		controller.getTeams = function getTeams()
 		{
@@ -225,7 +206,7 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 
 		controller.addConsult = function addConsult()
 		{
-			if (!controller.consultWriteAccess)
+			if (!controller.canCreateConsults())
 			{
 				alert("You don't have right to create new consult response");
 				return false;
@@ -395,7 +376,5 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 				controller.search.sortDirection = $location.search().sortDirection;
 			}
 		};
-
-		controller.init();
 	}
 ]);

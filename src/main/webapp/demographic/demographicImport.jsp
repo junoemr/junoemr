@@ -107,7 +107,6 @@ $(document).ready(function(){
 
 <%
 oscar.OscarProperties op = oscar.OscarProperties.getInstance();
-String learningEnabled = op.getProperty("OSCAR_LEARNING");
 if (!Util.checkDir(op.getProperty("TMP_DIR"))) { %>
 <p>
 <h2>Error! Cannot perform demographic import. Please contact support.</h2>
@@ -127,23 +126,6 @@ if (!Util.checkDir(op.getProperty("TMP_DIR"))) { %>
 					<img border="0" src="../images/icon_alertsml.gif"/>
 				</span>
 			</p>
-			<%
-				if(learningEnabled != null && learningEnabled.equalsIgnoreCase("yes"))
-				{
-			%>
-			<!-- Drop Down box of courses -->
-			Course:&nbsp;<html:select property="courseId">
-			<option value="0">Choose One</option>
-			<%
-				for(Program course : courses)
-				{
-			%>
-			<option value="<%=course.getId().intValue()%>"><%=course.getName()%>
-			</option>
-			<% } %>
-		</html:select><br/>
-			Timeshift (in days +/-):&nbsp;<html:text property="timeshiftInDays" value="0" size="5"/></br/>
-			<%} %>
 
 			If patient's providers do not have OHIP numbers:<br>
 			<html:radio property="matchProviderNames" value="true">

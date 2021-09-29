@@ -14,12 +14,11 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.util.MessageResources;
 import org.oscarehr.common.dao.OscarLogDao;
-import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dto.HRMDemographicDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.service.HRMService;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -48,7 +47,7 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 
 		Integer demographicNo = Integer.parseInt(bean.demographicNo);
 
-		if(!securityInfoManager.hasPrivilege(loggedInInfo, SecObjectName._HRM, SecurityInfoManager.READ, demographicNo)
+		if(!securityInfoManager.hasPrivileges(loggedInInfo.getLoggedInProviderNo(), demographicNo, Permission.HRM_READ)
 				|| !OscarProperties.getInstance().hasHRMDocuments())
 		{
 			return true; // HRM section does not show up at all

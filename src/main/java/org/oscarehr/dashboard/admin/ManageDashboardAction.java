@@ -62,7 +62,7 @@ public class ManageDashboardAction extends DispatchAction {
 		
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.WRITE, null ) ) {	
+		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.CREATE, null ) ) {
 			return mapping.findForward("unauthorized");
         }
 		
@@ -77,7 +77,7 @@ public class ManageDashboardAction extends DispatchAction {
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		String message = "";
 	
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.WRITE, null ) ) {	
+		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.CREATE, null ) ) {
 			return mapping.findForward("unauthorized");
         }
 
@@ -176,7 +176,7 @@ public class ManageDashboardAction extends DispatchAction {
 		
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.WRITE, null ) ) {	
+		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.CREATE, null ) ) {
 			return mapping.findForward("unauthorized");
         }
 		String dashboard = request.getParameter("indicatorDashboardId");
@@ -218,7 +218,7 @@ public class ManageDashboardAction extends DispatchAction {
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		ActionForward action = null;
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.WRITE, null ) ) {	
+		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.CREATE, null ) ) {
 			return mapping.findForward("unauthorized");
         }
 
@@ -266,7 +266,7 @@ public class ManageDashboardAction extends DispatchAction {
 		
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.WRITE, null ) ) {	
+		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_dashboardManager", SecurityInfoManager.CREATE, null ) ) {
 			return mapping.findForward("unauthorized");
         }
 		

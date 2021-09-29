@@ -44,6 +44,8 @@
   },
   "dependencies": {
     "angular": "~1.8.0",
+    "angular-chart.js": "^1.1.1",
+    "angular-drag-and-drop-lists": "^2.1.0",
     "angular-loading-bar": "^0.9.0",
     "angular-resource": "~1.6.0",
     "angular-ui-bootstrap": "^2.5.0",
@@ -51,7 +53,9 @@
     "bootstrap-sass": "^3.3.7",
     "bootstrap-sass-loader": "^1.0.10",
     "bootstrap-timepicker": "^0.5.2",
+    "chart.js": "^3.4.1",
     "components-font-awesome": "^4.7.0",
+    "file-saver": "^2.0.5",
     "fullcalendar-scheduler": "1.9.4",
     "glob": "^7.1.6",
     "html-loader": "^0.5.5",
@@ -62,8 +66,6 @@
     "ng-table": "~3",
     "ngstorage": "^0.3.11",
     "pym.js": "^1.2.0",
-    "ui-select": "^0.19.8",
-    "angular-drag-and-drop-lists": "^2.1.0",
-    "file-saver": "^2.0.5"
+    "ui-select": "^0.19.8"
   }
 }

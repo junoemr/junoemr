@@ -314,6 +314,7 @@ public class Appointment
 																LoggedInInfo loggedInInfo, HttpServletRequest request)
 	{
 		org.oscarehr.common.model.Appointment oldRecord = oscarAppointmentDao.find(appointment.getId());
+		validateAppointmentUpdate(oldRecord, appointment);
 		
 		appointment.setCreator(oldRecord.getCreator());
 		appointment.setCreateDateTime(oldRecord.getCreateDateTime());
@@ -484,6 +485,21 @@ public class Appointment
 		for (String phoneNumber: smsNumbers)
 		{
 			communicationService.sendSms(integration, phoneNumber, "New appointment: " + appointment.getName() + " booked for provider: " + provider.getDisplayName());
+		}
+	}
+
+	/**
+	 * Validates the new updated appointment against the original
+	 * @param oldRecord - the old appointment to validate against
+	 * @param newRecord - the updated appointment
+	 * @throws IllegalArgumentException
+	 */
+	private void validateAppointmentUpdate(org.oscarehr.common.model.Appointment oldRecord, org.oscarehr.common.model.Appointment newRecord) throws IllegalArgumentException
+	{
+		// Virtual appointments can not have their locations changed
+		if (newRecord.getIsVirtual() && !newRecord.getLocation().equals(oldRecord.getLocation()))
+		{
+			throw new IllegalArgumentException("Appointment ID: " + newRecord.getId() + " can't be updated. Virtual appointments can not change location.");
 		}
 	}
 

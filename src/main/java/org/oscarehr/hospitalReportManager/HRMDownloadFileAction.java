@@ -28,10 +28,10 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DownloadAction;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 import oscar.util.StringUtils;
@@ -58,8 +58,7 @@ public class HRMDownloadFileAction extends DownloadAction
 			HttpServletResponse response)
 			throws Exception
 	{
-	    securityInfoManager.requireOnePrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
-			    SecurityInfoManager.READ, null, SecObjectName._HRM);
+		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_READ);
 
 	    String hash = request.getParameter("hash");
 	    if(StringUtils.isNullOrEmpty(hash))

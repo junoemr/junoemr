@@ -37,6 +37,7 @@ import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.dao.MessageTblDao;
 import org.oscarehr.common.model.MessageTbl;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
@@ -47,10 +48,8 @@ public class MsgViewAttachmentAction extends Action {
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_msg", "r", null)) {
-			throw new SecurityException("missing required security object (_msg)");
-		}
+
+		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.MESSAGE_READ);
 		
 		MsgViewAttachmentForm frm = (MsgViewAttachmentForm) form;
 		String attachId;

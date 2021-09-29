@@ -38,16 +38,16 @@ import javax.persistence.Table;
 @Table(name = "casemgmt_note_link")
 public class CaseManagementNoteLink extends AbstractModel<Long>
 {
-	public static final Integer CASEMGMTNOTE = 1;
-	public static final Integer DRUGS = 2;
-	public static final Integer ALLERGIES = 3;
-	public static final Integer HL7LAB = 4; //represents the hl7TextMessage table
-	public static final Integer DOCUMENT = 5;
-	public static final Integer EFORMDATA = 6;
-	public static final Integer DEMOGRAPHIC = 7;
-	public static final Integer PREVENTIONS = 8;
-	public static final Integer LABTEST2 = 9; //repesents the labPatientPhysicianInfo table
-	public static final Integer TICKLER = 10;
+	public static final int CASEMGMTNOTE = 1;
+	public static final int DRUGS = 2;
+	public static final int ALLERGIES = 3;
+	public static final int HL7LAB = 4; //represents the hl7TextMessage table
+	public static final int DOCUMENT = 5;
+	public static final int EFORMDATA = 6;
+	public static final int DEMOGRAPHIC = 7;
+	public static final int PREVENTIONS = 8;
+	public static final int LABTEST2 = 9; //repesents the labPatientPhysicianInfo table
+	public static final int TICKLER = 10;
 
 
 	@Id
@@ -135,6 +135,11 @@ public class CaseManagementNoteLink extends AbstractModel<Long>
 	public void setLinkedTicklerId(int ticklerId)
 	{
 		setTableIdLink(ticklerId, TICKLER);
+	}
+
+	public void setLinkedLabPhysicianInfoId(int infoId)
+	{
+		setTableIdLink(infoId, LABTEST2);
 	}
 
 	private void setTableIdLink(int tableId, int tableName)

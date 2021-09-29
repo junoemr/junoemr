@@ -32,6 +32,8 @@ $page-subheader-height: 56px;
 
 $modal-height: 512px;
 $modal-width: 800px;
+$modal-height-lg: 800px;
+$modal-width-lg: 1280px;
 $modal-height-sml: 256px;
 $modal-width-sml: 512px;
 
@@ -45,6 +47,6 @@ $form-input-height: 32px;
 
 // Media queries breakpoints
 // $screen-nav-lg-max: 1305px;
-$screen-nav-lg: 1540px;
+$screen-nav-lg: 1700px;
 $screen-nav-md: 1290px;
 $screen-nav-sm: 768px; //matches the angular.js mobile check size, probably should not be changed

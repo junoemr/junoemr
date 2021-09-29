@@ -28,9 +28,13 @@ angular.module('Common.Components').component('junoToggle', {
     bindings: {
         id: "<",
         ngModel: "=",
+        label: "@?",
         change: "&?",
         disabled: "<?",
         componentStyle: "<?",
+        toggleTrueValue: "<?",
+        toggleFalseValue: "<?",
+        showValueLabels: "<?",
         round: "<?"
     },
     controller: [ "$scope", function ($scope) {
@@ -39,6 +43,9 @@ angular.module('Common.Components').component('junoToggle', {
         ctrl.$onInit = () =>
         {
             ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+            ctrl.toggleTrueValue = ctrl.toggleTrueValue || true;
+            ctrl.toggleFalseValue = ctrl.toggleFalseValue || false;
+            ctrl.showValueLabels = ctrl.showValueLabels || false;
         };
 
         ctrl.componentClasses = () =>
@@ -54,7 +61,8 @@ angular.module('Common.Components').component('junoToggle', {
             if (ctrl.change && !ctrl.disabled)
             {
                 ctrl.change({
-                    checked: ctrl.ngModel
+                    checked: ctrl.ngModel,
+                    value: ctrl.ngModel ? ctrl.toggleTrueValue : ctrl.toggleFalseValue,
                 });
             }
         }

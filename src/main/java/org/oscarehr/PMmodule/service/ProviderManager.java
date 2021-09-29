@@ -29,10 +29,10 @@ import java.util.List;
 import org.oscarehr.PMmodule.dao.AgencyDao;
 import org.oscarehr.PMmodule.dao.ProgramProviderDAO;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.PMmodule.dao.SecUserRoleDao;
+import org.oscarehr.security.dao.SecUserRoleDao;
 import org.oscarehr.PMmodule.model.Agency;
 import org.oscarehr.PMmodule.model.ProgramProvider;
-import org.oscarehr.PMmodule.model.SecUserRole;
+import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.common.model.Facility;
 import org.oscarehr.common.model.Provider;
 import org.springframework.transaction.annotation.Transactional;
@@ -125,9 +125,4 @@ public class ProviderManager
 	public List<SecUserRole> getSecUserRoles(String providerNo) {
 		return secUserRoleDao.getUserRoles(providerNo);
 	}
-
-	public void saveUserRole(SecUserRole sur) {
-		secUserRoleDao.save(sur);
-	}
-	
 }

@@ -29,16 +29,16 @@ import java.util.List;
 
 public class RestResponseValidationError extends RestResponseError
 {
-	private List<ValidationError> validationErrors;
+	private final List<ValidationError> validationErrors;
 
 	public RestResponseValidationError()
 	{
-		super();
+		super(ERROR_TYPE.VALIDATION);
 		validationErrors = new LinkedList<>();
 	}
 	public RestResponseValidationError(String message)
 	{
-		super(message);
+		super(message, ERROR_TYPE.VALIDATION);
 		validationErrors = new LinkedList<>();
 	}
 	public void addError(String path, String message)

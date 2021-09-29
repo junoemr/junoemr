@@ -99,7 +99,7 @@ angular.module('Common.Components').component('junoInput', {
 
 		ctrl.labelClasses = () =>
 		{
-			return [ctrl.labelPosition];
+			return [ctrl.labelPosition, "label-style"];
 		};
 
 		ctrl.onChange = () =>

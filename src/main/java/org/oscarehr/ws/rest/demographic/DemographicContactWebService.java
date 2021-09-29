@@ -26,6 +26,7 @@ package org.oscarehr.ws.rest.demographic;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -76,7 +77,7 @@ public class DemographicContactWebService extends AbstractServiceImpl
 																		DemographicContactFewTo1 demographicContactFewTo1)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.UPDATE, demographicId, "_demographic");
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), demographicId, Permission.DEMOGRAPHIC_READ);
 
 		DemographicContactFewTo1 updatedContact = demographicManager.updateExternalContact(demographicContactFewTo1, contactId, demographicId);
 

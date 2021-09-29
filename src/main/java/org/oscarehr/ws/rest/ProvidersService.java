@@ -27,9 +27,9 @@ package org.oscarehr.ws.rest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.dao.SecRoleDao;
+import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.SecRole;
+import org.oscarehr.security.model.SecRole;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -68,9 +68,9 @@ public class ProvidersService extends AbstractServiceImpl
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ProviderTo1> search(@QueryParam("searchText") String searchText,
-	                                                @QueryParam("searchMode") @DefaultValue("NAME") String searchMode,
-	                                                @QueryParam("page") @DefaultValue("1") Integer page,
-	                                                @QueryParam("perPage") @DefaultValue("10") Integer perPage)
+	                                        @QueryParam("searchMode") @DefaultValue("NAME") String searchMode,
+	                                        @QueryParam("page") @DefaultValue("1") Integer page,
+	                                        @QueryParam("perPage") @DefaultValue("10") Integer perPage)
 	{
 		try
 		{

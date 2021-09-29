@@ -237,7 +237,7 @@ boolean isDefaultRoleNameExist = true;
  	 	// make newly added provider by default a 'doctor' and 'primary' role
 		ProviderRoleService providerRoleService = SpringUtils.getBean(ProviderRoleService.class);
 
-		isDefaultRoleNameExist = providerRoleService.setDefaultRoleForNewProvider(provider.getProviderNo());
+		isDefaultRoleNameExist = providerRoleService.setDefaultRoleForNewProvider(provider.getId());
 	}
 
     if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable() && isOk)

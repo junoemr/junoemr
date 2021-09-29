@@ -24,10 +24,9 @@
 
 --%>
 
-<%@ page import="oscar.oscarResearch.oscarDxResearch.util.dxResearchCodingSystem"%>
-<%@ page
-	import="oscar.OscarProperties"%>
-<%@ page import="com.quatro.service.security.SecurityManager" %>
+<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.security.model.Permission" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -48,26 +47,15 @@ if(!authed) {
 }
 %>
 
-<%   
+<%
+	String user_no = (String) session.getAttribute("user");
+	String demographicIdStr = (String) pageContext.getAttribute("demographicNo");
+	Integer demographicId = (demographicIdStr != null) ? Integer.parseInt(demographicIdStr) : null;
+
+	SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	boolean disable = !securityInfoManager.hasPrivileges(user_no, demographicId, Permission.DX_UPDATE, Permission.DX_CREATE);
+	boolean showQuicklist = true; //this should be a preference setting not a permission
 	
-	//John's Question: Can't we just get rid of this to force use of the object _dx.code
-	//String disableVal = OscarProperties.getInstance().getProperty("dxResearch_disable_entry", "false");
-	//boolean disable = Boolean.valueOf(disableVal).booleanValue();
-	boolean disable;
-	SecurityManager sm = new SecurityManager();
-	
-	if(sm.hasWriteAccess("_dx.code",roleName$)) {
-		disable=false;
-	}else{
-		disable=true;
-	}
-	boolean showQuicklist=false;
-	
-	if(sm.hasWriteAccess("_dx.quicklist",roleName$)) {
-		showQuicklist=true;
-	}
-	
-    String user_no = (String) session.getAttribute("user");
     String color ="";
     int Count=0; 
     
@@ -295,7 +283,9 @@ function update_date(did, demoNo, provNo) {
 									<td class="notResolved">
                                                                             <a href="#" onclick="showdatebox(<bean:write name="diagnotics" property="dxResearchNo" />);">
                                                                                 <div id="startdate1st<bean:write name="diagnotics" property="dxResearchNo" />"><bean:write name="diagnotics" property="start_date" /></div>
-                                                                                <input id="startdatenew<bean:write name="diagnotics" property="dxResearchNo" />" type="text" name="start_date" size="8" value="<bean:write name="diagnotics" property="start_date" />" style="display:none" />
+                                                                                <input id="startdatenew<bean:write name="diagnotics" property="dxResearchNo" />"
+                                                                                       <%=disable ? "disabled='disabled'" : ""%>
+                                                                                       type="text" name="start_date" size="8" value="<bean:write name="diagnotics" property="start_date" />" style="display:none" />
                                                                             </a>
                                                                         </td>
 									<td class="notResolved">

@@ -27,25 +27,24 @@
 // c_lastVisited, formId - if the form has multiple pages
 package oscar.form;
 
-import java.util.Enumeration;
-import java.util.Properties;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.log.LogAction;
 import oscar.log.LogConst;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Enumeration;
+import java.util.Properties;
 
 public final class FrmAction extends Action {
     
@@ -56,9 +55,6 @@ public final class FrmAction extends Action {
             HttpServletResponse response) throws ServletException
     {
 		String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-
-		securityInfoManager.requireOnePrivilege(providerNo, "w", null, "_form");
-
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		int newID = 0;
 		FrmRecord rec = null;
@@ -84,6 +80,15 @@ public final class FrmAction extends Action {
 		{
 			logger.error("Ran into a problem treating formId as an integer: ", e);
 		}
+
+	    if (formId > 0)
+	    {
+		    securityInfoManager.requireAllPrivilege(providerNo, demographicNo, Permission.FORM_UPDATE);
+	    }
+	    else
+	    {
+		    securityInfoManager.requireAllPrivilege(providerNo, demographicNo, Permission.FORM_CREATE);
+	    }
 
         try {
             FrmRecordFactory recorder = new FrmRecordFactory();

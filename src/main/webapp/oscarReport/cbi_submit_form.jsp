@@ -41,7 +41,7 @@ if(!authed) {
 <%@page import="java.util.*"%>
 <%@page import="org.caisi.dao.*"%>
 <%@page import="org.caisi.model.*"%>
-<%@page import="org.oscarehr.common.dao.SecRoleDao"%>
+<%@page import="org.oscarehr.security.dao.SecRoleDao"%>
 <%@page import="org.oscarehr.common.model.*"%>
 <%@page import="org.oscarehr.PMmodule.model.*"%>
 <%@page import="org.oscarehr.PMmodule.dao.*"%>

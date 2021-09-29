@@ -29,17 +29,34 @@ import java.io.Serializable;
 @Schema(description = "Response wrapper object for error information")
 public class RestResponseError implements Serializable
 {
+	public enum ERROR_TYPE {
+		GENERIC,
+		SECURITY,
+		VALIDATION,
+	}
 	private final String message;
 	private Serializable data = null;
+	private final ERROR_TYPE type;
 
 	public RestResponseError()
 	{
-		this(null);
+		this((String) null);
 	}
 
 	public RestResponseError(String message)
 	{
+		this(message, ERROR_TYPE.GENERIC);
+	}
+
+	public RestResponseError(ERROR_TYPE type)
+	{
+		this(null, type);
+	}
+
+	public RestResponseError(String message, ERROR_TYPE type)
+	{
 		this.message = message;
+		this.type = type;
 	}
 
 	public RestResponseError(String message, Serializable data)
@@ -51,6 +68,11 @@ public class RestResponseError implements Serializable
 	public String getMessage()
 	{
 		return message;
+	}
+
+	public ERROR_TYPE getType()
+	{
+		return type;
 	}
 
 	public Serializable getData()

@@ -23,25 +23,13 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.ScheduledFuture;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.common.jobs.OscarJobExecutingManager;
 import org.oscarehr.common.jobs.OscarJobUtils;
 import org.oscarehr.common.model.OscarJob;
 import org.oscarehr.common.model.OscarJobType;
 import org.oscarehr.managers.OscarJobManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.to.OscarJobResponse;
 import org.oscarehr.ws.rest.to.OscarJobTypeResponse;
@@ -52,6 +40,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.SimpleTriggerContext;
 import org.springframework.stereotype.Component;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MultivaluedMap;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 
 @Path("/jobs")
 @Component("oscarJobService")
@@ -66,11 +66,15 @@ public class OscarJobService extends AbstractServiceImpl {
 	@GET
 	@Path("/types/current")
 	@Produces("application/json")
-	public OscarJobTypeResponse getCurrentlyAvailableJobTypes() {
+	public OscarJobTypeResponse getCurrentlyAvailableJobTypes()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TASK_READ);
+
 		List<OscarJobType> results = oscarJobManager.getCurrentlyAvaliableJobTypes();
-		
+
 		OscarJobTypeResponse response = new OscarJobTypeResponse();
-		for(OscarJobType result:results) {
+		for(OscarJobType result : results)
+		{
 			OscarJobTypeTo1 to = new OscarJobTypeTo1();
 			BeanUtils.copyProperties(result, to);
 			response.getTypes().add(to);
@@ -81,7 +85,10 @@ public class OscarJobService extends AbstractServiceImpl {
 	@GET
 	@Path("/types/all")
 	@Produces("application/json")
-	public OscarJobTypeResponse getAllJobTypes() {
+	public OscarJobTypeResponse getAllJobTypes()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TASK_READ);
+
 		List<OscarJobType> results = oscarJobManager.getAllJobTypes();
 		
 		OscarJobTypeResponse response = new OscarJobTypeResponse();
@@ -98,7 +105,10 @@ public class OscarJobService extends AbstractServiceImpl {
 	@GET
 	@Path("/all")
 	@Produces("application/json")
-	public OscarJobResponse getAllJobs() {
+	public OscarJobResponse getAllJobs()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TASK_READ);
+
 		List<OscarJob> results = oscarJobManager.getAllJobs(getLoggedInInfo());
 		
 		OscarJobResponse response = new OscarJobResponse();
@@ -125,8 +135,11 @@ public class OscarJobService extends AbstractServiceImpl {
 	@GET
 	@Path("/job/{jobId}")
 	@Produces("application/json")
-	public OscarJobResponse getJob(@PathParam("jobId")  Integer jobId) {
-		OscarJob result = oscarJobManager.getJob(getLoggedInInfo(),jobId);
+	public OscarJobResponse getJob(@PathParam("jobId") Integer jobId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TASK_READ);
+
+		OscarJob result = oscarJobManager.getJob(getLoggedInInfo(), jobId);
 		
 		OscarJobResponse response = new OscarJobResponse();
 		
@@ -144,7 +157,10 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Path("/saveJob")
 	@Produces("application/json")
 	@Consumes("application/x-www-form-urlencoded")
-	public OscarJobResponse saveJob(MultivaluedMap<String, String> params) {
+	public OscarJobResponse saveJob(MultivaluedMap<String, String> params)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TASK_CREATE);
+
 		OscarJob job = new OscarJob();
 		job.setId(Integer.parseInt(params.getFirst("job.id")));
 		job.setDescription(params.getFirst("job.description"));
@@ -187,7 +203,9 @@ public class OscarJobService extends AbstractServiceImpl {
 	@GET
 	@Path("/cancelJob")
 	@Produces("application/json")
-	public OscarJobResponse cancelJob(@QueryParam(value="jobId") Integer jobId) {
+	public OscarJobResponse cancelJob(@QueryParam(value = "jobId") Integer jobId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TASK_UPDATE);
 		
 		ScheduledFuture<Object> future = OscarJobExecutingManager.getFutures().get(jobId);
 		if(future != null) {
@@ -196,7 +214,7 @@ public class OscarJobService extends AbstractServiceImpl {
 		return getJob(jobId);
 	}
 	
-	public String getIdsAsStringList(List<String> list)
+	private String getIdsAsStringList(List<String> list)
 	{
 		StringBuilder sb=new StringBuilder();
 		
@@ -214,8 +232,10 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Path("/saveCrontabExpression")
 	@Produces("application/json")
 	@Consumes("application/x-www-form-urlencoded")
-	public OscarJobResponse saveCrontabExpression(MultivaluedMap<String, String> params) {
-		
+	public OscarJobResponse saveCrontabExpression(MultivaluedMap<String, String> params)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TASK_CREATE);
+
 		Integer jobId = null;
 		try {jobId = Integer.parseInt(params.getFirst("scheduleJobId"));}catch(NumberFormatException e){
 			//TODO-legacy: log error
@@ -281,8 +301,11 @@ public class OscarJobService extends AbstractServiceImpl {
 	@GET
 	@Path("/jobType/{jobTypeId}")
 	@Produces("application/json")
-	public OscarJobTypeResponse getJobType(@PathParam("jobTypeId")  Integer jobTypeId) {
-		OscarJobType result = oscarJobManager.getJobType(getLoggedInInfo(),jobTypeId);
+	public OscarJobTypeResponse getJobType(@PathParam("jobTypeId") Integer jobTypeId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TASK_READ);
+
+		OscarJobType result = oscarJobManager.getJobType(getLoggedInInfo(), jobTypeId);
 		
 		OscarJobTypeResponse response = new OscarJobTypeResponse();
 		
@@ -297,7 +320,10 @@ public class OscarJobService extends AbstractServiceImpl {
 	@Path("/saveJobType")
 	@Produces("application/json")
 	@Consumes("application/x-www-form-urlencoded")
-	public OscarJobTypeResponse saveJobType(MultivaluedMap<String, String> params) {
+	public OscarJobTypeResponse saveJobType(MultivaluedMap<String, String> params)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TASK_CREATE);
+
 		OscarJobType job = new OscarJobType();
 		job.setId(Integer.parseInt(params.getFirst("jobType.id")));
 		job.setName(params.getFirst("jobType.name"));
@@ -330,8 +356,11 @@ public class OscarJobService extends AbstractServiceImpl {
 	@GET
 	@Path("/enableJob")
 	@Produces("application/json")
-	public OscarJobResponse enableJob(@QueryParam(value="jobId") Integer jobId) {
-		OscarJob job = oscarJobManager.getJob(getLoggedInInfo(),jobId);
+	public OscarJobResponse enableJob(@QueryParam(value = "jobId") Integer jobId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TASK_UPDATE);
+
+		OscarJob job = oscarJobManager.getJob(getLoggedInInfo(), jobId);
 		if(job != null) {
 			job.setEnabled(true);
 		}
@@ -347,9 +376,13 @@ public class OscarJobService extends AbstractServiceImpl {
 	@GET
 	@Path("/disableJob")
 	@Produces("application/json")
-	public OscarJobResponse disableJob(@QueryParam(value="jobId") Integer jobId) {
-		OscarJob job = oscarJobManager.getJob(getLoggedInInfo(),jobId);
-		if(job != null) {
+	public OscarJobResponse disableJob(@QueryParam(value = "jobId") Integer jobId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TASK_UPDATE);
+
+		OscarJob job = oscarJobManager.getJob(getLoggedInInfo(), jobId);
+		if(job != null)
+		{
 			job.setEnabled(false);
 		}
 		oscarJobManager.updateJob(getLoggedInInfo(),job);
@@ -358,8 +391,7 @@ public class OscarJobService extends AbstractServiceImpl {
 		if(future != null) {
 			future.cancel(false);
 		}
-		
-		
+
 		return getJob(jobId);
 	}
 }

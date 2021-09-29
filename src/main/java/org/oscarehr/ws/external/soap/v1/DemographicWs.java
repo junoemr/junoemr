@@ -39,6 +39,7 @@ import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicIntegrationTransfer;
@@ -63,7 +64,8 @@ import java.util.List;
 @WebService
 @Component
 @GZIP(threshold= AbstractWs.GZIP_THRESHOLD)
-public class DemographicWs extends AbstractWs {
+public class DemographicWs extends AbstractWs
+{
 	private static Logger logger=MiscUtils.getLogger();
 
 	@Resource
@@ -94,15 +96,17 @@ public class DemographicWs extends AbstractWs {
 	 */
 	public DemographicTransfer getDemographic(Integer demographicId)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.DEMOGRAPHIC_READ);
+
 		Demographic demographic = demographicManager.getDemographic(getLoggedInInfo(), demographicId);
-		if (demographic == null)
+		if(demographic == null)
 		{
 			return null;
 		}
 		DemographicCust custResult = demographicCustDao.find(demographic.getDemographicNo());
 
 		DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
-		if (custResult != null)
+		if(custResult != null)
 		{
 			transfer.setNotes(custResult.getParsedNotes());
 		}
@@ -112,34 +116,39 @@ public class DemographicWs extends AbstractWs {
 
 	public DemographicTransfer getDemographicByMyOscarUserName(String myOscarUserName)
 	{
-		Demographic demographic=demographicManager.getDemographicByMyOscarUserName(getLoggedInInfo(),myOscarUserName);
-		return(DemographicTransfer.toTransfer(demographic));
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
+
+		Demographic demographic = demographicManager.getDemographicByMyOscarUserName(getLoggedInInfo(), myOscarUserName);
+		return (DemographicTransfer.toTransfer(demographic));
 	}
 
 	public List<DemographicTransfer> searchDemographicByName(String searchString, int startIndex, int itemsToReturn)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
+
 		List<Demographic> demographics = demographicManager.searchDemographicByName(getLoggedInInfo(), searchString, startIndex, itemsToReturn);
 		List<DemographicTransfer> transferList = new ArrayList<DemographicTransfer>();
 
-		for (Demographic demographic : demographics)
+		for(Demographic demographic : demographics)
 		{
 			DemographicCust custResult = demographicCustDao.find(demographic.getDemographicNo());
 
 			DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
-			if (custResult != null)
+			if(custResult != null)
 			{
 				transfer.setNotes(custResult.getParsedNotes());
 			}
 			transferList.add(transfer);
 		}
-
 		return (transferList);
 	}
-	
+
 	public PhrVerificationTransfer getLatestPhrVerificationByDemographic(Integer demographicId)
 	{
-		PHRVerification phrVerification=demographicManager.getLatestPhrVerificationByDemographicId(getLoggedInInfo(),demographicId);
-		return(PhrVerificationTransfer.toTransfer(phrVerification));
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.DEMOGRAPHIC_READ);
+
+		PHRVerification phrVerification = demographicManager.getLatestPhrVerificationByDemographicId(getLoggedInInfo(), demographicId);
+		return (PhrVerificationTransfer.toTransfer(phrVerification));
 	}
 	
 	/**
@@ -147,8 +156,9 @@ public class DemographicWs extends AbstractWs {
 	 */
 	public boolean isPhrVerifiedToSendMessages(Integer demographicId)
 	{
-		boolean result=demographicManager.isPhrVerifiedToSendMessages(getLoggedInInfo(),demographicId);
-		return(result);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.DEMOGRAPHIC_READ);
+
+		return demographicManager.isPhrVerifiedToSendMessages(getLoggedInInfo(), demographicId);
 	}
 
 	/**
@@ -156,16 +166,20 @@ public class DemographicWs extends AbstractWs {
 	 */
 	public boolean isPhrVerifiedToSendMedicalData(Integer demographicId)
 	{
-		boolean result=demographicManager.isPhrVerifiedToSendMedicalData(getLoggedInInfo(),demographicId);
-		return(result);		
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.DEMOGRAPHIC_READ);
+
+		return demographicManager.isPhrVerifiedToSendMedicalData(getLoggedInInfo(), demographicId);
 	}
 	
 	/**
 	 * see DemographicManager.searchDemographicsByAttributes for parameter details
 	 */
-	public DemographicTransfer[] searchDemographicsByAttributes(String hin, String firstName, String lastName, Gender gender, Calendar dateOfBirth, String city, String province, String phone, String email, String alias, int startIndex, int itemsToReturn) {
-		List<Demographic> demographics=demographicManager.searchDemographicsByAttributes(getLoggedInInfo(),hin, firstName, lastName, gender, dateOfBirth, city, province, phone, email, alias, startIndex, itemsToReturn);
-		return(DemographicTransfer.toTransfers(demographics));	
+	public DemographicTransfer[] searchDemographicsByAttributes(String hin, String firstName, String lastName, Gender gender, Calendar dateOfBirth, String city, String province, String phone, String email, String alias, int startIndex, int itemsToReturn)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
+
+		List<Demographic> demographics = demographicManager.searchDemographicsByAttributes(getLoggedInInfo(), hin, firstName, lastName, gender, dateOfBirth, city, province, phone, email, alias, startIndex, itemsToReturn);
+		return (DemographicTransfer.toTransfers(demographics));
 	}
 	
 	/**
@@ -173,44 +187,52 @@ public class DemographicWs extends AbstractWs {
 	 */
 	public Integer[] getAdmittedDemographicIdsByProgramProvider(Integer programId, String providerNo)
 	{
-		logger.debug("programId="+programId+", providerNo="+providerNo);
-		List<Integer> results=demographicManager.getAdmittedDemographicIdsByProgramAndProvider(getLoggedInInfo(), programId, providerNo);
-		return(results.toArray(new Integer[0]));
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
+
+		logger.debug("programId=" + programId + ", providerNo=" + providerNo);
+		List<Integer> results = demographicManager.getAdmittedDemographicIdsByProgramAndProvider(getLoggedInInfo(), programId, providerNo);
+		return (results.toArray(new Integer[0]));
 	}
 	
 	public Integer[] getDemographicIdsWithMyOscarAccounts(@WebParam(name="startDemographicIdExclusive") Integer startDemographicIdExclusive,
 	                                                      @WebParam(name="itemsToReturn") int itemsToReturn)
 	{
-		List<Integer> results=demographicManager.getDemographicIdsWithMyOscarAccounts(getLoggedInInfo(), startDemographicIdExclusive, itemsToReturn);
-		return(results.toArray(new Integer[0]));
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
+
+		List<Integer> results = demographicManager.getDemographicIdsWithMyOscarAccounts(getLoggedInInfo(), startDemographicIdExclusive, itemsToReturn);
+		return (results.toArray(new Integer[0]));
 	}
-	
+
 	public DemographicTransfer[] getDemographics(Integer[] demographicIds)
 	{
-		ArrayList<Integer> ids=new ArrayList<Integer>();
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
+
+		ArrayList<Integer> ids = new ArrayList<Integer>();
 		for(Integer i : demographicIds)
 		{
 			ids.add(i);
 		}
-		
-		List<Demographic> demographics=demographicManager.getDemographics(getLoggedInInfo(),ids);
-		return(DemographicTransfer.toTransfers(demographics));	
+
+		List<Demographic> demographics = demographicManager.getDemographics(getLoggedInInfo(), ids);
+		return (DemographicTransfer.toTransfers(demographics));
 	}
 
 	public List getDemographicsByHealthNum(String hin)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
+
 		List<Demographic> demographicList = demographicManager.getDemographicsByHealthNum(hin);
 
 		Iterator<Demographic> demographicListIterator = demographicList.iterator();
 		List<DemographicTransfer> out = new ArrayList<DemographicTransfer>();
-		while (demographicListIterator.hasNext())
+		while(demographicListIterator.hasNext())
 		{
 			Demographic demographic = demographicListIterator.next();
 
 			DemographicCust custResult = demographicCustDao.find(demographic.getDemographicNo());
 
 			DemographicTransfer transfer = DemographicTransfer.toTransfer(demographic);
-			if (custResult != null)
+			if(custResult != null)
 			{
 				transfer.setNotes(custResult.getParsedNotes());
 			}
@@ -229,6 +251,7 @@ public class DemographicWs extends AbstractWs {
 	 */
 	public DemographicTransfer getDemographicByHealthNumber(String healthNumber, String versionCode) throws Exception
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		if (healthNumber == null || healthNumber.isEmpty())
 		{
@@ -251,6 +274,8 @@ public class DemographicWs extends AbstractWs {
 	public Integer addDemographic(DemographicTransfer demographicTransfer,
 	                              @Nullable DemographicIntegrationTransfer integrationTransfer) throws Exception
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_CREATE);
+
 		MessageContext mc = wsContext.getMessageContext();
 		HttpServletRequest req = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
@@ -281,6 +306,8 @@ public class DemographicWs extends AbstractWs {
 
 	public void updateDemographic(DemographicTransfer demographicTransfer) throws Exception
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicTransfer.getDemographicNo(), Permission.DEMOGRAPHIC_UPDATE);
+
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 
 		Demographic demographic = new Demographic();
@@ -313,13 +340,15 @@ public class DemographicWs extends AbstractWs {
 	 */
 	public List<DemographicContact> getDemographicContact(int demographicNo, int type) throws Exception
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.DEMOGRAPHIC_READ);
+
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		if (demographicManager.getDemographic(loggedInInfo, demographicNo) == null)
+		if(demographicManager.getDemographic(loggedInInfo, demographicNo) == null)
 		{
 			throw new Exception("Demographic " + demographicNo + " doesn't exist.");
 		}
 
-		if (!(type == DemographicContact.TYPE_PROVIDER
+		if(!(type == DemographicContact.TYPE_PROVIDER
 				|| type == DemographicContact.TYPE_DEMOGRAPHIC
 				|| type == DemographicContact.TYPE_CONTACT
 				|| type == DemographicContact.TYPE_PROFESSIONALSPECIALIST))
@@ -336,6 +365,8 @@ public class DemographicWs extends AbstractWs {
 
 	public EligibilityCheckTransfer checkEligibility(DemographicTransfer demographicTransfer)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicTransfer.getDemographicNo(), Permission.DEMOGRAPHIC_READ);
+
 		EligibilityCheckTransfer transfer;
 		try
 		{
