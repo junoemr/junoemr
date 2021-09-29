@@ -32,7 +32,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-import static org.oscarehr.olis.OLISPollingUtil.OLIS_DATE_FORMAT;
+import static org.oscarehr.olis.service.OLISPollingService.OLIS_DATE_FORMAT;
 import static oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE;
 
 /**

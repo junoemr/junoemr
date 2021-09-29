@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.olis;
+package org.oscarehr.olis.service;
 
 import com.indivica.olis.Driver;
 import com.indivica.olis.parameters.OBR22;
@@ -39,6 +39,7 @@ import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.olis.OLISUtils;
 import org.oscarehr.olis.dao.OLISProviderPreferencesDao;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.exception.OLISAckFailedException;
@@ -48,7 +49,8 @@ import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
 import oscar.util.ConversionUtils;
@@ -65,25 +67,37 @@ import java.util.Optional;
 import static oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE;
 import static oscar.oscarLab.ca.all.upload.handlers.OLISHL7Handler.ALL_DUPLICATES_MARKER;
 
-public class OLISPollingUtil
+@Service
+public class OLISPollingService
 {
 	public static final String OLIS_DATE_FORMAT = "yyyyMMddHHmmssZ";
+
+	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties props = OscarProperties.getInstance();
 	private static final int DEFAULT_FETCH_PERIOD_MONTHS = 1;
 	private static final int MAX_FETCH_PERIOD_MONTHS = Integer.parseInt(props.getProperty("olis_max_fetch_months", "12")); //max 12
-	private static final Logger logger = MiscUtils.getLogger();
 
-	private static final ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
-	private static final OLISSystemPreferencesDao olisSystemPreferencesDao =  SpringUtils.getBean(OLISSystemPreferencesDao.class);
-	private static final OLISProviderPreferencesDao olisProviderPreferencesDao =  SpringUtils.getBean(OLISProviderPreferencesDao.class);
-	private static final UserPropertyDAO userPropertyDAO = SpringUtils.getBean(UserPropertyDAO.class);
+	@Autowired
+	private ProviderDataDao providerDao;
 
-	public OLISPollingUtil()
+	@Autowired
+	private OLISSystemPreferencesDao olisSystemPreferencesDao;
+
+	@Autowired
+	private OLISProviderPreferencesDao olisProviderPreferencesDao;
+
+	@Autowired
+	private UserPropertyDAO userPropertyDAO;
+
+	@Autowired
+	private LabHandlerService labHandlerService;
+
+	public OLISPollingService()
 	{
 		super();
 	}
 	
-	public static void requestResults(LoggedInInfo loggedInInfo)
+	public void requestResults(LoggedInInfo loggedInInfo)
 	{
 	    pollZ04Query(loggedInInfo);
 	    
@@ -98,7 +112,7 @@ public class OLISPollingUtil
 	 * Query OLIS by provider
 	 * @param loggedInInfo - current user info
 	 */
-	private static void pollZ04Query(LoggedInInfo loggedInInfo)
+	private void pollZ04Query(LoggedInInfo loggedInInfo)
 	{
 		//Z04Query providerQuery;
 		List<ProviderData> allProvidersList = providerDao.findByActiveStatus(true);
@@ -144,7 +158,7 @@ public class OLISPollingUtil
 		}
 	}
 
-	private static void pollZ06Query(LoggedInInfo loggedInInfo, String facilityId)
+	private void pollZ06Query(LoggedInInfo loggedInInfo, String facilityId)
 	{
 		try
 		{
@@ -167,7 +181,7 @@ public class OLISPollingUtil
 		}
 	}
 
-	private static OLISProviderPreferences findOrCreateOLISProviderPrefs(@NotNull String providerId)
+	private OLISProviderPreferences findOrCreateOLISProviderPrefs(@NotNull String providerId)
 	{
 		OLISProviderPreferences olisProviderPreferences = olisProviderPreferencesDao.findById(providerId);
 		if(olisProviderPreferences == null)
@@ -178,7 +192,7 @@ public class OLISPollingUtil
 		return olisProviderPreferences;
 	}
 
-	private static void updateProviderStartTime(@NotNull OLISProviderPreferences olisProviderPreferences, String timeStampForNextStartDate)
+	private void updateProviderStartTime(@NotNull OLISProviderPreferences olisProviderPreferences, String timeStampForNextStartDate)
 	{
 		if(StringUtils.isNotBlank(timeStampForNextStartDate) && !ALL_DUPLICATES_MARKER.equals(timeStampForNextStartDate))
 		{
@@ -188,7 +202,7 @@ public class OLISPollingUtil
 		olisProviderPreferencesDao.saveEntity(olisProviderPreferences);
 	}
 
-	private static String queryAndImportDateRange(LoggedInInfo loggedInInfo, DateRangeQuery query, ZonedDateTime startDateTime, ZonedDateTime endDateTime) throws Exception
+	private String queryAndImportDateRange(LoggedInInfo loggedInInfo, DateRangeQuery query, ZonedDateTime startDateTime, ZonedDateTime endDateTime) throws Exception
 	{
 		OBR22 obr22 = buildRequestStartEndTimestamp(startDateTime, endDateTime);
 		query.setStartEndTimestamp(obr22);
@@ -207,7 +221,7 @@ public class OLISPollingUtil
 		GenericFile labTempFile = writeLabFileTempFile(response);
 		try
 		{
-			timeStampForNextStartDate = OLISPollingUtil.parseAndImportResponse(loggedInInfo, labTempFile);
+			timeStampForNextStartDate = parseAndImportResponse(loggedInInfo, labTempFile);
 
 			// force recursive call attempt if response has labs but all are duplicates. Otherwise polling will get stuck.
 			if(ALL_DUPLICATES_MARKER.equals(timeStampForNextStartDate))
@@ -244,7 +258,7 @@ public class OLISPollingUtil
 		return timeStampForNextStartDate;
 	}
 
-	private static String queryAndImportNextDateRange(LoggedInInfo loggedInInfo, DateRangeQuery query, ZonedDateTime startDateTime, ZonedDateTime endDateTime) throws Exception
+	private String queryAndImportNextDateRange(LoggedInInfo loggedInInfo, DateRangeQuery query, ZonedDateTime startDateTime, ZonedDateTime endDateTime) throws Exception
 	{
 		String timeStampForNextStartDate = null;
 		ZonedDateTime nextStartDateTime = Optional.ofNullable(endDateTime).orElse(startDateTime.plusMonths(MAX_FETCH_PERIOD_MONTHS));
@@ -260,14 +274,14 @@ public class OLISPollingUtil
 		return timeStampForNextStartDate;
 	}
 
-	private static GenericFile writeLabFileTempFile(String response) throws Exception
+	private GenericFile writeLabFileTempFile(String response) throws Exception
 	{
 		//Get HL7 Content from xml
 		String responseContent =  OLISUtils.getOLISResponseContent(response);
 		return FileFactory.createTempFile(new ByteArrayInputStream(responseContent.getBytes(StandardCharsets.UTF_8)), "-olis-response.hl7");
 	}
 
-	private static String parseAndImportResponse(LoggedInInfo loggedInInfo, GenericFile labTempFile) throws Exception
+	private String parseAndImportResponse(LoggedInInfo loggedInInfo, GenericFile labTempFile) throws Exception
 	{
 		String labType = OLIS_MESSAGE_TYPE;
 		String serviceName = "OLIS_HL7";
@@ -275,7 +289,6 @@ public class OLISPollingUtil
 		logger.debug("Lab Type: " + labType);
 		logger.debug("Lab file path: " + labTempFile.getPath());
 
-		LabHandlerService labHandlerService = SpringUtils.getBean(LabHandlerService.class);
 		String timeStringForNextStartDate = labHandlerService.importLab(
 				labType,
 				loggedInInfo,
@@ -290,7 +303,7 @@ public class OLISPollingUtil
 		return timeStringForNextStartDate;
 	}
 
-	private static Pair<ZonedDateTime, ZonedDateTime> findStartEndTimestamps(@NotNull OLISProviderPreferences olisProviderPreferences)
+	private Pair<ZonedDateTime, ZonedDateTime> findStartEndTimestamps(@NotNull OLISProviderPreferences olisProviderPreferences)
 	{
 		OLISSystemPreferences olisSystemPreferences = olisSystemPreferencesDao.getPreferences();
 		Optional<String> optionalDefaultStartTime = Optional.ofNullable(StringUtils.trimToNull(olisSystemPreferences.getStartTime()));

@@ -13,6 +13,7 @@ import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
+import org.oscarehr.olis.service.OLISPollingService;
 import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -32,6 +33,11 @@ import java.util.Date;
 @Service
 public class OLISSchedulerJob
 {
+	private static final Logger logger = MiscUtils.getLogger();
+
+	@Autowired
+	private OLISPollingService olisPollingService;
+
 	@Autowired
 	private OLISSystemPreferencesDao olisPrefDao;
 
@@ -40,8 +46,6 @@ public class OLISSchedulerJob
 
 	@Autowired
 	private SecurityDao securityDao;
-
-	private static final Logger logger = MiscUtils.getLogger();
 
 	// olis recommends 30 minute polling interval
 	private static final int DEFAULT_POLLING_FREQUENCY = 30; // minutes
@@ -101,7 +105,7 @@ public class OLISSchedulerJob
 			loggedInInfo.setLoggedInProvider(providerDao.getProvider("999998"));
 			loggedInInfo.setLoggedInSecurity(securityDao.getByProviderNo("999998"));
 
-			OLISPollingUtil.requestResults(loggedInInfo);
+			olisPollingService.requestResults(loggedInInfo);
 			logger.info("===== OLIS JOB COMPLETE....");
 		}
 		catch(Exception e)

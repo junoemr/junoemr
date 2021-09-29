@@ -40,7 +40,7 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 			ctrl.$onInit = async () =>
 			{
 				ctrl.loadingQueue.pushLoadingState();
-				ctrl.pollingEnabled = await systemPreferenceService.getPreference(ctrl.pollingPropName, false);
+				ctrl.pollingEnabled = await systemPreferenceService.isPreferenceEnabled(ctrl.pollingPropName, false);
 				ctrl.loadingQueue.popLoadingState();
 			}
 
