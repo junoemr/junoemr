@@ -24,6 +24,7 @@ package org.oscarehr.ws.rest;
 
 import org.oscarehr.fax.schedulingTasks.InboundFaxSchedulingTask;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,8 +50,7 @@ public class FaxInboundWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<LocalDateTime> getNextPullTime()
 	{
-		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.READ, null, "_admin", "_admin.fax");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_READ);
 
 		return RestResponse.successResponse(inboundFaxSchedulingTask.getNextRunTime());
 	}

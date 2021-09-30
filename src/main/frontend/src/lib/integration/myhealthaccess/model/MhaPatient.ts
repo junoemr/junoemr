@@ -25,6 +25,7 @@ export default class MhaPatient
 	protected _city: string;
 	protected _address: string;
 	protected _province: Province;
+	protected _hasVoipToken: boolean;
 
 	protected _linkStatus: LinkStatus;
 	protected _canMessage: boolean;
@@ -132,6 +133,11 @@ export default class MhaPatient
 	set province(value: Province)
 	{
 		this._province = value;
+	}
+
+	set hasVoipToken(value: boolean)
+	{
+		this._hasVoipToken = value;
 	}
 
 	set linkStatus(value: LinkStatus)
@@ -247,6 +253,11 @@ export default class MhaPatient
 	get fullAddress(): string
 	{
 		return `${this.address ? this._address : ''} ${this.city ? this.city : ''}, ${this.province ? this.province : ''}`
+	}
+
+	get hasVoipToken(): boolean
+	{
+		return this._hasVoipToken;
 	}
 
 	get linkStatus(): LinkStatus

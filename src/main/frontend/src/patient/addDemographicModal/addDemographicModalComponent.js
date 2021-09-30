@@ -13,7 +13,6 @@ angular.module('Patient').component('addDemographicModal', {
 		'$httpParamSerializer',
 		'staticDataService',
 		'demographicService',
-		'programService',
 		'providerService',
 		function (
 			$scope,
@@ -21,7 +20,6 @@ angular.module('Patient').component('addDemographicModal', {
 			$httpParamSerializer,
 			staticDataService,
 			demographicService,
-			programService,
 			providerService)
 	{
 		let ctrl = this;
@@ -67,22 +65,6 @@ angular.module('Patient').component('addDemographicModal', {
 
 		ctrl.$onInit = () =>
 		{
-			//get programs to be selected
-			programService.getPrograms().then(
-				function success(results)
-				{
-					ctrl.programs = results;
-					if (ctrl.programs.length === 1)
-					{
-						ctrl.newDemographicData.admissionProgramId = ctrl.programs[0].id;
-					}
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				}
-			);
-
 			// Pull phone prefix from Oscar Properties file
 			ctrl.systemPreferenceApi.getPreferenceValue("phone_prefix", "").then(
 				function success(results)

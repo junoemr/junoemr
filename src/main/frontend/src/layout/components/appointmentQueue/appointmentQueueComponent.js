@@ -205,12 +205,14 @@ angular.module('Layout.Components').component('appointmentQueue', {
 		{
 			try
 			{
-				let reason = await Juno.Common.Util.openInputDialog($uibModal,
-				                                       "Delete Queued Appointment?",
-				                                       "Please provide a reason as to why you are deleting this appointment.",
-				                                       ctrl.componentStyle,
-				                                       "Proceed",
-						                       1024);
+				let reason = await Juno.Common.Util.openInputDialog(
+					$uibModal,
+					"Delete Queued Appointment?",
+					"Please provide a reason as to why you are deleting this appointment.",
+					ctrl.componentStyle,
+					"Proceed",
+					"Please enter reason here",
+					1024);
 				if (reason)
 				{
 					try

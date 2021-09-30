@@ -156,8 +156,8 @@ maybe use jquery/ajax to post this data instead of submitting a form to send ALL
 
 
     String flowSheet = mFlowsheet.getDisplayName();
-    ArrayList<String> warnings = mi.getWarnings();
-    ArrayList<String> recomendations = mi.getRecommendations();
+    List<String> warnings = mi.getWarnings();
+    List<String> recomendations = mi.getRecommendations();
     ArrayList comments = new ArrayList();
 
 %>

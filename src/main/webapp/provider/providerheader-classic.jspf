@@ -266,12 +266,6 @@ function popupPage2(varpage) {
    </caisi:isModuleLoad>
 </li>
 </security:oscarSec>
-<oscar:oscarPropertiesCheck property="OSCAR_LEARNING" value="yes">
-<li>
-    <a HREF="#" ONCLICK ="popupPage2('<%=request.getContextPath()%>/oscarLearning/CourseView.jsp','<bean:message key="global.courseview"/>');return false;" TITLE='<bean:message key="global.courseview"/>'>
-	<span id="oscar_courseview"><bean:message key="global.btncourseview"/></span></a>
-</li>
-</oscar:oscarPropertiesCheck>
 
 <oscar:oscarPropertiesCheck property="WORKFLOW" value="yes">
    <li><a href="javascript: function myFunction() {return false; }" onClick="popupPage2('<%=request.getContextPath()%>/oscarWorkflow/WorkFlowList.jsp','<bean:message key="global.workflow"/>')"><bean:message key="global.btnworkflow"/></a></li>

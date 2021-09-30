@@ -33,6 +33,7 @@ import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.model.Billingreferral;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.conversion.referralDoctor.ReferralDoctorBCToTransferConverter;
 import org.oscarehr.ws.rest.conversion.referralDoctor.ReferralDoctorONToTransferConverter;
 import org.oscarehr.ws.rest.conversion.referralDoctor.ReferralDoctorProviderToTransferConverter;
@@ -85,6 +86,8 @@ public class ReferralDoctorsService extends AbstractServiceImpl
 	                                                                       @QueryParam("page") @DefaultValue("1") Integer page,
 	                                                                       @QueryParam("perPage") @DefaultValue("10") Integer perPage)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONSULTATION_READ);
+
 		logger.debug("SEARCH REFERRAL DOCS: '" + searchName + "', '" + searchRefNo + "', " + page + ", " + perPage);
 		try
 		{

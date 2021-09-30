@@ -32,13 +32,17 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import com.quatro.model.security.Secrole;
 
+/**
+ * @deprecated use jpa version instead
+ */
+@Deprecated
 public class SecroleDao extends HibernateDaoSupport {
 
-    private Logger logger = MiscUtils.getLogger();
+    private static final Logger logger = MiscUtils.getLogger();
 
     public List<Secrole> getRoles() {
         @SuppressWarnings("unchecked")
-        List<Secrole> results = (List<Secrole>) this.getHibernateTemplate().find("from Secrole r order by roleName");
+        List<Secrole> results = (List<Secrole>) this.getHibernateTemplate().find("from Secrole r where deleted_at IS NULL order by roleName");
 
         logger.debug("getRoles: # of results=" + results.size());
 
@@ -55,26 +59,6 @@ public class SecroleDao extends HibernateDaoSupport {
         logger.debug("getRole: id=" + id + ",found=" + (result != null));
 
         return result;
-    }
-
-    public Secrole getRoleByName(String roleName) {
-    	Secrole result = null;
-    	if (roleName == null || roleName.length() <= 0) {
-            throw new IllegalArgumentException();
-        }
-
-        List lst = this.getHibernateTemplate().find("from Secrole r where r.roleName='" + roleName + "'");
-        if(lst != null && lst.size() > 0)
-        	result = (Secrole) lst.get(0);
-
-        logger.debug("getRoleByName: roleName=" + roleName + ",found=" + (result != null));
-
-        return result;
-    }
-
-
-    public List getDefaultRoles() {
-        return this.getHibernateTemplate().find("from Secrole r where r.userDefined=0");
     }
 
     public void save(Secrole secrole) {

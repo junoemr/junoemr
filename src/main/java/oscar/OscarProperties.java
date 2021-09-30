@@ -423,10 +423,6 @@ public class OscarProperties extends Properties {
 		return oscarProperties.getProperty("buildtag");
 	}
 
-	public boolean isOscarLearning() {
-		return isPropertyActive("OSCAR_LEARNING");
-	}
-
 	/** for legacy faxing setup, use the outboundFaxService check */
 	public boolean isFaxEnabled()
 	{

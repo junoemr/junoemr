@@ -36,17 +36,15 @@ public class FrmRecordFactory {
         String fullName = "oscar.form.Frm" + which + "Record"; // keyword - form_name get reference to the class
         FrmRecord myClass = null;
 
-        try {
+        try
+        {
             Class classDefinition = Class.forName( fullName );
             myClass = (FrmRecord) classDefinition.newInstance();
-        } catch (InstantiationException e) {
-            MiscUtils.getLogger().debug("debug", e);
-        } catch (IllegalAccessException e) {
-            MiscUtils.getLogger().debug("debug", e);
-        } catch (ClassNotFoundException e) {
-            MiscUtils.getLogger().debug("debug", e);
         }
-
+        catch (InstantiationException | IllegalAccessException | ClassNotFoundException e)
+        {
+            MiscUtils.getLogger().error("error", e);
+        }
         return myClass;
     }
 }

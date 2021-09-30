@@ -30,6 +30,7 @@ import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicListConverter;
@@ -99,8 +100,7 @@ public class DemographicsWs extends AbstractExternalRestWs
 			@QueryParam("providerNo") String searchProviderNo
 	)
 	{
-		String providerNoStr = getOAuthProviderNo();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.READ, null, "_demographic");
+		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), Permission.DEMOGRAPHIC_READ);
 
 		if(parametersAllNull(firstName, lastName, hin, sex, dateOfBirthStr, address, chartNo, phone, searchProviderNo))
 		{

@@ -26,11 +26,6 @@
 package oscar.oscarPrevention;
 
 //import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.net.URL;
-
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -44,8 +39,12 @@ import org.oscarehr.decisionSupport.prevention.DSPreventionDrools;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import oscar.OscarProperties;
+
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.URL;
 
 /**
  *
@@ -55,7 +54,7 @@ import oscar.OscarProperties;
 public class PreventionDS {
    private static Logger log = MiscUtils.getLogger();
    static boolean loaded = false;
-   static RuleBase ruleBase = null;
+   public static RuleBase ruleBase = null;
    
    @Autowired
    private ResourceStorageDao resourceStorageDao;// = SpringUtils.getBean(ResourceStorageDao.class);
@@ -127,7 +126,6 @@ public class PreventionDS {
       }
       loaded = true;             
    }
-   
    
    public Prevention getMessages(Prevention p) throws FactException
    {

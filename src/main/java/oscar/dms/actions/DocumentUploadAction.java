@@ -26,6 +26,7 @@ import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -59,7 +60,7 @@ public class DocumentUploadAction extends DispatchAction
 		DocumentUploadForm fm = (DocumentUploadForm) form;
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, Permission.DOCUMENT_CREATE);
 		logger.info("BEGIN DOCUMENT UPLOAD");
 
 		HashMap<String, Object> responseMap = new HashMap<>();

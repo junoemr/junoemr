@@ -25,12 +25,20 @@
 package org.oscarehr.measurements.service;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.model.Measurement;
+import org.oscarehr.common.model.Validations;
+import org.oscarehr.dataMigration.converter.out.MeasurementDbToModelConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.oscarEncounter.oscarMeasurements.pageUtil.EctValidation;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 @Component
 public class MeasurementsService
@@ -38,7 +46,16 @@ public class MeasurementsService
 	@Autowired
 	protected MeasurementDao measurementDao;
 
+	@Autowired
+	protected MeasurementDbToModelConverter measurementDbToModelConverter;
+
 	public MeasurementsService() {}
+
+	public List<org.oscarehr.dataMigration.model.measurement.Measurement> getMeasurements(Integer demographicId)
+	{
+		List<Measurement> measurements = measurementDao.findByDemographicId(demographicId);
+		return measurementDbToModelConverter.convert(measurements);
+	}
 
 	/**
 	 * create a new measurement
@@ -56,9 +73,9 @@ public class MeasurementsService
 		Measurement newMeasurement = new Measurement();
 		newMeasurement.setCreateDate(new Date());
 		newMeasurement.setDateObserved(obsDate);
-		newMeasurement.setComments(comment);
+		newMeasurement.setComments(StringUtils.trimToEmpty(comment));
 		newMeasurement.setDataField(observation);
-		newMeasurement.setMeasuringInstruction(measuringInstruction);
+		newMeasurement.setMeasuringInstruction(StringUtils.trimToEmpty(measuringInstruction));
 		newMeasurement.setDemographicId(demographicNo);
 		newMeasurement.setProviderNo(providerNo);
 		newMeasurement.setType(type);
@@ -94,5 +111,88 @@ public class MeasurementsService
 	public Measurement createNewMeasurement(Integer demographicNo, String providerNo, String type, String observation, Date obsDate)
 	{
 		return createNewMeasurement(demographicNo, providerNo, type, observation, "", obsDate, org.oscarehr.dataMigration.model.measurement.Measurement.DEFAULT_COMMENT);
+	}
+
+	public Measurement createNewMeasurementAndPersist(Integer demographicNo, String providerNo, String type, String observation, Date obsDate, String comment)
+	{
+		Measurement measurement = createNewMeasurement(demographicNo, providerNo, type, observation, null, obsDate, comment);
+		measurementDao.persist(measurement);
+		return measurement;
+	}
+
+	public List<String> getValidationErrors(String inputType, String inputValue)
+	{
+		EctValidation ectValidation = new EctValidation();
+		List<Validations> validations = ectValidation.getValidationType(inputType, null);
+		return getValidationErrors(inputType, inputValue, ectValidation, validations);
+	}
+
+	private List<String> getValidationErrors(String inputType, String inputValue, EctValidation ectValidation, List<Validations> validations)
+	{
+		List<Validations> validationsWithoutDuplicates = validations.stream().distinct().collect(Collectors.toList());
+
+		List<String> validationErrors = new LinkedList<>();
+		for(Validations validation : validationsWithoutDuplicates)
+		{
+			Double dMax = validation.getMaxValue();
+			Double dMin = validation.getMinValue();
+			Integer iMax = validation.getMaxLength();
+			Integer iMin = validation.getMinLength();
+			String regExp = validation.getRegularExp();
+
+			ResourceBundle resourceBundle = ResourceBundle.getBundle("oscarResources");
+			if (!ectValidation.isInRange(dMax, dMin, inputValue))
+			{
+				validationErrors.add(formatResourceString(resourceBundle, "errors.range", inputType, Double.toString(dMin), Double.toString(dMax)));
+			}
+
+			if (!ectValidation.maxLength(iMax, inputValue))
+			{
+				validationErrors.add(formatResourceString(resourceBundle, "errors.maxlength", inputType, Integer.toString(iMax)));
+			}
+
+			if (!ectValidation.minLength(iMin, inputValue))
+			{
+				validationErrors.add(formatResourceString(resourceBundle, "errors.minlength", inputType, Integer.toString(iMin)));
+			}
+
+			if (!ectValidation.matchRegExp(regExp, inputValue))
+			{
+				validationErrors.add(formatResourceString(resourceBundle, "errors.invalid", inputType));
+			}
+
+			if (!ectValidation.isValidBloodPressure(regExp, inputValue))
+			{
+				validationErrors.add(formatResourceString(resourceBundle, "error.bloodPressure"));
+			}
+
+//			if (!ectValidation.isDate(measurement.getDateObserved()) && inputValue.compareTo("")!=0)
+//			{
+//				errors.add(inputType, new ActionMessage("errors.invalidDate", inputType));
+//			}
+		}
+		return validationErrors;
+	}
+
+	/**
+	 * need to format the resource string due to legacy use.
+	 * @param resourceBundle the resource bundle
+	 * @param key the resource key
+	 * @param values values to inject, custom string interpolation
+	 * @return formatted string
+	 */
+	private String formatResourceString(ResourceBundle resourceBundle , String key, String... values)
+	{
+		String resource = resourceBundle.getString(key);
+
+		if(values != null)
+		{
+			for(int i = 0; i < values.length; i++)
+			{
+				resource = resource.replaceAll("\\{" + i + "\\}", values[i]);
+			}
+		}
+		resource = resource.replaceAll("<\\/*li>", "");
+		return resource;
 	}
 }

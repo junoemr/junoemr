@@ -34,6 +34,7 @@ import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.AppManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.preferences.service.SystemPreferenceService;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -80,12 +81,13 @@ public class AppService extends AbstractServiceImpl {
 	
 	@Autowired
 	private SystemPreferenceService systemPreferenceService;
-	
+
 	@GET
 	@Path("/getApps/")
 	@Produces("application/json")
-	public List<AppDefinitionTo1> getApps() {
-		return appManager.getAppDefinitions(getLoggedInInfo());		
+	public List<AppDefinitionTo1> getApps()
+	{
+		return appManager.getAppDefinitions(getLoggedInInfo());
 	}
 
 	@GET
@@ -93,9 +95,10 @@ public class AppService extends AbstractServiceImpl {
 	@Produces("application/json")
 	public RestResponse<Boolean> isK2AActive()
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.K2A_READ);
 		boolean k2aEnabled = systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_KNOW2ACT_ENABLED, false);
 		boolean k2aInit = appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null;
-		
+
 		return RestResponse.successResponse(k2aEnabled && k2aInit);
 	}
 	
@@ -103,10 +106,9 @@ public class AppService extends AbstractServiceImpl {
 	@Path("/K2AInit/")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public RestResponse<String> initK2A(JSONObject k2aClinicTo1, @Context HttpServletRequest request) {
-		if (!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_appDefinition", "w", null)) {
-			return RestResponse.errorResponse("Access Denied");
-		}
+	public RestResponse<String> initK2A(JSONObject k2aClinicTo1, @Context HttpServletRequest request)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.K2A_CREATE);
 
 		if (appManager.getAppDefinition(getLoggedInInfo(), "K2A") != null) {
 			return RestResponse.errorResponse("K2A Already Initialized");
@@ -179,7 +181,10 @@ public class AppService extends AbstractServiceImpl {
 	@Path("/comment")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestSearchResponse<RssItem> postK2AComment(RssItem comment) {
+	public RestSearchResponse<RssItem> postK2AComment(RssItem comment)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.K2A_CREATE);
+
 		int total = 0;
 
 		RSSResponse response = new RSSResponse();
@@ -238,8 +243,12 @@ public class AppService extends AbstractServiceImpl {
 	@Path("/comment/{commentId}")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<Date> removeK2AComment(@PathParam("commentId") String commentId) {
-		try {
+	public RestResponse<Date> removeK2AComment(@PathParam("commentId") String commentId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.K2A_DELETE);
+
+		try
+		{
 			AppDefinitionDao appDefinitionDao = SpringUtils.getBean(AppDefinitionDao.class);
 	    	AppUserDao appUserDao = SpringUtils.getBean(AppUserDao.class);
 	    		

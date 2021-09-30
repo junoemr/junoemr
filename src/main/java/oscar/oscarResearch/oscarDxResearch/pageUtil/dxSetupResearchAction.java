@@ -33,6 +33,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
@@ -52,9 +53,7 @@ public final class dxSetupResearchAction extends Action {
 			throws Exception {
 
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_dxresearch", "r", null)) {
-			throw new RuntimeException("missing required security object (_dxresearch)");
-		}
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.DX_READ);
 
 		dxResearchCodingSystem codingSys = new dxResearchCodingSystem();
 		String demographicNo = request.getParameter("demographicNo");

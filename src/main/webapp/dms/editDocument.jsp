@@ -29,7 +29,7 @@
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
 	boolean authed = true;
 %>
-<security:oscarSec roleName="<%=roleName$%>" objectName="_edoc" rights="w" reverse="<%=true%>">
+<security:oscarSec roleName="<%=roleName$%>" objectName="_edoc" rights="u" reverse="<%=true%>">
 	<%authed = false; %>
 	<%response.sendRedirect("../securityError.jsp?type=_edoc");%>
 </security:oscarSec>

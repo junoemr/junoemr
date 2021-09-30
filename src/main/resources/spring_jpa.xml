@@ -122,6 +122,7 @@
 
 	<!-- Managed Beans -->
 	<context:component-scan base-package="org.oscarehr.appointment.dao" />
+	<context:component-scan base-package="org.oscarehr.careTracker" />
 	<context:component-scan base-package="org.oscarehr.clinic" />
 	<context:component-scan base-package="org.oscarehr.common.dao" />
 	<context:component-scan base-package="org.oscarehr.common.server" />
@@ -139,9 +140,11 @@
 	<context:component-scan base-package="org.oscarehr.PMmodule.dao" />
 	<context:component-scan base-package="org.oscarehr.dashboard.dao" />
 	<context:component-scan base-package="org.oscarehr.provider" />
+	<context:component-scan base-package="org.oscarehr.careTrackerDecisionSupport" />
 	<context:component-scan base-package="org.oscarehr.demographic" />
 	<context:component-scan base-package="org.oscarehr.dataMigration" />
 	<context:component-scan base-package="org.oscarehr.schedule" />
+	<context:component-scan base-package="org.oscarehr.security" />
 	<context:component-scan base-package="org.oscarehr.allergy" />
 	<context:component-scan base-package="org.oscarehr.providerBilling" />
 	<context:component-scan base-package="org.oscarehr.rx" />
@@ -159,6 +162,7 @@
 	<context:component-scan base-package="org.oscarehr.integration.aqs" />
 	<context:component-scan base-package="org.oscarehr.integration.iceFall" />
     <context:component-scan base-package="org.oscarehr.integration.imdhealth" />
+	<context:component-scan base-package="org.oscarehr.measurements" />
 	<context:component-scan base-package="org.oscarehr.message" />
 	<!-- Sharing Center -->
 	<context:component-scan base-package="org.oscarehr.sharingcenter.dao" />

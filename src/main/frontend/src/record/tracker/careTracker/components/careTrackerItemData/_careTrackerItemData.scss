@@ -1,0 +1,32 @@
+.care-tracker-item-data {
+	position: relative;
+	min-width: 128px;
+
+	// limit size when in app, but ensure all text visible when printing
+	@media screen {
+		max-width: 256px;
+	}
+
+	border: 2px solid var(--color-neutral-light-grey);
+	border-radius: 8px;
+	padding: 4px;
+
+	.display-date {
+		@include juno-font-body-smallest;
+	}
+	.display-value {
+		@include juno-font-body;
+		font-weight: bold;
+		text-align: center;
+		padding-top: 4px;
+		width: 100%;
+		overflow: auto;
+	}
+	i {
+		position: absolute;
+		top: 4px;
+		right: 4px;
+		font-size: 16px;
+		color: var(--color-primary-base);
+	}
+}

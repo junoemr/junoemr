@@ -1,0 +1,31 @@
+.care-tracker-container {
+	max-width: 1024px;
+
+	.filter-wrapper {
+		position: relative;
+		padding-bottom: 8px;
+
+		.input-size-constraint {
+			width: 240px;
+			min-width: 240px;
+		}
+	}
+
+	.care-tracker-header {
+		color: var(--color-primary-base);
+	}
+
+	.item-divider {
+		// use border so it shows up when printing
+		border-top: 2px solid var(--color-neutral-light);
+		margin-top: 16px;
+	}
+
+	.tracker-footer {
+		margin: 8px 0 24px 0;
+
+		.footer-button-wrapper {
+			width: 128px;
+		}
+	}
+}

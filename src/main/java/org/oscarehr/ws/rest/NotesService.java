@@ -23,10 +23,29 @@
  */
 package org.oscarehr.ws.rest;
 
+import static org.oscarehr.encounterNote.model.Issue.SUMMARY_CODE_TICKLER_NOTE;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -61,6 +80,7 @@ import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.EncounterUtil;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -81,31 +101,10 @@ import org.oscarehr.ws.rest.to.model.NoteTo1;
 import org.oscarehr.ws.rest.to.model.TicklerNoteTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarEncounter.pageUtil.EctSessionBean;
 import oscar.util.ConversionUtils;
-
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static org.oscarehr.encounterNote.model.Issue.SUMMARY_CODE_TICKLER_NOTE;
 
 
 @Path("/notes")
@@ -171,7 +170,7 @@ public class NotesService extends AbstractServiceImpl
 
 	@Autowired
 	private PartialDateDao partialDateDao;
-	
+
 	@GET
 	@Path("/{demographicNo}/all")
 	@Produces("application/json")
@@ -184,6 +183,7 @@ public class NotesService extends AbstractServiceImpl
 	                                                         @QueryParam("offset") @DefaultValue("0") Integer offset)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), demographicNo, Permission.ENCOUNTER_NOTE_READ);
 
 		HttpSession se = loggedInInfo.getSession();
 		if(se.getAttribute("userrole") == null)
@@ -195,12 +195,7 @@ public class NotesService extends AbstractServiceImpl
 
 		// need to check to see if the client is in our program domain
 		// if not...don't show this screen!
-		String roles = (String) se.getAttribute("userrole");
-		if(OscarProperties.getInstance().isOscarLearning() && roles != null && roles.contains("moderator"))
-		{
-			logger.info("skipping domain check..provider is a moderator");
-		}
-		else if(
+		if(
 			// TODO-legacy: speed this up
 			!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) &&
 			!caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo)
@@ -243,14 +238,16 @@ public class NotesService extends AbstractServiceImpl
 	@Path("/{demographicNo}/tmpSave")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public NoteTo1 tmpSaveNote(@PathParam("demographicNo") Integer demographicNo ,NoteTo1 note){
+	public NoteTo1 tmpSaveNote(@PathParam("demographicNo") Integer demographicNo, NoteTo1 note)
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();//  LoggedInInfo.loggedInInfo.get();
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
+
+		securityInfoManager.requireAllPrivilege(providerNo, demographicNo, Permission.ENCOUNTER_NOTE_CREATE);
+
 		logger.debug("autosave "+note);
 
-		LoggedInInfo loggedInInfo = getLoggedInInfo();//  LoggedInInfo.loggedInInfo.get();
-		String providerNo=loggedInInfo.getLoggedInProvider().getProviderNo();
-
-		
-		String programId = getProgram(loggedInInfo,providerNo);
+		String programId = getProgram(loggedInInfo, providerNo);
 		String noteStr = note.getNote();
 		String noteId  = ""+note.getNoteId();
 		
@@ -275,7 +272,6 @@ public class NotesService extends AbstractServiceImpl
 		return note;
 	}
 
-	//TODO-legacy -- POST shouldn't return a transfer object
 	/**
 	 * Save a new note
 	 * @param demographicNo
@@ -291,6 +287,11 @@ public class NotesService extends AbstractServiceImpl
 			@QueryParam("deleteTmpSave") @DefaultValue("false") String deleteTmpSaveString,
 			NoteTo1 note)
 	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
+
+		securityInfoManager.requireAllPrivilege(providerNo, demographicNo, Permission.ENCOUNTER_NOTE_CREATE);
+
 		logger.debug("saveNote "+note);
 
 		boolean deleteTmpSave = false;
@@ -307,8 +308,6 @@ public class NotesService extends AbstractServiceImpl
 				return RestResponse.errorResponse("Note text cannot be empty");
 			}
 
-			LoggedInInfo loggedInInfo = getLoggedInInfo();
-			String providerNo = loggedInInfo.getLoggedInProviderNo();
 			Provider provider = loggedInInfo.getLoggedInProvider();
 			String userName = provider != null ? provider.getFullName() : "";
 
@@ -449,13 +448,16 @@ public class NotesService extends AbstractServiceImpl
 		return RestResponse.successResponse(note);
 	}
 
-
-	//TODO-legacy -- POST shouldn't return a transfer object
 	@POST
 	@Path("/{demographicNo}/saveIssueNote")
 	@Consumes("application/json")
 	@Produces("application/json")
-	public RestResponse<NoteIssueTo1> saveIssueNote(@PathParam("demographicNo") Integer demographicNo, @Valid NoteIssueTo1 noteIssue) {
+	public RestResponse<NoteIssueTo1> saveIssueNote(@PathParam("demographicNo") Integer demographicNo, @Valid NoteIssueTo1 noteIssue)
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(providerNo, demographicNo,
+				Permission.ENCOUNTER_NOTE_CREATE, Permission.ENCOUNTER_ISSUE_CREATE);
 
 		try {
 			NoteTo1 note = noteIssue.getEncounterNote();
@@ -471,8 +473,6 @@ public class NotesService extends AbstractServiceImpl
 				return RestResponse.errorResponse("Note text cannot be empty");
 			}
 
-			LoggedInInfo loggedInInfo = getLoggedInInfo();
-			String providerNo = loggedInInfo.getLoggedInProviderNo();
 			Provider provider = loggedInInfo.getLoggedInProvider();
 			String providerName = provider != null ? provider.getFullName() : "";
 
@@ -836,16 +836,16 @@ public class NotesService extends AbstractServiceImpl
 				{
 					HttpSession session = loggedInInfo.getSession();
 
-					CaseManagementNote annotationNote = (CaseManagementNote) session.getAttribute(annotationAttribute);
+					// new annotation created and got it in session attribute
+					org.oscarehr.encounterNote.model.CaseManagementNote annotationNote =
+						(org.oscarehr.encounterNote.model.CaseManagementNote) session.getAttribute(annotationAttribute);
 
 					if (annotationNote != null)
 					{
-						// new annotation created and got it in session attribute
-						caseManagementMgr.saveNoteSimple(annotationNote);
-						CaseManagementNoteLink cml = new CaseManagementNoteLink(CaseManagementNoteLink.CASEMGMTNOTE,
-								newNoteId, annotationNote.getId());
+						org.oscarehr.encounterNote.model.CaseManagementNoteLink link = new org.oscarehr.encounterNote.model.CaseManagementNoteLink(annotationNote);
+						link.setLinkedCaseManagementNoteId(Math.toIntExact(caseMangementNote.getId()));
 
-						caseManagementMgr.saveNoteLink(cml);
+						annotationNote = encounterNoteService.saveChartNote(annotationNote, providerNo, demographicNo);
 
 						String annotationSaveStatus = (annotationNote.getId() != null) ? LogConst.STATUS_SUCCESS : LogConst.STATUS_FAILURE;
 						LogAction.addLogEntry(
@@ -946,11 +946,12 @@ public class NotesService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<NoteIssueTo1> getLatestNoteToEdit(@PathParam("demographicNo") Integer demographicNo)
 	{
-		LoggedInInfo loggedInInfo =  getLoggedInInfo();
+		String loggedInProviderId = getLoggedInProviderId();
+		securityInfoManager.requireAllPrivilege(loggedInProviderId, demographicNo, Permission.ENCOUNTER_NOTE_READ);
 
 		NoteIssueTo1 returnNote = encounterNoteService.getLatestUnsignedNote(
 				demographicNo,
-				Integer.parseInt(loggedInInfo.getLoggedInProviderNo())
+				Integer.parseInt(loggedInProviderId)
 		);
 
 		return RestResponse.successResponse(returnNote);
@@ -962,8 +963,10 @@ public class NotesService extends AbstractServiceImpl
 	@Produces("application/json")
 	public RestResponse<CaseManagementTmpSaveTo1> getTmpSave(@PathParam("demographicNo") Integer demographicNo)
 	{
-		LoggedInInfo loggedInInfo =  getLoggedInInfo();
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		String providerNo = loggedInInfo.getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(providerNo, demographicNo, Permission.ENCOUNTER_NOTE_READ);
+
 		Integer programId = getProgramId(loggedInInfo, providerNo);
 
 		CaseManagementTmpSave tmpSave = caseManagementTmpSaveDao.find(providerNo, demographicNo, programId);
@@ -980,6 +983,8 @@ public class NotesService extends AbstractServiceImpl
 	public RestResponse<NoteIssueTo1> getNoteToEdit(@PathParam("demographicNo") Integer demographicNo,
 											   @PathParam("noteId") Integer noteId)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ENCOUNTER_NOTE_READ);
+
 		NoteIssueTo1 returnNote = encounterNoteService.getNoteToEdit(demographicNo, noteId);
 
 		return RestResponse.successResponse(returnNote);
@@ -990,13 +995,15 @@ public class NotesService extends AbstractServiceImpl
 	@Consumes("application/json")
 	@Produces("application/json")
 	@Hidden
-	public NoteTo1 getCurrentNote(@PathParam("demographicNo") Integer demographicNo ,JSONObject jsonobject){
-		logger.debug("getCurrentNote "+jsonobject);
-		LoggedInInfo loggedInInfo =  getLoggedInInfo(); //LoggedInInfo.loggedInInfo.get();
+	public NoteTo1 getCurrentNote(@PathParam("demographicNo") Integer demographicNo, JSONObject jsonobject)
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
 
-		String providerNo=loggedInInfo.getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(providerNo, demographicNo, Permission.ENCOUNTER_NOTE_READ);
 
-		
+		logger.debug("getCurrentNote " + jsonobject);
+
 		HttpSession session = loggedInInfo.getSession();
 		if (session.getAttribute("userrole") == null) {
 //			response.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -1225,11 +1232,14 @@ public class NotesService extends AbstractServiceImpl
 	}
 	
 	@GET
-	@Path("/getIssueNote/{noteId}")	
+	@Path("/getIssueNote/{noteId}")
 	@Produces("application/json")
-	public RestResponse<NoteIssueTo1> getIssueNote(@PathParam("noteId") Integer noteId){
+	public RestResponse<NoteIssueTo1> getIssueNote(@PathParam("noteId") Integer noteId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ENCOUNTER_NOTE_READ);
 
-		try {
+		try
+		{
 			//get all note values NoteDisplay nd = new NoteDisplayLocal(loggedInInfo,note);
 			CaseManagementNote casemgmtNote = caseManagementMgr.getNote(String.valueOf(noteId));
 			if(casemgmtNote == null) {
@@ -1297,7 +1307,9 @@ public class NotesService extends AbstractServiceImpl
 	@GET
 	@Path("/getGroupNoteExt/{noteId}")	
 	@Produces("application/json")
-	public NoteExtTo1 getGroupNoteExt(@PathParam("noteId") Long noteId){
+	public NoteExtTo1 getGroupNoteExt(@PathParam("noteId") Long noteId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ENCOUNTER_NOTE_READ);
 		
 		List<CaseManagementNoteExt> extNoteList = new ArrayList<CaseManagementNoteExt>();
 		extNoteList.addAll(caseManagementMgr.getExtByNote(noteId));
@@ -1311,9 +1323,11 @@ public class NotesService extends AbstractServiceImpl
 	
 	//TODO-legacy
 	@GET
-	@Path("/getIssueId/{issueCode}")	
+	@Path("/getIssueId/{issueCode}")
 	@Produces("application/json")
-	public IssueTo1 getIssueId(@PathParam("issueCode") String issueCode){
+	public IssueTo1 getIssueId(@PathParam("issueCode") String issueCode)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ENCOUNTER_ISSUE_READ);
 		
 		//translate summary codes
 		issueCode = translateSystemCode(issueCode);
@@ -1326,9 +1340,11 @@ public class NotesService extends AbstractServiceImpl
 	}
 	
 	@POST
-	@Path("/getIssueById/{issueId}")	
+	@Path("/getIssueById/{issueId}")
 	@Produces("application/json")
-	public IssueTo1 getIssueId(@PathParam("issueId") int issueId){
+	public IssueTo1 getIssueId(@PathParam("issueId") int issueId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ENCOUNTER_ISSUE_READ);
 		
 		Issue issue = caseManagementMgr.getIssue(String.valueOf(issueId));
 		
@@ -1340,15 +1356,9 @@ public class NotesService extends AbstractServiceImpl
 	@GET
 	@Path("/ticklerGetNote/{ticklerNo}")
 	@Produces("application/json")
-	//{"ticklerNote":{"editor":"oscardoc, doctor","note":"note 2","noteId":6,"observationDate":"2014-09-13T13:18:41-04:00","revision":2}}
-	public TicklerNoteResponse ticklerGetNote(@PathParam("ticklerNo") Integer ticklerNo ){
-
-		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "r", null)) {
-			throw new RuntimeException("Access Denied");
-		}
-		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_eChart", "r", null)) {
-			throw new RuntimeException("Access Denied");
-		}
+	public TicklerNoteResponse ticklerGetNote(@PathParam("ticklerNo") Integer ticklerNo)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TICKLER_READ);
 		
 		TicklerNoteResponse response = new TicklerNoteResponse();
 		CaseManagementNoteLink link = caseManagementMgr.getLatestLinkByTableId(CaseManagementNoteLink.TICKLER, Long.valueOf(ticklerNo));
@@ -1376,14 +1386,9 @@ public class NotesService extends AbstractServiceImpl
 	@Produces("application/json")
 	@Consumes("application/json")
 	@Hidden
-	public GenericRESTResponse ticklerSaveNote(JSONObject json){
-		
-		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_tickler", "w", null)) {
-			throw new RuntimeException("Access Denied");
-		}
-		if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_eChart", "w", null)) {
-			throw new RuntimeException("Access Denied");
-		}
+	public GenericRESTResponse ticklerSaveNote(JSONObject json)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TICKLER_CREATE);
 
 		logger.info("The config "+json.toString());
 		
@@ -1503,7 +1508,9 @@ public class NotesService extends AbstractServiceImpl
 	@Produces("application/json")
 	@Consumes("application/json")
 	@Hidden
-	public AbstractSearchResponse<IssueTo1> search(JSONObject json,@QueryParam("startIndex") Integer startIndex,@QueryParam("itemsToReturn") Integer itemsToReturn ) {
+	public AbstractSearchResponse<IssueTo1> search(JSONObject json, @QueryParam("startIndex") Integer startIndex, @QueryParam("itemsToReturn") Integer itemsToReturn)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ENCOUNTER_ISSUE_READ);
 		AbstractSearchResponse<IssueTo1> response = new AbstractSearchResponse<IssueTo1>();
 		
 		//if(!securityInfoManager.hasPrivilege(getLoggedInInfo(), "_demographic", "r", null)) {
@@ -1546,7 +1553,10 @@ public class NotesService extends AbstractServiceImpl
 	@POST
 	@Path("/setEditingNoteFlag")
 	@Produces("application/json")
-	public GenericRESTResponse setEditingNoteFlag(@QueryParam("noteUUID") String noteUUID, @QueryParam("userId") String providerNo) {
+	public GenericRESTResponse setEditingNoteFlag(@QueryParam("noteUUID") String noteUUID, @QueryParam("userId") String providerNo)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ENCOUNTER_NOTE_CREATE);
+
 		GenericRESTResponse resp = new GenericRESTResponse(false, "Parameter error");
 		if (noteUUID==null || noteUUID.trim().isEmpty() || providerNo==null || providerNo.trim().isEmpty()) return resp;
 		
@@ -1592,7 +1602,10 @@ public class NotesService extends AbstractServiceImpl
 	@POST
 	@Path("/checkEditNoteNew")
 	@Produces("application/json")
-	public GenericRESTResponse checkEditNoteNew(@QueryParam("noteUUID") String noteUUID, @QueryParam("userId") String providerNo) {
+	public GenericRESTResponse checkEditNoteNew(@QueryParam("noteUUID") String noteUUID, @QueryParam("userId") String providerNo)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ENCOUNTER_NOTE_CREATE);
+
 		GenericRESTResponse resp = new GenericRESTResponse(true, null);
 		if (noteUUID==null || noteUUID.trim().isEmpty() || providerNo==null || providerNo.trim().isEmpty()) return resp;
 		
@@ -1615,7 +1628,10 @@ public class NotesService extends AbstractServiceImpl
 
 	@POST
 	@Path("/removeEditingNoteFlag")
-	public void removeEditingNoteFlag(@QueryParam("noteUUID") String noteUUID, @QueryParam("userId") String providerNo) {
+	public void removeEditingNoteFlag(@QueryParam("noteUUID") String noteUUID, @QueryParam("userId") String providerNo)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ENCOUNTER_NOTE_CREATE);
+
 		if (noteUUID==null || noteUUID.trim().isEmpty() || providerNo==null || providerNo.trim().isEmpty()) return;
 		
 		ConcurrentHashMap<String, Long> noteList = editList.get(noteUUID);

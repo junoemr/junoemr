@@ -33,8 +33,7 @@ angular.module("Common.Services").service("labService", [
 	         $http,
 	         $httpParamSerializer)
 	{
-		let service = {};
-
+		const service = this;
 		const labApi = new LabApi($http, $httpParamSerializer, '../ws/rs');
 
 		service.triggerLabPull = async (): Promise<boolean> =>

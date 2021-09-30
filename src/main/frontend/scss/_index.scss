@@ -1,3 +1,6 @@
+#main-body {
+	min-height: 100vh;
+}
 
 #parent {
 	position: fixed;
@@ -32,10 +35,7 @@ li.cpp-note-list:last-child {
 	border-bottom: none;
 }
 
-
 #index-content {
-	height: calc(100vh - #{$primary-navbar-height});
-
 	#content-left-pane {
 		&.expanded {
 			width: $left-aside-width;
@@ -46,6 +46,9 @@ li.cpp-note-list:last-child {
 		}
 	}
 	#content-center-pane {
+		> ui-view {
+			flex-grow: 1;
+		}
 	}
 	#content-right-pane {
 		&.expanded {

@@ -20,14 +20,14 @@
  * Victoria, British Columbia
  * Canada
 --%>
-<div id="admin-page" class="height-100">
+<div id="admin-page" class="height-100 flex-col">
 	<div id="admin-page-header" class="row vertical-align">
 		<h5><a href="#!/admin/landingPage" ng-click="AdminCtrl.collapseAllNavGroups()">Administration <h6>{{AdminCtrl.currentState}}</h6></a></h5>
 	</div>
-	<div id="admin-page-body" class="row height-100">
+	<div id="admin-page-body" class="row flex-item-grow">
 		<div class="admin-side-nav">
 			<accordion-list item-list="AdminCtrl.navList"></accordion-list>
 		</div>
-		<div class="admin-subpage-view height-100" ui-view></div>
+		<div class="admin-subpage-view h-min-100" ui-view></div>
 	</div>
 </div>

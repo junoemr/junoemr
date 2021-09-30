@@ -94,7 +94,7 @@ public class ClinicImageAction extends DispatchAction
 	public ActionForward uploadImage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null,  "_admin");
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.CREATE, null,  "_admin");
 
 		ClinicImageService.IMAGE_TYPE imageType = ClinicImageService.stringToImageType(request.getParameter("image_type"));
 		if (imageType != null)
@@ -133,7 +133,7 @@ public class ClinicImageAction extends DispatchAction
 	public ActionForward deleteImage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null,  "_admin");
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.CREATE, null,  "_admin");
 
 		ClinicImageService.IMAGE_TYPE imageType = ClinicImageService.stringToImageType(request.getParameter("image_type"));
 		if (imageType != null)

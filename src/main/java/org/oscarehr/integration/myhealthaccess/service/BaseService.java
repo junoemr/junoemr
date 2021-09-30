@@ -34,6 +34,22 @@ import oscar.OscarProperties;
 @Service("mha_BaseService")
 public class BaseService extends org.oscarehr.integration.BaseService
 {
+	// ==========================================================================
+	// MHA Endpoints
+	// ==========================================================================
+
+	// Appointments
+	protected static final String APPOINTMENT_CACHE_UPDATE = "/clinic/%s/appointment/%s/cache";
+	protected static final String APPOINTMENT_BOOK = "/clinic_user/appointment/book";
+	protected static final String APPOINTMENT_LINK_AQS_TO_CLINIC_APPOINTMENT = "/clinic_user/self/appointment/%s/aqs_link";
+	protected static final String APPOINTMENT_SEND_TELEHEALTH_NOTIFICATION = "/clinic_user/self/clinic/appointment/%s/send_telehealth_notification";
+	protected static final String APPOINTMENT_SEND_GENERAL_NOTIFICATION = "/clinic_user/self/juno/appointment/%s/send_general_notification";
+	protected static final String APPOINTMENT_SEARCH = "/clinic/%s/appointments";
+	protected static final String APPOINTMENT_GET = "/clinic/%s/appointment/%s/";
+	protected static final String APPOINTMENT_GET_TELEHEALTH_SESSION_INFO = "/clinic/%s/appointment/%s/session";
+
+
+
 	@Autowired
 	IntegrationService integrationService;
 

@@ -34,6 +34,7 @@ import org.apache.struts.upload.FormFile;
 import org.oscarehr.eform.model.EForm;
 import org.oscarehr.eform.service.EFormTemplateService;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -56,7 +57,7 @@ public class HtmlUploadAction extends Action
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 		String ipAddress = LoggedInInfo.getLoggedInInfoFromSession(request).getIp();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_eform");
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, Permission.EFORM_CREATE);
 
 		HtmlUploadForm fm = (HtmlUploadForm) form;
 		FormFile formHtml = fm.getFormHtml();

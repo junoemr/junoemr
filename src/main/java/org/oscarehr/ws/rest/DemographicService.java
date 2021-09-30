@@ -41,8 +41,8 @@ import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
 import org.oscarehr.managers.DemographicManager;
-import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.conversion.DemographicToDomainConverter;
@@ -101,7 +101,7 @@ public class DemographicService extends AbstractServiceImpl {
 
 	@Autowired
 	private DemographicManager demographicManager;
-	
+
 	@Autowired
 	private WaitingListDao waitingListDao;
 	
@@ -148,7 +148,10 @@ public class DemographicService extends AbstractServiceImpl {
 	 * 		Returns all demographics.
 	 */
 	@GET
-	public OscarSearchResponse<DemographicTo1> getAllDemographics(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
+	public OscarSearchResponse<DemographicTo1> getAllDemographics(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
+
 		OscarSearchResponse<DemographicTo1> result = new OscarSearchResponse<DemographicTo1>();
 		
 		if (offset == null) {
@@ -180,7 +183,10 @@ public class DemographicService extends AbstractServiceImpl {
 	@GET
 	@Path("/{dataId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> getDemographicData(@PathParam("dataId") Integer id) throws PatientDirectiveException {
+	public RestResponse<DemographicTo1> getDemographicData(@PathParam("dataId") Integer id) throws PatientDirectiveException
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), id, Permission.DEMOGRAPHIC_READ);
+
 		try
 		{
 			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
@@ -259,9 +265,11 @@ public class DemographicService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<DemographicTo1> createDemographicData(DemographicTo1 data)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_CREATE);
+
 		Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
 		hinValidationService.validateNoDuplication(demographic.getHin(), demographic.getVer(), demographic.getHcType());
-		demographicManager.createDemographic(getLoggedInInfo(), demographic, data.getAdmissionProgramId());
+		demographicManager.createDemographic(getLoggedInInfo(), demographic);
 
 		String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
 		int providerNo = Integer.parseInt(providerNoStr);
@@ -286,7 +294,7 @@ public class DemographicService extends AbstractServiceImpl {
 	public RestResponse<DemographicTo1> updateDemographicData(DemographicTo1 data)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.UPDATE, data.getDemographicNo(), "_demographic");
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), data.getDemographicNo(), Permission.DEMOGRAPHIC_UPDATE);
 
 		try
 		{
@@ -352,7 +360,9 @@ public class DemographicService extends AbstractServiceImpl {
 	@DELETE
 	@Path("/{dataId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> deleteDemographicData(@PathParam("dataId") Integer id) {
+	public RestResponse<DemographicTo1> deleteDemographicData(@PathParam("dataId") Integer id)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), id, Permission.DEMOGRAPHIC_DELETE);
 		try
 		{
 			Demographic demo = demographicManager.getDemographic(getLoggedInInfo(), id);
@@ -386,6 +396,9 @@ public class DemographicService extends AbstractServiceImpl {
 			@PathParam("issueId") Long issueId
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo,
+				Permission.DEMOGRAPHIC_READ, Permission.ENCOUNTER_ISSUE_READ);
+
 		CaseManagementIssueTo1 issue = caseManagementIssueService.getIssueById(demographicNo, issueId);
 
 		return RestResponse.successResponse(issue);
@@ -401,6 +414,8 @@ public class DemographicService extends AbstractServiceImpl {
 			PropertyData propertyData
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ENCOUNTER_ISSUE_UPDATE);
+
 		CaseManagementIssueTo1 issue = caseManagementIssueService.updateProperty(
 				demographicNo,
 				issueId,
@@ -421,6 +436,8 @@ public class DemographicService extends AbstractServiceImpl {
 			IssueData issueData
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ENCOUNTER_ISSUE_CREATE);
+
 		CaseManagementIssueTo1 issue = caseManagementIssueService.updateIssue(
 				demographicNo,
 				issueId,
@@ -438,6 +455,8 @@ public class DemographicService extends AbstractServiceImpl {
 			@PathParam("demographicNo") int demographicNo
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ENCOUNTER_ISSUE_READ);
+
 		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
 				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_ALL);
 		return RestResponse.successResponse(issues);
@@ -451,6 +470,8 @@ public class DemographicService extends AbstractServiceImpl {
 			@PathParam("demographicNo") int demographicNo
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ENCOUNTER_ISSUE_READ);
+
 		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
 				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_RESOLVED);
 		return RestResponse.successResponse(issues);
@@ -464,6 +485,8 @@ public class DemographicService extends AbstractServiceImpl {
 			@PathParam("demographicNo") int demographicNo
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ENCOUNTER_ISSUE_READ);
+
 		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
 				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_UNRESOLVED);
 
@@ -475,7 +498,7 @@ public class DemographicService extends AbstractServiceImpl {
 	public RestSearchResponse<DemographicRosterTransfer> getRosteredHistory(
 			@PathParam("demographicNo") Integer demographicNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, demographicNo, "_demographic");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.DEMOGRAPHIC_READ);
 		List<DemographicRosterTransfer> rosteredHistory = demographicRosterService.getRosteredHistory(demographicNo);
 		return RestSearchResponse.successResponseOnePage(rosteredHistory);
 	}

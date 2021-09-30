@@ -789,7 +789,7 @@ public class ContactAction extends DispatchAction {
 			// assuming that the address String is always csv.
 			address = professionalSpecialist.getStreetAddress();
 
-			if (address.contains(","))
+			if (address != null && address.contains(","))
 			{
 				String[] addressArray = address.split(",");
 				address = addressArray[0].trim();

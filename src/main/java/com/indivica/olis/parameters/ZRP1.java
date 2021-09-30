@@ -42,9 +42,9 @@ public class ZRP1 implements Parameter {
 		return getQueryCode() + ".1^" + idNumber + "~" + getQueryCode() + ".13^" + idTypeCode + "~" +
 			getQueryCode() + ".22.1^" + (assigningJurisdiction != null ? assigningJurisdiction : "") + "~" +
 			getQueryCode() + ".22.3^" + (assigningJurisdictionCodingSystem != null ? assigningJurisdictionCodingSystem : "") + "~" +
-			getQueryCode() + ".2^" + (name != null ? name : "") + "~" +
-			getQueryCode() + ".3" + (firstName != null ? "^"+firstName : "") + "~" +
-			getQueryCode() + ".4" + (secondName != null ? "^"+secondName : "");
+			getQueryCode() + ".2^" + (name != null ? name : "^") + "~" +
+			getQueryCode() + ".3" + (firstName != null ? "^"+firstName : "^") + "~" +
+			getQueryCode() + ".4" + (secondName != null ? "^"+secondName : "^");
 	}
 
 	@Override

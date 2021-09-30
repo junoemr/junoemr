@@ -9,11 +9,15 @@
 
 --%>
 <%@page contentType="text/html"%>
-	<%@page import="java.util.*,org.oscarehr.common.dao.DemographicDao, 
-		org.oscarehr.common.model.Demographic, org.oscarehr.PMmodule.dao.ProviderDao, org.oscarehr.common.model.Provider,
-		org.oscarehr.olis.dao.OLISRequestNomenclatureDao, org.oscarehr.olis.dao.OLISResultNomenclatureDao,
-		org.oscarehr.olis.model.OLISRequestNomenclature, org.oscarehr.olis.model.OLISResultNomenclature, org.oscarehr.util.SpringUtils" %>
-	<%@page import="org.oscarehr.common.dao.UserPropertyDAO" %>
+<%@page import="java.util.*,
+                org.oscarehr.PMmodule.dao.ProviderDao,
+                org.oscarehr.common.model.Provider,
+                org.oscarehr.olis.dao.OLISRequestNomenclatureDao,
+                org.oscarehr.olis.dao.OLISResultNomenclatureDao,
+                org.oscarehr.olis.model.OLISRequestNomenclature,
+                org.oscarehr.olis.model.OLISResultNomenclature,
+                org.oscarehr.util.SpringUtils" %>
+<%@page import="org.oscarehr.common.dao.UserPropertyDAO" %>
 	<%@page import="org.oscarehr.common.model.UserProperty" %>
 	<%@page import="org.oscarehr.util.LoggedInInfo" %>
 	<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
@@ -136,6 +140,10 @@
 		input.checkbox {
 			width: auto;
 		}
+		.required:after {
+			content:" *";
+			color: red;
+		}
 	</style>
 	 <style type="text/css">
 #myAutoComplete {
@@ -227,16 +235,43 @@
 	
 	}
 
+	function displayDateRange(selection) {
+
+		var observationStartTimePeriod = $("#observationStartTimePeriod");
+		var observationEndTimePeriod = $("#observationEndTimePeriod");
+
+		var startTimePeriod = $("#startTimePeriod");
+		var endTimePeriod = $("#endTimePeriod");
+
+		console.info(selection.value, observationStartTimePeriod.val(), endTimePeriod.val());
+
+		if(selection.value === "OBR_22")
+		{
+			observationStartTimePeriod.css("display", "table-cell");
+			observationEndTimePeriod.css("display", "table-cell");
+			startTimePeriod.css("display", "none");
+			startTimePeriod.val("");
+			endTimePeriod.css("display", "none");
+			endTimePeriod.val("");
+		}
+		else
+		{
+			startTimePeriod.css("display", "table-cell");
+			endTimePeriod.css("display", "table-cell");
+			observationStartTimePeriod.css("display", "none");
+			observationStartTimePeriod.val("")
+			observationEndTimePeriod.css("display", "none");
+			observationEndTimePeriod.val("");
+		}
+	}
+
 	</script>
 
 
 
 <%
 ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
-List<Provider> allProvidersList = providerDao.getActiveProviders(); 
-
-//DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
-//List allDemographics = demographicDao.getDemographics();
+List<Provider> allProvidersList = providerDao.getActiveProviders();
 
 OLISResultNomenclatureDao resultDao = (OLISResultNomenclatureDao) SpringUtils.getBean("OLISResultNomenclatureDao");
 List<OLISResultNomenclature> resultNomenclatureList = resultDao.findAll();
@@ -265,11 +300,19 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<td colspan=2><input type="submit" name="submit" value="Search" /></td>
 		</tr>
 		<tr>
-			<th width="20%">Date &amp; Time Period to Search<br />(yyyy-mm-dd)</th>
-			<td width="30%"><input style="width:150px" type="text" name="startTimePeriod" id="startTimePeriod" value="" > to <input style="width:150px" name="endTimePeriod" type="text" id="endTimePeriod" ></td>
-		</tr><tr>
-			<th width="20%">Observation Date &amp; Time Period<br />(yyyy-mm-dd)</th>
-			<td width="30%"><input style="width:150px;" type="text" name="observationStartTimePeriod" id="observationStartTimePeriod" > to <input style="width:150px" name="obsevationEndTimePeriod" type="text" id="observationEndTimePeriod" ></td>
+			<th>
+				<select id="dateType" onchange="displayDateRange(this)">
+					<option value="OBR_22" selected>Date &amp; Time Period to Search</option>
+					<option value="OBR_7">Observation Date &amp; Time Period</option>
+				</select><span class="required"></span>
+			</th>
+			<td width="30%">
+				<input style="width:150px;" type="text" name="startTimePeriod" id="startTimePeriod" value="">
+				<input style="width:150px; display:none;" type="text" name="observationStartTimePeriod" id="observationStartTimePeriod">
+				to
+				<input style="width:150px;" name="endTimePeriod" type="text" id="endTimePeriod">
+				<input style="width:150px; display:none;" name="obsevationEndTimePeriod" type="text" id="observationEndTimePeriod">
+			</td>
 		</tr>
 		<tr>
 			<th width="20%"><input class="checkbox" type="checkbox" name="quantityLimitedQuery" id="quantityLimitedQuery"> Quantity Limit?</th>
@@ -350,7 +393,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<td colspan=4><hr /></td>
 		</tr>
 		<tr>
-			<td><span>Patient</span></td>
+			<td><span class="required">Patient</span></td>
 			<td> 
 				<%String currentDocId="1"; %>
 				<input type="hidden" name="demographic" id="demofind<%=currentDocId%>" />
@@ -407,7 +450,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<td colspan=4><hr /></td>
 		</tr>	
 		<tr>
-			<td><span>Requesting HIC</span></td><td>
+			<td><span class="required">Requesting HIC</span></td><td>
 			<select name="requestingHic" id="requestingHic">
 			
 			<option value=""></option>
@@ -559,7 +602,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<td colspan=4><hr /></td>
 		</tr>
 		<tr>
-			<td width="20%"><span>Patient</span></td>
+			<td width="20%"><span class="required">Patient</span></td>
 			<td> 
 			<%currentDocId="2"; %>
 				<input type="hidden" name="demographic" id="demofind<%=currentDocId%>" />
@@ -616,7 +659,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<td colspan=4><hr /></td>
 		</tr>
 		<tr>
-			<td width="20%"><span>Requesting HIC</span></td>
+			<td width="20%"><span class="required">Requesting HIC</span></td>
 			<td><select name="requestingHic" id="requestingHic">
 			
 			<option value=""></option>

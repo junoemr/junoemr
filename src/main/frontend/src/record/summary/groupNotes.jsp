@@ -32,7 +32,7 @@
 
 <!-- make div layout more fluid see medical history as an example -->
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
-<div class="modal-content" ng-click="$ctrl.checkAction($event)" ng-keypress="$ctrl.checkAction($event)">
+<div class="modal-content">
 
 	<div class="modal-header"> <!-- ng-style="setColor(note.cpp)" -->
 		<button type="button" class="close" data-dismiss="modal" aria-label="<bean:message key="global.close"/>" ng-click="$ctrl.cancel()">
@@ -107,7 +107,7 @@
 							<em>
 								<small>
 									<bean:message key="oscarEncounter.encounterDate.title"/>: 
-									<span>{{$ctrl.groupNotesForm.encounterNote.updateDate | date : 'dd-MMM-yyyy'}}</span>  
+									<span>{{$ctrl.groupNotesForm.encounterNote.updateDate | date : 'dd-MMM-yyyy'}}</span>
 									<bean:message key="oscarEncounter.noteRev.title"/>: 
 									<a href="javascript:void(0)" ng-click="$ctrl.openRevisionHistory($ctrl.groupNotesForm.encounterNote)">
 										{{$ctrl.groupNotesForm.encounterNote.revision}}
@@ -137,7 +137,7 @@
 							<bean:message key="oscarEncounter.problemdescription.title" />
 						</label>				
 						<input type="text" class="form-control" id="problemdescription"	name="problemdescription" 
-							ng-model="$ctrl.groupNotesForm.groupNoteExt.problemDesc" 
+							ng-model="$ctrl.groupNotesForm.groupNoteExt.problemDesc"
 							placeholder="<bean:message key="oscarEncounter.problemdescription.title" />" />
 					</div>
 
@@ -147,7 +147,7 @@
 							<span class="glyphicon glyphicon-info-sign" tooltip="Examples: <bean:message key="oscarEncounter.problemStatusExample.msg" />"> </span>
 						</label>
 						<input type="text" class="form-control" id="problemstatus" name="problemstatus" 
-							ng-model="$ctrl.groupNotesForm.groupNoteExt.problemStatus" 
+							ng-model="$ctrl.groupNotesForm.groupNoteExt.problemStatus"
 							placeholder="<bean:message key="oscarEncounter.problemStatus.title" /> " 
 						/>
 						<!-- example: <bean:message key="oscarEncounter.problemStatusExample.msg" /> -->
@@ -171,7 +171,7 @@
 						<label class="control-label"><bean:message key="oscarEncounter.ageAtOnset.title" /></label>
 						<input type="text" class="form-control" id="ageatonset" 
 							name="ageatonset" 
-							ng-model="$ctrl.groupNotesForm.groupNoteExt.ageAtOnset" 
+							ng-model="$ctrl.groupNotesForm.groupNoteExt.ageAtOnset"
 							placeholder="<bean:message key="oscarEncounter.ageAtOnset.title" />" 
 						/>
 					</div>
@@ -180,7 +180,7 @@
 						<label><bean:message key="oscarEncounter.relationship.title" /></label>
 						<input type="text" class="form-control" id="relationship" 
 							name="relationship" 
-							ng-model="$ctrl.groupNotesForm.groupNoteExt.relationship" 
+							ng-model="$ctrl.groupNotesForm.groupNoteExt.relationship"
 							placeholder="<bean:message key="oscarEncounter.relationship.title" />" 
 						/>
 					</div>
@@ -194,7 +194,7 @@
 						/>
 					</div>
 
-					<div class="form-group col-xs-6" ng-if="$ctrl.page.code == 'medhx'" >	
+					<div class="form-group col-xs-6" ng-if="$ctrl.page.code == 'medhx'" >
 						<label class="control-label"><bean:message key="oscarEncounter.procedureDate.title" /></label>
 						<juno-partial-date-select
 								ng-model="$ctrl.groupNotesForm.groupNoteExt.procedureDate">
@@ -205,12 +205,12 @@
 						<label class="control-label"><bean:message key="oscarEncounter.exposureDetail.title" /></label>				    							
 						<input  type="text" class="form-control" id="exposuredetail" 
 							name="exposuredetail" 
-							ng-model="$ctrl.groupNotesForm.groupNoteExt.exposureDetail" 
+							ng-model="$ctrl.groupNotesForm.groupNoteExt.exposureDetail"
 							placeholder="<bean:message key="oscarEncounter.exposureDetail.title" />" 
 						/>
 					</div>		
 				
-					<div class="form-group col-xs-6" ng-if="$ctrl.page.code == 'medhx' || $ctrl.page.code == 'famhx' || $ctrl.page.code == 'ongoingconcerns' || $ctrl.page.code == 'riskfactors' ">		    
+					<div class="form-group col-xs-6" ng-if="$ctrl.page.code == 'medhx' || $ctrl.page.code == 'famhx' || $ctrl.page.code == 'ongoingconcerns' || $ctrl.page.code == 'riskfactors' ">
 						<label class="control-label"><bean:message key="oscarEncounter.lifestage.title" /></label>
 						
 						<select class="form-control" name="lifestage" 

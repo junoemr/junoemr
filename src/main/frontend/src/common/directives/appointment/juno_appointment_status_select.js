@@ -37,14 +37,17 @@ angular.module('Common').directive(
 			};
 			$scope.button_change_fn = function button_change_fn()
 			{
-				$scope.model = scheduleService.getNextRotateStatus($scope.model);
-				$scope.setStatus();
-
-				// call the custom ng-change function
-				$timeout(function ()
+				if(!scope.disabled)
 				{
-					$scope.change_fn();
-				});
+					$scope.model = scheduleService.getNextRotateStatus($scope.model);
+					$scope.setStatus();
+
+					// call the custom ng-change function
+					$timeout(function ()
+					{
+						$scope.change_fn();
+					});
+				}
 			};
 			$scope.setStatus = function setStatus()
 			{

@@ -40,6 +40,7 @@ import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -64,10 +65,8 @@ public final class RxChoosePatientAction extends Action {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-		
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_demographic", "r", null)) {
-			throw new RuntimeException("missing required security object (_demoraphic)");
-		}
+
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.DEMOGRAPHIC_READ);
 
 		// p("locale",locale.toString());
 		// p("messages",messages.toString());

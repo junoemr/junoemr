@@ -76,6 +76,8 @@ List<AffinityDomainDataObject> affinityDomains = affDao.getAllAffinityDomains();
 
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils, oscar.OscarProperties, oscar.dms.EDoc, oscar.dms.EDocUtil, java.util.ArrayList, java.util.List"%>
 <%@ page import="org.oscarehr.fax.service.OutgoingFaxService" %>
+<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
+<%@ page import="org.oscarehr.security.model.Permission" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" scope="request" />
 
 
@@ -180,10 +182,25 @@ if( viewstatus == null ) {
 UserPropertyDAO pref = (UserPropertyDAO) WebApplicationContextUtils.getWebApplicationContext(pageContext.getServletContext()).getBean("UserPropertyDAO"); 
 UserProperty up = pref.getProp(user_no, UserProperty.EDOC_BROWSER_IN_DOCUMENT_REPORT);
 Boolean DocumentBrowserLink=false;
- 
-if ( up != null && up.getValue() != null && up.getValue().equals("yes")){ 
-   DocumentBrowserLink = true;
-                            }
+
+if (up != null && up.getValue() != null && up.getValue().equals("yes"))
+{
+    DocumentBrowserLink = true;
+}
+
+SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+boolean hasDocumentCreatePermission = false;
+boolean hasDocumentUpdatePermission = false;
+boolean hasTicklerCreatePermission = false;
+boolean hasNoteCreatePermission = false;
+
+if(module.equals("demographic"))
+{
+    hasDocumentCreatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.DOCUMENT_CREATE);
+    hasDocumentUpdatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.DOCUMENT_UPDATE);
+    hasTicklerCreatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.TICKLER_CREATE);
+    hasNoteCreatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.ENCOUNTER_NOTE_CREATE);
+}
 %>
 <html:html locale="true">
 <head>
@@ -556,7 +573,7 @@ function popup1(height, width, url, windowName){
                 <%
                 }
 
-                if( curdoc.getStatus() != 'D' ) {
+                if( hasDocumentUpdatePermission && curdoc.getStatus() != 'D' ) {
                   if (curdoc.getStatus() == 'H') { %>
                   <a href="#" onclick="popup(450, 600, 'addedithtmldocument.jsp?editDocumentNo=<%=curdoc.getDocId()%>&function=<%=module%>&functionid=<%=moduleid%>', 'EditDoc')">
                   <%
@@ -571,14 +588,14 @@ function popup1(height, width, url, windowName){
                   <%
                 }
 
-                if(module.equals("demographic")){%>
+                if(module.equals("demographic") && hasNoteCreatePermission){%>
                   <a href="#" title="Annotation" onclick="window.open('../annotation/annotation.jsp?display=<%=annotation_display%>&table_id=<%=curdoc.getDocId()%>&demo=<%=moduleid%>','anwin','width=400,height=500');">
                     <img src="../images/notes.gif" border="0">
                   </a>
                            <%
                            }
 
-                 if(!(moduleid.equals(session.getAttribute("user"))&& module.equals("demographic"))) {
+                 if(hasTicklerCreatePermission && !(moduleid.equals(session.getAttribute("user"))&& module.equals("demographic")) ) {
 
                                 String tickler_url;
                               if( org.oscarehr.common.IsPropertiesOn.isTicklerPlusEnable() ) {
@@ -618,9 +635,12 @@ function popup1(height, width, url, windowName){
       </div>
       <div><input type="button" name="Button"
         value="<bean:message key="dms.documentReport.btnDoneClose"/>"
-        onclick=self.close();> <input type="button" name="print"
+        onclick=self.close();>
+          <input type="button" name="print"
         value='<bean:message key="global.btnPrint"/>'
-        onClick="window.print()"> <input type="button"
+        onClick="window.print()">
+          <input type="button"
+                  <%=(hasDocumentCreatePermission) ? "" : "disabled='disabled'"%>
         value="<bean:message key="dms.documentReport.btnCombinePDF"/>"
         onclick="return submitForm('<rewrite:reWrite jspPage="combinePDFs.do"/>');" />
 				<% if (faxEnabled) { %>

@@ -1,0 +1,33 @@
+.care-tracker-edit {
+	.row-padding {
+		padding: 0 2px;
+	}
+	.row-padding-l {
+		padding-left: 2px;
+	}
+	.row-padding-r {
+		padding-right: 2px;
+	}
+	.trigger-code-list {
+		padding: 8px 4px;
+	}
+
+	.save-button-wrapper {
+		width: 128px;
+		padding: 8px;
+	}
+	.icon-only-button-wrapper {
+		width: 48px;
+		padding: 0 4px;
+		i {
+			font-size: 16px;
+		}
+	}
+	.add-button-wrapper {
+		padding: 8px;
+		width: 256px;
+		i {
+			font-size: 12px;
+		}
+	}
+}
