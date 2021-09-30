@@ -41,7 +41,7 @@ export default class DxRecordTransferToModelConverter extends AbstractConverter<
 		model.id = recordTransfer.id;
 		model.status = recordTransfer.status;
 		model.dxCode = new DxCodeTransferToModelConverter().convert(recordTransfer.dxCode);
-		model.providerId = recordTransfer.provider?.providerNo;
+		model.providerId = recordTransfer.provider?.id;
 		model.startDate = recordTransfer.startDate;
 		model.updateDate = recordTransfer.updateDate;
 

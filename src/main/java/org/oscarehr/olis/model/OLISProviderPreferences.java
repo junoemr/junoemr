@@ -32,6 +32,12 @@ public class OLISProviderPreferences extends AbstractModel<String>
 		super();
 	}
 
+	public OLISProviderPreferences(String id)
+	{
+		super();
+		this.providerId = id;
+	}
+
 	@Override
 	public String getId()
 	{

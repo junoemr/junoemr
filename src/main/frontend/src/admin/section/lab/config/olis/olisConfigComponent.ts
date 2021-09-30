@@ -22,6 +22,8 @@
 */
 
 import LoadingQueue from "../../../../../lib/util/LoadingQueue";
+import ToastService from "../../../../../lib/alerts/service/ToastService";
+import {Moment} from "moment/moment";
 
 angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 	{
@@ -38,12 +40,30 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 			const ctrl = this;
 			ctrl.loadingQueue = new LoadingQueue();
 			ctrl.pollingPropName = "olis_polling_enabled";
+			ctrl.labType = "OLIS_HL7"
 
 			ctrl.$onInit = async () =>
 			{
-				ctrl.loadingQueue.pushLoadingState();
-				ctrl.pollingEnabled = await systemPreferenceService.isPreferenceEnabled(ctrl.pollingPropName, false);
-				ctrl.loadingQueue.popLoadingState();
+				try
+				{
+					ctrl.loadingQueue.pushLoadingState();
+					const responseArray = await Promise.all([
+						systemPreferenceService.isPreferenceEnabled(ctrl.pollingPropName, false),
+						labService.getOlisSystemSettings(),
+						labService.getOlisProviderSettings(),
+					]);
+					ctrl.pollingEnabled = responseArray[0];
+					ctrl.systemSettings = responseArray[1];
+					ctrl.providerSettingsList = responseArray[2];
+
+					ctrl.loadingQueue.popLoadingState();
+					console.info(responseArray);
+				}
+				catch (e)
+				{
+					new ToastService().errorToast("Error loading olis configuration", true);
+					console.error(e);
+				}
 			}
 
 			ctrl.setPollingEnabled = (value: boolean) =>
@@ -54,7 +74,7 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 			ctrl.manualLabPull = async () =>
 			{
 				ctrl.loadingQueue.pushLoadingState();
-				await labService.triggerLabPull();
+				await labService.triggerLabPull(ctrl.labType);
 				ctrl.loadingQueue.popLoadingState();
 			}
 
@@ -64,6 +84,23 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 				const url = "../olis/Search.jsp";
 				window.open(url, target, "scrollbars=yes, location=no, width=1024, height=800");
 			};
+
+			ctrl.startDateDisplay = (date: Moment) =>
+			{
+				if(date)
+				{
+					return Juno.Common.Util.formatMomentDateTimeNoTimezone(date);
+				}
+				else
+				{
+					return "System Default";
+				}
+			}
+
+			ctrl.configurationStatusDisplay = (configured: boolean) =>
+			{
+				return (configured)? "OK" : "Not Configured";
+			}
 		}],
 	}
 );

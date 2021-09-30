@@ -9,6 +9,7 @@
 package org.oscarehr.olis.model;
 
 import java.util.Date;
+import java.util.Optional;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -42,6 +43,11 @@ public class OLISSystemPreferences extends AbstractModel<Integer> {
 	public String getStartTime() {
     	return startTime;
     }
+
+	public Optional<String> getOptionalStartTime()
+	{
+		return Optional.ofNullable(startTime);
+	}
 
 	public void setStartTime(String startTime) {
     	this.startTime = startTime;

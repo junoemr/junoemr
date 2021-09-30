@@ -24,6 +24,10 @@
  */
 
 import {LabApi} from "../../../generated";
+import OlisSystemSettings from "../../lib/lab/olis/model/OlisSystemSettings";
+import OlisProviderSettings from "../../lib/lab/olis/model/OlisProviderSettings";
+import OlisProviderSettingsTransferToModelConverter from "../../lib/lab/olis/converter/OlisProviderSettingsTransferToModelConverter";
+import OlisSystemSettingsTransferToModelConverter from "../../lib/lab/olis/converter/OlisSystemSettingsTransferToModelConverter";
 
 angular.module("Common.Services").service("labService", [
 	'$q',
@@ -36,9 +40,24 @@ angular.module("Common.Services").service("labService", [
 		const service = this;
 		const labApi = new LabApi($http, $httpParamSerializer, '../ws/rs');
 
-		service.triggerLabPull = async (): Promise<boolean> =>
+		service.olisSystemSettingsTransferToModelConverter = new OlisSystemSettingsTransferToModelConverter();
+		service.olisProviderSettingsTransferToModelConverter = new OlisProviderSettingsTransferToModelConverter();
+
+		service.triggerLabPull = async (labType: string): Promise<boolean> =>
 		{
-			return (await labApi.triggerLabPull()).data.body;
+			return (await labApi.triggerLabPull(labType)).data.body;
+		}
+
+		service.getOlisProviderSettings = async (): Promise<OlisProviderSettings[]> =>
+		{
+			return service.olisProviderSettingsTransferToModelConverter.convertList(
+				(await labApi.getOlisProviderSettings()).data.body);
+		}
+
+		service.getOlisSystemSettings = async (): Promise<OlisSystemSettings> =>
+		{
+			return service.olisSystemSettingsTransferToModelConverter.convert(
+				(await labApi.getOlisSystemSettings()).data.body);
 		}
 
 		return service;

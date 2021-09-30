@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
+import org.oscarehr.labs.service.LabPollingService;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
@@ -37,9 +38,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import java.util.List;
 
 @Path("/lab")
@@ -49,6 +52,9 @@ import java.util.List;
 public class LabWebService extends AbstractServiceImpl
 {
     private static final Logger logger = MiscUtils.getLogger();
+
+    @Autowired
+    private LabPollingService labPollingService;
 
     @Autowired
     private ProviderLabRoutingDao providerLabRoutingDao;
@@ -72,5 +78,15 @@ public class LabWebService extends AbstractServiceImpl
         }
 
         return RestResponse.successResponse(transfer);
+    }
+
+    @POST
+    @Path("/pullAll")
+    public RestResponse<Boolean> triggerLabPull(@QueryParam("labType") String labType)
+    {
+        securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.LAB_CREATE);
+
+        labPollingService.pullLabs(getLoggedInInfo(), labType);
+        return RestResponse.successResponse(true);
     }
 }

@@ -183,13 +183,8 @@ public class OLISPollingService
 
 	private OLISProviderPreferences findOrCreateOLISProviderPrefs(@NotNull String providerId)
 	{
-		OLISProviderPreferences olisProviderPreferences = olisProviderPreferencesDao.findById(providerId);
-		if(olisProviderPreferences == null)
-		{
-			olisProviderPreferences = new OLISProviderPreferences();
-			olisProviderPreferences.setProviderId(providerId);
-		}
-		return olisProviderPreferences;
+		Optional<OLISProviderPreferences> olisProviderPreferencesOptional = olisProviderPreferencesDao.findById(providerId);
+		return olisProviderPreferencesOptional.orElseGet(() -> new OLISProviderPreferences(providerId));
 	}
 
 	private void updateProviderStartTime(@NotNull OLISProviderPreferences olisProviderPreferences, String timeStampForNextStartDate)
