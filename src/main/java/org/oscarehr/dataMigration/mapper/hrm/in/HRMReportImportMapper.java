@@ -31,6 +31,7 @@ import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 
 import org.oscarehr.integration.clinicaid.dto.v2.MasterNumber;
 import org.oscarehr.integration.clinicaid.service.v2.ClinicAidService;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -95,10 +96,17 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		
 		if (clinicAidService != null && ConversionUtils.hasContent(facilityMasterNumber))
 		{
-			MasterNumber masterNumberLookup = clinicAidService.getOntarioMasterNumber(facilityMasterNumber);
-			if (masterNumberLookup != null)
+			try
 			{
-				model.setSendingFacility(masterNumberLookup.getName());
+				MasterNumber masterNumberLookup = clinicAidService.getOntarioMasterNumber(facilityMasterNumber);
+				if (masterNumberLookup != null)
+				{
+					model.setSendingFacility(masterNumberLookup.getName());
+				}
+			}
+			catch (Exception e)
+			{
+				MiscUtils.getLogger().error("Could not establish connection to clinicaid api", e);
 			}
 		}
 		
