@@ -13,6 +13,7 @@ export default class OlisSystemSettingsTransferToModelConverter extends Abstract
 	{
 		const model = new OlisSystemSettings();
 		model.startDateTime = (from.startDateTime) ? moment(from.startDateTime) : null;
+		model.lastRunDateTime = (from.lastRunDateTime) ? moment(from.lastRunDateTime) : null;
 		model.frequency = from.frequency;
 		model.filterPatients = from.filterPatients;
 		model.warnings = from.warnings;

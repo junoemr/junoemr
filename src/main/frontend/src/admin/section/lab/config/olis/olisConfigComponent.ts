@@ -139,6 +139,18 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 					return "System Default";
 				}
 			}
+			ctrl.lastRunDateDisplay = (): string =>
+			{
+				const date = ctrl.systemSettings.lastRunDateTime;
+				if(date)
+				{
+					return Juno.Common.Util.formatMomentDateTimeNoTimezone(date);
+				}
+				else
+				{
+					return "Never";
+				}
+			}
 
 			ctrl.configurationStatusDisplay = (configured: boolean): string =>
 			{

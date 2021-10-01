@@ -244,6 +244,20 @@
 	justify-content: end;
 }
 
+// allow a grid item to take space across multiple columns
+.grid-item-column-span-1 {
+	grid-column-start: span 1;
+}
+.grid-item-column-span-2 {
+	grid-column-start: span 2;
+}
+.grid-item-column-span-3 {
+	grid-column-start: span 3;
+}
+.grid-item-column-span-4 {
+	grid-column-start: span 4;
+}
+
 
 // ========================= Size Helpers ==============================
 

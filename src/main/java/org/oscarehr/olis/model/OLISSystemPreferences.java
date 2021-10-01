@@ -8,8 +8,7 @@
  */
 package org.oscarehr.olis.model;
 
-import java.util.Date;
-import java.util.Optional;
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,8 +16,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.oscarehr.common.model.AbstractModel;
+import java.util.Date;
+import java.util.Optional;
 @Entity
 public class OLISSystemPreferences extends AbstractModel<Integer>
 {
@@ -78,8 +77,12 @@ public class OLISSystemPreferences extends AbstractModel<Integer>
 
 	public void setLastRun(Date lastRun) {
 		this.lastRun = lastRun;
-	}	
-	
+	}
+
+	public Optional<Date> getOptionalLastRunTime()
+	{
+		return Optional.ofNullable(lastRun);
+	}
 	
 
 	public boolean isFilterPatients() {

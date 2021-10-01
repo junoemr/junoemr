@@ -50,6 +50,7 @@ public class OLISSystemPreferencesToTransferConverter extends AbstractModelConve
 			transfer.setStartDateTime(input.getOptionalStartTime()
 					.map((str) -> ConversionUtils.toZonedDateTime(str, DateTimeFormatter.ofPattern(OLISPollingService.OLIS_DATE_FORMAT)))
 					.orElse(null));
+			transfer.setLastRunDateTime(input.getOptionalLastRunTime().map(ConversionUtils::toZonedDateTime).orElse(null));
 		}
 		else
 		{

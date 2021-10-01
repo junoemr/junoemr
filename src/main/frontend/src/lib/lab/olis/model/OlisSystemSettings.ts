@@ -3,6 +3,7 @@ import {Moment} from "moment/moment";
 export default class OlisSystemSettings
 {
 	private _startDateTime: Moment;
+	private _lastRunDateTime: Moment;
 	private _filterPatients: boolean;
 	private _frequency: number;
 	private _warnings: string[];
@@ -16,6 +17,16 @@ export default class OlisSystemSettings
 	set startDateTime(value: Moment)
 	{
 		this._startDateTime = value;
+	}
+
+	get lastRunDateTime(): Moment
+	{
+		return this._lastRunDateTime;
+	}
+
+	set lastRunDateTime(value: Moment)
+	{
+		this._lastRunDateTime = value;
 	}
 
 	get filterPatients(): boolean
