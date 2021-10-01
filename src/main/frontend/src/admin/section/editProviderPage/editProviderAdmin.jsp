@@ -412,98 +412,6 @@
 							</div>
 						</div>
 					</div>
-<%--					<div class="edit-provider-or-group" ng-class="{'field-error': !$ctrl.providerValidations.emailOrUserName() && $ctrl.hasSubmitted}">--%>
-<%--						<!-- Email -->--%>
-<%--						<ca-field-text--%>
-<%--										ca-name="email"--%>
-<%--										ca-title="Email"--%>
-<%--										ca-model="$ctrl.provider.email"--%>
-<%--										ca-rows="1"--%>
-<%--										ca-text-placeholder="Email"--%>
-<%--										ca-disabled="$ctrl.fieldsDisabled"--%>
-<%--						>--%>
-<%--						</ca-field-text>--%>
-<%--						<div class="error-message" ng-if="!$ctrl.providerValidations.emailOrUserName() && $ctrl.hasSubmitted">--%>
-<%--							Either a User Name or Email is required.--%>
-<%--						</div>--%>
-<%--						<!-- User Name -->--%>
-<%--						<ca-field-text--%>
-<%--										ca-name="username"--%>
-<%--										ca-title="User Name"--%>
-<%--										ca-model="$ctrl.provider.userName"--%>
-<%--										ca-rows="1"--%>
-<%--										ca-text-placeholder="User Name"--%>
-<%--										ca-disabled="$ctrl.fieldsDisabled"--%>
-<%--						>--%>
-<%--						</ca-field-text>--%>
-<%--					</div>--%>
-<%--					<!-- Password -->--%>
-<%--					<div ng-class="{'field-error': (!$ctrl.providerValidations.password() || !$ctrl.providerValidations.passwordMatch()) && $ctrl.hasSubmitted}">--%>
-<%--						<ca-field-text--%>
-<%--										ca-name="password"--%>
-<%--										ca-title="Password"--%>
-<%--										ca-model="$ctrl.provider.password"--%>
-<%--										ca-rows="1"--%>
-<%--										ca-text-placeholder="Password"--%>
-<%--										ca-hide-input="true"--%>
-<%--										ca-required-field="true"--%>
-<%--										ca-disabled="$ctrl.fieldsDisabled"--%>
-<%--						>--%>
-<%--						</ca-field-text>--%>
-<%--						<div class="body-smallest error-message" ng-if="!$ctrl.providerValidations.password() && $ctrl.hasSubmitted">--%>
-<%--							Password must be atleast 8 characters long and include atleast one special character.--%>
-<%--						</div>--%>
-<%--					</div>--%>
-<%--					<!-- Confirm Password -->--%>
-<%--					<div ng-class="{'field-error': (!$ctrl.providerValidations.passwordVerify() || !$ctrl.providerValidations.passwordMatch()) && $ctrl.hasSubmitted}">--%>
-<%--						<ca-field-text--%>
-<%--										ca-name="confirm_password"--%>
-<%--										ca-title="Confirm Password"--%>
-<%--										ca-model="$ctrl.provider.passwordVerify"--%>
-<%--										ca-rows="1"--%>
-<%--										ca-text-placeholder="Retype Password"--%>
-<%--										ca-hide-input="true"--%>
-<%--										ca-required-field="true"--%>
-<%--										ca-disabled="$ctrl.fieldsDisabled"--%>
-<%--						>--%>
-<%--						</ca-field-text>--%>
-<%--						<div class="body-smallest error-message" ng-if="!$ctrl.providerValidations.passwordMatch() && $ctrl.hasSubmitted">--%>
-<%--							Passwords do not match.--%>
-<%--						</div>--%>
-<%--					</div>--%>
-<%--					<!-- Second Level Passcode -->--%>
-<%--					<div ng-class="{'field-error': (!$ctrl.providerValidations.secondLevelPasscode() || !$ctrl.providerValidations.secondLevelPasscodeMatch()) && $ctrl.hasSubmitted}">--%>
-<%--						<ca-field-text--%>
-<%--										ca-name="passcode"--%>
-<%--										ca-title="Second Level Passcode"--%>
-<%--										ca-model="$ctrl.provider.secondLevelPasscode"--%>
-<%--										ca-rows="1"--%>
-<%--										ca-text-placeholder="Passcode"--%>
-<%--										ca-hide-input="true"--%>
-<%--										ca-required-field="true"--%>
-<%--										ca-disabled="$ctrl.fieldsDisabled"--%>
-<%--						>--%>
-<%--						</ca-field-text>--%>
-<%--					</div>--%>
-<%--					<!-- Confirm Second Level Passcode -->--%>
-<%--					<div ng-class="{'field-error': (!$ctrl.providerValidations.secondLevelPasscodeVerify() || !$ctrl.providerValidations.secondLevelPasscodeMatch()) && $ctrl.hasSubmitted}">--%>
-<%--						<ca-field-text--%>
-<%--										ca-name="confirm_passcode"--%>
-<%--										ca-title="Retype Second Level Passcode"--%>
-<%--										ca-model="$ctrl.provider.secondLevelPasscodeVerify"--%>
-<%--										ca-rows="1"--%>
-<%--										ca-text-placeholder="Retype Passcode"--%>
-<%--										ca-hide-input="true"--%>
-<%--										ca-required-field="true"--%>
-<%--										ca-disabled="$ctrl.fieldsDisabled"--%>
-<%--						>--%>
-<%--						</ca-field-text>--%>
-<%--						<div class="body-smallest error-message" ng-if="!$ctrl.providerValidations.secondLevelPasscodeMatch() && $ctrl.hasSubmitted">--%>
-<%--							Passcodes do not match.--%>
-<%--						</div>--%>
-<%--					</div>--%>
-
-
 				</panel-body>
 			</panel>
 
@@ -566,6 +474,17 @@
 							label="Service Location Code"
 							label-position="$ctrl.LABEL_POSITION.TOP"
 							disabled="$ctrl.fieldsDisabled"
+						>
+						</juno-select>
+
+						<!-- BCP Eligible // single site mode only -->
+						<juno-select
+								ng-if="!$ctrl.isMultisiteEnabled"
+								ng-model="$ctrl.provider.bcpEligible"
+								options="$ctrl.bcEligibilityOptions"
+								label="BCP Eligible"
+								label-position="$ctrl.LABEL_POSITION.TOP"
+								disabled="$ctrl.fieldsDisabled"
 						>
 						</juno-select>
 					</div>
