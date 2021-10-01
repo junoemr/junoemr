@@ -83,9 +83,9 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 			providerLinks.add(deliverToProviderLink);
 		}
 		
-		if (input.getInternalReviewers() != null && !input.getInternalReviewers().isEmpty())
+		if (input.getReviewers() != null && !input.getReviewers().isEmpty())
 		{
-			providerLinks.addAll(convertReviewerLinks(hrmDocument, input.getInternalReviewers()));
+			providerLinks.addAll(convertReviewerLinks(hrmDocument, input.getReviewers()));
 		}
 		
 		hrmDocument.setDocumentToProviderList(providerLinks);

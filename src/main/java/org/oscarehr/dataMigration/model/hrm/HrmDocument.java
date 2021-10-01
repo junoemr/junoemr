@@ -162,13 +162,13 @@ public class HrmDocument extends AbstractTransientModel
 
 	private List<HrmComment> comments;
 	private List<HrmObservation> observations;
-	private List<Reviewer> internalReviewers;
+	private List<Reviewer> reviewers;
 
 	public HrmDocument()
 	{
 		comments = new ArrayList<>();
 		observations = new ArrayList<>();
-		internalReviewers = new ArrayList<>();
+		reviewers = new ArrayList<>();
 	}
 
 	public void addComment(HrmComment comment)
@@ -191,10 +191,10 @@ public class HrmDocument extends AbstractTransientModel
 
 	public void addReviewer(Reviewer reviewer)
 	{
-		if(this.internalReviewers == null)
+		if(this.reviewers == null)
 		{
-			this.internalReviewers = new ArrayList<>();
+			this.reviewers = new ArrayList<>();
 		}
-		this.internalReviewers.add(reviewer);
+		this.reviewers.add(reviewer);
 	}
 }

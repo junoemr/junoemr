@@ -68,7 +68,7 @@ import oscar.util.ConversionUtils;
 public class HRMService
 {
 	@Autowired
-	private HRMSftpService sftpConnector;
+	private HRMSftpService sftpService;
 	
 	@Autowired
 	private HRMReportProcessor reportProcessor;
@@ -109,7 +109,7 @@ public class HRMService
 	public HRMFetchResults consumeRemoteHRMDocuments()
 	{
 		HRMFetchResults results = new HRMFetchResults();
-		List<GenericFile> downloadedFiles = sftpConnector.pullHRMFromSource(results);
+		List<GenericFile> downloadedFiles = sftpService.pullHRMFromSource(results);
 		reportProcessor.processHRMFiles(downloadedFiles, true, results);
 		
 		this.lastFetchResults = results;

@@ -39,6 +39,7 @@ import xml.hrm.v4_3.ReportFormat;
 import xml.hrm.v4_3.ReportsReceived;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -91,7 +92,7 @@ public class HRMReport_4_3 implements HRMReport
 	public String getLegalName()
 	{
 		PersonNameStandard name = demographics.getNames();
-		return getLegalFirstName() + ", " + getLegalLastName();
+		return getLegalLastName() + ", " + getLegalFirstName();
 	}
 
 	public String getLegalLastName()
@@ -140,6 +141,17 @@ public class HRMReport_4_3 implements HRMReport
 		}
 		
 		return dateOfBirthList;
+	}
+	
+	public LocalDate getDateOfBirthAsLocalDate()
+	{
+		XMLGregorianCalendar fullDate = dateFP(demographics.getDateOfBirth());
+		if (fullDate != null)
+		{
+			return LocalDate.of(fullDate.getYear(), fullDate.getMonth(), fullDate.getDay());
+		}
+		
+		return null;
 	}
 
 	public String getDateOfBirthAsString()

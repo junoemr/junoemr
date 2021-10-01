@@ -20,6 +20,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.dataMigration.parser.hrm.HRMFileParser;
+import org.oscarehr.dataMigration.parser.hrm.HRMFileParser4_1;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
@@ -28,6 +29,7 @@ import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentSubClassDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
+import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_1;
 import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -46,9 +48,6 @@ public class HRMReportParser
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final HRMDocumentDao hrmDocumentDao = SpringUtils.getBean(HRMDocumentDao.class);
 	
-	private HRMReportParser() {}
-
-
 	public static HRMReport parseReport(String hrmReportFileLocation, String schemaVersion)
 	{
 		logger.info("Parsing the Report in the location:" + hrmReportFileLocation);
@@ -58,34 +57,42 @@ public class HRMReportParser
 			try
 			{
 				GenericFile hrmXML = FileFactory.getExistingFile(hrmReportFileLocation);
-				if(!hrmXML.getFileObject().exists())
 				return parseReport(hrmXML, schemaVersion);
 			}
-			catch(SAXException e)
+			catch(SAXException | JAXBException e)
 			{
-				logger.error("SAX ERROR PARSING XML " + e);
+				logger.error("Error parsing HRM XML " + e);
 			}
-			catch(IOException | JAXBException e)
+			catch(IOException e)
 			{
-				logger.error("error", e);
+				logger.error("Error accessing HRM file", e);
 			}
 		}
 		
 		return null;
 	}
-
-	// TODO:  Have to put the schema version back, in case there's older reports
+	
 	public static HRMReport parseReport(GenericFile hrmFile, String schemaVersion) throws IOException, SAXException, JAXBException
 	{
-		String fileData = FileUtils.getStringFromFile(hrmFile.getFileObject());
+		String hrmXML = FileUtils.getStringFromFile(hrmFile.getFileObject());
 		
-		HRMFileParser hrmParser = new HRMFileParser();
-		
-		xml.hrm.v4_3.OmdCds root = hrmParser.parse(hrmFile);
+		if (schemaVersion.equals("4.3"))
+		{
+			HRMFileParser hrmParser = new HRMFileParser();
+			xml.hrm.v4_3.OmdCds root = hrmParser.parse(hrmFile);
+			HRMReport_4_3 report = new HRMReport_4_3(root, hrmFile.getPath(), hrmXML);
 			
-		HRMReport_4_3 report = new HRMReport_4_3(root, hrmFile.getPath(), fileData);
-		
-		return report;
+			return report;
+		}
+		else
+		{
+			// Legacy Implementation for HRM v4.1
+			HRMFileParser4_1 hrmParser = new HRMFileParser4_1();
+			xml.hrm.v4_1.OmdCds root = hrmParser.parse(hrmFile);
+			HRMReport_4_1 report = new HRMReport_4_1(root, hrmFile.getPath(), hrmXML);
+			
+			return report;
+		}
 	}
 	
 	public static HRMReport parseRelativeLocation(String relativeLocation, String schemaVersion) throws IOException, SAXException, JAXBException

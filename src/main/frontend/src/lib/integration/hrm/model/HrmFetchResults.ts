@@ -34,13 +34,13 @@ export enum HRMStatus
 
 export default class HrmFetchResults
 {
-    readonly _reportsDownloaded: number;
-    readonly _reportsProcessed: number;
-    readonly _startTime: Moment;
-    readonly _endTime: Moment;
-    readonly _loginSuccess: boolean;
-    readonly _downloadSuccess: boolean;
-    readonly _processingSuccess: boolean;
+    private readonly _reportsDownloaded: number;
+    private readonly _reportsProcessed: number;
+    private readonly _startTime: Moment;
+    private readonly _endTime: Moment;
+    private readonly _loginSuccess: boolean;
+    private readonly _downloadSuccess: boolean;
+    private readonly _processingSuccess: boolean;
 
     public constructor(transfer: HRMFetchResults)
     {

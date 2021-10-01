@@ -2341,6 +2341,28 @@
 									<generatePackage>xml.hrm.v4_3</generatePackage>
 								</configuration>
 							</execution>
+                            <execution>
+                                <id>hrm4.1-schema-generation</id>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <extension>true</extension>
+                                    <!-- no header to prevent all the generated files being changed on automatic re-compile -->
+                                    <noFileHeader>true</noFileHeader>
+                                    <args>
+                                        <arg>-Xinheritance</arg>
+                                    </args>
+                                    <bindingDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/hrm/v4_1</bindingDirectory>
+                                    <bindingIncludes>
+                                        <include>bindings.xjb</include>
+                                    </bindingIncludes>
+                                    <schemaDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/hrm/v4_1</schemaDirectory>
+                                    <generateDirectory>${basedir}/src/gen/java</generateDirectory>
+                                    <generatePackage>xml.hrm.v4_1</generatePackage>
+                                </configuration>
+                            </execution>
 						</executions>
 						<configuration>
 							<extension>true</extension>

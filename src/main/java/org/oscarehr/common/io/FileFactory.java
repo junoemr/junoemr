@@ -141,13 +141,14 @@ public class FileFactory
 	public static XMLFile createHRMFile(String fileName, LocalDate date, String... morePaths) throws IOException
 	{
 		String[] varArgs = ArrayUtils.addAll(new String[]{date.format((DateTimeFormatter.ofPattern("yyyyMMdd")))}, morePaths);
+
 		File file = new File(Paths.get(GenericFile.HRM_BASE_DIR, varArgs).toString(), fileName);
 		
-		if (!file.getParentFile().exists() && !file.getParentFile().mkdirs())
+		if (!FileFactory.directoryExists(file.getParentFile()) && !file.getParentFile().mkdirs())
 		{
 			throw new IOException("Could not make subdirectories for file: " + file.getPath());
 		}
-		if (fileExists(file))
+		if (FileFactory.fileExists(file))
 		{
 			throw new IOException("File already exists: " + file.getPath());
 		}
@@ -665,6 +666,11 @@ public class FileFactory
 	private static boolean fileExists(File file)
 	{
 		return file.exists() && file.isFile();
+	}
+	
+	private static boolean directoryExists(File file)
+	{
+		return file.exists() && file.isDirectory();
 	}
 
 	private static boolean isFileInDirectory(String fileName, String directory)

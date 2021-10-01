@@ -30,8 +30,8 @@ import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class HRMReportDemographicMatcher extends AbstractHRMImportMapper<HRMReport_4_3, List<Demographic>>
@@ -51,11 +51,7 @@ public class HRMReportDemographicMatcher extends AbstractHRMImportMapper<HRMRepo
 		searchParams.setSex(importStructure.getGender());
 		searchParams.setLastName(importStructure.getLegalLastName());
 		
-		List<Integer> dateParts = importStructure.getDateOfBirth();
-		if (dateParts != null && dateParts.size() == 3)
-		{
-			searchParams.setDateOfBirth(LocalDate.of(dateParts.get(0), dateParts.get(1), dateParts.get(2)));
-		}
+		Optional.ofNullable(importStructure.getDateOfBirthAsLocalDate()).ifPresent(searchParams::setDateOfBirth);
 		
 		// Additional parameters
 		searchParams.setHealthCardProvince(extractSubRegionCode(importStructure.getHCNProvinceCode()));

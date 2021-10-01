@@ -83,7 +83,7 @@ public class CDSReportHrmExportMapper extends AbstractCDSReportExportMapper<HrmD
 		sourceAuthorPhysician.setAuthorName(toPersonNameSimple(exportStructure.getCreatedBy()));
 		reports.setSourceAuthorPhysician(sourceAuthorPhysician);
 
-		reports.getReportReviewed().addAll(getReportReviewedList(exportStructure.getInternalReviewers().toArray(new Reviewer[]{})));
+		reports.getReportReviewed().addAll(getReportReviewedList(exportStructure.getReviewers().toArray(new Reviewer[]{})));
 
 		//HRM Specific fields
 		reports.setSourceFacility(exportStructure.getSourceFacility());
