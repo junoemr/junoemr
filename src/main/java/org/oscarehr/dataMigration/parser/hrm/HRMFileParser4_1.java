@@ -35,7 +35,7 @@ import javax.xml.bind.JAXBException;
 
 public class HRMFileParser4_1 extends AbstractXMLFileParser<OmdCds>
 {
-	public static final String SCHEMA_VERSION = "4.3";
+	public static final String SCHEMA_VERSION = "4.1";
 	
 	@Override
 	public String getSchemaVersion()
