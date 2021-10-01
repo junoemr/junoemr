@@ -25,14 +25,11 @@ package org.oscarehr.olis.transfer;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @Data
-public class OLISSystemSettingsTransfer
+public class OLISSystemSettingsUpdateInput
 {
 	private ZonedDateTime startDateTime;
-	private ZonedDateTime lastRunDateTime;
 	private boolean filterPatients;
 	private Integer frequency;
-	private List<String> warnings;
 }

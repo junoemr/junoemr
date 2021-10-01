@@ -24,6 +24,7 @@
 import LoadingQueue from "../../../../../lib/util/LoadingQueue";
 import ToastService from "../../../../../lib/alerts/service/ToastService";
 import {Moment} from "moment/moment";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../../../../../common/components/junoComponentConstants";
 
 angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 	{
@@ -38,11 +39,45 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 			          systemPreferenceService)
 		{
 			const ctrl = this;
+
+			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+
 			ctrl.loadingQueue = new LoadingQueue();
 			ctrl.pollingPropName = "olis_polling_enabled";
 			ctrl.labType = "OLIS_HL7"
+			ctrl.frequencySelectOptions = [
+				{
+					label: "5 Minutes",
+					value: 5,
+				},
+				{
+					label: "10 Minutes",
+					value: 10,
+				},
+				{
+					label: "15 Minutes",
+					value: 15,
+				},
+				{
+					label: "30 Minutes",
+					value: 30,
+				},
+				{
+					label: "1 Hour",
+					value: 60,
+				},
+				{
+					label: "2 Hours",
+					value: 120,
+				},
+				{
+					label: "4 Hours",
+					value: 240,
+				},
+			];
 
-			ctrl.$onInit = async () =>
+			ctrl.$onInit = async (): Promise<void> =>
 			{
 				try
 				{
@@ -57,7 +92,6 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 					ctrl.providerSettingsList = responseArray[2];
 
 					ctrl.loadingQueue.popLoadingState();
-					console.info(responseArray);
 				}
 				catch (e)
 				{
@@ -66,26 +100,35 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 				}
 			}
 
-			ctrl.setPollingEnabled = (value: boolean) =>
+			ctrl.setPollingEnabled = (value: boolean): void =>
 			{
 				systemPreferenceService.setPreference(ctrl.pollingPropName, value.toString());
 			}
 
-			ctrl.manualLabPull = async () =>
+			ctrl.manualLabPull = async (): Promise<void> =>
 			{
 				ctrl.loadingQueue.pushLoadingState();
 				await labService.triggerLabPull(ctrl.labType);
+				// refresh provider settings after pulling labs, as dates may change
+				ctrl.providerSettingsList = await labService.getOlisProviderSettings();
 				ctrl.loadingQueue.popLoadingState();
 			}
 
-			ctrl.labSearch = () =>
+			ctrl.labSearch = (): void =>
 			{
 				const target = "_blank";
 				const url = "../olis/Search.jsp";
 				window.open(url, target, "scrollbars=yes, location=no, width=1024, height=800");
 			};
 
-			ctrl.startDateDisplay = (date: Moment) =>
+			ctrl.saveSystemSettings = async (): Promise<void> =>
+			{
+				ctrl.loadingQueue.pushLoadingState();
+				await labService.updateOlisSystemSettings(ctrl.systemSettings);
+				ctrl.loadingQueue.popLoadingState();
+			}
+
+			ctrl.startDateDisplay = (date: Moment): string =>
 			{
 				if(date)
 				{
@@ -97,7 +140,7 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 				}
 			}
 
-			ctrl.configurationStatusDisplay = (configured: boolean) =>
+			ctrl.configurationStatusDisplay = (configured: boolean): string =>
 			{
 				return (configured)? "OK" : "Not Configured";
 			}

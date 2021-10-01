@@ -34,7 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Component
-public class OLISSystemSPreferencesToTransferConverter extends AbstractModelConverter<OLISSystemPreferences, OLISSystemSettingsTransfer>
+public class OLISSystemPreferencesToTransferConverter extends AbstractModelConverter<OLISSystemPreferences, OLISSystemSettingsTransfer>
 {
 	@Override
 	public OLISSystemSettingsTransfer convert(OLISSystemPreferences input)
@@ -56,6 +56,13 @@ public class OLISSystemSPreferencesToTransferConverter extends AbstractModelConv
 			warnings.add("OLIS system settings have not been set");
 		}
 		transfer.setWarnings(warnings);
+
+		// always have a polling frequency
+		if(transfer.getFrequency() == null)
+		{
+			transfer.setFrequency(OLISSystemPreferences.DEFAULT_POLLING_FREQUENCY);
+		}
+
 		return transfer;
 	}
 }

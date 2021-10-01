@@ -26,13 +26,14 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.dataMigration.converter.out.ProviderDbToModelConverter;
-import org.oscarehr.olis.converter.OLISSystemSPreferencesToTransferConverter;
+import org.oscarehr.olis.converter.OLISSystemPreferencesToTransferConverter;
 import org.oscarehr.olis.dao.OLISProviderPreferencesDao;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISProviderPreferences;
 import org.oscarehr.olis.model.OLISSystemPreferences;
 import org.oscarehr.olis.transfer.OLISProviderSettingsTransfer;
 import org.oscarehr.olis.transfer.OLISSystemSettingsTransfer;
+import org.oscarehr.olis.transfer.OLISSystemSettingsUpdateInput;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class OLISConfigService
 	private UserPropertyDAO userPropertyDAO;
 
 	@Autowired
-	private OLISSystemSPreferencesToTransferConverter olisSystemSPreferencesToTransferConverter;
+	private OLISSystemPreferencesToTransferConverter olisSystemPreferencesToTransferConverter;
 
 	@Autowired
 	private ProviderDbToModelConverter providerDbToModelConverter;
@@ -70,7 +71,18 @@ public class OLISConfigService
 	public OLISSystemSettingsTransfer getOlisSystemSettings()
 	{
 		OLISSystemPreferences olisSystemPreferences = olisSystemPreferencesDao.getPreferences();
-		return olisSystemSPreferencesToTransferConverter.convert(olisSystemPreferences);
+		return olisSystemPreferencesToTransferConverter.convert(olisSystemPreferences);
+	}
+
+	public OLISSystemSettingsTransfer updateOlisSystemSettings(OLISSystemSettingsUpdateInput input)
+	{
+		OLISSystemPreferences olisSystemPreferences = olisSystemPreferencesDao.getPreferences();
+		olisSystemPreferences.setFilterPatients(input.isFilterPatients());
+		olisSystemPreferences.setPollFrequency(input.getFrequency());
+		olisSystemPreferences.setStartTime(ConversionUtils.toDateTimeString(input.getStartDateTime(), DateTimeFormatter.ofPattern(OLISPollingService.OLIS_DATE_FORMAT)));
+		olisSystemPreferencesDao.merge(olisSystemPreferences);
+
+		return olisSystemPreferencesToTransferConverter.convert(olisSystemPreferences);
 	}
 
 	public List<OLISProviderSettingsTransfer> getAllProviderSettings()

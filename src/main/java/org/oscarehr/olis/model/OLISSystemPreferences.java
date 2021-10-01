@@ -20,7 +20,10 @@ import javax.persistence.TemporalType;
 
 import org.oscarehr.common.model.AbstractModel;
 @Entity
-public class OLISSystemPreferences extends AbstractModel<Integer> {
+public class OLISSystemPreferences extends AbstractModel<Integer>
+{
+	// olis recommends 30 minute polling interval
+	public static final int DEFAULT_POLLING_FREQUENCY = 30; // minutes
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -47,9 +47,6 @@ public class OLISSchedulerJob
 	@Autowired
 	private SecurityDao securityDao;
 
-	// olis recommends 30 minute polling interval
-	private static final int DEFAULT_POLLING_FREQUENCY = 30; // minutes
-
 	public void run()
 	{
 		try
@@ -84,7 +81,7 @@ public class OLISSchedulerJob
 				Integer freqMins = olisPrefs.getPollFrequency();
 				if(freqMins == null)
 				{
-					freqMins = DEFAULT_POLLING_FREQUENCY;
+					freqMins = OLISSystemPreferences.DEFAULT_POLLING_FREQUENCY;
 				}
 
 				Calendar cal = Calendar.getInstance();

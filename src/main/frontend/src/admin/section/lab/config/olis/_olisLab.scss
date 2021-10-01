@@ -1,5 +1,5 @@
 .lab-config-olis {
-	.search-button-wrapper {
+	.button-wrapper {
 		width: 128px;
 	}
 
@@ -11,6 +11,12 @@
 		}
 		.header-text {
 			font-weight: bold;
+		}
+	}
+
+	.input-form {
+		label {
+			min-width: 192px;
 		}
 	}
 }

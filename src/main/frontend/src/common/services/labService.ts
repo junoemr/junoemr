@@ -28,6 +28,7 @@ import OlisSystemSettings from "../../lib/lab/olis/model/OlisSystemSettings";
 import OlisProviderSettings from "../../lib/lab/olis/model/OlisProviderSettings";
 import OlisProviderSettingsTransferToModelConverter from "../../lib/lab/olis/converter/OlisProviderSettingsTransferToModelConverter";
 import OlisSystemSettingsTransferToModelConverter from "../../lib/lab/olis/converter/OlisSystemSettingsTransferToModelConverter";
+import OlisSystemSettingsInputConverter from "../../lib/lab/olis/converter/OlisSystemSettingsInputConverter";
 
 angular.module("Common.Services").service("labService", [
 	'$q',
@@ -42,6 +43,7 @@ angular.module("Common.Services").service("labService", [
 
 		service.olisSystemSettingsTransferToModelConverter = new OlisSystemSettingsTransferToModelConverter();
 		service.olisProviderSettingsTransferToModelConverter = new OlisProviderSettingsTransferToModelConverter();
+		service.olisSystemSettingsInputConverter = new OlisSystemSettingsInputConverter();
 
 		service.triggerLabPull = async (labType: string): Promise<boolean> =>
 		{
@@ -58,6 +60,12 @@ angular.module("Common.Services").service("labService", [
 		{
 			return service.olisSystemSettingsTransferToModelConverter.convert(
 				(await labApi.getOlisSystemSettings()).data.body);
+		}
+
+		service.updateOlisSystemSettings = async (input: OlisSystemSettings): Promise<OlisSystemSettings> =>
+		{
+			return service.olisSystemSettingsTransferToModelConverter.convert(
+				(await labApi.updateOlisSystemSettings(service.olisSystemSettingsInputConverter.convert(input))).data.body);
 		}
 
 		return service;

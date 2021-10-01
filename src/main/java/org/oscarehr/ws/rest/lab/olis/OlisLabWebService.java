@@ -24,30 +24,30 @@
 package org.oscarehr.ws.rest.lab.olis;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.log4j.Logger;
 import org.oscarehr.olis.service.OLISConfigService;
 import org.oscarehr.olis.transfer.OLISProviderSettingsTransfer;
 import org.oscarehr.olis.transfer.OLISSystemSettingsTransfer;
+import org.oscarehr.olis.transfer.OLISSystemSettingsUpdateInput;
 import org.oscarehr.security.model.Permission;
-import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 @Path("/olis")
 @Component("OlisLabWebService")
-@Produces("application/json")
+@Produces(MediaType.APPLICATION_JSON)
 @Tag(name = "lab")
 public class OlisLabWebService extends AbstractServiceImpl
 {
-    private static final Logger logger = MiscUtils.getLogger();
-
     @Autowired
     private OLISConfigService olisConfigService;
 
@@ -55,8 +55,17 @@ public class OlisLabWebService extends AbstractServiceImpl
     @Path("/config/system")
     public RestResponse<OLISSystemSettingsTransfer> getOlisSystemSettings()
     {
-        securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.LAB_READ);
+        securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.LAB_READ, Permission.ADMIN_READ);
         return RestResponse.successResponse(olisConfigService.getOlisSystemSettings());
+    }
+
+    @PUT
+    @Path("/config/system")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public RestResponse<OLISSystemSettingsTransfer> updateOlisSystemSettings(OLISSystemSettingsUpdateInput updateTransfer)
+    {
+        securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.LAB_UPDATE, Permission.ADMIN_UPDATE);
+        return RestResponse.successResponse(olisConfigService.updateOlisSystemSettings(updateTransfer));
     }
 
     @GET
