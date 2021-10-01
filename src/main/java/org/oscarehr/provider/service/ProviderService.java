@@ -485,6 +485,11 @@ public class ProviderService
 		}
 		existingRecord.setUserName(source.getUserName());
 		existingRecord.setEmail(source.getEmail());
+		existingRecord.setBExpireset(source.getBExpireset());
+		existingRecord.setDateExpiredate(source.getDateExpiredate());
+		existingRecord.setBLocallockset(source.getBLocallockset());
+		existingRecord.setBRemotelockset(source.getBRemotelockset());
+		existingRecord.setForcePasswordReset(source.isForcePasswordReset());
 	}
 
 	public void createAndSaveProviderImdHealthUuid(ProviderData providerData)

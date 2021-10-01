@@ -364,9 +364,10 @@ public class ProviderEditFormTo1 implements Serializable
 			security.setPin(securityRecordTo1.getPin());
 		}
 		security.setProviderNo(providerNo.toString());
-		security.setBExpireset(0);
-		security.setBLocallockset(1);
-		security.setBRemotelockset(1);
-		security.setForcePasswordReset(false);
+		security.setBExpireset(securityRecordTo1.isExpirySet() ? 1 : 0);
+		security.setDateExpiredate(ConversionUtils.toNullableLegacyDate(securityRecordTo1.getExpiryDate()));
+		security.setBLocallockset(securityRecordTo1.isPinLockLocal() ? 1 : 0);
+		security.setBRemotelockset(securityRecordTo1.isPinLockRemote() ? 1 : 0);
+		security.setForcePasswordReset(securityRecordTo1.isForcePasswordReset());
 	}
 }

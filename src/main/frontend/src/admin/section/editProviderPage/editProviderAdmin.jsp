@@ -410,6 +410,51 @@
 									Passcodes do not match.
 								</div>
 							</div>
+							<div class="grid-column-2 justify-content-start align-items-center">
+								<div class="m-r-16">
+									<juno-check-box
+											ng-model="securityRecord.expirySet"
+											label="Expires"
+											label-position="LABEL_POSITION.TOP"
+											disabled="$ctrl.fieldsDisabled"
+									>
+									</juno-check-box>
+								</div>
+								<ca-field-date
+										ca-title="Expires On"
+										ca-date-picker-id="login-expiry-date"
+										ca-name="login-expiry-date"
+										ca-model="securityRecord.expiryDate"
+										ca-orientation="auto"
+										ca-disabled="$ctrl.fieldsDisabled"
+								>
+								</ca-field-date>
+							</div>
+							<div class="grid-column-4 justify-content-start align-items-center">
+								<juno-check-box
+										ng-model="securityRecord.pinLockLocal"
+										label="Local Pin Lock"
+										label-position="LABEL_POSITION.TOP"
+										disabled="$ctrl.fieldsDisabled"
+								>
+								</juno-check-box>
+								<juno-check-box
+										ng-model="securityRecord.pinLockRemote"
+										label="Remote Pin Lock"
+										label-position="LABEL_POSITION.TOP"
+										disabled="$ctrl.fieldsDisabled"
+								>
+								</juno-check-box>
+								<juno-check-box
+										ng-model="securityRecord.forcePasswordReset"
+										label="Force password reset"
+										label-position="LABEL_POSITION.TOP"
+										title="force the user to reset their password on next login"
+										disabled="$ctrl.fieldsDisabled"
+								>
+								</juno-check-box>
+							</div>
+
 						</div>
 					</div>
 <%--					<div class="edit-provider-or-group" ng-class="{'field-error': !$ctrl.providerValidations.emailOrUserName() && $ctrl.hasSubmitted}">--%>
