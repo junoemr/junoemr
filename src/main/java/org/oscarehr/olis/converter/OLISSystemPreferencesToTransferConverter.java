@@ -61,7 +61,7 @@ public class OLISSystemPreferencesToTransferConverter extends AbstractModelConve
 		// always have a polling frequency
 		if(transfer.getFrequency() == null)
 		{
-			transfer.setFrequency(OLISSystemPreferences.DEFAULT_POLLING_FREQUENCY);
+			transfer.setFrequency(OLISSystemPreferences.DEFAULT_POLLING_FREQUENCY_MIN);
 		}
 
 		return transfer;

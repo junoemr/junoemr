@@ -81,7 +81,7 @@ public class OLISSchedulerJob
 				Integer freqMins = olisPrefs.getPollFrequency();
 				if(freqMins == null)
 				{
-					freqMins = OLISSystemPreferences.DEFAULT_POLLING_FREQUENCY;
+					freqMins = OLISSystemPreferences.DEFAULT_POLLING_FREQUENCY_MIN;
 				}
 
 				Calendar cal = Calendar.getInstance();
