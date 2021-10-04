@@ -299,7 +299,7 @@ public class PatientService extends BaseService
 			logInvalidIntegrationWarn(e);
 		}
 
-		return null;
+		return Optional.empty();
 	}
 
 
@@ -345,7 +345,7 @@ public class PatientService extends BaseService
 			logInvalidIntegrationWarn(e);
 		}
 
-		return null;
+		return Optional.empty();
 	}
 
 	// ==========================================================================
