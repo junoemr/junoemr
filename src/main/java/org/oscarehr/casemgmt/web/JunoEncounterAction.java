@@ -73,7 +73,6 @@ import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.conversion.CaseManagementIssueConverter;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
 import org.springframework.beans.factory.annotation.Autowired;
