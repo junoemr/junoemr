@@ -1,4 +1,5 @@
 import {ProviderPreferenceApi} from "../../generated";
+import {SecurityPermissions} from "../common/security/securityConstants";
 
 angular.module('Consults').controller('Consults.ConsultRequestListController', [
 	'$http',
@@ -7,13 +8,12 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 	'$timeout',
 	'$state',
 	'$location',
-	// '$defer',
 	'NgTableParams',
 	'consultService',
 	'providerService',
 	'demographicService',
 	'demographicsService',
-	'securityService',
+	'securityRolesService',
 	'staticDataService',
 
 	function(
@@ -23,48 +23,18 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 		$timeout,
 		$state,
 		$location,
-		// $defer,
 		NgTableParams,
 		consultService,
 		providerService,
 		demographicService,
 		demographicsService,
-		securityService,
+		securityRolesService,
 		staticDataService)
 	{
 
 		var controller = this;
 		let providerPreferenceApi = new ProviderPreferenceApi($http, $httpParamSerializer, '../ws/rs');
 
-
-		//get access rights
-		securityService.hasRight("_con", "r").then(
-			function success(results)
-			{
-				controller.consultReadAccess = results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-		securityService.hasRight("_con", "u").then(
-			function success(results)
-			{
-				controller.consultUpdateAccess = results; //to be used with batch operations (not yet implemented)
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-		securityService.hasRight("_con", "w").then(
-			function success(results)
-			{
-				controller.consultWriteAccess = results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
 
 		//set search statuses
 		controller.statuses = staticDataService.getConsultRequestStatuses();
@@ -83,17 +53,39 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 			numToReturn: 10
 		};
 
-		providerService.getActiveTeams().then(
-			function success(results)
-			{
-				controller.teams = results;
-				controller.teams.unshift(allTeams);
-			},
-			function error(errors)
-			{
-				alert(errors);
-				console.log(errors);
-			});
+		controller.SecurityPermissions = SecurityPermissions;
+
+		controller.$onInit = () =>
+		{
+			providerService.getActiveTeams().then(
+				function success(results)
+				{
+					controller.teams = results;
+					controller.teams.unshift(allTeams);
+				},
+				function error(errors)
+				{
+					alert(errors);
+					console.log(errors);
+				});
+		}
+
+		controller.canEditConsults = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationUpdate);
+		}
+		controller.canCreateConsults = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationCreate);
+		}
+		controller.canAccessDemographics = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead);
+		}
+		controller.canAccessConsultConfig = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConfigureConsultRead);
+		}
 
 		controller.searchPatients = function searchPatients(term)
 		{
@@ -216,7 +208,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 
 		controller.addConsult = function addConsult()
 		{
-			if (!controller.consultWriteAccess)
+			if (!controller.canCreateConsults())
 			{
 				alert("You don't have right to create new consult");
 				return false;

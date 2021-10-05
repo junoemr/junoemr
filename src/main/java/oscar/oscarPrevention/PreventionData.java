@@ -24,6 +24,7 @@
 
 package oscar.oscarPrevention;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
@@ -55,6 +56,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PreventionData {
 
@@ -67,59 +69,104 @@ public class PreventionData {
 		// prevent instantiation
 	}
 
-	public static Integer insertPreventionData(String creator, String demoNo, String date, String providerNo, String providerName, String preventionType, String refused, String nextDate, String neverWarn, ArrayList<Map<String, String>> list) {
-		Integer insertId = -1;
-		try {
-			Prevention prevention = new Prevention();
-			prevention.setCreatorProviderNo(creator);
-			prevention.setDemographicId(Integer.valueOf(demoNo));
+	@Deprecated
+	public static Integer insertPreventionData(
+			String creator,
+			String demoNo,
+			String date,
+			String providerNo,
+			String providerName,
+			String preventionType,
+			String refused,
+			String nextDate,
+			String neverWarn,
+			ArrayList<Map<String, String>> list)
+	{
+		String preventionDateFormat = partialDateDao.getFormat(date);
+		date = makeFullDate(preventionDateFormat, date);
 
-			String preventionDateFormat = partialDateDao.getFormat(date);
+		Prevention prevention = null;
+		try
+		{
+			// convert the list of maps to a list of preventionExt items.
+			// it looks like the maps are being used as key value pairs and are only ever of size 1
+			List<PreventionExt> extList = list
+					.stream()
+					.flatMap((extMap) ->
+							extMap.entrySet().stream().map((entry) -> {
+								PreventionExt preventionExt = new PreventionExt();
+								preventionExt.setKeyval(entry.getKey());
+								preventionExt.setVal(entry.getValue());
+								return preventionExt;
+							}).collect(Collectors.toList()).stream())
+					.collect(Collectors.toList());
 
-			date = makeFullDate(preventionDateFormat, date);
-
-			prevention.setPreventionDate(ConversionUtils.fromDateString(date));
-
-			prevention.setProviderNo(providerNo);
-			prevention.setProviderName(providerName);
-			prevention.setPreventionType(preventionType);
-			prevention.setNextDate(ConversionUtils.fromDateString(nextDate, ConversionUtils.DEFAULT_DATE_PATTERN));
-			prevention.setNever(neverWarn.trim().equals("1"));
-			if (refused.trim().equals("1")) prevention.setRefused(true);
-			else if (refused.trim().equals("2")) prevention.setIneligible(true);
-
-			preventionDao.persist(prevention);
-			if (prevention.getId() == null) return insertId;
-			partialDateDao.setPartialDate(PartialDate.TABLE_PREVENTIONS, prevention.getId(), PartialDate.PREVENTION_DATE, preventionDateFormat);
-
-			insertId = prevention.getId();
-			for (int i = 0; i < list.size(); i++) {
-				Map<String, String> preventionMap = list.get(i);
-				for (Map.Entry<String, String> entry : preventionMap.entrySet()) {
-					if (entry.getKey() != null && entry.getValue() != null) {
-						addPreventionKeyValue("" + insertId, entry.getKey(), entry.getValue());
-					}
-				}
-			}
-		} catch (Exception e) {
+			prevention = insertPreventionData(
+					creator,
+					Integer.parseInt(demoNo),
+					ConversionUtils.fromDateString(date),
+					preventionDateFormat,
+					providerNo,
+					providerName,
+					preventionType,
+					String.valueOf(Prevention.REFUSED_STATUS_REFUSED).equals(StringUtils.trimToNull(refused)),
+					String.valueOf(Prevention.REFUSED_STATUS_INELIGIBLE).equals(StringUtils.trimToNull(refused)),
+					ConversionUtils.fromDateString(nextDate, ConversionUtils.DEFAULT_DATE_PATTERN),
+					String.valueOf(Prevention.NEVER_SEND_REMINDER).equals(StringUtils.trimToNull(neverWarn)),
+					extList);
+		}
+		catch(Exception e)
+		{
 			log.error(e.getMessage(), e);
 		}
-		return insertId;
+		return (prevention != null) ? prevention.getId() : -1;
 	}
 
-	public static void addPreventionKeyValue(String preventionId, String keyval, String val) {
-		try {
-			Prevention prevention = preventionDao.find(Integer.valueOf(preventionId));
+	public static Prevention insertPreventionData(
+			String creator,
+			Integer demoNo,
+			Date date,
+			String preventionDateFormat,
+			String providerNo,
+			String providerName,
+			String preventionType,
+			boolean refused,
+			boolean ineligible,
+			Date nextDate,
+			boolean neverWarn,
+			List<PreventionExt> preventionExts)
+	{
+		Prevention prevention = new Prevention();
+		prevention.setCreatorProviderNo(creator);
+		prevention.setDemographicId(demoNo);
+		prevention.setPreventionDate(date);
+		prevention.setProviderNo(providerNo);
+		prevention.setProviderName(providerName);
+		prevention.setPreventionType(preventionType);
+		prevention.setNextDate(nextDate);
+		prevention.setNever(neverWarn);
 
-			PreventionExt preventionExt = new PreventionExt();
-			preventionExt.setPrevention(prevention);
-			preventionExt.setKeyval(keyval);
-			preventionExt.setVal(val);
-
-			preventionExtDao.persist(preventionExt);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+		// this is a weird set up since both refused and ineligible use the same db column.
+		if(refused)
+		{
+			prevention.setRefused(true);
 		}
+		else if (ineligible)
+		{
+			prevention.setIneligible(true);
+		}
+
+
+		if(preventionExts != null)
+		{
+			prevention.setPreventionExtensionList(preventionExts);
+			preventionExts.forEach(preventionExt -> preventionExt.setPrevention(prevention));
+		}
+
+		preventionDao.persist(prevention);
+		partialDateDao.setPartialDate(PartialDate.TABLE_PREVENTIONS, prevention.getId(), PartialDate.PREVENTION_DATE, preventionDateFormat);
+
+		return prevention;
 	}
 
 	public static Map<String, String> getPreventionKeyValues(String preventionId) {

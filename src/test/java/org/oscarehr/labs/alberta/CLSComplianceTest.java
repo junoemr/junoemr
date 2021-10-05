@@ -28,8 +28,14 @@ import static org.junit.Assert.*;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+import org.junit.runner.RunWith;
+import org.oscarehr.JunoApplication;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class)
 public class CLSComplianceTest {
 
 	private static final Logger logger = Logger.getLogger(CLSComplianceTest.class);

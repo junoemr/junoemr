@@ -28,6 +28,9 @@ import {
 } from "../../../../common/components/junoComponentConstants";
 import MessagingServiceFactory from "../../../../lib/messaging/factory/MessagingServiceFactory";
 import {MessageGroup} from "../../../../lib/messaging/model/MessageGroup";
+import TicklerAttachment from "../../../../lib/tickler/model/TicklerAttachment";
+import {TicklerAttachmentType} from "../../../../lib/tickler/model/TicklerAttachmentType";
+import {MessageableMappingConfidence} from "../../../../lib/messaging/model/MessageableMappingConfidence";
 
 angular.module("Messaging.Components").component('inboxHeaderBar', {
 	templateUrl: 'src/messaging/inbox/components/inboxHeaderBar/inboxHeaderBar.jsp',
@@ -207,6 +210,25 @@ angular.module("Messaging.Components").component('inboxHeaderBar', {
 						}
 					}
 				).result;
+			}
+
+			ctrl.openCreateTicklerModal = async () =>
+			{
+				const selectedMessage = await ctrl.getSelectedMessage();
+				const ticklerTargets = await selectedMessage.demographicParticipants(MessageableMappingConfidence.MEDIUM);
+				const ticklerTarget = ticklerTargets.length > 0 ? ticklerTargets[0]: null; // just pick the first target for now
+				const demographicNo = ticklerTarget ? await ticklerTarget.localId() : null;
+
+				$uibModal.open(
+					{
+						component: 'ticklerAddComponent',
+						backdrop: 'static',
+						size: 'lg',
+						resolve: {
+							attachment: () => new TicklerAttachment(TicklerAttachmentType.Message, selectedMessage.id, {messagingBackend: ctrl.messagingBackendId, source: ctrl.sourceId, group: ctrl.groupId}),
+							presetDemographicNo: () => demographicNo,
+						},
+					});
 			}
 
 			/**

@@ -61,7 +61,7 @@
 		<memcachedSessionManager.version>2.3.2</memcachedSessionManager.version>
 		<jaxb.version>2.3.1</jaxb.version>
 		<jaxbcore.version>2.3.0.1</jaxbcore.version>
-    <jackson.version>2.12.3</jackson.version>
+    	<jackson.version>2.12.3</jackson.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -917,7 +917,7 @@
 		<dependency>
 			<groupId>com.jcraft</groupId>
 			<artifactId>jsch</artifactId>
-			<version>0.1.55</version>
+			<version>0.1.49</version>
 		</dependency>
 		<!-- OLIS -->
 		<dependency>
@@ -1404,13 +1404,30 @@
 				<directory>${basedir}/src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
+			<resource>
+				<directory>${basedir}/database</directory>
+				<filtering>false</filtering>
+				<targetPath>create_instance/database</targetPath>
+			</resource>
+			<resource>
+				<directory>${basedir}/package_files</directory>
+				<filtering>false</filtering>
+				<targetPath>create_instance/package_files</targetPath>
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<executable>true</executable>
+					<image>
+						<env>
+							<BP_JVM_VERSION>16.0.2</BP_JVM_VERSION>
+						</env>
+					</image>
+					<layers>
+						<enabled>true</enabled>
+					</layers>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -1830,35 +1847,54 @@
 								org.oscarehr.ws.rest.ScheduleService
 								org.oscarehr.ws.rest.SitesService
 								org.oscarehr.ws.rest.AppointmentService
+								org.oscarehr.ws.rest.CareTrackerWebService
+								org.oscarehr.ws.rest.CareTrackersWebService
+								org.oscarehr.ws.rest.DecisionSupportWebService
+								org.oscarehr.ws.rest.DemographicService
+								org.oscarehr.ws.rest.DemographicsService
+								org.oscarehr.ws.rest.demographic.DemographicCareTrackerWebService
+								org.oscarehr.ws.rest.demographic.DemographicContactWebService
+								org.oscarehr.ws.rest.demographic.DemographicContactsWebService
 								org.oscarehr.ws.rest.demographic.DemographicDocumentsWebService
 								org.oscarehr.ws.rest.demographic.DemographicDocumentWebService
+								org.oscarehr.ws.rest.demographic.DemographicDxWebService
+								org.oscarehr.ws.rest.demographic.DemographicMeasurementsWebService
 								org.oscarehr.ws.rest.DocumentTypesWebService
+								org.oscarehr.ws.rest.DiseaseRegistryService
 								org.oscarehr.ws.rest.DocumentWebService
-								org.oscarehr.ws.rest.ProviderPreferenceWebService
-								org.oscarehr.ws.rest.DemographicService
-                                org.oscarehr.ws.rest.DemographicsService
-                                org.oscarehr.ws.rest.RosterWebService
-                                org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
-								org.oscarehr.ws.rest.ProvidersService
-								org.oscarehr.ws.rest.ReferralDoctorsService
-                                org.oscarehr.ws.rest.integrations.hrm.HrmWebService
+								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
+								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
+								org.oscarehr.ws.rest.integrations.aqs.QueueWebService
+                org.oscarehr.ws.rest.integrations.hrm.HrmWebService
+								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
 								org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService
+								org.oscarehr.ws.rest.MeasurementsWebService
 								org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.ConversationWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.message.AttachmentWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.MessagesWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.MessageWebService
 								org.oscarehr.ws.rest.myhealthaccess.DemographicWebService
-								org.oscarehr.ws.rest.myhealthaccess.IntegrationsWebService
 								org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService
+								org.oscarehr.ws.rest.myhealthaccess.IntegrationsWebService
 								org.oscarehr.ws.rest.myhealthaccess.MhaPatientsWebService
-                                org.oscarehr.ws.rest.myhealthaccess.MhaPatientWebService
+								org.oscarehr.ws.rest.myhealthaccess.MhaPatientWebService
 								org.oscarehr.ws.rest.myhealthaccess.patient.AccessWebService
 								org.oscarehr.ws.rest.myhealthaccess.SSOWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueueWebService
 								org.oscarehr.ws.rest.NotesService
+								org.oscarehr.ws.rest.PreventionService
+								org.oscarehr.ws.rest.ProviderPreferenceWebService
+								org.oscarehr.ws.rest.ProviderService
+								org.oscarehr.ws.rest.ProvidersService
+								org.oscarehr.ws.rest.ReferralDoctorsService
+								org.oscarehr.ws.rest.RosterWebService
+								org.oscarehr.ws.rest.ScheduleService
+								org.oscarehr.ws.rest.SecurityRolesWebService
+								org.oscarehr.ws.rest.SitesService
+								org.oscarehr.ws.rest.SystemPreferenceWebService
 							</value>
 						</systemProperty>
 						<systemProperty>
@@ -1875,7 +1911,7 @@
 			<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>5.1.0</version>
 				<executions>
 					<execution>
 						<id>generate-typescript-api</id>
@@ -1885,8 +1921,13 @@
 						</goals>
 						<configuration>
 							<inputSpec>${project.build.directory}/openapi/openapi.json</inputSpec>
-							<generatorName>typescript-angularjs</generatorName>
+							<generatorName>typescript-angularjs-deprecated</generatorName>
 							<output>src/main/frontend/generated/</output>
+							<skip>${juno.webpack.skip}</skip>
+							<skipValidateSpec>true</skipValidateSpec>
+							<additionalProperties>
+								<additionalProperty>enumPropertyNaming=PascalCase</additionalProperty>
+							</additionalProperties>
 						</configuration>
 					</execution>
 				</executions>
@@ -1934,9 +1975,7 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<target>
-								<exec resolveexecutable="true" executable="fix_openapi_generate_hack.sh"></exec>
-							</target>
+							<skip>${juno.webpack.skip}</skip>
 						</configuration>
 					</execution>
 				</executions>
@@ -2091,6 +2130,7 @@
 								<!-- These should already be included by other jsp files -->
 								<exclude>**/*.jspf</exclude>
 							</excludes>
+							<keepSources>true</keepSources>
 							<threads>4</threads>
 							<!-- Use a dummy web.xml file just used for registering jsps compiled by jspc -->
 							<webXml>${basedir}/src/main/webapp/WEB-INF/blank-web.xml</webXml>
@@ -2341,28 +2381,28 @@
 									<generatePackage>xml.hrm.v4_3</generatePackage>
 								</configuration>
 							</execution>
-                            <execution>
-                                <id>hrm4.1-schema-generation</id>
-                                <goals>
-                                    <goal>generate</goal>
-                                </goals>
-                                <phase>generate-resources</phase>
-                                <configuration>
-                                    <extension>true</extension>
-                                    <!-- no header to prevent all the generated files being changed on automatic re-compile -->
-                                    <noFileHeader>true</noFileHeader>
-                                    <args>
-                                        <arg>-Xinheritance</arg>
-                                    </args>
-                                    <bindingDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/hrm/v4_1</bindingDirectory>
-                                    <bindingIncludes>
-                                        <include>bindings.xjb</include>
-                                    </bindingIncludes>
-                                    <schemaDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/hrm/v4_1</schemaDirectory>
-                                    <generateDirectory>${basedir}/src/gen/java</generateDirectory>
-                                    <generatePackage>xml.hrm.v4_1</generatePackage>
-                                </configuration>
-                            </execution>
+                            				<execution>
+                                				<id>hrm4.1-schema-generation</id>
+                                				<goals>
+                                    					<goal>generate</goal>
+                                				</goals>
+                                				<phase>generate-resources</phase>
+                                				<configuration>
+                                    					<extension>true</extension>
+                                    					<!-- no header to prevent all the generated files being changed on automatic re-compile -->
+                                    					<noFileHeader>true</noFileHeader>
+                                    					<args>
+                                        					<arg>-Xinheritance</arg>
+                                    					</args>
+                                    				<bindingDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/hrm/v4_1</bindingDirectory>
+                                    					<bindingIncludes>
+                                        					<include>bindings.xjb</include>
+                                    					</bindingIncludes>
+                                    					<schemaDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/hrm/v4_1</schemaDirectory>
+                                    					<generateDirectory>${basedir}/src/gen/java</generateDirectory>
+                                    					<generatePackage>xml.hrm.v4_1</generatePackage>
+                                				</configuration>
+                            			</execution>
 						</executions>
 						<configuration>
 							<extension>true</extension>

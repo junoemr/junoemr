@@ -37,6 +37,7 @@ import org.oscarehr.integration.iceFall.service.IceFallService;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallException;
 import org.oscarehr.integration.iceFall.service.exceptions.IceFallRESTException;
 import org.oscarehr.preferences.service.SystemPreferenceService;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.integrations.iceFall.transfer.IceFallLogEntryListTo1;
@@ -176,6 +177,8 @@ public class IceFallWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> sendFormToIceFall(IceFallSendFormTo1 iceFallSendFormTo1)
 	{
 		Provider provider = getCurrentProvider();
+		securityInfoManager.requireAllPrivilege(provider.getProviderNo(), Permission.RX_CREATE, Permission.EFORM_CREATE);
+
 		Demographic demo = demographicDao.find(iceFallSendFormTo1.getDemographicNo());
 
 		if (systemPreferenceService.isPreferenceEnabled(UserProperty.ICE_FALL_INTEGRATION_ENABLED, false) &&

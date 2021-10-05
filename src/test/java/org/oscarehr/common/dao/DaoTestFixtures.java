@@ -90,6 +90,7 @@ public abstract class DaoTestFixtures
 			p.setProperty("db_password_readonly", ConfigUtils.getProperty("db_password_readonly"));
 			p.setProperty("db_uri", ConfigUtils.getProperty("db_url_prefix"));
 			p.setProperty("db_driver", ConfigUtils.getProperty("db_driver"));
+			p.setProperty("ModuleNames", "BORN");
 			//ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext();
 			//context.setConfigLocations(new String[]{"/applicationContext.xml","/applicationContextBORN.xml"});
 			//context.refresh();

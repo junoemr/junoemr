@@ -25,21 +25,13 @@ package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.service.CaseManagementIssueService;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
-import org.oscarehr.common.dao.ContactDao;
-import org.oscarehr.common.dao.DemographicContactDao;
-import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.dao.WaitingListDao;
 import org.oscarehr.common.dao.WaitingListNameDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
-import org.oscarehr.common.model.Contact;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.DemographicContact;
-import org.oscarehr.common.model.ProfessionalSpecialist;
-import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.WaitingList;
 import org.oscarehr.common.model.WaitingListName;
 import org.oscarehr.demographic.model.DemographicCust;
@@ -49,8 +41,8 @@ import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
 import org.oscarehr.managers.DemographicManager;
-import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.conversion.DemographicToDomainConverter;
@@ -64,7 +56,6 @@ import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
 import org.oscarehr.ws.rest.to.model.AddressTo1;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
-import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
 import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.oscarehr.ws.rest.to.model.WaitingListNameTo1;
@@ -112,22 +103,10 @@ public class DemographicService extends AbstractServiceImpl {
 	private DemographicManager demographicManager;
 
 	@Autowired
-	private DemographicContactDao demographicContactDao;
-	
-	@Autowired
-	private ContactDao contactDao;
-	
-	@Autowired
 	private WaitingListDao waitingListDao;
 	
 	@Autowired
 	private WaitingListNameDao waitingListNameDao;
-	
-	@Autowired
-	private ProviderDao providerDao;
-	
-	@Autowired
-	private ProfessionalSpecialistDao specialistDao;
 
 	@Autowired
 	private RecentDemographicAccessService recentDemographicAccessService;
@@ -169,7 +148,10 @@ public class DemographicService extends AbstractServiceImpl {
 	 * 		Returns all demographics.
 	 */
 	@GET
-	public OscarSearchResponse<DemographicTo1> getAllDemographics(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
+	public OscarSearchResponse<DemographicTo1> getAllDemographics(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
+
 		OscarSearchResponse<DemographicTo1> result = new OscarSearchResponse<DemographicTo1>();
 		
 		if (offset == null) {
@@ -201,7 +183,10 @@ public class DemographicService extends AbstractServiceImpl {
 	@GET
 	@Path("/{dataId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> getDemographicData(@PathParam("dataId") Integer id) throws PatientDirectiveException {
+	public RestResponse<DemographicTo1> getDemographicData(@PathParam("dataId") Integer id) throws PatientDirectiveException
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), id, Permission.DEMOGRAPHIC_READ);
+
 		try
 		{
 			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
@@ -267,84 +252,6 @@ public class DemographicService extends AbstractServiceImpl {
 		return RestResponse.errorResponse("Error");
 	}
 
-	@GET
-	@Path("/{dataId}/contacts")
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestSearchResponse<DemographicContactFewTo1> getDemographicContacts(@PathParam("dataId") Integer demographicNo,
-	                                                                           @QueryParam("category") String category)
-	{
-		try
-		{
-			// return error if invalid category
-			if(!DemographicContact.ALL_CATEGORIES.contains(category))
-			{
-				return RestSearchResponse.errorResponse("Invalid Category");
-			}
-
-			List<DemographicContactFewTo1> results = new ArrayList<>();
-
-			List<DemographicContact> demoContacts = demographicContactDao.findByDemographicNoAndCategory(demographicNo, category);
-			for (DemographicContact demoContact : demoContacts)
-			{
-				Integer contactId = Integer.valueOf(demoContact.getContactId());
-				DemographicContactFewTo1 demoContactTo1 = new DemographicContactFewTo1();
-
-				if (demoContact.getCategory().equals(DemographicContact.CATEGORY_PERSONAL))
-				{
-					if (demoContact.getType() == DemographicContact.TYPE_DEMOGRAPHIC)
-					{
-						Demographic contactD = demographicManager.getDemographic(getLoggedInInfo(), contactId);
-						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactD);
-
-						DemographicExt cell = demographicManager.getDemographicExt(getLoggedInInfo(), contactId, DemographicExt.KEY_DEMO_CELL);
-						DemographicExt hPhoneExt = demographicManager.getDemographicExt(getLoggedInInfo(), contactId, DemographicExt.KEY_DEMO_H_PHONE_EXT);
-						DemographicExt wPhoneExt = demographicManager.getDemographicExt(getLoggedInInfo(), contactId, DemographicExt.KEY_DEMO_W_PHONE_EXT);
-
-						if (cell != null && !cell.toString().isEmpty())
-						{
-							demoContactTo1.setCellPhone(cell.getValue());
-						}
-						if (hPhoneExt != null && !hPhoneExt.toString().isEmpty())
-						{
-							demoContactTo1.setHPhoneExt(hPhoneExt.getValue());
-						}
-						if (wPhoneExt != null && !wPhoneExt.toString().isEmpty())
-						{
-							demoContactTo1.setWPhoneExt(wPhoneExt.getValue());
-						}
-					}
-					else if (demoContact.getType() == DemographicContact.TYPE_CONTACT)
-					{
-						Contact contactC = contactDao.find(contactId);
-						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactC);
-					}
-					results.add(demoContactTo1);
-				}
-				else if (demoContact.getCategory().equals(DemographicContact.CATEGORY_PROFESSIONAL))
-				{
-					if (demoContact.getType() == DemographicContact.TYPE_PROVIDER)
-					{
-						Provider contactP = providerDao.getProvider(contactId.toString());
-						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactP);
-					}
-					else if (demoContact.getType() == DemographicContact.TYPE_PROFESSIONALSPECIALIST)
-					{
-						ProfessionalSpecialist contactS = specialistDao.find(contactId);
-						demoContactTo1 = demoContactFewConverter.getAsTransferObject(demoContact, contactS);
-					}
-					results.add(demoContactTo1);
-				}
-			}
-			return RestSearchResponse.successResponse(results, 0, 0, 0);
-
-		}
-		catch (Exception e)
-		{
-			logger.error("Error",e);
-		}
-		return RestSearchResponse.errorResponse("Error");
-	}
-
 	/**
 	 * Saves demographic information. 
 	 *
@@ -358,9 +265,11 @@ public class DemographicService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<DemographicTo1> createDemographicData(DemographicTo1 data)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_CREATE);
+
 		Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
 		hinValidationService.validateNoDuplication(demographic.getHin(), demographic.getVer(), demographic.getHcType());
-		demographicManager.createDemographic(getLoggedInInfo(), demographic, data.getAdmissionProgramId());
+		demographicManager.createDemographic(getLoggedInInfo(), demographic);
 
 		String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
 		int providerNo = Integer.parseInt(providerNoStr);
@@ -385,7 +294,7 @@ public class DemographicService extends AbstractServiceImpl {
 	public RestResponse<DemographicTo1> updateDemographicData(DemographicTo1 data)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.UPDATE, data.getDemographicNo(), "_demographic");
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), data.getDemographicNo(), Permission.DEMOGRAPHIC_UPDATE);
 
 		try
 		{
@@ -451,7 +360,9 @@ public class DemographicService extends AbstractServiceImpl {
 	@DELETE
 	@Path("/{dataId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> deleteDemographicData(@PathParam("dataId") Integer id) {
+	public RestResponse<DemographicTo1> deleteDemographicData(@PathParam("dataId") Integer id)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), id, Permission.DEMOGRAPHIC_DELETE);
 		try
 		{
 			Demographic demo = demographicManager.getDemographic(getLoggedInInfo(), id);
@@ -485,6 +396,9 @@ public class DemographicService extends AbstractServiceImpl {
 			@PathParam("issueId") Long issueId
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo,
+				Permission.DEMOGRAPHIC_READ, Permission.ENCOUNTER_ISSUE_READ);
+
 		CaseManagementIssueTo1 issue = caseManagementIssueService.getIssueById(demographicNo, issueId);
 
 		return RestResponse.successResponse(issue);
@@ -500,6 +414,8 @@ public class DemographicService extends AbstractServiceImpl {
 			PropertyData propertyData
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ENCOUNTER_ISSUE_UPDATE);
+
 		CaseManagementIssueTo1 issue = caseManagementIssueService.updateProperty(
 				demographicNo,
 				issueId,
@@ -520,6 +436,8 @@ public class DemographicService extends AbstractServiceImpl {
 			IssueData issueData
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ENCOUNTER_ISSUE_CREATE);
+
 		CaseManagementIssueTo1 issue = caseManagementIssueService.updateIssue(
 				demographicNo,
 				issueId,
@@ -537,6 +455,8 @@ public class DemographicService extends AbstractServiceImpl {
 			@PathParam("demographicNo") int demographicNo
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ENCOUNTER_ISSUE_READ);
+
 		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
 				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_ALL);
 		return RestResponse.successResponse(issues);
@@ -550,6 +470,8 @@ public class DemographicService extends AbstractServiceImpl {
 			@PathParam("demographicNo") int demographicNo
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ENCOUNTER_ISSUE_READ);
+
 		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
 				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_RESOLVED);
 		return RestResponse.successResponse(issues);
@@ -563,6 +485,8 @@ public class DemographicService extends AbstractServiceImpl {
 			@PathParam("demographicNo") int demographicNo
 	)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ENCOUNTER_ISSUE_READ);
+
 		List<CaseManagementIssueTo1> issues = getIssues(request, demographicNo,
 				org.oscarehr.encounterNote.model.CaseManagementIssue.ISSUE_FILTER_UNRESOLVED);
 
@@ -574,7 +498,7 @@ public class DemographicService extends AbstractServiceImpl {
 	public RestSearchResponse<DemographicRosterTransfer> getRosteredHistory(
 			@PathParam("demographicNo") Integer demographicNo)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, demographicNo, "_demographic");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.DEMOGRAPHIC_READ);
 		List<DemographicRosterTransfer> rosteredHistory = demographicRosterService.getRosteredHistory(demographicNo);
 		return RestSearchResponse.successResponseOnePage(rosteredHistory);
 	}

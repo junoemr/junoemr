@@ -7,8 +7,8 @@
 
 import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
-import {SitesApi} from "../../generated";
-import {MhaDemographicApi, MhaIntegrationApi, MhaAppointmentApi} from "../../generated";
+import {MhaAppointmentApi, MhaDemographicApi, MhaIntegrationApi, SitesApi} from "../../generated";
+import {SecurityPermissions} from "../common/security/securityConstants";
 
 angular.module('Schedule').component('eventComponent', {
 	templateUrl: "src/schedule/event.jsp",
@@ -29,6 +29,7 @@ angular.module('Schedule').component('eventComponent', {
 		'demographicService',
 		'providerService',
 		'securityService',
+		'securityRolesService',
 		'scheduleService',
 
 		function (
@@ -43,6 +44,7 @@ angular.module('Schedule').component('eventComponent', {
 			demographicService,
 			providerService,
 			securityService,
+			securityRolesService,
 			scheduleService,
 		)
 		{
@@ -175,6 +177,7 @@ angular.module('Schedule').component('eventComponent', {
 				NO_CONNECTION: "noConnection",
 			};
 			$scope.telehealthMode = $scope.TELEHEALTH_MODES.NONE;
+			controller.readOnlyMode = true;
 
 			controller.patientTypeahead = {};
 			$scope.autocompleteValues = {};
@@ -275,33 +278,6 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.$onInit = function init()
 			{
-				if (!securityService.hasPermission('scheduling_create'))
-				{
-					$timeout(function ()
-					{
-						$scope.cancel();
-					});
-				}
-
-				controller.validations = {
-					appointmentDateOnSameDay: Juno.Validations.validationCustom(() =>
-					{
-						let momentStart = Juno.Common.Util.getDateAndTimeMoment(
-							$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
-						let momentEnd = controller.calculateEndTime();
-
-						let momentStartDay = momentStart.date();
-						let momentEndDay = momentEnd.date();
-
-						if (momentEndDay != momentStartDay)
-						{
-							return false;
-						}
-
-						return true;
-					}),
-				};
-
 				// resolve data from opener
 				controller.loadedSettings = controller.resolve.loadedSettings;
 				controller.parentScope = controller.resolve.parentScope;
@@ -323,6 +299,36 @@ angular.module('Schedule').component('eventComponent', {
 				controller.loadAppointmentReasons();
 				controller.loadAppointmentTypes();
 				controller.providerModel.loadData(data.scheduleId);
+
+				if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentRead))
+				{
+					$timeout(function ()
+					{
+						controller.cancel();
+					});
+				}
+				controller.readOnlyMode = controller.inEditMode() ?
+					!securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentUpdate) :
+					!securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentCreate);
+
+				controller.validations = {
+					appointmentDateOnSameDay: Juno.Validations.validationCustom(() =>
+					{
+						let momentStart = Juno.Common.Util.getDateAndTimeMoment(
+							$scope.eventData.startDate, $scope.formattedTime($scope.eventData.startTime));
+						let momentEnd = controller.calculateEndTime();
+
+						let momentStartDay = momentStart.date();
+						let momentEndDay = momentEnd.date();
+
+						if (momentEndDay != momentStartDay)
+						{
+							return false;
+						}
+
+						return true;
+					}),
+				};
 
 				var momentStart = data.startTime;
 				var momentEnd = data.endTime;
@@ -439,10 +445,17 @@ angular.module('Schedule').component('eventComponent', {
 											sitesApi.getProviderSiteBySchedule(controller.providerModel.providerNo, $scope.eventData.startDate).then(
 													function success(result)
 													{// assign to schedule site that we are booking in to.
-														let site = controller.siteOptions.find(el => el.uuid === result.data.body.siteId);
-														if (site)
+														if(result.data.body)
 														{
-															$scope.eventData.site = site.value;
+															let site = controller.siteOptions.find(el => el.uuid === result.data.body.siteId);
+															if (site)
+															{
+																$scope.eventData.site = site.value;
+															}
+															else
+															{
+																controller.assignDefaultSite();
+															}
 														}
 														else
 														{
@@ -600,7 +613,7 @@ angular.module('Schedule').component('eventComponent', {
 
 				const defaultAppointmentReason = "Others";
 
-				$scope.scheduleApi.getAppointmentReasons().then(
+				$scope.scheduleApi.getAppointmentReasons(true).then(
 					function success(rawResults)
 					{
 						var results = rawResults.data.body;
@@ -1084,6 +1097,10 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				return controller.editMode;
 			};
+			controller.inReadOnlyMode = function inReadOnlyMode()
+			{
+				return controller.readOnlyMode;
+			};
 			controller.isRepeatBookingEnabled = function isRepeatBookingEnabled()
 			{
 				return (!controller.inEditMode() && controller.repeatBookingData.enabled === controller.repeatBooking.toggleEnum.on);
@@ -1096,6 +1113,26 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				return controller.repeatBookingData.endType === controller.repeatBooking.endTypeEnum.after;
 			};
+			controller.isEncounterLinkEnabled = () =>
+			{
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EchartRead);
+			}
+			controller.isMasterFileLinkEnabled = () =>
+			{
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead);
+			}
+			controller.isBillingLinkEnabled = () =>
+			{
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.BillingRead);
+			}
+			controller.isRxLinkEnabled = () =>
+			{
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.RxRead);
+			}
+			controller.deleteButtonEnabled = () =>
+			{
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentDelete);
+			}
 
 			$scope.hasSites = function hasSites()
 			{

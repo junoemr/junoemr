@@ -138,12 +138,21 @@ public class PageUtil
 		driver.manage().window().maximize();
 	}
 
-	public static void switchToNewWindow(WebDriver driver, By textlink, Set<String> oldWindowHandles) throws InterruptedException {
+	public static void  switchToNewWindow(WebDriver driver, By textlink, Set<String> oldWindowHandles) throws InterruptedException {
 		driver.findElement(textlink).click();
 		Thread.sleep(2000);
 		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
 		PageUtil.switchToWindow(newWindows.get(0), driver);
 		driver.manage().window().maximize();
+	}
+
+	public static void accessEncounterPage(WebDriver driver)
+	{
+		driver.findElement((By.xpath("//a[@title=\"Search for patient records\"]"))).click();
+		PageUtil.switchToLastWindow(driver);
+		driver.findElement(By.xpath("//input[@title='Search active patients']")).click();
+		driver.findElement(By.linkText("E")).click();
+		PageUtil.switchToLastWindow(driver);
 	}
 
 }

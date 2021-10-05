@@ -25,15 +25,14 @@
 
 package org.oscarehr.common.dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.oscarehr.common.model.Contact;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class ContactDao extends AbstractDao<Contact> {
@@ -41,23 +40,42 @@ public class ContactDao extends AbstractDao<Contact> {
 	public ContactDao() {
 		super(Contact.class);
 	}
+
+	public Contact findActiveContactById(int contactId) {
+		String sql = "select x from " + this.modelClass.getName() + " x where x.id=?1 and x.deleted=false";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter(1, contactId);
+
+		@SuppressWarnings("unchecked")
+		Contact result = this.getSingleResultOrNull(query);
+
+		return result;
+	}
 	
 	public List<Contact> search(String searchMode, String orderBy, String keyword) {
 		StringBuilder where = new StringBuilder();
 		List<String> paramList = new ArrayList<String>();
 	    
 		if(searchMode.equals("search_name")) {
-			String[] temp = keyword.split("\\,\\p{Space}*");
-			if(temp.length>1) {
-		      where.append("c.lastName like ?1 and c.firstName like ?2");
-		      paramList.add(temp[0]+"%");
-		      paramList.add(temp[1]+"%");
-		    } else {
-		      where.append("c.lastName like ?1");
-		      paramList.add(temp[0]+"%");
-		    }
+			if (keyword == null)
+			{
+				where.append("c.deleted=false");
+			}
+			else
+			{
+				String[] temp = keyword.split("\\,\\p{Space}*");
+				if(temp.length>1) {
+					where.append("c.lastName like ?1 and c.firstName like ?2 and c.deleted=false");
+					paramList.add(temp[0]+"%");
+					paramList.add(temp[1]+"%");
+				} else {
+					where.append("c.lastName like ?1 and c.deleted=false");
+					paramList.add(temp[0]+"%");
+				}
+			}
+
 		}else {		
-			where.append("c." + StringEscapeUtils.escapeSql(searchMode) + " like ?1");
+			where.append("c." + StringEscapeUtils.escapeSql(searchMode) + " like ?1 and c.deleted=false");
 			paramList.add(keyword+"%");
 		}			
 		String sql = "SELECT c from Contact c where " + where.toString() + " order by " + orderBy;

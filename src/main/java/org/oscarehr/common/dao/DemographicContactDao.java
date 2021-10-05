@@ -25,11 +25,12 @@
 
 package org.oscarehr.common.dao;
 
-import java.util.List;
-import javax.persistence.Query;
-
+import org.hibernate.NonUniqueResultException;
 import org.oscarehr.common.model.DemographicContact;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.List;
 
 @Repository
 public class DemographicContactDao extends AbstractDao<DemographicContact>{
@@ -92,7 +93,19 @@ public class DemographicContactDao extends AbstractDao<DemographicContact>{
 		List<DemographicContact> dContacts = query.getResultList();
 		return dContacts;
 	}
-	
+
+	public DemographicContact find(int demographicNo, String contactId, String category) throws NonUniqueResultException
+	{
+		Query query = entityManager.createQuery("SELECT x FROM DemographicContact x WHERE x.demographicNo = :demographicNo AND x.contactId = :contactId AND x.category = :category AND x.deleted = false");
+		query.setParameter("demographicNo", demographicNo);
+		query.setParameter("contactId", contactId);
+		query.setParameter("category", category);
+
+		@SuppressWarnings("unchecked")
+		DemographicContact dContact = (DemographicContact) query.getSingleResult();
+		return dContact;
+	}
+
 	public List<DemographicContact> findAllByContactIdAndCategoryAndType(int contactId, String category, int type) {
 		String sql = "select x from " + this.modelClass.getName() + " x where x.contactId = ?1 and x.category = ?2 and x.type = ?3";
 		Query query = entityManager.createQuery(sql);

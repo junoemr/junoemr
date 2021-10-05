@@ -33,12 +33,12 @@ import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote.SortChronologicDescTextAsc;
 import org.oscarehr.common.dao.OscarLogDao;
-import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dto.HRMDemographicDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.service.HRMService;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
@@ -96,12 +96,12 @@ public class EncounterHRMService extends EncounterSectionService
 	{
 		return WIN_NAME_PREFIX + sectionParams.getDemographicNo();
 	}
-	
+
 	public EncounterNotes getNotes(SectionParameters sectionParams, Integer limit, Integer offset)
 	{
-		if(!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo(), SecObjectName._HRM,
-			SecurityInfoManager.READ, sectionParams.getDemographicNo())
-			|| !OscarProperties.getInstance().isModuleEnabled(OscarProperties.Module.MODULE_HRM))
+		Integer demographicNo = Integer.parseInt(sectionParams.getDemographicNo());
+		if(!OscarProperties.getInstance().isModuleEnabled(OscarProperties.Module.MODULE_HRM) || !securityInfoManager.hasPrivileges(
+				sectionParams.getLoggedInInfo().getLoggedInProviderNo(), demographicNo, Permission.HRM_READ))
 		{
 			return EncounterNotes.noNotes();
 		}

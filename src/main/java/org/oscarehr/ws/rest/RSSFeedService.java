@@ -23,20 +23,6 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-
 import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -46,6 +32,7 @@ import org.oscarehr.common.dao.AppDefinitionDao;
 import org.oscarehr.common.dao.AppUserDao;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.LoggedInInfo;
@@ -56,6 +43,19 @@ import org.oscarehr.ws.rest.to.RSSResponse;
 import org.oscarehr.ws.rest.to.model.RssItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 @Path("/rssproxy")
@@ -71,15 +71,21 @@ public class RSSFeedService extends AbstractServiceImpl {
 	
 	@Autowired
 	SystemPreferenceService systemPreferenceService;
-	
+
 	@GET
 	@Path("/rss")
 	@Produces("application/json")
-	public RestResponse<RSSResponse> getRSS(@QueryParam("key") String key, @QueryParam("startPoint") String startPoint, @QueryParam("numberOfRows") String numberOfRows, @Context HttpServletRequest request) {
+	public RestResponse<RSSResponse> getRSS(
+			@QueryParam("key") String key,
+			@QueryParam("startPoint") String startPoint,
+			@QueryParam("numberOfRows") String numberOfRows,
+			@Context HttpServletRequest request)
+	{
 		RSSResponse response = new RSSResponse();
 		response.setTimestamp(new Date());
 		try {
 			if(key.equals("k2a") && systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_KNOW2ACT_ENABLED, false)) {
+				securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.K2A_READ);
 				AppDefinitionDao appDefinitionDao = SpringUtils.getBean(AppDefinitionDao.class);
 	    		AppUserDao appUserDao = SpringUtils.getBean(AppUserDao.class);
 	    		

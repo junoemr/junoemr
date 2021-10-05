@@ -28,6 +28,7 @@ import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.dx.DxCode;
+import org.oscarehr.dataMigration.model.dx.DxCodingSystem;
 import org.oscarehr.dataMigration.model.encounterNote.BaseNote;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.oscarehr.dataMigration.service.context.PatientExportContext;
@@ -42,12 +43,16 @@ import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+
+import static org.oscarehr.util.CppUtils.cppCodes;
 
 @Component
 public abstract class BaseNoteDbToModelConverter<N extends BaseNote> extends
 		BaseDbToModelConverter<CaseManagementNote, N>
 {
+	
 	@Autowired
 	private ProviderDataDao providerDao;
 
@@ -97,11 +102,12 @@ public abstract class BaseNoteDbToModelConverter<N extends BaseNote> extends
 				.stream()
 				.map((link) -> link.getId().getCaseManagementIssue().getIssue())
 				.distinct()
+				.filter(issue -> !Arrays.asList(cppCodes).contains(issue.getCode()))
 				.forEach((issue) ->
 				{
 					DxCode dxCode = new DxCode();
 					dxCode.setCode(issue.getCode());
-					dxCode.setCodingSystem(DxCode.DxCodingSystem.fromValue(issue.getType()));
+					dxCode.setCodingSystem(DxCodingSystem.fromValue(issue.getType()));
 					dxCode.setDescription(issue.getDescription());
 					exportNote.addIssueCode(dxCode);
 				});

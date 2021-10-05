@@ -56,10 +56,6 @@ public class RolesManager {
 		return secroleDao.getRole(id);
 	}
 
-	public Secrole getRoleByRolename(String roleName) {
-		return secroleDao.getRoleByName(roleName);
-	}
-
 	public void save(Secrole secrole) {
 		secroleDao.save(secrole);
 	}

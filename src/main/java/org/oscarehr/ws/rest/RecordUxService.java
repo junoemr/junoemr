@@ -47,6 +47,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.casemgmt.service.CaseManagementPrint;
@@ -61,6 +63,7 @@ import org.oscarehr.managers.ConsultationManager;
 import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.preferences.service.SystemPreferenceService;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -76,8 +79,6 @@ import org.oscarehr.ws.rest.transfer.DashboardTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import oscar.OscarProperties;
 import oscar.oscarProvider.data.ProviderMyOscarIdData;
 
@@ -106,8 +107,6 @@ public class RecordUxService extends AbstractServiceImpl {
 	@Autowired
 	private DashboardDao dashboardDao;
 
-	private static final OscarProperties properties = OscarProperties.getInstance();
-	
 	/**
 	$scope.recordtabs2 = [ 
 	 {id : 0,name : 'Master',url : 'partials/master.html'},
@@ -131,30 +130,39 @@ public class RecordUxService extends AbstractServiceImpl {
 	@GET
 	@Path("/{demographicNo}/recordMenu")
 	@Produces("application/json")
-	public List<MenuItemTo1> getRecordMenu(@PathParam("demographicNo") Integer demographicNo){
+	public List<MenuItemTo1> getRecordMenu(@PathParam("demographicNo") Integer demographicNo)
+	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		String loggedInProviderId = getLoggedInProviderId();
 		ResourceBundle bundle = getResourceBundle();
 		
 		int idCounter = 0;
-		
-		List<MenuItemTo1> menulist = new ArrayList<MenuItemTo1>();
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_demographic", "r", null)) {
+
+		List<MenuItemTo1> menulist = new ArrayList<>();
+
+		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.DEMOGRAPHIC_READ))
+		{
 			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter, "Details", Arrays.asList("record.details")));
 		}
-		
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_eChart", "r", null)) {
+
+		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.ECHART_READ))
+		{
 			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Summary", Arrays.asList("record.summary")));
 		}
-		
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.forms", "r", null) || securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.eforms", "r", null)) {
+
+		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.FORM_READ, Permission.EFORM_READ))
+		{
 			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Forms", Arrays.asList("record.forms", "record.forms.completed", "record.forms.revisions", "record.forms.deleted", "record.forms.add")));
 		}
-		
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.viewTickler", "r", null)) {
+
+		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.TICKLER_READ))
+		{
 			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Tickler", Arrays.asList("record.tickler")));
 		}
-
-		menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Health Tracker", Arrays.asList("record.tracker")));
+		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.MEASUREMENT_READ))
+		{
+			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Health Tracker", Arrays.asList("record.tracker")));
+		}
 
 		if (systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_IMDHEALTH_ENABLED, false))
 		{
@@ -174,9 +182,9 @@ public class RecordUxService extends AbstractServiceImpl {
 			}
 			
 		}
-		
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.consultations", "r", null)) {
-			
+
+		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.CONSULTATION_READ))
+		{
 			//add notification if patient has outstanding consultation requests (incomplete requests > 1 month)
 			String outstanding = consultationManager.hasOutstandingConsultations(loggedInInfo, demographicNo)? "outstanding" : null;
 			
@@ -199,20 +207,24 @@ public class RecordUxService extends AbstractServiceImpl {
 			}
 		}
 
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.prescriptions", "r", null)) {
+		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.RX_READ))
+		{
 			menulist.add(new MenuItemTo1(idCounter++, "Rx", "../oscarRx/choosePatient.do?demographicNo="+demographicNo));
 		}
 
 		//END PHR
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.DxRegistry", "r", null)) {
+		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.DX_READ))
+		{
 			menulist.add(new MenuItemTo1(idCounter++, "Disease Registry", "../oscarResearch/oscarDxResearch/setupDxResearch.do?quickList=&demographicNo="+demographicNo));
 		}
-		
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.oscarMsg", "r", null)) {
+
+		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.MESSAGE_READ))
+		{
 			menulist.add(new MenuItemTo1(idCounter++, "Create Message", "../oscarMessenger/SendDemoMessage.do?demographic_no="+demographicNo));
-		}		
-				
-		if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.documents", "r", null)) {
+		}
+
+		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.DOCUMENT_READ))
+		{
 			menulist.add(new MenuItemTo1(idCounter++, "Documents", "../dms/documentReport.jsp?function=demographic&doctype=lab&functionid="+demographicNo));
 		}
 
@@ -239,75 +251,98 @@ public class RecordUxService extends AbstractServiceImpl {
 	@GET
 	@Path("/{demographicNo}/summary/{summaryName}") //@Path("/leftsideSummary")
 	@Produces("application/json")
-	public List<SummaryTo1> getSummary(@PathParam("demographicNo") Integer demographicNo,@PathParam("summaryName") String summaryName){
-		LoggedInInfo loggedInInfo = getLoggedInInfo();// LoggedInInfo.loggedInInfo.get();
+	public List<SummaryTo1> getSummary(
+			@PathParam("demographicNo") Integer demographicNo,
+			@PathParam("summaryName") String summaryName)
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		String loggedInProviderId = getLoggedInProviderId();
+		OscarProperties properties = OscarProperties.getInstance();
+
 		logger.debug("getting summary:"+summaryName+" for demo "+demographicNo+"  loggedInInfo "+loggedInInfo);
 		List<SummaryTo1> summaryList = null;
 		int count = 0;
-		
-		if("right".equals(summaryName )){
-			summaryList = new ArrayList<SummaryTo1>();
-			if( (securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.documents", "r", null)
-					|| securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.labResult", "r", null) )
-					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.INCOMING_POS) )
+
+		if("right".equals(summaryName))
+		{
+			summaryList = new ArrayList<>();
+
+			if (securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.DOCUMENT_READ, Permission.LAB_READ)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.INCOMING_POS))
 			{
-				summaryList.add(new SummaryTo1("Incoming",count++,SummaryTo1.INCOMING_CODE));
+				summaryList.add(new SummaryTo1("Incoming", count++, SummaryTo1.INCOMING_CODE));
 			}
 
-			if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.decisionSupportAlerts", "r", null)
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.DECISION_SUPPORT_READ)
 					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.DS_SUPPORT_POS))
 			{
-				summaryList.add(new SummaryTo1("Decision Support",count++,SummaryTo1.DECISIONSUPPORT_CODE)); 
+				summaryList.add(new SummaryTo1("Decision Support", count++, SummaryTo1.DECISIONSUPPORT_CODE));
 			}
-			
-		}else if("left".equals(summaryName )){
-			summaryList = new ArrayList<SummaryTo1>();
-			if (securityInfoManager.hasPrivilege(loggedInInfo, "_prevention", "r", null)&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.PREVENTION_POS)) {
-				summaryList.add(new SummaryTo1("Preventions",count++,SummaryTo1.PREVENTIONS));
+		}
+		else if("left".equals(summaryName))
+		{
+			summaryList = new ArrayList<>();
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.PREVENTION_READ)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.PREVENTION_POS))
+			{
+				summaryList.add(new SummaryTo1("Preventions", count++, SummaryTo1.PREVENTIONS));
 			}
-			
-			if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.prescriptions", "r", null) && preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.MEDS_POS)) {
-				summaryList.add(new SummaryTo1("Medications",count++,SummaryTo1.MEDICATIONS_CODE));  
+
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.RX_READ)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.MEDS_POS))
+			{
+				summaryList.add(new SummaryTo1("Medications", count++, SummaryTo1.MEDICATIONS_CODE));
 			}
-			
-			if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.otherMeds", "r", null) && preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.OTHER_MEDS_POS)) {
+
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.CPP_NOTE_READ)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.OTHER_MEDS_POS))
+			{
 				summaryList.add(new SummaryTo1("Other Meds",count++,SummaryTo1.OTHERMEDS_CODE));
 			}
-			
-			if(preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ONGOING_POS)){
-				summaryList.add(new SummaryTo1("Ongoing Concerns",count++,SummaryTo1.ONGOINGCONCERNS_CODE));
+
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.CPP_NOTE_READ)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ONGOING_POS))
+			{
+				summaryList.add(new SummaryTo1("Ongoing Concerns", count++, SummaryTo1.ONGOINGCONCERNS_CODE));
+			}
+
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.CPP_NOTE_READ)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.MED_HX_POS))
+			{
+				summaryList.add(new SummaryTo1("Medical History", count++, SummaryTo1.MEDICALHISTORY_CODE));
+			}
+
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.CPP_NOTE_READ))
+			{
+				summaryList.add(new SummaryTo1("Social History", count++, SummaryTo1.SOCIALHISTORY_CODE));
+			}
+
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.CPP_NOTE_READ)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.FAM_HX_POS))
+			{
+				summaryList.add(new SummaryTo1("Family History", count++, SummaryTo1.FAMILYHISTORY_CODE));
+			}
+
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.CPP_NOTE_READ)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.REMINDERS_POS))
+			{
+				summaryList.add(new SummaryTo1("Reminders", count++, SummaryTo1.REMINDERS_CODE));
+			}
+
+			if (securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.CPP_NOTE_READ)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.RISK_FACTORS_POS))
+			{
+				summaryList.add(new SummaryTo1("Risk Factors", count++, SummaryTo1.RISK_FACTORS));
+			}
+
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.ALLERGY_READ)
+					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ALLERGIES_POS))
+			{
+				summaryList.add(new SummaryTo1("Allergies", count++, SummaryTo1.ALLERGIES));
 			}
 			
-			if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.medicalHistory", "r", null) && preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.MED_HX_POS)) {
-				summaryList.add(new SummaryTo1("Medical History",count++,SummaryTo1.MEDICALHISTORY_CODE)); 
-			}
-			
-			if(preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.SOC_HX_POS)){
-				//summaryList[2] = new SummaryTo1("Social/Family History",2,"socfamhx");
-				summaryList.add(new SummaryTo1("Social History",count++,SummaryTo1.SOCIALHISTORY_CODE));
-			}
-			
-			if(securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.familyHistory", "r", null) && preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.FAM_HX_POS)) {
-				summaryList.add(new SummaryTo1("Family History",count++,SummaryTo1.FAMILYHISTORY_CODE));
-			}
-	
-			if(preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.REMINDERS_POS)){
-				summaryList.add(new SummaryTo1("Reminders",count++,SummaryTo1.REMINDERS_CODE));
-			}
-			
-			if(preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.RISK_FACTORS_POS)){
-			summaryList.add(new SummaryTo1("Risk Factors",count++,SummaryTo1.RISK_FACTORS));
-			}
-			
-			if(preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ALLERGIES_POS)){
-			summaryList.add(new SummaryTo1("Allergies",count++,SummaryTo1.ALLERGIES));  
-			}
-			
-			if( (securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.forms", "r", null) || securityInfoManager.hasPrivilege(loggedInInfo, "_newCasemgmt.eforms", "r", null)) && preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ASSESSMENTS_POS)  ){
-				summaryList.add(new SummaryTo1("Forms",count++,SummaryTo1.FORMS_CODE));
-			}
-			
-			if(properties.isModuleEnabled(OscarProperties.Module.MODULE_HRM)) // TODO: security module merge
+			if(properties.isModuleEnabled(OscarProperties.Module.MODULE_HRM)
+					&& securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.HRM_READ))
 			{
 				summaryList.add(new SummaryTo1("HRM Documents", count++, SummaryTo1.HRM_DOCUMENTS));
 			}
@@ -339,89 +374,99 @@ public class RecordUxService extends AbstractServiceImpl {
 		
         return Collections.unmodifiableMap(result);
     }
-	
-	
+
 	@GET
 	@Path("/{demographicNo}/fullSummary/{summaryCode}")
 	@Produces("application/json")
-	public SummaryTo1 getFullSummmary(@PathParam("demographicNo") Integer demographicNo,@PathParam(value="summaryCode") String summaryCode){
+	public SummaryTo1 getFullSummmary(@PathParam("demographicNo") Integer demographicNo, @PathParam(value = "summaryCode") String summaryCode)
+	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		SummaryTo1 summary = null;
-		
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), demographicNo, Permission.ECHART_READ);
+
 		Summary summaryInterface = (Summary) SpringUtils.getBean(MY_MAP.get(summaryCode));
-		summary = summaryInterface.getSummary(loggedInInfo, demographicNo, summaryCode);
-		
-		logger.debug("outgoing summary object:"+summary);
+		SummaryTo1 summary = summaryInterface.getSummary(loggedInInfo, demographicNo, summaryCode);
+
+		logger.debug("outgoing summary object:" + summary);
 		return summary;
 	}
-	
-	
+
 	@GET
 	@Path("/{demographicNo}/getFamilyHistory")
 	@Produces(MediaType.APPLICATION_JSON)
-	public SummaryTo1 getFamilyHistory(@PathParam("demographicNo") Integer demographicNo) {
+	public SummaryTo1 getFamilyHistory(@PathParam("demographicNo") Integer demographicNo)
+	{
 		return getFullSummmary(demographicNo, SummaryTo1.FAMILYHISTORY_CODE);
 	}
 	
 	@GET
 	@Path("/{demographicNo}/getMedicalHistory")
 	@Produces(MediaType.APPLICATION_JSON)
-	public SummaryTo1 getMedicalHistory(@PathParam("demographicNo") Integer demographicNo) {
+	public SummaryTo1 getMedicalHistory(@PathParam("demographicNo") Integer demographicNo)
+	{
 		return getFullSummmary(demographicNo, SummaryTo1.MEDICALHISTORY_CODE);
 	}
 
 	@GET
 	@Path("/{demographicNo}/getSocialHistory")
 	@Produces(MediaType.APPLICATION_JSON)
-	public SummaryTo1 getSocialHistory(@PathParam("demographicNo") Integer demographicNo) {
+	public SummaryTo1 getSocialHistory(@PathParam("demographicNo") Integer demographicNo)
+	{
 		return getFullSummmary(demographicNo, SummaryTo1.SOCIALHISTORY_CODE);
 	}
-	
+
 	@GET
 	@Path("/{demographicNo}/getOngoingConcerns")
 	@Produces(MediaType.APPLICATION_JSON)
-	public SummaryTo1 getOngoingConcerns(@PathParam("demographicNo") Integer demographicNo) {
+	public SummaryTo1 getOngoingConcerns(@PathParam("demographicNo") Integer demographicNo)
+	{
 		return getFullSummmary(demographicNo, SummaryTo1.ONGOINGCONCERNS_CODE);
 	}
-	
+
 	@GET
 	@Path("/{demographicNo}/getOtherMeds")
 	@Produces(MediaType.APPLICATION_JSON)
-	public SummaryTo1 getOtherMeds(@PathParam("demographicNo") Integer demographicNo) {
+	public SummaryTo1 getOtherMeds(@PathParam("demographicNo") Integer demographicNo)
+	{
 		return getFullSummmary(demographicNo, SummaryTo1.OTHERMEDS_CODE);
 	}
-	
+
 	@GET
 	@Path("/{demographicNo}/getReminders")
 	@Produces(MediaType.APPLICATION_JSON)
-	public SummaryTo1 getReminders(@PathParam("demographicNo") Integer demographicNo) {
+	public SummaryTo1 getReminders(@PathParam("demographicNo") Integer demographicNo)
+	{
 		return getFullSummmary(demographicNo, SummaryTo1.REMINDERS_CODE);
 	}
-	
+
 	@GET
 	@Path("/{demographicNo}/getRiskFactors")
 	@Produces(MediaType.APPLICATION_JSON)
-	public SummaryTo1 getRiskFactors(@PathParam("demographicNo") Integer demographicNo) {
+	public SummaryTo1 getRiskFactors(@PathParam("demographicNo") Integer demographicNo)
+	{
 		return getFullSummmary(demographicNo, SummaryTo1.RISK_FACTORS);
 	}
-	
+
 	@GET
 	@Path("/{demographicNo}/getAllergies")
 	@Produces(MediaType.APPLICATION_JSON)
-	public SummaryTo1 getAllergies(@PathParam("demographicNo") Integer demographicNo) {
+	public SummaryTo1 getAllergies(@PathParam("demographicNo") Integer demographicNo)
+	{
 		return getFullSummmary(demographicNo, SummaryTo1.ALLERGIES);
 	}
-	
+
 	@GET
 	@Path("/{demographicNo}/getPreventions")
 	@Produces(MediaType.APPLICATION_JSON)
-	public SummaryTo1 getPreventions(@PathParam("demographicNo") Integer demographicNo) {
+	public SummaryTo1 getPreventions(@PathParam("demographicNo") Integer demographicNo)
+	{
 		return getFullSummmary(demographicNo, SummaryTo1.PREVENTIONS);
 	}
-	
-	boolean getBoolean(JSONObject jsonobject,String key){
-		if(jsonobject.containsKey(key)){
-			return jsonobject.getBoolean(key); 
+
+	boolean getBoolean(JSONObject jsonobject, String key)
+	{
+		if(jsonobject.containsKey(key))
+		{
+			return jsonobject.getBoolean(key);
 		}
 		return false;
 	}
@@ -452,6 +497,7 @@ public class RecordUxService extends AbstractServiceImpl {
 								 @QueryParam("printOps") String jsonString,
 								 @Context HttpServletRequest request)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ECHART_READ);
 
 		JSONObject jsonobject = JSONObject.fromObject(jsonString);
 
@@ -513,8 +559,14 @@ public class RecordUxService extends AbstractServiceImpl {
 	@Path("/searchTemplates")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public EncounterTemplateResponse getEncounterTemplates(JSONObject obj, @QueryParam("startIndex") Integer startIndex, @QueryParam("itemsToReturn") Integer itemsToReturn) {
-		
+	public EncounterTemplateResponse getEncounterTemplates(
+			JSONObject obj,
+			@QueryParam("startIndex") Integer startIndex,
+			@QueryParam("itemsToReturn") Integer itemsToReturn)
+	{
+
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ECHART_READ);
+
 		String name = obj.getString("name");
 		
 		List<EncounterTemplate> et = encounterTemplateDao.findByName(name + "%", startIndex, itemsToReturn);
@@ -531,8 +583,10 @@ public class RecordUxService extends AbstractServiceImpl {
 	@Path("/template")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public EncounterTemplateResponse getEncounterTemplate(JSONObject obj) {
-		
+	public EncounterTemplateResponse getEncounterTemplate(JSONObject obj)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ECHART_READ);
+
 		String name = obj.getString("name");
 		
 		List<EncounterTemplate> et = new ArrayList<EncounterTemplate>();
@@ -543,15 +597,18 @@ public class RecordUxService extends AbstractServiceImpl {
 		
 		EncounterTemplateResponse response = new EncounterTemplateResponse();
 		response.setTemplates(transfers);
-		
+
 		return response;
 	}
-	
+
 	@GET
 	@Path("/dashboards")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<List<DashboardTo1>> getDashboardList() {
-    	ArrayList<DashboardTo1> dashboardTo1s = new ArrayList<>();
+	public RestResponse<List<DashboardTo1>> getDashboardList()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ECHART_READ);
+
+		ArrayList<DashboardTo1> dashboardTo1s = new ArrayList<>();
     	List<Dashboard> dashboards = dashboardDao.getDashboards();
     	for (Dashboard dashboard : dashboards)
 			{

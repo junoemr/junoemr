@@ -24,22 +24,8 @@
 
 package oscar.oscarEncounter.pageUtil;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.quatro.dao.security.SecroleDao;
+import com.quatro.model.security.Secrole;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -67,17 +53,29 @@ import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
 import org.oscarehr.myoscar_server.ws.MessageTransfer3;
 import org.oscarehr.myoscar_server.ws.MinimalPersonTransfer2;
 import org.oscarehr.phr.web.MyOscarMessagesHelper;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SessionConstants;
 import org.oscarehr.util.SpringUtils;
-
-import com.quatro.dao.security.SecroleDao;
-import com.quatro.model.security.Secrole;
-
 import oscar.OscarProperties;
 import oscar.util.DateUtils;
 import oscar.util.UtilDateUtilities;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 public class EctIncomingEncounterAction extends Action {
 
@@ -93,9 +91,7 @@ public class EctIncomingEncounterAction extends Action {
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		String demoNo = request.getParameter("demographicNo");
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_demographic", "r", null)) {
-			throw new SecurityException("missing required security object (_demographic)");
-		}
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Integer.parseInt(demoNo), Permission.DEMOGRAPHIC_READ);
 		
 		if(!"true".equals(OscarProperties.getInstance().getProperty("program_domain.show_echart", "false"))) {
 			if (!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) && !caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo)) {

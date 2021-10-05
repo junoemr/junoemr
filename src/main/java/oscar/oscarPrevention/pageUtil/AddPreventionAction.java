@@ -59,7 +59,7 @@ public class AddPreventionAction  extends Action {
       public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)
       {
          String loggedInProvider = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-         securityInfoManager.requireOnePrivilege(loggedInProvider, SecurityInfoManager.WRITE, null, "_prevention");
+         securityInfoManager.requireOnePrivilege(loggedInProvider, SecurityInfoManager.CREATE, null, "_prevention");
 
          String sessionUser  = (String) request.getSession().getAttribute("user");
          if ( sessionUser == null){

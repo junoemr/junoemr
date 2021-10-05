@@ -188,6 +188,7 @@ export default class ClinicMessagingService implements MessagingServiceInterface
 			{
 				const messages = (await this._mhaClinicMessagingApi.getMessages(
 					source.id,
+					// @ts-ignore
 					searchOptions.startDateTime?.toDate(),
 					searchOptions.endDateTime?.toDate(),
 					searchOptions.group?.toString(),

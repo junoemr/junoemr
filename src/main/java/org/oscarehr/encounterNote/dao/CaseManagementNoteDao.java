@@ -787,6 +787,12 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				note.setNoteId(null);
 			}
 			note.setEncounterForm(getBooleanFromInteger(row[column++]));
+			if(note.isEncounterForm())
+			{
+				//TODO why is the note id fake and also the form id???
+				note.setEncounterFormId(note.getNoteId());
+				note.setNoteId(null);
+			}
 			note.setInvoice(getBooleanFromInteger(row[column++]));
 			note.setTicklerNote(getBooleanFromInteger(row[column++]));
 			note.setEncounterType((String) row[column++]);

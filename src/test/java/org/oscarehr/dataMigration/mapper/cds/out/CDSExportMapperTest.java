@@ -34,6 +34,7 @@ import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.dx.DxCode;
+import org.oscarehr.dataMigration.model.dx.DxCodingSystem;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.service.context.PatientExportContext;
 import org.oscarehr.dataMigration.service.context.PatientExportContextService;
@@ -437,17 +438,18 @@ public class CDSExportMapperTest
 	{
 		assertNull(cdsExportMapper.toYnIndicator(null));
 	}
+
 	@Test
 	public void testToYnIndicator_False()
 	{
 		YnIndicator ynIndicator = cdsExportMapper.toYnIndicator(false);
-		assertFalse(ynIndicator.isBoolean());
+		assertEquals(CDSConstants.Y_INDICATOR_FALSE, ynIndicator.getYnIndicatorsimple());
 	}
 	@Test
 	public void testToYnIndicator_True()
 	{
 		YnIndicator ynIndicator = cdsExportMapper.toYnIndicator(true);
-		assertTrue(ynIndicator.isBoolean());
+		assertEquals(CDSConstants.Y_INDICATOR_TRUE, ynIndicator.getYnIndicatorsimple());
 	}
 
 	@Test
@@ -483,7 +485,7 @@ public class CDSExportMapperTest
 		DxCode dxCode = new DxCode();
 
 		dxCode.setCode(expectedCode);
-		dxCode.setCodingSystem(DxCode.DxCodingSystem.ICD9);
+		dxCode.setCodingSystem(DxCodingSystem.ICD9);
 		dxCode.setDescription(expectedDescription);
 
 		StandardCoding result = cdsExportMapper.getStandardCoding(dxCode);
@@ -500,7 +502,7 @@ public class CDSExportMapperTest
 		DxCode dxCode = new DxCode();
 
 		dxCode.setCode(expectedCode);
-		dxCode.setCodingSystem(DxCode.DxCodingSystem.OSCAR_CODE);
+		dxCode.setCodingSystem(DxCodingSystem.OSCAR_CODE);
 		dxCode.setDescription(expectedDescription);
 
 		assertNull(cdsExportMapper.getStandardCoding(dxCode));

@@ -62,29 +62,6 @@ angular.module("Common.Services").service("demographicService", [
             return deferred.promise;
         };
 
-	    service.getDemographicContacts = function getDemographicContacts(demographicNo,contactCategory)
-	    {
-		    var deferred = $q.defer();
-
-		    var config = Juno.Common.ServiceHelper.configHeaders();
-		    config.params = {
-			    category: contactCategory
-		    };
-
-		    junoHttp.get(service.apiPath + '/' + encodeURIComponent(demographicNo) + "/contacts", config).then(
-			    function success(results)
-			    {
-				    deferred.resolve(results.data);
-			    },
-			    function error(errors)
-			    {
-				    console.log("demographicServices::getDemographicContacts error", errors);
-				    deferred.reject("An error occurred while fetching demographic contacts");
-			    });
-
-		    return deferred.promise;
-	    };
-
         service.saveDemographic = function saveDemographic(demographic)
         {
             var deferred = $q.defer();

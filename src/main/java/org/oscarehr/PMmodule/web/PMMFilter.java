@@ -23,7 +23,15 @@
 
 package org.oscarehr.PMmodule.web;
 
-import java.io.IOException;
+import org.apache.log4j.Logger;
+import org.oscarehr.PMmodule.model.Agency;
+import org.oscarehr.PMmodule.service.AgencyManager;
+import org.oscarehr.PMmodule.service.ProviderManager;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.SecObjectName;
+import org.oscarehr.util.MiscUtils;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -33,15 +41,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.model.Agency;
-import org.oscarehr.PMmodule.service.AgencyManager;
-import org.oscarehr.PMmodule.service.OscarSecurityManager;
-import org.oscarehr.PMmodule.service.ProviderManager;
-import org.oscarehr.util.MiscUtils;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import java.io.IOException;
 
 /**
  */
@@ -50,15 +50,15 @@ public class PMMFilter implements Filter {
 	private static Logger logger = MiscUtils.getLogger();
 
 	private AgencyManager agencyManager;
-	private OscarSecurityManager oscarSecurityManager;
 	private ProviderManager providerManager;
 	private FilterConfig config;
+	private SecurityInfoManager securityInfoManager;
 
 	private void setProviderManager() {
 		WebApplicationContext wac = WebApplicationContextUtils.getWebApplicationContext(config.getServletContext());
 
+		securityInfoManager = (SecurityInfoManager) wac.getBean("securityInfoManager");
 		agencyManager = (AgencyManager) wac.getBean("agencyManager");
-		oscarSecurityManager = (OscarSecurityManager) wac.getBean("oscarSecurityManager");
 		providerManager = (ProviderManager) wac.getBean("providerManager");
 	}
 
@@ -85,7 +85,8 @@ public class PMMFilter implements Filter {
 
 		if (session.getAttribute("pmm_admin") == null) {
 			logger.debug("setting session variable: pmm_admin");
-			session.setAttribute("pmm_admin", new Boolean(oscarSecurityManager.hasAdminRole(oscarUser)));
+			session.setAttribute("pmm_admin", securityInfoManager.hasPrivilege(oscarUser,
+					SecurityInfoManager.PRIVILEGE_LEVEL.READ, SecObjectName.OBJECT_NAME.ADMIN));
 		}
 		
 /* If the provider didn't have the role 'admin', he can still have the access to the administration links(eg. Add Program) on PMM.

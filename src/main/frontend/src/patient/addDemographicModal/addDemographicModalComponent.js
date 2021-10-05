@@ -13,7 +13,6 @@ angular.module('Patient').component('addDemographicModal', {
 		'$httpParamSerializer',
 		'staticDataService',
 		'demographicService',
-		'programService',
 		'providerService',
 		function (
 			$scope,
@@ -21,7 +20,6 @@ angular.module('Patient').component('addDemographicModal', {
 			$httpParamSerializer,
 			staticDataService,
 			demographicService,
-			programService,
 			providerService)
 	{
 		let ctrl = this;
@@ -63,37 +61,24 @@ angular.module('Patient').component('addDemographicModal', {
 		ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 		ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 		ctrl.buttonClicked = false;
+		ctrl.focusField = "lastName";
 
-		//get programs to be selected
-		programService.getPrograms().then(
-			function success(results)
-			{
-				ctrl.programs = results;
-				if (ctrl.programs.length === 1)
-				{
-					ctrl.newDemographicData.admissionProgramId = ctrl.programs[0].id;
-				}
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			}
-		);
-
+		ctrl.$onInit = () =>
+		{
 			// Pull phone prefix from Oscar Properties file
 			ctrl.systemPreferenceApi.getPreferenceValue("phone_prefix", "").then(
 				function success(results)
-			{
-				ctrl.newDemographicData.phone = results.data.body;
-			},
-			function error(errors)
-			{
-				console.log("errors::" + errors);
-			}
-		);
+				{
+					ctrl.newDemographicData.phone = results.data.body;
+				},
+				function error(errors)
+				{
+					console.log("errors::" + errors);
+				}
+			);
 
-		// set defaults based on provider settings
-		providerService.getSettings().then(
+			// set defaults based on provider settings
+			providerService.getSettings().then(
 				function success(result)
 				{
 					ctrl.newDemographicData.sex = result.defaultSex;
@@ -122,7 +107,8 @@ angular.module('Patient').component('addDemographicModal', {
 				{
 					console.error("Failed to fetch Provider settings with error: " + errors);
 				}
-		);
+			);
+		}
 
 		ctrl.validateDemographic = function ()
 		{

@@ -23,12 +23,6 @@
  */
 package org.oscarehr.ws.rest;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.common.model.Demographic;
@@ -38,14 +32,20 @@ import org.oscarehr.integration.mchcv.HCValidator;
 import org.oscarehr.integration.mchcv.OnlineHCValidator;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.model.PatientDetailStatusTo1;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import oscar.OscarProperties;
 import oscar.oscarDemographic.data.DemographicData;
 import oscar.oscarProvider.data.ProviderMyOscarIdData;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 
 
 @Path("/patientDetailStatusService")
@@ -60,7 +60,10 @@ public class PatientDetailStatusService extends AbstractServiceImpl {
 	
 	@GET
 	@Path("/getStatus")
-	public PatientDetailStatusTo1 getStatus(@QueryParam("demographicNo") Integer demographicNo) {
+	public PatientDetailStatusTo1 getStatus(@QueryParam("demographicNo") Integer demographicNo)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.DEMOGRAPHIC_READ);
+
 		PatientDetailStatusTo1 status = new PatientDetailStatusTo1();
 		
 		//Integrator status
@@ -120,7 +123,10 @@ public class PatientDetailStatusService extends AbstractServiceImpl {
 	
 	@GET
 	@Path("/validateHC")
-	public HCValidationResult validateHC(@QueryParam("hin") String healthCardNo, @QueryParam("ver") String versionCode) {
+	public HCValidationResult validateHC(@QueryParam("hin") String healthCardNo, @QueryParam("ver") String versionCode)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
+
 		HCValidator validator = HCValidationFactory.getHCValidator();
 		HCValidationResult result = null;
 		
@@ -154,6 +160,8 @@ public class PatientDetailStatusService extends AbstractServiceImpl {
 										  @QueryParam("province") String hcType,
 										  @QueryParam("demographicNo") Integer demographicNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
+
 		GenericRESTResponse response = new GenericRESTResponse();
 		if (healthCardNo != null && !healthCardNo.trim().isEmpty() && demographicNo != null)
 		{

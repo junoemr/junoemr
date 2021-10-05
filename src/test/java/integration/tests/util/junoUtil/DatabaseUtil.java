@@ -26,6 +26,7 @@ import integration.tests.util.data.PatientTestCollection;
 import integration.tests.util.data.PatientTestData;
 import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.data.ProviderTestData;
+import java.util.HashSet;
 import org.oscarehr.common.dao.ProviderSiteDao;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.ProviderSite;
@@ -37,10 +38,12 @@ import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.service.ProviderService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestComponent;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
+
+import org.springframework.boot.test.context.TestComponent;
 
 import static integration.tests.util.data.PatientTestCollection.patientLNames;
 import static integration.tests.util.data.ProviderTestCollection.providerLNames;
@@ -77,7 +80,7 @@ public class DatabaseUtil
 			demo.setSex(patient.sex);
 			demo.setHin(patient.hin);
 			demo.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
-			demoService.addNewDemographicRecord(TEST_PROVIDER_ID, demo, null, new ArrayList<DemographicExt>());
+			demoService.addNewDemographicRecord(TEST_PROVIDER_ID, demo, null, new HashSet<DemographicExt>());
 		}
 	}
 	public void createTestProvider()

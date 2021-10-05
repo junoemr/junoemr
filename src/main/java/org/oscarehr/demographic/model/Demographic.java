@@ -23,8 +23,6 @@
 package org.oscarehr.demographic.model;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
@@ -59,6 +57,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -204,13 +203,11 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private String nameOfMother;
 	@Column(name = "name_of_father")
 	private String nameOfFather;
-	@Getter
-	@Setter
+
 	@Column(name = "electronic_messaging_consent_given_at")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date electronicMessagingConsentGivenAt;
-	@Getter
-	@Setter
+
 	@Column(name = "electronic_messaging_consent_rejected_at", columnDefinition = "TIMESTAMP")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date electronicMessagingConsentRejectedAt;
@@ -219,7 +216,7 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	private DemographicCust demographicCust;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo")
-	private List<DemographicExt> demographicExtList;
+	private Set<DemographicExt> demographicExtSet;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo")
 	@Where(clause="deleted=0")
@@ -239,8 +236,6 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "demographic")
 	@WhereJoinTable(clause = "module = '" + CtlDocument.MODULE_DEMOGRAPHIC + "'")
 	@Where(clause= "status != '" + Document.STATUS_DELETED +"'")
-	@Getter
-	@Setter
 	private List<Document> documents;
 
 	public static final String BC_NEWBORN_BILLING_CODE = "66";
@@ -869,14 +864,14 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		this.demographicCust = demographicCust;
 	}
 
-	public List<DemographicExt> getDemographicExtList()
+	public Set<DemographicExt> getDemographicExtSet()
 	{
-		return demographicExtList;
+		return demographicExtSet;
 	}
 
-	public void setDemographicExtList(List<DemographicExt> demographicExtList)
+	public void setDemographicExtSet(Set<DemographicExt> demographicExtSet)
 	{
-		this.demographicExtList = demographicExtList;
+		this.demographicExtSet = demographicExtSet;
 	}
 
 	public List<DemographicMerged> getMergedDemographicsList()

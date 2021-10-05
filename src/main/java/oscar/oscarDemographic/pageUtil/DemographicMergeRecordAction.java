@@ -76,7 +76,7 @@ public class DemographicMergeRecordAction  extends Action {
 
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
-		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_demographic");
+		securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.CREATE, null, "_demographic");
 
 		if (request.getParameterValues("records") == null)
 		{

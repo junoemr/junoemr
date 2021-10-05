@@ -25,18 +25,14 @@
 
 package oscar.login.tld;
 
-import java.util.List;
-import java.util.Properties;
-import java.util.Vector;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.util.SpringUtils;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.Tag;
-
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import oscar.util.OscarRoleObjectPrivilege;
 
 public class SecurityTag implements Tag {
     private PageContext pageContext;
@@ -45,7 +41,6 @@ public class SecurityTag implements Tag {
     private String objectName;
     private String rights = "r";
     private boolean reverse = false;
-    //private Vector roleInObj = new Vector();
 
     public void setPageContext(PageContext arg0) {
         this.pageContext = arg0;
@@ -60,28 +55,16 @@ public class SecurityTag implements Tag {
         return this.parentTag;
     }
 
-    public int doStartTag() throws JspException {
-        /*
-         * try { JspWriter out = pageContext.getOut(); out.print("goooooooo"); } catch (Exception e) { }
-         */
-        int ret = 0;
-        Vector v = OscarRoleObjectPrivilege.getPrivilegeProp(objectName);
-        // if (checkPrivilege(roleName, (Properties) getPrivilegeProp(objectName).get(0), (Vector) getPrivilegeProp(
-        ///        objectName).get(1)))
-    	/*TODO-legacy: temporily allow current security work, the if statement should be removed */
-        if (roleName == null) 
+    public int doStartTag() throws JspException
+    {
+        int ret = SKIP_BODY;
+        if (roleName != null)
         {
-        	
-	            ret = SKIP_BODY;
-	       
-        }
-        else
-        {
-	        if (OscarRoleObjectPrivilege.checkPrivilege(roleName, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), rights)){
-	            ret = EVAL_BODY_INCLUDE;
-	        }else{
-	            ret = SKIP_BODY;
-	        }
+            SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+            if(securityInfoManager.hasPrivilege(roleName, objectName, rights))
+            {
+                ret = EVAL_BODY_INCLUDE;
+            }
         }
 
         if (reverse) {           

@@ -1013,6 +1013,10 @@ public class RxPrescriptionData {
 					if(Integer.parseInt(duration) > 0)
 					{
 						int i = Integer.parseInt(duration);
+						if(durationUnit != null && durationUnit.equalsIgnoreCase("H"))
+						{
+							days = (int) Math.ceil((double) i / 24);
+						}
 						if(durationUnit != null && durationUnit.equalsIgnoreCase("D"))
 						{
 							days = i;

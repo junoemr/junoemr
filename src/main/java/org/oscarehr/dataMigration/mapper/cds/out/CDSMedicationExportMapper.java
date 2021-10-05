@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.out;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.dataMigration.model.medication.CustomMedication;
 import org.oscarehr.dataMigration.model.medication.FrequencyCode;
 import org.oscarehr.dataMigration.model.medication.Medication;
@@ -47,18 +48,26 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 		medicationsAndTreatments.setDrugName(medication.getDrugName());
 		medicationsAndTreatments.setPrescriptionWrittenDate(toNullableDateTimeFullOrPartial(medication.getWrittenDate()));
 		medicationsAndTreatments.setStartDate(toNullableDateFullOrPartial(medication.getRxStartDate()));
-		medicationsAndTreatments.setNumberOfRefills(toStringOrNull(medication.getRefillQuantity()));
+		// Medication Refills
+		medicationsAndTreatments.setNumberOfRefills(toStringOrNull(medication.getRepeat()));
+		medicationsAndTreatments.setRefillQuantity(toStringOrNull(medication.getRefillQuantity()));
+		medicationsAndTreatments.setRefillDuration(toStringOrNull(medication.getRefillDuration()));
+
 		medicationsAndTreatments.setForm(medication.getDrugForm());
 		medicationsAndTreatments.setRoute(medication.getRoute());
 
 		FrequencyCode frequencyCode = medication.getFrequencyCode();
 		medicationsAndTreatments.setFrequency((frequencyCode != null) ? frequencyCode.getCode() : null);
 		medicationsAndTreatments.setDuration(medication.getDuration());
-		medicationsAndTreatments.setRefillDuration(toStringOrNull(medication.getRefillDuration()));
 		medicationsAndTreatments.setQuantity(medication.getQuantity());
 		medicationsAndTreatments.setRefillQuantity(toStringOrNull(medication.getRefillQuantity()));
 		medicationsAndTreatments.setLongTermMedication(toYnIndicator(medication.getLongTerm()));
 		medicationsAndTreatments.setPastMedications(toYnIndicator(medication.getPastMed()));
+		medicationsAndTreatments.setDosage(generateCDSDosage(medication.getTakeMin(), medication.getTakeMax()));
+		medicationsAndTreatments.setDrugIdentificationNumber(medication.getRegionalIdentifier());
+		medicationsAndTreatments.setDosageUnitOfMeasure(medication.getUnit());
+		medicationsAndTreatments.setStrength(getDrugMeasure(medication));
+		medicationsAndTreatments.setSubstitutionNotAllowed(toYnIndicatorString(medication.getNoSubs()));
 
 		Provider prescribingProvider = medication.getPrescribingProvider();
 		if(prescribingProvider != null)
@@ -70,10 +79,15 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 		}
 
 		medicationsAndTreatments.setNotes(medication.getComment());
-		medicationsAndTreatments.setPrescriptionInstructions(medication.getInstructions());
+		medicationsAndTreatments.setPrescriptionInstructions(
+				StringUtils.trimToNull(
+					StringUtils.trimToEmpty(medication.getInstructions()) + "\n" +
+						StringUtils.trimToEmpty(medication.getSpecialInstructions())
+				));
+		
 		medicationsAndTreatments.setPatientCompliance(toYnIndicator(medication.getPatientCompliance()));
-		medicationsAndTreatments.setTreatmentType(medication.getETreatmentType());
-		medicationsAndTreatments.setPrescriptionStatus(medication.getRxStatus());
+		medicationsAndTreatments.setTreatmentType((medication.getETreatmentType() != null) ? medication.getETreatmentType().getValue() : null);
+		medicationsAndTreatments.setPrescriptionStatus((medication.getRxStatus() != null) ? medication.getRxStatus().getValue() : null);
 		medicationsAndTreatments.setNonAuthoritativeIndicator(toStringOrNull(medication.getNonAuthoritative()));
 		medicationsAndTreatments.setPriorPrescriptionReferenceIdentifier(null); //TODO
 		medicationsAndTreatments.setDispenseInterval(toStringOrNull(medication.getDispenseInterval()));
@@ -95,26 +109,51 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 		}
 	}
 
+	/**
+	 * Builds a string for the CDS Dosage field based on the provided takeMin and takeMax
+	 * Will produce format of "X" or "X - Y"
+	 * @param takeMin Medication takeMin value
+	 * @param takeMax Medication takeMax value
+	 * @return string CDS Dosage
+	 */
+	protected String generateCDSDosage(float takeMin, float takeMax)
+	{
+		if (takeMin == takeMax)
+		{
+			return String.valueOf(takeMin);
+		} 
+		return takeMin + " - " + takeMax;
+	}
+
+	/**
+	 * Not used for the CDS Exports. Left in to show this is how you would fill
+	 * elements that are specific to StandardMedications, and to keep design pattern the same
+	 * when building out to other data formats
+	 * @param medicationsAndTreatments The CDS MedicationsAndTreatments to add elements to
+	 * @param medication StandardMedication to pull elements from
+	 * @return medicationsAndTreatments filled with StandardMedication elements
+	 */
 	protected MedicationsAndTreatments fillStandardDrugElements(MedicationsAndTreatments medicationsAndTreatments,
 	                                                            StandardMedication medication)
 	{
-		medicationsAndTreatments.setDrugIdentificationNumber(medication.getRegionalIdentifier());
-		medicationsAndTreatments.setDosage(medication.getDosage());
-		medicationsAndTreatments.setDosageUnitOfMeasure(medication.getUnit());
-		medicationsAndTreatments.setStrength(getDrugMeasure(medication));
-
-		medicationsAndTreatments.setSubstitutionNotAllowed(toYnIndicatorString(medication.getNoSubs()));
-
 		return medicationsAndTreatments;
 	}
 
+	/**
+	 * Not used for the CDS Exports. Left in to show this is how you would fill
+	 * elements that are specific to CustomMedications, and to keep design pattern the same
+	 * when building out to other data formats
+	 * @param medicationsAndTreatments The CDS MedicationsAndTreatments to add elements to
+	 * @param medication CustomMedication to pull elements from
+	 * @return medicationsAndTreatments filled with CustomMedication elements
+	 */
 	protected MedicationsAndTreatments fillCustomDrugElements(MedicationsAndTreatments medicationsAndTreatments,
 	                                                          CustomMedication medication)
 	{
 		return medicationsAndTreatments;
 	}
 
-	protected DrugMeasure getDrugMeasure(StandardMedication exportStructure)
+	protected DrugMeasure getDrugMeasure(Medication exportStructure)
 	{
 		DrugMeasure drugMeasure = null;
 

@@ -28,10 +28,16 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.oscarehr.JunoApplication;
 import org.oscarehr.util.MiscUtils;
 
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = JunoApplication.class)
 public class CLSHandlerTest {
 
 	Logger logger = MiscUtils.getLogger();

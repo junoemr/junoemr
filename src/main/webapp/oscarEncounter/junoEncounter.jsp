@@ -50,11 +50,7 @@
 
 <c:set var="ctx" value="${pageContext.request.contextPath}" scope="request"/>
 
-<fmt:parseDate value="${junoEncounterForm.pageData.encounterNoteHideBeforeDate}"
-			   pattern="EEE MMM dd HH:mm:ss z y"
-			   var="encounterNoteHideBeforeDateParsed"/>
-
-<fmt:formatDate value="${encounterNoteHideBeforeDateParsed}"
+<fmt:formatDate value="${junoEncounterForm.pageData.encounterNoteHideBeforeDate}"
 			   pattern="yyyy-MM-dd'T'HH:mm"
 			   var="encounterNoteHideBeforeDateFormatted"/>
 
@@ -259,7 +255,7 @@
 
 			function reloadNav(sectionName)
 			{
-				junoEncounter.getSectionRemote(sectionName, false, false);
+				junoEncounter.getSectionRemote(sectionName, false, false, getEChartUUID());
 			}
 
 
@@ -629,7 +625,7 @@
 										<c:when test="${ section.remainingNotes > 0 && loop.last }">
 											<a href="#"
 											   class="expandCasemgmtSidebar encounterNoteTitle"
-											   onclick="junoEncounter.getSectionRemote('${sectionName}', true, false); return false;"
+											   onclick="junoEncounter.getSectionRemote('${sectionName}', true, false, getEChartUUID()); return false;"
 											   title="${section.remainingNotes} more items">
 												<img id="img${sectionName}5"
 													 src="${ctx}/oscarEncounter/graphics/expand.gif"/>&nbsp;&nbsp;

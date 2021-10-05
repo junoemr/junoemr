@@ -436,10 +436,11 @@ Juno.Common.Util.confirmationDialog = function confirmationDialog(uibModal, titl
  * @param message - message to display to the user
  * @param style - the style of the modal
  * @param okText - alternate text for the ok button. omit if you want default ("Ok").
+ * @param placeholder - the input placeholder text
  * @param characterLimit - limit the number of characters that can be entered in to the input box. omit for unlimited.
  * @returns {*} - user selection
  */
-Juno.Common.Util.openInputDialog = function openInputDialog(uibModal, title, message, style, okText, characterLimit)
+Juno.Common.Util.openInputDialog = function openInputDialog(uibModal, title, message, style, okText, placeholder, characterLimit)
 {
 	return uibModal.open(
 			{
@@ -451,6 +452,7 @@ Juno.Common.Util.openInputDialog = function openInputDialog(uibModal, title, mes
 					message: () => message,
 					style: () => style,
 					okText: () => okText,
+					placeholder: () => placeholder,
 					characterLimit: () => characterLimit,
 				}
 			}
@@ -465,9 +467,10 @@ Juno.Common.Util.openInputDialog = function openInputDialog(uibModal, title, mes
  * @param options - the select menu options
  * @param style - style of the modal
  * @param okText - the text to display on the "ok" button. Leave blank for "Ok"
+ * @param placeholder - the input placeholder text
  * @returns {*} - user selection
  */
-Juno.Common.Util.openSelectDialog = function openSelectDialog(uibModal, title, message, options, style, okText)
+Juno.Common.Util.openSelectDialog = function openSelectDialog(uibModal, title, message, options, style, okText, placeholder)
 {
 	return uibModal.open(
 			{
@@ -479,10 +482,44 @@ Juno.Common.Util.openSelectDialog = function openSelectDialog(uibModal, title, m
 					message: () => message,
 					style: () => style,
 					okText: () => okText,
+					placeholder: () => placeholder,
 					options: () => options,
 					type: () => JUNO_INPUT_MODAL_TYPE.SELECT,
 				}
 			}
+	).result;
+};
+
+/**
+ * display a typeahead dialog to the user
+ * @param uibModal - the uib modal instance
+ * @param title - title of the modal
+ * @param message - message inside the modal
+ * @param options - an array of predefined options, or the callback function to call when searching for typeahead results
+ * @param style - style of the modal
+ * @param okText - the text to display on the "ok" button. Leave blank for "Ok"
+ * @param placeholder - the input placeholder text
+ * @param typeaheadMinLength - the minimum typeahead search length
+ * @returns {*} - user selection
+ */
+Juno.Common.Util.openTypeaheadDialog = function openTypeaheadDialog(uibModal, title, message, options, style, okText, placeholder, typeaheadMinLength)
+{
+	return uibModal.open(
+		{
+			component: 'junoInputModal',
+			backdrop: 'static',
+			windowClass: "juno-simple-modal-window",
+			resolve: {
+				title: () => title,
+				message: () => message,
+				style: () => style,
+				okText: () => okText,
+				placeholder: () => placeholder,
+				options: () => options,
+				type: () => JUNO_INPUT_MODAL_TYPE.TYPEAHEAD,
+				typeaheadMinLength: () => typeaheadMinLength,
+			}
+		}
 	).result;
 };
 

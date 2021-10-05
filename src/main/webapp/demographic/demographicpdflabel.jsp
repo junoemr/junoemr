@@ -156,7 +156,7 @@ out.println("failed!!!");
                 rd = rd !=null ? rd : "" ;
                 rdohip = SxmlMisc.getXmlContent(d.getFamilyDoctor(),"rdohip");
                 rdohip = rdohip !=null ? rdohip : "" ;
-                family_doc = SxmlMisc.getXmlContent(d.getFamilyDoctor(),"family_doc");
+                family_doc = SxmlMisc.getXmlContent(d.getFamilyDoctor2(),"family_doc");
                 family_doc = family_doc !=null ? family_doc : "" ;
         }
         //----------------------------REFERRAL DOCTOR --------------end-----------

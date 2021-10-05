@@ -40,12 +40,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryResults>, List<Lab>>
 {
 	public static final String UNKNOWN_OBR_NAME = "UNKNOWN TEST TYPE";
-	public static final String UNKNOWN_OBX_ID = "UNKNOWN ID";
+	public static final String UNKNOWN_OBX_ID = "UNKNOWN_ID";
 	public static final String UNKNOWN_OBX_NAME = "UNKNOWN TEST NAME";
 
 	public CDSLabImportMapper()
@@ -136,6 +137,10 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 			for(LaboratoryResults.ResultReviewer importReviewer : laboratoryResults.getResultReviewer())
 			{
 				// use names not ohip number for check since names are required
+				if (importReviewer == null)
+				{
+					continue;
+				}
 				String reviewerKey = importReviewer.getName().getFirstName() + importReviewer.getName().getLastName();
 				if(!uniqueReviewerSet.contains(reviewerKey))
 				{
@@ -227,25 +232,47 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 	private String getOBXName(LaboratoryResults importLabResults)
 	{
 		String name = StringUtils.trimToNull(importLabResults.getTestNameReportedByLab());
-		if(name == null)
+		String testCode = StringUtils.trimToNull(importLabResults.getLabTestCode());
+		/*
+		Return "{testCode} : {name}" if both exist
+		else return "{testCode}" or "{name}" if one exists.
+		If neither exist, return UNKNOWN_OBX_NAME
+		 */
+		if (name != null && testCode != null)
 		{
-			name = StringUtils.trimToNull(importLabResults.getLabTestCode());
+			return testCode + " : " + name;
 		}
-		if(name == null)
+		else if (name == null && testCode != null)
 		{
-			name = UNKNOWN_OBX_NAME;
+			return testCode;
 		}
-		return name;
+		else if (name != null)
+		{
+			return name;
+		}
+		return UNKNOWN_OBX_NAME;
 	}
 
 	private String getOBXId(LaboratoryResults importLabResults)
 	{
 		String id = StringUtils.trimToNull(importLabResults.getLabTestCode());
-		if(id == null)
+		if(id != null)
 		{
-			id = UNKNOWN_OBX_ID;
+			// This is the ideal outcome, where the other EMR gave us a LabTestCode
+			return id;
 		}
-		return id;
+
+		String name = StringUtils.trimToNull(importLabResults.getTestNameReportedByLab());
+		if (name != null)
+		{
+			// Less ideal, use the TestNameReportedByLab as the LabTestCode if it exists
+			return name;
+		}
+
+		// Least ideal, generate a unique LabTestCode
+		// The UUID ensures that each test is considered unique and won't be grouped together with
+		// other labs missing the ID when viewing /lab/CA/ON/labValues.jsp
+		return UNKNOWN_OBX_ID + UUID.randomUUID().toString().replace("-", "");
 	}
 
 	protected Hl7TextInfo.REPORT_STATUS getReportStatusEnum(LaboratoryResults laboratoryResults)
@@ -268,7 +295,7 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 		if(referenceRange != null)
 		{
 			String lowLimit = referenceRange.getLowLimit();
-			String highLimit = referenceRange.getLowLimit();
+			String highLimit = referenceRange.getHighLimit();
 			if(lowLimit != null || highLimit != null)
 			{
 				rangeText = StringUtils.trimToEmpty(lowLimit) + "-" + StringUtils.trimToEmpty(highLimit);

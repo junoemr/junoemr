@@ -63,7 +63,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.DateTimeException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -255,7 +254,7 @@ public class AddDemographicAction extends Action
 
 
 		//Create demographic extensions
-		List<DemographicExt> extensions = new ArrayList<DemographicExt>();
+		Set<DemographicExt> extensions = new HashSet<>();
 
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "hPhoneExt", filterControlCharacters(StringUtils.trimToEmpty(request.getParameter("hPhoneExt")))));
 		extensions.add(new DemographicExt(providerNo, demographic.getDemographicId(), "wPhoneExt", filterControlCharacters(StringUtils.trimToEmpty(request.getParameter("wPhoneExt")))));

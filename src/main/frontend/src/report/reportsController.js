@@ -1,4 +1,6 @@
 // Figure out what to do with this. 
+import {SecurityPermissions} from "../common/security/securityConstants";
+
 angular.module('oscarProviderViewModule').factory('ReportNavigation', [ '$rootScope', function($rootScope)
 {
 	return {
@@ -33,6 +35,7 @@ angular.module('Report').controller('Report.ReportsController', [
 		controller.me = securityService.getUser().providerNo;
 
 		$scope.$emit('configureShowPatientList', false);
+		controller.SecurityPermissions = SecurityPermissions;
 
 		controller.reports = [
 			{

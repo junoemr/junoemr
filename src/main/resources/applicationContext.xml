@@ -25,23 +25,8 @@
 		</property>
 	</bean>
 
-	<!-- setup JPA -->
-<!--
-	<import resource="classpath:spring_jpa.xml" />
--->
-
-	<!-- setup hibernate -->
-<!--
-	<import resource="classpath:spring_hibernate.xml" />
--->
-
 	<!-- setup managers -->
 	<import resource="classpath:spring_managers.xml" />
-
-	<!-- setup CXF -->
-<!--
-	<import resource="classpath:spring_ws.xml" />
--->
 
 	<bean id="hl7HandlerMSHMappingDao" class="org.oscarehr.common.dao.HL7HandlerMSHMappingDao" autowire="byName" />
 
@@ -87,7 +72,6 @@
 	<bean id="programTeamDAO" class="org.oscarehr.PMmodule.dao.ProgramTeamDAO" autowire="byName" />
 	<bean id="bedProgramDao" class="org.caisi.dao.BedProgramDao" autowire="byName" />
 	<bean id="demographicDao" class="org.oscarehr.common.dao.DemographicDao" autowire="byName" />
-	<bean id="secUserRoleDao" class="org.oscarehr.PMmodule.dao.SecUserRoleDao" autowire="byName" />
 	<bean id="programSignatureDao" class="org.oscarehr.PMmodule.dao.ProgramSignatureDao" autowire="byName" />
 	<bean id="programClientRestrictionDAO" class="org.oscarehr.PMmodule.dao.ProgramClientRestrictionDAO" autowire="byName" />
 	<bean id="UserPropertyDAO" class="org.oscarehr.common.dao.UserPropertyDAO" autowire="byName" />

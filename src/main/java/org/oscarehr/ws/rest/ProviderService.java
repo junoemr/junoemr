@@ -23,6 +23,8 @@
  */
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import net.sf.json.JSONObject;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -42,17 +44,21 @@ import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 import org.oscarehr.providerBilling.transfer.ProviderBillingTransfer;
+import org.oscarehr.security.model.Permission;
+import org.oscarehr.security.service.SecurityRolesService;
+import org.oscarehr.security.service.SecuritySetsService;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditFormTo1;
-import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
+import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.ProviderTo1;
+import org.oscarehr.ws.rest.transfer.PatientListItemTransfer;
+import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditFormTo1;
 import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditResponseTo1;
+import org.oscarehr.ws.rest.transfer.security.UserSecurityRolesTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -61,6 +67,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -75,31 +82,39 @@ import java.util.List;
 
 @Component("ProviderService")
 @Path("/providerService/")
+@Tag(name = "provider")
 @Transactional
 public class ProviderService extends AbstractServiceImpl {
 
-	private static Logger logger = MiscUtils.getLogger();
+	private static final Logger logger = MiscUtils.getLogger();
 
 	@Autowired
-	ProviderDao providerDao;
+	private ProviderDao providerDao;
 
 	@Autowired
-	org.oscarehr.provider.service.ProviderService providerService;
+	private org.oscarehr.provider.service.ProviderService providerService;
 
 	@Autowired
-	ProviderManager2 providerManager;
+	private ProviderManager2 providerManager;
 	
 	@Autowired
-	DemographicManager demographicManager;
+	private DemographicManager demographicManager;
 
 	@Autowired
-	RecentDemographicAccessService recentDemographicAccessService;
+	private RecentDemographicAccessService recentDemographicAccessService;
 
 	@Autowired
 	private PreferenceManager preferenceManager;
 
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
+
+	@Autowired
+	private SecurityRolesService securityRolesService;
+
+	@Autowired
+	private SecuritySetsService securitySetsService;
+
 
 	protected SecurityContext getSecurityContext() {
 		Message m = PhaseInterceptorChain.getCurrentMessage();
@@ -118,6 +133,7 @@ public class ProviderService extends AbstractServiceImpl {
 
     @GET
     @Path("/providers")
+	@Produces(MediaType.APPLICATION_JSON)
     @Deprecated
     public org.oscarehr.ws.rest.to.OscarSearchResponse<ProviderTransfer> getProviders() {
     	org.oscarehr.ws.rest.to.OscarSearchResponse<ProviderTransfer> lst = new 
@@ -132,7 +148,7 @@ public class ProviderService extends AbstractServiceImpl {
  
     @GET
     @Path("/providers_json")
-    @Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
     public AbstractSearchResponse<ProviderTo1> getProvidersAsJSON()
     {
     	List<ProviderTo1> providers = new ProviderConverter().getAllAsTransferObjects(getLoggedInInfo(), providerDao.getActiveProviders());
@@ -145,7 +161,7 @@ public class ProviderService extends AbstractServiceImpl {
 
     @GET
     @Path("/provider/me")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public ProviderTo1 getLoggedInProvider()
     {
     	Provider provider = getLoggedInInfo().getLoggedInProvider();
@@ -207,7 +223,7 @@ public class ProviderService extends AbstractServiceImpl {
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public synchronized RestResponse<ProviderEditResponseTo1> createProvider(ProviderEditFormTo1 providerEditFormTo1)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ADMIN_CREATE);
 		try
 		{
 			ProviderData providerData = providerService.createProvider(providerEditFormTo1, getLoggedInInfo());
@@ -231,12 +247,12 @@ public class ProviderService extends AbstractServiceImpl {
 	@Transactional(propagation = Propagation.NOT_SUPPORTED)
 	public synchronized RestResponse<ProviderEditResponseTo1> editProvider(@PathParam("id") Integer providerNo, ProviderEditFormTo1 providerEditFormTo1)
 	{
-		String currentProvider = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(currentProvider, SecurityInfoManager.WRITE, null, "_admin");
-		securityInfoManager.requireUserCanModify(currentProvider, providerNo.toString());
+		String currentProviderId = getLoggedInProviderId();
+		securityInfoManager.requireAllPrivilege(currentProviderId, Permission.ADMIN_UPDATE);
+		securityInfoManager.requireUserCanModify(currentProviderId, providerNo.toString());
 		try
 		{
-			ProviderData providerData = providerService.editProvider(providerEditFormTo1, providerNo, currentProvider);
+			ProviderData providerData = providerService.editProvider(providerEditFormTo1, providerNo, currentProviderId);
 			return RestResponse.successResponse(new ProviderEditResponseTo1(providerData.getProviderNo().toString(), ProviderEditResponseTo1.STATUS_SUCCESS));
 		}
 		catch (SecurityRecordAlreadyExistsException secRecordExists)
@@ -262,12 +278,15 @@ public class ProviderService extends AbstractServiceImpl {
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<ProviderBillingTransfer> getProviderBilling(@PathParam("id") String providerNo)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.BILLING_READ);
+
 		ProviderBilling billing = providerService.getProviderBilling(providerNo);
 		ProviderBillingTransfer transfer = ProviderBillingTransfer.toTransferObj(billing);
 		return RestResponse.successResponse(transfer);
 	}
     @GET
     @Path("/providerjson/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
     public ProviderTo1 getProviderAsJSON(@PathParam("id") String id)
     {
 	    Provider provider = providerDao.getProvider(id);
@@ -278,15 +297,18 @@ public class ProviderService extends AbstractServiceImpl {
 
     @GET
     @Path("/providers/bad")
+	@Produces(MediaType.APPLICATION_JSON)
     public Response getBadRequest() {
         return Response.status(Status.BAD_REQUEST).build();
     }
 	
 	@POST
 	@Path("/providers/search")
-	@Produces("application/json")
-	@Consumes("application/json")
-	public AbstractSearchResponse<ProviderTo1> search(JSONObject json,@QueryParam("startIndex") Integer startIndex,@QueryParam("itemsToReturn") Integer itemsToReturn ) {
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Hidden
+	public AbstractSearchResponse<ProviderTo1> search(JSONObject json,@QueryParam("startIndex") Integer startIndex,@QueryParam("itemsToReturn") Integer itemsToReturn )
+	{
 		AbstractSearchResponse<ProviderTo1> response = new AbstractSearchResponse<ProviderTo1>();
 		
 		int startIndexVal = startIndex==null?0:startIndex.intValue();
@@ -322,9 +344,10 @@ public class ProviderService extends AbstractServiceImpl {
 	
 	@GET
 	@Path("/getRecentDemographicsViewed")
-	@Produces("application/json")
+	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<PatientListItemTransfer> getRecentDemographicsViewed()
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		int providerNo = Integer.parseInt(getLoggedInInfo().getLoggedInProviderNo());
 		int offset = 0;
@@ -358,8 +381,9 @@ public class ProviderService extends AbstractServiceImpl {
 	
 	@GET
 	@Path("/getActiveTeams")
-	@Produces("application/json")
-	public AbstractSearchResponse<String> getActiveTeams() {	
+	@Produces(MediaType.APPLICATION_JSON)
+	public AbstractSearchResponse<String> getActiveTeams()
+	{
 		List<String> teams = providerManager.getActiveTeams(getLoggedInInfo());
 		
 		AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
@@ -368,7 +392,42 @@ public class ProviderService extends AbstractServiceImpl {
 		response.setTotal(response.getContent().size());
 		return response;
 	}
-	
+
+	@GET
+	@Path("/self/security/roles")
+	public RestResponse<UserSecurityRolesTransfer> getCurrentUserSecurityRoles()
+	{
+		return RestResponse.successResponse(securityRolesService.getUserSecurityRolesTransfer(getLoggedInProviderId()));
+	}
+
+	@GET
+	@Path("/self/security/access/demographic/{demographicId}")
+	public RestResponse<Boolean> canCurrentUserAccessDemographic(@PathParam("demographicId") Integer demographicId)
+	{
+		return RestResponse.successResponse(securityInfoManager.isAllowedAccessToPatientRecord(getLoggedInProviderId(), demographicId));
+	}
+
+	@GET
+	@Path("/provider/{providerId}/security/sets/blacklist")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestSearchResponse<String> getProviderSecurityDemographicSetsBlacklist(@PathParam("providerId") String providerId)
+	{
+		return RestSearchResponse.successResponseOnePage(securitySetsService.getSecurityDemographicSetNamesBlacklist(providerId));
+	}
+
+	@PUT
+	@Path("/provider/{providerId}/security/sets/blacklist")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> setProviderSecurityDemographicSetsBlacklist(@PathParam("providerId") String providerId,
+	                                                                         List<String> assignedSetNames)
+	{
+		String loggedInProviderId = getLoggedInProviderId();
+		securityInfoManager.requireAllPrivilege(loggedInProviderId, Permission.CONFIGURE_SECURITY_ROLES_UPDATE);
+		securitySetsService.setSecurityDemographicSetsBlacklist(loggedInProviderId, providerId, assignedSetNames);
+		return RestResponse.successResponse(true);
+	}
+
 //	@GET
 //	@Path("/settings/get")
 //	@Produces("application/json")

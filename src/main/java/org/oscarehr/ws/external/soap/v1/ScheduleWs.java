@@ -72,6 +72,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -328,11 +329,46 @@ public class ScheduleWs extends AbstractWs {
 		return (appointment.getId());
 	}
 
-	public void updateAppointment(AppointmentTransfer appointmentTransfer) {
-		Appointment appointment = scheduleManager.getAppointment(getLoggedInInfo(),appointmentTransfer.getId());
-
+	/**
+	 * Updates an appointment using the provided DTO
+	 * @param appointmentTransfer Appointment DTO to be updated
+	 * @throws IllegalArgumentException
+	 */
+	public void updateAppointment(AppointmentTransfer appointmentTransfer)
+	{
+		Appointment appointment = scheduleManager.getAppointment(getLoggedInInfo(), appointmentTransfer.getId());
+		validateAppointmentUpdate(appointment, appointmentTransfer);
 		appointmentTransfer.copyTo(appointment);
 		scheduleManager.updateAppointment(getLoggedInInfo(),appointment);
+	}
+
+	/**
+	 * Validates an update to an appointment ensuring the update is valid
+	 * @param oldAppointment appointment prior to updating
+	 * @param newAppointment appointment after updating
+	 * @throws IllegalArgumentException
+	 */
+	private void validateAppointmentUpdate(Appointment oldAppointment, AppointmentTransfer newAppointment) throws IllegalArgumentException
+	{
+		String errorMessage = "Appointment ID: " + oldAppointment.getId() + " can't be updated. ";
+
+		if (oldAppointment.getIsVirtual() != newAppointment.getIsVirtual())
+		{
+			throw new IllegalArgumentException(errorMessage.concat("Appointments can not change their isVirtual value."));
+		}
+
+		if (oldAppointment.getIsVirtual())
+		{
+			if (!Objects.equals(oldAppointment.getLocation(), newAppointment.getLocation()))
+			{
+				throw new IllegalArgumentException(errorMessage.concat("Virtual appointments can not change location."));
+			}
+
+			if (oldAppointment.getDemographicNo() != newAppointment.getDemographicNo())
+			{
+				throw new IllegalArgumentException(errorMessage.concat("Virtual appointments can not change demographic."));
+			}
+		}
 	}
 
 	public void cancelAppointment(Integer appointmentId)

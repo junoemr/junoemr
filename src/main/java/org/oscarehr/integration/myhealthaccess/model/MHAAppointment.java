@@ -48,6 +48,7 @@ public class MHAAppointment
 	public enum APPOINTMENT_TYPE {
 		REGULAR,
 		ONE_TIME_LINK,
+		ON_DEMAND_AUDIO_CALL,
 	}
 
 	public MHAAppointment(AppointmentTo1 appointmentTo1)

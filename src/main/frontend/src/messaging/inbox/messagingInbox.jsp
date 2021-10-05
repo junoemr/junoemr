@@ -1,8 +1,8 @@
-<page-wrapper class="messaging-inbox" show-header="!$ctrl.recordPageEmbedded" dont-set-height="$ctrl.recordPageEmbedded">
+<page-wrapper class="messaging-inbox" show-header="!$ctrl.recordPageEmbedded">
 	<page-header class="flex-row align-items-center h-100">
 		<h6>{{stringResources.getString("inbox.pageTitle")}}</h6>
 	</page-header>
-	<page-body class="flex-item-grow flex-col messaging-inbox" ng-class="{'record-page-embedded': $ctrl.recordPageEmbedded}">
+	<page-body class="flex-item-grow flex-col messaging-inbox-content">
 		<inbox-header-bar ng-if="$ctrl.backend"
 		                  component-style="$ctrl.componentStyle"
 		                  selected-message-id="$ctrl.selectedMessageId"

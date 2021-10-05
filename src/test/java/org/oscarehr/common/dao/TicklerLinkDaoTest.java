@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.oscarehr.common.model.Tickler;
 import org.oscarehr.common.model.TicklerLink;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +49,11 @@ public class TicklerLinkDaoTest extends DaoTestFixtures
 	@Autowired
 	protected TicklerLinkDao ticklerLinkDao;
 
+	@Autowired TicklerDao ticklerDao;
+
 	@Before
 	public void before() throws Exception {
-		SchemaUtils.restoreTable("tickler_link");
+		SchemaUtils.restoreTable("tickler_link", "tickler");
 	}
 
 	@Test
@@ -67,8 +70,8 @@ public class TicklerLinkDaoTest extends DaoTestFixtures
 		String tableName1 = "alp";
 		String tableName2 = "brv";
 		
-		long tableId1 = 101;
-		long tableId2 = 202;
+		String tableId1 = "101";
+		String tableId2 = "202";
 		
 		TicklerLink ticklerLink1 = new TicklerLink();
 		EntityDataGenerator.generateTestDataForModelClass(ticklerLink1);
@@ -95,7 +98,7 @@ public class TicklerLinkDaoTest extends DaoTestFixtures
 		ticklerLinkDao.persist(ticklerLink4);
 		
 		List<TicklerLink> expectedResult = new ArrayList<TicklerLink>(Arrays.asList(ticklerLink1, ticklerLink3));		
-		List<TicklerLink> result = ticklerLinkDao.getLinkByTableId(tableName1, tableId1);
+		List<TicklerLink> result = ticklerLinkDao.getLinkByTableId(tableName1, Long.parseLong(tableId1));
 		
 		Logger logger = MiscUtils.getLogger();
 		if (result.size() != expectedResult.size()) {
@@ -114,33 +117,34 @@ public class TicklerLinkDaoTest extends DaoTestFixtures
 	
 	@Test
 	public void testGetLinkByTickler() throws Exception {
-		
-		int ticklerNo1 = 101;
-		int ticklerNo2 = 202;
-		
+		Tickler tickler1 = new Tickler();
+		ticklerDao.persist(tickler1);
+		Tickler tickler2 = new Tickler();
+		ticklerDao.persist(tickler2);
+
 		TicklerLink ticklerLink1 = new TicklerLink();
-		EntityDataGenerator.generateTestDataForModelClass(ticklerLink1);
-		ticklerLink1.setTicklerNo(ticklerNo1);
+		fillTicklerLink(ticklerLink1);
+		ticklerLink1.setTickler(tickler1);
 		ticklerLinkDao.persist(ticklerLink1);
-		
+
 		TicklerLink ticklerLink2 = new TicklerLink();
-		EntityDataGenerator.generateTestDataForModelClass(ticklerLink2);
-		ticklerLink2.setTicklerNo(ticklerNo2);
+		fillTicklerLink(ticklerLink2);
+		ticklerLink2.setTickler(tickler2);
 		ticklerLinkDao.persist(ticklerLink2);
-		
+
 		TicklerLink ticklerLink3 = new TicklerLink();
-		EntityDataGenerator.generateTestDataForModelClass(ticklerLink3);
-		ticklerLink3.setTicklerNo(ticklerNo1);
+		fillTicklerLink(ticklerLink3);
+		ticklerLink3.setTickler(tickler1);
 		ticklerLinkDao.persist(ticklerLink3);
-		
+
 		TicklerLink ticklerLink4 = new TicklerLink();
-		EntityDataGenerator.generateTestDataForModelClass(ticklerLink4);
-		ticklerLink4.setTicklerNo(ticklerNo1);
+		fillTicklerLink(ticklerLink4);
+		ticklerLink4.setTickler(tickler1);
 		ticklerLinkDao.persist(ticklerLink4);
-		
-		List<TicklerLink> expectedResult = new ArrayList<TicklerLink>(Arrays.asList(ticklerLink1, ticklerLink3, ticklerLink4));		
-		List<TicklerLink> result = ticklerLinkDao.getLinkByTickler(ticklerNo1);
-		
+
+		List<TicklerLink> expectedResult = new ArrayList<TicklerLink>(Arrays.asList(ticklerLink1, ticklerLink3, ticklerLink4));
+		List<TicklerLink> result = ticklerLinkDao.getLinkByTickler(tickler1.getId());
+
 		Logger logger = MiscUtils.getLogger();
 		if (result.size() != expectedResult.size()) {
 			logger.warn("Array sizes do not match. Result: "+result.size());
@@ -154,5 +158,13 @@ public class TicklerLinkDaoTest extends DaoTestFixtures
 			}
 		}
 		assertTrue(true);
+	}
+
+
+	protected TicklerLink fillTicklerLink(TicklerLink ticklerLink)
+	{
+		ticklerLink.setTableId("34");
+		ticklerLink.setTableName("foobar");
+		return ticklerLink;
 	}
 }

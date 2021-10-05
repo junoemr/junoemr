@@ -9,26 +9,8 @@
 
 package org.oscarehr.caseload;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.time.LocalDate;
-import java.time.Period;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Properties;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -42,20 +24,35 @@ import org.oscarehr.common.dao.TicklerDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.MessageList;
-import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.util.ConversionUtils;
 import oscar.util.OscarRoleObjectPrivilege;
 import oscar.util.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Properties;
 
 public class CaseloadContentAction extends DispatchAction {
 
@@ -87,7 +84,7 @@ public class CaseloadContentAction extends DispatchAction {
 	{
 
 		String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireOnePrivilege(providerNo, SecurityInfoManager.READ, null, SecObjectName._DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(providerNo, Permission.DEMOGRAPHIC_READ);
 
 		String caseloadProv     = request.getParameter("clProv");
 		String caseloadQuery    = request.getParameter("clQ");

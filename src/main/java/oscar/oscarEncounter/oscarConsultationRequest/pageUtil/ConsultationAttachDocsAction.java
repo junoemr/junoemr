@@ -54,7 +54,7 @@ public class ConsultationAttachDocsAction extends Action
 			throws ServletException, IOException
 	{
 		securityInfoManager.requireOnePrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
-				SecurityInfoManager.WRITE, null, "_con");
+				SecurityInfoManager.CREATE, null, "_con");
 
 		DynaActionForm frm = (DynaActionForm) form;
 

@@ -28,12 +28,13 @@ import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.ProviderSitePK;
 import org.oscarehr.common.model.Site;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.site.service.SiteService;
 import org.oscarehr.site.transfer.ProviderSiteBillingTransfer;
+import org.oscarehr.site.transfer.SiteTransfer;
 import org.oscarehr.ws.rest.conversion.SiteConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
-import org.oscarehr.site.transfer.SiteTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -106,6 +107,8 @@ public class SitesService extends AbstractServiceImpl
 	@Path("/{siteId}/provider/{providerNo}/billing")
 	public RestResponse<ProviderSiteBillingTransfer> getProviderBillingForSite(@PathParam("providerNo") String providerNo, @PathParam("siteId") Integer siteId)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.BILLING_READ);
+
 		ProviderSitePK key = new ProviderSitePK(providerNo, siteId);
 		ProviderSite providerSite = providerSiteDao.find(key);
 
@@ -118,6 +121,8 @@ public class SitesService extends AbstractServiceImpl
 	@Path("/provider/{providerNo}/{sdate}")
 	public RestResponse<SiteTransfer> getProviderSiteBySchedule(@PathParam("providerNo") String providerNo, @PathParam("sdate") String sdate)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
+
 		LocalDate sdateLocalDate = ConversionUtils.toLocalDate(sdate);
 		Site site = siteDao.getProviderSiteByScheduleDate(providerNo, sdateLocalDate);
 

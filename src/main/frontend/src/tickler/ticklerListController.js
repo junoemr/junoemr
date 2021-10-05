@@ -1,3 +1,7 @@
+import {SecurityPermissions} from "../common/security/securityConstants";
+
+import {TicklerAttachmentType} from "../lib/tickler/model/TicklerAttachmentType";
+
 angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 	'$scope',
@@ -10,6 +14,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 	'$filter',
 	'NgTableParams',
 	'securityService',
+	'securityRolesService',
 	'ticklerService',
 	'noteService',
 	'providerService',
@@ -27,6 +32,7 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 		$filter,
 		NgTableParams,
 		securityService,
+		securityRolesService,
 		ticklerService,
 		noteService,
 		providerService,
@@ -39,67 +45,44 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		controller.lastResponse = ""; // Can be removed?
 		controller.providers = providers;
+		controller.SecurityPermissions = SecurityPermissions;
+		controller.tableParams = null;
 
-		securityService.hasRights(
+		controller.$onInit = () =>
 		{
-			items: [
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.TicklerRead))
 			{
-				objectName: '_tickler',
-				privilege: 'w'
-			},
-			{
-				objectName: '_tickler',
-				privilege: 'r'
-			}]
-		}).then(function(result)
-		{
-			if (result.content != null && result.content.length == 2)
-			{
-				controller.ticklerWriteAccess = result.content[0];
-				controller.ticklerReadAccess = result.content[1];
+				//object which represents all the filters, initialize status.
+				controller.search = {
+					status: 'A',
+				};
 
-				if (controller.ticklerReadAccess)
-				{
-
-					//object which represents all the filters, initialize status.
-					controller.search = {
-						status: 'A',
-					};
-
-					if ($state.current.name === 'ticklers')
-					{// only default to current day for serviceEndDate on the global tickler page.
-						controller.search.serviceEndDate = moment().endOf('day').toDate();
-					}
-
-					providerService.getSettings().then(
-						function(settings)
-						{
-							if (settings.ticklerViewOnlyMine)
-							{
-								providerService.getMe().then(
-										function(user)
-										{
-											controller.search.taskAssignedTo = user.providerNo;
-											controller.loadTable();
-										}
-								)
-							}
-							else
-							{
-								controller.loadTable();
-							}
-						}
-					);
+				if ($state.current.name === 'ticklers')
+				{// only default to current day for serviceEndDate on the global tickler page.
+					controller.search.serviceEndDate = moment().endOf('day').toDate();
 				}
+
+				providerService.getSettings().then(
+					function(settings)
+					{
+						if (settings.ticklerViewOnlyMine)
+						{
+							providerService.getMe().then(
+								function(user)
+								{
+									controller.search.taskAssignedTo = user.providerNo;
+									controller.loadTable();
+								}
+							)
+						}
+						else
+						{
+							controller.loadTable();
+						}
+					}
+				);
 			}
-			else
-			{
-				alert('failed to load rights');
-			}
-		}, function(reason)
-		{
-			alert(reason);
-		});
+		}
 
 		controller.doSearch = function()
 		{
@@ -122,15 +105,6 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 				tickler.checked = true;
 			});
 		};
-
-		// controller.checkAll = function()
-		// {
-
-		// 	angular.forEach(controller.lastResponse, function(item)
-		// 	{
-		// 		item.checked = true;
-		// 	});
-		// };
 
 		controller.checkNone = function checkNone(data)
 		{
@@ -238,20 +212,19 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		controller.addTickler = function()
 		{
-			var windowProps = "height=400,width=600,location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes";
-			//window.open('../tickler/ticklerAdd.jsp','ticklerAdd',windowProps);
-
 			var modalInstance = $uibModal.open(
 			{
-				templateUrl: 'src/tickler/ticklerAdd.jsp',
-				controller: 'Tickler.TicklerAddController as ticklerAddCtrl',
+				component: "ticklerAddComponent",
 				backdrop: 'static',
-				size: 'lg'
+				size: 'lg',
+				resolve: {
+					attachment: () => null,
+					presetDemographicNo: () => null,
+				}
 			});
 
 			modalInstance.result.then(function(data)
 			{
-				console.log('data from modalInstance ' + data);
 				if (data != null && data == true)
 				{
 					controller.tableParams.reload();
@@ -260,8 +233,6 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 			{
 				alert(reason);
 			});
-
-
 		};
 
 		controller.editTickler = function(tickler)
@@ -282,10 +253,6 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 					ticklerNote: function()
 					{
 						return noteService.getTicklerNote(tickler.id);
-					},
-					ticklerWriteAccess: function()
-					{
-						return controller.ticklerWriteAccess;
 					},
 					me: function()
 					{
@@ -377,33 +344,54 @@ angular.module('Tickler').controller('Tickler.TicklerListController', [
 
 		controller.getLinkUrl = function getLinkUrl(input)
 		{
-            if (input !== null && input.id !== null)
-            {
-                var url = "";
-
-                if (input.tableName === 'CML')
-                {
-                    url = "../lab/CA/ON/CMLDisplay.jsp?segmentID=" + input.tableId;
-                }
-                else if (input.tableName === 'MDS')
-                {
-                    url = "../oscarMDS/SegmentDisplay.jsp?segmentID=" + input.tableId;
-                }
-                else if (input.tableName === 'HL7')
-                {
-                    url = "../lab/CA/ALL/labDisplay.jsp?segmentID=" + input.tableId;
-                }
-                else if (input.tableName === 'DOC')
-                {
-                    url = "../dms/ManageDocument.do?method=display&doc_no=" + input.tableId;
-                }
-                return url;
-            }
-
+			if (input !== null && input.id !== null)
+			{
+				var url = "";
+				if (input.tableName === TicklerAttachmentType.Cml)
+				{
+					url = "../lab/CA/ON/CMLDisplay.jsp?segmentID=" + input.tableId;
+				}
+				else if (input.tableName === TicklerAttachmentType.Mds)
+				{
+					url = "../oscarMDS/SegmentDisplay.jsp?segmentID=" + input.tableId;
+				}
+				else if (input.tableName === TicklerAttachmentType.Hl7)
+				{
+					url = "../lab/CA/ALL/labDisplay.jsp?segmentID=" + input.tableId;
+				}
+				else if (input.tableName === TicklerAttachmentType.Doc)
+				{
+					url = "../dms/ManageDocument.do?method=display&doc_no=" + input.tableId;
+				}
+				else if (input.tableName === TicklerAttachmentType.Message)
+				{
+					const meta = JSON.parse(input.meta);
+					url = $state.href("messaging.view.message", {
+						messageId: input.tableId,
+						backend: meta.messagingBackend,
+						source: meta.source,
+						group: meta.group,
+					});
+				}
+				return url;
+			}
 		};
 		controller.inDemographicView = function()
 		{
 			return ($state.params.demographicNo != null);
+		}
+
+		controller.canEdit = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TicklerUpdate);
+		}
+		controller.canCreate = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TicklerCreate);
+		}
+		controller.canDelete = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.TicklerDelete);
 		}
 	}
 ]);

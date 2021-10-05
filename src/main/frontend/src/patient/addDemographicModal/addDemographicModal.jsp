@@ -22,6 +22,7 @@
 						ca-model="$ctrl.newDemographicData.lastName"
 						ca-rows="1"
 						ca-required-field="true"
+						ca-focus-field="$ctrl.focusField"
 					>
 					</ca-field-text>
 				</div>

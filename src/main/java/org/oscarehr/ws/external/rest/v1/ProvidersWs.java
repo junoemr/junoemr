@@ -58,7 +58,8 @@ public class ProvidersWs extends AbstractExternalRestWs
 	@GET
 	@Path("/providers_json")
 	@Hidden
-	public AbstractSearchResponse<ProviderTo1> getProvidersAsJSON() {
+	public AbstractSearchResponse<ProviderTo1> getProvidersAsJSON()
+	{
 		JsonConfig config = new JsonConfig();
 		config.registerJsonBeanProcessor(java.sql.Date.class, new JsDateJsonBeanProcessor());
 

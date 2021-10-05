@@ -37,6 +37,7 @@ import org.oscarehr.common.model.Explain;
 import org.oscarehr.common.model.ReportByExamples;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.report.SQLReportHelper;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
@@ -76,7 +77,7 @@ public class RptByExampleAction extends Action
 			RptByExampleForm frm = (RptByExampleForm) form;
 
 			String providerNo = (String) request.getSession().getAttribute("user");
-			securityInfoManager.requireAllPrivilege(providerNo, SecurityInfoManager.READ, null, "_admin", "_report");
+			securityInfoManager.requireAllPrivilege(providerNo, Permission.ADMIN_READ, Permission.REPORT_READ);
 
 			RptByExampleQueryBeanHandler hd = new RptByExampleQueryBeanHandler();
 			Collection favorites = hd.getFavoriteCollection(providerNo);

@@ -1,6 +1,8 @@
 :root {
 	--juno-form-input-default-padding-left: 16px;
 	--juno-form-input-default-padding-right: 16px;
+
+	--juno-form-input-label-padding-left: 16px;
 }
 
 @mixin juno-form-inputs-colors($text-color, $background-color, $border-color,
@@ -29,14 +31,14 @@
 		}
 
 		&.field-invalid {
-			border-color: $color-red-base;
+			border-color:  var(--color-red-base);
 
 			&:focus, &:active {
-				border-color: $color-red-base;
+				border-color: var(--color-red-base);
 			}
 		}
-		::placeholder {
-			color: $color-neutral-grey;
+		&::placeholder {
+			color: var(--color-neutral-grey);
 		}
 	}
 }

@@ -1,0 +1,15 @@
+.care-tracker-item-graph-modal {
+
+	.canvas-wrapper {
+		padding: 8px;
+	}
+	.x-axis-label {
+		height: 32px;
+		@include juno-font-body();
+	}
+	.y-axis-label {
+		width: 32px;
+		@include juno-font-body();
+		transform: rotate(-90deg);
+	}
+}

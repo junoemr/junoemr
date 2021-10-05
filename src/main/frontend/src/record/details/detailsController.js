@@ -24,9 +24,10 @@
 
 */
 
-import {INSTANCE_TYPE, SYSTEM_PROPERTIES, BILLING_TYPE} from "../../common/services/systemPreferenceServiceConstants";
-import {ProvidersServiceApi, SystemPreferenceApi} from "../../../generated";
+import {BILLING_TYPE, INSTANCE_TYPE, SYSTEM_PROPERTIES} from "../../common/services/systemPreferenceServiceConstants";
+import {DemographicApi, ProvidersServiceApi, SystemPreferenceApi} from "../../../generated";
 import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
+import {SecurityPermissions} from "../../common/security/securityConstants";
 import {BILLING_REGION} from "../../billing/billingConstants";
 
 angular.module('Record.Details').controller('Record.Details.DetailsController', [
@@ -44,7 +45,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'demographicsService',
 	'errorsService',
 	'patientDetailStatusService',
-	'securityService',
+	'securityRolesService',
 	'staticDataService',
 	'referralDoctorsService',
 	'user',
@@ -64,7 +65,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		demographicsService,
 		messagesFactory,
 		patientDetailStatusService,
-		securityService,
+		securityRolesService,
 		staticDataService,
 		referralDoctorsService,
 		user,
@@ -73,6 +74,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		var controller = this;
 		controller.page = {};
+		const demographicApi = new DemographicApi($http, $httpParamSerializer, "../ws/rs");
 
 		// Global variables
 		var posExtras = {};
@@ -100,196 +102,203 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
 				'../ws/rs');
-		
+
 		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 		controller.eligibilityMsg = $sce.trustAsHtml("...");
 		controller.showEligibility = false;
 		controller.rosteringModuleEnabled = false;
 		controller.displayMessages = messagesFactory.factory();
 		controller.validations = {};
+		controller.SecurityPermissions = SecurityPermissions;
 
 		$scope.JUNO_STYLE = JUNO_STYLE;
 		$scope.pageStyle = JUNO_STYLE.GREY;
 
-		controller.init = function init()
+		controller.$onInit = () =>
 		{
-			demographicService.getDemographic($stateParams.demographicNo).then(
-				function success(results)
-				{
-					controller.page.demo = results;
-					controller.initDemographicVars();
-					controller.checkAccess();
-
-					// retrieve provider types for dropdown selection
-					//TODO-legacy - are roles determined by security role or provider type?
-					providersServiceApi.getBySecurityRole("doctor").then(
-						function success(results) {
-							controller.page.doctors = results.data.body;
-						}
-					);
-					providersServiceApi.getBySecurityRole("nurse").then(
-						function success(results) {
-							controller.page.nurses = results.data.body;
-						}
-					);
-					providersServiceApi.getBySecurityRole("midwife").then(
-						function success(results) {
-							controller.page.midwives = results.data.body;
-						}
-					);
-
-					//show notes
-					if (controller.page.demo.notes != null)
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead))
+			{
+				demographicService.getDemographic($stateParams.demographicNo).then(
+					function success(results)
 					{
-						controller.page.demo.scrNotes = controller.page.demo.notes;
-						if (/^<unotes>[\s\S]*/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring("<unotes>".length);
-						if (/[\s\S]*<\/unotes>$/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring(0, controller.page.demo.scrNotes.lastIndexOf("</unotes>"));
-					}
+						controller.page.demo = results;
+						controller.initDemographicVars();
 
-					// format referral doctor
-					if (controller.page.demo.familyDoctor != null)
-					{
-						const referralDoc = controller.formatReferralDocXMLToJSON(controller.page.demo.familyDoctor);
-						controller.page.demo.scrReferralDocNo = referralDoc.number;
-						controller.page.demo.scrReferralDoc = referralDoc.name;
-					}
-
-					// format family doctor
-					if (controller.page.demo.familyDoctor2 != null)
-					{
-						const familyDoc = controller.formatFamilyDocXMLToJSON(controller.page.demo.familyDoctor2, 'fd', 'fdname');
-						controller.page.demo.scrFamilyDocNo = familyDoc.number;
-						controller.page.demo.scrFamilyDoc = familyDoc.name;
-					}
-
-					if (controller.page.demo.extras != null)
-					{
-						controller.page.demo.extras = toArray(controller.page.demo.extras);
-						for (var i = 0; i < controller.page.demo.extras.length; i++)
-						{
-							if (controller.page.demo.extras[i].key == "demo_cell") controller.page.demo.scrDemoCell = controller.page.demo.extras[i].value;
-							else if (controller.page.demo.extras[i].key == "aboriginal") controller.page.demo.scrAboriginal = controller.page.demo.extras[i].value;
-							else if (controller.page.demo.extras[i].key == "hPhoneExt") controller.page.demo.scrHPhoneExt = controller.page.demo.extras[i].value;
-							else if (controller.page.demo.extras[i].key == "wPhoneExt") controller.page.demo.scrWPhoneExt = controller.page.demo.extras[i].value;
-							else if (controller.page.demo.extras[i].key == "cytolNum") controller.page.demo.scrCytolNum = controller.page.demo.extras[i].value;
-							else if (controller.page.demo.extras[i].key == "phoneComment") controller.page.demo.scrPhoneComment = controller.page.demo.extras[i].value;
-							else if (controller.page.demo.extras[i].key == "paper_chart_archived") controller.page.demo.scrPaperChartArchived = controller.page.demo.extras[i].value;
-							else if (controller.page.demo.extras[i].key == "paper_chart_archived_date") controller.page.demo.scrPaperChartArchivedDate = controller.page.demo.extras[i].value;
-							else if (controller.page.demo.extras[i].key == "usSigned") controller.page.demo.scrUsSigned = controller.page.demo.extras[i].value;
-							else if (controller.page.demo.extras[i].key == "privacyConsent") controller.page.demo.scrPrivacyConsent = controller.page.demo.extras[i].value;
-							else if (controller.page.demo.extras[i].key == "informedConsent") controller.page.demo.scrInformedConsent = controller.page.demo.extras[i].value;
-							else if (controller.page.demo.extras[i].key == "securityQuestion1") controller.page.demo.scrSecurityQuestion1 = controller.page.demo.extras[i].value;
-							else if (controller.page.demo.extras[i].key == "securityAnswer1") controller.page.demo.scrSecurityAnswer1 = controller.page.demo.extras[i].value;
-							else if (controller.page.demo.extras[i].key == "rxInteractionWarningLevel") controller.page.demo.scrRxInteractionLevel = controller.page.demo.extras[i].value;
-
-
-							//record array position of extras by keys - to be used on saving
-							posExtras[controller.page.demo.extras[i].key] = i;
-						}
-					}
-
-					//show phone numbers with preferred check
-					controller.page.demo.scrCellPhone = getPhoneNum(controller.page.demo.scrDemoCell);
-					controller.page.demo.scrHomePhone = getPhoneNum(controller.page.demo.phone);
-					controller.page.demo.scrWorkPhone = getPhoneNum(controller.page.demo.alternativePhone);
-
-					//show waitingListNames
-					if (controller.page.demo.waitingListNames != null)
-					{
-						if (controller.page.demo.waitingListNames.id != null)
-						{ //only 1 entry, convert to array
-							var tmp = {};
-							tmp.id = controller.page.demo.waitingListNames.id;
-							tmp.name = controller.page.demo.waitingListNames.name;
-							tmp.groupNo = controller.page.demo.waitingListNames.groupNo;
-							tmp.providerNo = controller.page.demo.waitingListNames.providerNo;
-							tmp.createDate = controller.page.demo.waitingListNames.createDate;
-							tmp.isHistory = controller.page.demo.waitingListNames.isHistory;
-							controller.page.demo.waitingListNames = [tmp];
-						}
-					}
-
-
-					controller.page.cellPhonePreferredMsg = defPhTitle;
-					controller.page.homePhonePreferredMsg = defPhTitle;
-					controller.page.workPhonePreferredMsg = defPhTitle;
-					if (isPreferredPhone(controller.page.demo.scrDemoCell))
-					{
-						controller.page.demo.scrPreferredPhone = "C";
-						controller.page.preferredPhoneNumber = controller.page.demo.scrCellPhone;
-						controller.page.cellPhonePreferredMsg = prefPhTitle;
-						controller.page.cellPhonePreferredColor = colorAttn;
-					}
-					else if (isPreferredPhone(controller.page.demo.phone))
-					{
-						controller.page.demo.scrPreferredPhone = "H";
-						controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
-						controller.page.homePhonePreferredMsg = prefPhTitle;
-						controller.page.homePhonePreferredColor = colorAttn;
-					}
-					else if (isPreferredPhone(controller.page.demo.alternativePhone))
-					{
-						controller.page.demo.scrPreferredPhone = "W";
-						controller.page.preferredPhoneNumber = controller.page.demo.scrWorkPhone;
-						controller.page.workPhonePreferredMsg = prefPhTitle;
-						controller.page.workPhonePreferredColor = colorAttn;
-					}
-					else
-					{
-						controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
-					}
-
-					controller.page.dataChanged = false;
-
-					//get patient detail status
-					patientDetailStatusService.getStatus($stateParams.demographicNo).then(
-						function success(results)
-						{
-							controller.page.macPHRLoggedIn = results.macPHRLoggedIn;
-							controller.page.macPHRIdsSet = results.macPHRIdsSet;
-							controller.page.macPHRVerificationLevel = results.macPHRVerificationLevel;
-
-							controller.page.integratorEnabled = results.integratorEnabled;
-							controller.page.integratorOffline = results.integratorOffline;
-							controller.page.integratorAllSynced = results.integratorAllSynced;
-
-							controller.page.workflowEnhance = results.workflowEnhance;
-							controller.page.billregion = results.billregion;
-							controller.page.defaultView = results.defaultView;
-							controller.page.hospitalView = results.hospitalView;
-
-							if (controller.page.integratorEnabled)
-							{
-								if (controller.page.integratorOffline)
-								{
-									controller.page.integratorStatusColor = "#ff5500";
-									controller.page.integratorStatusMsg = "NOTE: Integrator is not available at this time";
-								}
-								else if (!controller.page.integratorAllSynced)
-								{
-									controller.page.integratorStatusColor = "#ff5500";
-									controller.page.integratorStatusMsg = "NOTE: Integrated Community is not synced";
-								}
+						// retrieve provider types for dropdown selection
+						//TODO-legacy - are roles determined by security role or provider type?
+						providersServiceApi.getBySecurityRole("doctor").then(
+							function success(results) {
+								controller.page.doctors = results.data.body;
 							}
+						);
+						providersServiceApi.getBySecurityRole("nurse").then(
+							function success(results) {
+								controller.page.nurses = results.data.body;
+							}
+						);
+						providersServiceApi.getBySecurityRole("midwife").then(
+							function success(results) {
+								controller.page.midwives = results.data.body;
+							}
+						);
+					demographicApi.getDemographicContacts(controller.page.demo.demographicNo, "professional").then(
+                    (data) => {
+						controller.page.demoContactPros = data.data.body;
+                    	}
+                    );
 
-							controller.page.billingHistoryLabel = "Invoice List";
-							if (controller.page.billregion == "ON") controller.page.billingHistoryLabel = "Billing History";
-						},
-						function error(errors)
+						// show notes
+						if (controller.page.demo.notes != null)
 						{
-							console.log(errors);
-						});
+							controller.page.demo.scrNotes = controller.page.demo.notes;
+							if (/^<unotes>[\s\S]*/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring("<unotes>".length);
+							if (/[\s\S]*<\/unotes>$/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring(0, controller.page.demo.scrNotes.lastIndexOf("</unotes>"));
+						}
 
-					controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
-					controller.formatLastName(); //done on page load
-					controller.formatFirstName(); //done on page load
-				},
-				function error(errors)
-				{
-					alert('Error loading demographic: ', errors) // TODO-legacy: Display actual error message
-				}
-			);
-			
+						// format referral doctor
+						if (controller.page.demo.familyDoctor != null)
+						{
+							const referralDoc = controller.formatReferralDocXMLToJSON(controller.page.demo.familyDoctor);
+							controller.page.demo.scrReferralDocNo = referralDoc.number;
+							controller.page.demo.scrReferralDoc = referralDoc.name;
+						}
+
+						// format family doctor
+						if (controller.page.demo.familyDoctor2 != null)
+						{
+							const familyDoc = controller.formatFamilyDocXMLToJSON(controller.page.demo.familyDoctor2, 'fd', 'fdname');
+							controller.page.demo.scrFamilyDocNo = familyDoc.number;
+							controller.page.demo.scrFamilyDoc = familyDoc.name;
+						}
+
+						if (controller.page.demo.extras != null)
+						{
+							controller.page.demo.extras = toArray(controller.page.demo.extras);
+							for (var i = 0; i < controller.page.demo.extras.length; i++)
+							{
+								if (controller.page.demo.extras[i].key == "demo_cell") controller.page.demo.scrDemoCell = controller.page.demo.extras[i].value;
+								else if (controller.page.demo.extras[i].key == "aboriginal") controller.page.demo.scrAboriginal = controller.page.demo.extras[i].value;
+								else if (controller.page.demo.extras[i].key == "hPhoneExt") controller.page.demo.scrHPhoneExt = controller.page.demo.extras[i].value;
+								else if (controller.page.demo.extras[i].key == "wPhoneExt") controller.page.demo.scrWPhoneExt = controller.page.demo.extras[i].value;
+								else if (controller.page.demo.extras[i].key == "cytolNum") controller.page.demo.scrCytolNum = controller.page.demo.extras[i].value;
+								else if (controller.page.demo.extras[i].key == "phoneComment") controller.page.demo.scrPhoneComment = controller.page.demo.extras[i].value;
+								else if (controller.page.demo.extras[i].key == "paper_chart_archived") controller.page.demo.scrPaperChartArchived = controller.page.demo.extras[i].value;
+								else if (controller.page.demo.extras[i].key == "paper_chart_archived_date") controller.page.demo.scrPaperChartArchivedDate = controller.page.demo.extras[i].value;
+								else if (controller.page.demo.extras[i].key == "usSigned") controller.page.demo.scrUsSigned = controller.page.demo.extras[i].value;
+								else if (controller.page.demo.extras[i].key == "privacyConsent") controller.page.demo.scrPrivacyConsent = controller.page.demo.extras[i].value;
+								else if (controller.page.demo.extras[i].key == "informedConsent") controller.page.demo.scrInformedConsent = controller.page.demo.extras[i].value;
+								else if (controller.page.demo.extras[i].key == "securityQuestion1") controller.page.demo.scrSecurityQuestion1 = controller.page.demo.extras[i].value;
+								else if (controller.page.demo.extras[i].key == "securityAnswer1") controller.page.demo.scrSecurityAnswer1 = controller.page.demo.extras[i].value;
+								else if (controller.page.demo.extras[i].key == "rxInteractionWarningLevel") controller.page.demo.scrRxInteractionLevel = controller.page.demo.extras[i].value;
+
+
+								//record array position of extras by keys - to be used on saving
+								posExtras[controller.page.demo.extras[i].key] = i;
+							}
+						}
+
+						//show phone numbers with preferred check
+						controller.page.demo.scrCellPhone = getPhoneNum(controller.page.demo.scrDemoCell);
+						controller.page.demo.scrHomePhone = getPhoneNum(controller.page.demo.phone);
+						controller.page.demo.scrWorkPhone = getPhoneNum(controller.page.demo.alternativePhone);
+
+						//show waitingListNames
+						if (controller.page.demo.waitingListNames != null)
+						{
+							if (controller.page.demo.waitingListNames.id != null)
+							{ //only 1 entry, convert to array
+								var tmp = {};
+								tmp.id = controller.page.demo.waitingListNames.id;
+								tmp.name = controller.page.demo.waitingListNames.name;
+								tmp.groupNo = controller.page.demo.waitingListNames.groupNo;
+								tmp.providerNo = controller.page.demo.waitingListNames.providerNo;
+								tmp.createDate = controller.page.demo.waitingListNames.createDate;
+								tmp.isHistory = controller.page.demo.waitingListNames.isHistory;
+								controller.page.demo.waitingListNames = [tmp];
+							}
+						}
+
+
+						controller.page.cellPhonePreferredMsg = defPhTitle;
+						controller.page.homePhonePreferredMsg = defPhTitle;
+						controller.page.workPhonePreferredMsg = defPhTitle;
+						if (isPreferredPhone(controller.page.demo.scrDemoCell))
+						{
+							controller.page.demo.scrPreferredPhone = "C";
+							controller.page.preferredPhoneNumber = controller.page.demo.scrCellPhone;
+							controller.page.cellPhonePreferredMsg = prefPhTitle;
+							controller.page.cellPhonePreferredColor = colorAttn;
+						}
+						else if (isPreferredPhone(controller.page.demo.phone))
+						{
+							controller.page.demo.scrPreferredPhone = "H";
+							controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
+							controller.page.homePhonePreferredMsg = prefPhTitle;
+							controller.page.homePhonePreferredColor = colorAttn;
+						}
+						else if (isPreferredPhone(controller.page.demo.alternativePhone))
+						{
+							controller.page.demo.scrPreferredPhone = "W";
+							controller.page.preferredPhoneNumber = controller.page.demo.scrWorkPhone;
+							controller.page.workPhonePreferredMsg = prefPhTitle;
+							controller.page.workPhonePreferredColor = colorAttn;
+						}
+						else
+						{
+							controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
+						}
+
+						controller.page.dataChanged = false;
+
+						//get patient detail status
+						patientDetailStatusService.getStatus($stateParams.demographicNo).then(
+							function success(results)
+							{
+								controller.page.macPHRLoggedIn = results.macPHRLoggedIn;
+								controller.page.macPHRIdsSet = results.macPHRIdsSet;
+								controller.page.macPHRVerificationLevel = results.macPHRVerificationLevel;
+
+								controller.page.integratorEnabled = results.integratorEnabled;
+								controller.page.integratorOffline = results.integratorOffline;
+								controller.page.integratorAllSynced = results.integratorAllSynced;
+
+								controller.page.workflowEnhance = results.workflowEnhance;
+								controller.page.billregion = results.billregion;
+								controller.page.defaultView = results.defaultView;
+								controller.page.hospitalView = results.hospitalView;
+
+								if (controller.page.integratorEnabled)
+								{
+									if (controller.page.integratorOffline)
+									{
+										controller.page.integratorStatusColor = "#ff5500";
+										controller.page.integratorStatusMsg = "NOTE: Integrator is not available at this time";
+									}
+									else if (!controller.page.integratorAllSynced)
+									{
+										controller.page.integratorStatusColor = "#ff5500";
+										controller.page.integratorStatusMsg = "NOTE: Integrated Community is not synced";
+									}
+								}
+
+								controller.page.billingHistoryLabel = "Invoice List";
+								if (controller.page.billregion == "ON") controller.page.billingHistoryLabel = "Billing History";
+							},
+							function error(errors)
+							{
+								console.log(errors);
+							});
+
+						controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
+						controller.formatLastName(); //done on page load
+						controller.formatFirstName(); //done on page load
+					},
+					function error(errors)
+					{
+						alert('Error loading demographic: ', errors) // TODO-legacy: Display actual error message
+					}
+				);
+			}
 			// show eligibility check button only if instance is BC OR (ON AND billing type CLINICAID)
 			systemPreferenceApi.getPropertyValue(SYSTEM_PROPERTIES.INSTANCE_TYPE, INSTANCE_TYPE.BC).then(
 					function success(result)
@@ -320,12 +329,29 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						console.error("Failed to fetch instance type with error: " + result);
 					}
 			);
-			
+
 			systemPreferenceApi.getPreferenceEnabled(SYSTEM_PROPERTIES.ROSTERING_MODULE, false).then((result) =>
 			{
 				controller.rosteringModuleEnabled = result.data.body;
 			});
 		};
+
+		controller.canAccessAppointments = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentRead);
+		}
+		controller.canAccessBilling = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.BillingRead);
+		}
+		controller.canAccessExport = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicExportRead);
+		}
+		controller.canEdit = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicUpdate);
+		}
 
 		controller.initDemographicVars = function initDemographicVars()
 		{
@@ -392,34 +418,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			paperChartArchivedDate0 = controller.page.demo.scrPaperChartArchivedDate;
 		};
 
-		controller.checkAccess = function checkAccess()
-		{
-			//get access rights
-			securityService.hasRight("_demographic", "r", controller.page.demo.demographicNo).then(
-				function success(results)
-				{
-					controller.page.canRead = results;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-			securityService.hasRight("_demographic", "u", controller.page.demo.demographicNo).then(
-				function success(results)
-				{
-					controller.page.cannotChange = !results;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-
-		};
-
 		//disable click and keypress if user only has read-access
 		controller.checkAction = function checkAction(event)
 		{
-			if (controller.page.cannotChange)
+			if (!controller.canEdit())
 			{
 				event.preventDefault();
 				event.stopPropagation();
@@ -466,18 +468,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				if (!discard)
 				{
 					event.preventDefault();
-				} else {
-					demographicService.getDemographic($stateParams.demographicNo).then(
-						function success(results)
-						{
-							// TODO-legacy: Celebrate
-						},
-						function error(errors)
-						{
-							alert('Error loading demographic: ', errors) // TODO-legacy: Display actual error message
-						}
-					);
-				
 				}
 			}
 		});
@@ -684,14 +674,14 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		controller.isPostalValidCanadian = function isPostalValidCanadian(postalCode)
 		{
-			var regex = new RegExp(/^[A-Za-z]\d[A-Za-z][ ]\d[A-Za-z]\d$/); // Match to Canadian postal code standard
+			const regex = new RegExp(/^[A-Za-z]\d[A-Za-z][ ]?\d[A-Za-z]\d$/); // Match to Canadian postal code standard
 			if (regex.test(postalCode))
 			{
 				return true;
 			}
 			else
 			{
-				alert("Invalid/Incomplete Postal Code"); // TODO-legacy: Display proper error message
+				Juno.Common.Util.errorAlert($uibModal, "Validation", "Invalid/Incomplete Postal Code");
 				return false;
 			}
 		};
@@ -699,7 +689,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//check Chart No (length)
 		controller.checkChartNo = function checkChartNo()
 		{
-			if (controller.page.demo.chartNo == null || controller.page.demo.chartNo == "")
+			if (controller.page.demo.chartNo == null || controller.page.demo.chartNo === "")
 			{
 				chartNo0 = controller.page.demo.chartNo;
 				return;
@@ -732,7 +722,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//check SIN
 		controller.checkSin = function checkSin()
 		{
-			if (controller.page.demo.sin == null || controller.page.demo.sin == "")
+			if (controller.page.demo.sin == null || controller.page.demo.sin === "")
 			{
 				sin0 = controller.page.demo.sin;
 				return;
@@ -759,10 +749,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		controller.validateSin = function validateSin()
 		{
-			if (controller.page.demo.sin == null || controller.page.demo.sin == "") return true;
+			if (controller.page.demo.sin == null || controller.page.demo.sin === "") return true;
 
 			var sin = controller.page.demo.sin.replace(/\s/g, "");
-			if (isNumber(sin) && sin.length == 9)
+			if (isNumber(sin) && sin.length === 9)
 			{
 				var sinNumber = 0;
 				for (var i = 0; i < sin.length; i++)
@@ -770,7 +760,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					var n = Number(sin.charAt(i)) * (i % 2 + 1);
 					sinNumber += n % 10 + Math.floor(n / 10);
 				}
-				if (sinNumber % 10 == 0) return true;
+				if (sinNumber % 10 === 0) return true;
 			}
 			alert("Invalid SIN #");
 			return false;
@@ -789,6 +779,21 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		{
 			var url = "../casemgmt/uploadimage.jsp?demographicNo=" + controller.page.demo.demographicNo;
 			window.open(url, "uploadWin", "width=500, height=300");
+		};
+
+		//manage contacts
+		controller.manageContacts = function manageContacts()
+		{
+			var discard = true;
+			if (controller.page.dataChanged > 0)
+			{
+				discard = confirm("You may have unsaved data. Are you sure to leave?");
+			}
+			if (discard)
+			{
+				var url = "../demographic/Contact.do?method=manage&demographic_no=" + controller.page.demo.demographicNo;
+				window.open(url, "ManageContacts");
+			}
 		};
 
 		//print buttons
@@ -819,7 +824,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.macPHRDo = function macPHRDo(func)
 		{
 			var url = null;
-			if (func == "Register")
+			if (func === "Register")
 			{
 				if (!controller.page.macPHRLoggedIn)
 				{
@@ -828,15 +833,15 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				}
 				url = "../phr/indivo/RegisterIndivo.jsp?demographicNo=" + controller.page.demo.demographicNo;
 			}
-			else if (func == "SendMessage")
+			else if (func === "SendMessage")
 			{
 				url = "../phr/PhrMessage.do?method=createMessage&providerNo=" + user.providerNo + "&demographicNo=" + controller.page.demo.demographicNo;
 			}
-			else if (func == "ViewRecord")
+			else if (func === "ViewRecord")
 			{
 				url = "../demographic/viewPhrRecord.do?demographic_no=" + controller.page.demo.demographicNo;
 			}
-			else if (func == "Verification")
+			else if (func === "Verification")
 			{
 				url = "../phr/PHRVerification.jsp?demographic_no=" + controller.page.demo.demographicNo;
 			}
@@ -847,14 +852,14 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.appointmentDo = function appointmentDo(func)
 		{
 			var url = null;
-			if (func == "ApptHistory") url = "../demographic/demographiccontrol.jsp?displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25&orderby=appttime&demographic_no=" + controller.page.demo.demographicNo + "&last_name=" + encodeURI(controller.page.demo.lastName) + "&first_name=" + encodeURI(controller.page.demo.firstName);
-			else if (func == "WaitingList") url = "../oscarWaitingList/SetupDisplayPatientWaitingList.do?demographic_no=" + controller.page.demo.demographicNo;
+			if (func === "ApptHistory") url = "../demographic/demographiccontrol.jsp?displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25&orderby=appttime&demographic_no=" + controller.page.demo.demographicNo + "&last_name=" + encodeURI(controller.page.demo.lastName) + "&first_name=" + encodeURI(controller.page.demo.firstName);
+			else if (func === "WaitingList") url = "../oscarWaitingList/SetupDisplayPatientWaitingList.do?demographic_no=" + controller.page.demo.demographicNo;
 			window.open(url, "Appointment", "width=960, height=700");
 		};
 
 		controller.isClinicaidBilling = function isClinicaidBilling()
 		{
-			return controller.page.billregion == "CLINICAID";
+			return controller.page.billregion === "CLINICAID";
 		};
 
 		//billing buttons
@@ -1155,8 +1160,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			);
 		};
 
-
-
 		controller.resetEditState = function resetEditState()
 		{
 			controller.page.saving = false;
@@ -1175,8 +1178,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		{
 			$scope.pageStyle = style;
 		}
-
-		controller.init(); // Initialize the controller
 	}
 ]);
 
