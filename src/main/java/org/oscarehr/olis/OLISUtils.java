@@ -58,10 +58,10 @@ import java.util.List;
 
 public class OLISUtils
 {
+	public static final String PROVINCIAL_LAB_ON = "2.16.840.1.113883.3.59.1";
+
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
-
-	private static final String PROVINCIAL_LAB_ON = "2.16.840.1.113883.3.59.1";
 
 	private static final String CMLIndentifier = "5047";// Canadian Medical Laboratories
 	private static final String GammaDyancareIndentifier = "5552";// Gamma Dynacare

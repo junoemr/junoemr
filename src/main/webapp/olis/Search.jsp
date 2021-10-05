@@ -144,18 +144,17 @@
 			content:" *";
 			color: red;
 		}
-	</style>
-	 <style type="text/css">
-#myAutoComplete {
-    width:15em; /* set width here or else widget will expand to fit its container */
-    padding-bottom:2em;
-}
+		</style>
+<style type="text/css">
+	#myAutoComplete {
+		width: 15em; /* set width here or else widget will expand to fit its container */
+		padding-bottom: 2em;
+	}
 
-
-
-
-        .yui-ac {
-	    position:relative;font-family:arial;font-size:100%;
+	.yui-ac {
+		position: relative;
+		font-family: arial;
+		font-size: 100%;
 	}
 
 	/* styles for input field */
@@ -199,7 +198,7 @@
 	}
 
 </style>
-	
+
 	</head>
 
 	<body>
@@ -304,7 +303,9 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 				<select id="dateType" onchange="displayDateRange(this)">
 					<option value="OBR_22" selected>Date &amp; Time Period to Search</option>
 					<option value="OBR_7">Observation Date &amp; Time Period</option>
-				</select><span class="required"></span>
+				</select>
+				<span>(yyyy-MM-dd)</span>
+				<span class="required"></span>
 			</th>
 			<td width="30%">
 				<input style="width:150px;" type="text" name="startTimePeriod" id="startTimePeriod" value="">
@@ -315,9 +316,17 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			</td>
 		</tr>
 		<tr>
-			<th width="20%"><input class="checkbox" type="checkbox" name="quantityLimitedQuery" id="quantityLimitedQuery"> Quantity Limit?</th>
-			<td width="30%">Quantity<br><input type="text" id="quantityLimit" name="quantityLimit"></td>
-		</tr><tr>
+			<th width="20%">
+				Quantity Limit?
+			</th>
+			<td>
+				<input class="checkbox" type="checkbox" name="quantityLimitedQuery" id="quantityLimitedQuery">
+				<span>Quantity:
+					<input type="text" id="quantityLimit" name="quantityLimit">
+				</span>
+			</td>
+		</tr>
+		<tr>
 			<th width="20%">Consent to View Blocked Information?</th>
 			<td width="30%"><select id="blockedInformationConsent" name="blockedInformationConsent"><option value="">(none)</option>
 			<option value="Z">Temporary </option>
@@ -328,7 +337,12 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			</td>
 		</tr>
 		<tr>
-			<td width="20%" colspan=4><span><input class="checkbox" type="checkbox" name="consentBlockAllIndicator" id="consentBlockAllIndicator"> Enable Patient Consent Block-All Indicator?</span></td>
+			<th>
+					Enable Patient Consent Block-All Indicator?
+			</th>
+			<td>
+				<input class="checkbox" type="checkbox" name="consentBlockAllIndicator" id="consentBlockAllIndicator">
+			</td>
 		</tr>
 		<tr>
 			<th width="20%">Specimen Collector</th>
@@ -670,7 +684,30 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<%	
 			}
 			%>
-</select></td>		
+			</select></td>
+		</tr>
+		<tr>
+			<td colspan=4><hr /></td>
+		</tr>
+		<tr>
+			<td>
+				<span class="required">Placer Group Number</span>
+			</td>
+			<td>
+				<input type="text" name="placerGroupNumber" maxlength="25">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<span class="required">Ordering Facility</span>
+			</td>
+			<td>
+				<select id="orderingFacility" name="orderingFacility">
+				<option value=""></option>
+				<option value="5552">Gamma-Dynacare</option>
+				<option value="5407">CML</option>
+				<option value="5687">LifeLabs</option>
+			</select>
 		</tr>
 		<tr>
 			<td colspan=2><input type="submit" name="submit" value="Search" /></td>
@@ -896,5 +933,10 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			</td>
 		</tr>
 	</tbody></table>
+	<hr />
+	<div>
+		<span class="required"></span>
+		<span>Required field indicator</span>
+	</div>
 	</body>
 	</html>

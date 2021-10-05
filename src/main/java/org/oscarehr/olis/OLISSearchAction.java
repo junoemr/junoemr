@@ -8,33 +8,6 @@
  */
 package org.oscarehr.olis;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.time.DateUtils;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
-import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.OscarLogDao;
-import org.oscarehr.common.dao.UserPropertyDAO;
-import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.OscarLog;
-import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.UserProperty;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-
 import com.indivica.olis.Driver;
 import com.indivica.olis.parameters.OBR16;
 import com.indivica.olis.parameters.OBR22;
@@ -44,6 +17,7 @@ import com.indivica.olis.parameters.OBR4;
 import com.indivica.olis.parameters.OBR7;
 import com.indivica.olis.parameters.OBX3;
 import com.indivica.olis.parameters.ORC21;
+import com.indivica.olis.parameters.ORC4;
 import com.indivica.olis.parameters.PID3;
 import com.indivica.olis.parameters.PID51;
 import com.indivica.olis.parameters.PID52;
@@ -71,6 +45,31 @@ import com.indivica.olis.queries.Z06Query;
 import com.indivica.olis.queries.Z07Query;
 import com.indivica.olis.queries.Z08Query;
 import com.indivica.olis.queries.Z50Query;
+import org.apache.commons.lang.time.DateUtils;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.dao.DemographicDao;
+import org.oscarehr.common.dao.OscarLogDao;
+import org.oscarehr.common.dao.UserPropertyDAO;
+import org.oscarehr.common.model.Demographic;
+import org.oscarehr.common.model.OscarLog;
+import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 public class OLISSearchAction extends DispatchAction {
 
@@ -449,8 +448,13 @@ public class OLISSearchAction extends DispatchAction {
 					MiscUtils.getLogger().error("Can't add requested patient data to OLIS query", e);
 				}
 
-
-				// TODO-legacy: Add placer group number
+				String orderingFacilityId = request.getParameter("orderingFacility");
+				String placeGroupNumber = request.getParameter("placerGroupNumber");
+				ORC4 orc4 = new ORC4();
+				orc4.setValue(1, placeGroupNumber);
+				orc4.setValue(3, OLISUtils.PROVINCIAL_LAB_ON + ":" + orderingFacilityId);
+				orc4.setValue(4, "ISO");
+				((Z02Query) query).setPlacerGroupNumber(orc4);
 
 
 				String blockedInfoConsent = request.getParameter("blockedInformationConsent");
