@@ -110,11 +110,13 @@ public class OLISHL7Handler extends MessageHandler
 	{
 		return hl7Message;
 	}
+
 	@Override
 	public boolean canUpload()
 	{
 		return "OK".equalsIgnoreCase(getAckStatus());
 	}
+
 	public String getAckStatus()
 	{
 		String queryAckStatus = null;
@@ -143,7 +145,12 @@ public class OLISHL7Handler extends MessageHandler
 
 	public String getObrStatusDisplayValue(int index)
 	{
-		return getTestRequestStatusMessage(getObrStatus(index));
+		return getObrTestResultStatusValue(getObrStatus(index));
+	}
+
+	public String getObrStatusDisplayMessage(int index)
+	{
+		return getObrTestResultStatusMessage(getObrStatus(index));
 	}
 
 	public String getObrSpecimenSource(int index) {
@@ -1321,7 +1328,7 @@ public class OLISHL7Handler extends MessageHandler
 		}
 	}
 
-	public static String getTestResultStatusMessage(char status) {
+	public static String getObxTestResultStatusValue(char status) {
 		switch (status) {
 		case 'C':
 			return "Amended";
@@ -1342,7 +1349,32 @@ public class OLISHL7Handler extends MessageHandler
 		}
 	}
 
-	public String getTestRequestStatusMessage(String status) {
+	public static String getObrTestResultStatusValue(String status)
+	{
+		switch (status)
+		{
+			case "A":
+				return "Partial";
+			case "C":
+				return "Amended";
+			case "E":
+				return "Expired";
+			case "F":
+				return "Final";
+			case "I":
+				return "No results available";
+			case "O":
+				return "Order received";
+			case "P":
+				return "Preliminary";
+			case "X":
+				return "Canceled";
+			default:
+				return "";
+		}
+	}
+
+	public String getObrTestResultStatusMessage(String status) {
 		switch (status) {
 		case "A":
 			return "Some, but not all, results available";

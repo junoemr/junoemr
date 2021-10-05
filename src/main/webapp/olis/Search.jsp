@@ -144,6 +144,11 @@
 			content:" *";
 			color: red;
 		}
+
+		.page-wrapper {
+			display: flex;
+			flex-direction: column;
+		}
 		</style>
 <style type="text/css">
 	#myAutoComplete {
@@ -202,6 +207,7 @@
 	</head>
 
 	<body>
+	<div class="page-wrapper">
 	
 	<table style="width:600px;" class="MainTable" align="left">
 		<tbody><tr class="MainTableTopRow">
@@ -926,17 +932,17 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 	
 	<oscar:oscarPropertiesCheck value="yes" property="olis_simulate">
 
-		<iframe src="Simulate.jsp" width="500" heigh="300" frameborder="0" scrolling="no"></iframe>	
+		<iframe src="Simulate.jsp" width="500" height="300" frameborder="0" scrolling="no"></iframe>
 
 	</oscar:oscarPropertiesCheck>
 		
 			</td>
 		</tr>
 	</tbody></table>
-	<hr />
-	<div>
-		<span class="required"></span>
-		<span>Required field indicator</span>
+		<div>
+			<span class="required"></span>
+			<span>Required field indicator</span>
+		</div>
 	</div>
 	</body>
 	</html>

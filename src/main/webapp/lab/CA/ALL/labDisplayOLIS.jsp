@@ -1538,7 +1538,7 @@ public String strikeOutInvalidContent(String content, String status) {
                                 		<% if (!handler.getObrSpecimenSource(obr).equals("")) { %>
                                 			<tr> <td> Specimen Source: </td><td><%=handler.getObrSpecimenSource(obr) %></td> </tr>
                                 		<% } %>
-                                		<tr> <td> Request Status: </td><td> <%=handler.getObrStatusDisplayValue(obr) %></td></tr>
+                                		<tr> <td> Request Status: </td><td> <%=handler.getObrStatusDisplayMessage(obr) %></td></tr>
                                 	</table>
 
                                 	</div>
@@ -1761,7 +1761,7 @@ public String strikeOutInvalidContent(String content, String status) {
                                         String status = handler.getOBXResultStatus(obr, obx).trim();
                                         String statusMsg = "";
                                         try {
-                                        	 statusMsg = OLISHL7Handler.getTestResultStatusMessage(handler.getOBXResultStatus(obr, obx).charAt(0));
+                                        	 statusMsg = OLISHL7Handler.getObxTestResultStatusValue(handler.getOBXResultStatus(obr, obx).charAt(0));
                                         }
                                         catch (Exception e) {
                                         	statusMsg = "";

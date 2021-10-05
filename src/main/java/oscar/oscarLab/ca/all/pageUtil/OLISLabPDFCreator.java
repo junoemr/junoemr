@@ -369,7 +369,7 @@ public class OLISLabPDFCreator extends PdfPageEventHelper
 		//Outputs the request status
 		cell.setPhrase(new Phrase("Request Status: ", boldFont));
 		specimenTable.addCell(cell);
-		cell.setPhrase(new Phrase(handler.getObrStatusDisplayValue(obr), font));
+		cell.setPhrase(new Phrase(handler.getObrStatusDisplayMessage(obr), font));
 		specimenTable.addCell(cell);
 
 		//Adds the specimen table to the category table
@@ -518,7 +518,7 @@ public class OLISLabPDFCreator extends PdfPageEventHelper
 				String status = handler.getOBXResultStatus(obr, obx).trim();
 				String statusMsg = "";
 				try{
-					statusMsg = OLISHL7Handler.getTestResultStatusMessage(handler.getOBXResultStatus(obr, obx).charAt(0));
+					statusMsg = OLISHL7Handler.getObxTestResultStatusValue(handler.getOBXResultStatus(obr, obx).charAt(0));
 				}
 				catch(Exception e){
 					statusMsg = "";

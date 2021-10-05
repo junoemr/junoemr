@@ -9,7 +9,11 @@
 
 --%>
 <%@ page language="java" contentType="text/html;" %>
-<%@page import="com.indivica.olis.queries.*,org.oscarehr.olis.OLISSearchAction,java.util.*,oscar.oscarLab.ca.all.parsers.Factory, oscar.oscarLab.ca.all.parsers.OLISHL7Handler, oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLISError, org.oscarehr.olis.OLISResultsAction, org.oscarehr.util.SpringUtils" %>
+<%@page import="java.util.*,
+                oscar.oscarLab.ca.all.parsers.Factory,
+                oscar.oscarLab.ca.all.parsers.OLISHL7Handler,
+                oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLISError,
+                org.oscarehr.olis.OLISResultsAction" %>
 <%@page import="org.oscarehr.util.MiscUtils" %>
 	
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -93,6 +97,16 @@ function filterResults(select) {
 	margin: 10px;
 	padding: 10px;
 }
+
+.width-md {
+	min-width: 128px;
+}
+.width-sm {
+	min-width: 64px;
+}
+.width-xs {
+	min-width: 32px;
+}
 </style>
 	
 <title>OLIS Search Results</title>
@@ -157,7 +171,8 @@ function filterResults(select) {
 			}
 			if (hasBlockedContent) { 
 			%>
-			<form  action="<%=request.getContextPath()%>/olis/Search.do" onsubmit="return confirm('Are you sure you want to resubmit this query with a patient consent override?')">
+			<form  action="<%=request.getContextPath()%>/olis/Search.do"
+			       onsubmit="return confirm('Are you sure you want to resubmit this query with a patient consent override?')">
 				<input type="hidden" name="redo" value="true" />
 				<input type="hidden" name="uuid" value="<%=(String)request.getAttribute("searchUuid")%>" />
 				<input type="hidden" name="force" value="true" />				
@@ -222,63 +237,56 @@ function filterResults(select) {
 						<th class="unsortable"></th>
 						<th class="unsortable"></th>
 						<th class="unsortable"></th>
-						<th>Health Number</th>
-						<th>Patient Name</th>
-						<th>Sex</th>
-						<th>Date of Test</th>
-						<th>Discipline</th>
-						<th>Tests</th>
-						<th>Status</th>
-						<th>Ordering Practitioner</th>
-						<th>Admitting Practitioner</th>
+<%--						<th class="width-sm">Health Number</th>--%>
+<%--						<th class="width-sm">Patient Name</th>--%>
+<%--						<th class="width-xs">Sex</th>--%>
+						<th class="width-md">Collection Date/Time</th>
+						<th class="width-md">Last Updated in OLIS</th>
+						<th class="width-sm">Discipline</th>
+						<th class="width-md">Test Name</th>
+						<th class="width-sm">Test Status</th>
+						<th class="width-sm">Ordering Practitioner</th>
+						<th class="width-sm">Admitting Practitioner</th>
 					</tr>
 					
 					<%  int lineNum = 0;
-						for (String resultUuid : resultList) {
-						result = OLISResultsAction.searchResultsMap.get(resultUuid);
-					%>
-					<tr class="<%=++lineNum % 2 == 1 ? "oddLine" : "evenLine"%>" patientName="<%=result.getPatientName()%>" reportingLaboratory="<%=result.getReportingFacilityName()%>">
-						<td>
-							<div id="<%=resultUuid %>_result"></div>
-							<input type="button" onClick="addToInbox('<%=resultUuid %>'); return false;" id="<%=resultUuid %>" value="Add to Inbox" />
-						</td>
-						<td>
-							
-							<input type="button" onClick="preview('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_preview" value="Preview" />
-						</td>
-						
-						<td>							
-							<input type="button" onClick="save('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_save" value="Save/File" />
-						</td>
-						
-						<td>							
-							<input type="button" onClick="ack('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_ack" value="Acknowledge" />
-						</td>
-						
-						<td><%=result.getHealthNum() %></td>
-						<td><%=result.getPatientName() %></td>
-						<td align="center"><%=result.getSex() %></td>
-						<td><%=result.getSpecimenReceivedDateTime() %></td>
-						<td style="width:200px;">
+						for (String resultUuid : resultList)
+						{
+							result = OLISResultsAction.searchResultsMap.get(resultUuid);
+
+							for(int obrRep=0; obrRep < result.getOBRCount(); obrRep++)
+							{%>
+							<tr class="<%=++lineNum % 2 == 1 ? "oddLine" : "evenLine"%>"
+							    patientName="<%=result.getPatientName()%>"
+							    reportingLaboratory="<%=result.getReportingFacilityName()%>">
+								<td>
+									<div id="<%=resultUuid %>_result"></div>
+									<input type="button" onClick="addToInbox('<%=resultUuid %>'); return false;" id="<%=resultUuid %>" value="Add to Inbox" />
+								</td>
+								<td>
+
+									<input type="button" onClick="preview('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_preview" value="Preview" />
+								</td>
+
+								<td>
+									<input type="button" onClick="save('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_save" value="Save/File" />
+								</td>
+
+								<td>
+									<input type="button" onClick="ack('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_ack" value="Acknowledge" />
+								</td>
+								<td><%=result.getSpecimenReceivedDateTime() %></td>
+								<td><%=result.getLastUpdateInOLIS() %></td>
+								<td><%=result.getOBRCategory(obrRep) %></td>
+								<td> <%=result.getOBRName(obrRep)%> </td>
+								<td> <%=result.getObrStatusDisplayValue(obrRep)%> </td>
+								<td> <%=result.getShortDocName() %> </td>
+								<td> <%=result.getAdmittingProviderNameShort()%> </td>
+
+							</tr>
 						<%
-						String discipline = result.getCategoryList();
-						%>
-						<%=discipline %>
-						</td>
-						
-						<td style="width:200px;">
-						<%
-						String tests = result.getTestList();
-						%>
-						
-						<%=tests %>
-						</td>
-						<td><%= result.getOrderStatusDisplayValue()%></td>
-						<td> <%=result.getShortDocName() %> </td>
-						<td> <%=result.getAdmittingProviderNameShort()%></td>
-						 
-					</tr>					
-					<% } %>
+							}
+						}%>
 					</table></td></tr>
 				<% } %>
 			</table>
@@ -288,8 +296,5 @@ function filterResults(select) {
 		</td>
 	</tr></tbody>
 </table>
-<!-- RAW HL7 ERP
-<%=request.getAttribute("unsignedResponse") %>
--->
 </body>
 </html>
