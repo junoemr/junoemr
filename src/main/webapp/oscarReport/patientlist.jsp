@@ -104,4 +104,17 @@ if(!authed) {
 		  	}
 		});
 	});
+
+	$('#plForm').submit(function(event) {
+		var $form =$('#plForm');
+
+		$.ajax({
+			type: "POST",
+			url: $form.attr('action'),
+			data: $form.serialize(),
+			success: function () {
+				$(document).find(':button[type=submit]').prop('disabled', false);
+			}
+		})
+	});
 </script>
