@@ -132,7 +132,7 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 			{
 				if(date)
 				{
-					return Juno.Common.Util.formatMomentDateTimeNoTimezone(date);
+					return Juno.Common.Util.formatMomentDateTime(date, Juno.Common.Util.DisplaySettings.dateTimeFormat);
 				}
 				else
 				{
@@ -141,15 +141,15 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 			}
 			ctrl.lastRunDateDisplay = (): string =>
 			{
-				const date = ctrl.systemSettings.lastRunDateTime;
-				if(date)
+				if(ctrl.systemSettings)
 				{
-					return Juno.Common.Util.formatMomentDateTimeNoTimezone(date);
+					const date = ctrl.systemSettings.lastRunDateTime;
+					if (date)
+					{
+						return Juno.Common.Util.formatMomentDateTime(date, Juno.Common.Util.DisplaySettings.dateTimeFormat);
+					}
 				}
-				else
-				{
-					return "Never";
-				}
+				return "Never";
 			}
 
 			ctrl.configurationStatusDisplay = (configured: boolean): string =>
