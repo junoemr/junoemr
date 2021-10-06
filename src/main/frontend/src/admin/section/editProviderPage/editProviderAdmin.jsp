@@ -410,7 +410,7 @@
 									Passcodes do not match.
 								</div>
 							</div>
-							<div class="grid-column-2 justify-content-start align-items-center">
+							<div class="grid-column-2 justify-content-start align-items-center" ng-class="{'field-error': (!securityRecord.validations.loginExpiry() && $ctrl.hasSubmitted) }">
 								<div class="m-r-16">
 									<juno-check-box
 											ng-model="securityRecord.expirySet"
