@@ -64,8 +64,7 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 	}
 
 	@Test
-	public void addAllergiesClassicUITest()
-		throws InterruptedException
+	public void addAllergiesClassicUITest() throws InterruptedException
 	{
 		String allergyNameQuickButton = "Penicillin";
 		String allergyNameSearch = "CHILDREN'S TYLENOL 160MG";
@@ -135,6 +134,7 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		String severity_modified = "Mild";
 		String onset_modified = "Slow";
 		PageUtil.switchToLastWindow(driver);
+
 		String modifyButtonEggWhiteXpath = "//table[@class='allergy_table']/descendant::td[contains(., '" + allergyNameQuickButton.toUpperCase() + "')]" +
 			"/parent::tr/descendant::a[contains(., 'Modify')]";
 		driver.findElement(By.xpath(modifyButtonEggWhiteXpath)).click();
