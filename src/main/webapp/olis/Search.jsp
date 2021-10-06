@@ -64,14 +64,14 @@
 	<script type="text/javascript" src="../share/javascript/Oscar.js"></script>
 	
 	<script type="text/javascript" src="../share/yui/js/yahoo-dom-event.js"></script>
-        <script type="text/javascript" src="../share/yui/js/connection-min.js"></script>
-        <script type="text/javascript" src="../share/yui/js/animation-min.js"></script>
-        <script type="text/javascript" src="../share/yui/js/datasource-min.js"></script>
-        <script type="text/javascript" src="../share/yui/js/autocomplete-min.js"></script>
-        <script type="text/javascript" src="../js/demographicProviderAutocomplete.js"></script>
+    <script type="text/javascript" src="../share/yui/js/connection-min.js"></script>
+    <script type="text/javascript" src="../share/yui/js/animation-min.js"></script>
+    <script type="text/javascript" src="../share/yui/js/datasource-min.js"></script>
+    <script type="text/javascript" src="../share/yui/js/autocomplete-min.js"></script>
+    <script type="text/javascript" src="../js/demographicProviderAutocomplete.js"></script>
 
-        <link rel="stylesheet" type="text/css" href="../share/yui/css/fonts-min.css"/>
-        <link rel="stylesheet" type="text/css" href="../share/yui/css/autocomplete.css"/>
+    <link rel="stylesheet" type="text/css" href="../share/yui/css/fonts-min.css"/>
+    <link rel="stylesheet" type="text/css" href="../share/yui/css/autocomplete.css"/>
 	
 	
 	<script type="text/javascript">
@@ -291,11 +291,12 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 		<option value="Z01">Z01 - Retrieve Laboratory Information for Patient</option>
 		<option value="Z02">Z02 - Retrieve Laboratory Information for Order ID</option>
 		<%-- REMOVED UNTIL IT'S OPERATIONAL, REQUESTED BY ONTARIO MD option value="Z04">Z04 - Retrieve Laboratory Information Updates for Practitioner</option  --%>
-		<option value="Z05">Z05 - Retrieve Laboratory Information Updates for Destination Laboratory</option>
-		<option value="Z06">Z06 - Retrieve Laboratory Information Updates for Ordering Facility</option>
-		<option value="Z07">Z07 - Retrieve Test Results Reportable to Public Health</option>
-		<option value="Z08">Z08 - Retrieve Test Results Reportable to Cancer Care Ontario</option>
-		<option value="Z50">Z50 - Identify Patient by Name, Sex, and Date of Birth</option>
+<%--		REMOVED Below queries as they are not required for OLIS conformance --%>
+<%--		<option value="Z05">Z05 - Retrieve Laboratory Information Updates for Destination Laboratory</option>--%>
+<%--		<option value="Z06">Z06 - Retrieve Laboratory Information Updates for Ordering Facility</option>--%>
+<%--		<option value="Z07">Z07 - Retrieve Test Results Reportable to Public Health</option>--%>
+<%--		<option value="Z08">Z08 - Retrieve Test Results Reportable to Cancer Care Ontario</option>--%>
+<%--		<option value="Z50">Z50 - Identify Patient by Name, Sex, and Date of Birth</option>--%>
 	</select>
 
 	<form action="<%=request.getContextPath() %>/olis/Search.do" method="POST" onSubmit="checkBlockedConsent('Z01')" name="Z01_form">

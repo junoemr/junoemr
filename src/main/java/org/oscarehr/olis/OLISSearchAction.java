@@ -51,16 +51,17 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.OscarLogDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
-import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -73,9 +74,9 @@ import java.util.UUID;
 
 public class OLISSearchAction extends DispatchAction {
 
-	private DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
-	private ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
-	
+	private final DemographicService demographicService = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
+	private final ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
+
 	public static HashMap<String, Query> searchQueryMap = new HashMap<String, Query>();
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
@@ -249,12 +250,14 @@ public class OLISSearchAction extends DispatchAction {
 				// Patient Identifier (PID.3 -- pull data from db and add to query)
 				String demographicNo = request.getParameter("demographic");
 				query.setDemographicNo(demographicNo);
+
 				try {
 					if (demographicNo != null && demographicNo.trim().length() > 0) {
-						Demographic demo = demographicDao.getDemographic(demographicNo);
+						Demographic demo = demographicService.getDemographicModel(Integer.parseInt(demographicNo));
+						request.setAttribute("demographic", demo);
 
-						PID3 pid3 = new PID3(demo.getHin(), null, null, "JHN", demo.getHcType(), "HL70347", demo.getSex(), null);
-						pid3.setValue(7, DateUtils.parseDate(demo.getYearOfBirth() + "-" + demo.getMonthOfBirth() + "-" + demo.getDateOfBirth(), dateFormat));
+						PID3 pid3 = new PID3(demo.getHealthNumber(), null, null, "JHN", demo.getHealthNumberProvinceCode(), "HL70347", demo.getSexString(), null);
+						pid3.setValue(7, ConversionUtils.toLegacyDate(demo.getDateOfBirth()));
 
 						((Z01Query) query).setPatientIdentifier(pid3);
 					}
@@ -437,10 +440,12 @@ public class OLISSearchAction extends DispatchAction {
 
 				try {
 					if (demographicNo != null && demographicNo.trim().length() > 0) {
-						Demographic demo = demographicDao.getDemographic(demographicNo);
 
-						PID3 pid3 = new PID3(demo.getHin(), null, null, "JHN", demo.getHcType(), "HL70347", demo.getSex(), null);
-						pid3.setValue(7, DateUtils.parseDate(demo.getYearOfBirth() + "-" + demo.getMonthOfBirth() + "-" + demo.getDateOfBirth(), dateFormat));
+						Demographic demo = demographicService.getDemographicModel(Integer.parseInt(demographicNo));
+						request.setAttribute("demographic", demo);
+
+						PID3 pid3 = new PID3(demo.getHealthNumber(), null, null, "JHN", demo.getHealthNumberProvinceCode(), "HL70347", demo.getSexString(), null);
+						pid3.setValue(7, ConversionUtils.toLegacyDate(demo.getDateOfBirth()));
 
 						((Z02Query) query).setPatientIdentifier(pid3);
 					}

@@ -8,14 +8,15 @@
     and "gnu.org/licenses/gpl-2.0.html".
 
 --%>
-<%@ page language="java" contentType="text/html;" %>
+<%@page contentType="text/html;" %>
 <%@page import="java.util.*,
                 oscar.oscarLab.ca.all.parsers.Factory,
                 oscar.oscarLab.ca.all.parsers.OLISHL7Handler,
                 oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLISError,
                 org.oscarehr.olis.OLISResultsAction" %>
 <%@page import="org.oscarehr.util.MiscUtils" %>
-	
+<%@ page import="org.oscarehr.dataMigration.model.demographic.Demographic" %>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -27,63 +28,63 @@
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/share/css/OscarStandardLayout.css">
 <script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/Oscar.js"></script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/oscarMDSIndex.js"></script>
-	
-<script type="text/javascript">
-function addToInbox(uuid) {
-	jQuery(uuid).attr("disabled", "disabled");
-	jQuery.ajax({
-		url: "<%=request.getContextPath() %>/olis/AddToInbox.do",
-		data: "uuid=" + uuid,
-		success: function(data) {
-			jQuery("#" + uuid + "_result").html(data);
-		}
-	});
-}
-function preview(uuid) {
-	reportWindow('<%=request.getContextPath()%>/lab/CA/ALL/labDisplayOLIS.jsp?segmentID=0&preview=true&uuid=' + uuid);
-}
-
-function save(uuid) {
-	jQuery(uuid).attr("disabled", "disabled");
-	jQuery.ajax({
-		url: "<%=request.getContextPath() %>/olis/AddToInbox.do",
-		data: "uuid=" + uuid + "&file=true",
-		success: function(data) {
-			jQuery("#" + uuid + "_result").html(data);
-		}
-	});
-}
-
-function ack(uuid) {
-	jQuery(uuid).attr("disabled", "disabled");
-	jQuery.ajax({
-		url: "<%=request.getContextPath() %>/olis/AddToInbox.do?ack=true",
-		data: "uuid=" + uuid + "&ack=true",
-		success: function(data) {
-			jQuery("#" + uuid + "_result").html(data);
-		}
-	});
-}
-
-var patientFilter = "";
-var labFilter = "";
-function filterResults(select) {
-	if (select.name == "labFilter") {
-		labFilter = select.value;
-	} else if(select.name == "patientFilter") {
-		patientFilter = select.value;
-	}
-	var performFilter = function() {
-		var visible = (patientFilter == "" || jQuery(this).attr("patientName") == patientFilter)
-				   && (labFilter == "" || jQuery(this).attr("reportingLaboratory") == labFilter);
-		if (visible) { jQuery(this).show(); }
-		else { jQuery(this).hide(); }
-	};
-	jQuery(".evenLine").each(performFilter);
-	jQuery(".oddLine").each(performFilter);
-}
-</script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/sortable.js"></script>
+
+<script type="text/javascript">
+	function addToInbox(uuid) {
+		jQuery(uuid).attr("disabled", "disabled");
+		jQuery.ajax({
+			url: "<%=request.getContextPath() %>/olis/AddToInbox.do",
+			data: "uuid=" + uuid,
+			success: function(data) {
+				jQuery("#" + uuid + "_result").html(data);
+			}
+		});
+	}
+	function preview(uuid) {
+		reportWindow('<%=request.getContextPath()%>/lab/CA/ALL/labDisplayOLIS.jsp?segmentID=0&preview=true&uuid=' + uuid);
+	}
+
+	function save(uuid) {
+		jQuery(uuid).attr("disabled", "disabled");
+		jQuery.ajax({
+			url: "<%=request.getContextPath() %>/olis/AddToInbox.do",
+			data: "uuid=" + uuid + "&file=true",
+			success: function(data) {
+				jQuery("#" + uuid + "_result").html(data);
+			}
+		});
+	}
+
+	function ack(uuid) {
+		jQuery(uuid).attr("disabled", "disabled");
+		jQuery.ajax({
+			url: "<%=request.getContextPath() %>/olis/AddToInbox.do?ack=true",
+			data: "uuid=" + uuid + "&ack=true",
+			success: function(data) {
+				jQuery("#" + uuid + "_result").html(data);
+			}
+		});
+	}
+
+	var patientFilter = "";
+	var labFilter = "";
+	function filterResults(select) {
+		if (select.name == "labFilter") {
+			labFilter = select.value;
+		} else if(select.name == "patientFilter") {
+			patientFilter = select.value;
+		}
+		var performFilter = function() {
+			var visible = (patientFilter == "" || jQuery(this).attr("patientName") == patientFilter)
+					   && (labFilter == "" || jQuery(this).attr("reportingLaboratory") == labFilter);
+			if (visible) { jQuery(this).show(); }
+			else { jQuery(this).hide(); }
+		};
+		jQuery(".evenLine").each(performFilter);
+		jQuery(".oddLine").each(performFilter);
+	}
+</script>
 <style type="text/css">
 .oddLine { 
 	background-color: #cccccc;
@@ -107,6 +108,17 @@ function filterResults(select) {
 .width-xs {
 	min-width: 32px;
 }
+
+#patientTable {
+	border: 1px solid lightgrey;
+}
+#patientTable td {
+	font-weight: normal;
+}
+#patientTable .table-title {
+	background-color: lightgrey;
+}
+
 </style>
 	
 <title>OLIS Search Results</title>
@@ -130,6 +142,8 @@ function filterResults(select) {
 	<tr>
 		<td colspan="2">
 			<%
+			Demographic demographic = (Demographic) request.getAttribute("demographic");
+
 			if (request.getAttribute("searchException") != null) {
 			%>
 				<div class="error">Could not perform the OLIS query due to the following exception:<br /><%=((Exception) request.getAttribute("searchException")).getLocalizedMessage() %></div>
@@ -175,7 +189,7 @@ function filterResults(select) {
 			       onsubmit="return confirm('Are you sure you want to resubmit this query with a patient consent override?')">
 				<input type="hidden" name="redo" value="true" />
 				<input type="hidden" name="uuid" value="<%=(String)request.getAttribute("searchUuid")%>" />
-				<input type="hidden" name="force" value="true" />				
+				<input type="hidden" name="force" value="true" />
 				<input type="submit" value="Submit Override Consent" /> 
 				Authorized by: 
 				<select id="blockedInformationIndividual" name="blockedInformationIndividual">
@@ -231,20 +245,66 @@ function filterResults(select) {
 						</select>
 						</td>
 					</tr>
+				<% if (demographic != null) { %>
+					<tr>
+						<th colspan="10">
+							<table id="patientTable">
+								<tbody>
+								<tr class="table-title">
+									<th colspan="6">
+										<span>Patient Info</span>
+									</th>
+								</tr>
+								<tr>
+									<th class="width-md">
+										<span>Name</span>
+									</th>
+									<th class="width-sm">
+										<span>Sex</span>
+									</th>
+									<th class="width-md">
+										<span>Date of Birth</span>
+									</th>
+									<th class="width-md">
+										<span>Hin</span>
+									</th>
+									<th class="width-md">
+										<span>Contact Phone #</span>
+									</th>
+								</tr>
+								<tr>
+									<td>
+										<span><%=demographic.getDisplayName()%></span>
+									</td>
+									<td>
+										<span><%=demographic.getSexString()%></span>
+									</td>
+									<td>
+										<span><%=demographic.getDateOfBirth()%></span>
+									</td>
+									<td>
+										<span><%=demographic.getHealthNumber()%></span>
+									</td>
+									<td>
+										<span><%=((demographic.getPreferredPhone().isPresent()) ? demographic.getPreferredPhone().get().getNumberFormattedDisplay() : "")%></span>
+									</td>
+								</tr>
+								</tbody>
+							</table>
+						</th>
+					</tr>
+				<% } %>
 					<tr><td colspan="10">
 					<table class="sortable" id="resultsTable">
 					<tr><th class="unsortable"></th>
 						<th class="unsortable"></th>
 						<th class="unsortable"></th>
 						<th class="unsortable"></th>
-<%--						<th class="width-sm">Health Number</th>--%>
-<%--						<th class="width-sm">Patient Name</th>--%>
-<%--						<th class="width-xs">Sex</th>--%>
 						<th class="width-md">Collection Date/Time</th>
 						<th class="width-md">Last Updated in OLIS</th>
-						<th class="width-sm">Discipline</th>
-						<th class="width-md">Test Name</th>
-						<th class="width-sm">Test Status</th>
+						<th class="width-sm">Specimen Type</th>
+						<th class="width-md">Test Request Name</th>
+						<th class="width-sm">Test Request Status</th>
 						<th class="width-sm">Ordering Practitioner</th>
 						<th class="width-sm">Admitting Practitioner</th>
 					</tr>
@@ -254,6 +314,7 @@ function filterResults(select) {
 						{
 							result = OLISResultsAction.searchResultsMap.get(resultUuid);
 
+							// show one row per OBR, so that individual statuses can be displayed. Required feature for OLIS conformance.
 							for(int obrRep=0; obrRep < result.getOBRCount(); obrRep++)
 							{%>
 							<tr class="<%=++lineNum % 2 == 1 ? "oddLine" : "evenLine"%>"
@@ -264,24 +325,21 @@ function filterResults(select) {
 									<input type="button" onClick="addToInbox('<%=resultUuid %>'); return false;" id="<%=resultUuid %>" value="Add to Inbox" />
 								</td>
 								<td>
-
-									<input type="button" onClick="preview('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_preview" value="Preview" />
-								</td>
-
-								<td>
 									<input type="button" onClick="save('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_save" value="Save/File" />
 								</td>
-
 								<td>
 									<input type="button" onClick="ack('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_ack" value="Acknowledge" />
 								</td>
-								<td><%=result.getSpecimenReceivedDateTime() %></td>
-								<td><%=result.getLastUpdateInOLIS() %></td>
-								<td><%=result.getOBRCategory(obrRep) %></td>
-								<td> <%=result.getOBRName(obrRep)%> </td>
-								<td> <%=result.getObrStatusDisplayValue(obrRep)%> </td>
-								<td> <%=result.getShortDocName() %> </td>
-								<td> <%=result.getAdmittingProviderNameShort()%> </td>
+								<td>
+									<input type="button" onClick="preview('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_preview" value="Preview" />
+								</td>
+								<td><%=result.getSpecimenReceivedDateTime()%></td>
+								<td><%=result.getLastUpdateInOLIS()%></td>
+								<td><%=result.getOBRCategory(obrRep)%></td>
+								<td><%=result.getOBRName(obrRep)%></td>
+								<td><%=result.getObrStatusDisplayValue(obrRep)%></td>
+								<td><%=result.getShortDocName()%></td>
+								<td><%=result.getAdmittingProviderNameShort()%></td>
 
 							</tr>
 						<%

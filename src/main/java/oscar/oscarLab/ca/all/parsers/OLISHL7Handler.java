@@ -1362,9 +1362,9 @@ public class OLISHL7Handler extends MessageHandler
 			case "F":
 				return "Final";
 			case "I":
-				return "No results available";
+				return "Incomplete";
 			case "O":
-				return "Order received";
+				return "Ordered";
 			case "P":
 				return "Preliminary";
 			case "X":

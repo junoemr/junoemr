@@ -28,6 +28,8 @@ import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.DemographicArchive;
+import org.oscarehr.dataMigration.converter.in.DemographicModelToDbConverter;
+import org.oscarehr.dataMigration.converter.out.DemographicDbToModelConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicIntegrationDao;
@@ -36,7 +38,6 @@ import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.model.DemographicIntegration;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
-import org.oscarehr.dataMigration.converter.in.DemographicModelToDbConverter;
 import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.integration.service.IntegrationPushUpdateService;
@@ -102,6 +103,9 @@ public class DemographicService
 	@Autowired
 	private DemographicModelToDbConverter demographicModelToDBConverter;
 
+	@Autowired
+	private DemographicDbToModelConverter demographicDbToModelConverter;
+
 	public enum SEARCH_MODE
 	{
 		demographicNo, name, phone, dob, address, hin, chart_no, email
@@ -120,6 +124,11 @@ public class DemographicService
 		DemographicCust demoCustom = demographic.getDemographicCust();
 
 		return DemographicConverter.getAsTransferObject(demographic, demographicExtList, demoCustom);
+	}
+
+	public org.oscarehr.dataMigration.model.demographic.Demographic getDemographicModel(Integer demographicId)
+	{
+		return demographicDbToModelConverter.convert(demographicDao.find(demographicId));
 	}
 
 	public SEARCH_MODE searchModeStringToEnum(String searchMode)
