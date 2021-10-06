@@ -2726,11 +2726,7 @@ public class OLISHL7Handler extends MessageHandler
 				} else {
 					op = s.substring(pieceStart + 1, pieceEnd);
 					result = parseOperator(op);
-					if (result.equals("")) {
-						sb.append(op);
-					} else {
-						sb.append(result);
-					}
+					sb.append(result);
 					pos = pieceEnd + 1;
 				}
 			}
@@ -2739,7 +2735,7 @@ public class OLISHL7Handler extends MessageHandler
 		return sb.toString();
 	}
 
-	public String parseOperator(String op) {
+	protected String parseOperator(String op) {
 		if (op == null || op.equals("")) {
 			return "";
 		}
@@ -2782,13 +2778,13 @@ public class OLISHL7Handler extends MessageHandler
 
 		if (!matchFound) {
 			// If we haven't already matched a command, look for a command with a parameter.
-			String patternStr = "\\.(SP|IN|TI|SK)\\s*(\\d*)\\s*";
+			String patternStr = "\\.(SP|IN|TI|SK)\\s*([+-]?)(\\d*)\\s*";
 			Pattern pattern = Pattern.compile(patternStr);
 			Matcher matcher = pattern.matcher(piece.toUpperCase());
 			matchFound = matcher.find();
 			if (matchFound) {
 				// Get all groups for this match
-				String result = parseParamsAndFormat(matcher.group(1), matcher.group(2), centered);
+				String result = parseParamsAndFormat(matcher.group(1), matcher.group(2), matcher.group(3), centered);
 				if (result != null && result.contains("</center>"))
 				{
 					centered = false;
@@ -2799,10 +2795,17 @@ public class OLISHL7Handler extends MessageHandler
 		return "";
 	}
 
-	public static String parseParamsAndFormat(String operator, String operand, boolean centered)
+	protected static String parseParamsAndFormat(String operator, String sign, String operand, boolean centered)
 	{
 		int opInt = operand.equals("") ? 1 : Integer.parseInt(operand);
 		String result = "";
+
+		// ignore negative spacing for now
+		if("-".equals(sign))
+		{
+			return result;
+		}
+
 		switch (operator)
 		{
 			case "SP":
