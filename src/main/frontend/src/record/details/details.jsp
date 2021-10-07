@@ -139,8 +139,8 @@
 					</div>
 				</div>
 		</div>
-		<div id="profile-fields" class="row">
-			<div class="col-md-10 col-lg-8 ">
+		<div id="profile-fields" class="flex-row flex-wrap justify-content-start m-t-8">
+			<div class="flex-item-grow-2">
 				<div id="pd1" ng-click="detailsCtrl.checkAction($event)" ng-keypress="detailsCtrl.checkAction($event)">
 
 					<demographic-section ng-model="detailsCtrl.page.demo"
@@ -182,7 +182,7 @@
 				</div>
 			</div>
 		<br/>
-			<div class=" col-md-10 col-lg-4">
+			<div class="flex-item-grow flex-col flex-wrap">
 				<div class="clearfix col-md-12">
 					<img class="pull-left" id="photo"
 						 title="Click to upload photo"
@@ -202,8 +202,7 @@
 					</div>
 				</div>
 				<hr>
-
-				<div class="col-md-12">
+				<div class="col-md-12 flex-grow">
 					<h3 class="form-heading">
 						<bean:message key="web.record.details.proContacts"/>
 							<button type="button" class="btn btn-primary pull-right manage-button-padding"  ng-click="detailsCtrl.manageContacts()">
