@@ -1874,7 +1874,7 @@ public class OLISHL7Handler extends MessageHandler
 			String ident = key.substring(0, key.indexOf(":"));
 			ident = getOrganizationType(ident);
 			key = key.substring(key.indexOf(":") + 1);
-			return sourceOrganizations.get(key) + " (" + ident + " " + key + ")";
+			return StringUtils.trimToEmpty(sourceOrganizations.get(key)) + " (" + ident + " " + key + ")";
 
 		} catch (Exception e) {
 			logger.error("Could not retrieve OBX comment ZNT", e);
@@ -2052,7 +2052,7 @@ public class OLISHL7Handler extends MessageHandler
 			String ident = key.substring(0, key.indexOf(":"));
 			ident = getOrganizationType(ident);
 			key = key.substring(key.indexOf(":") + 1);
-			return String.format("%s (%s %s)", sourceOrganizations.get(key), ident, key);
+			return String.format("%s (%s %s)", StringUtils.trimToEmpty(sourceOrganizations.get(key)), ident, key);
 		} catch (Exception e) {
 			logger.error("Could not retrieve OBX comment ZNT", e);
 
@@ -2153,7 +2153,7 @@ public class OLISHL7Handler extends MessageHandler
 			String ident = key.substring(0, key.indexOf(":"));
 			ident = getOrganizationType(ident);
 			key = key.substring(key.indexOf(":") + 1);
-			return String.format("%s (%s %s)", sourceOrganizations.get(key), ident, key);
+			return String.format("%s (%s %s)", StringUtils.trimToEmpty(sourceOrganizations.get(key)), ident, key);
 
 		} catch (Exception e) {
 			logger.error("Could not retrieve OBX comment ZNT", e);
@@ -2393,7 +2393,7 @@ public class OLISHL7Handler extends MessageHandler
 			String sourceOrg = sourceOrganizations.get(key);
 			if(sourceOrg == null)
 				sourceOrg = defaultSourceOrganizations.get(key);
-			return String.format("%s (%s %s)", sourceOrg, ident, key);
+			return String.format("%s (%s %s)", StringUtils.trimToEmpty(sourceOrg), ident, key);
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 		}
