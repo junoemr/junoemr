@@ -27,7 +27,15 @@ import lombok.Setter;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.common.model.Appointment;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 @Getter
 @Setter
@@ -41,12 +49,12 @@ public class QueuedAppointmentLink extends AbstractModel<Integer>
 	private Integer id;
 
 	@Column(name = "aqs_queued_appointment_id")
-  private String queuedAppointmentId;
+  	private String queuedAppointmentId;
 
 	@Column(name = "aqs_queued_id")
 	private String queueId;
 
-	@OneToOne(fetch= FetchType.EAGER)
+	@OneToOne(fetch= FetchType.LAZY)
 	@JoinColumn(name="appointment_no")
 	private Appointment appointment;
 
