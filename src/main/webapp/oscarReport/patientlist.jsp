@@ -105,16 +105,35 @@ if(!authed) {
 		});
 	});
 
-	$('#plForm').submit(function(event) {
-		var $form =$('#plForm');
+	$('#plForm').submit(function () {
+		var $form = $('#plForm');
 
-		$.ajax({
-			type: "POST",
-			url: $form.attr('action'),
-			data: $form.serialize(),
-			success: function () {
-				$(document).find(':button[type=submit]').prop('disabled', false);
+		if ($form.valid())
+		{
+			var $path = $form.attr('action');
+			var $provider_no = $('#provider_no').val();
+			var $date_from = $('#date_from').val();
+			var $date_to = $('#date_to').val();
+			var userAgentString = navigator.userAgent;
+			var isChrome = userAgentString.indexOf("Chrome") > -1;
+			var new_window;
+
+			$(document).find(':button[type=submit]').prop('disabled', true);
+
+			if (isChrome)
+			{
+				window.alert("Please wait for the file to be downloaded, then close the download window to re-enable the Export button.");
+				new_window = window.open($path + "?" + $form.serialize(), "Downloading", "length=100,width=100");
+				new_window.document.title = "File Download";
 			}
-		})
+			else
+			{
+				new_window = window.open($path + "?" + $form.serialize())
+			}
+
+			new_window.onbeforeunload = (function() {
+				$(document).find(':button[type=submit]').prop('disabled', false);
+			});
+		}
 	});
 </script>
