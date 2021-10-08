@@ -97,11 +97,7 @@ if(!authed) {
 					required : true,
 					oscarDate : true
 				}
-			},
-			submitHandler: function(form) {
-				form.submit();
-				$(document).find(':button[type=submit]').prop('disabled', true);
-		  	}
+			}
 		});
 	});
 
