@@ -29,6 +29,7 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@ page import="org.oscarehr.common.model.Demographic" %>
+<%@ page import="java.util.List" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -1475,7 +1476,7 @@ public String strikeOutInvalidContent(String content, String status) {
                         int l=0;
                         int linenum=0;
                         String highlight = "#E0E0FF";
-                        ArrayList headers = handler.getHeaders();
+                        List<String> headers = handler.getHeaders();
                         int OBRCount = handler.getOBRCount();
                         String category = "";
                         String newCategory = "";

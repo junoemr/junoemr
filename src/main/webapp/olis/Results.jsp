@@ -16,6 +16,7 @@
                 org.oscarehr.olis.OLISResultsAction" %>
 <%@page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.oscarehr.dataMigration.model.demographic.Demographic" %>
+<%@ page import="org.apache.commons.lang3.StringUtils" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -118,12 +119,17 @@
 #patientTable .table-title {
 	background-color: lightgrey;
 }
+.page-wrapper {
+	display: flex;
+	flex-direction: column;
+}
 
 </style>
 	
 <title>OLIS Search Results</title>
 </head>
 <body>
+<div class="page-wrapper">
 
 <table style="width:600px;" class="MainTable" align="left">
 	<tbody><tr class="MainTableTopRow">
@@ -157,13 +163,7 @@
 					<div class="error"><%=error.replaceAll("\\n", "<br />") %></div>
 				<% }
 			}
-			String resp = (String) request.getAttribute("olisResponseContent");
-			if(resp == null) { resp = ""; }
-			%>
-			<!--  RAW HL7
-				<%=resp%>
-			-->
-			<%
+			String resp = StringUtils.trimToEmpty((String) request.getAttribute("olisResponseContent"));
 			boolean hasBlockedContent = false;
 			try {
 				if(resp != null && resp.length()>0) {
@@ -354,5 +354,7 @@
 		</td>
 	</tr></tbody>
 </table>
+<pre style="display: none;"><%=resp%></pre>
+</div>
 </body>
 </html>

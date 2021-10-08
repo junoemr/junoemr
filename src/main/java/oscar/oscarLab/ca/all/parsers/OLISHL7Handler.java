@@ -25,6 +25,8 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.bouncycastle.util.encoders.Base64;
@@ -41,14 +43,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,16 +70,35 @@ public class OLISHL7Handler extends MessageHandler
 	protected static final String OLIS_SENDING_APPLICATION_ID = "OLIS";
 	protected static final String OLIS_SENDING_APPLICATION_ID_TYPE = "X500";
 
-	Logger logger = Logger.getLogger(DefaultGenericHandler.class);
+	private static final Logger logger = Logger.getLogger(OLISHL7Handler.class);
+	private static final String finalStatus = "CFEX";
+
 	protected boolean isFinal = true;
 	protected boolean isCorrected = false;
+	protected boolean reportBlocked = false;
 	protected Message msg = null;
 	protected ArrayList<ArrayList<Segment>> obrGroups = null;
+
+	private boolean centered = false;
 	private ArrayList<String> obrSpecimenSource;
 	private ArrayList<String> obrStatus;
 	private HashMap<String, String> sourceOrganizations;
 
 	private HashMap<String, String> defaultSourceOrganizations;
+
+	private OlisSortMap obrSortMap;
+	private OlisSortMap[] obxSortMaps;
+
+	private HashMap<String, String[]> patientIdentifiers;
+	private HashMap<String, String> patientIdentifierNames;
+
+	private HashMap<String, String> addressTypeNames;
+	private HashMap<String, String> telecomUseCode;
+	private HashMap<String, String> telecomEquipType;
+
+	private HashMap<Integer, Segment> obrDiagnosis;
+	private ArrayList<String> disciplines;
+	private List<OLISError> errors;
 
 	public static boolean handlerTypeMatch(Message message)
 	{
@@ -217,9 +243,6 @@ public class OLISHL7Handler extends MessageHandler
 		return patientIdentifierNames.get(ident);
 	}
 
-	HashMap<String, String[]> patientIdentifiers;
-	HashMap<String, String> patientIdentifierNames;
-
 	private void initPatientIdentifierNames() {
 		patientIdentifierNames.put("ANON", "Non Nominal Identifier");
 		patientIdentifierNames.put("DDSL", "Dentist Licence Number");
@@ -233,10 +256,6 @@ public class OLISHL7Handler extends MessageHandler
 		patientIdentifierNames.put("SS", "USA Social Security number");
 
 	}
-
-	private HashMap<String, String> addressTypeNames;
-	private HashMap<String, String> telecomUseCode;
-	private HashMap<String, String> telecomEquipType;
 
 	public String getAddressTypeName(String ident) {
 		return addressTypeNames.get(ident);
@@ -312,8 +331,6 @@ public class OLISHL7Handler extends MessageHandler
 			return "";
 		}
 	}
-
-	public boolean reportBlocked = false;
 
 	public boolean isReportBlocked() {
 		return reportBlocked;
@@ -836,12 +853,7 @@ public class OLISHL7Handler extends MessageHandler
 
 	public int getMappedOBR(int obr) {
 		try {
-			String[] keys = obrSortMap.keySet().toArray(new String[0]);
-			Arrays.sort(keys);
-			if (obr > keys.length - 1) {
-				return obr;
-			}
-			return obrSortMap.get(keys[obr]);
+			return obrSortMap.getByKeyIndex(obr);
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 		}
@@ -850,24 +862,17 @@ public class OLISHL7Handler extends MessageHandler
 
 	public int getMappedOBX(int obr, int obx) {
 		try {
-			String[] keys = obxSortMap.get(obr).keySet().toArray(new String[0]);
-			Arrays.sort(keys);
-			return obxSortMap.get(obr).get(keys[obx]);
+			OlisSortMap obxMapForObr = obxSortMaps[obr];
+			return obxMapForObr.getByKeyIndex(obx);
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 		}
-		return obr;
+		return obx;
 	}
-
-	HashMap<Integer, Segment> obrDiagnosis;
-
-	private ArrayList<String> disciplines;
 
 	public ArrayList<String> getDisciplines() {
 		return disciplines;
 	}
-
-	List<OLISError> errors;
 
 	public List<OLISError> getReportErrors() {
 		List<OLISError> result = new ArrayList<OLISError>();
@@ -1019,11 +1024,16 @@ public class OLISHL7Handler extends MessageHandler
 			}
 			obrGroups.add(obxSegs);
 		}
-		obxSortMap = new HashMap<Integer, HashMap<String, Integer>>();
-		obrSortMap = new HashMap<String, Integer>();
-		mapOBRSortKeys();
 
-		disciplines = new ArrayList<String>();
+		obrSortMap = mapOBRSortKeys();
+		obxSortMaps = new OlisSortMap[obrCount];
+
+		for(int obrRep = 0; obrRep < obrCount; obrRep++)
+		{
+			obxSortMaps[obrRep] = mapOBXSortKey(obrRep);
+		}
+
+		disciplines = new ArrayList<>();
 		for (int i = 0; i < getOBRCount(); i++) {
 			disciplines.add(getOBRCategory(i));
 		}
@@ -1213,66 +1223,55 @@ public class OLISHL7Handler extends MessageHandler
 		}
 	}
 
-	HashMap<String, Integer> obrSortMap;
-
-	private void mapOBRSortKeys() {
-
+	protected OlisSortMap mapOBRSortKeys() throws HL7Exception
+	{
 		int obrCount = getOBRCount();
+		OlisSortMap obrSortMap = new OlisSortMap();
+
 		Segment zbr;
 		String tempKey;
-		try {
-			for (int i = 0; i < obrCount; i++) {
-				mapOBXSortKey(i);
-				if (i == 0) {
-					zbr = terser.getSegment("/.ZBR");
-				} else {
-					zbr = (Segment) terser.getFinder().getRoot().get("ZBR" + (i + 1));
-				}
-				try {
-					tempKey = getString(Terser.get(zbr, 11, 0, 1, 1));
-					tempKey = tempKey.equals("") ? String.valueOf(i) : tempKey;
-					if (obrSortMap.containsKey(tempKey)) {
-						tempKey = tempKey + i;
-					}
-					obrSortMap.put(tempKey, i);
-				} catch (Exception e) {
-					MiscUtils.getLogger().error("OLIS HL7 Error", e);
-				}
+		for(int obrRep = 0; obrRep < obrCount; obrRep++)
+		{
+			if(obrRep == 0)
+			{
+				zbr = terser.getSegment("/.ZBR");
 			}
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("OLIS HL7 Error", e);
+			else
+			{
+				zbr = (Segment) terser.getFinder().getRoot().get("ZBR" + (obrRep + 1));
+			}
+			tempKey = getString(Terser.get(zbr, 11, 0, 1, 1));
+//			tempKey = tempKey.isEmpty() ? String.valueOf(obrRep) : tempKey;
+
+			OLISSortKey key = new OLISSortKey(tempKey, null, getOBRName(obrRep), String.valueOf(obrRep), null);
+			obrSortMap.put(key, obrRep);
 		}
+		return obrSortMap;
 	}
 
-	HashMap<Integer, HashMap<String, Integer>> obxSortMap;
+	protected OlisSortMap mapOBXSortKey(int obrRep) throws HL7Exception
+	{
+		OlisSortMap obxSortMap = new OlisSortMap();
+		for(int obxRep = 0; obxRep < getOBXCount(obrRep); obxRep++)
+		{
+			Optional<Segment> zbxSegment = getZBX(obrRep, obxRep);
+			String tempKey = "";
 
-	private void mapOBXSortKey(int obr) {
-		HashMap<String, Integer> obxMap = null;
-		int k;
-		String tempKey;
-		obxMap = new HashMap<String, Integer>();
-		for (int i = 0; i < getOBXCount(obr); i++) {
-
-			try {
-				k = getZBXLocation(obr, i);
-				String[] segments = terser.getFinder().getRoot().getNames();
-				if (!segments[k].startsWith("ZBX")) {
-					continue;
-				}
-				Structure[] zbxSegs = terser.getFinder().getRoot().getAll(segments[k]);
-				Segment zbxSeg = (Segment) zbxSegs[0];
-				tempKey = getString(Terser.get(zbxSeg, 2, 0, 1, 1));
-				obxMap.put(tempKey.equals("") ? String.valueOf(i) : tempKey, i);
-
-			} catch (Exception e) {
-				MiscUtils.getLogger().error("OLIS HL7 Error", e);
+			if(zbxSegment.isPresent())
+			{
+				tempKey = getString(Terser.get(zbxSegment.get(), 2, 0, 1, 1));
 			}
+//			tempKey = (tempKey.isEmpty() ? String.valueOf(obxRep) : tempKey);
+			// obx sub-id = OBX-4
+
+			OLISSortKey key = new OLISSortKey(tempKey, null, getOBXName(obrRep, obxRep), String.valueOf(obxRep), null);
+			obxSortMap.put(key, obxRep);
 		}
-		obxSortMap.put(obr, obxMap);
+		return obxSortMap;
 	}
 
-	private int getZBXLocation(int i, int j) {
-
+	private Optional<Segment> getZBX(int i, int j) throws HL7Exception
+	{
 		int obrCount = 0;
 		int obxCount = 0;
 		// Compensating for -1 parameters for OBR and OBX
@@ -1280,9 +1279,10 @@ public class OLISHL7Handler extends MessageHandler
 		i++;
 		String[] segments = terser.getFinder().getRoot().getNames();
 
-		String segId = "";
-		for (int k = 0; k != segments.length && obxCount <= j && obrCount <= i; k++) {
-			segId = segments[k].substring(0, 3);
+		for (int k = 0; k != segments.length && obxCount <= j && obrCount <= i; k++)
+		{
+			String segment = segments[k];
+			String segId = segment.substring(0, 3);
 
 			// We count all OBRs we see.
 			if (segId.equals("OBR")) {
@@ -1294,15 +1294,15 @@ public class OLISHL7Handler extends MessageHandler
 				obxCount++;
 			}
 
-			// Check that this segment is an NTE and we are in the right OBR/OBX position.
-			else if (segId.equals("ZBX") && obxCount == j && obrCount == i) {
-				return k;
+			// Check that this segment is a ZBX and we are in the right OBR/OBX position.
+			else if (segId.equals("ZBX") && obxCount == j && obrCount == i)
+			{
+				Structure[] zbxSegs = terser.getFinder().getRoot().getAll(segment);
+				return Optional.of((Segment) zbxSegs[0]);
 			}
 		}
-		return segments.length - 1;
+		return Optional.empty();
 	}
-
-	private String finalStatus = "CFEX";
 
 	public boolean isStatusFinal(char status) {
 		return finalStatus.contains(String.valueOf(status));
@@ -1313,39 +1313,43 @@ public class OLISHL7Handler extends MessageHandler
 		return stringIsNotNullOrEmpty(nature) ? getNatureOfAbnormalTest(nature.charAt(0)) : "";
 	}
 
-	public String getNatureOfAbnormalTest(char nature) {
-		switch (nature) {
-		case 'A':
-			return "An age-based population";
-		case 'N':
-			return "None ‚Äì generic normal range";
-		case 'R':
-			return "A race-based population";
-		case 'S':
-			return "A sex-based population";
-		default:
-			return "";
+	public String getNatureOfAbnormalTest(char nature)
+	{
+		switch(nature)
+		{
+			case 'A':
+				return "An age-based population";
+			case 'N':
+				return "None ‚Äì generic normal range";
+			case 'R':
+				return "A race-based population";
+			case 'S':
+				return "A sex-based population";
+			default:
+				return "";
 		}
 	}
 
-	public static String getObxTestResultStatusValue(char status) {
-		switch (status) {
-		case 'C':
-			return "Amended";
-		case 'F':
-			return "Final";
-		case 'P':
-			return "Preliminary";
-		case 'X':
-			return "Could not obtain results";
-		case 'W':
-			return "Invalid";
-		case 'Z':
-			return "Ancillary information";
-		case 'N':
-			return "Not performed";
-		default:
-			return "";
+	public static String getObxTestResultStatusValue(char status)
+	{
+		switch(status)
+		{
+			case 'C':
+				return "Amended";
+			case 'F':
+				return "Final";
+			case 'P':
+				return "Preliminary";
+			case 'X':
+				return "Could not obtain results";
+			case 'W':
+				return "Invalid";
+			case 'Z':
+				return "Ancillary information";
+			case 'N':
+				return "Not performed";
+			default:
+				return "";
 		}
 	}
 
@@ -1374,26 +1378,28 @@ public class OLISHL7Handler extends MessageHandler
 		}
 	}
 
-	public String getObrTestResultStatusMessage(String status) {
-		switch (status) {
-		case "A":
-			return "Some, but not all, results available";
-		case "C":
-			return "Correction to results";
-		case "E":
-			return "OLIS has expired the test request because no activity has occurred within a reasonable amount of time.";
-		case "F":
-			return "Final results; results stored and verified. Can only be changed with a corrected result.";
-		case "I":
-			return "No results available; specimen received, procedure incomplete.";
-		case "O":
-			return "Order received; specimen not yet received. ";
-		case "P":
-			return "Preliminary: A verified early result is available, final results not yet obtained.";
-		case "X":
-			return "No results available; Order canceled";
-		default:
-			return "";
+	public String getObrTestResultStatusMessage(String status)
+	{
+		switch (status)
+		{
+			case "A":
+				return "Some, but not all, results available";
+			case "C":
+				return "Correction to results";
+			case "E":
+				return "OLIS has expired the test request because no activity has occurred within a reasonable amount of time.";
+			case "F":
+				return "Final results; results stored and verified. Can only be changed with a corrected result.";
+			case "I":
+				return "No results available; specimen received, procedure incomplete.";
+			case "O":
+				return "Order received; specimen not yet received. ";
+			case "P":
+				return "Preliminary: A verified early result is available, final results not yet obtained.";
+			case "X":
+				return "No results available; Order canceled";
+			default:
+				return "";
 		}
 	}
 
@@ -2683,8 +2689,6 @@ public class OLISHL7Handler extends MessageHandler
 		}
 	}
 
-	boolean centered = false;
-
 	public String formatString(String str)
 	{
 		if (StringUtils.isEmpty(str))
@@ -2931,5 +2935,82 @@ public class OLISHL7Handler extends MessageHandler
 			return OLISHL7Handler.this;
 		}
 
+	}
+
+	protected static class OlisSortMap extends TreeMap<OLISSortKey, Integer>
+	{
+		public OlisSortMap()
+		{
+			super(OLISSortKey.getKeyComparator());
+		}
+
+		public Integer getByKeyIndex(int index)
+		{
+			// keys are already ordered
+			OLISSortKey[] keys = this.keySet().toArray(new OLISSortKey[0]);
+			return this.get(keys[index]);
+		}
+	}
+
+	@Getter
+	@Setter
+	protected static class OLISSortKey
+	{
+		private String msgKey;
+		private String olisKey;
+		private String altName1;
+		private String subId;
+		private ZonedDateTime relativeDateTime;
+
+		public OLISSortKey(String msgKey, String olisKey, String altName1, String subId, ZonedDateTime relativeDateTime)
+		{
+			this.msgKey = StringUtils.trimToEmpty(msgKey);
+			this.olisKey = StringUtils.trimToEmpty(olisKey);
+			this.altName1 = StringUtils.trimToEmpty(altName1);
+			this.subId = StringUtils.trimToEmpty(subId);
+			this.relativeDateTime = relativeDateTime;
+		}
+
+		public static Comparator<OLISSortKey> getKeyComparator()
+		{
+			return (o1, o2) -> {
+				Comparator<String> stringComparator = Comparator.comparing(String::toString);
+
+				// check null input cases
+				if(o1 == null && o2 == null)
+				{
+					return 0; // equal
+				}
+				if(o1 == null)
+				{
+					return -1;
+				}
+				if(o2 == null)
+				{
+					return 1;
+				}
+
+				// comapare values in olis preferred ordering
+				int result = stringComparator.compare(o1.getMsgKey(), o2.getMsgKey());
+				if(result == 0)
+				{
+					result = stringComparator.compare(o1.getOlisKey(), o2.getOlisKey());
+				}
+				if(result == 0)
+				{
+					result = stringComparator.compare(o1.getAltName1(), o2.getAltName1());
+				}
+				if(result == 0)
+				{
+					result = stringComparator.compare(o1.getSubId(), o2.getSubId());
+				}
+				if(result == 0 && o1.getRelativeDateTime() != null && o2.getRelativeDateTime() != null) //TODO null checking comparison
+				{
+					Comparator<ZonedDateTime> dateTimeComparator = Comparator.comparing(zdt -> zdt.truncatedTo(ChronoUnit.SECONDS));
+					result = dateTimeComparator.compare(o1.getRelativeDateTime(), o2.getRelativeDateTime());
+				}
+				return result;
+			};
+		}
 	}
 }
