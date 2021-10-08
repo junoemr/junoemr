@@ -42,17 +42,17 @@ class OLISSortKey
 
 	public OLISSortKey(String msgKey, String olisKey, String altName1, String subId, ZonedDateTime relativeDateTime)
 	{
-		this.msgKey = StringUtils.trimToEmpty(msgKey);
-		this.olisKey = StringUtils.trimToEmpty(olisKey);
-		this.altName1 = StringUtils.trimToEmpty(altName1);
-		this.subId = StringUtils.trimToEmpty(subId);
+		this.msgKey = StringUtils.trimToNull(msgKey);
+		this.olisKey = StringUtils.trimToNull(olisKey);
+		this.altName1 = StringUtils.trimToNull(altName1);
+		this.subId = StringUtils.trimToNull(subId);
 		this.relativeDateTime = relativeDateTime;
 	}
 
 	public static Comparator<OLISSortKey> getKeyComparator()
 	{
 		return (o1, o2) -> {
-			Comparator<String> stringComparator = Comparator.comparing(String::toString);
+			Comparator<String> stringComparator = Comparator.nullsLast(Comparator.comparing(String::toString));
 
 			// check null input cases
 			if(o1 == null && o2 == null)
@@ -61,11 +61,11 @@ class OLISSortKey
 			}
 			if(o1 == null)
 			{
-				return -1;
+				return 1;
 			}
 			if(o2 == null)
 			{
-				return 1;
+				return -1;
 			}
 
 			// comapare values in olis preferred ordering
@@ -82,9 +82,9 @@ class OLISSortKey
 			{
 				result = stringComparator.compare(o1.getSubId(), o2.getSubId());
 			}
-			if(result == 0 && o1.getRelativeDateTime() != null && o2.getRelativeDateTime() != null) //TODO null checking comparison
+			if(result == 0)
 			{
-				Comparator<ZonedDateTime> dateTimeComparator = Comparator.comparing(zdt -> zdt.truncatedTo(ChronoUnit.SECONDS));
+				Comparator<ZonedDateTime> dateTimeComparator = Comparator.nullsLast(Comparator.comparing(zdt -> zdt.truncatedTo(ChronoUnit.SECONDS)));
 				result = dateTimeComparator.compare(o1.getRelativeDateTime(), o2.getRelativeDateTime());
 			}
 			return result;

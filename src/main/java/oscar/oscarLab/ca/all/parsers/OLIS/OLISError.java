@@ -22,9 +22,14 @@
  */
 package oscar.oscarLab.ca.all.parsers.OLIS;
 
+import lombok.Data;
+
+@Data
 public class OLISError
 {
 	private final OLISHL7Handler olishl7Handler;
+
+	private String segment, sequence, field, indentifer, text;
 
 	public OLISError(OLISHL7Handler olishl7Handler, String segment, String sequence, String field, String indentifer, String text)
 	{
@@ -34,58 +39,6 @@ public class OLISError
 		this.sequence = sequence;
 		this.field = field;
 		this.indentifer = indentifer;
-		this.text = text;
-	}
-
-	String segment, sequence, field, indentifer, text;
-
-	public String getSegment()
-	{
-		return segment;
-	}
-
-	public void setSegment(String segment)
-	{
-		this.segment = segment;
-	}
-
-	public String getSequence()
-	{
-		return sequence;
-	}
-
-	public void setSequence(String sequence)
-	{
-		this.sequence = sequence;
-	}
-
-	public String getField()
-	{
-		return field;
-	}
-
-	public void setField(String field)
-	{
-		this.field = field;
-	}
-
-	public String getIndentifer()
-	{
-		return indentifer;
-	}
-
-	public void setIndentifer(String indentifer)
-	{
-		this.indentifer = indentifer;
-	}
-
-	public String getText()
-	{
-		return text;
-	}
-
-	public void setText(String text)
-	{
 		this.text = text;
 	}
 
@@ -114,30 +67,49 @@ public class OLISError
 		{
 			return this.indentifer.equals(obj);
 		}
-		if(getClass() != obj.getClass()) return false;
+		if(getClass() != obj.getClass())
+		{
+			return false;
+		}
 		OLISError other = (OLISError) obj;
-		if(!getOuterType().equals(other.getOuterType())) return false;
+		if(!getOuterType().equals(other.getOuterType()))
+		{
+			return false;
+		}
 		if(field == null)
 		{
-			if(other.field != null) return false;
+			if(other.field != null)
+			{
+				return false;
+			}
 		}
-		else if(!field.equals(other.field)) return false;
+		else if(!field.equals(other.field))
+		{
+			return false;
+		}
 		if(segment == null)
 		{
-			if(other.segment != null) return false;
+			if(other.segment != null)
+			{
+				return false;
+			}
 		}
-		else if(!segment.equals(other.segment)) return false;
+		else if(!segment.equals(other.segment))
+		{
+			return false;
+		}
 		if(sequence == null)
 		{
-			if(other.sequence != null) return false;
+			return other.sequence == null;
 		}
-		else if(!sequence.equals(other.sequence)) return false;
-		return true;
+		else
+		{
+			return sequence.equals(other.sequence);
+		}
 	}
 
 	private OLISHL7Handler getOuterType()
 	{
 		return olishl7Handler;
 	}
-
 }

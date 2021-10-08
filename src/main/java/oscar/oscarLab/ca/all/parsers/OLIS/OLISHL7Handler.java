@@ -874,8 +874,11 @@ public class OLISHL7Handler extends MessageHandler
 		if (errors == null) {
 			return result;
 		}
-		for (OLISError error : errors) {
-			if (error.segment == null || error.segment.equals("") || error.segment.equals("ERR") || error.segment.equals("SPR")) {
+		for(OLISError error : errors)
+		{
+			String segment = error.getSegment();
+			if(segment == null || segment.equals("") || segment.equals("ERR") || segment.equals("SPR"))
+			{
 				result.add(error);
 			}
 		}
