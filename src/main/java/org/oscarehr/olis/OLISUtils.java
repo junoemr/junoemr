@@ -39,7 +39,7 @@ import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.parsers.AlphaHandler;
 import oscar.oscarLab.ca.all.parsers.CMLHandler;
 import oscar.oscarLab.ca.all.parsers.GDMLHandler;
-import oscar.oscarLab.ca.all.parsers.OLISHL7Handler;
+import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
 import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
 
 import javax.xml.bind.JAXBContext;

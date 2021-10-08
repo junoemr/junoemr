@@ -11,7 +11,7 @@
  * OLISHL7Handler.java
  */
 
-package oscar.oscarLab.ca.all.parsers;
+package oscar.oscarLab.ca.all.parsers.OLIS;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.GenericComposite;
@@ -37,6 +37,7 @@ import org.oscarehr.olis.model.OLISRequestNomenclature;
 import org.oscarehr.olis.model.OLISResultNomenclature;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.util.UtilDateUtilities;
 
 import javax.servlet.http.HttpServletRequest;

@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import oscar.oscarLab.ca.all.parsers.OLISHL7Handler;
+import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
 
 /**
  * A service dedicated to polling and downloading labs

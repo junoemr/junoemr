@@ -32,7 +32,7 @@ import org.oscarehr.util.SpringUtils;
 
 import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.parsers.Factory;
-import oscar.oscarLab.ca.all.parsers.OLISHL7Handler;
+import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
 
 /**
  *

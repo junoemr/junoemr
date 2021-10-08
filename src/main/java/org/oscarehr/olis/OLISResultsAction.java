@@ -32,7 +32,7 @@ import com.indivica.olis.Driver;
 
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
-import oscar.oscarLab.ca.all.parsers.OLISHL7Handler;
+import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
 import oscar.oscarLab.ca.all.util.Utilities;
 
 public class OLISResultsAction extends DispatchAction {

@@ -67,6 +67,7 @@
 <%@ page import="org.apache.commons.lang3.tuple.Pair" %>
 <%@ page import="oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler" %>
 <%@ page import="org.oscarehr.labs.service.Hl7TextInfoService" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>

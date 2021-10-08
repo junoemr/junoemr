@@ -23,7 +23,7 @@
 package org.oscarehr.olis.exception;
 
 import lombok.Getter;
-import oscar.oscarLab.ca.all.parsers.OLISHL7Handler;
+import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
 
 import java.util.List;
 import java.util.stream.Collectors;

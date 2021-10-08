@@ -59,7 +59,7 @@ public class OLISAddToInboxAction extends DispatchAction {
 
 		String fileLocation = System.getProperty("java.io.tmpdir") + "/olis_" + uuidToAdd + ".response";
 		File file = new File(fileLocation);
-		OLISHL7Handler msgUploadHandler = (OLISHL7Handler) HandlerClassFactory.getHandler(oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE);
+		OLISHL7Handler msgUploadHandler = (OLISHL7Handler) HandlerClassFactory.getHandler(oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler.OLIS_MESSAGE_TYPE);
 
 		InputStream is = null;
 		try

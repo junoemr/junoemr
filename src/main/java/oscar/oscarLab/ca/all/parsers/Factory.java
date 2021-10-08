@@ -80,6 +80,7 @@ import oscar.oscarLab.ca.all.parsers.AHS.v23.ProvlabHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestORMHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v251.ConnectCareLabHandler;
+import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
 import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 
 import java.io.FileInputStream;

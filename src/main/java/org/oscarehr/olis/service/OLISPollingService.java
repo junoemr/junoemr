@@ -64,7 +64,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import static oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE;
+import static oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler.OLIS_MESSAGE_TYPE;
 import static oscar.oscarLab.ca.all.upload.handlers.OLISHL7Handler.ALL_DUPLICATES_MARKER;
 
 @Service

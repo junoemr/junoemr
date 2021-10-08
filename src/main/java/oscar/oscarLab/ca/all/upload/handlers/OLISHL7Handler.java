@@ -33,7 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import static org.oscarehr.olis.service.OLISPollingService.OLIS_DATE_FORMAT;
-import static oscar.oscarLab.ca.all.parsers.OLISHL7Handler.OLIS_MESSAGE_TYPE;
+import static oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler.OLIS_MESSAGE_TYPE;
 
 /**
  * 
@@ -70,7 +70,7 @@ public class OLISHL7Handler implements MessageHandler
 		if(checkQAKStatus && !messages.isEmpty())
 		{
 			String messageWithQAK = Utilities.fixLineBreaks(messages.get(0), "\\.br\\");
-			oscar.oscarLab.ca.all.parsers.OLISHL7Handler parser = (oscar.oscarLab.ca.all.parsers.OLISHL7Handler) Factory.getHandler(OLIS_MESSAGE_TYPE, messageWithQAK);
+			oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler parser = (oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler) Factory.getHandler(OLIS_MESSAGE_TYPE, messageWithQAK);
 
 			if(!parser.canUpload())
 			{
@@ -82,7 +82,7 @@ public class OLISHL7Handler implements MessageHandler
 		for(String msg : messages)
 		{
 			msg = Utilities.fixLineBreaks(msg, "\\.br\\");
-			oscar.oscarLab.ca.all.parsers.OLISHL7Handler parser = (oscar.oscarLab.ca.all.parsers.OLISHL7Handler) Factory.getHandler(OLIS_MESSAGE_TYPE, msg);
+			oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler parser = (oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler) Factory.getHandler(OLIS_MESSAGE_TYPE, msg);
 
 			// skip uploading duplicates
 			if(OLISUtils.isDuplicate(loggedInInfo, parser, msg))
