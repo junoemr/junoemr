@@ -12,7 +12,7 @@
 <%@page import="java.util.*,
                 oscar.oscarLab.ca.all.parsers.Factory,
                 oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler,
-                oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler.OLISError,
+                oscar.oscarLab.ca.all.parsers.OLIS.OLISError,
                 org.oscarehr.olis.OLISResultsAction" %>
 <%@page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.oscarehr.dataMigration.model.demographic.Demographic" %>

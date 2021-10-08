@@ -25,8 +25,6 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.bouncycastle.util.encoders.Base64;
@@ -44,19 +42,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -87,8 +81,8 @@ public class OLISHL7Handler extends MessageHandler
 
 	private HashMap<String, String> defaultSourceOrganizations;
 
-	private OlisSortMap obrSortMap;
-	private OlisSortMap[] obxSortMaps;
+	private OLISSortMap obrSortMap;
+	private OLISSortMap[] obxSortMaps;
 
 	private HashMap<String, String[]> patientIdentifiers;
 	private HashMap<String, String> patientIdentifierNames;
@@ -863,7 +857,7 @@ public class OLISHL7Handler extends MessageHandler
 
 	public int getMappedOBX(int obr, int obx) {
 		try {
-			OlisSortMap obxMapForObr = obxSortMaps[obr];
+			OLISSortMap obxMapForObr = obxSortMaps[obr];
 			return obxMapForObr.getByKeyIndex(obx);
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
@@ -1027,7 +1021,7 @@ public class OLISHL7Handler extends MessageHandler
 		}
 
 		obrSortMap = mapOBRSortKeys();
-		obxSortMaps = new OlisSortMap[obrCount];
+		obxSortMaps = new OLISSortMap[obrCount];
 
 		for(int obrRep = 0; obrRep < obrCount; obrRep++)
 		{
@@ -1220,14 +1214,14 @@ public class OLISHL7Handler extends MessageHandler
 			sequence = Terser.get(err, 1, rep, 1, 2);
 			field = Terser.get(err, 1, rep, 1, 3);
 			text = Terser.get(err, 1, rep, 4, 2);
-			errors.add(new OLISError(segment, sequence, field, identifier, text));
+			errors.add(new OLISError(this, segment, sequence, field, identifier, text));
 		}
 	}
 
-	protected OlisSortMap mapOBRSortKeys() throws HL7Exception
+	protected OLISSortMap mapOBRSortKeys() throws HL7Exception
 	{
 		int obrCount = getOBRCount();
-		OlisSortMap obrSortMap = new OlisSortMap();
+		OLISSortMap obrSortMap = new OLISSortMap();
 
 		Segment zbr;
 		String tempKey;
@@ -1250,9 +1244,9 @@ public class OLISHL7Handler extends MessageHandler
 		return obrSortMap;
 	}
 
-	protected OlisSortMap mapOBXSortKey(int obrRep) throws HL7Exception
+	protected OLISSortMap mapOBXSortKey(int obrRep) throws HL7Exception
 	{
-		OlisSortMap obxSortMap = new OlisSortMap();
+		OLISSortMap obxSortMap = new OLISSortMap();
 		for(int obxRep = 0; obxRep < getOBXCount(obrRep); obxRep++)
 		{
 			Optional<Segment> zbxSegment = getZBX(obrRep, obxRep);
@@ -2843,175 +2837,4 @@ public class OLISHL7Handler extends MessageHandler
 		return result;
 	}
 
-	public class OLISError {
-		public OLISError(String segment, String sequence, String field, String indentifer, String text) {
-			super();
-			this.segment = segment;
-			this.sequence = sequence;
-			this.field = field;
-			this.indentifer = indentifer;
-			this.text = text;
-		}
-
-		String segment, sequence, field, indentifer, text;
-
-		public String getSegment() {
-			return segment;
-		}
-
-		public void setSegment(String segment) {
-			this.segment = segment;
-		}
-
-		public String getSequence() {
-			return sequence;
-		}
-
-		public void setSequence(String sequence) {
-			this.sequence = sequence;
-		}
-
-		public String getField() {
-			return field;
-		}
-
-		public void setField(String field) {
-			this.field = field;
-		}
-
-		public String getIndentifer() {
-			return indentifer;
-		}
-
-		public void setIndentifer(String indentifer) {
-			this.indentifer = indentifer;
-		}
-
-		public String getText() {
-			return text;
-		}
-
-		public void setText(String text) {
-			this.text = text;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + ((field == null) ? 0 : field.hashCode());
-			result = prime * result + ((indentifer == null) ? 0 : indentifer.hashCode());
-			result = prime * result + ((segment == null) ? 0 : segment.hashCode());
-			result = prime * result + ((sequence == null) ? 0 : sequence.hashCode());
-			return result;
-		}
-
-		/**
-		 * OLIS Errors are identified by the error code for global errors or the segment, sequence and field of the error for localised errors.
-		 */
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) return true;
-			if (obj == null) return false;
-			if (obj instanceof String) {
-				return this.indentifer.equals(obj);
-			}
-			if (getClass() != obj.getClass()) return false;
-			OLISError other = (OLISError) obj;
-			if (!getOuterType().equals(other.getOuterType())) return false;
-			if (field == null) {
-				if (other.field != null) return false;
-			} else if (!field.equals(other.field)) return false;
-			if (segment == null) {
-				if (other.segment != null) return false;
-			} else if (!segment.equals(other.segment)) return false;
-			if (sequence == null) {
-				if (other.sequence != null) return false;
-			} else if (!sequence.equals(other.sequence)) return false;
-			return true;
-		}
-
-		private OLISHL7Handler getOuterType() {
-			return OLISHL7Handler.this;
-		}
-
-	}
-
-	protected static class OlisSortMap extends TreeMap<OLISSortKey, Integer>
-	{
-		public OlisSortMap()
-		{
-			super(OLISSortKey.getKeyComparator());
-		}
-
-		public Integer getByKeyIndex(int index)
-		{
-			// keys are already ordered
-			OLISSortKey[] keys = this.keySet().toArray(new OLISSortKey[0]);
-			return this.get(keys[index]);
-		}
-	}
-
-	@Getter
-	@Setter
-	protected static class OLISSortKey
-	{
-		private String msgKey;
-		private String olisKey;
-		private String altName1;
-		private String subId;
-		private ZonedDateTime relativeDateTime;
-
-		public OLISSortKey(String msgKey, String olisKey, String altName1, String subId, ZonedDateTime relativeDateTime)
-		{
-			this.msgKey = StringUtils.trimToEmpty(msgKey);
-			this.olisKey = StringUtils.trimToEmpty(olisKey);
-			this.altName1 = StringUtils.trimToEmpty(altName1);
-			this.subId = StringUtils.trimToEmpty(subId);
-			this.relativeDateTime = relativeDateTime;
-		}
-
-		public static Comparator<OLISSortKey> getKeyComparator()
-		{
-			return (o1, o2) -> {
-				Comparator<String> stringComparator = Comparator.comparing(String::toString);
-
-				// check null input cases
-				if(o1 == null && o2 == null)
-				{
-					return 0; // equal
-				}
-				if(o1 == null)
-				{
-					return -1;
-				}
-				if(o2 == null)
-				{
-					return 1;
-				}
-
-				// comapare values in olis preferred ordering
-				int result = stringComparator.compare(o1.getMsgKey(), o2.getMsgKey());
-				if(result == 0)
-				{
-					result = stringComparator.compare(o1.getOlisKey(), o2.getOlisKey());
-				}
-				if(result == 0)
-				{
-					result = stringComparator.compare(o1.getAltName1(), o2.getAltName1());
-				}
-				if(result == 0)
-				{
-					result = stringComparator.compare(o1.getSubId(), o2.getSubId());
-				}
-				if(result == 0 && o1.getRelativeDateTime() != null && o2.getRelativeDateTime() != null) //TODO null checking comparison
-				{
-					Comparator<ZonedDateTime> dateTimeComparator = Comparator.comparing(zdt -> zdt.truncatedTo(ChronoUnit.SECONDS));
-					result = dateTimeComparator.compare(o1.getRelativeDateTime(), o2.getRelativeDateTime());
-				}
-				return result;
-			};
-		}
-	}
 }

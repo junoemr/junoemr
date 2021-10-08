@@ -23,7 +23,7 @@
 package org.oscarehr.olis.exception;
 
 import lombok.Getter;
-import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
+import oscar.oscarLab.ca.all.parsers.OLIS.OLISError;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +39,7 @@ public class OLISAckFailedException extends OLISException
 	@Getter
 	private final QAKStatus statusCode;
 	@Getter
-	private final List<OLISHL7Handler.OLISError> errors;
+	private final List<OLISError> errors;
 
 	public OLISAckFailedException()
 	{
@@ -57,11 +57,11 @@ public class OLISAckFailedException extends OLISException
 	{
 		this(message, statusCode, null);
 	}
-	public OLISAckFailedException(String message, String statusCode, List<OLISHL7Handler.OLISError> errors)
+	public OLISAckFailedException(String message, String statusCode, List<OLISError> errors)
 	{
 		this(message, (statusCode == null) ? null : QAKStatus.valueOf(statusCode), errors);
 	}
-	public OLISAckFailedException(String message, QAKStatus statusCode, List<OLISHL7Handler.OLISError> errors)
+	public OLISAckFailedException(String message, QAKStatus statusCode, List<OLISError> errors)
 	{
 		super(message);
 		this.statusCode = statusCode;
@@ -97,7 +97,7 @@ public class OLISAckFailedException extends OLISException
 		{
 			message = message + ":\n" +
 					this.errors.stream()
-							.map(OLISHL7Handler.OLISError::getText)
+							.map(OLISError::getText)
 							.collect(Collectors.joining("\n"));
 		}
 		return message;
