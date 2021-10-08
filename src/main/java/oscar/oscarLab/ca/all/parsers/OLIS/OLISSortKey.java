@@ -40,6 +40,8 @@ class OLISSortKey
 	private String subId;
 	private ZonedDateTime relativeDateTime;
 
+	private Integer originalIndex;
+
 	public OLISSortKey(String msgKey, String olisKey, String altName1, String subId, ZonedDateTime relativeDateTime)
 	{
 		this.msgKey = StringUtils.trimToNull(msgKey);

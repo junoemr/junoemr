@@ -36,12 +36,15 @@ import org.oscarehr.olis.model.OLISResultNomenclature;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,6 +56,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.oscarehr.olis.service.OLISPollingService.OLIS_DATE_FORMAT;
 
 /**
  * @author Adam Balanga
@@ -81,8 +86,8 @@ public class OLISHL7Handler extends MessageHandler
 
 	private HashMap<String, String> defaultSourceOrganizations;
 
-	private OLISSortMap obrSortMap;
-	private OLISSortMap[] obxSortMaps;
+	private List<OLISSortKey> obrSortKeys;
+	private List<List<OLISSortKey>> obxSortKeyArray;
 
 	private HashMap<String, String[]> patientIdentifiers;
 	private HashMap<String, String> patientIdentifierNames;
@@ -848,7 +853,7 @@ public class OLISHL7Handler extends MessageHandler
 
 	public int getMappedOBR(int obr) {
 		try {
-			return obrSortMap.getByKeyIndex(obr);
+			return obrSortKeys.get(obr).getOriginalIndex();
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 		}
@@ -857,8 +862,8 @@ public class OLISHL7Handler extends MessageHandler
 
 	public int getMappedOBX(int obr, int obx) {
 		try {
-			OLISSortMap obxMapForObr = obxSortMaps[obr];
-			return obxMapForObr.getByKeyIndex(obx);
+			List<OLISSortKey> obxKeysForObr = obxSortKeyArray.get(obr);
+			return obxKeysForObr.get(obx).getOriginalIndex();
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 		}
@@ -1023,12 +1028,12 @@ public class OLISHL7Handler extends MessageHandler
 			obrGroups.add(obxSegs);
 		}
 
-		obrSortMap = mapOBRSortKeys();
-		obxSortMaps = new OLISSortMap[obrCount];
+		obrSortKeys = mapOBRSortKeys();
+		obxSortKeyArray = new ArrayList<>(obrCount);
 
 		for(int obrRep = 0; obrRep < obrCount; obrRep++)
 		{
-			obxSortMaps[obrRep] = mapOBXSortKey(obrRep);
+			obxSortKeyArray.add(mapOBXSortKey(obrRep));
 		}
 
 		disciplines = new ArrayList<>();
@@ -1221,13 +1226,12 @@ public class OLISHL7Handler extends MessageHandler
 		}
 	}
 
-	protected OLISSortMap mapOBRSortKeys() throws HL7Exception
+	protected List<OLISSortKey> mapOBRSortKeys() throws HL7Exception
 	{
 		int obrCount = getOBRCount();
-		OLISSortMap obrSortMap = new OLISSortMap();
+		List<OLISSortKey> obrKeys = new ArrayList<>(obrCount);
 
 		Segment zbr;
-		String tempKey;
 		for(int obrRep = 0; obrRep < obrCount; obrRep++)
 		{
 			if(obrRep == 0)
@@ -1238,34 +1242,43 @@ public class OLISHL7Handler extends MessageHandler
 			{
 				zbr = (Segment) terser.getFinder().getRoot().get("ZBR" + (obrRep + 1));
 			}
-			tempKey = getString(Terser.get(zbr, 11, 0, 1, 1));
-//			tempKey = tempKey.isEmpty() ? String.valueOf(obrRep) : tempKey;
 
-			OLISSortKey key = new OLISSortKey(tempKey, null, getOBRName(obrRep), String.valueOf(obrRep), null);
-			obrSortMap.put(key, obrRep);
+			String olisSortKey = null; //TODO - where do we get this from?
+			String msgKey = getString(Terser.get(zbr, 11, 0, 1, 1));
+
+			OLISSortKey key = new OLISSortKey(msgKey, olisSortKey, getOBRName(obrRep), String.valueOf(obrRep), null);
+			key.setOriginalIndex(obrRep);
+			obrKeys.add(key);
 		}
-		return obrSortMap;
+		obrKeys.sort(OLISSortKey.getKeyComparator());
+		return obrKeys;
 	}
 
-	protected OLISSortMap mapOBXSortKey(int obrRep) throws HL7Exception
+	protected List<OLISSortKey> mapOBXSortKey(int obrRep) throws HL7Exception
 	{
-		OLISSortMap obxSortMap = new OLISSortMap();
-		for(int obxRep = 0; obxRep < getOBXCount(obrRep); obxRep++)
+		int obxCount = getOBXCount(obrRep);
+		List<OLISSortKey> obxKeys = new ArrayList<>(obxCount);
+		for(int obxRep = 0; obxRep < obxCount; obxRep++)
 		{
 			Optional<Segment> zbxSegment = getZBX(obrRep, obxRep);
-			String tempKey = "";
+			String msgKey = null;
+			String olisSortKey = null; //TODO - where do we get this from?
+			String subId = null;
+			ZonedDateTime zbxDate = null;
 
 			if(zbxSegment.isPresent())
 			{
-				tempKey = getString(Terser.get(zbxSegment.get(), 2, 0, 1, 1));
+				String zbxDateStr = getString(Terser.get(zbxSegment.get(), 1, 0, 1, 1));
+				msgKey = getString(Terser.get(zbxSegment.get(), 2, 0, 1, 1));
+				subId = getOBXField(obrRep, obxRep, 4, 0, 1);
+				zbxDate = ConversionUtils.toZonedDateTime(zbxDateStr, DateTimeFormatter.ofPattern(OLIS_DATE_FORMAT));
 			}
-//			tempKey = (tempKey.isEmpty() ? String.valueOf(obxRep) : tempKey);
-			// obx sub-id = OBX-4
-
-			OLISSortKey key = new OLISSortKey(tempKey, null, getOBXName(obrRep, obxRep), String.valueOf(obxRep), null);
-			obxSortMap.put(key, obxRep);
+			OLISSortKey key = new OLISSortKey(msgKey, olisSortKey, getOBXName(obrRep, obxRep), subId, zbxDate);
+			key.setOriginalIndex(obxRep);
+			obxKeys.add(key);
 		}
-		return obxSortMap;
+		obxKeys.sort(OLISSortKey.getKeyComparator());
+		return obxKeys;
 	}
 
 	private Optional<Segment> getZBX(int i, int j) throws HL7Exception
