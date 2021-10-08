@@ -81,7 +81,7 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 		{
 			return null;
 		}
-		else if(provider == null || provider.getFirstName() == null || provider.getLastName() == null)
+		else if(provider == null || provider.getFirstName().isEmpty() || provider.getLastName().isEmpty())
 		{
 			logger.warn("Not enough provider info found to link or create provider record (first and last name are required). \n" +
 					"Default provider (" + DEFAULT_PROVIDER_LAST_NAME + "," + DEFAULT_PROVIDER_FIRST_NAME + ") will be assigned.");
