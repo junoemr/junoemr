@@ -61,7 +61,8 @@
 		<memcachedSessionManager.version>2.3.2</memcachedSessionManager.version>
 		<jaxb.version>2.3.1</jaxb.version>
 		<jaxbcore.version>2.3.0.1</jaxbcore.version>
-    	<jackson.version>2.12.3</jackson.version>
+    <jackson.version>2.12.3</jackson.version>
+		<juno.webpack.skip>false</juno.webpack.skip>
 	</properties>
 	<repositories>
 		<repository>
@@ -167,6 +168,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
 			<scope>test</scope>
 		</dependency>
 
@@ -1758,22 +1765,62 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<oscar.skip.dbinit>${oscar.dbinit.skip}</oscar.skip.dbinit>
+						<buildDirectory>${project.build.directory}</buildDirectory>
+					</systemPropertyVariables>
+					<excludes>
+						<exclude>**/AR2005*.java</exclude>
+						<exclude>**/OntarioMDSpec4DataTest.java</exclude>
+						<exclude>**/ONAREnhancedBornConnectorTest.java</exclude>
+						<exclude>integration/tests/*</exclude>
+						<exclude>org/oscarehr/common/dao/**/*</exclude>
+						<exclude>org/oscarehr/e2e/populator/body/*</exclude>
+						<exclude>org/oscarehr/e2e/populator/header/*</exclude>
+						<exclude>org/oscarehr/e2e/model/**/*</exclude>
+						<exclude>org/oscarehr/eform/parser/**/*</exclude>
+						<exclude>org/oscarehr/eyeform/dao/**/*</exclude>
+						<exclude>org/oscarehr/labs/alberta/*</exclude>
+						<exclude>org/oscarehr/PMmodule/dao/**/*</exclude>
+						<exclude>org/oscarehr/billing/CA/ON/dao/**/*</exclude>
+						<exclude>org/oscarehr/billing/CA/dao/**/*</exclude>
+						<exclude>org/oscarehr/billing/CA/BC/dao/**/*</exclude>
+						<exclude>org/oscarehr/hospitalReportManager/dao/**/*</exclude>
+						<exclude>org/oscarehr/research/eaaps/EaapsIntegrationTest.java</exclude>
+						<exclude>org/oscarehr/research/eaaps/EaapsHandlerTest.java</exclude>
+						<exclude>org/oscarehr/labs/alberta/UploadingTest.java</exclude>
+						<exclude>org/oscarehr/managers/DemographicManagerTest.java</exclude>
+						<exclude>org/oscarehr/appointment/service/AppointmentStatusServiceTest.java</exclude>
+						<exclude>org/oscarehr/ws/conversion/DemographicConverterTest.java</exclude>
+						<exclude>org/oscarehr/casemgmt/service/DefaultNoteServiceTest.java</exclude>
+						<exclude>org/oscarehr/e2e/constant/ConstantsTest.java</exclude>
+						<exclude>org/oscarehr/e2e/util/EverestUtilsTest.java</exclude>
+						<exclude>org/oscarehr/e2e/director/E2ECreatorTest.java</exclude>
+						<exclude>org/oscarehr/e2e/populator/PopulatorTest.java</exclude>
+						<exclude>org/oscarehr/e2e/populator/body/AbstractBodyPopulatorTest.java</exclude>
+						<exclude>org/oscarehr/e2e/populator/AbstractPopulatorTest.java</exclude>
+						<exclude>org/oscarehr/e2e/populator/AbstractPopulatorTest.java</exclude>
+						<exclude>org/oscarehr/integration/born/ONAREnhancedBornConnectorTest.java</exclude>
+						<exclude>org/oscarehr/integration/born/AR2005BornConnectorTest.java</exclude>
+						<exclude>org/oscarehr/integration/born/AR2005Form2XMLTest.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>default-test</id>
+						<id>pre-integration-test</id>
+						<phase>pre-integration-test</phase>
 						<goals>
 							<goal>test</goal>
 						</goals>
-						<phase>test</phase>
 						<configuration>
 							<skipTests>false</skipTests>
-							<argLine>-Xms1024m -Xmx1024m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
-							<excludes>
-								<exclude>**/AR2005*.java</exclude>
-								<exclude>**/OntarioMDSpec4DataTest.java</exclude>
-								<exclude>**/ONAREnhancedBornConnectorTest.java</exclude>
-								<exclude>integration/tests/*</exclude>
-							</excludes>
+							<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m</argLine>
+							<test>SetupDatabase</test>
 							<systemPropertyVariables>
 								<oscar.skip.dbinit>${oscar.dbinit.skip}</oscar.skip.dbinit>
 								<buildDirectory>${project.build.directory}</buildDirectory>
@@ -1781,9 +1828,64 @@
 						</configuration>
 					</execution>
 				</executions>
-				<version>2.10</version>
 			</plugin>
-            <plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<includes>
+						<include>integration/tests/*</include>
+						<include>org/oscarehr/common/dao/**/*</include>
+						<include>org/oscarehr/e2e/populator/body/*</include>
+						<include>org/oscarehr/e2e/populator/header/*</include>
+						<include>org/oscarehr/e2e/model/**/*</include>
+						<include>org/oscarehr/eform/parser/**/*</include>
+						<include>org/oscarehr/eyeform/dao/**/*</include>
+						<include>org/oscarehr/labs/alberta/*</include>
+						<include>org/oscarehr/PMmodule/dao/**/*</include>
+						<include>org/oscarehr/billing/CA/ON/dao/**/*</include>
+						<include>org/oscarehr/billing/CA/dao/**/*</include>
+						<include>org/oscarehr/billing/CA/BC/dao/**/*</include>
+						<include>org/oscarehr/hospitalReportManager/dao/**/*</include>
+						<include>org/oscarehr/research/eaaps/EaapsIntegrationTest.java</include>
+						<include>org/oscarehr/research/eaaps/EaapsHandlerTest.java</include>
+						<include>org/oscarehr/labs/alberta/UploadingTest.java</include>
+						<include>org/oscarehr/managers/DemographicManagerTest.java</include>
+						<include>org/oscarehr/appointment/service/AppointmentStatusServiceTest.java</include>
+						<include>org/oscarehr/ws/conversion/DemographicConverterTest.java</include>
+						<include>org/oscarehr/casemgmt/service/DefaultNoteServiceTest.java</include>
+						<include>org/oscarehr/e2e/constant/ConstantsTest.java</include>
+						<include>org/oscarehr/e2e/util/EverestUtilsTest.java</include>
+						<include>org/oscarehr/e2e/director/E2ECreatorTest.java</include>
+						<include>org/oscarehr/e2e/populator/PopulatorTest.java</include>
+						<include>org/oscarehr/e2e/populator/body/AbstractBodyPopulatorTest.java</include>
+						<include>org/oscarehr/e2e/populator/AbstractPopulatorTest.java</include>
+						<include>org/oscarehr/e2e/populator/AbstractPopulatorTest.java</include>
+						<include>org/oscarehr/integration/born/ONAREnhancedBornConnectorTest.java</include>
+						<include>org/oscarehr/integration/born/AR2005BornConnectorTest.java</include>
+						<include>org/oscarehr/integration/born/AR2005Form2XMLTest.java</include>
+					</includes>
+					<excludes>
+						<exclude>**/SetupDatabase.java</exclude>
+					</excludes>
+					<skipTests>false</skipTests>
+					<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m</argLine>
+					<systemPropertyVariables>
+						<oscar.skip.dbinit>true</oscar.skip.dbinit>
+					</systemPropertyVariables>
+					<useManifestOnlyJar>false</useManifestOnlyJar>
+				</configuration>
+				<executions>
+					<execution>
+						<id>verify</id>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+						<phase>integration-test</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.oscarehr</groupId>
 				<artifactId>oscar-il18n-check-plugin</artifactId>
 				<version>1.0</version>
@@ -1901,6 +2003,7 @@
 							<value>${project.build.directory}/openapi/</value>
 						</systemProperty>
 					</systemProperties>
+					<skip>${juno.webpack.skip}</skip>
 				</configuration>
 			</plugin>
 
@@ -1952,17 +2055,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
-			<!-- This is a terrible hack to counteract a bug in the openapi-generator library.  -->
-			<!-- There is an open issue at the time of writing to prove they are aware of the -->
-			<!-- issue at https://github.com/OpenAPITools/openapi-generator/issues/189 -->
-			<!-- This plugin runs a script that replaces the string "models.models." in the -->
-			<!-- generated api with "models.".  It is being run using antrun because all plugins -->
-			<!-- of the same type in a pom.xml file are bundled together and run where the first -->
-			<!-- one is defined.  Since exec-maven-plugin needs to be run before the -->
-			<!-- openapi-generator-maven-plugin and this needs to be run after, they can't use -->
-			<!-- the same plugin. -->
-			<!-- TODO: scrap this once openapi-generator is fixed -->
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.8</version>
@@ -1993,6 +2085,7 @@
 							<followSymlinks>false</followSymlinks>
 						</fileset>
 					</filesets>
+					<skip>${juno.webpack.skip}</skip>
 				</configuration>
 			</plugin>
 
@@ -2079,6 +2172,7 @@
 					<!-- <workingDirectory>${basedir}/src/main/webapp/juno</workingDirectory> -->
 					<installDirectory>target</installDirectory>
 					<nodeVersion>v6.10.3</nodeVersion>
+					<skip>${juno.webpack.skip}</skip>
 				</configuration>
 
 				<executions>
@@ -2390,238 +2484,6 @@
 									<version>1.11.1</version>
 								</plugin>
 							</plugins>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-
-		<profile>
-			<id>integration</id>
-			<activation>
-				<property>
-					<name>environment</name>
-					<value>integration</value>
-				</property>
-			</activation>
-			<properties>
-				<antrun.skip.jspc>true</antrun.skip.jspc>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>default-test</id>
-								<goals>
-									<goal>test</goal>
-								</goals>
-								<phase>test</phase>
-								<configuration>
-									<skipTests>false</skipTests>
-									<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
-									<test>SetupDatabase</test>
-									<systemPropertyVariables>
-										<oscar.skip.dbinit>${oscar.dbinit.skip}</oscar.skip.dbinit>
-										<buildDirectory>${project.build.directory}</buildDirectory>
-									</systemPropertyVariables>
-								</configuration>
-							</execution>
-						</executions>
-						<version>2.10</version>
-					</plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <includes>
-                                <include>integration/tests/*</include>
-                            </includes>
-                            <excludes>
-                                <exclude>**/SetupDatabase.java</exclude>
-                            </excludes>
-                            <skipTests>false</skipTests>
-                            <argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m -XX:MaxPermSize=192m</argLine>
-                            <systemPropertyVariables>
-                                <oscar.skip.dbinit>true</oscar.skip.dbinit>
-                                <buildDirectory>${project.build.directory}</buildDirectory>
-                            </systemPropertyVariables>
-                            <useManifestOnlyJar>false</useManifestOnlyJar>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>verify</id>
-                                <goals>
-                                    <goal>verify</goal>
-                                </goals>
-                                <phase>integration-test</phase>
-                            </execution>
-                        </executions>
-                        <version>3.0.0-M5</version>
-                    </plugin>
-				</plugins>
-			</build>
-		</profile>
-
-
-
-
-
-		<profile>
-			<id>environment-dev</id>
-			<activation>
-				<property>
-					<name>environment</name>
-					<value>dev</value>
-				</property>
-			</activation>
-			<properties>
-				<!-- default port for embedded tomcat -->
-				<!-- override with -Dmaven.tomcat.port=the-port -->
-				<maven.tomcat.port>9090</maven.tomcat.port>
-				<!-- default context path for embedded tomcat -->
-				<!-- override with -Dmaven.tomcat.path=/the-path -->
-				<!-- the external properties file will be loaded using this name -->
-				<!-- from the ${user.home} directory, e.g. ~/the-path.properties -->
-				<!-- with / context path it uses ~/localhost.properties) -->
-				<maven.tomcat.path>/</maven.tomcat.path>
-				<!-- default host name for embedded tomcat -->
-				<!-- override with -Dmaven.tomcat.hostname=the-host-name -->
-				<maven.tomcat.hostname>${env.HOSTNAME}</maven.tomcat.hostname>
-				<!-- make the context reloadable to allow hot deploy -->
-				<maven.tomcat.contextReloadable>true</maven.tomcat.contextReloadable>
-				<!-- delay the redeployment of the webapp. If this value is to low tomcat will redeploy
-					 before compilation is complete causing it to redeploy twice -->
-				<maven.tomcat.backgroundProcessorDelay>30</maven.tomcat.backgroundProcessorDelay>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.tomcat.maven</groupId>
-						<artifactId>tomcat7-maven-plugin</artifactId>
-						<version>2.2</version>
-						<dependencies>
-							<dependency>
-								<groupId>org.apache.tomcat.embed</groupId>
-								<artifactId>tomcat-embed-core</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-util</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-coyote</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-api</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-jdbc</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-dbcp</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-servlet-api</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-jsp-api</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-jasper</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-jasper-el</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-el-api</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-catalina</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-tribes</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-catalina-ha</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-annotations-api</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat</groupId>
-								<artifactId>tomcat-juli</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-
-							<dependency>
-								<groupId>org.apache.tomcat.embed</groupId>
-								<artifactId>tomcat-embed-logging-juli</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-							<dependency>
-								<groupId>org.apache.tomcat.embed</groupId>
-								<artifactId>tomcat-embed-logging-log4j</artifactId>
-								<version>${tomcat.version}</version>
-							</dependency>
-						</dependencies>
-						<configuration>
-							<systemProperties>
-								<oscar.use.integration.prop.file>${oscar.use.integration.prop}</oscar.use.integration.prop.file>
-							</systemProperties>
-						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-compiler-plugin</artifactId>
-						<version>3.3</version>
-						<configuration combine.self="override">
-							<useIncrementalCompilation>true</useIncrementalCompilation>
-							<source>1.8</source>
-							<target>1.8</target>
 						</configuration>
 					</plugin>
 				</plugins>
