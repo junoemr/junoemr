@@ -58,7 +58,13 @@ public class MessageService
 	{
 		this.saveMessage(message, providerList, demographic, MessageList.STATUS_NEW);
 	}
+
 	public void saveMessage(MessageTbl message, List<ProviderData> providerList, Demographic demographic, String messageStatus)
+	{
+		this.saveMessage(message, providerList, demographic, messageStatus, MessageList.DEFAULT_REMOTE_LOCATION);
+	}
+
+	public void saveMessage(MessageTbl message, List<ProviderData> providerList, Demographic demographic, String messageStatus, int remoteLocation)
 	{
 		// set required data values if they are not present
 		if(message.getDate() == null)
@@ -104,7 +110,7 @@ public class MessageService
 			ml.setMessage(message.getId());
 			ml.setProviderNo(provider.getId());
 			ml.setStatus(messageStatus);
-			//TODO do I need to set the location?
+			ml.setRemoteLocation(remoteLocation);
 			messageListDao.persist(ml);
 		}
 
