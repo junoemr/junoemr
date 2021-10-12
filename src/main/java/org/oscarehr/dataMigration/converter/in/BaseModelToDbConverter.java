@@ -22,6 +22,8 @@
  */
 package org.oscarehr.dataMigration.converter.in;
 
+import java.util.HashMap;
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.dataMigration.model.provider.Provider;
@@ -34,9 +36,7 @@ import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
-
-import java.util.HashMap;
-import java.util.List;
+import oscar.util.StringUtils;
 
 @Component
 public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverter<I, E>
@@ -76,12 +76,13 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 	 */
 	protected ProviderData findOrCreateProviderRecord(Provider provider, boolean nullable)
 	{
+
 		Provider newProvider;
 		if(provider == null && nullable)
 		{
 			return null;
 		}
-		else if(provider == null || provider.getFirstName().isEmpty() || provider.getLastName().isEmpty())
+		else if(provider == null || StringUtils.isNullOrEmpty(provider.getFirstName()) || StringUtils.isNullOrEmpty(provider.getLastName()))
 		{
 			logger.warn("Not enough provider info found to link or create provider record (first and last name are required). \n" +
 					"Default provider (" + DEFAULT_PROVIDER_LAST_NAME + "," + DEFAULT_PROVIDER_FIRST_NAME + ") will be assigned.");
