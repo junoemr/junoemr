@@ -44,6 +44,7 @@ public class DemographicMapper extends AbstractMapper
 {
 	private final PID messagePID;
 	private final String DEMO_NULL_NAME = "NULL_NAME";
+	private final String[] PERSONAL_EMAIL_TYPES = {"PERS", "RESD"};
 
 	public DemographicMapper(ZPD_ZTR message, CoPDImportService.IMPORT_SOURCE importSource)
 	{
@@ -264,12 +265,14 @@ public class DemographicMapper extends AbstractMapper
 
 	private String getEmail() throws HL7Exception
 	{
-		Integer rep = getEmailRepByUsageType("PERS");
-		if (rep != null)
+		for (String emailType : PERSONAL_EMAIL_TYPES)
 		{
-			return messagePID.getPid13_PhoneNumberHome(rep).getEmailAddress().getValue();
+			Integer rep = getEmailRepByUsageType(emailType);
+			if (rep != null)
+			{
+				return messagePID.getPid13_PhoneNumberHome(rep).getEmailAddress().getValue();
+			}
 		}
-
 		return null;
 	}
 
