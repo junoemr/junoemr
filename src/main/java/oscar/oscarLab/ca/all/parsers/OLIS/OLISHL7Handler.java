@@ -86,8 +86,8 @@ public class OLISHL7Handler extends MessageHandler
 
 	private HashMap<String, String> defaultSourceOrganizations;
 
-	private List<OLISSortKey> obrSortKeys;
-	private List<List<OLISSortKey>> obxSortKeyArray;
+	private List<OLISRequestSortKey> obrSortKeys;
+	private List<List<OLISResultSortKey>> obxSortKeyArray;
 
 	private HashMap<String, String[]> patientIdentifiers;
 	private HashMap<String, String> patientIdentifierNames;
@@ -851,23 +851,14 @@ public class OLISHL7Handler extends MessageHandler
 		return "";
 	}
 
-	public int getMappedOBR(int obr) {
-		try {
-			return obrSortKeys.get(obr).getOriginalIndex();
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("OLIS HL7 Error", e);
-		}
-		return obr;
+	public int getMappedOBR(int obr)
+	{
+		return obrSortKeys.get(obr).getOriginalIndex();
 	}
 
-	public int getMappedOBX(int obr, int obx) {
-		try {
-			List<OLISSortKey> obxKeysForObr = obxSortKeyArray.get(obr);
-			return obxKeysForObr.get(obx).getOriginalIndex();
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("OLIS HL7 Error", e);
-		}
-		return obx;
+	public int getMappedOBX(int obr, int obx)
+	{
+		return obxSortKeyArray.get(obr).get(obx).getOriginalIndex();
 	}
 
 	public ArrayList<String> getDisciplines() {
@@ -1226,58 +1217,107 @@ public class OLISHL7Handler extends MessageHandler
 		}
 	}
 
-	protected List<OLISSortKey> mapOBRSortKeys() throws HL7Exception
+	/**
+	 * @return ordered list of obr sort keys
+	 * @throws HL7Exception if hl7 error occurs
+	 */
+	protected List<OLISRequestSortKey> mapOBRSortKeys() throws HL7Exception
 	{
+		OLISRequestNomenclatureDao requestNomenclatureDao = SpringUtils.getBean(OLISRequestNomenclatureDao.class);
+
 		int obrCount = getOBRCount();
-		List<OLISSortKey> obrKeys = new ArrayList<>(obrCount);
+		List<OLISRequestSortKey> obrKeys = new ArrayList<>(obrCount);
 
 		Segment zbr;
 		for(int obrRep = 0; obrRep < obrCount; obrRep++)
 		{
+			String obrRepStr = (obrRep == 0) ? "" : String.valueOf(obrRep + 1);
 			if(obrRep == 0)
 			{
 				zbr = terser.getSegment("/.ZBR");
 			}
 			else
 			{
-				zbr = (Segment) terser.getFinder().getRoot().get("ZBR" + (obrRep + 1));
+				zbr = (Segment) terser.getFinder().getRoot().get("ZBR" + obrRepStr);
 			}
 
-			String olisSortKey = null; //TODO - where do we get this from?
-			String msgKey = getString(Terser.get(zbr, 11, 0, 1, 1));
+			String collectionDateStr = StringUtils.trimToNull(get("/.OBR" + obrRepStr + "-7"));
+			String placerGroupNo = this.getPlacerGroupNumber();
+			String requestSortKey = getString(Terser.get(zbr, 11, 0, 1, 1));
 
-			OLISSortKey key = new OLISSortKey(msgKey, olisSortKey, getOBRName(obrRep), String.valueOf(obrRep), null);
+			String obxCategory = StringUtils.trimToNull(get("/.OBR" + obrRepStr + "-4-1-1"));
+			String olisSortKey = null;
+			if(obxCategory != null)
+			{
+				OLISRequestNomenclature olisRequestNomenclature = requestNomenclatureDao.findByNameId(obxCategory);
+				if(olisRequestNomenclature != null)
+				{
+					olisSortKey = olisRequestNomenclature.getName();
+				}
+			}
+
+			OLISRequestSortKey key = new OLISRequestSortKey(
+					ConversionUtils.toNullableZonedDateTime(collectionDateStr, DateTimeFormatter.ofPattern(OLIS_DATE_FORMAT)),
+					placerGroupNo,
+					requestSortKey,
+					olisSortKey,
+					getOBRName(obrRep),
+					obrRep);
+
 			key.setOriginalIndex(obrRep);
 			obrKeys.add(key);
 		}
-		obrKeys.sort(OLISSortKey.getKeyComparator());
+		Collections.sort(obrKeys);
 		return obrKeys;
 	}
 
-	protected List<OLISSortKey> mapOBXSortKey(int obrRep) throws HL7Exception
+	/**
+	 * @param obrRep the obr rep
+	 * @return ordered list of obx sort keys
+	 * @throws HL7Exception if hl7 error occurs
+	 */
+	protected List<OLISResultSortKey> mapOBXSortKey(int obrRep) throws HL7Exception
 	{
+		OLISResultNomenclatureDao resultNomenclatureDao = SpringUtils.getBean(OLISResultNomenclatureDao.class);
+
 		int obxCount = getOBXCount(obrRep);
-		List<OLISSortKey> obxKeys = new ArrayList<>(obxCount);
+		List<OLISResultSortKey> obxKeys = new ArrayList<>(obxCount);
 		for(int obxRep = 0; obxRep < obxCount; obxRep++)
 		{
-			Optional<Segment> zbxSegment = getZBX(obrRep, obxRep);
 			String msgKey = null;
-			String olisSortKey = null; //TODO - where do we get this from?
-			String subId = null;
+			String subId = getOBXField(obrRep, obxRep, 4, 0, 1);
 			ZonedDateTime zbxDate = null;
 
+			String obxName = StringUtils.trimToNull(getOBXField(obrRep, obxRep, 3, 0, 1));
+			String olisSortKey = null;
+			if(obxName != null)
+			{
+				OLISResultNomenclature olisResultNomenclature = resultNomenclatureDao.findByNameId(obxName);
+				if(olisResultNomenclature != null)
+				{
+					olisSortKey = olisResultNomenclature.getName();
+				}
+			}
+
+			Optional<Segment> zbxSegment = getZBX(obrRep, obxRep);
 			if(zbxSegment.isPresent())
 			{
-				String zbxDateStr = getString(Terser.get(zbxSegment.get(), 1, 0, 1, 1));
-				msgKey = getString(Terser.get(zbxSegment.get(), 2, 0, 1, 1));
-				subId = getOBXField(obrRep, obxRep, 4, 0, 1);
-				zbxDate = ConversionUtils.toZonedDateTime(zbxDateStr, DateTimeFormatter.ofPattern(OLIS_DATE_FORMAT));
+				String zbxDateStr = Terser.get(zbxSegment.get(), 1, 0, 1, 1);
+				msgKey = Terser.get(zbxSegment.get(), 2, 0, 1, 1);
+				zbxDate = ConversionUtils.toNullableZonedDateTime(zbxDateStr, DateTimeFormatter.ofPattern(OLIS_DATE_FORMAT));
 			}
-			OLISSortKey key = new OLISSortKey(msgKey, olisSortKey, getOBXName(obrRep, obxRep), subId, zbxDate);
+			OLISResultSortKey key = new OLISResultSortKey(
+					getOBXResultStatus(obrRep, obxRep),
+					msgKey,
+					olisSortKey,
+					getOBXName(obrRep, obxRep),
+					subId,
+					zbxDate);
+
 			key.setOriginalIndex(obxRep);
 			obxKeys.add(key);
 		}
-		obxKeys.sort(OLISSortKey.getKeyComparator());
+		Collections.sort(obxKeys);
 		return obxKeys;
 	}
 
@@ -1321,43 +1361,43 @@ public class OLISHL7Handler extends MessageHandler
 
 	public String getNatureOfAbnormalTest(int obr, int obx) {
 		String nature = getString(getOBXField(obr, obx, 10, 0, 1));
-		return stringIsNotNullOrEmpty(nature) ? getNatureOfAbnormalTest(nature.charAt(0)) : "";
+		return stringIsNotNullOrEmpty(nature) ? getNatureOfAbnormalTest(nature) : "";
 	}
 
-	public String getNatureOfAbnormalTest(char nature)
+	public String getNatureOfAbnormalTest(String nature)
 	{
 		switch(nature)
 		{
-			case 'A':
+			case "A":
 				return "An age-based population";
-			case 'N':
+			case "N":
 				return "None ‚Äì generic normal range";
-			case 'R':
+			case "R":
 				return "A race-based population";
-			case 'S':
+			case "S":
 				return "A sex-based population";
 			default:
 				return "";
 		}
 	}
 
-	public static String getObxTestResultStatusValue(char status)
+	public static String getObxTestResultStatusValue(String status)
 	{
 		switch(status)
 		{
-			case 'C':
+			case "C":
 				return "Amended";
-			case 'F':
+			case "F":
 				return "Final";
-			case 'P':
+			case "P":
 				return "Preliminary";
-			case 'X':
+			case "X":
 				return "Could not obtain results";
-			case 'W':
+			case "W":
 				return "Invalid";
-			case 'Z':
+			case "Z":
 				return "Ancillary information";
-			case 'N':
+			case "N":
 				return "Not performed";
 			default:
 				return "";
@@ -1724,12 +1764,12 @@ public class OLISHL7Handler extends MessageHandler
 		try {
 			OLISResultNomenclatureDao resultDao = (OLISResultNomenclatureDao) SpringUtils.getBean("OLISResultNomenclatureDao");
 			OLISResultNomenclature resultNomenclature = resultDao.findByNameId(obxName);
-			String nomenclatureCategory = "";
+			String nomenclatureName = "";
 			if (resultNomenclature != null)
 			{
-				nomenclatureCategory = StringUtils.trimToEmpty(resultNomenclature.getName());
+				nomenclatureName = StringUtils.trimToEmpty(resultNomenclature.getName());
 			}
-			return nomenclatureCategory;
+			return nomenclatureName;
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 		}

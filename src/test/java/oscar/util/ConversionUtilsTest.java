@@ -1182,6 +1182,19 @@ public class ConversionUtilsTest
 	}
 
 	@Test
+	public void toNullableZonedDateTime_ExpectNull()
+	{
+		assertNull(ConversionUtils.toNullableZonedDateTime(null));
+	}
+
+	@Test
+	public void toNullableZonedDateTime_DateStringCustom_ExpectNull()
+	{
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssZ");
+		assertNull(ConversionUtils.toNullableZonedDateTime(null, dateTimeFormatter));
+	}
+
+	@Test
 	public void toZonedDateTime_DateStringCustom_ExpectZonedDateTime()
 	{
 		String dateTime = "20211231120000-0800";

@@ -836,6 +836,18 @@ public class ConversionUtils {
 		return ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
 	}
 
+	public static ZonedDateTime toNullableZonedDateTime(String dateString)
+	{
+		if(dateString == null) return null;
+		return toZonedDateTime(dateString);
+	}
+
+	public static ZonedDateTime toNullableZonedDateTime(String dateString, DateTimeFormatter dateTimeFormatter)
+	{
+		if(dateString == null) return null;
+		return toZonedDateTime(dateString, dateTimeFormatter);
+	}
+
 	public static ZonedDateTime toZonedDateTime(String dateString, DateTimeFormatter dateTimeFormatter)
 	{
 		return ZonedDateTime.parse(dateString, dateTimeFormatter);

@@ -518,7 +518,7 @@ public class OLISLabPDFCreator extends PdfPageEventHelper
 				String status = handler.getOBXResultStatus(obr, obx).trim();
 				String statusMsg = "";
 				try{
-					statusMsg = OLISHL7Handler.getObxTestResultStatusValue(handler.getOBXResultStatus(obr, obx).charAt(0));
+					statusMsg = OLISHL7Handler.getObxTestResultStatusValue(handler.getOBXResultStatus(obr, obx));
 				}
 				catch(Exception e){
 					statusMsg = "";
