@@ -45,7 +45,11 @@ public class PartialDateDeserializer extends StdDeserializer<PartialDate>
 	@Override
 	public PartialDate deserialize(JsonParser jsonparser, DeserializationContext context) throws IOException
 	{
-		String jsonDate = jsonparser.getText().substring(0, 10); // only take 10 digits, should be formatted yyyy-MM-dd
+		String jsonDate = jsonparser.getText();
+		if(jsonDate.length() > 10)
+		{
+			jsonDate = jsonDate.substring(0, 10); // only take 10 digits, should be formatted yyyy-MM-dd
+		}
 		return PartialDate.parseDate(jsonDate);
 	}
 }

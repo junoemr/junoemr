@@ -29,7 +29,7 @@ import org.oscarehr.dataMigration.model.common.PartialDate;
 
 import java.io.IOException;
 
-// Deserialize dates in format yyyy-MM-dd without time zone.
+// Serialize partial dates in format yyyy-MM-dd, yyyy-MM, or yyyy.
 public class PartialDateSerializer extends StdSerializer<PartialDate>
 {
 	public PartialDateSerializer()

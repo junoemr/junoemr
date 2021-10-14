@@ -1,5 +1,5 @@
 import PartialDateConverter from "../../lib/common/partialDate/converter/partialDateConverter";
-import PartialDateModelConverter from "../../lib/common/partialDate/converter/partialDateModelConverter";
+import PartialDateModelSerializer from "../../lib/common/partialDate/converter/partialDateModelSerializer";
 
 angular.module('Record.Summary').component('groupNotesComponent', {
 	templateUrl: 'src/record/summary/groupNotes.jsp',
@@ -75,9 +75,9 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 				controller.displayIssueId(controller.page.code);
 
 				//action is NULL when new , action is some id when not
-				if (action != null)
+				if (controller.action != null)
 				{
-					controller.displayGroupNote(controller.page.items, action);
+					controller.displayGroupNote(controller.page.items, controller.action);
 				}
 				else
 				{
@@ -284,7 +284,7 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 			groupNotesFormTransfer.encounterNote.assignedIssues = controller.groupNotesForm.assignedCMIssues;
 			groupNotesFormTransfer.encounterNote.summaryCode = controller.page.code;
 
-			let partialDateModelConverter = new PartialDateModelConverter();
+			let partialDateModelConverter = new PartialDateModelSerializer();
 
 			let startDate = groupNotesFormTransfer.groupNoteExt.startDate;
 			if (startDate)

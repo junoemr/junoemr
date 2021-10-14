@@ -1,10 +1,56 @@
-import { PartialDate } from "../../../../../generated";
+import {PartialDate} from "../../../../../generated";
 import PartialDateModel from "../model/partialDateModel"
 import AbstractConverter from "../../../conversion/AbstractConverter";
 
 export default class PartialDateConverter extends AbstractConverter<PartialDate, PartialDateModel>
 {
-    convert(from: PartialDate): PartialDateModel
+    convert(from: PartialDate | string): PartialDateModel
+    {
+        if (!from)
+        {
+            return null;
+        }
+
+        if (typeof from === "string")
+        {
+            return this.convertString(from);
+        }
+        else
+        {
+            return this.convertObject(from);
+        }
+    }
+
+    private convertString(from: string): PartialDateModel
+    {
+        let partialDateModel;
+        let parts = from.split("T")
+
+        if(parts.length == 2) //datetime
+        {
+            let asMoment = moment(from);
+            partialDateModel = new PartialDateModel(asMoment.year(), asMoment.month(), asMoment.day());
+        }
+        else
+        {
+            const dateParts = parts[0].split("-");
+            if(dateParts.length === 3)
+            {
+                partialDateModel = new PartialDateModel(Number(dateParts[0]), Number(dateParts[1]), Number(dateParts[2]));
+            }
+            else if(dateParts.length === 2)
+            {
+                partialDateModel = new PartialDateModel(Number(dateParts[0]), Number(dateParts[1]), null);
+            }
+            else if(dateParts.length === 1)
+            {
+                partialDateModel = new PartialDateModel(Number(dateParts[0]), null, null);
+            }
+        }
+        return partialDateModel;
+    }
+
+    private convertObject(from: PartialDate): PartialDateModel
     {
         if (!from || !from.year)
         {
