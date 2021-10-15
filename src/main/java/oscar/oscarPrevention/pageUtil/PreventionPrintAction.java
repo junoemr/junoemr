@@ -32,24 +32,23 @@
 package oscar.oscarPrevention.pageUtil;
 
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.lowagie.text.DocumentException;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 
-import com.lowagie.text.DocumentException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -66,7 +65,7 @@ public class PreventionPrintAction extends Action
     public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)
     {
         LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-        securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_prevention");
+        securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.PREVENTION_READ);
 
         try
         {

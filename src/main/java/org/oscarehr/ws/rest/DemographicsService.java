@@ -37,7 +37,6 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.common.io.ZipFileFactory;
-import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
 import org.oscarehr.dataMigration.service.DataMigrationService;
 import org.oscarehr.dataMigration.service.ImporterExporterFactory;
@@ -52,6 +51,7 @@ import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.DemographicSearchHelper;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
@@ -146,8 +146,8 @@ public class DemographicsService extends AbstractServiceImpl
 					Integer perPage,
 			@QueryParam("query") String query)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.READ, null, "_demographic");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
+
 		if (query == null)
 		{
 			return RestSearchResponse.errorResponse("No Query Parameter Sent");
@@ -196,8 +196,7 @@ public class DemographicsService extends AbstractServiceImpl
 			                                                          Integer perPage,
 	                                                          @QueryParam("jsonData") String jsonStr)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.READ, null, "_demographic");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		JSONObject json = JSONObject.fromObject(jsonStr);
 
@@ -205,36 +204,19 @@ public class DemographicsService extends AbstractServiceImpl
 		DemographicCriteriaSearch searchQuery = convertFromJSON(json);
 		return getSearchResponse(searchQuery, page, perPage);
 	}
-	private RestSearchResponse<DemographicSearchResult> getSearchResponse(DemographicCriteriaSearch searchQuery, Integer page, Integer perPage)
-	{
-		page = validPageNo(page);
-		perPage = limitedResultCount(perPage);
-		int offset = calculatedOffset(page, perPage);
-
-		searchQuery.setOffset(offset);
-		searchQuery.setLimit(perPage);
-		int total = demographicDao.criteriaSearchCount(searchQuery);
-
-		List<DemographicSearchResult> results = new ArrayList<>(0);
-		if(total > 0)
-		{
-			results = demographicService.toSearchResultTransferList(searchQuery);
-		}
-		return RestSearchResponse.successResponse(results, page, perPage, total);
-	}
 
 	@GET
 	@Path("/searchIntegrator")
-	public RestResponse<AbstractSearchResponse<DemographicSearchResult>> searchIntegrator(@QueryParam("jsonData") String jsonStr,
-	                                                                                      @QueryParam("itemsToReturn") Integer itemsToReturn)
+	public RestResponse<AbstractSearchResponse<DemographicSearchResult>> searchIntegrator(
+			@QueryParam("jsonData") String jsonStr,
+			@QueryParam("itemsToReturn") Integer itemsToReturn)
 	{
 		AbstractSearchResponse<DemographicSearchResult> response = new AbstractSearchResponse<>();
 		try
 		{
 			JSONObject json = JSONObject.fromObject(jsonStr);
 
-			securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
-					SecurityInfoManager.READ, null, "_demographic");
+			securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 			List<DemographicSearchResult> results = new ArrayList<>();
 
@@ -296,6 +278,7 @@ public class DemographicsService extends AbstractServiceImpl
 	@Path("/statusList")
 	public RestResponse<List<StatusValueTo1>> getStatusList(@QueryParam("type") String listType)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 		try
 		{
 			// get the list
@@ -327,8 +310,7 @@ public class DemographicsService extends AbstractServiceImpl
 			@QueryParam("site") String defaultSiteName,
 			List<FileTransfer> fileListTransfer) throws IOException, InterruptedException, TimeoutException
 	{
-		String loggedInProviderNo = getLoggedInInfo().getLoggedInProviderNo();
-		securityInfoManager.requireOnePrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, SecObjectName._ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_IMPORT_CREATE);
 
 		String processId = UUID.randomUUID().toString();
 
@@ -417,8 +399,7 @@ public class DemographicsService extends AbstractServiceImpl
 	@SkipContentLoggingOutbound
 	public RestResponse<ImportTransferOutbound> demographicImportResults(@PathParam("processId") String processId) throws IOException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_IMPORT_READ);
 		return RestResponse.successResponse(dataMigrationService.getImportTransfer(processId));
 	}
 
@@ -426,8 +407,7 @@ public class DemographicsService extends AbstractServiceImpl
 	@Path("/import/{processId}/progress")
 	public RestResponse<ProgressBarPollingData> demographicImportProgress(@PathParam("processId") String processId) throws IOException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_IMPORT_READ);
 		return RestResponse.successResponse(dataMigrationService.getImportStatus(processId));
 	}
 
@@ -438,8 +418,7 @@ public class DemographicsService extends AbstractServiceImpl
 	public Response downloadImportLogs(@PathParam("processId") String processId,
 	                                   @QueryParam("logName") final List<String> logFileNames) throws IOException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_IMPORT_READ);
 
 		List<GenericFile> logFiles = new ArrayList<>(logFileNames.size());
 		for(String fileName : logFileNames)
@@ -464,8 +443,7 @@ public class DemographicsService extends AbstractServiceImpl
 			@QueryParam("patientSet") String patientSet,
 			ExportPreferences exportPreferences) throws Exception
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_EXPORT_READ);
 
 		String processId = UUID.randomUUID().toString();
 
@@ -498,8 +476,8 @@ public class DemographicsService extends AbstractServiceImpl
 	@SkipContentLoggingOutbound
 	public Response demographicExportResults(@PathParam("processId") String processId) throws IOException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_EXPORT_READ);
+
 		ExportTransferOutbound transfer = dataMigrationService.getExportTransfer(processId);
 
 		Response.ResponseBuilder response = Response.ok(transfer.getExportFile().toFileInputStream());
@@ -512,8 +490,8 @@ public class DemographicsService extends AbstractServiceImpl
 	@Path("/export/{processId}/progress")
 	public RestResponse<ProgressBarPollingData> demographicExportProgress(@PathParam("processId") String processId) throws IOException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.READ, null, SecObjectName._ADMIN);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_EXPORT_READ);
+
 
 		return RestResponse.successResponse(dataMigrationService.getExportStatus(processId));
 	}
@@ -522,8 +500,7 @@ public class DemographicsService extends AbstractServiceImpl
 	@Path("/sets")
 	public RestSearchResponse<String> getDemographicSetNames()
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.READ, null, SecObjectName._DEMOGRAPHIC);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 
 		List<String> demographicSetNames = demographicSetsDao.findSetNames();
 		return RestSearchResponse.successResponseOnePage(demographicSetNames);
@@ -537,6 +514,24 @@ public class DemographicsService extends AbstractServiceImpl
 			searchMode = DemographicService.SEARCH_MODE.name;
 		}
 		return searchMode;
+	}
+
+	private RestSearchResponse<DemographicSearchResult> getSearchResponse(DemographicCriteriaSearch searchQuery, Integer page, Integer perPage)
+	{
+		page = validPageNo(page);
+		perPage = limitedResultCount(perPage);
+		int offset = calculatedOffset(page, perPage);
+
+		searchQuery.setOffset(offset);
+		searchQuery.setLimit(perPage);
+		int total = demographicDao.criteriaSearchCount(searchQuery);
+
+		List<DemographicSearchResult> results = new ArrayList<>(0);
+		if(total > 0)
+		{
+			results = demographicService.toSearchResultTransferList(searchQuery);
+		}
+		return RestSearchResponse.successResponse(results, page, perPage, total);
 	}
 
 	private DemographicCriteriaSearch convertFromJSON(JSONObject json) {

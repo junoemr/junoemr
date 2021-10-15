@@ -537,7 +537,7 @@ public class DSDemographicAccess {
 	        	MiscUtils.getLogger().error("Error getting messages for flowsheet ",e);
 	        }
 
-	        ArrayList<String> warnings = mi.getWarnings();
+	        List<String> warnings = mi.getWarnings();
 	        if( warnings.size() == 0 ) {
 	        	retval = true;
 	        }

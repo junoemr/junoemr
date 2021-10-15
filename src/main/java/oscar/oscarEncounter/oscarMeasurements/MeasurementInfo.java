@@ -25,63 +25,54 @@
 
 package oscar.oscarEncounter.oscarMeasurements;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.careTrackerDecisionSupport.model.DsInfoCache;
+import org.oscarehr.careTrackerDecisionSupport.model.DsInfoLookup;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBeanHandler;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  *
  * @author jay
  */
-public class MeasurementInfo {
-    private static Logger log = MiscUtils.getLogger();
+public class MeasurementInfo implements DsInfoCache, DsInfoLookup
+{
+    private static final Logger log = MiscUtils.getLogger();
 
-    ArrayList<String> warning = null;
-    Hashtable<String,String> warningHash = new Hashtable<String,String>();
-    ArrayList<String> recommendations = null;
-    Hashtable<String,String> recommendationHash = new Hashtable<String,String>();
-    HashMap<String,Boolean> hiddens = new HashMap<String,Boolean>();
+    private final List<String> warning = new ArrayList<>();
+    private final Map<String, List<String>> criticalAlertHash = new HashMap<>();
+    private final Map<String, List<String>> warningHash = new HashMap<>();
+    private final List<String> recommendations = new ArrayList<>();
+    private final Map<String, List<String>> recommendationHash = new HashMap<>();
+    private final Map<String, Boolean> hiddens = new HashMap<>();
 
-    ArrayList measurementList = new ArrayList();
-    Hashtable measurementHash = new Hashtable();
-    ArrayList itemList = new ArrayList();
+    List<EctMeasurementsDataBean> measurementList = new ArrayList<>();
+    Hashtable<String, ArrayList<EctMeasurementsDataBean>> measurementHash = new Hashtable<>();
     String demographicNo = "";
-    
-    DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-     
+
     /** Creates a new instance of MeasurementInfo */
     public MeasurementInfo(String demographic) {
         demographicNo = demographic;
     }
 
-    public ArrayList getList(){
-        ArrayList<String> list = new ArrayList<String>();
-
-        Enumeration<String> e = warningHash.keys();
-        while (e.hasMoreElements()){
-            list.add(e.nextElement());
-        }
-
-        e = recommendationHash.keys();
-        while (e.hasMoreElements()){
-            list.add(e.nextElement());
-        }
-
+    public ArrayList getList()
+    {
+        ArrayList<String> list = new ArrayList<>(warningHash.keySet());
+        list.addAll(recommendationHash.keySet());
         return list;
     }
 
@@ -89,26 +80,25 @@ public class MeasurementInfo {
         log.debug(logMessage);
     }
 
-    public ArrayList getWarnings(){
-        if (warning == null){
-           warning = new ArrayList();
-        }
+    public List<String> getWarnings()
+    {
         return warning;
     }
 
-    public ArrayList getRecommendations(){
-        if (recommendations == null){
-           recommendations = new ArrayList();
-        }
+    public List<String> getRecommendations()
+    {
         return recommendations;
     }
-    
-    public boolean getHidden(String measurement){
-    	if (hiddens.get(measurement) == null) return false;
-    	return hiddens.get(measurement);
+
+    @Override
+    public boolean getHidden(String measurement)
+    {
+        if(hiddens.get(measurement) == null) return false;
+        return hiddens.get(measurement);
     }
 
-    public void setDemographic(String demographic){
+    public void setDemographic(String demographic)
+    {
         demographicNo = demographic;
     }
 
@@ -117,92 +107,141 @@ public class MeasurementInfo {
     }
 
 
-    public void getMeasurements(List<String> list){
-        for (int i =0; i < list.size(); i++){
-           String measurement = list.get(i);
-           EctMeasurementsDataBeanHandler ect = new EctMeasurementsDataBeanHandler(Integer.valueOf(demographicNo), measurement);
-           Collection v = ect.getMeasurementsData();
-           measurementList.add(new ArrayList(v));
-           measurementHash.put(measurement,new ArrayList(v));
+    public void getMeasurements(List<String> list)
+    {
+        for(int i = 0; i < list.size(); i++)
+        {
+            String measurement = list.get(i);
+            EctMeasurementsDataBeanHandler ect = new EctMeasurementsDataBeanHandler(Integer.valueOf(demographicNo), measurement);
+            List<EctMeasurementsDataBean> measurementsData = ect.getMeasurementsData();
+            measurementList.addAll(measurementsData);
+            measurementHash.put(measurement, new ArrayList<>(measurementsData));
         }
-
     }
 
-    public ArrayList getMeasurementData(String measurement){
-        return (ArrayList) measurementHash.get(measurement);
+    public ArrayList<EctMeasurementsDataBean> getMeasurementData(String measurement)
+    {
+        return measurementHash.get(measurement);
     }
 
-    public void addRecommendation(String measurement,String recommendationMessage){
-        if (recommendations == null){
-           recommendations = new ArrayList();
+    @Override
+    public void addRecommendation(String measurement, String recommendationMessage)
+    {
+        if(recommendationHash.containsKey(measurement))
+        {
+            recommendationHash.get(measurement).add(recommendationMessage);
         }
-        recommendationHash.put(measurement,recommendationMessage);
+        else
+        {
+            List<String> messageList = new ArrayList<>();
+            messageList.add(recommendationMessage);
+            recommendationHash.put(measurement, messageList);
+        }
         recommendations.add(recommendationMessage);
     }
 
-    public void addWarning(String measurement,String warningMessage){
-        if (warning == null){
-           warning = new ArrayList();
+    @Override
+    public void addWarning(String measurement, String warningMessage)
+    {
+        if(warningHash.containsKey(measurement))
+        {
+            warningHash.get(measurement).add(warningMessage);
         }
-        warningHash.put(measurement,warningMessage);
+        else
+        {
+            List<String> messageList = new ArrayList<>();
+            messageList.add(warningMessage);
+            warningHash.put(measurement, messageList);
+        }
         warning.add(warningMessage);
     }
-    
-    public void addHidden(String measurement, boolean hidden) {
-    	hiddens.put(measurement, hidden);
-    }
 
-
-    public boolean hasWarning(String measurement){
-        boolean warn = false;
-        if (warningHash.get(measurement) != null){
-            warn = true;
+    @Override
+    public void addCriticalAlert(String measurement, String warningMessage)
+    {
+        if(criticalAlertHash.containsKey(measurement))
+        {
+            criticalAlertHash.get(measurement).add(warningMessage);
         }
-        return warn;
-    }
-
-    public boolean hasRecommendation(String measurement){
-        boolean warn = false;
-        if (recommendationHash.get(measurement) != null){
-            warn = true;
+        else
+        {
+            List<String> messageList = new ArrayList<>();
+            messageList.add(warningMessage);
+            criticalAlertHash.put(measurement, messageList);
         }
-        return warn;
     }
 
-    public String getRecommendation(String measurement){
+    @Override
+    public void addHidden(String measurement, boolean hidden)
+    {
+        hiddens.put(measurement, hidden);
+    }
+
+    @Override
+    public boolean hasWarning(String measurement)
+    {
+        return warningHash.get(measurement) != null;
+    }
+
+    @Override
+    public boolean hasRecommendation(String measurement)
+    {
+        return recommendationHash.get(measurement) != null;
+    }
+
+    @Override
+    public boolean hasCriticalAlert(String measurement)
+    {
+        return criticalAlertHash.get(measurement) != null;
+    }
+
+    @Deprecated
+    public String getRecommendation(String measurement)
+    {
+        List<String> recommendations = recommendationHash.get(measurement);
+        return (recommendations != null && !recommendations.isEmpty()) ? String.join(", ", recommendations) : null;
+    }
+
+    @Override
+    public List<String> getRecommendations(String measurement)
+    {
         return recommendationHash.get(measurement);
     }
 
-    public String getWarning(String measurement){
+    @Deprecated
+    public String getWarning(String measurement)
+    {
+        List<String> warnings = warningHash.get(measurement);
+        return (warnings != null && !warnings.isEmpty()) ? String.join(", ", warnings) : null;
+    }
+
+    @Override
+    public List<String> getWarnings(String measurement)
+    {
         return warningHash.get(measurement);
     }
 
-//    public void setIndicationColour(String measurement,int threshold,String comparison){
-//        ArrayList list = getMeasurementData(measurement);
-//        if ( list != null){
-//            for (int i =0; i < list.size(); i++){
-//                EctMeasurementsDataBean mdata = (EctMeasurementsDataBean) list.get(i);
-//                String val = mdata.getDataField();
-//            }
-//        }
-//    }
+    @Override
+    public List<String> getCriticalAlerts(String measurement)
+    {
+        return criticalAlertHash.get(measurement);
+    }
 
-    public int getLastDateRecordedInMonths(String measurement){
+    @Override
+    public int getMonthsSinceLastRecordedDate(String measurement)
+    {
+        return getLastDateRecordedInMonths(measurement);
+    }
+
+    public int getLastDateRecordedInMonths(String measurement)
+    {
         int numMonths = -1;
-        ArrayList list = getMeasurementData(measurement);
-        Hashtable h =  null;
+        List<EctMeasurementsDataBean> list = getMeasurementData(measurement);
         if ( list != null && list.size() > 0){
-            //h = (Hashtable) list.get(0);
-            EctMeasurementsDataBean mdata = (EctMeasurementsDataBean) list.get(0);
+            EctMeasurementsDataBean mdata = list.get(0);
             Date date = mdata.getDateObservedAsDate();
             numMonths = getNumMonths(date, Calendar.getInstance().getTime());
         }
-
-        //EctMeasurementsDataBeanHandler.getLast(demographicNo, measurement);
-        //if (h != null ){
-        //   Date date = ConversionUtils.fromTimestampString(h.get("dateObserved");
-        //   numMonths = getNumMonths(date, Calendar.getInstance().getTime());
-        //}
         log.debug("Returning the number of months "+numMonths);
         return numMonths;
     }
@@ -210,11 +249,11 @@ public class MeasurementInfo {
     public String getLastDateRecordedInMonthsMsg (String measurement){
         String message = "";
         int numMonths = -1;
-        ArrayList list = getMeasurementData(measurement);
+        List<EctMeasurementsDataBean> list = getMeasurementData(measurement);
 
         if ( list != null && list.size() > 0){
            
-            EctMeasurementsDataBean mdata = (EctMeasurementsDataBean) list.get(0);
+            EctMeasurementsDataBean mdata = list.get(0);
             Date date = mdata.getDateObservedAsDate();
             numMonths = getNumMonths(date, Calendar.getInstance().getTime());
         }
@@ -230,30 +269,62 @@ public class MeasurementInfo {
         return message;
     }
 
-    public int getLastValueAsInt(String measurement){
-
-        int value = -1; //TODO-legacy not sure how to handle a non int value.
-        ArrayList list = getMeasurementData(measurement);
-        Hashtable h =  null;
-        if ( list != null && list.size() > 0){
-            EctMeasurementsDataBean mdata = (EctMeasurementsDataBean) list.get(0);
-            try{
-             value = Integer.parseInt(mdata.getDataField());
-            }catch (Exception e ){
-               MiscUtils.getLogger().error("Error", e);
+    @Override
+    public Optional<Double> getLatestValueNumeric(String measurement)
+    {
+        try
+        {
+            List<EctMeasurementsDataBean> list = getMeasurementData(measurement);
+            if(list != null && list.size() > 0)
+            {
+                return Optional.of(Double.parseDouble(list.get(0).getDataField()));
             }
         }
-        log.debug("Returning the number of months "+value);
+        catch(NumberFormatException e)
+        {
+            MiscUtils.getLogger().error("Error", e);
+        }
+        return Optional.empty();
+    }
+
+    public int getLastValueAsInt(String measurement)
+    {
+        int value = -1; //TODO-legacy not sure how to handle a non int value.
+        List<EctMeasurementsDataBean> list = getMeasurementData(measurement);
+        if(list != null && list.size() > 0)
+        {
+            EctMeasurementsDataBean mdata = list.get(0);
+            try
+            {
+                value = Integer.parseInt(mdata.getDataField());
+            }
+            catch(NumberFormatException e)
+            {
+                MiscUtils.getLogger().error("Error", e);
+            }
+        }
         return value;
     }
-    
-    public int isDataEqualToYes(String measurement){   	
+
+    @Override
+    public String getLatestValue(String measurement)
+    {
+        String value = null;
+        List<EctMeasurementsDataBean> list = getMeasurementData(measurement);
+        if(list != null && list.size() > 0)
+        {
+            EctMeasurementsDataBean mdata = list.get(0);
+            value = mdata.getDataField();
+        }
+        return value;
+    }
+
+    public int isDataEqualToYes(String measurement){
         int v = 0;
         String str="";
-        ArrayList list = getMeasurementData(measurement);
-        Hashtable h =  null;
+        List<EctMeasurementsDataBean> list = getMeasurementData(measurement);
         if ( list != null && list.size() > 0){
-            EctMeasurementsDataBean mdata = (EctMeasurementsDataBean) list.get(0);
+            EctMeasurementsDataBean mdata = list.get(0);
             try{
             	str = mdata.getDataField();
             }catch (Exception e ){
@@ -277,6 +348,14 @@ public class MeasurementInfo {
     	Demographic d = demographicDao.getDemographic(demographicNo);
     	return (sex.trim().equals(d.getSex()));
     }
+
+    @Override
+    public String getGender()
+    {
+        DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+        Demographic d = demographicDao.getDemographic(demographicNo);
+        return (StringUtils.trimToNull(d.getSex()));
+    }
     
     /*
      *Called by Drools - not sure how to pass in LoggedInInfo
@@ -285,6 +364,12 @@ public class MeasurementInfo {
     	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
     	Demographic d = demographicDao.getDemographic(demographicNo);
     	return d.getAgeInYears();
+    }
+
+    @Override
+    public int getAgeInYears()
+    {
+        return getAge();
     }
     
 

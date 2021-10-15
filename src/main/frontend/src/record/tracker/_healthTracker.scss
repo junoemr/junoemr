@@ -1,0 +1,21 @@
+.health-tracker-component {
+	position: relative;
+
+	.options-button-wrapper {
+		position: absolute;
+		top: 0;
+		right: 0;
+
+		i {
+			font-size: 24px;
+		}
+	}
+
+	.ui-view-wrapper {
+		padding: 0 16px;
+	}
+
+	.tracker-nav {
+		min-width: 196px;
+	}
+}

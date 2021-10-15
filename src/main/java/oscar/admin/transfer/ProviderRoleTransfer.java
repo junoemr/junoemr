@@ -31,7 +31,8 @@ public class ProviderRoleTransfer
 	private Boolean superAdmin;
 
 	private String roleName;
-	private Long roleId;
+	private Integer roleId;
+	private Long userRoleId;
 	private Long primaryRoleId;
 
 	public ProviderRoleTransfer()
@@ -79,19 +80,29 @@ public class ProviderRoleTransfer
 		this.roleName = roleName;
 	}
 
-	public Long getRoleId()
+	public Long getUserRoleId()
+	{
+		return userRoleId;
+	}
+
+	public void setUserRoleId(Long userRoleId)
+	{
+		this.userRoleId = userRoleId;
+	}
+
+	public Integer getRoleId()
 	{
 		return roleId;
 	}
 
-	public void setRoleId(Long roleId)
+	public void setRoleId(Integer roleId)
 	{
 		this.roleId = roleId;
 	}
 
 	public boolean hasRole()
 	{
-		return (roleId != null);
+		return (userRoleId != null);
 	}
 
 	public Long getPrimaryRoleId()

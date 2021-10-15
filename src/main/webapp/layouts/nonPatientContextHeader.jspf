@@ -328,13 +328,6 @@ label.error {
 			   <a HREF="#" onclick="popupPage2('<%=request.getContextPath()%>/dms/documentReport.jsp?function=provider&functionid=<%=curUser_no%>&curUser=<%=curUser_no%>', 'edocView');" TITLE='<bean:message key="provider.appointmentProviderAdminDay.viewEdoc"/>'><bean:message key="global.edoc"/></a>
 			</li>
 			</security:oscarSec>
-			 
-			<oscar:oscarPropertiesCheck property="OSCAR_LEARNING" value="yes">
-			<li>
-			    <a HREF="#" ONCLICK ="popupPage2('<%=request.getContextPath()%>/oscarLearning/CourseView.jsp','<bean:message key="global.courseview"/>');return false;" TITLE='<bean:message key="global.courseview"/>'>
-				<span id="oscar_courseview"><bean:message key="global.btncourseview"/></span></a>
-			</li>
-			</oscar:oscarPropertiesCheck>
 			
 			<oscar:oscarPropertiesCheck property="WORKFLOW" value="yes">
 			   <li><a href="javascript: function myFunction() {return false; }" onClick="popupPage2('<%=request.getContextPath()%>/oscarWorkflow/WorkFlowList.jsp','<bean:message key="global.workflow"/>')"><bean:message key="global.btnworkflow"/></a></li>

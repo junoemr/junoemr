@@ -43,6 +43,7 @@ import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.model.AbstractCodeSystemModel;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
@@ -57,9 +58,7 @@ public class dxResearchAction extends Action {
 
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException{
-		if (!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_dxresearch", "w", null)) {
-			throw new RuntimeException("missing required security object (_dxresearch)");
-		}
+	    securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.DX_CREATE);
         
         dxResearchForm frm = (dxResearchForm) form; 
         request.getSession().setAttribute("dxResearchForm", frm);

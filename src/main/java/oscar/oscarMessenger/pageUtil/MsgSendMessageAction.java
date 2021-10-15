@@ -44,6 +44,7 @@ import org.oscarehr.common.model.MessageList;
 import org.oscarehr.common.model.MessageTbl;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
@@ -56,9 +57,7 @@ public class MsgSendMessageAction extends Action {
 		// Setup variables
 		ActionMessages errors = new ActionMessages();
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_msg", "w", null)) {
-			throw new SecurityException("missing required security object (_msg)");
-		}
+		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.MESSAGE_CREATE);
 		
 		String message = ((MsgCreateMessageForm) form).getMessage();
 		String[] providers = ((MsgCreateMessageForm) form).getProvider();

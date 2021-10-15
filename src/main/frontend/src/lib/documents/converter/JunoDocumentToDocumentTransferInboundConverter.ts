@@ -13,6 +13,7 @@ export default class JunoDocumentToDocumentTransferInboundConverter extends Abst
 		return {
 			documentNo: parseInt(from.documentNo),
 			status: from.status,
+			// @ts-ignore
 			createdDateTime: from.createdAt?.toDate(),
 			observationDate: from.observedAt?.toString(),
 			publicDocument: from.publicDocument,
@@ -27,6 +28,7 @@ export default class JunoDocumentToDocumentTransferInboundConverter extends Abst
 			documentCreator: from.documentCreatorProviderNo,
 			responsible: from.responsibleProviderNo,
 			reviewer: from.reviewerProviderNo,
+			// @ts-ignore
 			reviewDateTime: from.reviewedAt?.toDate(),
 			appointmentNo: parseInt(from.appointmentNo),
 			fileName: from.fileName,

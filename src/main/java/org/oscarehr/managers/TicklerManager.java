@@ -23,16 +23,7 @@
  */
 package org.oscarehr.managers;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import com.quatro.model.security.Secrole;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -55,13 +46,13 @@ import org.oscarehr.common.dao.TicklerTextSuggestDao;
 import org.oscarehr.common.dao.TicklerUpdateDao;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.CustomFilter;
-import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Tickler;
 import org.oscarehr.common.model.TicklerCategory;
 import org.oscarehr.common.model.TicklerComment;
 import org.oscarehr.common.model.TicklerLink;
 import org.oscarehr.common.model.TicklerTextSuggest;
 import org.oscarehr.common.model.TicklerUpdate;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.EmailUtilsOld;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -69,13 +60,19 @@ import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.VelocityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-
 import oscar.OscarProperties;
 import oscar.log.LogAction;
 
-import com.quatro.model.security.Secrole;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class TicklerManager {
@@ -131,7 +128,7 @@ public class TicklerManager {
 	private TicklerCategoryDao ticklerCategoryDao;
 	
 	public List<TicklerCategory> getActiveTicklerCategories( LoggedInInfo loggedInInfo ) {
-		checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_READ);
 		
 		LogAction.addLogSynchronous(loggedInInfo, "TicklerManager.getActiveTicklerCategories", "All active categories");
 		
@@ -153,7 +150,7 @@ public class TicklerManager {
 	
 	public boolean addTicklerLink(LoggedInInfo loggedInInfo, TicklerLink ticklerLink )
         {
-            checkPrivilege(loggedInInfo, PRIVILEGE_WRITE);    	    	
+	        securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_CREATE);
             ticklerDao.persist(ticklerLink);
 	     
 	    //--- log action ---
@@ -163,7 +160,7 @@ public class TicklerManager {
 	}
         
     public boolean addTickler(LoggedInInfo loggedInInfo, Tickler tickler) {
-    	checkPrivilege(loggedInInfo, PRIVILEGE_WRITE);
+	    securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_CREATE);
     	
     	if(!validateTicklerIsValid(tickler)) {
     		return false;
@@ -188,7 +185,7 @@ public class TicklerManager {
 		return false;
 	}
     public boolean updateTickler(LoggedInInfo loggedInInfo, Tickler tickler) {
-    	checkPrivilege(loggedInInfo, PRIVILEGE_UPDATE);
+	    securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_UPDATE);
     	
     	if(!validateTicklerIsValid(tickler)) {
     		return false;
@@ -213,7 +210,7 @@ public class TicklerManager {
    
     
     public List<Tickler> getTicklers(LoggedInInfo loggedInInfo,CustomFilter filter,String providerNo,String programId) {
-    	checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+	    securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_READ);
     	
         List<Tickler> results = ticklerDao.getTicklers(filter);     
            
@@ -230,7 +227,7 @@ public class TicklerManager {
     }
     
     public List<Tickler> getTicklers(LoggedInInfo loggedInInfo, CustomFilter filter) {
-    	checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+	    securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_READ);
     	
     	List<Tickler> results = ticklerDao.getTicklers(filter);     
         
@@ -238,7 +235,7 @@ public class TicklerManager {
     }
     
     public List<Tickler> getTicklers(LoggedInInfo loggedInInfo, CustomFilter filter, int offset, int limit) {
-    	checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+	    securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_READ);
 
 		return ticklerDao.getTicklers(filter, offset, limit);
     }
@@ -367,7 +364,7 @@ public class TicklerManager {
 
     
     public Tickler getTickler(LoggedInInfo loggedInInfo, String tickler_no) {
-    	checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+	    securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_READ);
     	
         Integer id = Integer.valueOf(tickler_no);
         Tickler tickler =  ticklerDao.find(id);
@@ -379,7 +376,7 @@ public class TicklerManager {
     }
     
     public Tickler getTickler(LoggedInInfo loggedInInfo, Integer id) {
-    	checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+	    securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_READ);
     	
         Tickler tickler =  ticklerDao.find(id);
         
@@ -390,7 +387,7 @@ public class TicklerManager {
     }
     
 	public void addComment(LoggedInInfo loggedInInfo, Integer tickler_id, String provider, String message) {
-    	checkPrivilege(loggedInInfo, PRIVILEGE_UPDATE);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_UPDATE);
     	
 		Tickler tickler = ticklerDao.find(tickler_id);
 		if (tickler != null && message != null && !"".equals(message)) {
@@ -406,7 +403,7 @@ public class TicklerManager {
 	}
 	
 	public void reassign(LoggedInInfo loggedInInfo, Integer tickler_id, String provider, String task_assigned_to) {
-    	checkPrivilege(loggedInInfo, PRIVILEGE_UPDATE);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_UPDATE);
     	
 		Tickler tickler = ticklerDao.find(tickler_id);
 		if (tickler != null && !task_assigned_to.equals(tickler.getTaskAssignedTo())) {
@@ -433,7 +430,7 @@ public class TicklerManager {
 	}
 	
 	public void updateStatus(LoggedInInfo loggedInInfo, Integer tickler_id, String provider, Tickler.STATUS status) {
-    	checkPrivilege(loggedInInfo, PRIVILEGE_UPDATE);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_UPDATE);
 		
 		Tickler tickler = ticklerDao.find(tickler_id);
 		if (tickler != null && tickler.getStatus() != null && tickler.getStatus() != null && !status.equals(tickler.getStatus())) {
@@ -453,7 +450,7 @@ public class TicklerManager {
 	}
 	
 	   public void sendNotification(LoggedInInfo loggedInInfo, Tickler t) throws EmailException, IOException {
-	    	checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+		   securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_READ);
 	    	
 	        if (t == null) {
 	            throw new IllegalArgumentException("Tickler object required to send tickler email");
@@ -492,25 +489,25 @@ public class TicklerManager {
 	    }
 	
 	public void completeTickler(LoggedInInfo loggedInInfo, Integer tickler_id, String provider) {
-    	checkPrivilege(loggedInInfo, PRIVILEGE_UPDATE);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_UPDATE);
     	
 		updateStatus(loggedInInfo, tickler_id, provider, Tickler.STATUS.C);
 	}
 
 	public void deleteTickler(LoggedInInfo loggedInInfo, Integer tickler_id, String provider) {
-    	checkPrivilege(loggedInInfo, PRIVILEGE_UPDATE);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_UPDATE);
 
 		updateStatus(loggedInInfo, tickler_id, provider, Tickler.STATUS.D);
 	}
 
 	public void activateTickler(LoggedInInfo loggedInInfo, Integer tickler_id, String provider) {
-    	checkPrivilege(loggedInInfo, PRIVILEGE_UPDATE);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_UPDATE);
     	
 		updateStatus(loggedInInfo, tickler_id, provider, Tickler.STATUS.A);
 	}
 	
 	public void resolveTicklersBySubstring(LoggedInInfo loggedInInfo, String providerNo, List<String> demographicIds, String remString) {
-    	checkPrivilege(loggedInInfo, PRIVILEGE_UPDATE);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_UPDATE);
     	
 		List<Integer> tmp = new ArrayList<Integer>();
 		for(String str:demographicIds) {
@@ -638,7 +635,7 @@ public class TicklerManager {
     	  }
     	  
     	  public List<Tickler> listTicklers(LoggedInInfo loggedInInfo, Integer demographicNo, Date beginDate, Date endDate) {
-    		  checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+		      securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_READ);
     		  
     		  List<Tickler> result = ticklerDao.listTicklers(demographicNo, beginDate, endDate);
     		  
@@ -651,7 +648,7 @@ public class TicklerManager {
     	  }
 
 		public int getActiveByDemographicNoCount(LoggedInInfo loggedInInfo, Integer demographicNo) {
-			checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+			securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_READ);
 			return ticklerDao.getActiveByDemographicNoCount(demographicNo);
 		}
 
@@ -660,7 +657,7 @@ public class TicklerManager {
 		  }
 
 		  public List<Tickler> findActiveByDemographicNo(LoggedInInfo loggedInInfo, Integer demographicNo, Integer limit, Integer offset, String sortOrder) {
-				  checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+			  securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_READ);
     		  
     		  List<Tickler> result = ticklerDao.findActiveByDemographicNo(demographicNo, limit, offset, sortOrder);
     		  
@@ -673,7 +670,7 @@ public class TicklerManager {
     	  }
     	  
     	  public List<Tickler> search_tickler_bydemo(LoggedInInfo loggedInInfo, Integer demographicNo, String status, Date beginDate, Date endDate) {
-    		  checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+		      securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_READ);
     		  
     		  List<Tickler> result = ticklerDao.search_tickler_bydemo(demographicNo,status,beginDate,endDate);
     		  
@@ -686,7 +683,7 @@ public class TicklerManager {
     	  }
     	  
     	  public List<Tickler> search_tickler(LoggedInInfo loggedInInfo, Integer demographicNo, Date endDate) {
-    		  checkPrivilege(loggedInInfo, PRIVILEGE_READ);
+		      securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.TICKLER_READ);
     		  
     		  List<Tickler> result = ticklerDao.search_tickler(demographicNo,endDate);
     		  
@@ -739,17 +736,5 @@ public class TicklerManager {
                 }
 
                 return ticklers;
-          }
-
-
-
-          private void checkPrivilege(LoggedInInfo loggedInInfo, String privilege) {
-      		if (!Provider.SYSTEM_PROVIDER_NO.equals(loggedInInfo.getLoggedInProviderNo()))
-			{
-				if (!securityInfoManager.hasPrivilege(loggedInInfo, "_tickler", privilege, null))
-				{
-					throw new RuntimeException("missing required security object (_tickler)");
-				}
-			}
           }
 }

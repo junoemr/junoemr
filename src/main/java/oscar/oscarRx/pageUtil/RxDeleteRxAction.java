@@ -25,41 +25,36 @@
 
 package oscar.oscarRx.pageUtil;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Hashtable;
+import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.rx.dao.DrugDao;
+import org.oscarehr.rx.model.Drug;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.dms.EDocUtil;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
+import oscar.oscarEncounter.data.EctProgram;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
-
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
-import org.oscarehr.rx.dao.DrugDao;
-import org.oscarehr.common.dao.SecRoleDao;
-import org.oscarehr.rx.model.Drug;
-import org.oscarehr.common.model.SecRole;
-import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import oscar.dms.EDocUtil;
-import oscar.log.LogAction;
-import oscar.log.LogConst;
-import oscar.oscarEncounter.data.EctProgram;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
 
 
 public final class RxDeleteRxAction extends DispatchAction {
@@ -302,51 +297,34 @@ public ActionForward clearStash(ActionMapping mapping,ActionForm form,HttpServle
          //create a note and store this info in casemanagement_note table
         //note_id,update_date,observation_date,demographic_no,provider_no,note: ,signed,include_issue_innote,archived,position, uuid
         //signing_provider_no,encounter_type:  billing_code:  program_no,reporter_caisi_role,reporter_program_team,history, password, locked
-        CaseManagementNote cmn=new CaseManagementNote();
         //get parameter values
         Date now=EDocUtil.getDmsDateTimeAsDate();
-        String demoNo=request.getParameter("demoNo");
-        String idStr = request.getParameter("drugId");
-        String user=request.getSession().getAttribute("user").toString();
+        Integer demoNo = Integer.parseInt(request.getParameter("demoNo"));
+        Integer drugId = Integer.parseInt(request.getParameter("drugId"));
+        String userId = request.getSession().getAttribute("user").toString();
         String strNote=request.getParameter("drugSpecial")+"\nDiscontinued reason: "+request.getParameter("reason")+ "\nDiscontinued comment: "+request.getParameter("comment") ;
         HttpSession se = request.getSession();
-        String prog_no = new EctProgram(se).getProgram(user);
+        String prog_no = new EctProgram(se).getProgram(userId);
+
+        CaseManagementNote cmn = new CaseManagementNote();
+
+        EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
+        DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+        ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
+        ProviderData user = providerDao.find(userId);
 
         //set parameter values
-        cmn.setUpdate_date(now);
-        cmn.setObservation_date(now);
-        cmn.setDemographic_no(demoNo);
-        cmn.setProviderNo(user);
+        cmn.setUpdateDate(now);
+        cmn.setObservationDate(now);
+        cmn.setDemographic(demographicDao.find(demoNo));
+        cmn.setProvider(user);
         cmn.setNote(strNote);
         cmn.setSigned(true);
-        cmn.setSigning_provider_no(user);
-        cmn.setProgram_no(prog_no);
-        
-        SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
-		SecRole doctorRole = secRoleDao.findByName("doctor");		
-		cmn.setReporter_caisi_role(doctorRole.getId().toString());
-                
-        cmn.setReporter_program_team("0");
-        cmn.setPassword("NULL");
-        cmn.setLocked(false);
+        cmn.setSigningProvider(user);
+        cmn.setProgramNo(prog_no);
         cmn.setHistory(strNote);
-        //cmn.setPosition(0);
-        //save note
-        WebApplicationContext  ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(se.getServletContext());
-        CaseManagementManager cmm = (CaseManagementManager) ctx.getBean("caseManagementManager");
-        
-        Long note_id = cmm.saveNoteSimpleReturnID(cmn);
-        // Debugging purposes on the live server
-		MiscUtils.getLogger().info("Document Note ID: "+note_id.toString());
 
-        //create an entry in casemgmt note link
-        CaseManagementNoteLink cmnl=new CaseManagementNoteLink();
-        cmnl.setTableName(CaseManagementNoteLink.DRUGS);
-        cmnl.setTableId(Long.parseLong(idStr));//drug id
-        cmnl.setNoteId(note_id);
-
-
-        EDocUtil.addCaseMgmtNoteLink(cmnl);
+        encounterNoteService.saveDrugNote(cmn, drugDao.find(drugId));
     }
 
     

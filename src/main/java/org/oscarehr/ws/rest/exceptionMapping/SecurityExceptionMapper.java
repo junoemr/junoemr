@@ -22,6 +22,8 @@
  */
 package org.oscarehr.ws.rest.exceptionMapping;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestResponseError;
 
@@ -34,6 +36,7 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class SecurityExceptionMapper implements ExceptionMapper<SecurityException>
 {
+	private static final Logger logger = MiscUtils.getLogger();
 	public SecurityExceptionMapper()
 	{
 	}
@@ -41,9 +44,10 @@ public class SecurityExceptionMapper implements ExceptionMapper<SecurityExceptio
 	@Override
 	public Response toResponse(SecurityException exception)
 	{
-		RestResponseError responseError = new RestResponseError(exception.getMessage());
+		RestResponseError responseError = new RestResponseError(exception.getMessage(), RestResponseError.ERROR_TYPE.SECURITY);
 		RestResponse<String> response = RestResponse.errorResponse(responseError);
 
+		logger.error("Illegal Security Access", exception);
 		return Response.status(Response.Status.FORBIDDEN).entity(response)
 				.type(MediaType.APPLICATION_JSON).build();
 	}

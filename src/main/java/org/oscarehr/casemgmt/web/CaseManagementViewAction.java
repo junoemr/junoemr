@@ -23,34 +23,10 @@
 
 package org.oscarehr.casemgmt.web;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Vector;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import com.quatro.model.security.Secrole;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import net.sf.json.processors.JsDateJsonBeanProcessor;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
@@ -60,10 +36,9 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.LabelValueBean;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
-import org.oscarehr.PMmodule.dao.SecUserRoleDao;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.model.ProgramTeam;
-import org.oscarehr.PMmodule.model.SecUserRole;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicIssue;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicNote;
 import org.oscarehr.caisi_integrator.ws.CachedFacility;
@@ -91,17 +66,14 @@ import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.EncounterFormDao;
 import org.oscarehr.common.dao.GroupNoteDao;
 import org.oscarehr.common.model.Admission;
-import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.BillingONCHeader1;
-import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.common.model.CustomFilter;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.preferences.service.SystemPreferenceService;
-import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.GroupNoteLink;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.eyeform.EyeformInit;
 import org.oscarehr.eyeform.dao.EyeformFollowUpDao;
 import org.oscarehr.eyeform.dao.EyeformTestBookDao;
@@ -109,13 +81,16 @@ import org.oscarehr.eyeform.dao.MacroDao;
 import org.oscarehr.eyeform.model.EyeformFollowUp;
 import org.oscarehr.eyeform.model.EyeformTestBook;
 import org.oscarehr.eyeform.model.Macro;
-import org.oscarehr.managers.TicklerManager;
-import org.oscarehr.provider.web.CppPreferencesUIBean;
 import org.oscarehr.integration.model.CmeJs;
+import org.oscarehr.managers.TicklerManager;
+import org.oscarehr.preferences.service.SystemPreferenceService;
+import org.oscarehr.provider.web.CppPreferencesUIBean;
+import org.oscarehr.rx.model.Drug;
+import org.oscarehr.security.dao.SecUserRoleDao;
+import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.OscarProperties;
 import oscar.eform.EFormUtil;
 import oscar.oscarEncounter.data.EctFormData;
@@ -124,7 +99,28 @@ import oscar.oscarRx.pageUtil.RxSessionBean;
 import oscar.util.ConversionUtils;
 import oscar.util.OscarRoleObjectPrivilege;
 
-import com.quatro.model.security.Secrole;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Vector;
 
 /*
  * Updated by Eugene Petruhin on 21 jan 2009 while fixing missing "New Note" link
@@ -244,10 +240,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		logger.debug("is client in program");
 		// need to check to see if the client is in our program domain
 		// if not...don't show this screen!
-		String roles = (String) se.getAttribute("userrole");
-		if (OscarProperties.getInstance().isOscarLearning() && roles != null && roles.indexOf("moderator") != -1) {
-			logger.info("skipping domain check..provider is a moderator");
-		} else if (!caseManagementMgr.isClientInProgramDomain(providerNo, demoNo) && !caseManagementMgr.isClientReferredInProgramDomain(providerNo, demoNo)) {
+		if (!caseManagementMgr.isClientInProgramDomain(providerNo, demoNo) && !caseManagementMgr.isClientReferredInProgramDomain(providerNo, demoNo)) {
 			return mapping.findForward("domain-error");
 		}
 		String programId = (String) request.getSession().getAttribute("case_program_id");
@@ -290,12 +283,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		logger.debug("is client in program");
 		// need to check to see if the client is in our program domain
 		// if not...don't show this screen!
-		String roles = (String) session.getAttribute("userrole");
-		if (OscarProperties.getInstance().isOscarLearning() && roles != null && roles.indexOf("moderator") != -1)
-		{
-			logger.info("skipping domain check..provider is a moderator");
-		}
-		else if (!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) && !caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo))
+		if (!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) && !caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo))
 		{
 			return mapping.findForward("domain-error");
 		}
@@ -2056,10 +2044,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		logger.debug("is client in program");
 		// need to check to see if the client is in our program domain
 		// if not...don't show this screen!
-		String roles = (String) se.getAttribute("userrole");
-		if (OscarProperties.getInstance().isOscarLearning() && roles != null && roles.indexOf("moderator") != -1) {
-			logger.info("skipping domain check..provider is a moderator");
-		} else if (!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) && !caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo)) {
+		if (!caseManagementMgr.isClientInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo) && !caseManagementMgr.isClientReferredInProgramDomain(loggedInInfo.getLoggedInProviderNo(), demoNo)) {
 			return mapping.findForward("domain-error");
 		}
 		String programId = (String) request.getSession().getAttribute("case_program_id");

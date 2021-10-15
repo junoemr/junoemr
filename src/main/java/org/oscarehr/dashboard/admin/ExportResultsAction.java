@@ -58,7 +58,7 @@ public class ExportResultsAction extends Action  {
 			providerNo = request.getParameter("providerNo");
 		}
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_tickler", SecurityInfoManager.WRITE, null ) ) {	
+		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_tickler", SecurityInfoManager.CREATE, null ) ) {
 			return mapping.findForward("unauthorized");
 		}
 		

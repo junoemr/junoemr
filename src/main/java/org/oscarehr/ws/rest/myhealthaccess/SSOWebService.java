@@ -25,20 +25,20 @@
 package org.oscarehr.ws.rest.myhealthaccess;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.integration.dao.IntegrationDao;
-import org.oscarehr.integration.model.Integration;
-import org.oscarehr.integration.model.IntegrationData;
-import org.oscarehr.telehealth.service.MyHealthAccessService;
-import org.oscarehr.ws.rest.AbstractServiceImpl;
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import org.oscarehr.integration.dao.IntegrationDao;
+import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.model.IntegrationData;
+import org.oscarehr.security.model.Permission;
+import org.oscarehr.telehealth.service.MyHealthAccessService;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
+import org.oscarehr.ws.rest.response.RestResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Path("myhealthaccess/integration/{integrationId}/sso/")
 @Component("mhaSSOWebService")
@@ -68,10 +68,28 @@ public class SSOWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<String> getClinicAdminSSOLink(@PathParam("integrationId") String integrationId)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
+
 		Integration integration = integrationDao.findOrThrow(Integer.parseInt(integrationId));
 		IntegrationData integrationData = new IntegrationData(integration);
 
 		integrationData = myHealthAccessService.createOrGetUserIntegrationData(integrationData, getLoggedInInfo().getLoggedInSecurity());
-		return RestResponse.successResponse(myHealthAccessService.getTelehealthUrl(integrationData, null, null));
+		return RestResponse.successResponse(myHealthAccessService.getSSORedirectUrl(integrationData, MyHealthAccessService.MHA_HOME_URL));
+	}
+
+	@GET
+	@Path("/appointment/{appointmentId}/session/audio")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<String> getTelehealthAudioCallSSOLink(@PathParam("integrationId") String integrationId, @PathParam("appointmentId") String appointmentId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
+
+		Integration integration = integrationDao.findOrThrow(Integer.parseInt(integrationId));
+		IntegrationData integrationData = new IntegrationData(integration);
+
+		integrationData = myHealthAccessService.createOrGetUserIntegrationData(integrationData, getLoggedInInfo().getLoggedInSecurity());
+		return RestResponse.successResponse(myHealthAccessService.getSSORedirectUrl(
+				integrationData,
+				String.format(MyHealthAccessService.MHA_OD_AUDIO_CALL_URL, appointmentId)));
 	}
 }

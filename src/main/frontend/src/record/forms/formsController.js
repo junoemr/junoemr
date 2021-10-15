@@ -24,6 +24,7 @@
 
 */
 import {FORM_CONTROLLER_STATES, FORM_CONTROLLER_FORM_TYPES, FORM_CONTROLLER_SPECIAL_GROUPS} from "./formsConstants";
+import {SecurityPermissions} from "../../common/security/securityConstants";
 
 angular.module('Record.Forms').controller('Record.Forms.FormController', [
 
@@ -33,12 +34,9 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 	'$stateParams',
 	'$state',
 	'demographicService',
-	'demo',
 	'formService',
 	'user',
-	'securityService',
-	'NgTableParams',
-	'$uibModal',
+	'securityRolesService',
 
 	function(
 		$scope,
@@ -47,16 +45,14 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		$stateParams,
 		$state,
 		demographicService,
-		demo,
 		formService,
 		user,
-		securityService,
-		NgTableParams,
-		$uibModal)
+		securityRolesService)
 	{
 		var controller = this;
 
 		$scope.FORM_CONTROLLER_STATES = FORM_CONTROLLER_STATES;
+		controller.SecurityPermissions = SecurityPermissions;
 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.providerNo = user.providerNo;
@@ -71,38 +67,27 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		// form display list
 		$scope.displayFormList = [];
 
-		securityService.hasRights(
+		controller.$onInit = () =>
 		{
-			items: [
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EformRead, SecurityPermissions.FormRead))
 			{
-				objectName: '_admin',
-				privilege: 'w'
-			},
-			{
-				objectName: '_admin.eform',
-				privilege: 'w'
-			}]
-		}).then(
-			function success(results)
-			{
-				controller.adminAccess = results.content[0];
-				controller.adminEformAccess = results.content[1];
-				if (results.content != null && results.content.length === 2)
+				switch (controller.viewState)
 				{
-					if (controller.adminAccess || controller.adminEformAccess)
-					{
-						controller.hasAdminAccess = true;
-					}
+					case FORM_CONTROLLER_STATES.ADD:
+						controller.getFormsToAdd();
+						break;
+					case FORM_CONTROLLER_STATES.COMPLETED:
+						controller.getCompletedForms();
+						break;
+					case FORM_CONTROLLER_STATES.REVISION:
+						controller.getFormRevisions();
+						break;
+					case FORM_CONTROLLER_STATES.DELETED:
+						controller.getDeletedForms();
+						break;
 				}
-				else
-				{
-					alert('failed to load rights');
-				}
-			},
-			function error(errors)
-			{
-				console.error(errors);
-		});
+			}
+		}
 
 		// fill form list with completed forms
 		controller.getCompletedForms = function ()
@@ -260,21 +245,5 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 			window.open("../administration/?show=Forms&load=Groups"
 				,'popUpWindow','height=700,width=1200,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no');
 		};
-
-		switch (controller.viewState)
-		{
-			case FORM_CONTROLLER_STATES.ADD:
-				controller.getFormsToAdd();
-				break;
-			case FORM_CONTROLLER_STATES.COMPLETED:
-				controller.getCompletedForms();
-				break;
-			case FORM_CONTROLLER_STATES.REVISION:
-				controller.getFormRevisions();
-				break;
-			case FORM_CONTROLLER_STATES.DELETED:
-				controller.getDeletedForms();
-				break;
-		}
 	}
 ]);

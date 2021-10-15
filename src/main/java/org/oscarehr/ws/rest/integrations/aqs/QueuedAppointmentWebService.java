@@ -25,11 +25,11 @@ package org.oscarehr.ws.rest.integrations.aqs;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.common.model.SecObjectName;
 import org.oscarehr.integration.aqs.conversion.QueuedAppointmentBookingTransferQueuedAppointmentConverter;
 import org.oscarehr.integration.aqs.model.QueuedAppointment;
 import org.oscarehr.integration.aqs.service.QueuedAppointmentService;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.conversion.AppointmentConverter;
 import org.oscarehr.ws.rest.integrations.aqs.transfer.BookQueuedAppointmentTransfer;
@@ -42,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ValidationException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.PATCH;
@@ -50,7 +51,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.validation.ValidationException;
 import java.util.UUID;
 
 @Path("/integrations/aqs/queue/{queueId}/appointment")
@@ -73,6 +73,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<QueuedAppointmentTo1> createQueuedAppointment(@PathParam("queueId") UUID queueId, QueuedAppointmentBookingTransfer queuedAppointmentBookingTransfer)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.AQS_QUEUED_APPOINTMENTS_CREATE);
 		QueuedAppointment newQueuedAppointment = queuedAppointmentConverter.convert(queuedAppointmentBookingTransfer);
 		newQueuedAppointment = queuedAppointmentService.bookQueuedAppointment(queueId, newQueuedAppointment, getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		return RestResponse.successResponse(new QueuedAppointmentTo1(newQueuedAppointment));
@@ -84,7 +85,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> deleteAppointment(@PathParam("queueId") UUID queueId, @PathParam("appointmentId") UUID appointmentId, String reason)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.DELETE, null, SecObjectName._APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.AQS_QUEUED_APPOINTMENTS_DELETE);
 		queuedAppointmentService.deleteQueuedAppointment(appointmentId, queueId, reason, getLoggedInInfo());
 		return RestResponse.successResponse(true);
 	}
@@ -95,7 +96,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<QueuedAppointmentTo1> moveAppointment(@PathParam("queueId") UUID queueId, @PathParam("appointmentId") UUID appointmentId, QueuedAppointmentMoveTransfer queuedAppointmentMoveTransfer)
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.AQS_QUEUED_APPOINTMENTS_CREATE);
 
 		QueuedAppointment queuedAppointment = queuedAppointmentService.moveQueuedAppointment(appointmentId, queuedAppointmentMoveTransfer.getQueuePosition(), getLoggedInInfo().getLoggedInSecurity().getSecurityNo());
 		return RestResponse.successResponse(new QueuedAppointmentTo1(queuedAppointment));
@@ -110,7 +111,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 	                                                          @PathParam("appointmentId") UUID appointmentId,
 	                                                          BookQueuedAppointmentTransfer bookQueuedAppointmentTransfer) throws ValidationException
 	{
-		securityInfoManager.requireOnePrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, SecObjectName._APPOINTMENT);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.AQS_QUEUED_APPOINTMENTS_CREATE);
 
 		// schedule the queued appointment
 		Appointment newAppointment = queuedAppointmentService.scheduleQueuedAppointment(appointmentId, queueId, bookQueuedAppointmentTransfer.getProviderNo(),

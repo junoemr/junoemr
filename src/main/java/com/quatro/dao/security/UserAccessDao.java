@@ -23,6 +23,11 @@ package com.quatro.dao.security;
 import java.util.List;
 
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+
+/**
+ * @deprecated use jpa version instead
+ */
+@Deprecated
 public class UserAccessDao extends HibernateDaoSupport {
 	  public List GetUserAccessList(String providerNo, Integer shelterId)
 	  {

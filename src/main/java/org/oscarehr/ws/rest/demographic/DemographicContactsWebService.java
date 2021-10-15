@@ -28,6 +28,7 @@ import org.apache.jcs.access.exception.InvalidArgumentException;
 import org.oscarehr.common.model.DemographicContact;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
@@ -50,7 +51,6 @@ public class DemographicContactsWebService extends AbstractServiceImpl
 {
     protected SecurityInfoManager securityInfoManager;
     protected DemographicManager demographicManager;
-    protected DemographicContactFewTo1 demographicContactFewTo1;
 
     // ==========================================================================
     // Public Methods
@@ -76,7 +76,7 @@ public class DemographicContactsWebService extends AbstractServiceImpl
                                                                                @QueryParam("categoryType") String categoryType) throws InvalidArgumentException
     {
         LoggedInInfo loggedInInfo = getLoggedInInfo();
-        securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, demographicId, "_demographic");
+        securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), demographicId, Permission.DEMOGRAPHIC_READ);
 
         if (!DemographicContact.ALL_CATEGORIES.contains(categoryType))
         {

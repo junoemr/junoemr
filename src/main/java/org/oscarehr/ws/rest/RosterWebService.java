@@ -28,10 +28,11 @@ import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.rosterStatus.service.RosterStatusService;
 import org.oscarehr.rosterStatus.transfer.RosterStatusTransfer;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.springframework.stereotype.Component;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -64,7 +65,7 @@ public class RosterWebService extends AbstractServiceImpl
 	@Path("/statuses")
 	public RestSearchResponse<RosterStatusTransfer> getRosterStatuses(@QueryParam("active") Boolean active)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.READ, null, "_demographic");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 		List<RosterStatusTransfer> rosterStatuses = rosterStatusService.getRosterStatusList(active);
 		return RestSearchResponse.successResponseOnePage(rosterStatuses);
 	}
@@ -73,7 +74,7 @@ public class RosterWebService extends AbstractServiceImpl
 	@Path("/status")
 	public RestResponse<RosterStatusTransfer> addStatus(RosterStatusTransfer rosterStatusTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ADMIN_CREATE);
 		String currentProvider = getCurrentProvider().getProviderNo();
 		rosterStatusTransfer = rosterStatusService.addStatus(rosterStatusTransfer, currentProvider);
 
@@ -86,7 +87,7 @@ public class RosterWebService extends AbstractServiceImpl
 			@PathParam("id") Integer id,
 			RosterStatusTransfer rosterStatusTransfer)
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInInfo().getLoggedInProviderNo(), SecurityInfoManager.WRITE, null, "_admin");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ADMIN_UPDATE);
 		String currentProvider = getCurrentProvider().getProviderNo();
 		rosterStatusTransfer = rosterStatusService.editStatus(rosterStatusTransfer, currentProvider);
 

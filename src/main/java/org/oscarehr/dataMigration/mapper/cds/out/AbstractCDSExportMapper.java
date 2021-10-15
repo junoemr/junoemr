@@ -29,6 +29,7 @@ import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.dx.DxCode;
+import org.oscarehr.dataMigration.model.dx.DxCodingSystem;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -284,7 +285,7 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 		StandardCoding standardCoding = null;
 		if(exportStructure != null)
 		{
-			DxCode.DxCodingSystem codingSystem = exportStructure.getCodingSystem();
+			DxCodingSystem codingSystem = exportStructure.getCodingSystem();
 			if(codingSystem != null)
 			{
 				CDSConstants.CodingSystem cdsCodingSystem = codingSystem.getCdsCodingSystem();

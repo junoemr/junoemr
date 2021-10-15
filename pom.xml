@@ -1973,40 +1973,51 @@
 						<systemProperty>
 							<key>openApiSpecBuilder.resourceClassCsv</key>
 							<value>
-								org.oscarehr.ws.rest.SystemPreferenceWebService
-								org.oscarehr.ws.rest.ScheduleService
-								org.oscarehr.ws.rest.SitesService
 								org.oscarehr.ws.rest.AppointmentService
-								org.oscarehr.ws.rest.demographic.DemographicDocumentsWebService
-								org.oscarehr.ws.rest.demographic.DemographicDocumentWebService
+								org.oscarehr.ws.rest.CareTrackerWebService
+								org.oscarehr.ws.rest.CareTrackersWebService
+								org.oscarehr.ws.rest.DecisionSupportWebService
+								org.oscarehr.ws.rest.DemographicService
+								org.oscarehr.ws.rest.DemographicsService
+								org.oscarehr.ws.rest.demographic.DemographicCareTrackerWebService
 								org.oscarehr.ws.rest.demographic.DemographicContactWebService
 								org.oscarehr.ws.rest.demographic.DemographicContactsWebService
+								org.oscarehr.ws.rest.demographic.DemographicDocumentsWebService
+								org.oscarehr.ws.rest.demographic.DemographicDocumentWebService
+								org.oscarehr.ws.rest.demographic.DemographicDxWebService
+								org.oscarehr.ws.rest.demographic.DemographicMeasurementsWebService
 								org.oscarehr.ws.rest.DocumentTypesWebService
+								org.oscarehr.ws.rest.DiseaseRegistryService
 								org.oscarehr.ws.rest.DocumentWebService
-								org.oscarehr.ws.rest.ProviderPreferenceWebService
-								org.oscarehr.ws.rest.DemographicService
-                                org.oscarehr.ws.rest.DemographicsService
-                                org.oscarehr.ws.rest.RosterWebService
-                                org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
-								org.oscarehr.ws.rest.ProvidersService
-								org.oscarehr.ws.rest.ReferralDoctorsService
+								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
+								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
+								org.oscarehr.ws.rest.integrations.aqs.QueueWebService
+								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
 								org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService
+								org.oscarehr.ws.rest.MeasurementsWebService
 								org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.ConversationWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.message.AttachmentWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.MessagesWebService
 								org.oscarehr.ws.rest.myhealthaccess.clinic.MessageWebService
 								org.oscarehr.ws.rest.myhealthaccess.DemographicWebService
-								org.oscarehr.ws.rest.myhealthaccess.IntegrationsWebService
 								org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService
+								org.oscarehr.ws.rest.myhealthaccess.IntegrationsWebService
 								org.oscarehr.ws.rest.myhealthaccess.MhaPatientsWebService
-                                org.oscarehr.ws.rest.myhealthaccess.MhaPatientWebService
+								org.oscarehr.ws.rest.myhealthaccess.MhaPatientWebService
 								org.oscarehr.ws.rest.myhealthaccess.patient.AccessWebService
 								org.oscarehr.ws.rest.myhealthaccess.SSOWebService
-								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
-								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
-								org.oscarehr.ws.rest.integrations.aqs.QueueWebService
 								org.oscarehr.ws.rest.NotesService
+								org.oscarehr.ws.rest.PreventionService
+								org.oscarehr.ws.rest.ProviderPreferenceWebService
+								org.oscarehr.ws.rest.ProviderService
+								org.oscarehr.ws.rest.ProvidersService
+								org.oscarehr.ws.rest.ReferralDoctorsService
+								org.oscarehr.ws.rest.RosterWebService
+								org.oscarehr.ws.rest.ScheduleService
+								org.oscarehr.ws.rest.SecurityRolesWebService
+								org.oscarehr.ws.rest.SitesService
+								org.oscarehr.ws.rest.SystemPreferenceWebService
 							</value>
 						</systemProperty>
 						<systemProperty>
@@ -2024,7 +2035,7 @@
 			<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>5.1.0</version>
 				<executions>
 					<execution>
 						<id>generate-typescript-api</id>
@@ -2034,9 +2045,13 @@
 						</goals>
 						<configuration>
 							<inputSpec>${project.build.directory}/openapi/openapi.json</inputSpec>
-							<generatorName>typescript-angularjs</generatorName>
+							<generatorName>typescript-angularjs-deprecated</generatorName>
 							<output>src/main/frontend/generated/</output>
 							<skip>${juno.webpack.skip}</skip>
+							<skipValidateSpec>true</skipValidateSpec>
+							<additionalProperties>
+								<additionalProperty>enumPropertyNaming=PascalCase</additionalProperty>
+							</additionalProperties>
 						</configuration>
 					</execution>
 				</executions>
@@ -2062,17 +2077,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
-			<!-- This is a terrible hack to counteract a bug in the openapi-generator library.  -->
-			<!-- There is an open issue at the time of writing to prove they are aware of the -->
-			<!-- issue at https://github.com/OpenAPITools/openapi-generator/issues/189 -->
-			<!-- This plugin runs a script that replaces the string "models.models." in the -->
-			<!-- generated api with "models.".  It is being run using antrun because all plugins -->
-			<!-- of the same type in a pom.xml file are bundled together and run where the first -->
-			<!-- one is defined.  Since exec-maven-plugin needs to be run before the -->
-			<!-- openapi-generator-maven-plugin and this needs to be run after, they can't use -->
-			<!-- the same plugin. -->
-			<!-- TODO: scrap this once openapi-generator is fixed -->
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.8</version>
@@ -2084,9 +2088,6 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<target>
-								<exec resolveexecutable="true" executable="fix_openapi_generate_hack.sh"></exec>
-							</target>
 							<skip>${juno.webpack.skip}</skip>
 						</configuration>
 					</execution>

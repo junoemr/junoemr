@@ -1,9 +1,8 @@
+import {SecurityPermissions} from "../common/security/securityConstants";
 import {BILLING_REGION} from "../billing/billingConstants";
 import {MessagingServiceType} from "../lib/messaging/model/MessagingServiceType";
 import MessagingServiceFactory from "../lib/messaging/factory/MessagingServiceFactory";
 import {MessageGroup} from "../lib/messaging/model/MessageGroup";
-import {MhaIntegrationApi} from "../../generated";
-import {API_BASE_PATH} from "../lib/constants/ApiConstants";
 import MhaConfigService from "../lib/integration/myhealthaccess/service/MhaConfigService";
 import {MessageCountMode} from "../lib/provider/settings/model/MessageCountMode";
 
@@ -22,6 +21,7 @@ angular.module('Layout').component("primaryNavigation", {
 		"$http",
 		"$httpParamSerializer",
 		"securityService",
+		"securityRolesService",
 		"personaService",
 		"billingService",
 		"consultService",
@@ -40,6 +40,7 @@ angular.module('Layout').component("primaryNavigation", {
 		          $http,
 		          $httpParamSerializer,
 		          securityService,
+		          securityRolesService,
 		          personaService,
 		          billingService,
 		          consultService,
@@ -78,46 +79,7 @@ angular.module('Layout').component("primaryNavigation", {
 			ctrl.mhaEnabled = false;
 			// measured in months
 			ctrl.consultationLookbackPeriod = 1;
-
-			billingService.getBillingRegion().then(
-				function success(results)
-				{
-					ctrl.billRegion = results.message;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-
-			securityService.hasRights(
-				{
-					items: [
-						{
-							objectName: '_search',
-							privilege: 'r'
-						},
-						{
-							objectName: '_demographic',
-							privilege: 'w'
-						},
-						{
-							objectName: '_msg',
-							privilege: 'r'
-						}]
-				}).then(
-				function success(results)
-				{
-					if (results.content !== null)
-					{
-						ctrl.searchRights = results.content[0];
-						ctrl.newDemographicRights = results.content[1];
-						ctrl.messageRights = results.content[2];
-					}
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
+			ctrl.SecurityPermissions = SecurityPermissions;
 
 			personaService.getDashboardMenu().then(
 				function success(results)
@@ -316,38 +278,47 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.getUnAckLabDocCount = function getUnAckLabDocCount()
 		{
-			inboxService.getUnAckLabDocCount().then(
-				function success(results)
-				{
-					ctrl.unAckLabDocTotal = results;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.LabRead, SecurityPermissions.DocumentRead, SecurityPermissions.HrmRead))
+			{
+				inboxService.getUnAckLabDocCount().then(
+					function success(results)
+					{
+						ctrl.unAckLabDocTotal = results;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
+			}
 		};
 		ctrl.getUnclaimedInboxCount = function()
 		{
-
-			inboxService.getInboxCountByStatus(0,"N").then(
-				function success(results)
-				{
-					ctrl.unclaimedCount = results;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				}
-			);
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.LabRead, SecurityPermissions.DocumentRead, SecurityPermissions.HrmRead))
+			{
+				inboxService.getInboxCountByStatus(0, "N").then(
+					function success(results)
+					{
+						ctrl.unclaimedCount = results;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					}
+				);
+			}
 		};
 
 		ctrl.updateMhaPatientMessagesCount = async () =>
 		{
-			if (await ctrl.mhaConfigService.mhaEnabled())
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.MessageUpdate))
 			{
-				// MHA message count
-				const messagingService = MessagingServiceFactory.build(MessagingServiceType.MHA_CLINIC);
-				ctrl.mhaUnreadMessageTotal = await messagingService.countMessages(await messagingService.getDefaultMessageSource(), {group: MessageGroup.Received, onlyUnread: true});
+				if (await ctrl.mhaConfigService.mhaEnabled())
+				{
+					// MHA message count
+					const messagingService = MessagingServiceFactory.build(MessagingServiceType.MHA_CLINIC);
+					ctrl.mhaUnreadMessageTotal = await messagingService.countMessages(
+						await messagingService.getDefaultMessageSource(), {group: MessageGroup.Received});
+				}
 			}
 		}
 
@@ -366,62 +337,71 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.getUnreadMessageCount = async function getUnreadMessageCount()
 		{
-			// oscar message count
-			messageService.getUnreadCount().then(
-				function success(results)
-				{
-					ctrl.unreadMessageTotal = results;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.MessageRead))
+			{
+				// oscar message count
+				messageService.getUnreadCount().then(
+					function success(results)
+					{
+						ctrl.unreadMessageTotal = results;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
 
-			await ctrl.updateMhaPatientMessagesCount();
+				await ctrl.updateMhaPatientMessagesCount();
 
-			$scope.$apply();
+				$scope.$apply();
+			}
 		};
 
 		ctrl.getOverdueTicklerCount = function getOverdueTicklerCount()
 		{
-			ticklerService.search(
-				{
-					status: 'A',
-					assignee: ctrl.me.providerNo,
-					overdueOnly: 'property'
-				}, 0, 6).then(
-				function success(results)
-				{
-					ctrl.ticklerTotal = results.total;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				}
-			);
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.TicklerRead))
+			{
+				ticklerService.search(
+					{
+						status: 'A',
+						assignee: ctrl.me.providerNo,
+						overdueOnly: 'property'
+					}, 0, 6).then(
+					function success(results)
+					{
+						ctrl.ticklerTotal = results.total;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					}
+				);
+			}
 		};
 
 		ctrl.getActiveConsultationCount = function getActiveConsultationCount()
 		{
-			// Any consultations that should have ended after this point but haven't need to be alerted for
-			var endDate = moment().subtract(ctrl.consultationLookbackPeriod, "months").toISOString();
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationRead))
+			{
+				// Any consultations that should have ended after this point but haven't need to be alerted for
+				var endDate = moment().subtract(ctrl.consultationLookbackPeriod, "months").toISOString();
 
-			consultService.getTotalRequests(
-				{
-					invertStatus: true,
-					referralEndDate: endDate,
-					status: '4',
-					team: ctrl.consultationTeamWarning
-				}).then(
-				function success(results)
-				{
-					ctrl.activeConsultationTotal = results.data;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				}
-			);
+				consultService.getTotalRequests(
+					{
+						invertStatus: true,
+						referralEndDate: endDate,
+						status: '4',
+						team: ctrl.consultationTeamWarning
+					}).then(
+					function success(results)
+					{
+						ctrl.activeConsultationTotal = results.data;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					}
+				);
+			}
 		};
 
 		ctrl.getNavBar = function getNavBar()
@@ -451,6 +431,11 @@ angular.module('Layout').component("primaryNavigation", {
 					console.log(errors);
 				});
 		};
+
+		ctrl.patientSearchEnabled = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead);
+		}
 
 		// when patient typeahead search button is clicked
 		ctrl.onPatientSearch = function onPatientSearch(search)
@@ -662,6 +647,11 @@ angular.module('Layout').component("primaryNavigation", {
 				'scratch', 'height=700,width=1024,scrollbars=1');
 			win.focus();
 		};
+
+		ctrl.patientCreationEnabled = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicCreate);
+		}
 
 		ctrl.newDemographic = function newDemographic(size)
 		{

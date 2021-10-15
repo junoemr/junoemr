@@ -27,7 +27,9 @@ package org.oscarehr.ws.external.soap.v1;
 
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Security;
+import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -41,6 +43,9 @@ public abstract class AbstractWs
 
 	@Resource
     protected WebServiceContext context;
+
+	@Autowired
+	protected SecurityInfoManager securityInfoManager;
 	
 	protected HttpServletRequest getHttpServletRequest()
 	{
@@ -59,6 +64,11 @@ public abstract class AbstractWs
 	{
 		LoggedInInfo loggedInInfo=getLoggedInInfo();
 		return(loggedInInfo.getLoggedInProvider());
+	}
+
+	protected String getLoggedInProviderId()
+	{
+		return getLoggedInProvider().getProviderNo();
 	}
 	
 	protected LoggedInInfo getLoggedInInfo()

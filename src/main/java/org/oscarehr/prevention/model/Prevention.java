@@ -45,7 +45,25 @@ import java.util.List;
 
 @Entity
 @Table(name = "preventions")
-public class Prevention extends AbstractModel<Integer> implements Serializable {
+public class Prevention extends AbstractModel<Integer> implements Serializable
+{
+	// The names are weird, these are all the possible values for the "refused" column
+	public static final char REFUSED_STATUS_COMPLETED = '0';
+	public static final char REFUSED_STATUS_REFUSED = '1';
+	public static final char REFUSED_STATUS_INELIGIBLE = '2';
+
+	public static final char IS_ACTIVE = '0';
+	public static final char IS_DELETED = '1';
+
+	// for the 'never' column, seems to refer to whether to send a reminder to patient
+	public static final char SEND_REMINDER = '0';
+	public static final char NEVER_SEND_REMINDER = '1';
+
+	public static final String REFUSED = "refused";
+	public static final String NEVER = "never";
+	public static final String INELIGIBLE = "ineligible";
+	public static final String PREVIOUS = "previous";
+	public static final String NEVER_REMIND = "neverRemind";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,13 +90,13 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 	private String preventionType = null;
 
 	@Column(name = "deleted")
-	private char deleted = '0';
+	private char deleted = IS_ACTIVE;
 
 	@Column(name = "refused")
 	private char refused = REFUSED_STATUS_COMPLETED;
 
 	@Column(name = "never")
-	private char never = '0';
+	private char never = SEND_REMINDER;
 
 	@Column(name = "next_date")
 	@Temporal(TemporalType.DATE)
@@ -94,24 +112,6 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 	// with cascade, these entities will be persisted when this class is.
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "prevention", cascade = CascadeType.PERSIST)
 	private List<PreventionExt> preventionExtensionList;
-
-	// The names are weird, these are all the possible values for the "refused" column
-	public static final char REFUSED_STATUS_COMPLETED = '0';
-	public static final char REFUSED_STATUS_REFUSED = '1';
-	public static final char REFUSED_STATUS_INELIGIBLE = '2';
-
-	public static final char IS_ACTIVE = '0';
-	public static final char IS_DELETED = '1';
-
-	// for the 'never' column, seems to refer to whether to send a reminder to patient
-	public static final char SEND_REMINDER = '0';
-	public static final char NEVER_SEND_REMINDER = '1';
-
-	public static final String REFUSED = "refused";
-	public static final String NEVER = "never";
-	public static final String INELIGIBLE = "ineligible";
-	public static final String PREVIOUS = "previous";
-	public static final String NEVER_REMIND = "neverRemind";
 
 	public Integer getDemographicId() {
 		return demographicId;
@@ -173,11 +173,13 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 		return refused == REFUSED_STATUS_INELIGIBLE;
 	}
 
+	// should be refactored to an enum instead of having booleans
 	public void setRefused(boolean refused)
 	{
 		this.refused = refused ? REFUSED_STATUS_REFUSED : REFUSED_STATUS_COMPLETED;
 	}
-	
+
+	// should be refactored to an enum instead of having booleans
 	public void setIneligible(boolean ineligible)
 	{
 		this.refused = ineligible ? REFUSED_STATUS_INELIGIBLE : REFUSED_STATUS_COMPLETED;
@@ -191,11 +193,13 @@ public class Prevention extends AbstractModel<Integer> implements Serializable {
 		this.nextDate = nextDate;
 	}
 
-	public boolean isNever() {
-		return never=='1';
+	public boolean isNever()
+	{
+		return never == NEVER_SEND_REMINDER;
 	}
 
-	public void setNever(boolean never) {
+	public void setNever(boolean never)
+	{
 		this.never = never ? NEVER_SEND_REMINDER : SEND_REMINDER;
 	}
 

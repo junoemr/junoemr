@@ -13,7 +13,7 @@
 							class="modal-input"
 							ng-model="$ctrl.value"
 							invalid="!$ctrl.validations.value() && $ctrl.hasSubmitted"
-							placeholder="Please enter reason here"
+                            placeholder="{{$ctrl.placeholder}}"
 							character-limit="$ctrl.resolve.characterLimit"
 							component-style="$ctrl.resolve.style">
 	</juno-input>
@@ -22,10 +22,23 @@
 							 class="modal-input"
 							 ng-model="$ctrl.value"
 							 options="$ctrl.resolve.options"
-							 placeholder="Please Select An Option"
+							 placeholder="{{$ctrl.placeholder}}"
 							 component-style="$ctrl.resolve.style"
 	>
 	</juno-select>
+
+	<juno-typeahead ng-if="$ctrl.inputModalType === $ctrl.JUNO_INPUT_MODAL_TYPE.TYPEAHEAD"
+							 class="modal-input"
+							 model="$ctrl.value"
+							 options="$ctrl.typeaheadOptions"
+	                         filter-options="false"
+                             on-change="$ctrl.typeaheadSearch(value)"
+                             on-selected="$ctrl.setTypeahedValue(value)"
+							 placeholder="{{$ctrl.placeholder}}"
+							 component-style="$ctrl.resolve.style"
+	                         typeahead-min-length="{{$ctrl.resolve.typeaheadMinLength}}"
+	>
+	</juno-typeahead>
 	
 	<juno-divider component-style="$ctrl.resolve.style"
 	              slim="true">

@@ -246,7 +246,7 @@ public class ProviderDao extends HibernateDaoSupport {
 
 	public List<Provider> getActiveProvidersByRole(String role) {
 
-    	String queryString = "select p FROM Provider p, SecUserRole s where p.ProviderNo = s.ProviderNo and p.Status='1' and s.RoleName = ?0 order by p.LastName, p.FirstName";
+    	String queryString = "select p FROM Provider p, SecUserRole s where p.ProviderNo = s.providerNo and p.Status='1' and s.roleName = ?0 order by p.LastName, p.FirstName";
 		List<Provider> rs = (List<Provider>) getHibernateTemplate().find(queryString, role);
 
 		if (log.isDebugEnabled()) {

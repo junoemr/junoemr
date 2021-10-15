@@ -29,6 +29,9 @@ import MhaPatientService from "../lib/integration/myhealthaccess/service/MhaPati
 import MessagingServiceFactory from "../lib/messaging/factory/MessagingServiceFactory";
 import {MessagingServiceType} from "../lib/messaging/model/MessagingServiceType";
 import {MessageGroup} from "../lib/messaging/model/MessageGroup";
+import {SecurityPermissions} from "../common/security/securityConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../common/components/junoComponentConstants";
+import {MhaCallPanelEvents} from "./components/mhaCallPanel/mhaCallPanelEvents";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -45,11 +48,11 @@ angular.module('Record').controller('Record.RecordController', [
 	'$interval',
 	'$uibModal',
 	'demographicService',
-	'demo',
 	'user',
 	'noteService',
 	'uxService',
 	'securityService',
+	'securityRolesService',
 	'billingService',
 	'focusService',
 
@@ -67,11 +70,11 @@ angular.module('Record').controller('Record.RecordController', [
 		$interval,
 		$uibModal,
 		demographicService,
-		demo,
 		user,
 		noteService,
 		uxService,
 		securityService,
+		securityRolesService,
 		billingService,
 		focusService)
 	{
@@ -80,13 +83,17 @@ angular.module('Record').controller('Record.RecordController', [
 
 		const PATIENT_MESSENGER_NAV_ID = 432543;
 
+		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+
 		controller.appointmentApi = new AppointmentApi($http, $httpParamSerializer,
 			'../ws/rs');
 
 		controller.demographicNo = $stateParams.demographicNo;
-		controller.demographic = demo;
+		controller.demographic = null;
 		controller.page = {};
 		controller.page.assignedCMIssues = [];
+		controller.SecurityPermissions = SecurityPermissions;
 
 		/*
 		 * handle concurrent note edit - EditingNoteFlag
@@ -101,6 +108,9 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.working = false;
 		controller.noteDirty = false;
 		controller.displayPhone = null;
+		controller.page.cannotChange = true;
+		controller.canMHACallPatient = false;
+		controller.mhaCallPanelOpen = false;
 
 		// phone related constants
 		controller.phone = {
@@ -112,14 +122,93 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.$onInit = async () =>
 		{
-			controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
-			await controller.getCurrentNote(true);
-			controller.loadPreferredPhone(controller.demographic);
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead))
+			{
+				controller.page.cannotChange = !securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterNoteCreate);
+				controller.demographic = await demographicService.getDemographic(controller.demographicNo);
+				controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
+				controller.loadPreferredPhone(controller.demographic);
 
-			controller.fillMenu();
+				controller.fillMenu();
+			}
 
-			// init watches after note state initialization
-			$scope.$watch('recordCtrl.page.encounterNote.note', delayTmpSave);
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterNoteCreate))
+			{
+				//////AutoSave
+				const saveIntervalSeconds = 2;
+				let timeout = null;
+				controller.skipTmpSave = false;
+				controller.noteDirty = false;
+
+
+				let saveUpdates = function saveUpdates()
+				{
+					if (controller.page.encounterNote.note === controller.page.initNote) return; //user did not input anything, don't save
+
+					console.log("save", controller.page.encounterNote);
+					noteService.tmpSave($stateParams.demographicNo, controller.page.encounterNote).then(() =>
+					{
+						controller.noteDirty = false;
+					});
+				};
+
+				await controller.getCurrentNote(true);
+
+				let delayTmpSave = function delayTmpSave(newVal, oldVal)
+				{
+					if (!controller.skipTmpSave)
+					{
+						if (newVal !== oldVal)
+						{
+							controller.noteDirty = true;
+							if (timeout)
+							{
+								$timeout.cancel(timeout);
+							}
+							timeout = $timeout(saveUpdates, saveIntervalSeconds * 1000);
+						}
+						else
+						{
+							controller.noteDirty = false;
+						}
+					}
+					controller.skipTmpSave = false; // only skip once
+				};
+
+				controller.checkIfMhaCallAvailable();
+				$scope.$watch('recordCtrl.page.encounterNote.note', delayTmpSave);
+
+				//////
+
+				//////Timer
+				controller.currentDate = new Date(); //the start
+
+				controller.totalSeconds = 0;
+				controller.intervalVal = setInterval(setTime, 1000);
+
+				$scope.$on('$destroy', function()
+				{
+					clearInterval(controller.intervalVal);
+					delete $window.onbeforeunload;
+				});
+
+			}
+		}
+
+		/**
+		 * check if patient has the MHA app & they have a strong enough connection to be called from the eChart.
+		 */
+		controller.checkIfMhaCallAvailable = async () =>
+		{
+			const mhaConfigService = new MhaConfigService();
+			const mhaPatientService = new MhaPatientService();
+
+			if (await mhaConfigService.mhaEnabled())
+			{
+				let profiles = await mhaPatientService.profilesForDemographic(controller.demographicNo);
+				profiles = profiles.filter((profile) => profile.isConfirmed && profile.hasVoipToken);
+				controller.canMHACallPatient = profiles.length > 0;
+			}
 		}
 
 		// quick and dirty way to show preferred phone
@@ -171,17 +260,11 @@ angular.module('Record').controller('Record.RecordController', [
 			return value;
 		}
 
-
-		//get access rights
-		securityService.hasRight("_eChart", "w", controller.demographicNo).then(
-			function success(results)
-			{
-				controller.page.cannotChange = !results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
+		controller.canSaveIssues = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterIssueUpdate)
+				|| securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterIssueCreate);
+		}
 
 		//disable click and keypress if user only has read-access
 		controller.checkAction = function checkAction(event)
@@ -311,7 +394,7 @@ angular.module('Record').controller('Record.RecordController', [
 								var rnd = Math.round(Math.random() * 1000);
 								win = "win" + rnd;
 							}
-							window.open(temp.url, win, "scrollbars=yes, location=no, width=1000, height=600", "");
+							window.open(temp.url, win, "scrollbars=yes, location=no, width=1000, height=600");
 						}
 						break;
 				}
@@ -338,11 +421,6 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-		$scope.$on('$destroy', function ()
-		{
-			delete $window.onbeforeunload;
-		});
-
 		// Warn user about unsaved data before a state change
 		$scope.$on("$stateChangeStart", function(event, data)
 		{
@@ -366,54 +444,9 @@ angular.module('Record').controller('Record.RecordController', [
 			return false;
 		}
 
-		//////AutoSave
-		var saveIntervalSeconds = 2;
-
-		var timeout = null;
-		var saveUpdates = function saveUpdates()
-		{
-			if (controller.page.encounterNote.note == controller.page.initNote) return; //user did not input anything, don't save
-
-			console.log("save", controller.page.encounterNote);
-			noteService.tmpSave($stateParams.demographicNo, controller.page.encounterNote).then(() =>
-			{
-				controller.noteDirty = false;
-			});
-		};
-		var skipTmpSave = false;
-
-		var delayTmpSave = function delayTmpSave(newVal, oldVal)
-		{
-			if (!skipTmpSave)
-			{
-				if (newVal !== oldVal)
-				{
-					controller.noteDirty = true;
-					if (timeout)
-					{
-						$timeout.cancel(timeout);
-					}
-					timeout = $timeout(saveUpdates, saveIntervalSeconds * 1000);
-				}
-				else
-				{
-					controller.noteDirty = false;
-				}
-			}
-			skipTmpSave = false; // only skip once
-		};
-
-		//////
-
-		//////Timer
-		var d = new Date(); //the start
-
-		var totalSeconds = 0;
-		var myVar = setInterval(setTime, 1000);
-
 		controller.getCurrentTimerToggle = function getCurrentTimerToggle()
 		{
-			if (angular.isDefined(myVar))
+			if (angular.isDefined(controller.intervalVal))
 			{
 				return "fa-pause";
 			}
@@ -426,31 +459,31 @@ angular.module('Record').controller('Record.RecordController', [
 			{
 				$("#aToggle").removeClass("fa-pause");
 				$("#aToggle").addClass("fa-play");
-				clearInterval(myVar);
+				clearInterval(controller.intervalVal);
 			}
 			else
 			{
 				$("#aToggle").removeClass("fa-play");
 				$("#aToggle").addClass("fa-pause");
-				myVar = setInterval(setTime, 1000);
+				controller.intervalVal = setInterval(setTime, 1000);
 			}
 		};
 
 		controller.pasteTimer = function pasteTimer()
 		{
 			var ed = new Date();
-			controller.page.encounterNote.note += "\n" + document.getElementById("startTag").value + ": " + d.getHours() + ":" + pad(d.getMinutes()) + "\n" + document.getElementById("endTag").value + ": " + ed.getHours() + ":" + pad(ed.getMinutes()) + "\n" + pad(parseInt(totalSeconds / 3600)) + ":" + pad(parseInt((totalSeconds / 60) % 60)) + ":" + pad(totalSeconds % 60);
+			controller.page.encounterNote.note += "\n" + document.getElementById("startTag").value + ": " + controller.currentDate.getHours() + ":" + pad(controller.currentDate.getMinutes()) + "\n" + document.getElementById("endTag").value + ": " + ed.getHours() + ":" + pad(ed.getMinutes()) + "\n" + pad(parseInt(controller.totalSeconds / 3600)) + ":" + pad(parseInt((controller.totalSeconds / 60) % 60)) + ":" + pad(controller.totalSeconds % 60);
 		};
 
 		function setTime()
 		{
-			++totalSeconds;
-			document.getElementById("aTimer").innerHTML = pad(parseInt(totalSeconds / 60)) + ":" + pad(totalSeconds % 60);
-			if (totalSeconds == 1200)
+			++(controller.totalSeconds);
+			document.getElementById("aTimer").innerHTML = pad(parseInt(controller.totalSeconds / 60)) + ":" + pad(controller.totalSeconds % 60);
+			if (controller.totalSeconds === 1200)
 			{
 				$("#aTimer").css("background-color", "#DFF0D8");
 			} //1200 sec = 20 min light green
-			if (totalSeconds == 3000)
+			if (controller.totalSeconds === 3000)
 			{
 				$("#aTimer").css("background-color", "#FDFEC7");
 			} //3600 sec = 50 min light yellow
@@ -468,11 +501,6 @@ angular.module('Record').controller('Record.RecordController', [
 				return valString;
 			}
 		}
-		$scope.$on('$destroy', function()
-		{
-			clearInterval(myVar);
-		});
-		//////		
 
 		controller.isWorking = function isWorking()
 		{
@@ -499,7 +527,7 @@ angular.module('Record').controller('Record.RecordController', [
 			console.log('CANCELLING EDIT');
 			controller.page.encounterNote = null;
 			$scope.$broadcast('stopEditingNote');
-			skipTmpSave = true;
+			controller.skipTmpSave = true;
 			controller.getCurrentNote(false);
 			controller.removeEditingNoteFlag();
 			controller.$storage.hideNote = true;
@@ -545,7 +573,7 @@ angular.module('Record').controller('Record.RecordController', [
 					controller.page.isNoteSaved = true;
 					controller.noteDirty = false;
 					$scope.$broadcast('noteSaved', results);
-					skipTmpSave = true;
+					controller.skipTmpSave = true;
 					controller.page.encounterNote = results;
 					controller.$storage.hideNote = true;
 					controller.getCurrentNote(false);
@@ -643,14 +671,14 @@ angular.module('Record').controller('Record.RecordController', [
 
 			var url = "../billing.do?billRegion=" + encodeURIComponent(controller.page.billregion);
 			url += "&billForm=" + encodeURIComponent(controller.page.defaultView);
-			url += "&demographic_name=" + encodeURIComponent(demo.lastName + "," + demo.firstName);
-			url += "&demographic_no=" + demo.demographicNo;
+			url += "&demographic_name=" + encodeURIComponent(controller.demographic.lastName + "," + controller.demographic.firstName);
+			url += "&demographic_no=" + controller.demographicNo;
 			url += "&providerview=" + user.providerNo + "&user_no=" + user.providerNo;
 			url += "&appointment_no=" + apptNo + "&apptProvider_no=" + apptProvider;
 			url += "&appointment_date=" + apptDate + "&start_time=" + apptStartTime;
 			url += "&hotclick=&status=t&bNewForm=1" + dxCode;
 
-			window.open(url, "billingWin", "scrollbars=yes, location=no, width=" + screen.width + ", height=" + screen.height, "");
+			window.open(url, "billingWin", "scrollbars=yes, location=no, width=" + screen.width + ", height=" + screen.height);
 		};
 
 		controller.page.currentNoteConfig = {};
@@ -708,6 +736,23 @@ angular.module('Record').controller('Record.RecordController', [
 
 			controller.removeEditingNoteFlag();
 		});
+
+		$scope.$on('appendToCurrentNote', (event, message) =>
+		{
+			if(!controller.page.encounterNote)
+			{
+				controller.page.encounterNote = {
+					note: "",
+				}
+			}
+			controller.page.encounterNote.note = controller.page.encounterNote.note + "\n" + message;
+			controller.getIssueNote();
+
+			controller.$storage.hideNote = false;
+			$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
+
+			controller.removeEditingNoteFlag();
+		})
 
 		controller.initAppendNoteEditor = function initAppendNoteEditor()
 		{
@@ -984,6 +1029,20 @@ angular.module('Record').controller('Record.RecordController', [
 				return filterValue;
 			};
 		};
+
+		/**
+		 * open the mha audio call panel.
+		 */
+		controller.openMhaCallPanel = () =>
+		{
+			controller.mhaCallPanelOpen = true;
+		}
+
+		// close the mha audio call panel.
+		$scope.$on(MhaCallPanelEvents.Close, () =>
+		{
+			controller.mhaCallPanelOpen = false;
+		});
 	}
 ]);
 

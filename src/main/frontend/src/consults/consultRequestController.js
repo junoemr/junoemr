@@ -1,3 +1,4 @@
+import {SecurityPermissions} from "../common/security/securityConstants";
 import {LABEL_POSITION} from "../common/components/junoComponentConstants";
 import {ProvidersServiceApi} from "../../generated";
 import LoadingQueue from "../lib/util/LoadingQueue";
@@ -13,7 +14,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 	'$uibModal',
 	'consultService',
 	'demographicService',
-	'securityService',
+	'securityRolesService',
 	'summaryService',
 	'staticDataService',
 	'consult',
@@ -29,14 +30,14 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		$uibModal,
 		consultService,
 		demographicService,
-		securityService,
+		securityRolesService,
 		summaryService,
 		staticDataService,
 		consult,
 		user)
 	{
-
-		var controller = this;
+		const controller = this;
+		controller.SecurityPermissions = SecurityPermissions;
 
 		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 
@@ -70,35 +71,6 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		controller.initialize = function()
 		{
 			controller.labelPosition = LABEL_POSITION;
-
-			//get access rights
-			securityService.hasRight("_con", "r").then(
-				function success(results)
-				{
-					controller.consultReadAccess = results;
-				},
-				function error(errors)
-				{
-					console.error(errors);
-				});
-			securityService.hasRight("_con", "u").then(
-				function success(results)
-				{
-					controller.consultUpdateAccess = results;
-				},
-				function error(errors)
-				{
-					console.error(errors);
-				});
-			securityService.hasRight("_con", "w").then(
-				function success(results)
-				{
-					controller.consultWriteAccess = results;
-				},
-				function error(errors)
-				{
-					console.error(errors);
-				});
 
 			//set demographic info
 			controller.loadingQueue.pushLoadingState();
@@ -465,12 +437,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			var deferred = $q.defer();
 			var valid = true;
 
-			if (!controller.consultWriteAccess && consult.id == null)
+			if (consult.id == null && !securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationCreate))
 			{
 				alert("You don't have right to save new consult");
 				valid = false;
 			}
-			if (!controller.consultUpdateAccess)
+			else if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationUpdate))
 			{
 				alert("You don't have right to update consult");
 				valid = false;

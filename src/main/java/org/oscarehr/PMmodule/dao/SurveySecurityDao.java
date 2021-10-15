@@ -23,7 +23,7 @@
 
 package org.oscarehr.PMmodule.dao;
 
-import org.oscarehr.common.dao.SecObjPrivilegeDao;
+import org.oscarehr.security.dao.SecObjPrivilegeDao;
 import org.oscarehr.util.SpringUtils;
 
 public class SurveySecurityDao {

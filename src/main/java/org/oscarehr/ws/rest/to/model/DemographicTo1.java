@@ -111,7 +111,6 @@ public class DemographicTo1 implements Serializable {
 	private String waitingListNote;
 	@JsonDeserialize(using = DateDeserializer.class)
 	private Date onWaitingListSinceDate;
-	private Integer admissionProgramId;
 	private String nameOfMother;
 	private String nameOfFather;
 	@Getter
@@ -623,14 +622,6 @@ public class DemographicTo1 implements Serializable {
 
 	public void setWaitingListNames(List<WaitingListNameTo1> waitingListNames) {
 		this.waitingListNames = waitingListNames;
-	}
-
-	public Integer getAdmissionProgramId() {
-		return admissionProgramId;
-	}
-
-	public void setAdmissionProgramId(Integer programId) {
-		this.admissionProgramId = programId;
 	}
 
 	public String getNameOfMother() { return nameOfMother; }
