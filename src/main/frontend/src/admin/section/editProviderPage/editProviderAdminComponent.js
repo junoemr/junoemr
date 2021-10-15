@@ -262,7 +262,10 @@ angular.module('Admin.Section').component('editProviderAdmin',
 						// user name / email
 						emailOrUserName: Juno.Validations.validationFieldOr(
 								Juno.Validations.validationFieldRequired(secRecord, 'userName'),
-								Juno.Validations.validationFieldRequired(secRecord, 'email'))
+								Juno.Validations.validationFieldRequired(secRecord, 'email')),
+						loginExpiry: Juno.Validations.validationFieldOr(
+							Juno.Validations.validationFieldBlank(secRecord, "expirySet"),
+							Juno.Validations.validationFieldRequired(secRecord, "expiryDate")),
 					};
 				}
 			}
@@ -291,7 +294,10 @@ angular.module('Admin.Section').component('editProviderAdmin',
 						// user name / email
 						emailOrUserName: Juno.Validations.validationFieldOr(
 								Juno.Validations.validationFieldRequired(secRecord, 'userName'),
-								Juno.Validations.validationFieldRequired(secRecord, 'email'))
+								Juno.Validations.validationFieldRequired(secRecord, 'email')),
+						loginExpiry: Juno.Validations.validationFieldOr(
+							Juno.Validations.validationFieldBlank(secRecord, "expirySet"),
+							Juno.Validations.validationFieldRequired(secRecord, "expiryDate")),
 					};
 				}
 			}
@@ -685,7 +691,12 @@ angular.module('Admin.Section').component('editProviderAdmin',
 					email: "",
 					password: "",
 					providerNo: null,
-					pin: ""
+					pin: "",
+					pinLockLocal: true,
+					pinLockRemote: true,
+					forcePasswordReset: true,
+					expirySet: false,
+					expiryDate: null,
 				});
 				ctrl.provider.currentSecurityRecord = -1;
 			}
