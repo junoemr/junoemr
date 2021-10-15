@@ -189,12 +189,13 @@ public class HrmDocument extends AbstractTransientModel
 		this.observations.add(observation);
 	}
 
-	public void addReviewer(Reviewer reviewer)
+	public void addReviewers(List<Reviewer> reviewers)
 	{
-		if(this.reviewers == null)
+		if (this.reviewers == null)
 		{
 			this.reviewers = new ArrayList<>();
 		}
-		this.reviewers.add(reviewer);
+
+		this.reviewers.addAll(reviewers);
 	}
 }

@@ -66,6 +66,7 @@ public class CDSReportHrmExportMapper extends AbstractCDSReportExportMapper<HrmD
 		else
 		{
 			HRMReport hrmReport = HRMReportParser.parseReport(new XMLFile(exportStructure.getReportFile().getFileObject()), exportStructure.getReportFileSchemaVersion());
+			// Have to read the appropriate content type here
 			media = hrmReport.getBinaryContent();
 			reports.setFileExtensionAndVersion(hrmReport.getFileExtension());
 		}

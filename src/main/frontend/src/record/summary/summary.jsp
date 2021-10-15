@@ -43,9 +43,7 @@
 					>
 					</summary-module>
 				</div>
-			</div>
-		</div>
-
+            </div>
 			<div class="col-md-6 col-sm-7 col-xs-10 col-sm-offset-0 col-xs-offset-1"
 				 ng-click="summaryCtrl.checkAction($event)"
 				 ng-keypress="summaryCtrl.checkAction($event)">
@@ -100,24 +98,23 @@
 					</div><!-- tab content -->
 				</div>
 			</div>
-		</div>
-
-		<div class="col-md-3 col-md-offset-0 col-xs-10 col-xs-offset-1"
-			 id="summary-section-right"
-			 ng-click="summaryCtrl.checkAction($event)"
-			 ng-keypress="summaryCtrl.checkAction($event)">
-			<div ng-repeat="mod in summaryCtrl.page.columnThree.modules">
-				<summary-module
-						module="mod"
-						item-display-count="mod.displaySize"
-						onclick-item="summaryCtrl.gotoState(item, module, successCallback, dismissCallback)"
-						onclick-title="summaryCtrl.onSummaryModClickTitle(module)"
-						clickable-title="summaryCtrl.isModTitleClickable(mod)"
-                        			enable-add-button="summaryCtrl.showAddButton(mod)"
-						enable-filter="true"
-				>
-				</summary-module>
+		    <div class="col-md-3 col-md-offset-0 col-xs-10 col-xs-offset-1"
+			    id="summary-section-right"
+			    ng-click="summaryCtrl.checkAction($event)"
+			    ng-keypress="summaryCtrl.checkAction($event)">
+			    <div ng-repeat="mod in summaryCtrl.page.columnThree.modules">
+				    <summary-module
+						    module="mod"
+						    item-display-count="mod.displaySize"
+						    onclick-item="summaryCtrl.gotoState(item, module, successCallback, dismissCallback)"
+						    onclick-title="summaryCtrl.onSummaryModClickTitle(module)"
+						    clickable-title="summaryCtrl.isModTitleClickable(mod)"
+                        			    enable-add-button="summaryCtrl.showAddButton(mod)"
+                            enable-filter="true"
+				    >
+				    </summary-module>
 			</div>
 		</div>
 	</div>
 </div>
+</juno-security-check>

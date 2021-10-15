@@ -25,6 +25,7 @@ package org.oscarehr.hospitalReportManager.service;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -150,7 +151,7 @@ public class HRMService
 	}
 	
 	/**
-	 * Upload a new HRM document to the database and move the associated hrm report xml file to the to the HRM documents folder
+	 * Upload a new HRM document to the database and move the associated hrm report xml file to the to the HRM documents folder.
 	 *
 	 * @param hrmDocumentModel - the model
 	 * @param demographic - the demographic entity
@@ -161,9 +162,17 @@ public class HRMService
 	{
 		HRMDocument hrmDocument = hrmDocumentModelToDbConverter.convert(hrmDocumentModel);
 		HRMReportParser.fillDocumentHashData(hrmDocument, hrmDocumentModel.getReportFile());
-		
+
+		// The intent here was to move the document into documents folder as close to the end of the import
+		// process as possible, such that a failure earlier on doesn't result in an orphaned file in the
+		// documents directory with no database references
+		Path hrmBaseDirectory = Paths.get(GenericFile.HRM_BASE_DIR);
+
+		GenericFile newFileLocation = hrmDocumentModel.getReportFile().moveToHRMDocuments();
+		Path relativePath = hrmBaseDirectory.relativize(Paths.get(newFileLocation.getPath()));
+		hrmDocument.setReportFile(relativePath.toString());
+
 		HRMDocument documentModel = persistAndLinkHRMDocument(hrmDocument, demographic);
-		hrmDocumentModel.getReportFile().moveToHRMDocuments();
 
 		return documentModel;
 	}

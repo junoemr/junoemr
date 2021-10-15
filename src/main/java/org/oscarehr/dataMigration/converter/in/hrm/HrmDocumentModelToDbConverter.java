@@ -189,47 +189,54 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 	 */
 	protected HRMDocumentToProvider createDeliverToLink(HRMDocument document, String deliverToID)
 	{
-		ProviderCriteriaSearch searchParams = new ProviderCriteriaSearch();
-		if (!deliverToID.isEmpty())
-		{
-			String practitionerNumber = deliverToID.substring(1);
-			
-			HrmDocument.DeliveryPrefix prefix = HrmDocument.DeliveryPrefix.fromString(deliverToID.substring(0, 1));
-			
-			if (HrmDocument.DeliveryPrefix.DOCTOR.equals(prefix))
-			{
-				searchParams.setPractitionerNo(practitionerNumber);
-			}
-			else if (HrmDocument.DeliveryPrefix.NURSE.equals(prefix))
-			{
-				searchParams.setOntarioCnoNumber(practitionerNumber);
-			}
-		}
-		
-		List<ProviderData> providers = searchProviders(searchParams);
 		HRMDocumentToProvider link = null;
-		
-		if (providers == null || providers.size() == 0)
+
+		if (ConversionUtils.hasContent(deliverToID))
 		{
-			logger.info(String.format("Could not match provider (%s) for HRM document (unlinked): %s",
-			                          document.getDeliverToUserId(),
-			                          document.getReportFile()));
+			ProviderCriteriaSearch searchParams = buildCriteriaSearch(deliverToID);
+			List<ProviderData> providers = searchProviders(searchParams);
+
+			if (providers == null || providers.size() == 0)
+			{
+				logger.info(String.format("Could not match provider (%s) for HRM document (unlinked): %s",
+					document.getDeliverToUserId(),
+					document.getReportFile()));
+			}
+			else if (providers.size() == 1)
+			{
+				ProviderData foundProvider = providers.get(0);
+
+				link = new HRMDocumentToProvider();
+				link.setProviderNo(String.valueOf(foundProvider.getProviderNo()));
+				link.setHrmDocument(document);
+			}
+			else
+			{
+				logger.info(String.format("Multiple providers (%s) matched for HRM document (unlinked): %s",
+					document.getDeliverToUserId(),
+					document.getReportFile()));
+			}
 		}
-		else if (providers.size() == 1)
-		{
-			ProviderData foundProvider = providers.get(0);
-			
-			link = new HRMDocumentToProvider();
-			link.setProviderNo(String.valueOf(foundProvider.getProviderNo()));
-			link.setHrmDocument(document);
-		}
-		else
-		{
-			logger.info(String.format("Multiple providers (%s) matched for HRM document (unlinked): %s",
-			                          document.getDeliverToUserId(),
-			                          document.getReportFile()));
-		}
-		
+
 		return link;
+	}
+
+	private ProviderCriteriaSearch buildCriteriaSearch(String deliverToID)
+	{
+		String practitionerNumber = deliverToID.substring(1);
+
+		ProviderCriteriaSearch searchParams = new ProviderCriteriaSearch();
+		HrmDocument.DeliveryPrefix prefix = HrmDocument.DeliveryPrefix.fromString(deliverToID.substring(0, 1));
+
+		if (HrmDocument.DeliveryPrefix.DOCTOR.equals(prefix))
+		{
+			searchParams.setPractitionerNo(practitionerNumber);
+		}
+		else if (HrmDocument.DeliveryPrefix.NURSE.equals(prefix))
+		{
+			searchParams.setOntarioCnoNumber(practitionerNumber);
+		}
+
+		return searchParams;
 	}
 }

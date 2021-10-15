@@ -505,7 +505,6 @@
             String address2 = hrmReport.getAddressLine2();
             String city = hrmReport.getAddressCity();
 
-            String zipCode = hrmReport.getZipCode();
             String postalCode = hrmReport.getPostalCode();
             String province = hrmReport.getCountrySubDivisionCode().replaceAll("\\w{2}-", "");
 
@@ -577,7 +576,7 @@
                 Please use the link to view/download the content contained within.
             </div>
             <% } %>
-            <a href="<%=request.getContextPath() %>/hospitalReportManager/HRMDownloadFile.do?hash=<%=noMessageIdHash%>"><%=(hrmReport.getLegalLastName() + "-" + hrmReport.getLegalFirstName() + "-" +  hrmReport.getFirstReportClass() + hrmReport.getFileExtension()).replaceAll("\\s", "_") %></a>
+            <a href="<%=request.getContextPath() %>/hospitalReportManager/HRMDownloadFile.do?hash=<%=noMessageIdHash%>"><%=(hrmReport.getLegalLastName() + "_" + hrmReport.getLegalFirstName() + "_" +  hrmReport.getFirstReportClass() + hrmReport.getFileExtension()).replaceAll("\\s", "_") %></a>
             <% } else { %>
             <div class="<%=getFieldClass(hrmReport.getFirstReportTextContent())%>"><%=ConversionUtils.hasContent(hrmReport.getFirstReportTextContent()) ? hrmReport.getFirstReportTextContent() : "NO CONTENT"%></div>
             <% } %>
@@ -760,45 +759,44 @@
                     <td><%=hrmReport.getFirstReportClass()%></td>
                 </tr>
                 <% if (hrmReport.getFirstReportClass().equalsIgnoreCase("Diagnostic Imaging Report") || hrmReport.getFirstReportClass().equalsIgnoreCase("Cardio Respiratory Report")) { %>
-                <%
-                    List<HrmObservation> hrmObservations = hrmReport.getObservations();
-                    List<HRMDocumentSubClass> subClassesFromDb = (List<HRMDocumentSubClass>) request.getAttribute("subClassList");
-                %>
-                <tr>
-                    <td colspan="2">Accompanying SubClasses:</td>
-                </tr>
-                <% for (HrmObservation observation: hrmObservations) { %>
-                <%
-                    String mnemonic = observation.getAccompanyingMnemonic();
-                    String subclass = observation.getAccompanyingSubClass();
-                    String description = observation.getAccompanyingDescription();
-                    String observationDate = ConversionUtils.toDateString(observation.getObservationDateTime());
-                %>
-                <tr>
-                    <td><span class="<%=getFieldClass(mnemonic)%>">(<%=getFieldDisplayValue(mnemonic)%>)</span> <span class="<%=getFieldClass(subclass)%>"><%=getFieldDisplayValue(subclass)%></span> <span class="<%=getFieldClass(description)%>"><%=getFieldDisplayValue(description)%></span></td>
-                    <td class="<%=getFieldClass(observationDate)%>"><%=getFieldDisplayValue(observationDate)%></td>
-                </tr>
-                <% } %>
-                <%--        <tr>
-                            <%
-                                if (subClassListFromDb != null && subClassListFromDb.size() > 0) { %>
-                            <i>Stored in Database</i><br />
-                            <div id="subclassstatus<%=hrmReportId %>"></div>
-                            <% for (HRMDocumentSubClass subClass : subClassListFromDb) { %>
-                            <abbr title="Type: <%=subClass.getSubClass() %>; Date of Observation: <%= String.valueOf(subClass.getSubClassDateTime()) %>">(<%=subClass.getSubClassMnemonic() %>) <%=subClass.getSubClassDescription() %></abbr>
-                            <% if (!subClass.isActive()) { %> (<a href="#" onclick="makeActiveSubClass('<%=hrmReportId %>', '<%=subClass.getId() %>')">make active</a>)<% } %><br />
-                            <% }
-                            } %>
-                        </tr>--%>
+                    <%
+                        List<HrmObservation> hrmObservations = hrmReport.getObservations();
+                    %>
+                    <tr>
+                        <td colspan="2">Accompanying SubClasses:</td>
+                    </tr>
+                    <% for (HrmObservation observation: hrmObservations) { %>
+                        <%
+                            String mnemonic = observation.getAccompanyingMnemonic();
+                            String subclass = observation.getAccompanyingSubClass();
+                            String description = observation.getAccompanyingDescription();
+                            String observationDate = ConversionUtils.toDateString(observation.getObservationDateTime());
+                        %>
+                        <tr>
+                            <td><span class="<%=getFieldClass(mnemonic)%>">(<%=getFieldDisplayValue(mnemonic)%>)</span> <span class="<%=getFieldClass(subclass)%>"><%=getFieldDisplayValue(subclass)%></span> <span class="<%=getFieldClass(description)%>"><%=getFieldDisplayValue(description)%></span></td>
+                            <td class="<%=getFieldClass(observationDate)%>"><%=getFieldDisplayValue(observationDate)%></td>
+                        </tr>
+                    <% } %>
                 <% } else { %>
                 <%
-                    String[] subClassFromReport = hrmReport.getFirstReportSubClass().split("\\^");
+                    if (hrmReport.getFirstReportSubClass() != null) {
+                        String[] subClassFromReport = hrmReport.getFirstReportSubClass().split("\\^");
+                        String subClassDisplay = "";
+                        if (subClassFromReport.length == 1)
+                        {
+                            subClassDisplay = subClassFromReport[0];  // subclass was not sent with a short code
+                        }
+                        else if (subClassFromReport.length == 2)
+                        {
+                            subClassDisplay = "(" + subClassFromReport[0] + ") " + subClassFromReport[1];
+                        }
                 %>
-                <tr>
-                    <td>Subclass:</td>
-                    <td>(<%=subClassFromReport[0]%>) <%=subClassFromReport[1] %></td>
-                </tr>
+                    <tr>
+                        <td>Subclass:</td>
+                        <td><%=subClassDisplay%></td>
+                    </tr>
                 <% } %>
+            <% } %>
             </table>
             <table>
                 <tr>

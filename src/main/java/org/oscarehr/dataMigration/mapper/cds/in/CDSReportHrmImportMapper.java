@@ -29,8 +29,12 @@ import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
+import org.oscarehr.integration.clinicaid.dto.v2.MasterNumber;
+import org.oscarehr.integration.clinicaid.service.v2.ClinicAidService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
+import xml.cds.v5_0.ReportClass;
 import xml.cds.v5_0.Reports;
 
 import java.io.IOException;
@@ -44,6 +48,9 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 	@Autowired
 	protected CDSReportDocumentImportMapper documentImportMapper;
 
+	@Autowired
+	protected ClinicAidService clinicaidService;
+
 	public CDSReportHrmImportMapper()
 	{
 		super();
@@ -55,29 +62,64 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 		HrmDocument document = new HrmDocument();
 
 		document.setDocument(documentImportMapper.importToJuno(importStructure));
+
+		ReportClass reportClass = importStructure.getClazz();
+		document.setReportClass(HrmDocument.ReportClass.fromValueString(getReportClass(importStructure.getClazz())));
+
+		boolean isOBRType = ReportClass.DIAGNOSTIC_IMAGING_REPORT.equals(reportClass) || ReportClass.CARDIO_RESPIRATORY_REPORT.equals(reportClass);
+		boolean hasOBRContent = importStructure.getOBRContent() != null && !importStructure.getOBRContent().isEmpty();
+
+		// Diagnostic imaging and cardio-respiratory reports typically don't include a report date,
+		// so try looking in the first OBR segment, if one exists.
+		if (toNullableLocalDateTime(importStructure.getEventDateTime()) == null && isOBRType && hasOBRContent)
+		{
+			document.setReportDateTime(toNullableLocalDateTime(importStructure.getOBRContent().get(0).getObservationDateTime()));
+		}
+		else
+		{
+			document.setReportDateTime(toNullableLocalDateTime(importStructure.getEventDateTime()));
+		}
+
 		document.setReportClass(HrmDocument.ReportClass.fromValueString(getReportClass(importStructure.getClazz())));
 		document.setReportSubClass(importStructure.getSubClass());
-		document.setReportDateTime(toNullableLocalDateTime(importStructure.getEventDateTime()));
 		document.setReceivedDateTime(toNullableLocalDateTime(importStructure.getReceivedDateTime()));
 
 		document.setCreatedBy(getAuthorPhysician(importStructure.getSourceAuthorPhysician()));
-		Reviewer reviewer = getReviewer(importStructure.getReportReviewed());
+		List<Reviewer> reviewer = getReviewers(importStructure.getReportReviewed());
 		if(reviewer != null)
 		{
-			document.addReviewer(reviewer);
+			document.addReviewers(reviewer);
 		}
 
 		document.setReportStatus(HrmDocument.ReportStatus.fromValueString(importStructure.getHRMResultStatus()));
 		document.setObservations(getObservations(importStructure.getOBRContent()));
 		document.addComment(getNoteAsHrmComment(importStructure.getNotes(), document.getCreatedBy(), document.getReportDateTime()));
-		document.setDescription(CDSConstants.DEFAULT_HRM_DESCRIPTION);
+		document.setDescription(document.getReportClass().getValue() + " (" + CDSConstants.DEFAULT_HRM_DESCRIPTION + ")");
 
 		document.setSourceFacility(importStructure.getSourceFacility());
+
+		String facilityId = importStructure.getSendingFacilityId();
+		if (ConversionUtils.hasContent(facilityId))
+		{
+			document.setSendingFacilityId(facilityId);
+			try
+			{
+				MasterNumber masterNumber = clinicaidService.getOntarioMasterNumber(facilityId);
+				document.setSendingFacility(masterNumber.getName());
+			}
+			catch (Exception e)
+			{
+				logger.warn("Could not retrieve HRM facility name from ClinicAid for id [" + facilityId + "]");
+			}
+		}
+
 		document.setSendingFacilityId(importStructure.getSendingFacilityId());
 		document.setSendingFacilityReport(importStructure.getSendingFacilityReport());
 		document.setMessageUniqueId(importStructure.getMessageUniqueID());
-		document.setDeliverToUserId(null); // can this be derived somehow?
 
+		// We could do something like search the providers for a specific OHIP number, if there was only
+		// one reviewer associated.  This would just be guess, as the original info is not included in CDS.
+		document.setDeliverToUserId(null);
 		return document;
 	}
 

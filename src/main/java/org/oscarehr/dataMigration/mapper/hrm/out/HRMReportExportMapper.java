@@ -34,6 +34,7 @@ import xml.hrm.v4_3.ReportFormat;
 import xml.hrm.v4_3.ReportsReceived;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,12 +58,24 @@ public class HRMReportExportMapper extends AbstractHRMExportMapper<ReportsReceiv
 		{
 			throw new RuntimeException("HRM document model cannot be exported without an attached Document model");
 		}
+
 		GenericFile documentFile = document.getFile();
-		reportsReceived.setFormat(ReportFormat.BINARY);	// all Juno documents will be treated as binary reports
+
 		ReportContent reportContent = objectFactory.createReportContent();
-		reportContent.setMedia(documentFile.toBase64ByteArray());
+		if (documentFile.getExtension().equals("txt"))
+		{
+			reportsReceived.setFormat(ReportFormat.TEXT);
+			reportContent.setTextContent(new String(documentFile.toByteArray(), StandardCharsets.UTF_8));
+		}
+		else
+		{
+			reportsReceived.setFormat(ReportFormat.BINARY);
+			reportContent.setMedia(documentFile.toByteArray());
+		}
+
 		reportsReceived.setContent(reportContent);
-		reportsReceived.setFileExtensionAndVersion(documentFile.getExtension().toLowerCase());
+		// OMD-HRM files contain the '.' as part of this field
+		reportsReceived.setFileExtensionAndVersion("." + documentFile.getExtension().toLowerCase());
 
 		reportsReceived.setClazz(toReportClass(exportStructure.getReportClass()));
 		reportsReceived.setSubClass(exportStructure.getReportSubClass());

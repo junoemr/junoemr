@@ -49,7 +49,7 @@ public class HRMReportDocumentMapper extends AbstractHRMImportMapper<HRMReport_4
 		document.setDocumentSubClass(report.getSubClass());
 		document.setObservationDate(toNullableLocalDate(report.getEventDateTime()));
 		document.setCreatedAt(toNullableLocalDateTime(report.getReceivedDateTime()));
-		
+		document.setSource("HRM");
 		document.setResponsible(stubProviderFromPersonName(report.getAuthorPhysician()));
 		
 		document.setReviewer(getFirstStubReviewer(report));

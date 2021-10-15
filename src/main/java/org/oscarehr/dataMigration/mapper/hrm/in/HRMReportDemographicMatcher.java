@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class HRMReportDemographicMatcher extends AbstractHRMImportMapper<HRMReport_4_3, List<Demographic>>
@@ -50,8 +49,8 @@ public class HRMReportDemographicMatcher extends AbstractHRMImportMapper<HRMRepo
 		searchParams.setHin(importStructure.getHCN());
 		searchParams.setSex(importStructure.getGender());
 		searchParams.setLastName(importStructure.getLegalLastName());
-		
-		Optional.ofNullable(importStructure.getDateOfBirthAsLocalDate()).ifPresent(searchParams::setDateOfBirth);
+		importStructure.getDateOfBirthAsLocalDate()
+			.ifPresent(searchParams::setDateOfBirth);
 		
 		// Additional parameters
 		searchParams.setHealthCardProvince(extractSubRegionCode(importStructure.getHCNProvinceCode()));
