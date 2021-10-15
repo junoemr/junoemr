@@ -25,6 +25,7 @@ package oscar.util.Jackson;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 
 import java.io.IOException;
@@ -45,8 +46,8 @@ public class PartialDateDeserializer extends StdDeserializer<PartialDate>
 	@Override
 	public PartialDate deserialize(JsonParser jsonparser, DeserializationContext context) throws IOException
 	{
-		String jsonDate = jsonparser.getText();
-		if(jsonDate.length() > 10)
+		String jsonDate = StringUtils.trimToNull(jsonparser.getText());
+		if(jsonDate != null && jsonDate.length() > 10)
 		{
 			jsonDate = jsonDate.substring(0, 10); // only take 10 digits, should be formatted yyyy-MM-dd
 		}

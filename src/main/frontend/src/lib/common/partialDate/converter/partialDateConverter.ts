@@ -1,6 +1,7 @@
 import {PartialDate} from "../../../../../generated";
 import PartialDateModel from "../model/partialDateModel"
 import AbstractConverter from "../../../conversion/AbstractConverter";
+import moment from "moment/moment";
 
 export default class PartialDateConverter extends AbstractConverter<PartialDate, PartialDateModel>
 {
@@ -24,7 +25,7 @@ export default class PartialDateConverter extends AbstractConverter<PartialDate,
     private convertString(from: string): PartialDateModel
     {
         let partialDateModel;
-        let parts = from.split("T")
+        let parts = from.split("T");
 
         if(parts.length == 2) //datetime
         {
