@@ -52,9 +52,9 @@ public class OscarCommLocationsDao extends AbstractDao<OscarCommLocations>{
 	}
 
 	/**
-	 * Gets a list of ids of oscarCommLocations entries with the provider locationDesc
+	 * Gets a list of oscarCommLocations entries with the provided locationDesc
 	 * @param description Description to find
-	 * @return List of ids
+	 * @return List of OscarCommLocations
 	 */
 	public List<OscarCommLocations> findByLocationDesc(String description) {
 		Query query = createQuery("ocl", "ocl.locationDesc = :locationDesc");
