@@ -67,6 +67,7 @@ angular.module('Admin.Section').component('editProviderAdmin',
 		ctrl.allowSubmit = false; // if false submit is blocked.
 		ctrl.loadingError = false; // if true submit is blocked. if any async function returns error set this.
 		ctrl.fieldsDisabled = ctrl.mode === EDIT_PROVIDER_MODE.VIEW;
+		ctrl.isMultisiteEnabled = false;
 
 		ctrl.sexes = staticDataService.getGenders();
 		ctrl.providerTypes = staticDataService.getProviderTypes();
@@ -125,6 +126,18 @@ angular.module('Admin.Section').component('editProviderAdmin',
 		
 		// options for the BC service location field
 		ctrl.bcServiceLocationOptions = [];
+
+		// options for BCP eligibility
+		ctrl.bcEligibilityOptions = [
+			{
+				label: "No",
+				value: false,
+			},
+			{
+				label: "Yes",
+				value: true,
+			},
+		];
 
 		// options for the AB facilities field
 		ctrl.albertaFacilityOptions = [];
@@ -365,6 +378,13 @@ angular.module('Admin.Section').component('editProviderAdmin',
 						console.error("Failed to fetch instance billing type with error: " + error);
 						ctrl.loadingError = true;
 					}
+			);
+
+			systemPreferenceApi.getPropertyEnabled("multisites").then(
+				(response) =>
+				{
+					ctrl.isMultisiteEnabled = response.data.body;
+				}
 			);
 
 			// when we switch bill region, load additional data.
