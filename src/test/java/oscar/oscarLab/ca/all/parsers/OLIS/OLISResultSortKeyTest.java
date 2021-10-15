@@ -75,9 +75,9 @@ public class OLISResultSortKeyTest
 	@Test
 	public void testCompare_nomenclatureOrdering()
 	{
-		OLISResultSortKey sortKeyA1 = new OLISResultSortKey(null, null, "AAA", null, null, null);
-		OLISResultSortKey sortKeyA2 = new OLISResultSortKey(null, null, "AAA", null, null, null);
-		OLISResultSortKey sortKeyB = new OLISResultSortKey(null, null, "BBB", null, null, null);
+		OLISResultSortKey sortKeyA1 = new OLISResultSortKey(null, null, "200000.064.000", null, null, null);
+		OLISResultSortKey sortKeyA2 = new OLISResultSortKey(null, null, "200000.064.000", null, null, null);
+		OLISResultSortKey sortKeyB = new OLISResultSortKey(null, null, "200000.066.000", null, null, null);
 		OLISResultSortKey sortKeyN = new OLISResultSortKey(null, null, null, null, null, null);
 
 		int result = sortKeyA1.compareTo(sortKeyA2);

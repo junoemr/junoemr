@@ -103,9 +103,9 @@ public class OLISRequestSortKeyTest
 	@Test
 	public void testCompare_nomenclatureKeyOrdering()
 	{
-		OLISRequestSortKey sortKeyA1 = new OLISRequestSortKey(null, null, null, "AAA", null, null);
-		OLISRequestSortKey sortKeyA2 = new OLISRequestSortKey(null, null, null, "AAA", null, null);
-		OLISRequestSortKey sortKeyB = new OLISRequestSortKey(null, null, null, "BBB", null, null);
+		OLISRequestSortKey sortKeyA1 = new OLISRequestSortKey(null, null, null, "200000.064.000", null, null);
+		OLISRequestSortKey sortKeyA2 = new OLISRequestSortKey(null, null, null, "200000.064.000", null, null);
+		OLISRequestSortKey sortKeyB = new OLISRequestSortKey(null, null, null, "200000.066.000", null, null);
 		OLISRequestSortKey sortKeyN = new OLISRequestSortKey(null, null, null, null, null, null);
 
 

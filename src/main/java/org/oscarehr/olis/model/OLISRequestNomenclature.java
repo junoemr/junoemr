@@ -13,48 +13,29 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
 
+@Data
 @Entity
-public class OLISRequestNomenclature extends AbstractModel<Integer> {
+public class OLISRequestNomenclature extends AbstractModel<Integer>
+{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private String nameId;
 	private String name;
+	private String sortKey;
 	private String category;
 
-	public OLISRequestNomenclature(){
+	public OLISRequestNomenclature()
+	{
 		super();
-	}	
-
-	@Override
-    public Integer getId() {
-	    return id;
-    }
-
-	public String getNameId() {
-    	return nameId;
-    }
-
-	public void setNameId(String nameId) {
-    	this.nameId = nameId;
-    }
-	
-	public String getName() {
-    	return name;
-    }
-
-	public void setName(String name) {
-    	this.name = name;
-    }
-
-	public String getCategory() {
-    	return category;
-    }
-
-	public void setCategory(String category) {
-    	this.category = category;
 	}
 
+	@Override
+	public Integer getId()
+	{
+		return id;
+	}
 }

@@ -8,43 +8,33 @@
  */
 package org.oscarehr.olis.model;
 
+import lombok.Data;
+import org.oscarehr.common.model.AbstractModel;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import org.oscarehr.common.model.AbstractModel;
-
+@Data
 @Entity
-public class OLISResultNomenclature extends AbstractModel<String> {
+public class OLISResultNomenclature extends AbstractModel<String>
+{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private String id;
 	private String name;
 	private String nameId;
+	private String sortKey;
 
-	public String getNameId() {
-    	return nameId;
-    }
-
-	public void setNameId(String nameId) {
-    	this.nameId = nameId;
-    }
+	public OLISResultNomenclature()
+	{
+		super();
+	}
 
 	@Override
-    public String getId() {
-	    return id;
-    }
-
-	public String getName() {
-    	return name;
-    }
-
-	public void setName(String name) {
-    	this.name = name;
-    }
-
-	public OLISResultNomenclature(){
-		super();
-	}	
+	public String getId()
+	{
+		return id;
+	}
 }

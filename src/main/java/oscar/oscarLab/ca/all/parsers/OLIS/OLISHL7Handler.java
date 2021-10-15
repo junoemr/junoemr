@@ -1252,7 +1252,7 @@ public class OLISHL7Handler extends MessageHandler
 				OLISRequestNomenclature olisRequestNomenclature = requestNomenclatureDao.findByNameId(obxCategory);
 				if(olisRequestNomenclature != null)
 				{
-					olisSortKey = olisRequestNomenclature.getName();
+					olisSortKey = olisRequestNomenclature.getSortKey();
 				}
 			}
 
@@ -1295,7 +1295,7 @@ public class OLISHL7Handler extends MessageHandler
 				OLISResultNomenclature olisResultNomenclature = resultNomenclatureDao.findByNameId(obxName);
 				if(olisResultNomenclature != null)
 				{
-					olisSortKey = olisResultNomenclature.getName();
+					olisSortKey = olisResultNomenclature.getSortKey();
 				}
 			}
 
