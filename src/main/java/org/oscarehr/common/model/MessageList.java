@@ -38,7 +38,6 @@ public class MessageList extends AbstractModel<Integer> {
 	public static final String STATUS_DELETED = "del";
 	public static final String STATUS_NEW = "new";
 	public static final String STATUS_READ = "read";
-	public static final int DEFAULT_REMOTE_LOCATION = 145;
 	
 	
 	@Id
