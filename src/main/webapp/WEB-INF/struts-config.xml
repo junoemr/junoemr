@@ -33,6 +33,7 @@
 		<form-bean name="clinicForm" type="org.apache.struts.validator.DynaValidatorForm">
 			<form-property name="clinic" type="org.oscarehr.common.model.Clinic" />
 			<form-property name="clinicBillingAddress" type="org.oscarehr.clinic.model.ClinicBillingAddress" />
+            <form-property name="clinicServiceLocationCode" type="java.lang.String"></form-property>
 		</form-bean>
 
 		<form-bean name="siteForm" type="org.apache.struts.validator.DynaValidatorForm">

@@ -90,6 +90,16 @@ form {
     height: 15px;
 }
 
+.input-field select {
+    margin-top: 2px;
+    margin-bottom: 5px;
+    padding: 3px 0;
+    padding-left: 4px;
+    font-size: 1.0em;
+
+    width: auto;
+}
+
 .input-field label {
     font-size: 0.8em;
     font-weight: bold;
