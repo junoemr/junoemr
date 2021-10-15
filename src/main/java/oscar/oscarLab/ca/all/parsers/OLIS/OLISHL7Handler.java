@@ -1247,12 +1247,14 @@ public class OLISHL7Handler extends MessageHandler
 
 			String obxCategory = StringUtils.trimToNull(get("/.OBR" + obrRepStr + "-4-1-1"));
 			String olisSortKey = null;
+			String olisAlternateName1 = null;
 			if(obxCategory != null)
 			{
 				OLISRequestNomenclature olisRequestNomenclature = requestNomenclatureDao.findByNameId(obxCategory);
 				if(olisRequestNomenclature != null)
 				{
 					olisSortKey = olisRequestNomenclature.getSortKey();
+					olisAlternateName1 = olisRequestNomenclature.getAltName1();
 				}
 			}
 
@@ -1261,7 +1263,7 @@ public class OLISHL7Handler extends MessageHandler
 					placerGroupNo,
 					requestSortKey,
 					olisSortKey,
-					getOBRName(obrRep),
+					olisAlternateName1,
 					obrRep);
 
 			key.setOriginalIndex(obrRep);
@@ -1290,12 +1292,14 @@ public class OLISHL7Handler extends MessageHandler
 
 			String obxName = StringUtils.trimToNull(getOBXField(obrRep, obxRep, 3, 0, 1));
 			String olisSortKey = null;
+			String olisAlternateName1 = null;
 			if(obxName != null)
 			{
 				OLISResultNomenclature olisResultNomenclature = resultNomenclatureDao.findByNameId(obxName);
 				if(olisResultNomenclature != null)
 				{
 					olisSortKey = olisResultNomenclature.getSortKey();
+					olisAlternateName1 = olisResultNomenclature.getAltName1();
 				}
 			}
 
@@ -1310,7 +1314,7 @@ public class OLISHL7Handler extends MessageHandler
 					getOBXResultStatus(obrRep, obxRep),
 					msgKey,
 					olisSortKey,
-					getOBXName(obrRep, obxRep),
+					olisAlternateName1,
 					subId,
 					zbxDate);
 

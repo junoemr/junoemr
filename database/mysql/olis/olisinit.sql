@@ -3,6 +3,7 @@ CREATE TABLE OLISResultNomenclature
     id          INT NOT NULL AUTO_INCREMENT,
     nameId      VARCHAR(10),
     name        TEXT,
+    altName1    TEXT,
     sortKey     VARCHAR(14),
     PRIMARY KEY (id)
 );
@@ -11,13 +12,14 @@ INTO TABLE OLISResultNomenclature
 FIELDS TERMINATED BY ','
        OPTIONALLY ENCLOSED BY '\"' 
 LINES TERMINATED BY '\n'
-(nameId, name, sortKey);
+(nameId, name, altName1, sortKey);
 
 CREATE TABLE OLISRequestNomenclature
 (
     id       INT NOT NULL AUTO_INCREMENT,
     nameId   VARCHAR(10),
     name     TEXT,
+    altName1 TEXT,
     sortKey  VARCHAR(14),
     category VARCHAR(20),
     PRIMARY KEY (id)
@@ -28,7 +30,7 @@ INTO TABLE OLISRequestNomenclature
 FIELDS TERMINATED BY ','
        OPTIONALLY ENCLOSED BY '\"' 
 LINES TERMINATED BY '\n'
-(nameId, name, sortKey, category);
+(nameId, name, altName1, sortKey, category);
 
 UPDATE OLISResultNomenclature SET sortKey=NULL WHERE sortKey = '';
 UPDATE OLISRequestNomenclature SET sortKey=NULL WHERE sortKey = '';

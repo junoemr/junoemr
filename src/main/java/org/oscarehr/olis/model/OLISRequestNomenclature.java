@@ -25,6 +25,7 @@ public class OLISRequestNomenclature extends AbstractModel<Integer>
 	private Integer id;
 	private String nameId;
 	private String name;
+	private String altName1;
 	private String sortKey;
 	private String category;
 

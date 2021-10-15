@@ -77,7 +77,7 @@ public class OLISResultSortKeyTest
 	{
 		OLISResultSortKey sortKeyA1 = new OLISResultSortKey(null, null, "200000.064.000", null, null, null);
 		OLISResultSortKey sortKeyA2 = new OLISResultSortKey(null, null, "200000.064.000", null, null, null);
-		OLISResultSortKey sortKeyB = new OLISResultSortKey(null, null, "200000.066.000", null, null, null);
+		OLISResultSortKey sortKeyB = new OLISResultSortKey(null, null, "200000.066.100", null, null, null);
 		OLISResultSortKey sortKeyN = new OLISResultSortKey(null, null, null, null, null, null);
 
 		int result = sortKeyA1.compareTo(sortKeyA2);

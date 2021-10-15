@@ -24,6 +24,7 @@ public class OLISResultNomenclature extends AbstractModel<String>
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private String id;
 	private String name;
+	private String altName1;
 	private String nameId;
 	private String sortKey;
 
