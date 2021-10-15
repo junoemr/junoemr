@@ -56,7 +56,7 @@ public class OscarCommLocationsDao extends AbstractDao<OscarCommLocations>{
 	 * @param description Description to find
 	 * @return List of ids
 	 */
-	public List<Integer> findByLocationDesc(String description) {
+	public List<OscarCommLocations> findByLocationDesc(String description) {
 		Query query = createQuery("ocl", "ocl.locationDesc = :locationDesc");
 		query.setParameter("locationDesc", description);
 		return query.getResultList();

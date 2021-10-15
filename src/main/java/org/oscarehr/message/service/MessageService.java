@@ -30,6 +30,7 @@ import org.oscarehr.common.dao.OscarCommLocationsDao;
 import org.oscarehr.common.model.MessageList;
 import org.oscarehr.common.model.MessageTbl;
 import org.oscarehr.common.model.MsgDemoMap;
+import org.oscarehr.common.model.OscarCommLocations;
 import org.oscarehr.common.model.OscarMsgType;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.provider.model.ProviderData;
@@ -139,9 +140,10 @@ public class MessageService
 	public int getDefaultLocation() throws NoSuchElementException, NullPointerException
 	{
 		final String DEFAULT_LOCATION_DESCRIPTION = "Oscar Users";
-		List<Integer> locations = oscarCommLocationsDao.findByLocationDesc(DEFAULT_LOCATION_DESCRIPTION);
+		List<OscarCommLocations> locations = oscarCommLocationsDao.findByLocationDesc(DEFAULT_LOCATION_DESCRIPTION);
 		if (locations.size() == 0)
 		{
+			MiscUtils.getLogger().error("No location with description of '" + DEFAULT_LOCATION_DESCRIPTION + "'");
 			throw new NoSuchElementException("No location with description of '" + DEFAULT_LOCATION_DESCRIPTION + "'");
 		}
 
@@ -151,6 +153,6 @@ public class MessageService
 		}
 
 		// Return first value in the event that more than one are found with the same description
-		return locations.get(0);
+		return locations.get(0).getId();
 	}
 }
