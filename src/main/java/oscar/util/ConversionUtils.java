@@ -76,6 +76,7 @@ public class ConversionUtils {
 	public static final String TIME_PATTERN_NO_SEC = "HH:mm";
 	public static final String DEFAULT_TS_PATTERN = "yyyy-MM-dd HH:mm:ss";
 	public static final String DATE_TIME_ZONE_OFFSET_X_PATTERN = "yyyy-MM-dd HH:mm:ss X";
+	public static final String DATE_TIME_ZONE_DISPLAY_PATTERN = "yyyy-MM-dd HH:mm:ss z";
 	public static final String DATE_TIME_FILENAME = "yyyy-MM-dd.HH.mm.ss";
 
 	public static final String DISPLAY_DATE_PATTERN = "dd-MMM-yyyy";

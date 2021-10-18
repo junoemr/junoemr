@@ -34,19 +34,12 @@ package oscar.oscarLab.ca.all.pageUtil;
 
 import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
+import com.itextpdf.kernel.events.PdfDocumentEvent;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.styledxmlparser.css.media.MediaDeviceDescription;
 import com.itextpdf.styledxmlparser.css.media.MediaType;
 import com.lowagie.text.DocumentException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -54,11 +47,25 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
+import oscar.oscarLab.ca.all.pageUtil.OLIS.OLISPrintFooter;
+import oscar.oscarLab.ca.all.pageUtil.OLIS.OLISPrintHeader;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -75,8 +82,8 @@ public class PrintLabsAction extends Action{
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
-        String providerNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-        securityInfoManager.requireOnePrivilege(providerNo, SecurityInfoManager.READ, null, "_lab");
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+        securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.LAB_READ);
 
         try
         {
@@ -97,7 +104,7 @@ public class PrintLabsAction extends Action{
 
 				response.setContentType("application/pdf");
                 response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "_OLISLabReport.pdf\"");
-				htmlToPdf(labRequestUrl, request, response.getOutputStream());
+				htmlToPdf(labRequestUrl, request, response.getOutputStream(), loggedInInfo);
             }
             else
             {
@@ -128,7 +135,7 @@ public class PrintLabsAction extends Action{
         return null;
     }
 
-	private void htmlToPdf(String urlStr, HttpServletRequest request, OutputStream outputStream)
+	private void htmlToPdf(String urlStr, HttpServletRequest request, OutputStream outputStream, LoggedInInfo loggedInInfo)
 		throws IOException
 	{
 		String baseUri = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
@@ -149,13 +156,24 @@ public class PrintLabsAction extends Action{
 		}
 
 		InputStream inputStream = connection.getInputStream();
+		PdfWriter writer = new PdfWriter(outputStream);
+		PdfDocument pdfDocument = new PdfDocument(writer);
 
 		ConverterProperties props = new ConverterProperties();
 		props.setMediaDeviceDescription(new MediaDeviceDescription(MediaType.PRINT));
 		props.setBaseUri(baseUri);
 
-		HtmlConverter.convertToPdf(connection.getInputStream(), outputStream, props);
+		pdfDocument.addEventHandler(PdfDocumentEvent.START_PAGE, new OLISPrintHeader(
+				"Ministry of Health and Long-Term Care",
+				"Ontario Laboratories Information System (OLIS)"));
+
+		OLISPrintFooter printFooter = new OLISPrintFooter(loggedInInfo.getLoggedInProvider().getDisplayName());
+		pdfDocument.addEventHandler(PdfDocumentEvent.END_PAGE, printFooter);
+
+		HtmlConverter.convertToPdf(inputStream, pdfDocument, props);
+
 		inputStream.close();
+		pdfDocument.close();
 
 		logger.info("PDF conversion complete");
 	}
