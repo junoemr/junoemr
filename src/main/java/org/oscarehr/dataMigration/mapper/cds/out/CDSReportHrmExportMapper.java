@@ -87,7 +87,7 @@ public class CDSReportHrmExportMapper extends AbstractCDSReportExportMapper<HrmD
 		reports.getReportReviewed().addAll(getReportReviewedList(exportStructure.getReviewers().toArray(new Reviewer[]{})));
 
 		//HRM Specific fields
-		reports.setSourceFacility(exportStructure.getSourceFacility());
+		reports.setSourceFacility(exportStructure.getSendingFacility());  // Not a mistake, part of the spec
 		reports.setSendingFacilityId(exportStructure.getSendingFacilityId());
 		reports.setSendingFacilityReport(exportStructure.getSendingFacilityReport());
 
