@@ -1,0 +1,77 @@
+.juno-radio-select {
+	--juno-select-label-padding: 0;
+	--juno-select-label-width: unset;
+
+	.label-style {
+		padding: var(--juno-select-label-padding);
+		width: var(--juno-select-label-width);
+	}
+
+	.radio-select-container {
+		@include juno-form-inputs-style(1px, var(--theme-form-field-border-radius));
+		@include juno-form-inputs-colors-default();
+
+		position: relative;
+		flex: 1 1 0;
+
+		.radio-selector {
+			input[type="radio"] {
+				display: none;
+
+				&:checked + .selection-indicator {
+
+					&.juno-radio-style-circle {
+						color: var(--color-primary-base);
+						border-color: var(--color-primary-dark);
+						background-color: var(--color-neutral-white);
+
+						.icon {
+							color: var(--color-primary-base);
+						}
+					}
+					&.juno-radio-style-check {
+						color: var(--color-neutral-white);
+						border-color: var(--color-primary-dark);
+						background-color: var(--color-primary-base);
+
+						.icon {
+							color: var(--color-neutral-white);
+						}
+					}
+				}
+			}
+
+			.selection-indicator {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background-size: 100%;
+
+				width: 16px;
+				height: 16px;
+				font-size: 12px;
+
+				color: var(--theme-color-form-field-text);
+				border: 1px solid var(--theme-color-form-field-border);
+				background-color: var(--theme-color-form-field-background);
+
+				&.juno-radio-style-circle {
+					border-radius: 50%;
+					.icon {
+						font-size: 18px;
+					}
+				}
+				&.juno-radio-style-check {
+					border-radius: 4px;
+					.icon {
+						font-size: 12px;
+					}
+				}
+
+				.icon {
+					color: transparent;
+				}
+			}
+		}
+	}
+}

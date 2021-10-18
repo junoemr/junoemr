@@ -28,6 +28,7 @@ import org.oscarehr.common.dao.PropertyDao;
 import org.oscarehr.common.model.Property;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.dao.PreventionExtDao;
+import org.oscarehr.prevention.dto.PreventionTypeTransfer;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.model.PreventionExt;
 import org.oscarehr.util.LoggedInInfo;
@@ -231,5 +232,38 @@ public class PreventionManager
 	{
 		List<Prevention> results = preventionDao.findUniqueByDemographicId(demographicNo);
 		return (results);
+	}
+
+	/**
+	 * kinda hackey keyword search of prevention types. checks name, code, and health Canada type
+	 * @param filterTerm the term to filter on, set to null for all items
+	 * @return the relevant preventions
+	 */
+	public List<PreventionTypeTransfer> searchPreventionTypes(String filterTerm)
+	{
+		ArrayList<PreventionTypeTransfer> transfers = new ArrayList<>();
+		PreventionDisplayConfig pdc = PreventionDisplayConfig.getInstance();
+		for(HashMap<String, String> prevTypeHash : pdc.getPreventions())
+		{
+			PreventionTypeTransfer transfer = new PreventionTypeTransfer();
+			transfer.setName(org.apache.commons.lang3.StringUtils.trimToNull(prevTypeHash.get("name")));
+			transfer.setCode(org.apache.commons.lang3.StringUtils.trimToNull(prevTypeHash.get("name")));
+			transfer.setHealthCanadaType(org.apache.commons.lang3.StringUtils.trimToNull(prevTypeHash.get("healthCanadaType")));
+			transfer.setAtc(org.apache.commons.lang3.StringUtils.trimToNull(prevTypeHash.get("atc")));
+			transfer.setDescription(org.apache.commons.lang3.StringUtils.trimToNull(prevTypeHash.get("description")));
+
+			// no filter term
+			if(org.apache.commons.lang3.StringUtils.trimToNull(filterTerm) == null)
+			{
+				transfers.add(transfer);
+			}
+			else if((transfer.getName() != null && transfer.getName().contains(filterTerm)) ||
+					(transfer.getCode() != null && transfer.getCode().contains(filterTerm)) ||
+					(transfer.getHealthCanadaType() != null && transfer.getHealthCanadaType().contains(filterTerm)))
+			{
+				transfers.add(transfer);
+			}
+		}
+		return transfers;
 	}
 }

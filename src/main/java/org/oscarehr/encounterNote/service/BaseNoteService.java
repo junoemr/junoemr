@@ -27,10 +27,8 @@ import org.oscarehr.PMmodule.dao.ProgramDao;
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.dao.PartialDateDao;
-import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.PartialDate;
-import org.oscarehr.common.model.SecRole;
 import org.oscarehr.dataMigration.converter.in.ResidualInfoModelToDbConverter;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.encounterNote.BaseNote;
@@ -50,6 +48,8 @@ import org.oscarehr.encounterNote.model.CaseManagementNoteResidualInfo;
 import org.oscarehr.encounterNote.model.Issue;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.security.dao.SecRoleDao;
+import org.oscarehr.security.model.SecRole;
 import org.oscarehr.ws.rest.conversion.CaseManagementIssueConverter;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
 import org.oscarehr.ws.rest.to.model.NoteIssueTo1;
@@ -357,6 +357,12 @@ public abstract class BaseNoteService
 			note.setUuid(UUID.randomUUID().toString());
 		}
 
+		// signed without a signing provider is invalid. default signing provider to the note provider
+		if(note.getSigned() && note.getSigningProvider() == null)
+		{
+			note.setSigningProvider(note.getProvider());
+		}
+
 		caseManagementNoteDao.persist(note);
 
 		return note;
@@ -367,7 +373,7 @@ public abstract class BaseNoteService
 	 */
 	protected String getCaisiRole()
 	{
-		SecRole secRole = secRoleDao.findByName("doctor");
+		SecRole secRole = secRoleDao.findSystemDefaultRole();
 		if(secRole != null)
 		{
 			return String.valueOf(secRole.getId());

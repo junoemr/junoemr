@@ -26,6 +26,7 @@ package org.oscarehr.ws.rest;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.inbox.InboxManagerResponse;
 import org.oscarehr.inbox.service.InboxManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.InboxResponse;
 import org.oscarehr.ws.rest.to.model.InboxTo1;
@@ -55,10 +56,15 @@ public class InboxService extends AbstractServiceImpl {
 	@GET
 	@Path("/mine")
 	@Produces("application/json")
-	public InboxResponse getMyUnacknowlegedReports(@QueryParam("limit") int limit) {
-	
+	public InboxResponse getMyUnacknowlegedReports(@QueryParam("limit") int limit)
+	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		String providerNo = loggedInInfo.getLoggedInProviderNo();
+
+		securityInfoManager.requireAllPrivilege(providerNo,
+				Permission.DOCUMENT_READ,
+				Permission.LAB_READ,
+				Permission.HRM_READ);
 	
 		InboxManagerResponse response = inboxManager.getInboxResults(
 				loggedInInfo,
@@ -110,10 +116,14 @@ public class InboxService extends AbstractServiceImpl {
 	@GET
 	@Path("/mine/count")
 	@Produces("application/json")
-	public int getMyUnacknowlegedReportsCount() {
-		LoggedInInfo loggedInInfo=getLoggedInInfo();
-		String providerNo=loggedInInfo.getLoggedInProviderNo();
-		
+	public int getMyUnacknowlegedReportsCount()
+	{
+		String providerNo = getLoggedInProviderId();
+		securityInfoManager.requireAllPrivilege(providerNo,
+				Permission.DOCUMENT_READ,
+				Permission.LAB_READ,
+				Permission.HRM_READ);
+
 		return providerLabRoutingDao.findByProviderNo(providerNo, "N").size();
 	}
 
@@ -123,6 +133,11 @@ public class InboxService extends AbstractServiceImpl {
 	public int getInboxReportsCount(@PathParam("providerId") String providerNo,
 	                                @PathParam("reportStatus") String reportStatus)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(),
+				Permission.DOCUMENT_READ,
+				Permission.LAB_READ,
+				Permission.HRM_READ);
+
 		return providerLabRoutingDao.findByProviderNo(providerNo, reportStatus).size();
 	}
 }

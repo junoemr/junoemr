@@ -55,7 +55,7 @@
 	.patient-list-content {
 		height: calc(100vh - #{$primary-navbar-height} - #{$page-header-height});
 
-		#patient-list-nav {
+		.patient-list-nav {
 			$margin-height: 4px;
 			@include juno-tab-md(calc(#{$page-tabs-height} - #{$margin-height}));
 			@include juno-tab-color-scheme-primary;
@@ -117,6 +117,11 @@
 					}
 				}
 			}
+		}
+
+		.patient-list-no-access {
+			@extend %juno-primary-view-pane;
+			border-right: $color-neutral-lighter 8px solid;
 		}
 	}
 

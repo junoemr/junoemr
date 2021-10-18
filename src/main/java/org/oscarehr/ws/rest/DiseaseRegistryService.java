@@ -23,29 +23,44 @@
  */
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.oscarehr.casemgmt.dao.IssueDAO;
 import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.common.dao.DxresearchDAO;
+import org.oscarehr.common.dao.Icd9Dao;
 import org.oscarehr.common.dao.QuickListDao;
 import org.oscarehr.common.model.Dxresearch;
+import org.oscarehr.common.model.Icd9;
 import org.oscarehr.common.model.QuickListView;
+import org.oscarehr.dataMigration.model.dx.DxCode;
+import org.oscarehr.dataMigration.model.dx.DxCodingSystem;
+import org.oscarehr.dx.converter.Icd9EntityToDxCodeConverter;
+import org.oscarehr.dx.search.DxCodeCriteriaSearch;
+import org.oscarehr.dx.search.DxIcd9CodeCriteriaSearch;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.model.DiagnosisTo1;
 import org.oscarehr.ws.rest.to.model.DxQuickList;
 import org.oscarehr.ws.rest.to.model.IssueTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,12 +69,14 @@ import java.util.List;
 import java.util.Map;
 
 @Path("/dxRegisty")
+@Component("DiseaseRegistryWebService")
+@Tag(name = "diseaseRegistry")
 public class DiseaseRegistryService extends AbstractServiceImpl {
 
 	private static Logger logger = Logger.getLogger(DiseaseRegistryService.class);
 	
 	@Autowired
-	QuickListDao quickListDao;
+	private QuickListDao quickListDao;
 	
 	@Autowired
     @Qualifier("DxresearchDAO")
@@ -69,6 +86,58 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@Qualifier("IssueDAO")
 	private IssueDAO issueDao;
 
+	@Autowired
+	private Icd9Dao icd9Dao;
+
+	@Autowired
+	private Icd9EntityToDxCodeConverter icd9EntityToDxCodeConverter;
+
+	@GET
+	@Path("/search")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestSearchResponse<DxCode> searchDxCodes(
+			@QueryParam("codingSystem") String codingSystemStr,
+			@QueryParam("keyword") String searchParam,
+			@QueryParam("page")
+			@DefaultValue("1")
+			@Parameter(description = "Requested result page")
+					Integer page,
+			@QueryParam("perPage")
+			@DefaultValue("10")
+			@Parameter(description = "Number of results per page")
+					Integer perPage)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DX_READ);
+
+		page = validPageNo(page);
+		perPage = limitedResultCount(perPage);
+		int offset = calculatedOffset(page, perPage);
+
+		DxCodingSystem codingSystem = DxCodingSystem.fromValue(codingSystemStr);
+		if(codingSystem == null)
+		{
+			throw new IllegalArgumentException(codingSystemStr + " is not a valid coding system");
+		}
+
+		DxCodeCriteriaSearch criteriaSearch;
+		switch(codingSystem)
+		{
+			case ICD9: criteriaSearch = new DxIcd9CodeCriteriaSearch(); break;
+			default: throw new NotImplementedException(codingSystemStr + " criteria search not implemented");
+		}
+
+		criteriaSearch.setOffset(offset);
+		criteriaSearch.setLimit(perPage);
+		criteriaSearch.setSortDirAscending();
+		criteriaSearch.setJunctionTypeOR();
+		criteriaSearch.setCode(searchParam);
+		criteriaSearch.setDescription(searchParam);
+
+		List<Icd9> icd9Codes = icd9Dao.criteriaSearch(criteriaSearch);
+		int total = icd9Dao.criteriaSearchCount(criteriaSearch);
+		return RestSearchResponse.successResponse(icd9EntityToDxCodeConverter.convert(icd9Codes), page, perPage, total);
+	}
+
 	/**
 	 * gets quick lists
 	 * @return List of quickList transfer objects
@@ -76,8 +145,8 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@GET
 	@Path("/quickLists")
 	@Produces("application/json")
-	public RestResponse<List<DxQuickList>> getQuickLists() {
-
+	public RestResponse<List<DxQuickList>> getQuickLists()
+	{
 		List<DxQuickList> resultList;
 		try {
 			resultList = createQuickList(quickListDao.getQuickLists());
@@ -97,8 +166,8 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@GET
 	@Path("/issueQuickLists")
 	@Produces("application/json")
-	public RestResponse<List<DxQuickList>> getIssueQuickLists() {
-
+	public RestResponse<List<DxQuickList>> getIssueQuickLists()
+	{
 		List<DxQuickList> resultList;
 		try {
 			resultList = createQuickList(quickListDao.getIssueQuickLists());
@@ -113,7 +182,10 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@GET
 	@Path("/findDxIssue")
 	@Produces("application/json")
-	public RestResponse<IssueTo1> findDxIssue(@QueryParam("codingSystem") String codingSystem, @QueryParam("code") String code) {
+	public RestResponse<IssueTo1> findDxIssue(@QueryParam("codingSystem") String codingSystem, @QueryParam("code") String code)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ENCOUNTER_ISSUE_READ);
+
 		Issue issue = issueDao.findIssueByTypeAndCode(codingSystem, code);
 		if(issue != null) {
 			IssueTo1 returnIssue = new IssueTo1();
@@ -134,7 +206,10 @@ public class DiseaseRegistryService extends AbstractServiceImpl {
 	@Path("/{demographicNo}/add")
 	@Produces("application/json")
 	@Consumes("application/json")
-	public Response addToDiseaseRegistry(@PathParam("demographicNo") Integer demographicNo,IssueTo1 issue){		
+	public Response addToDiseaseRegistry(@PathParam("demographicNo") Integer demographicNo, IssueTo1 issue)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.DX_CREATE);
+
 		boolean activeEntryExists = dxresearchDao.activeEntryExists(demographicNo, issue.getType(), issue.getCode());
 		
 		if(!activeEntryExists){

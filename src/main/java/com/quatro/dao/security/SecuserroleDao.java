@@ -46,8 +46,9 @@ import com.quatro.model.security.Secuserrole;
  *
  * @see com.quatro.model.security.Secuserrole
  * @author MyEclipse Persistence Tools
+ * @deprecated use jpa version instead
  */
-
+@Deprecated
 public class SecuserroleDao extends HibernateDaoSupport {
 	private static final Logger logger = MiscUtils.getLogger();
 	// property constants

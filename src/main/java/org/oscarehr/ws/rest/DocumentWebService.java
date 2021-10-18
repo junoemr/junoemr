@@ -27,7 +27,7 @@ package org.oscarehr.ws.rest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.external.rest.v1.conversion.DocumentConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.document.DocumentTransferOutbound;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -67,14 +67,9 @@ public class DocumentWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<DocumentTransferOutbound> getDocument(@PathParam("documentNo") String documentNo) throws IOException
 	{
-		securityInfoManager.requireAllPrivilege(
-				getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.READ,
-				null,
-				"_edoc");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DOCUMENT_READ);
 
 		Document document = this.documentDao.findOrThrow(Integer.parseInt(documentNo));
-
 		return RestResponse.successResponse(DocumentConverter.getAsTransferObject(document, true));
 	}
 

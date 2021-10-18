@@ -3,7 +3,8 @@ angular.module('Layout').controller('Layout.BodyController', [
 	'$scope',
 	'providerService',
 	'securityService',
-	function($rootScope, $scope, providerService, securityService)
+	'securityRolesService',
+	function($rootScope, $scope, providerService, securityService, securityRolesService)
 	{
 		var controller = this;
 
@@ -23,6 +24,10 @@ angular.module('Layout').controller('Layout.BodyController', [
 				{
 					console.log(errors);
 				});
+			securityRolesService.loadUserRoles().then(() =>
+			{
+				controller.userRolesLoaded = true;
+			});
 		};
 
 		// flag for whether the patient list should be showing or not
@@ -31,6 +36,7 @@ angular.module('Layout').controller('Layout.BodyController', [
 
 		// used to prevent race condition on user load. the rest of the app will not render until true.
 		controller.userLoaded = false;
+		controller.userRolesLoaded = false;
 
 		// controllers can update the showPatientList value by calling an $emit
 		// e.g. $scope.$emit('configureShowPatientList', false);
@@ -48,5 +54,9 @@ angular.module('Layout').controller('Layout.BodyController', [
 		{
 			return (controller.showPatientList === true);
 		};
+		controller.isInitialized = () =>
+		{
+			return (controller.userLoaded && controller.userRolesLoaded);
+		}
 	}
 ]);

@@ -32,6 +32,7 @@
 <%@page import="org.oscarehr.util.*"%>
 <%@page import="java.text.*"%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
+<%@ page import="org.oscarehr.security.model.SecRole" %>
 
 <%@page contentType="text/csv"%>
 <%

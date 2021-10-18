@@ -23,40 +23,52 @@
  */
 package org.oscarehr.managers;
 
-import com.quatro.dao.security.SecobjprivilegeDao;
-import com.quatro.dao.security.SecuserroleDao;
-import com.quatro.model.security.Secobjprivilege;
-import com.quatro.model.security.Secuserrole;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.EnumUtils;
+import org.oscarehr.common.dao.DemographicSetsDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.security.dao.SecRoleDao;
+import org.oscarehr.security.dao.SecUserRoleDao;
+import org.oscarehr.security.model.Permission;
+import org.oscarehr.security.model.SecObjectName;
+import org.oscarehr.security.model.SecRole;
+import org.oscarehr.security.model.SecUserRole;
+import org.oscarehr.security.service.SecurityRolesService;
+import org.oscarehr.security.service.SecuritySetsService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import oscar.util.OscarRoleObjectPrivilege;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
+import java.util.Set;
 
 @Service
-public class SecurityInfoManager {
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+public class SecurityInfoManager
+{
+	// avoid use of these, use enum instead
 	public static final String READ = "r";
-	public static final String WRITE = "w";
+	public static final String CREATE = "w";
 	public static final String UPDATE = "u";
 	public static final String DELETE = "d";
-	public static final String NORIGHTS = "o";
-	
+	public static final String NO_RIGHTS = "o";
+	public static final String ALL = "x";
+
 	public enum PRIVILEGE_LEVEL
 	{
-		READ ("r"),
-		WRITE ("w"),
-		UPDATE ("u"),
-		DELETE ("d"),
-		NO_RIGHTS ("o");
+		READ("r"),
+		UPDATE("u"),
+		CREATE("w"),
+		DELETE("d");
 
 		String level;
 
@@ -69,43 +81,47 @@ public class SecurityInfoManager {
 		{
 			return this.level;
 		}
+
+		public static PRIVILEGE_LEVEL fromStringIgnoreCase(String enumString)
+		{
+			if(EnumUtils.isValidEnumIgnoreCase(PRIVILEGE_LEVEL.class, enumString))
+			{
+				return PRIVILEGE_LEVEL.valueOf(enumString.toUpperCase());
+			}
+			return null;
+		}
+
+		public static PRIVILEGE_LEVEL fromValueString(String value)
+		{
+			for(PRIVILEGE_LEVEL level : PRIVILEGE_LEVEL.values())
+			{
+				if(level.asString().equalsIgnoreCase(value))
+				{
+					return level;
+				}
+			}
+			return null;
+		}
 	}
 
+	@Autowired
+	private SecRoleDao secRoleDao;
 
 	@Autowired
-	private SecuserroleDao secUserRoleDao;
-	
-	@Autowired
-	private SecobjprivilegeDao secobjprivilegeDao;
+	private SecUserRoleDao secUserRoleDao;
 
 	@Autowired
 	private ProviderDataDao providerDataDao;
 
-	public List<Secuserrole> getRoles(String providerNo)
-	{
-		@SuppressWarnings("unchecked")
-		List<Secuserrole> results = secUserRoleDao.findByProviderNo(providerNo);
-		return results;
-	}
+	@Autowired
+	private DemographicSetsDao demographicSetsDao;
 
-	public List<Secobjprivilege> getSecurityObjects(LoggedInInfo loggedInInfo)
-	{
-		return getSecurityObjects(loggedInInfo.getLoggedInProviderNo());
-	}
-	public List<Secobjprivilege> getSecurityObjects(String providerNo)
-	{
-		List<String> roleNames = new ArrayList<>();
-		for(Secuserrole role : getRoles(providerNo))
-		{
-			roleNames.add(role.getRoleName());
-		}
-		roleNames.add(providerNo);
+	@Autowired
+	private SecurityRolesService securityRolesService;
 
-		List<Secobjprivilege> results = secobjprivilegeDao.getByRoles(roleNames);
+	@Autowired
+	private SecuritySetsService securitySetsService;
 
-		return results;
-	}
-	
 	/**
 	 * Checks to see if this provider has the privilege to the security object being requested.
 	 * 
@@ -132,34 +148,32 @@ public class SecurityInfoManager {
 	 * @param demographicNo
 	 * @return boolean
 	 */
+	@Deprecated // use enum version instead
 	public boolean hasPrivilege(LoggedInInfo loggedInInfo, String objectName, String privilege, String demographicNo)
 	{
-		return hasPrivilege(loggedInInfo.getLoggedInProviderNo(), objectName, privilege, demographicNo);
+		return hasPrivilege(loggedInInfo.getLoggedInProviderNo(), objectName, privilege, (demographicNo != null ? Integer.parseInt(demographicNo) : null));
 	}
 
-	public boolean hasPrivilege(LoggedInInfo loggedInInfo, String objectName, String privilege, int demographicNo)
+	@Deprecated
+	public boolean hasPrivilege(String providerNo, PRIVILEGE_LEVEL privilege, Integer demographicNo, SecObjectName.OBJECT_NAME objectName)
 	{
-		return hasPrivilege(loggedInInfo, objectName, privilege, String.valueOf(demographicNo));
+		return hasPrivilege(providerNo, objectName.getValue(), privilege.asString(), demographicNo);
 	}
 
-	/**
-	 * check if the user has all of the requested privileges
-	 * @param providerNo - provider to check
-	 * @param privilege - privilege to check
-	 * @param demographicNo - demographic on which the check should be preformed (can be null)
-	 * @param hasObjList - a list of security objects to check
-	 * @return - true or false indicating pass or fail of the privilege check.
-	 */
-	public boolean hasPrivileges(String providerNo, String privilege, Integer demographicNo, String... hasObjList)
+	@Deprecated
+	public boolean hasPrivilege(String providerNo, PRIVILEGE_LEVEL privilege, SecObjectName.OBJECT_NAME objectName)
 	{
-		for(String objectName:hasObjList)
-		{
-			if(!hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
-			{
-				return false;
-			}
-		}
-		return true;
+		return hasPrivilege(providerNo, privilege, null, objectName);
+	}
+
+	public boolean hasPrivileges(String providerNo, Permission... permissions)
+	{
+		return hasPrivileges(providerNo, null, permissions);
+	}
+
+	public boolean hasPrivileges(String providerNo, Integer demographicId, Permission... permissions)
+	{
+		return (demographicId == null || isAllowedAccessToPatientRecord(providerNo, demographicId)) && hasAllPermissions(providerNo, permissions);
 	}
 
 	/**
@@ -169,12 +183,14 @@ public class SecurityInfoManager {
 	 * @param demographicNo - demographic on which the check should be preformed (can be null)
 	 * @param hasObjList - a list of security objects to check
 	 * @return - true or false indicating pass or fail of the privilege check.
+	 * @deprecated use Permission enum version
 	 */
-	public boolean hasOnePrivileges(String providerNo, String privilege, Integer demographicNo, String... hasObjList)
+	@Deprecated
+	public boolean hasOnePrivileges(String providerNo, PRIVILEGE_LEVEL privilege, Integer demographicNo, SecObjectName.OBJECT_NAME... hasObjList)
 	{
-		for(String objectName:hasObjList)
+		for(SecObjectName.OBJECT_NAME objectName : hasObjList)
 		{
-			if(hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
+			if(hasPrivilege(providerNo, privilege, demographicNo, objectName))
 			{
 				return true;
 			}
@@ -182,48 +198,106 @@ public class SecurityInfoManager {
 		return false;
 	}
 
-	public boolean hasPrivilege(String providerNo, String objectName, String privilege, String demographicNo)
+	@Deprecated //deprecated - use Permission enum version
+	public boolean hasOnePrivileges(String providerNo, PRIVILEGE_LEVEL privilege, SecObjectName.OBJECT_NAME... hasObjList)
+	{
+		return hasOnePrivileges(providerNo, privilege, null, hasObjList);
+	}
+
+	private boolean hasAllPermissions(String providerNo, Permission... permissions)
+	{
+		List<Permission> userPermissions = securityRolesService.getSecurityPermissionsForUser(providerNo);
+		for(Permission permission : permissions)
+		{
+			if(!userPermissions.contains(permission))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * used by classic security tag system. do not use for new code
+	 * @param roleNames role names separated by ,
+	 * @param objectName the object name
+	 * @param rights the required rights
+	 * @return the role has the required rights
+	 */
+	@Deprecated
+	public boolean hasPrivilege(String roleNames, String objectName, String rights)
+	{
+		Set<String> roleNameSet = new HashSet<>();
+
+		String[] roleNameArr = roleNames.split(",");
+		for(String roleName : roleNameArr)
+		{
+			SecRole role = secRoleDao.findByRoleName(roleName);
+			if(role == null)
+			{
+				// unknown role name, might be the provider ID
+				roleNameSet.add(roleName);
+			}
+			else
+			{
+				// with role inheritance, checking a role also requires us to check parent roles
+				// this is technically more permissive than it should be,
+				// as disabled permissions within the child roles will pass due to checking the parent.
+				do
+				{
+					roleNameSet.add(role.getName());
+					role = role.getParentSecRole();
+				}
+				while(role != null);
+			}
+		}
+
+		String allRoleNames = StringUtils.join(roleNameSet, ",");
+		List privilegeProps = OscarRoleObjectPrivilege.getPrivilegeProp(objectName);
+		return OscarRoleObjectPrivilege.checkPrivilege(allRoleNames, (Properties)privilegeProps.get(0), (List<String>)privilegeProps.get(1), (List<String>)privilegeProps.get(2), rights);
+	}
+
+	@Deprecated //deprecated - use Permission enum version
+	private boolean hasPrivilege(String providerNo, String objectName, String privilege, Integer demographicNo)
 	{
 		try
 		{
+			// if the requested legacy permission is also used in the new system, use the new check instead
+			SecObjectName.OBJECT_NAME objectNameEnum = SecObjectName.OBJECT_NAME.fromValueString(objectName);
+			if(Permission.includesObjectAsValue(objectNameEnum))
+			{
+				SecurityInfoManager.PRIVILEGE_LEVEL privilegeLevel = SecurityInfoManager.PRIVILEGE_LEVEL.fromValueString(privilege);
+				Permission permission = Permission.from(objectNameEnum, privilegeLevel);
+				return hasPrivileges(providerNo, demographicNo, permission);
+			}
+
+			if(demographicNo != null && !isAllowedAccessToPatientRecord(providerNo, demographicNo))
+			{
+				return false;
+			}
+
 			List<String> roleNameLs = new ArrayList<>();
-			for(Secuserrole role : getRoles(providerNo))
+			for(SecUserRole role : secUserRoleDao.getUserRoles(providerNo))
 			{
 				roleNameLs.add(role.getRoleName());
 			}
 			roleNameLs.add(providerNo);
 			String roleNames = StringUtils.join(roleNameLs, ",");
-			
-			boolean noMatchingRoleToSpecificPatient = true;
-			List v = null;
-			if (demographicNo!=null) {
-				v = OscarRoleObjectPrivilege.getPrivilegeProp(objectName+"$"+demographicNo);
-				List<String> roleInObj = (List<String>)v.get(1);
-				
-				for (String objRole : roleInObj) {
-					if (roleNames.toLowerCase().contains(objRole.toLowerCase().trim())) {
-						noMatchingRoleToSpecificPatient = false;
-						break;
-					}
-				}
-			}
-			if (noMatchingRoleToSpecificPatient) v = OscarRoleObjectPrivilege.getPrivilegeProp(objectName);
-			
-			if (!noMatchingRoleToSpecificPatient && OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), NORIGHTS)) {
-					throw new PatientDirectiveException("Patient has requested user not access record");
-			} else  if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), "x")) {
+
+			List privilegeProps = OscarRoleObjectPrivilege.getPrivilegeProp(objectName);
+			if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)privilegeProps.get(0), (List<String>)privilegeProps.get(1), (List<String>)privilegeProps.get(2), "x")) {
 				return true;
 			}
-			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), WRITE)) {
-				return ((READ+UPDATE+WRITE).contains(privilege));
+			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)privilegeProps.get(0), (List<String>)privilegeProps.get(1), (List<String>)privilegeProps.get(2), CREATE)) {
+				return ((READ+UPDATE+ CREATE).contains(privilege));
 			}
-			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), UPDATE)) {
+			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)privilegeProps.get(0), (List<String>)privilegeProps.get(1), (List<String>)privilegeProps.get(2), UPDATE)) {
 				return ((READ+UPDATE).contains(privilege));
 			}
-			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), READ)) {
+			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)privilegeProps.get(0), (List<String>)privilegeProps.get(1), (List<String>)privilegeProps.get(2), READ)) {
 				return (READ.equals(privilege));
 			}
-			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), DELETE)) {
+			else if (OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)privilegeProps.get(0), (List<String>)privilegeProps.get(1), (List<String>)privilegeProps.get(2), DELETE)) {
 				return (DELETE.equals(privilege));
 			}
 	
@@ -235,55 +309,82 @@ public class SecurityInfoManager {
 		
 		return false;
 	}
-	public boolean isAllowedAccessToPatientRecord(LoggedInInfo loggedInInfo, Integer demographicNo) {
-		return isAllowedAccessToPatientRecord(loggedInInfo.getLoggedInProviderNo(), demographicNo);
-	}
 
-	public boolean isAllowedAccessToPatientRecord(String providerNo, Integer demographicNo) {
-		
-		List<String> roleNameLs = new ArrayList<>();
-		for(Secuserrole role:getRoles(providerNo)) {
-			roleNameLs.add(role.getRoleName());
+	public boolean isAllowedAccessToPatientRecord(String providerNo, Integer demographicNo)
+	{
+		List<String> blacklist = securitySetsService.getSecurityDemographicSetNamesBlacklist(providerNo);
+		List<String> setsWithPatient = demographicSetsDao.findSetNamesByDemographicNo(demographicNo);
+
+		for(String blacklistedSet : blacklist)
+		{
+			if(setsWithPatient.contains(blacklistedSet))
+			{
+				return false;
+			}
 		}
-		roleNameLs.add(providerNo);
-		String roleNames = StringUtils.join(roleNameLs, ",");
-		
-		
-		Vector v = OscarRoleObjectPrivilege.getPrivilegeProp("_demographic$"+demographicNo);
-		if(OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), "o")) {
-			return false;
-		}
-		
-		v = OscarRoleObjectPrivilege.getPrivilegeProp("_eChart$"+demographicNo);
-		if(OscarRoleObjectPrivilege.checkPrivilege(roleNames, (Properties)v.get(0), (List<String>)v.get(1), (List<String>)v.get(2), "o")) {
-			return false;
-		}
-		
 		return true;
 	}
 
-	public void requireAllPrivilege(String providerNo, String privilege, Integer demographicNo, String... requiredObjList)
+	/**
+	 * require that the given provider has all of the required permissions, throw exception if requirements are not met
+	 * @param providerNo - the provider ID
+	 * @param permissions - the required security objects for access to the emr module
+	 * @throws SecurityException - if the requirements are not me by the provider record
+	 */
+	public void requireAllPrivilege(String providerNo, Permission... permissions)
 	{
-		for(String objectName:requiredObjList)
+		requireAllPrivilege(providerNo, null, permissions);
+	}
+
+	/**
+	 * require that the given provider has all of the required permissions, throw exception if requirements are not met.
+	 * also checks access to a specific demographic chart
+	 * @param providerNo - the provider ID
+	 * @param demographicId - the demographic to check access
+	 * @param permissions - the required security objects for access to the emr module
+	 * @throws SecurityException - if the requirements are not me by the provider record
+	 */
+	public void requireAllPrivilege(String providerNo, Integer demographicId, Permission... permissions)
+	{
+		if(permissions == null)
 		{
-			if(!hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
+			return;
+		}
+		if(demographicId != null && !isAllowedAccessToPatientRecord(providerNo, demographicId))
+		{
+			throw new SecurityException("user des not have access to patient #" + demographicId);
+		}
+
+		List<Permission> userPermissions = securityRolesService.getSecurityPermissionsForUser(providerNo);
+		for(Permission permission : permissions)
+		{
+			if(!userPermissions.contains(permission))
 			{
-				throw new SecurityException("missing required privilege: " + privilege + " for security object (" + objectName + ")");
+				throw new SecurityException("missing required permissions: " + permission.name());
 			}
 		}
 	}
 
+	/**
+	 * Check that the given provider has at least one of the required security access rights
+	 * @param providerNo - the provider ID
+	 * @param privilege - the privilege level required
+	 * @param demographicNo - an optional demographic number ( for blocking individual patient records where appropriate)
+	 * @param requiredObjList - the required security objects for access to the emr module
+	 * @throws SecurityException - if the requirements are not me by the provider record
+	 * @deprecated - use Permission enum version of requireAllPrivilege. no access should use an OR on securityObjects
+	 */
+	@Deprecated
 	public void requireOnePrivilege(String providerNo, String privilege, Integer demographicNo, String... requiredObjList)
 	{
 		for(String objectName:requiredObjList)
 		{
-			if(hasPrivilege(providerNo, objectName, privilege, (demographicNo != null ? String.valueOf(demographicNo):null)))
+			if(hasPrivilege(providerNo, objectName, privilege, demographicNo))
 			{
 				return;
 			}
 		}
 		throw new SecurityException("missing one or more required privileges: " + privilege + " for security objects (" + String.join(",", requiredObjList) + ")");
-
 	}
 
 	public void requireSuperAdminFlag(String providerNo)

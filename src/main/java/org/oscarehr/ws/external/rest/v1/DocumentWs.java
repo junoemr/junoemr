@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.conversion.DocumentConverter;
@@ -71,7 +72,7 @@ public class DocumentWs extends AbstractExternalRestWs
 	public RestResponse<Integer> postDocument(@Valid DocumentTransferInbound transfer) throws IOException, InterruptedException
 	{
 		String providerNoStr = getOAuthProviderNo();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(providerNoStr, Permission.DOCUMENT_CREATE);
 
 		if(transfer.getDocumentNo() != null)
 		{
@@ -108,7 +109,7 @@ public class DocumentWs extends AbstractExternalRestWs
 	{
 		String providerNoStr = getOAuthProviderNo();
 		String ip = getHttpServletRequest().getRemoteAddr();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(providerNoStr, Permission.DOCUMENT_UPDATE);
 
 		documentService.routeToGeneralInbox(documentId);
 		LogAction.addLogEntry(providerNoStr, null, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,
@@ -125,7 +126,7 @@ public class DocumentWs extends AbstractExternalRestWs
 	{
 		String providerNoStr = getOAuthProviderNo();
 		String ip = getHttpServletRequest().getRemoteAddr();
-		securityInfoManager.requireAllPrivilege(providerNoStr, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(providerNoStr, Permission.DOCUMENT_UPDATE);
 
 		documentService.routeToProviderInbox(documentId, providerId);
 		LogAction.addLogEntry(providerNoStr, null, LogConst.ACTION_UPDATE, LogConst.CON_DOCUMENT, LogConst.STATUS_SUCCESS,

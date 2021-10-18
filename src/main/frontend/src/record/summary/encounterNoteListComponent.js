@@ -42,8 +42,7 @@ angular.module('Record.Summary').component('encounterNoteList', {
 		          noteService,
 		          providerService)
 	{
-		var ctrl = this;
-
+		const ctrl = this;
 
 		ctrl.$onInit = function()
 		{
@@ -54,7 +53,6 @@ angular.module('Record.Summary').component('encounterNoteList', {
 				textFilter: null,
 			};
 			ctrl.enableFilterHeader = false; // temporarily remove the filters as they are still being developed
-			ctrl.showFilters = true;
 
 			ctrl.noteList = [];
 			ctrl.openNote = {};
@@ -65,12 +63,13 @@ angular.module('Record.Summary').component('encounterNoteList', {
 			ctrl.moreNotes = true;
 
 			// set default binding values
-			ctrl.userId =  ctrl.userId || null;
+			ctrl.userId = ctrl.userId || null;
 			ctrl.selectedNoteHash = ctrl.selectedNoteHash || {};
-			ctrl.onEditCpp =  ctrl.onEditCpp || null;
-			ctrl.onEditNote =  ctrl.onEditNote || null;
+			ctrl.onEditCpp = ctrl.onEditCpp || null;
+			ctrl.onEditNote = ctrl.onEditNote || null;
 			ctrl.registerFunctions = ctrl.registerFunctions || null;
 
+			ctrl.providerSettings = {};
 			providerService.getSettings().then(
 				function success(results)
 				{
@@ -153,10 +152,6 @@ angular.module('Record.Summary').component('encounterNoteList', {
 
 		// -----------------------------------------------------------------------------------------------------
 
-		ctrl.toggleShowFilters = function toggleShowFilters()
-		{
-			ctrl.showFilters = !ctrl.showFilters;
-		};
 		ctrl.clearFilters = function clearFilters()
 		{
 			ctrl.filter.onlyMine = false;
@@ -195,15 +190,15 @@ angular.module('Record.Summary').component('encounterNoteList', {
 
 		ctrl.setNoteMinimized = function setNoteMinimized(note)
 		{
-			var cmeNoteDate = ctrl.providerSettings.cmeNoteDate;
-			var minimizeNote = false;
+			const cmeNoteDate = ctrl.providerSettings.cmeNoteDate;
+			let minimizeNote = false;
 
 			// if the note observation date is before the cutoff, minimize the note
 			if(Juno.Common.Util.exists(cmeNoteDate) && Juno.Common.Util.isIntegerString(cmeNoteDate))
 			{
 				// the property stores a negative number, so add to get a past date
-				var cutoffDate = moment().add(cmeNoteDate, 'months');
-				var noteDate = moment(note.observationDate);
+				const cutoffDate = moment().add(cmeNoteDate, 'months');
+				const noteDate = moment(note.observationDate);
 				minimizeNote = (cutoffDate.isAfter(noteDate, 'days'));
 			}
 			return minimizeNote;

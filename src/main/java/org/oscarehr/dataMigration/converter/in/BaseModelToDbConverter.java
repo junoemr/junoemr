@@ -117,7 +117,7 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 
 				String billCenterCode = properties.getProperty("default_bill_center", "");
 				dbProvider = providerService.addNewProvider(IMPORT_PROVIDER, dbProvider, billCenterCode);
-				providerRoleService.setDefaultRoleForNewProvider(dbProvider.getProviderNo());
+				providerRoleService.setDefaultRoleForNewProvider(dbProvider.getId());
 
 				logger.info("Created new Provider record " + dbProvider.getId() + " (" + dbProvider.getLastName() + "," + dbProvider.getFirstName() + ")");
 			}

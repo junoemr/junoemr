@@ -24,7 +24,6 @@
 
 package oscar.eform;
 
-import com.quatro.model.security.Secobjprivilege;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -33,31 +32,32 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.PMmodule.model.ProgramProvider;
-import org.oscarehr.casemgmt.dao.CaseManagementNoteLinkDAO;
-import org.oscarehr.casemgmt.model.CaseManagementIssue;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
-import org.oscarehr.casemgmt.model.Issue;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.ConsultationRequestDao;
 import org.oscarehr.common.dao.EFormGroupDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
-import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.dao.TicklerDao;
 import org.oscarehr.common.model.ConsultationRequest;
 import org.oscarehr.common.model.EFormGroup;
 import org.oscarehr.common.model.OscarMsgType;
-import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.common.model.ProfessionalSpecialist;
-import org.oscarehr.common.model.SecRole;
 import org.oscarehr.common.model.Tickler;
+import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.eform.dao.EFormDao;
 import org.oscarehr.eform.dao.EFormDao.EFormSortOrder;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
-import org.oscarehr.prevention.service.PreventionManager;
+import org.oscarehr.encounterNote.dao.IssueDao;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.model.Issue;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.managers.ProgramManager2;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.prevention.model.Prevention;
+import org.oscarehr.prevention.service.PreventionManager;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.security.dao.SecRoleDao;
+import org.oscarehr.security.model.SecRole;
+import org.oscarehr.security.service.SecurityRolesService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -84,15 +84,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-import java.util.UUID;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * use the oscarehr/eform/service objects for anything new
@@ -113,16 +111,19 @@ public class EFormUtil {
 	public static final String CURRENT = "current";
 	public static final String ALL = "all";
 
-	private static CaseManagementManager cmm = (CaseManagementManager) SpringUtils.getBean(CaseManagementManager.class);
-	private static CaseManagementNoteLinkDAO cmDao = (CaseManagementNoteLinkDAO) SpringUtils.getBean(CaseManagementNoteLinkDAO.class);
-	private static EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean(EFormDataDao.class);
-	private static EFormGroupDao eFormGroupDao = (EFormGroupDao) SpringUtils.getBean(EFormGroupDao.class);
-	private static ProviderDao providerDao = (ProviderDao) SpringUtils.getBean(ProviderDao.class);
-	private static TicklerDao ticklerDao = SpringUtils.getBean(TicklerDao.class);
-	private static PreventionManager preventionManager = SpringUtils.getBean(PreventionManager.class);
-	private static ConsultationRequestDao consultationRequestDao = SpringUtils.getBean(ConsultationRequestDao.class);
-	private static ProfessionalSpecialistDao professionalSpecialistDao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
-	
+	private static final EFormDataDao eFormDataDao = (EFormDataDao) SpringUtils.getBean(EFormDataDao.class);
+	private static final EFormGroupDao eFormGroupDao = (EFormGroupDao) SpringUtils.getBean(EFormGroupDao.class);
+	private static final ProviderDao providerDao = (ProviderDao) SpringUtils.getBean(ProviderDao.class);
+	private static final TicklerDao ticklerDao = SpringUtils.getBean(TicklerDao.class);
+	private static final PreventionManager preventionManager = SpringUtils.getBean(PreventionManager.class);
+	private static final ConsultationRequestDao consultationRequestDao = SpringUtils.getBean(ConsultationRequestDao.class);
+	private static final ProfessionalSpecialistDao professionalSpecialistDao = SpringUtils.getBean(ProfessionalSpecialistDao.class);
+	private static final EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
+	private static final IssueDao issueDao = SpringUtils.getBean(IssueDao.class);
+	private static final ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
+	private static final DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+
+
 	private EFormUtil() {
 	}
 
@@ -742,14 +743,16 @@ public class EFormUtil {
 		return (results);
 	}
 
-	public static ArrayList<HashMap<String, ? extends Object>> listPatientEForms(LoggedInInfo loggedInInfo, String sortBy, String deleted, String demographic_no, String groupName, int offset, int numToReturn) {		
-		SecurityInfoManager secInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-		List<String> privs = new ArrayList<String>();
-		for(Secobjprivilege p: secInfoManager.getSecurityObjects(loggedInInfo)) {
-			if(p.getObjectname_code().startsWith("_eform.")) {
-				privs.add(p.getObjectname_code());
-			}
-		}
+	public static ArrayList<HashMap<String, ? extends Object>> listPatientEForms(LoggedInInfo loggedInInfo, String sortBy, String deleted, String demographic_no, String groupName, int offset, int numToReturn)
+	{
+		SecurityRolesService securityRolesService = SpringUtils.getBean(SecurityRolesService.class);
+
+		// refactor of legacy permissions checks. is this still needed?
+		List<String> privilegeNames = securityRolesService.getSecurityObjectsForUser(loggedInInfo.getLoggedInProviderNo())
+				.stream()
+				.map((object) -> object.getId().getObjectName())
+				.filter((objectName) -> objectName.startsWith("_eform."))
+				.collect(Collectors.toList());
 		
 		Boolean current = true;
 		if(deleted.equals("deleted")) {
@@ -759,7 +762,7 @@ public class EFormUtil {
 		}
 		
 		
-		List<EFormData> results1 = eFormDataDao.findInstancedInGroups(current, Integer.valueOf(demographic_no), groupName, sortBy, offset, numToReturn, privs);
+		List<EFormData> results1 = eFormDataDao.findInstancedInGroups(current, Integer.parseInt(demographic_no), groupName, sortBy, offset, numToReturn, privilegeNames);
 		ArrayList<HashMap<String, ? extends Object>> results = new ArrayList<HashMap<String, ? extends Object>>();
 		
 		for(EFormData x:results1) {
@@ -840,7 +843,7 @@ public class EFormUtil {
 				if (StringUtils.isBlank(template)) continue;
 
 				template = putTemplateEformHtml(eForm.getFormHtml(), template);
-				saveCMNote(eForm, fdid, programNo, code[i], template);
+				saveCMNote(eForm, Integer.parseInt(fdid), programNo, code[i], template);
 			}
 		}
 
@@ -1367,55 +1370,21 @@ public class EFormUtil {
 		return nwHtml;
 	}
 
-	private static void saveCMNote(EForm eForm, String fdid, String programNo, String code, String note) {
+	private static void saveCMNote(EForm eForm, Integer fdid, String programNo, String code, String note)
+	{
 		if (StringUtils.isBlank(note)) return;
 
-		CaseManagementNote cNote = createCMNote(eForm.getDemographicNo(), eForm.getProviderNo(), programNo, note);
-		if (!StringUtils.isBlank(code)) {
-			Set<CaseManagementIssue> scmi = createCMIssue(eForm.getDemographicNo(), code);
-			cNote.setIssues(scmi);
-		}
-		cmm.saveNoteSimple(cNote);
-		CaseManagementNoteLink cmLink = new CaseManagementNoteLink(CaseManagementNoteLink.EFORMDATA, Long.valueOf(fdid), cNote.getId());
-		cmDao.save(cmLink);
-	}
-
-	private static CaseManagementNote createCMNote(String demographicNo, String providerNo, String programNo, String note) {
+		ProviderData provider = providerDataDao.find(eForm.getProviderNo());
 		CaseManagementNote cmNote = new CaseManagementNote();
-		cmNote.setUpdate_date(new Date());
-		cmNote.setObservation_date(new Date());
-		cmNote.setDemographic_no(demographicNo);
-		cmNote.setProviderNo(providerNo);
-		cmNote.setSigning_provider_no(providerNo);
+		cmNote.setDemographic(demographicDao.find(eForm.getDemographicNo()));
+		cmNote.setProvider(provider);
+		cmNote.setSigningProvider(provider);
+		cmNote.setProgramNo(programNo);
 		cmNote.setSigned(true);
-		cmNote.setHistory("");
-
-		SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
-		SecRole doctorRole = secRoleDao.findByName("doctor");
-		cmNote.setReporter_caisi_role(doctorRole.getId().toString());
-
-		cmNote.setReporter_program_team("0");
-		cmNote.setProgram_no(programNo);
-		cmNote.setUuid(UUID.randomUUID().toString());
 		cmNote.setNote(note);
 
-		return cmNote;
-	}
-
-	private static Set<CaseManagementIssue> createCMIssue(String demographicNo, String code) {
-		Issue isu = cmm.getIssueInfoByCode(code);
-		CaseManagementIssue cmIssu = cmm.getIssueById(demographicNo, isu.getId().toString());
-		if (cmIssu == null) {
-			cmIssu = new CaseManagementIssue();
-			cmIssu.setDemographic_no(demographicNo);
-			cmIssu.setIssue_id(isu.getId());
-			cmIssu.setType(isu.getType());
-			cmm.saveCaseIssue(cmIssu);
-		}
-
-		Set<CaseManagementIssue> sCmIssu = new HashSet<CaseManagementIssue>();
-		sCmIssu.add(cmIssu);
-		return sCmIssu;
+		Issue issue = issueDao.findByCode(code);
+		encounterNoteService.saveEFormNote(cmNote, eFormDataDao.findByFormDataId(fdid), Arrays.asList(issue));
 	}
 
 	private static ArrayList<Integer> getFieldIndices(String fieldtag, String s) {

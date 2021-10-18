@@ -23,23 +23,13 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.List;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MultivaluedMap;
-
 import org.apache.http.impl.cookie.DateUtils;
 import org.oscarehr.common.model.DrugProduct;
 import org.oscarehr.common.model.DrugProductTemplate;
 import org.oscarehr.common.model.ProductLocation;
 import org.oscarehr.managers.DrugDispensingManager;
 import org.oscarehr.managers.DrugProductManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.DrugProductResponse;
@@ -52,6 +42,16 @@ import org.oscarehr.ws.rest.to.model.ProductLocationTo1;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MultivaluedMap;
+import java.util.List;
 
 @Path("/productDispensing")
 @Component("productDispensingService")
@@ -72,7 +72,9 @@ public class ProductDispensingService extends AbstractServiceImpl{
 	@Path("/saveDrugProduct")
 	@Produces("application/json")
 	@Consumes("application/x-www-form-urlencoded")
-	public DrugProductResponse saveDrugProduct(MultivaluedMap<String, String> params) throws Exception {
+	public DrugProductResponse saveDrugProduct(MultivaluedMap<String, String> params) throws Exception
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.RX_CREATE);
 		
 		DrugProduct drugProduct = new DrugProduct();
 		drugProduct.setId(Integer.parseInt(params.getFirst("product.id")));
@@ -121,8 +123,10 @@ public class ProductDispensingService extends AbstractServiceImpl{
 	@GET
 	@Path("/drugProduct/{drugProductId}")
 	@Produces("application/json")
-	public DrugProductResponse getDrugProduct(@PathParam("drugProductId") Integer drugProductId) {
-		DrugProduct result = drugProductManager.getDrugProduct(getLoggedInInfo(),drugProductId);
+	public DrugProductResponse getDrugProduct(@PathParam("drugProductId") Integer drugProductId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.RX_READ);
+		DrugProduct result = drugProductManager.getDrugProduct(getLoggedInInfo(), drugProductId);
 		DrugProductResponse response = new DrugProductResponse();
 		DrugProductTo1 to = new DrugProductTo1();
 		BeanUtils.copyProperties(result, to);
@@ -134,8 +138,10 @@ public class ProductDispensingService extends AbstractServiceImpl{
 	@Path("/drugProducts")
 	@Produces("application/json")
 	public DrugProductResponse getAllDrugProducts(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit,
-			@QueryParam("limitByName") String limitByName,@QueryParam("limitByLot") String limitByLot,@QueryParam("limitByLocation") String limitByLocation,
-			@QueryParam("availableOnly") boolean availableOnly) {
+	                                              @QueryParam("limitByName") String limitByName, @QueryParam("limitByLot") String limitByLot, @QueryParam("limitByLocation") String limitByLocation,
+	                                              @QueryParam("availableOnly") boolean availableOnly)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.RX_READ);
 		List<DrugProduct> results = null;
 		
 		int count = drugProductManager.getAllDrugProductsByNameAndLotCount(getLoggedInInfo(),limitByName,limitByLot,(limitByLocation!=null && limitByLocation.length()>0)?Integer.valueOf(limitByLocation):null,availableOnly);
@@ -154,8 +160,11 @@ public class ProductDispensingService extends AbstractServiceImpl{
 	@GET
 	@Path("/drugProducts/byCode")
 	@Produces("application/json")
-	public DrugProductResponse getAllDrugProductsGroupedByCode(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit ) {
-		List<DrugProduct> results = drugProductManager.getAllDrugProductsGroupedByCode(getLoggedInInfo(),offset,limit);
+	public DrugProductResponse getAllDrugProductsGroupedByCode(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.RX_READ);
+
+		List<DrugProduct> results = drugProductManager.getAllDrugProductsGroupedByCode(getLoggedInInfo(), offset, limit);
 		DrugProductResponse response = new DrugProductResponse();
 		for(DrugProduct result:results) {
 			DrugProductTo1 to = new DrugProductTo1();
@@ -168,10 +177,14 @@ public class ProductDispensingService extends AbstractServiceImpl{
 	@GET
 	@Path("/drugProducts/uniqueNames")
 	@Produces("application/json")
-	public AbstractSearchResponse<String> getUniqueDrugProductNames( ) {
+	public AbstractSearchResponse<String> getUniqueDrugProductNames()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.RX_READ);
+
 		List<String> results = drugProductManager.findUniqueDrugProductNames(getLoggedInInfo());
 		AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
-		for(String result:results) {
+		for(String result : results)
+		{
 			response.getContent().add(result);
 		}
 		return response;
@@ -180,8 +193,10 @@ public class ProductDispensingService extends AbstractServiceImpl{
 	@GET
 	@Path("/drugProducts/uniqueLots")
 	@Produces("application/json")
-	public AbstractSearchResponse<String> getUniqueDrugProducLotsByName(@QueryParam("name") String name ) {
-		
+	public AbstractSearchResponse<String> getUniqueDrugProducLotsByName(@QueryParam("name") String name)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.RX_READ);
+
 		List<String> results = drugProductManager.findUniqueDrugProductLotsByName(getLoggedInInfo(),name);
 		AbstractSearchResponse<String> response = new AbstractSearchResponse<String>();
 		for(String result:results) {
@@ -193,23 +208,25 @@ public class ProductDispensingService extends AbstractServiceImpl{
 	@GET
 	@Path("/deleteDrugProduct/{drugProductId}")
 	@Produces("application/json")
-	public GenericRESTResponse deleteDrugProduct(@PathParam("drugProductId") Integer drugProductId)  {
+	public GenericRESTResponse deleteDrugProduct(@PathParam("drugProductId") Integer drugProductId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.RX_DELETE);
 		drugProductManager.deleteDrugProduct(getLoggedInInfo(), drugProductId);
 		
 		GenericRESTResponse response = new GenericRESTResponse();
 		response.setMessage("Product deleted");
-		
-		
+
 		return response;
 	}
 	
 	@GET
 	@Path("/productLocations")
 	@Produces("application/json")
-	public ProductLocationResponse listProductLocations()  {
+	public ProductLocationResponse listProductLocations()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.RX_READ);
 		List<ProductLocation> productLocations = drugProductManager.getProductLocations();
-		
-	
+
 		ProductLocationResponse response = new ProductLocationResponse();
 		
 		for(ProductLocation result:productLocations) {
@@ -224,7 +241,9 @@ public class ProductDispensingService extends AbstractServiceImpl{
 	@GET
 	@Path("/status/{drugId}")
 	@Produces("application/json")
-	public GenericRESTResponse getDispensingStatus(@PathParam("drugId") Integer drugId)  {
+	public GenericRESTResponse getDispensingStatus(@PathParam("drugId") Integer drugId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.RX_READ);
 		GenericRESTResponse response = new GenericRESTResponse();
 		response.setMessage(drugDispensingManager.getStatus(drugId));
 		
@@ -234,9 +253,11 @@ public class ProductDispensingService extends AbstractServiceImpl{
 	@GET
 	@Path("/drugProductTemplates")
 	@Produces("application/json")
-	public DrugProductTemplateResponse listProductTemplates()  {
+	public DrugProductTemplateResponse listProductTemplates()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.RX_READ);
+
 		List<DrugProductTemplate> templates = drugProductManager.getDrugProductTemplates();
-		
 	
 		DrugProductTemplateResponse response = new DrugProductTemplateResponse();
 		

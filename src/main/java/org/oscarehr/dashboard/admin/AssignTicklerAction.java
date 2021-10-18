@@ -56,7 +56,7 @@ public class AssignTicklerAction extends DispatchAction {
 
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_tickler", SecurityInfoManager.WRITE, null ) ) {	
+		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_tickler", SecurityInfoManager.CREATE, null ) ) {
 			return mapping.findForward("unauthorized");
 		}
 		
@@ -82,7 +82,7 @@ public class AssignTicklerAction extends DispatchAction {
 
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		
-		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_tickler", SecurityInfoManager.WRITE, null ) ) {	
+		if( ! securityInfoManager.hasPrivilege(loggedInInfo, "_tickler", SecurityInfoManager.CREATE, null ) ) {
 			return mapping.findForward("unauthorized");
         }
 

@@ -43,25 +43,26 @@
 		<div class="flex-row align-items-center patient-list-header">
 			<div class="col-sm-12">
 				<input type="text" class="form-control"
-				placeholder="<bean:message key="patientList.search" bundle="ui"/>"
-				ng-model="query"/>
+				       ng-disabled="!$ctrl.componentEnabled()"
+				       placeholder="<bean:message key="patientList.search" bundle="ui"/>"
+				       ng-model="query"/>
 			</div>
 		</div>
 
 		<!-- main content pane -->
 		<div class="patient-list-content flex-column">
-			<ul class="nav nav-tabs" id="patient-list-nav">
-				<li ng-if="$ctrl.show_appointment_queue" ng-class="{'active' : $ctrl.isAppointmentQueueView()}">
+			<ul ng-if="$ctrl.componentEnabled()" class="nav nav-tabs patient-list-nav">
+				<li ng-if="$ctrl.isAppointmentQueueViewEnabled()" ng-class="{'active' : $ctrl.isAppointmentQueueView()}">
 					<a class="round-top" ng-class="$ctrl.getTabClasses($ctrl.isAppointmentQueueView())" data-toggle="tab"
 					ng-click="$ctrl.changeTab($ctrl.tabEnum.appointmentQueue);"> Queue
 					</a>
 				</li>
-				<li ng-class="{'active' : $ctrl.isAppointmentPatientView()}">
+				<li ng-if="$ctrl.isAppointmentPatientViewEnabled()" ng-class="{'active' : $ctrl.isAppointmentPatientView()}">
 					<a class="round-top" data-toggle="tab"
 					   ng-click="$ctrl.changeTab($ctrl.tabEnum.appointments);">Appointments
 					</a>
 				</li>
-				<li ng-class="{'active' : $ctrl.isRecentPatientView()}">
+				<li ng-if="$ctrl.isRecentPatientViewEnabled()" ng-class="{'active' : $ctrl.isRecentPatientView()}">
 					<a class="round-top" data-toggle="tab"
 					   ng-click="$ctrl.changeTab($ctrl.tabEnum.recent);">Patients
 					</a>
@@ -69,11 +70,11 @@
 			</ul>
 
 			<!-- tab contents -->
-			<div ng-if="$ctrl.isAppointmentQueueView()" class="tab-content">
+			<div ng-if="$ctrl.componentEnabled() && $ctrl.isAppointmentQueueView()" class="tab-content">
 				<appointment-queue component-style="pageStyle">
 				</appointment-queue>
 			</div>
-			<div ng-if="$ctrl.isAppointmentPatientView() || $ctrl.isRecentPatientView()">
+			<div ng-if="$ctrl.componentEnabled() && ($ctrl.isAppointmentPatientView() || $ctrl.isRecentPatientView())">
 				<!-- Appointment And Patient View. -->
 				<div class="content-controller flex-row align-items-center">
 					<div class="form-inline flex-row flex-grow col-md-12">
@@ -142,11 +143,12 @@
 								</div>
 								<div class="col-md-6">
 									<juno-appointment-status-select
-									ca-name="aside-appt-status-{{patient.appointmentNo}}"
-									ca-no-label="true"
-									ca-model="patient.status"
-									ca-options="$ctrl.eventStatusOptions"
-									ca-change="$ctrl.updateAppointmentStatus(patient)"
+											ca-disabled="!$ctrl.isAppointmentStatusSelectEnabled()"
+											ca-name="aside-appt-status-{{patient.appointmentNo}}"
+											ca-no-label="true"
+											ca-model="patient.status"
+											ca-options="$ctrl.eventStatusOptions"
+											ca-change="$ctrl.updateAppointmentStatus(patient)"
 									>
 									</juno-appointment-status-select>
 								</div>
@@ -154,6 +156,9 @@
 						</a>
 					</div>
 				</div>
+			</div>
+			<div ng-if="!$ctrl.componentEnabled()" class="patient-list-no-access">
+				<juno-missing-security></juno-missing-security>
 			</div>
 		</div>
 	</div>

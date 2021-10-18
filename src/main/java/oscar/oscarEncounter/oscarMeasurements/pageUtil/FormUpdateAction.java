@@ -9,19 +9,9 @@
 
 package oscar.oscarEncounter.oscarMeasurements.pageUtil;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Date;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.GenericValidator;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -30,16 +20,19 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.oscarehr.common.dao.FlowSheetCustomizationDao;
 import org.oscarehr.common.dao.MeasurementDao;
+import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.FlowSheetCustomization;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.Validations;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
 import oscar.oscarEncounter.oscarMeasurements.FlowSheetItem;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementFlowSheet;
 import oscar.oscarEncounter.oscarMeasurements.MeasurementTemplateFlowSheetConfig;
@@ -47,27 +40,25 @@ import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypeBeanHandler
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean;
 import oscar.util.ConversionUtils;
 
-import org.oscarehr.common.dao.SecRoleDao;
-import org.oscarehr.common.model.SecRole;
-
-import oscar.oscarEncounter.data.EctProgram;
-
-import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
-import org.apache.log4j.Logger;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class FormUpdateAction extends Action {
 	
 	private static Logger log = MiscUtils.getLogger();
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
 	
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String date = request.getParameter("date");
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_measurement", "w", null))
-		{
-			throw new SecurityException("missing required security object (_measurement)");
-		}
+		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.MEASUREMENT_CREATE);
 		
 		String testOutput = "";
 		String textOnEncounter = ""; // ********CDM Indicators Update******** \\n";
@@ -90,8 +81,7 @@ public class FormUpdateAction extends Action {
 		{
 			apptNoInt = Integer.parseInt(apptNo);
 		}
-		String userNo = (String) session.getAttribute("user");
-		String programNo = new EctProgram(session).getProgram(userNo);
+
 
 		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(session.getServletContext());
 
@@ -199,7 +189,16 @@ public class FormUpdateAction extends Action {
 
 		if (addToNote && addNewNote)
 		{
-			addNote(demographicNo, providerNo, programNo, note, apptNoInt, request);
+			CaseManagementNote chartNote = new CaseManagementNote();
+			chartNote.setNote(note);
+
+			if(apptNoInt > 0)
+			{
+				OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
+				chartNote.setAppointment(appointmentDao.find(apptNoInt));
+			}
+
+			encounterNoteService.saveChartNote(chartNote, providerNo, Integer.parseInt(demographicNo));
 		}
 
 		if (submit == null  || "Save".equals(submit) || "Save All".equals(submit))
@@ -210,37 +209,34 @@ public class FormUpdateAction extends Action {
 		return mapping.findForward("success");
 	}
 
-	public void addNote(String demographic_no, String providerNo, String prog_no, String note, int apptNoInt, HttpServletRequest request){
+	public void doCommentInput(FlowSheetItem item, EctMeasurementTypesBean mtypeBean, MeasurementFlowSheet mFlowsheet, String inputType, String mInstructions, String comment, String date, String apptNo, HttpServletRequest request)
+	{
+		String demographicNo = request.getParameter("demographic_no");
 		HttpSession session = request.getSession();
-		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(session.getServletContext());
-		CaseManagementManager cmm = (CaseManagementManager) ctx.getBean("caseManagementManager");
+		String providerNo = (String) session.getAttribute("user");
+		String comments = comment;
 
-		
-		SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
-		SecRole doctorRole = secRoleDao.findByName("doctor");
-		String reporter_caisi_role=doctorRole.getId().toString();
+		MeasurementDao measurementDao = (MeasurementDao) SpringUtils.getBean("measurementDao");
 
-		Date date = new Date();
-		    
-		CaseManagementNote cmn = new CaseManagementNote();
-		cmn.setUpdate_date(date);
-		cmn.setObservation_date(date);
-		cmn.setDemographic_no(demographic_no);
-		cmn.setProviderNo(providerNo);
-		cmn.setNote(note);
-		cmn.setSigned(true);
-		cmn.setSigning_provider_no(providerNo);
-		cmn.setProgram_no(prog_no);
-		cmn.setReporter_caisi_role(reporter_caisi_role);
+		Measurement measurement = new Measurement();
+		measurement.setDemographicId(Integer.parseInt(demographicNo));
+		measurement.setDataField("");
+		measurement.setMeasuringInstruction(mInstructions);
+		measurement.setComments(comments);
+		measurement.setDateObserved(ConversionUtils.fromDateString(date));
+		measurement.setType(inputType);
+		if(apptNo != null)
+		{
+			measurement.setAppointmentNo(Integer.parseInt(apptNo));
+		}
+		else
+		{
+			measurement.setAppointmentNo(0);
+		}
+		measurement.setProviderNo(providerNo);
 
-		cmn.setReporter_program_team("0");
-		cmn.setPassword("NULL");
-		cmn.setLocked(false);
-		cmn.setHistory(note+"-----hi story----");
-		cmn.setPosition(0);
-		cmn.setAppointmentNo(apptNoInt);
+		measurementDao.persist(measurement);
 
-		cmm.saveNoteSimple(cmn);
 	}
 
 	/**

@@ -29,6 +29,7 @@ angular.module('Common.Components').component('accordionList', {
 		// [{name: "groupName", expanded: true / false [optional] ,items: [{name: "item one", callback: func}, {name: "item two", callback: func}]},  ....
 		// {name: "another group", items: [{name: "item 1000", callback: func}, {name: "over 90000", callback: func}]}]
 		itemList: '<',
+		itemClicked: '&?',
 	},
 	controller: ['$state', '$scope', function ($state, $scope)
 	{
@@ -68,7 +69,7 @@ angular.module('Common.Components').component('accordionList', {
 
 		ctrl.getGroupCollapseId = function (group)
 		{
-			return group.name.replace(' ', '').replace('/', '');
+			return group.name.replaceAll(' ', '').replaceAll('/', '');
 		};
 
 		ctrl.onGroupClick = function (group)
@@ -88,6 +89,11 @@ angular.module('Common.Components').component('accordionList', {
 			if (item.callback !== undefined && item.callback !== null)
 			{
 				item.callback()
+			}
+
+			if(ctrl.itemClicked)
+			{
+				ctrl.itemClicked({item: item});
 			}
 		}
 

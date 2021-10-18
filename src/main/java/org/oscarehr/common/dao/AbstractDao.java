@@ -124,7 +124,7 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	 */
 	public List<T> findAll()
 	{
-		Query query = entityManager.createQuery("FROM " + modelClass.getSimpleName());
+		Query query = entityManager.createQuery("FROM " + getModelClassTableName());
 		return query.getResultList();
 	}
 
@@ -136,7 +136,7 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<T> findAll(Integer offset, Integer limit) {
-		Query query = entityManager.createQuery("FROM " + modelClass.getSimpleName());
+		Query query = entityManager.createQuery("FROM " + getModelClassTableName());
 		
 		if (offset != null && offset > 0) {
 			query.setFirstResult(offset);
@@ -234,7 +234,7 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 		// Query query = entityManager.createNativeQuery(sqlCommand, Integer.class);
 		// return((Integer)query.getSingleResult());
 
-		String tableName = modelClass.getSimpleName();
+		String tableName = getModelClassTableName();
 		javax.persistence.Table t = modelClass.getAnnotation(javax.persistence.Table.class);
 		if (t != null && t.name() != null && t.name().length() > 0) {
 			tableName = t.name();
@@ -356,6 +356,11 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	 */
 	protected String getModelClassName() {
 		return getModelClass().getSimpleName();
+	}
+
+	protected String getModelClassTableName()
+	{
+		return modelClass.getSimpleName();
 	}
 
 	private void setModelClass(Class<T> modelClass) {

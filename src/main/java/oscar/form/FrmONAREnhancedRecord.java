@@ -63,7 +63,7 @@ public class FrmONAREnhancedRecord extends FrmRecord {
 			this.setDemoProperties(loggedInInfo, demographicNo, props);
 			props.setProperty("c_lastName", StringUtils.trimToEmpty(demographic.getLastName()));
 			props.setProperty("c_firstName", StringUtils.trimToEmpty(demographic.getFirstName()));
-			props.setProperty("c_hin", demographic.getHin());
+			props.setProperty("c_hin", StringUtils.trimToEmpty(demographic.getHin()));
 
 			if ("ON".equals(demographic.getHcType()))
 			{

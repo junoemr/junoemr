@@ -26,8 +26,8 @@ package org.oscarehr.sharingcenter;
 
 import java.util.List;
 import org.marc.shic.core.configuration.consent.IIdentityProvider;
-import org.oscarehr.PMmodule.dao.SecUserRoleDao;
-import org.oscarehr.PMmodule.model.SecUserRole;
+import org.oscarehr.security.dao.SecUserRoleDao;
+import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.util.SpringUtils;
 
 public class OscarIdentityProvider implements IIdentityProvider

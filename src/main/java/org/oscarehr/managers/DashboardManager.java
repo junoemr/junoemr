@@ -190,7 +190,7 @@ public class DashboardManager {
 		JSONObject message = new JSONObject();
 		IndicatorTemplate indicatorTemplate = null;
 
-		if(!securityCheck(loggedInInfo, "_dashboardManager", SecurityInfoManager.WRITE)) {
+		if(!securityCheck(loggedInInfo, "_dashboardManager", SecurityInfoManager.CREATE)) {
 			message.put("status", "error");
 			message.put("message", "User missing _dashboardManager role with write access");
 			return message.toString();
@@ -252,7 +252,7 @@ public class DashboardManager {
 	 */
 	public boolean assignIndicatorToDashboard(LoggedInInfo loggedInInfo, int dashboardId, int indicatorId ) {
 		boolean success = Boolean.FALSE;
-		if(!securityCheck(loggedInInfo, "_dashboardManager", SecurityInfoManager.WRITE)) {
+		if(!securityCheck(loggedInInfo, "_dashboardManager", SecurityInfoManager.CREATE)) {
 			return success;
 		}
 		

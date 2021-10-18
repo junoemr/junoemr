@@ -12,7 +12,10 @@
             <column name="provider_no" length="6" not-null="true" />
         </property>
         <property name="roleName" type="java.lang.String">
-            <column name="role_name" length="30" not-null="true" />
+            <column name="role_name" length="30" />
+        </property>
+        <property name="roleId" type="java.lang.Integer">
+            <column name="sec_role_id" not-null="true" />
         </property>
         <property name="orgcd" type="java.lang.String">
             <column name="orgcd" length="80" />

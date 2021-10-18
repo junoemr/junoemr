@@ -23,12 +23,6 @@
  */
 package org.oscarehr.ws.rest;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-
 import org.oscarehr.billing.CA.AB.dao.AlbertaFacilityDao;
 import org.oscarehr.billing.CA.AB.dao.AlbertaFunctionalCenterDao;
 import org.oscarehr.billing.CA.AB.dao.AlbertaSkillCodeDao;
@@ -36,6 +30,7 @@ import org.oscarehr.billing.CA.ON.dao.OntarioMasterNumberDao;
 import org.oscarehr.common.dao.BillingBCDao;
 import org.oscarehr.common.dao.BillingServiceDao;
 import org.oscarehr.managers.BillingManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.conversion.ServiceTypeConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
@@ -48,14 +43,18 @@ import org.oscarehr.ws.rest.transfer.billing.BCBillingLocationTo1;
 import org.oscarehr.ws.rest.transfer.billing.BCBillingVisitCodeTo1;
 import org.oscarehr.ws.rest.transfer.billing.OntarioMasterNumberTo1;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import oscar.OscarProperties;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 @Path("/billing")
-public class BillingService extends AbstractServiceImpl {
-
+public class BillingService extends AbstractServiceImpl
+{
 	@Autowired
 	BillingManager billingManager;
 
@@ -79,41 +78,50 @@ public class BillingService extends AbstractServiceImpl {
 	@GET
 	@Path("/uniqueServiceTypes")
 	@Produces("application/json")
-	public AbstractSearchResponse<ServiceTypeTo> getUniqueServiceTypes(@QueryParam("type")  String type) {
+	public AbstractSearchResponse<ServiceTypeTo> getUniqueServiceTypes(@QueryParam("type") String type)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.BILLING_READ);
+
 		AbstractSearchResponse<ServiceTypeTo> response = new AbstractSearchResponse<ServiceTypeTo>();
 		ServiceTypeConverter converter = new ServiceTypeConverter();
-		if(type == null) {
-			response.setContent(converter.getAllAsTransferObjects(getLoggedInInfo(),billingManager.getUniqueServiceTypes(getLoggedInInfo())));	
-		} else {
-			response.setContent(converter.getAllAsTransferObjects(getLoggedInInfo(),billingManager.getUniqueServiceTypes(getLoggedInInfo(),type)));
+		if(type == null)
+		{
+			response.setContent(converter.getAllAsTransferObjects(getLoggedInInfo(), billingManager.getUniqueServiceTypes(getLoggedInInfo())));
+		}
+		else
+		{
+			response.setContent(converter.getAllAsTransferObjects(getLoggedInInfo(), billingManager.getUniqueServiceTypes(getLoggedInInfo(), type)));
 		}
 		response.setTotal(response.getContent().size());
 		return response;
-
 	}
 
 	@GET
 	@Path("/billingRegion")
 	@Produces("application/json")
-	public GenericRESTResponse billingRegion() {
-			boolean billRegionSet = true;
-			String billRegion = oscarProperties.getBillingType().trim().toUpperCase();
-			if(billRegion.isEmpty()){
-					billRegionSet = false;
-			}
-			return new GenericRESTResponse(billRegionSet, billRegion);
+	public GenericRESTResponse billingRegion()
+	{
+		boolean billRegionSet = true;
+		String billRegion = oscarProperties.getBillingType().trim().toUpperCase();
+		if(billRegion.isEmpty())
+		{
+			billRegionSet = false;
+		}
+		return new GenericRESTResponse(billRegionSet, billRegion);
 	}
 
 	@GET
 	@Path("/defaultView")
 	@Produces("application/json")
-	public GenericRESTResponse defaultView() {
-			boolean defaultViewSet = true;
-			String defaultView = oscarProperties.getProperty("default_view", "").trim();
-			if(defaultView.isEmpty()){
-				defaultViewSet = false;
-			}
-			return new GenericRESTResponse(defaultViewSet, defaultView);
+	public GenericRESTResponse defaultView()
+	{
+		boolean defaultViewSet = true;
+		String defaultView = oscarProperties.getProperty("default_view", "").trim();
+		if(defaultView.isEmpty())
+		{
+			defaultViewSet = false;
+		}
+		return new GenericRESTResponse(defaultViewSet, defaultView);
 	}
 
 	@GET

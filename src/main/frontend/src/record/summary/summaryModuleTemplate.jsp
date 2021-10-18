@@ -6,7 +6,8 @@
 				<div class="body-small-bold flex-grow title" ng-switch-when="false">{{$ctrl.module.displayName}}</div>
 				<div class="body-small-bold flex-grow title" ng-switch-when="true"><a href="javascript:" ng-click="$ctrl.clickTitleCallback()">{{$ctrl.module.displayName}}</a></div>
 			</div>
-			<button ng-if="$ctrl.enableAddButton"
+			<button ng-if="$ctrl.addButton"
+			        ng-disabled="!$ctrl.addButtonEnabled"
 					class="btn btn-xs btn-primary-inverted btn-add"
 			        ng-click="$ctrl.addBtnCallback()"
 			>

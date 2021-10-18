@@ -24,6 +24,7 @@
 
 package org.oscarehr.integration.clinicaid.service;
 
+import javax.annotation.Nullable;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 
@@ -32,6 +33,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -49,6 +51,7 @@ import org.oscarehr.common.model.Site;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidApiLimitInfoTo1;
 import org.oscarehr.integration.clinicaid.dto.ClinicaidResultTo1;
 import org.oscarehr.integration.clinicaid.dto.PatientEligibilityDataTo1;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.service.ProviderService;
 import org.oscarehr.util.LoggedInInfo;
@@ -84,6 +87,9 @@ public class ClinicaidAPIService
 	@Autowired
 	private ProviderService providerService;
 
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
+	
 	@Autowired
 	private ClinicDAO clinicDAO;
 
@@ -356,6 +362,8 @@ public class ClinicaidAPIService
 			data.put("address", StringUtils.trimToEmpty(demo.getAddress()));
 			data.put("appointment_site", StringUtils.trimToEmpty(request.getParameter("appointment_site")));
 
+			
+			
 			// In Oscar, Newborns are denoted with the Mother's PHN and version Code 66
 			// Before sending to Clinicaid, we will remove the version code
 			// and move the PHN into the guardian_health_number field instead
@@ -369,43 +377,24 @@ public class ClinicaidAPIService
 				}
 
 				ProviderData providerData = providerService.getProviderEager(provider_no);
-
-				// Default facility number
-				String facilityNumber = null;
-
+				Site site = null;
+				
 				if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable())
 				{
+					// If billed from the master file, appointmentNo = 0 aka no/unknown appointment;
 					Integer appointmentNo = NumberUtils.toInt(request.getParameter("appointment_no"), 0);
 					Appointment appointment = appointmentDao.find(appointmentNo);
-
-					// If billed from the master file, appointmentNo = 0
-					// So we just can't check for the present of the query parameter
 					if (appointment != null)
 					{
-						Site site = siteDao.findByName(appointment.getLocation());
-
-						ProviderSitePK key = new ProviderSitePK(provider_no, site.getId());
-						ProviderSite provSite = provSiteDao.find(key);
-
-						if (provSite != null && provSite.isBcBCPEligible())
-						{
-							facilityNumber = site.getBcFacilityNumber();
-						}
+						site = siteDao.findByName(appointment.getLocation());
 					}
 				}
-				else
-				{
-					if (providerData.getBillingOpts() != null && providerData.getBillingOpts().getBcBCPEligible())
-					{
-						Clinic clinic = clinicDAO.getClinic();
-						facilityNumber = clinic.getBcFacilityNumber();
-					}
-				}
-
-				if (facilityNumber != null)
-				{
-					data.put("facility_number", StringUtils.trimToEmpty(facilityNumber));
-				}
+				
+				Optional<String> facilityNumber = getBCFacilityNumber(providerData, site);
+				facilityNumber.ifPresent(facNo -> data.put("facility_number", StringUtils.trimToEmpty(facNo)));
+				
+				Optional<String> serviceLocationCode = getBCServiceLocationCode(providerData, site);
+				serviceLocationCode.ifPresent(slc -> data.put("service_location_cd", slc));
 			}
 
 			clinicaidLink = clinicaidLink + "/?nonce=" + nonce +
@@ -424,5 +413,76 @@ public class ClinicaidAPIService
 			}
 		}
 		return clinicaidLink;
+	}
+	
+	/**
+	 * Determine the BC service location code to use with the billing according to the following priority
+	 * Provider SLC > Site SLC > Clinic SLC > null
+	 *
+	 * @param provider provider associated with the appointment being billed
+	 * @param site Optional site associated with the appointment being billing
+	 * @return SLC code as a String of length 1, otherwise null if it can't be determined.
+	 */
+	private Optional<String> getBCServiceLocationCode(ProviderData provider, @Nullable Site site)
+	{
+		String serviceLocationCode = null;
+		
+		if (ConversionUtils.hasContent(provider.getBillingOpts().getBcServiceLocationCode()))
+		{
+			serviceLocationCode = provider.getBillingOpts().getBcServiceLocationCode();
+		}
+		else if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable() && site != null && ConversionUtils.hasContent(site.getBcServiceLocationCode()))
+		{
+			serviceLocationCode =  site.getBcServiceLocationCode();
+		}
+		else
+		{
+			String fullCodeWithDescription = systemPreferenceService.getPreferenceValue("service_location_code", null);
+			
+			// The systemPreference version of the SLC is non-standard at this time because it was mapped from old Oscar settings,
+			// it's stored in the format "<code>|<description>".  We only want the code.
+			if (fullCodeWithDescription != null && fullCodeWithDescription.split("\\|").length == 2)
+			{
+				serviceLocationCode = fullCodeWithDescription.split("\\|")[0];
+			}
+		}
+		
+		return Optional.ofNullable(serviceLocationCode);
+	}
+	
+	
+	/**
+	 * Get the facility number associated with the billing according to the following priority:
+	 * Appointment Site facNo > Clinic facNo > null
+	 *
+	 * @param provider Provider associated with the appointment being billed
+	 * @param site Optional site associated with the appointment being billed
+	 * @return facilty number if found, otherwise null.
+	 */
+	private Optional<String> getBCFacilityNumber(ProviderData provider, @Nullable Site site)
+	{
+		// Default facility number
+		String facilityNumber = null;
+		
+		if (org.oscarehr.common.IsPropertiesOn.isMultisitesEnable() && site != null)
+		{
+			ProviderSitePK key = new ProviderSitePK(String.valueOf(provider.getProviderNo()), site.getId());
+			ProviderSite provSite = provSiteDao.find(key);
+				
+			if (provSite != null && provSite.isBcBCPEligible())
+			{
+				facilityNumber = site.getBcFacilityNumber();
+			}
+		}
+		else
+		{
+			if (provider.getBillingOpts() != null && provider.getBillingOpts().getBcBCPEligible())
+			{
+				Clinic clinic = clinicDAO.getClinic();
+				facilityNumber = clinic.getBcFacilityNumber();
+			}
+		}
+		
+		return Optional.ofNullable(facilityNumber);
 	}
 }

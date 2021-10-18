@@ -23,29 +23,29 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.tools.ant.util.DateUtils;
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.service.AdmissionManager;
 import org.oscarehr.managers.ProgramManager2;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.conversion.AdmissionConverter;
 import org.oscarehr.ws.rest.conversion.ProgramConverter;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.model.AdmissionTo1;
 import org.oscarehr.ws.rest.to.model.ProgramTo1;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 @Path("/program")
 public class ProgramService extends AbstractServiceImpl {
@@ -61,7 +61,13 @@ public class ProgramService extends AbstractServiceImpl {
 	@GET
 	@Path("/patientList")
 	@Produces("application/json")
-	public AbstractSearchResponse<AdmissionTo1> getPatientList(@QueryParam("programNo")String programNo, @QueryParam("day") String day, @QueryParam("startIndex") Integer startIndex,  @QueryParam("numToReturn") Integer numToReturn) throws Exception {
+	public AbstractSearchResponse<AdmissionTo1> getPatientList(
+			@QueryParam("programNo") String programNo,
+			@QueryParam("day") String day,
+			@QueryParam("startIndex") Integer startIndex,
+			@QueryParam("numToReturn") Integer numToReturn) throws Exception
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
 		
 		AbstractSearchResponse<AdmissionTo1> response = new  AbstractSearchResponse<AdmissionTo1>();
 		
@@ -105,7 +111,8 @@ public class ProgramService extends AbstractServiceImpl {
 	@GET
 	@Path("/programList")
 	@Produces("application/json")
-	public AbstractSearchResponse<ProgramTo1> getProgramList() throws Exception {
+	public AbstractSearchResponse<ProgramTo1> getProgramList() throws Exception
+	{
 		AbstractSearchResponse<ProgramTo1> response = new  AbstractSearchResponse<ProgramTo1>();
 		
 		List<ProgramProvider> programProviders = programManager.getProgramDomain(getLoggedInInfo(), getLoggedInInfo().getLoggedInProviderNo());

@@ -3,6 +3,9 @@ juno-input {
 		@include juno-form-inputs-style(1px, var(--theme-form-field-border-radius));
 		@include juno-form-inputs-colors-default();
 
+		--juno-input-label-padding: 0;
+		--juno-input-label-width: unset;
+
 		div {
 			flex: 1 1 0;
 			min-width: 24px;
@@ -50,6 +53,10 @@ juno-input {
 			&.shift-right-for-icon {
 				padding-left: 32px;
 			}
+		}
+		.label-style {
+			padding: var(--juno-input-label-padding);
+			width: var(--juno-input-label-width);
 		}
 	}
 }

@@ -25,6 +25,27 @@
 
 package oscar.oscarEncounter.oscarMeasurements;
 
+import org.apache.commons.collections.OrderedMapIterator;
+import org.apache.commons.collections.map.ListOrderedMap;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.drools.RuleBase;
+import org.drools.WorkingMemory;
+import org.drools.io.RuleBaseLoader;
+import org.jdom.Element;
+import org.oscarehr.common.dao.DxDao;
+import org.oscarehr.careTrackerDecisionSupport.service.DroolsCachingService;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.OscarProperties;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean;
+import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
+import oscar.oscarEncounter.oscarMeasurements.util.MeasurementDSHelper;
+import oscar.oscarEncounter.oscarMeasurements.util.Recommendation;
+import oscar.oscarEncounter.oscarMeasurements.util.RuleBaseCreator;
+import oscar.oscarEncounter.oscarMeasurements.util.TargetColour;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,27 +58,6 @@ import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.collections.OrderedMapIterator;
-import org.apache.commons.collections.map.ListOrderedMap;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.drools.RuleBase;
-import org.drools.WorkingMemory;
-import org.drools.io.RuleBaseLoader;
-import org.jdom.Element;
-import org.oscarehr.common.dao.DxDao;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-
-import oscar.OscarProperties;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementTypesBean;
-import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
-import oscar.oscarEncounter.oscarMeasurements.util.MeasurementDSHelper;
-import oscar.oscarEncounter.oscarMeasurements.util.Recommendation;
-import oscar.oscarEncounter.oscarMeasurements.util.RuleBaseCreator;
-import oscar.oscarEncounter.oscarMeasurements.util.TargetColour;
 
 /**
  *
@@ -223,7 +223,8 @@ public class MeasurementFlowSheet {
         itemList.put(i, item.getItemName(), item);
     }
 
-    public FlowSheetItem getFlowSheetItem(String measurement) {
+    public FlowSheetItem getFlowSheetItem(String measurement)
+    {
         MiscUtils.getLogger().debug("GETTING "+measurement+ " ITEMS IN THE LIST "+itemList.size());
         FlowSheetItem item = (FlowSheetItem) itemList.get(measurement);
 
@@ -235,10 +236,10 @@ public class MeasurementFlowSheet {
         return (EctMeasurementTypesBean) measurementList.get(measurementType);
     }
 
-
-    public Map<String,String> getMeasurementFlowSheetInfo(String measurement) {
-        if (itemList == null) {
-         //DO something
+    public Map<String,String> getMeasurementFlowSheetInfo(String measurement)
+    {
+        if (itemList == null)
+        {
         	itemList = new ListOrderedMap();
         }
         log.debug("GETTING "+measurement+ " ITEMS IN THE LIST "+itemList.size());
@@ -248,27 +249,33 @@ public class MeasurementFlowSheet {
     }
 
     //If measurement is null. Add item to the end of the flowsheet.
-    public void addAfter(String measurement , FlowSheetItem item){
+    public void addAfter(String measurement , FlowSheetItem item)
+    {
     	int placement = itemList.size();
-    	if (measurement != null){
+    	if (measurement != null)
+    	{
     		placement = itemList.indexOf(measurement);
     	}
         itemList.put(placement, item.getItemName(), item);
     }
 
-    public void setToHidden(String measurement){
+    public void setToHidden(String measurement)
+    {
          FlowSheetItem item = (FlowSheetItem) itemList.get(measurement);
-         item.setHide(true);
+         if (item != null)
+         {
+             item.setHide(true);
+         }
     }
 
-
-
-    public void updateMeasurementFlowSheetInfo(String measurement, Hashtable<String,String> h) {
+    public void updateMeasurementFlowSheetInfo(String measurement, Hashtable<String,String> h)
+    {
         FlowSheetItem item = new FlowSheetItem(h);
         itemList.put(measurement, item);
     }
 
-    public void updateMeasurementFlowSheetInfo(String measurement, FlowSheetItem item) {
+    public void updateMeasurementFlowSheetInfo(String measurement, FlowSheetItem item)
+    {
         itemList.put(measurement, item);
     }
 
@@ -404,28 +411,35 @@ public class MeasurementFlowSheet {
         }
     }
 
-    public void loadRuleBase(String string) {
+    public void loadRuleBase(String string)
+    {
+        DroolsCachingService droolsCachingService = SpringUtils.getBean(DroolsCachingService.class);
+
         try {
-            boolean fileFound = false;
-            String measurementDirPath = OscarProperties.getInstance().getProperty("MEASUREMENT_DS_DIRECTORY");
+            ruleBase = droolsCachingService.getDroolsRuleBase(string);
 
-            if (measurementDirPath != null) {
-                //if (measurementDirPath.charAt(measurementDirPath.length()) != /)
-                File file = new File(OscarProperties.getInstance().getProperty("MEASUREMENT_DS_DIRECTORY") + string);
-                if (file.isFile() || file.canRead()) {
-                    log.debug("Loading from file " + file.getName());
-                    FileInputStream fis = new FileInputStream(file);
-                    ruleBase = RuleBaseLoader.loadFromInputStream(fis);
-                    fileFound = true;
-                }
-            }
-
-            if (!fileFound) {
-                URL url = MeasurementFlowSheet.class.getResource("/oscar/oscarEncounter/oscarMeasurements/flowsheets/" + string);  //TODO-legacy: change this so it is configurable;
-                log.debug("loading from URL " + url.getFile());
-                ruleBase = RuleBaseLoader.loadFromUrl(url);
-            }
-        } catch (Exception e) {
+//            boolean fileFound = false;
+//            String measurementDirPath = OscarProperties.getInstance().getProperty("MEASUREMENT_DS_DIRECTORY");
+//
+//            if (measurementDirPath != null) {
+//                //if (measurementDirPath.charAt(measurementDirPath.length()) != /)
+//                File file = new File(OscarProperties.getInstance().getProperty("MEASUREMENT_DS_DIRECTORY") + string);
+//                if (file.isFile() || file.canRead()) {
+//                    log.debug("Loading from file " + file.getName());
+//                    FileInputStream fis = new FileInputStream(file);
+//                    ruleBase = RuleBaseLoader.loadFromInputStream(fis);
+//                    fileFound = true;
+//                }
+//            }
+//
+//            if (!fileFound) {
+//                URL url = MeasurementFlowSheet.class.getResource("/oscar/oscarEncounter/oscarMeasurements/flowsheets/" + string);  //TODO-legacy: change this so it is configurable;
+//                log.debug("loading from URL " + url.getFile());
+//                ruleBase = RuleBaseLoader.loadFromUrl(url);
+//            }
+        }
+        catch(Exception e)
+        {
             MiscUtils.getLogger().error("Error", e);
         }
         rulesLoaded = true;

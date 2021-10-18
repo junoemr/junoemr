@@ -29,6 +29,7 @@ import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.external.rest.v1.conversion.DocumentConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.document.DocumentTransferInbound;
 import org.oscarehr.ws.external.rest.v1.transfer.document.DocumentTransferOutbound;
@@ -79,11 +80,7 @@ public class DemographicDocumentWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<DocumentTransferOutbound> createDocument(@PathParam("demographicNo") String demographicNo, DocumentTransferInbound documentTransfer) throws IOException, InterruptedException
 	{
-		securityInfoManager.requireAllPrivilege(
-				getLoggedInInfo().getLoggedInProviderNo(),
-				SecurityInfoManager.WRITE,
-				Integer.parseInt(demographicNo),
-				"_edoc");
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Integer.parseInt(demographicNo), Permission.DOCUMENT_CREATE);
 
 		documentTransfer.setDocumentNo(null);
 

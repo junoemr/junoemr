@@ -104,6 +104,12 @@
 		String remarks = ConversionUtils.getStringOrDefaultValue(request.getParameter("remarks"), appt.getRemarks());
 		String urgency = StringUtils.transformNullInEmptyString(request.getParameter("urgency"));
 
+		// Virtual appointments can not have their locations changed
+		if (appt.getIsVirtual() && !location.equals(appt.getLocation()))
+		{
+			throw new IllegalArgumentException("Appointment ID: " + appt.getId() + " can't be updated. Virtual appointments can not change location."); 
+		}
+
 		Integer reasonCode = appt.getReasonCode();
 		int demographicNo = appt.getDemographicNo();
 		try
