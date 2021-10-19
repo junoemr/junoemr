@@ -23,9 +23,14 @@
  */
 package org.oscarehr.ws.rest.to.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.oscarehr.dataMigration.model.common.PartialDate;
-import java.io.Serializable;
+import oscar.util.Jackson.PartialDateDeserializer;
+import oscar.util.Jackson.PartialDateSerializer;
+
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 @XmlRootElement(name="groupNoteExt")
 public class NoteExtTo1 implements Serializable{
@@ -49,11 +54,19 @@ public class NoteExtTo1 implements Serializable{
 	private Long noteId;
 	private String keyVal;
 	private String value;
+	@JsonSerialize(using = PartialDateSerializer.class)
+	@JsonDeserialize(using = PartialDateDeserializer.class)
 	private PartialDate dateValue;
 	
 	//keyVal's
+	@JsonSerialize(using = PartialDateSerializer.class)
+	@JsonDeserialize(using = PartialDateDeserializer.class)
 	private PartialDate startDate;
+	@JsonSerialize(using = PartialDateSerializer.class)
+	@JsonDeserialize(using = PartialDateDeserializer.class)
 	private PartialDate resolutionDate;
+	@JsonSerialize(using = PartialDateSerializer.class)
+	@JsonDeserialize(using = PartialDateDeserializer.class)
 	private PartialDate procedureDate;
 
 	private String ageAtOnset;
