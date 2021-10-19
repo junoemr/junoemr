@@ -203,6 +203,13 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 		return this.getLastName() + ", " + this.getFirstName() + (StringUtils.isBlank(this.getMiddleName()) ? "" : " " + this.getMiddleName());
 	}
 
+	public String getDisplayHealthNumber()
+	{
+		return StringUtils.trimToEmpty(this.getHealthNumber()) +
+				(StringUtils.isBlank(this.getHealthNumberVersion()) ? "" : " " + this.getHealthNumberVersion()) +
+				(StringUtils.isBlank(this.getHealthNumberProvinceCode()) ? "" : " " + this.getHealthNumberProvinceCode());
+	}
+
 	public Optional<PhoneNumber> getPreferredPhone()
 	{
 		PhoneNumber cellPhone = this.getCellPhone();

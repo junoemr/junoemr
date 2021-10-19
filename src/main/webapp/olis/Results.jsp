@@ -283,7 +283,7 @@
 										<span><%=demographic.getDateOfBirth()%></span>
 									</td>
 									<td>
-										<span><%=demographic.getHealthNumber()%></span>
+										<span><%=demographic.getDisplayHealthNumber()%></span>
 									</td>
 									<td>
 										<span><%=((demographic.getPreferredPhone().isPresent()) ? demographic.getPreferredPhone().get().getNumberFormattedDisplay() : "")%></span>
@@ -302,7 +302,8 @@
 						<th class="unsortable"></th>
 						<th class="width-md">Collection Date/Time</th>
 						<th class="width-md">Last Updated in OLIS</th>
-						<th class="width-sm">Specimen Type</th>
+						<th class="width-sm">Discipline</th>
+						<th class="width-md">Specimen Type</th>
 						<th class="width-md">Test Request Name</th>
 						<th class="width-sm">Test Request Status</th>
 						<th class="width-sm">Ordering Practitioner</th>
@@ -315,8 +316,10 @@
 							result = OLISResultsAction.searchResultsMap.get(resultUuid);
 
 							// show one row per OBR, so that individual statuses can be displayed. Required feature for OLIS conformance.
-							for(int obrRep=0; obrRep < result.getOBRCount(); obrRep++)
-							{%>
+							for(int i=0; i < result.getOBRCount(); i++)
+							{
+								int obrRep = result.getMappedOBR(i); // aka use sort keys
+							%>
 							<tr class="<%=++lineNum % 2 == 1 ? "oddLine" : "evenLine"%>"
 							    patientName="<%=result.getPatientName()%>"
 							    reportingLaboratory="<%=result.getReportingFacilityName()%>">
@@ -336,6 +339,7 @@
 								<td><%=result.getSpecimenReceivedDateTime()%></td>
 								<td><%=result.getLastUpdateInOLIS()%></td>
 								<td><%=result.getOBRCategory(obrRep)%></td>
+								<td><%=result.getObrSpecimenSource(obrRep)%></td>
 								<td><%=result.getOBRName(obrRep)%></td>
 								<td><%=result.getObrStatusDisplayValue(obrRep)%></td>
 								<td><%=result.getShortDocName()%></td>
