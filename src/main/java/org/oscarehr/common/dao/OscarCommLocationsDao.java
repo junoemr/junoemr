@@ -51,6 +51,17 @@ public class OscarCommLocationsDao extends AbstractDao<OscarCommLocations>{
 		
 	}
 
+	/**
+	 * Gets a list of oscarCommLocations entries with the provided locationDesc
+	 * @param description Description to find
+	 * @return List of OscarCommLocations
+	 */
+	public List<OscarCommLocations> findByLocationDesc(String description) {
+		Query query = createQuery("ocl", "ocl.locationDesc = :locationDesc");
+		query.setParameter("locationDesc", description);
+		return query.getResultList();
+	}
+
 	@NativeSql({"messagetbl", "oscarcommlocations"})
 	public List<Object[]> findFormLocationByMesssageId(String messId) {
 		String sql = "select ocl.locationDesc, mess.thesubject from messagetbl mess, oscarcommlocations ocl where mess.sentByLocation = ocl.locationId and mess.messageid = '" + messId + "' ";

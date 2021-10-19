@@ -102,9 +102,9 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 				"groupNoteExt": {
 					"noteId": noteId,
 					"hideCpp": form.hidecpp,
-					"startDate": me.junoEncounter.getUTCDateFromString(form.startdate),
-					"resolutionDate": me.junoEncounter.getUTCDateFromString(form.resolutiondate),
-					"procedureDate": me.junoEncounter.getUTCDateFromString(form.proceduredate),
+					"startDate": form.startdate,
+					"resolutionDate": form.resolutiondate,
+					"procedureDate": form.proceduredate,
 					"ageAtOnset": form.ageatonset,
 					"treatment": form.treatment,
 					"problemStatus": form.problemstatus,

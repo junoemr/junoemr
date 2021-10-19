@@ -202,7 +202,11 @@ angular.module('Record.Summary').component('encounterNote', {
 
 		ctrl.getNoteHeader = function firstLine()
 		{
-			return  ctrl.note.note.trim().split('\n')[0]; // First line of the note text, split by newline
+			if(ctrl.note && ctrl.note.note)
+			{
+				return ctrl.note.note.trim().split('\n')[0]; // First line of the note text, split by newline
+			}
+			return "";
 		};
 
 		ctrl.allowNoteExpansion = function allowNoteExpansion()
