@@ -23,6 +23,7 @@
 package org.oscarehr.dataMigration.model.demographic;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.common.Address;
@@ -74,6 +75,7 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 
 	// base info
 	private String firstName;
+	private String middleName;
 	private String lastName;
 	private TITLE title;
 	private LocalDate dateOfBirth;
@@ -198,7 +200,7 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 
 	public String getDisplayName()
 	{
-		return this.getLastName() + ", " + this.getFirstName();
+		return this.getLastName() + ", " + this.getFirstName() + (StringUtils.isBlank(this.getMiddleName()) ? "" : " " + this.getMiddleName());
 	}
 
 	public Optional<PhoneNumber> getPreferredPhone()
