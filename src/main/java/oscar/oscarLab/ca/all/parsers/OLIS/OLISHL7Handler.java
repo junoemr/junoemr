@@ -1478,6 +1478,25 @@ public class OLISHL7Handler extends MessageHandler
 		return "";
 	}
 
+	public String getPointOfCareMessage(int i)
+	{
+		String pointOfCare = getPointOfCare(i);
+		String message = null;
+
+		if(StringUtils.isNotBlank(pointOfCare))
+		{
+			if("PORT".equalsIgnoreCase(pointOfCare))
+			{
+				message = "Test performed at point of care";
+			}
+			else
+			{
+				message = "Test performed at patient location";
+			}
+		}
+		return message;
+	}
+
 	@Override
 	public String getMsgType()
 	{

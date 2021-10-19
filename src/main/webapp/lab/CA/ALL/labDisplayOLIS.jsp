@@ -564,6 +564,11 @@ public String strikeOutInvalidContent(String content, String status) {
                 .NormalRes, .AbnormalRes {
                     background-color: white;
                 }
+
+	            s {
+		            /* pdf renderer doesn't properly support strikethrough tag. */
+		            text-decoration: line-through;
+	            }
             }
             -->
         </style>
@@ -1522,11 +1527,11 @@ public String strikeOutInvalidContent(String content, String status) {
                                     <div class="Title2">
                                         <%=headers.get(obr)%>
                                         <%
-                                        String poc = handler.getPointOfCare(obr);
-                                        if (!stringIsNullOrEmpty(poc)) {
+                                        String pocMessage = handler.getPointOfCareMessage(obr);
+                                        if (!stringIsNullOrEmpty(pocMessage)) {
                                         %>
                                         <br/>
-                                        <span style="font-size:8px; color:#333333;">Test performed at patient location</span>
+                                        <span style="font-size:8px; color:#333333;"><%=pocMessage%></span>
                                         <% } %>
                                         <%
                                         boolean blocked = handler.isOBRBlocked(obr);
