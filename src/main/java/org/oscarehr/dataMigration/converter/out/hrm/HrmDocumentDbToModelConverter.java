@@ -54,7 +54,7 @@ public class HrmDocumentDbToModelConverter extends
 		hrmDocument.setReportDateTime(ConversionUtils.toNullableLocalDateTime(input.getReportDate()));
 		hrmDocument.setReceivedDateTime(ConversionUtils.toNullableLocalDateTime(input.getTimeReceived()));
 		hrmDocument.setDescription(input.getDescription());
-		hrmDocument.setSourceFacility(input.getSourceFacility());
+		hrmDocument.setSendingFacility(input.getSendingFacility());
 		hrmDocument.setSendingFacilityId(input.getSendingFacilityId());
 		hrmDocument.setSendingFacilityReport(input.getSendingFacilityReportId());
 		hrmDocument.setCreatedBy(null); // TODO not sure how to determine this

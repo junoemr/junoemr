@@ -1,1 +1,0 @@
-ALTER TABLE HRMDocument ADD COLUMN IF NOT EXISTS sendingFacility VARCHAR(255) NULL AFTER sourceFacility;

@@ -1,0 +1,1 @@
+ALTER TABLE HRMDocument CHANGE COLUMN sourceFacility sendingFacility VARCHAR(255) NULL;

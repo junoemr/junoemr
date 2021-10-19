@@ -202,7 +202,7 @@ public class GenericFile
 		{
 			Files.move(javaFile.toPath(), destinationFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
 			javaFile = destinationFile;
-			return new GenericFile(destinationFile);
+			return this;
 		}
 		throw new IOException("Invalid Directory: " + directoryFile.getPath());
 	}

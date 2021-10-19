@@ -29,11 +29,8 @@ import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
-import org.oscarehr.integration.clinicaid.dto.v2.MasterNumber;
-import org.oscarehr.integration.clinicaid.service.v2.ClinicAidService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.util.ConversionUtils;
 import xml.cds.v5_0.ReportClass;
 import xml.cds.v5_0.Reports;
 
@@ -47,9 +44,6 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 {
 	@Autowired
 	protected CDSReportDocumentImportMapper documentImportMapper;
-
-	@Autowired
-	protected ClinicAidService clinicaidService;
 
 	public CDSReportHrmImportMapper()
 	{
@@ -96,23 +90,8 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 		document.addComment(getNoteAsHrmComment(importStructure.getNotes(), document.getCreatedBy(), document.getReportDateTime()));
 		document.setDescription(document.getReportClass().getValue() + " (" + CDSConstants.DEFAULT_HRM_DESCRIPTION + ")");
 
-		document.setSourceFacility(importStructure.getSourceFacility());
-
-		String facilityId = importStructure.getSendingFacilityId();
-		if (ConversionUtils.hasContent(facilityId))
-		{
-			document.setSendingFacilityId(facilityId);
-			try
-			{
-				MasterNumber masterNumber = clinicaidService.getOntarioMasterNumber(facilityId);
-				document.setSendingFacility(masterNumber.getName());
-			}
-			catch (Exception e)
-			{
-				logger.warn("Could not retrieve HRM facility name from ClinicAid for id [" + facilityId + "]");
-			}
-		}
-
+		// The CDS source facility is the user friendly name of the sending facility.
+		document.setSendingFacility(importStructure.getSourceFacility());
 		document.setSendingFacilityId(importStructure.getSendingFacilityId());
 		document.setSendingFacilityReport(importStructure.getSendingFacilityReport());
 		document.setMessageUniqueId(importStructure.getMessageUniqueID());
