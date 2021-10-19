@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.BooleanUtils;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.providerBilling.model.ProviderBilling;
@@ -85,6 +86,7 @@ public class ProviderEditFormTo1 implements Serializable
 	private String bcBillingNo;
 	private JunoTypeaheadTo1 bcRuralRetentionCode;
 	private String bcServiceLocation;
+	private boolean bcpEligible;
 	private List<Integer> bcpSites;
 
 	// ON billing
@@ -250,6 +252,7 @@ public class ProviderEditFormTo1 implements Serializable
 		ruralRetentionCode.setValue(providerBilling.getBcRuralRetentionCode());
 		this.setBcRuralRetentionCode(ruralRetentionCode);
 		this.setBcServiceLocation(providerBilling.getBcServiceLocationCode());
+		this.setBcpEligible(BooleanUtils.toBooleanDefaultIfNull(providerBilling.getBcBCPEligible(), false));
 
 		// ON
 		this.setOnVisitLocation(providerBilling.getOnMasterNumber());
@@ -287,6 +290,7 @@ public class ProviderEditFormTo1 implements Serializable
 			providerBilling.setBcRuralRetentionName(this.getBcRuralRetentionCode().getLabel());
 		}
 		providerBilling.setBcServiceLocationCode(this.getBcServiceLocation());
+		providerBilling.setBcBCPEligible(this.isBcpEligible());
 
 		// ON
 		providerBilling.setOnMasterNumber(this.getOnVisitLocation());
@@ -364,9 +368,10 @@ public class ProviderEditFormTo1 implements Serializable
 			security.setPin(securityRecordTo1.getPin());
 		}
 		security.setProviderNo(providerNo.toString());
-		security.setBExpireset(0);
-		security.setBLocallockset(1);
-		security.setBRemotelockset(1);
-		security.setForcePasswordReset(false);
+		security.setBExpireset(securityRecordTo1.isExpirySet() ? 1 : 0);
+		security.setDateExpiredate(ConversionUtils.toNullableLegacyDate(securityRecordTo1.getExpiryDate()));
+		security.setBLocallockset(securityRecordTo1.isPinLockLocal() ? 1 : 0);
+		security.setBRemotelockset(securityRecordTo1.isPinLockRemote() ? 1 : 0);
+		security.setForcePasswordReset(securityRecordTo1.isForcePasswordReset());
 	}
 }

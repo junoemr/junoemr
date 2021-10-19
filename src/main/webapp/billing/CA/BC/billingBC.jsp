@@ -76,6 +76,7 @@ if(!authed) {
 <%@ page import="org.oscarehr.common.dao.BillingServiceDao" %>
 <%@ page import="oscar.oscarBilling.ca.bc.data.BillingVisit" %>
 <%@ page import="org.apache.commons.lang.math.NumberUtils" %>
+<%@ page import="java.util.Objects" %>
 <%!
   public void fillDxcodeList(BillingFormData.BillingService[] servicelist, Map dxcodeList) {
     for (int i = 0; i < servicelist.length; i++) {
@@ -1218,7 +1219,7 @@ if(wcbneeds != null){%>
                 <%
                   for (int i = 0; i < billvisit.length; i++) {
                       String visitTypeDescription = billvisit[i].getVisitType() + "|" + billvisit[i].getDescription();
-                      boolean isDefault = sxml_visittype.equals(visitTypeDescription);
+                      boolean isDefault = Objects.equals(sxml_visittype, visitTypeDescription);
                 %>
 		            <option value="<%= visitTypeDescription%>" <%=isDefault ? " selected" : ""%> ><%=visitTypeDescription%></option>
 

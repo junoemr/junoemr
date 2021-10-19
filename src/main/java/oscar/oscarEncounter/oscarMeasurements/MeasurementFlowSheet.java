@@ -223,7 +223,8 @@ public class MeasurementFlowSheet {
         itemList.put(i, item.getItemName(), item);
     }
 
-    public FlowSheetItem getFlowSheetItem(String measurement) {
+    public FlowSheetItem getFlowSheetItem(String measurement)
+    {
         MiscUtils.getLogger().debug("GETTING "+measurement+ " ITEMS IN THE LIST "+itemList.size());
         FlowSheetItem item = (FlowSheetItem) itemList.get(measurement);
 
@@ -235,10 +236,10 @@ public class MeasurementFlowSheet {
         return (EctMeasurementTypesBean) measurementList.get(measurementType);
     }
 
-
-    public Map<String,String> getMeasurementFlowSheetInfo(String measurement) {
-        if (itemList == null) {
-         //DO something
+    public Map<String,String> getMeasurementFlowSheetInfo(String measurement)
+    {
+        if (itemList == null)
+        {
         	itemList = new ListOrderedMap();
         }
         log.debug("GETTING "+measurement+ " ITEMS IN THE LIST "+itemList.size());
@@ -248,27 +249,33 @@ public class MeasurementFlowSheet {
     }
 
     //If measurement is null. Add item to the end of the flowsheet.
-    public void addAfter(String measurement , FlowSheetItem item){
+    public void addAfter(String measurement , FlowSheetItem item)
+    {
     	int placement = itemList.size();
-    	if (measurement != null){
+    	if (measurement != null)
+    	{
     		placement = itemList.indexOf(measurement);
     	}
         itemList.put(placement, item.getItemName(), item);
     }
 
-    public void setToHidden(String measurement){
+    public void setToHidden(String measurement)
+    {
          FlowSheetItem item = (FlowSheetItem) itemList.get(measurement);
-         item.setHide(true);
+         if (item != null)
+         {
+             item.setHide(true);
+         }
     }
 
-
-
-    public void updateMeasurementFlowSheetInfo(String measurement, Hashtable<String,String> h) {
+    public void updateMeasurementFlowSheetInfo(String measurement, Hashtable<String,String> h)
+    {
         FlowSheetItem item = new FlowSheetItem(h);
         itemList.put(measurement, item);
     }
 
-    public void updateMeasurementFlowSheetInfo(String measurement, FlowSheetItem item) {
+    public void updateMeasurementFlowSheetInfo(String measurement, FlowSheetItem item)
+    {
         itemList.put(measurement, item);
     }
 

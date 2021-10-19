@@ -90,8 +90,11 @@
 	flex: 0 0 50%;
 }
 
-.flex-item-grow, .flex-grow{
+.flex-item-grow, .flex-grow {
 	flex-grow: 1 ;
+}
+.flex-item-grow-2 {
+  flex-grow: 2 ;
 }
 .flex-item-no-grow, .flex-grow-0 {
 	flex-grow: 0;
