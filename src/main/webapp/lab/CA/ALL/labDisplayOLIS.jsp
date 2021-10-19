@@ -1160,7 +1160,7 @@ public String strikeOutInvalidContent(String content, String status) {
                                         <tr>
                                             <td colspan="2">
                                                 <div class="FieldData">
-                                                    <%= handler.getDocName()%>
+                                                    <%= handler.getOrderingProviderFullName()%>
                                                     <%
                                                     HashMap<String,String> address = handler.getOrderingProviderAddress();
                                                     if (address != null && address.size() > 0) {
@@ -1341,11 +1341,15 @@ public String strikeOutInvalidContent(String content, String status) {
                                             <%= No admitting Doctor for CML messages%>
                                     </div>
                                 </td> --%>
-                                            <td bgcolor="white" align="right" colspan="2">
+                                            <td bgcolor="white" colspan="2">
                                                 <div class="FieldData">
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formCCClient"/>: </strong>
-                                                    <%= handler.getCCDocs()%>
-
+	                                                <%
+		                                                for(String ccDoc : handler.getCCDocsList())
+		                                                {
+															%><div><%=ccDoc%></div><%
+		                                                }
+	                                                %>
                                                 </div>
                                             </td>
                                         </tr>

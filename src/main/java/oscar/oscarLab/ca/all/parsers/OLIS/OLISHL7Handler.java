@@ -51,6 +51,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -329,6 +330,18 @@ public class OLISHL7Handler extends MessageHandler
 		} catch (HL7Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 			return "";
+		}
+	}
+
+	public String getOrderingProviderFullName()
+	{
+		try
+		{
+			return getFullDocName("/.OBR-16-");
+		}
+		catch(Exception e)
+		{
+			return ("");
 		}
 	}
 
@@ -662,15 +675,6 @@ public class OLISHL7Handler extends MessageHandler
 		} catch (HL7Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 			return null;
-		}
-	}
-
-	public String getOrderingProviderName() {
-		try {
-			return (getString(terser.get("/.ORC-21-1")));
-		} catch (HL7Exception e) {
-			MiscUtils.getLogger().error("OLIS HL7 Error", e);
-			return "";
 		}
 	}
 
@@ -2499,6 +2503,28 @@ public class OLISHL7Handler extends MessageHandler
 		} catch (Exception e) {
 			return ("");
 		}
+	}
+
+	public List<String> getCCDocsList()
+	{
+		List<String> ccDocList = new LinkedList<>();
+		try
+		{
+			int i = 1;
+			String nextDoc = getFullDocName("/.OBR-28(" + i + ")-");
+
+			while(!nextDoc.equals(""))
+			{
+				ccDocList.add(nextDoc);
+				i++;
+				nextDoc = getFullDocName("/.OBR-28(" + i + ")-");
+			}
+		}
+		catch(Exception e)
+		{
+			logger.error("Olis hl7 error", e);
+		}
+		return ccDocList;
 	}
 
 	@Override
