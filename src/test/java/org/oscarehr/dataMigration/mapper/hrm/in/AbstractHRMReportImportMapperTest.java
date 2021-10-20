@@ -1,7 +1,7 @@
 package org.oscarehr.dataMigration.mapper.hrm.in;
 
 import org.junit.Test;
-import org.mockito.InjectMocks;
+import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import xml.hrm.v4_3.DateFullOrPartial;
 import xml.hrm.v4_3.ObjectFactory;
@@ -13,18 +13,29 @@ import java.time.LocalDateTime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class AbstractHRMReportImportMapperTest
 {
 	@Autowired
-	@InjectMocks
-	HRMReportImportMapper hrmReportImportMapper;
+	private final AbstractHRMImportMapper hrmReportImportMapper;
 
 	protected ObjectFactory objectFactory;
 	protected DatatypeFactory dataTypeFactory;
 
+	// Extend with a stub class, since logic we're testing is in an abstract class.
+	public class TestAbstractHRMReportImportMapper extends AbstractHRMImportMapper<Void, Void>
+	{
+		@Override
+		public Void importToJuno(Void importStructure) throws Exception
+		{
+			return null;
+		}
+	}
+
 	public AbstractHRMReportImportMapperTest() throws DatatypeConfigurationException
 	{
+		hrmReportImportMapper = new TestAbstractHRMReportImportMapper();
 		objectFactory = new ObjectFactory();
 		dataTypeFactory = DatatypeFactory.newInstance();
 	}
@@ -135,5 +146,64 @@ public class AbstractHRMReportImportMapperTest
 	public void toNullableLocalDateTime_fromNull()
 	{
 		assertNull(hrmReportImportMapper.toNullableLocalDateTime(null));
+	}
+
+	@Test
+	public void toPartialDateTime_fromNull()
+	{
+		assertNull(hrmReportImportMapper.toPartialDateTime(null));
+	}
+
+	@Test
+	public void toPartialDateTime_fromDateTime()
+	{
+		String dateString = "2012-04-19T03:04:05";
+		LocalDateTime expectedDateTime = LocalDateTime.parse(dateString);
+		XMLGregorianCalendar calendar = dataTypeFactory.newXMLGregorianCalendar(dateString);
+		DateFullOrPartial fullDateTime = objectFactory.createDateFullOrPartial();
+		fullDateTime.setDateTime(calendar);
+
+		PartialDateTime partialDateTime = hrmReportImportMapper.toPartialDateTime(fullDateTime);
+		assertTrue(partialDateTime.isFullDateTime());
+		assertEquals(partialDateTime.toLocalDateTime(), expectedDateTime);
+	}
+
+	@Test
+	public void toPartialDateTime_fromDate()
+	{
+		LocalDateTime expectedDateTime = LocalDateTime.parse("2012-05-19T00:00:00");
+		XMLGregorianCalendar calendar = dataTypeFactory.newXMLGregorianCalendar("2012-05-19T10:11:12");
+		DateFullOrPartial fullDate = objectFactory.createDateFullOrPartial();
+		fullDate.setFullDate(calendar);
+
+		PartialDateTime partialDateTime = hrmReportImportMapper.toPartialDateTime(fullDate);
+		assertTrue(partialDateTime.isFullDate());
+		assertEquals(partialDateTime.toLocalDateTime(), expectedDateTime);
+	}
+
+	@Test
+	public void toPartialDateTime_fromYearMonth()
+	{
+		LocalDateTime expectedDateTime = LocalDateTime.parse("2014-09-01T00:00:00");
+		XMLGregorianCalendar calendar = dataTypeFactory.newXMLGregorianCalendar("2014-09-04T09:10:15");
+		DateFullOrPartial yearMonth = objectFactory.createDateFullOrPartial();
+		yearMonth.setYearMonth(calendar);
+
+		PartialDateTime partialDateTime = hrmReportImportMapper.toPartialDateTime(yearMonth);
+		assertTrue(partialDateTime.isYearMonth());
+		assertEquals(partialDateTime.toLocalDateTime(), expectedDateTime);
+	}
+
+	@Test
+	public void toPartialDateTime_yearOnly()
+	{
+		LocalDateTime expectedDateTime = LocalDateTime.parse("2012-01-01T00:00:00");
+		XMLGregorianCalendar calendar = dataTypeFactory.newXMLGregorianCalendar("2012-07-14T11:12:13");
+		DateFullOrPartial yearOnly = objectFactory.createDateFullOrPartial();
+		yearOnly.setYearOnly(calendar);
+
+		PartialDateTime partialDateTime = hrmReportImportMapper.toPartialDateTime(yearOnly);
+		assertTrue(partialDateTime.isYearOnly());
+		assertEquals(partialDateTime.toLocalDateTime(), expectedDateTime);
 	}
 }

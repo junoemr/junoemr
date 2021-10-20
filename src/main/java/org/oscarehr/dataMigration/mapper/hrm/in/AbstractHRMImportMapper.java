@@ -34,6 +34,7 @@ import xml.hrm.v4_3.DateFullOrPartial;
 import xml.hrm.v4_3.ObjectFactory;
 import xml.hrm.v4_3.PersonNameSimple;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -80,14 +81,34 @@ public abstract class AbstractHRMImportMapper<I, E> extends AbstractImportMapper
 		return null;
 	}
 	
-	protected PartialDateTime toPartialDateTime(DateFullOrPartial xmlDate)
+	protected PartialDateTime toPartialDateTime(DateFullOrPartial fullOrPartial)
 	{
-		if (xmlDate == null)
+		if(fullOrPartial != null)
 		{
-			return null;
+			XMLGregorianCalendar xmlFullDateTime = fullOrPartial.getDateTime();
+			XMLGregorianCalendar xmlFullDate = fullOrPartial.getFullDate();
+			XMLGregorianCalendar xmlYearMonth = fullOrPartial.getYearMonth();
+			XMLGregorianCalendar xmlYearOnly = fullOrPartial.getYearOnly();
+
+			if(xmlFullDateTime != null)
+			{
+				return new PartialDateTime(xmlFullDateTime.getYear(), xmlFullDateTime.getMonth(), xmlFullDateTime.getDay(),
+					xmlFullDateTime.getHour(), xmlFullDateTime.getMinute(), xmlFullDateTime.getSecond());
+			}
+			else if(xmlFullDate != null)
+			{
+				return new PartialDateTime(xmlFullDate.getYear(), xmlFullDate.getMonth(), xmlFullDate.getDay());
+			}
+			else if (xmlYearMonth != null)
+			{
+				return new PartialDateTime(xmlYearMonth.getYear(), xmlYearMonth.getMonth());
+			}
+			else if(xmlYearOnly != null)
+			{
+				return new PartialDateTime(xmlYearOnly.getYear());
+			}
 		}
-		
-		return PartialDateTime.from(toNullableLocalDateTime(xmlDate));
+		return null;
 	}
 	
 	protected List<Reviewer> stubReviewers(String reviewerOHIPNo, DateFullOrPartial reviewDate)

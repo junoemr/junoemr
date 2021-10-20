@@ -43,7 +43,6 @@
 <%@ page import="org.oscarehr.hospitalReportManager.HRMReport" %>
 <%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider" %>
 <%@ page import="org.oscarehr.hospitalReportManager.HRMDisplayReportAction" %>
-<%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass" %>
 <%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocument" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -164,7 +163,7 @@
 
 		initDemographicAutoComplete = function initDemographicAutoComplete()
 		{
-			var demoLookup = {};
+			var demoLookup = {}; // closure to share data between autocomplete and hidden input
 
 			$("#demographic-search").autocomplete({
 				minLength: 2,
@@ -534,7 +533,7 @@
     </div>
     <br />
     <div id="hrmNotice">
-        This report was received from the Hospital Report Manager (HRM) at <%=(String) request.getAttribute("hrmReportTime") %>.
+        This report was received from the Hospital Report Manager (HRM) at <%= hrmDocument.getTimeReceived() %>.
         <% if (request.getAttribute("hrmDuplicateNum") != null && ((Integer) request.getAttribute("hrmDuplicateNum")) > 0) { %><br /><i>OSCAR has received <%=request.getAttribute("hrmDuplicateNum") %> duplicates of this report.</i><% } %>
         <%
             List<HRMDocument> allDocumentsWithRelationship = (List<HRMDocument>) request.getAttribute("allDocumentsWithRelationship");

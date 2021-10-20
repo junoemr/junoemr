@@ -168,8 +168,9 @@ public class HRMService
 		// documents directory with no database references
 		Path hrmBaseDirectory = Paths.get(GenericFile.HRM_BASE_DIR);
 
-		GenericFile newFileLocation = hrmDocumentModel.getReportFile().moveToHRMDocuments();
-		Path relativePath = hrmBaseDirectory.relativize(Paths.get(newFileLocation.getPath()));
+		GenericFile hrmReportFile = hrmDocumentModel.getReportFile();
+		hrmReportFile.moveToHRMDocuments();
+		Path relativePath = hrmBaseDirectory.relativize(Paths.get(hrmReportFile.getPath()));
 		hrmDocument.setReportFile(relativePath.toString());
 
 		HRMDocument documentModel = persistAndLinkHRMDocument(hrmDocument, demographic);
