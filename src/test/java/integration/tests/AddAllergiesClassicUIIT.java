@@ -32,16 +32,19 @@ import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.ActionUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -93,37 +96,33 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		List<String> errorMessages = Arrays.asList(errorMessageSearch, errorMessageQuickButton, errorMessageCustomized);
 
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
-		Thread.sleep(5000);
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("Allergies")));
 		String eChartWindowHandle = driver.getWindowHandle();
 		driver.findElement(By.linkText("Allergies")).click();
-		Thread.sleep(5000);
+		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 		String allergiesWindowHandle = driver.getWindowHandle();
 		Map<String, String> pageHandleMap = new HashMap<String, String>();
 		pageHandleMap.put(eChartPage, eChartWindowHandle);
 		pageHandleMap.put(allergiesPage, allergiesWindowHandle);
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(2000);
 
 		//** Add allergies from quick button. **
 		driver.findElement(By.xpath("//button[contains(., '" + allergyNameQuickButton + "')]")).click();
-		Thread.sleep(1000);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//textarea[@name='reactionDescription']")));
 		addAllergyDetails(reaction, startDate, ageOfOnset, lifeStage, severity, onset);
 
 		// ** Add allergies from search. **
 		driver.findElement(By.id("typeSelectAll")).click();
 		driver.findElement(By.id("searchString")).sendKeys(allergyNameSearch);
-		Thread.sleep(1000);
 		driver.findElement(By.id("searchStringButton")).click();
-		Thread.sleep(1000);
 		driver.findElement(By.linkText(allergySearchDescription)).click();
-		Thread.sleep(1000);
 		addAllergyDetails(reaction, startDate, ageOfOnset, lifeStage, severity, onset);
 
 		//** Add customised allergy. **
 		driver.findElement(By.id("searchString")).sendKeys(allergyNameCustom);
 		driver.findElement(By.xpath("//button[@value='Custom Allergy']")).click();
 		driver.switchTo().alert().accept();
-		Thread.sleep(1000);
+		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 		addAllergyDetails(reaction, startDate, ageOfOnset, lifeStage, severity, onset);
 
 		HashMap<String, Boolean> assertionTestData = new HashMap<String, Boolean>();
@@ -133,6 +132,7 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 			{
 				PageUtil.switchToWindow(pageHandleMap.get(chartType), driver);
 				driver.navigate().refresh();
+				driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 			}
 			for (int i = 0; i < allergyNames.size(); i++)
 			{
@@ -172,9 +172,8 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		String inactivateButtonEggWhite = "//table[@class='allergy_table']/descendant::td[contains(., '" + allergyNameCustom.toUpperCase() + "')]" +
 			"/parent::tr/descendant::a[contains(., 'Inactivate')]";
 		driver.findElement(By.xpath(inactivateButtonEggWhite)).click();
-		Thread.sleep(1000);
 		driver.switchTo().alert().accept();
-		Thread.sleep(1000);
+		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 
 		//** Verify on Allergies page. **
 		Assert.assertFalse("Allergies Page: " + allergyNameCustom + " is NOT inactivated successfully.",
@@ -183,7 +182,7 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		//** Verify on Allergies section on eChart page. **
 		PageUtil.switchToWindow(eChartWindowHandle, driver);
 		driver.navigate().refresh();
-		Thread.sleep(2000);
+		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		Assert.assertFalse("eChart Page: " + allergyNameCustom + " is NOT inactivated successfully.",
 			PageUtil.isExistsBy(By.linkText(allergyNameCustom.toUpperCase()), driver));
 	}
