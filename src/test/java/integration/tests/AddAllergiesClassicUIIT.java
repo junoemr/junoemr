@@ -23,25 +23,32 @@
 
 package integration.tests;
 
+import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
+
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.ActionUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
+import java.sql.SQLException;
+import java.sql.Time;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import java.sql.SQLException;
-
-import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
-import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -67,8 +74,8 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 	public void addAllergiesClassicUITest() throws InterruptedException
 	{
 		String allergyNameQuickButton = "Penicillin";
-		String allergyNameSearch = "CHILDREN'S TYLENOL 160MG";
-		String allergySearchDescription = "TYLENOL CHILDRENS ELIXIR 160MG/5ML";
+		String allergyNameSearch = "AMINOBENZOIC ACID";
+		String allergySearchDescription = "AMINOBENZOIC ACID";
 		String allergyNameCustom = "Egg white";
 		String reaction = "rash";
 		String startDate = "1981-01";
@@ -77,54 +84,63 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		String severity = "Moderate";
 		String onset = "Gradual";
 
+		String eChartPage = "eChartPage:";
+		String allergiesPage = "Allergies Page";
+
+		String errorMessageSearch = " is NOT added to Allergies by search successfully.";
+		String errorMessageQuickButton = " is NOT added to Allergies by quick button successfully.";
+		String errorMessageCustomized = " is NOT added to Customized Allergies successfully.";
+
+		List<String> pageTypes = Arrays.asList(eChartPage, allergiesPage);
+		List<String> allergyNames = Arrays.asList(allergyNameSearch, allergyNameQuickButton, allergyNameCustom);
+		List<String> errorMessages = Arrays.asList(errorMessageSearch, errorMessageQuickButton, errorMessageCustomized);
+
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
-		Thread.sleep(5000);
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("Allergies")));
 		String eChartWindowHandle = driver.getWindowHandle();
 		driver.findElement(By.linkText("Allergies")).click();
-		Thread.sleep(5000);
+		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+		String allergiesWindowHandle = driver.getWindowHandle();
+		Map<String, String> pageHandleMap = new HashMap<String, String>();
+		pageHandleMap.put(eChartPage, eChartWindowHandle);
+		pageHandleMap.put(allergiesPage, allergiesWindowHandle);
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(2000);
 
 		//** Add allergies from quick button. **
 		driver.findElement(By.xpath("//button[contains(., '" + allergyNameQuickButton + "')]")).click();
-		Thread.sleep(1000);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//textarea[@name='reactionDescription']")));
 		addAllergyDetails(reaction, startDate, ageOfOnset, lifeStage, severity, onset);
 
 		// ** Add allergies from search. **
 		driver.findElement(By.id("typeSelectAll")).click();
 		driver.findElement(By.id("searchString")).sendKeys(allergyNameSearch);
-		Thread.sleep(1000);
 		driver.findElement(By.id("searchStringButton")).click();
-		Thread.sleep(1000);
 		driver.findElement(By.linkText(allergySearchDescription)).click();
-		Thread.sleep(1000);
 		addAllergyDetails(reaction, startDate, ageOfOnset, lifeStage, severity, onset);
 
 		//** Add customised allergy. **
 		driver.findElement(By.id("searchString")).sendKeys(allergyNameCustom);
 		driver.findElement(By.xpath("//button[@value='Custom Allergy']")).click();
 		driver.switchTo().alert().accept();
-		Thread.sleep(1000);
+		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 		addAllergyDetails(reaction, startDate, ageOfOnset, lifeStage, severity, onset);
 
-		//** Verify on Allergies page. **
-		Assert.assertTrue("Allergies Page: " + allergyNameSearch + " is NOT added to Allergies by search successfully.",
-			PageUtil.isExistsBy(By.xpath("//td[contains(., '" + allergySearchDescription + "')]"), driver));
-		Assert.assertTrue("Allergies Page: " + allergyNameQuickButton + " is NOT added to Allergies by quick button successfully.",
-			PageUtil.isExistsBy(By.xpath("//td[contains(., '" + allergyNameQuickButton.toUpperCase() + "')]"), driver));
-		Assert.assertTrue("Allergies Page: " + allergyNameCustom + " is NOT added to Customized Allergies successfully.",
-			PageUtil.isExistsBy(By.xpath("//td[contains(., '" + allergyNameCustom.toUpperCase() + "')]"), driver));
-
-		//** Verify on Allergies section on eChart page. **
-		PageUtil.switchToWindow(eChartWindowHandle, driver);
-		driver.navigate().refresh();
-		Thread.sleep(2000);
-		Assert.assertTrue("eChart Page: " + allergyNameSearch + " is NOT added to Allergies by search successfully.",
-			PageUtil.isExistsBy(By.linkText(allergySearchDescription), driver));
-		Assert.assertTrue("eChart Page: " + allergyNameQuickButton + " is NOT added to Allergies by quick button successfully.",
-			PageUtil.isExistsBy(By.partialLinkText(allergyNameQuickButton.toUpperCase()), driver));
-		Assert.assertTrue("eChart Page: " + allergyNameCustom + " is NOT added to Customized Allergies successfully.",
-			PageUtil.isExistsBy(By.linkText(allergyNameCustom.toUpperCase()), driver));
+		HashMap<String, Boolean> assertionTestData = new HashMap<String, Boolean>();
+		for (String pageType : pageTypes)
+		{
+			if (!driver.getWindowHandle().equals(pageHandleMap.get(pageType)))
+			{
+				PageUtil.switchToWindow(pageHandleMap.get(pageType), driver);
+				driver.navigate().refresh();
+				driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+			}
+			for (int i = 0; i < allergyNames.size(); i++)
+			{
+				assertionTestData.put(createErrorMessageString(pageType, allergyNames.get(i), errorMessages.get(i)),
+					PageUtil.isExistsBy(By.partialLinkText(allergyNames.get(i).toUpperCase()), driver));
+			}
+		}
+		assertAllValuesTrue(assertionTestData);
 
 		//** Modify Penicillins Allergy**
 		String reaction_modified = "rash updated";
@@ -156,9 +172,8 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		String inactivateButtonEggWhite = "//table[@class='allergy_table']/descendant::td[contains(., '" + allergyNameCustom.toUpperCase() + "')]" +
 			"/parent::tr/descendant::a[contains(., 'Inactivate')]";
 		driver.findElement(By.xpath(inactivateButtonEggWhite)).click();
-		Thread.sleep(1000);
 		driver.switchTo().alert().accept();
-		Thread.sleep(1000);
+		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 
 		//** Verify on Allergies page. **
 		Assert.assertFalse("Allergies Page: " + allergyNameCustom + " is NOT inactivated successfully.",
@@ -167,7 +182,7 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		//** Verify on Allergies section on eChart page. **
 		PageUtil.switchToWindow(eChartWindowHandle, driver);
 		driver.navigate().refresh();
-		Thread.sleep(2000);
+		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		Assert.assertFalse("eChart Page: " + allergyNameCustom + " is NOT inactivated successfully.",
 			PageUtil.isExistsBy(By.linkText(allergyNameCustom.toUpperCase()), driver));
 	}
@@ -183,4 +198,16 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@type='submit']")).click();
 	}
 
+	private void assertAllValuesTrue(HashMap<String, Boolean> map)
+	{
+		for (Map.Entry<String, Boolean> item : map.entrySet())
+		{
+			Assert.assertTrue(item.getKey(), item.getValue());
+		}
+	}
+
+	private String createErrorMessageString(String pageType, String testItem, String errorMessage)
+	{
+		return pageType + " page: " + testItem + " " + errorMessage ;
+	}
 }
