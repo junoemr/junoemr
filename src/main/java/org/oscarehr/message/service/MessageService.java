@@ -26,12 +26,15 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.dao.MessageListDao;
 import org.oscarehr.common.dao.MessageTblDao;
 import org.oscarehr.common.dao.MsgDemoMapDao;
+import org.oscarehr.common.dao.OscarCommLocationsDao;
 import org.oscarehr.common.model.MessageList;
 import org.oscarehr.common.model.MessageTbl;
 import org.oscarehr.common.model.MsgDemoMap;
+import org.oscarehr.common.model.OscarCommLocations;
 import org.oscarehr.common.model.OscarMsgType;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -39,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 
 @Service
@@ -54,11 +58,20 @@ public class MessageService
 	@Autowired
 	MsgDemoMapDao messageDemoMapDao;
 
+	@Autowired
+	OscarCommLocationsDao oscarCommLocationsDao;
+
 	public void saveMessage(MessageTbl message, List<ProviderData> providerList, Demographic demographic)
 	{
 		this.saveMessage(message, providerList, demographic, MessageList.STATUS_NEW);
 	}
+
 	public void saveMessage(MessageTbl message, List<ProviderData> providerList, Demographic demographic, String messageStatus)
+	{
+		this.saveMessage(message, providerList, demographic, messageStatus, getDefaultLocation());
+	}
+
+	public void saveMessage(MessageTbl message, List<ProviderData> providerList, Demographic demographic, String messageStatus, int remoteLocation)
 	{
 		// set required data values if they are not present
 		if(message.getDate() == null)
@@ -104,7 +117,7 @@ public class MessageService
 			ml.setMessage(message.getId());
 			ml.setProviderNo(provider.getId());
 			ml.setStatus(messageStatus);
-			//TODO-legacy do I need to set the location?
+			ml.setRemoteLocation(remoteLocation);
 			messageListDao.persist(ml);
 		}
 
@@ -116,5 +129,30 @@ public class MessageService
 			demoMap.setMessageID(message.getId());
 			messageDemoMapDao.persist(demoMap);
 		}
+	}
+
+	/**
+	 * Gets the id of the oscarCommLocations entry with description of 'Oscar Users'
+	 * @return The id
+	 * @throws NoSuchElementException If a location with the default default description can't be found
+	 * @throws NullPointerException If the location found has a null id
+	 */
+	public int getDefaultLocation() throws NoSuchElementException, NullPointerException
+	{
+		final String DEFAULT_LOCATION_DESCRIPTION = "Oscar Users";
+		List<OscarCommLocations> locations = oscarCommLocationsDao.findByLocationDesc(DEFAULT_LOCATION_DESCRIPTION);
+		if (locations.size() == 0)
+		{
+			MiscUtils.getLogger().error("No location with description of '" + DEFAULT_LOCATION_DESCRIPTION + "'");
+			throw new NoSuchElementException("No location with description of '" + DEFAULT_LOCATION_DESCRIPTION + "'");
+		}
+
+		if (locations.size() != 1)
+		{
+			MiscUtils.getLogger().warn("More than one location with description of '" + DEFAULT_LOCATION_DESCRIPTION + "'");
+		}
+
+		// Return first value in the event that more than one are found with the same description
+		return locations.get(0).getId();
 	}
 }

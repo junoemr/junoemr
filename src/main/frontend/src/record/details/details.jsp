@@ -202,7 +202,7 @@
 					</div>
 				</div>
 				<hr>
-				<div class="col-md-12 flex-grow">
+				<div class="col-md-12">
 					<h3 class="form-heading">
 						<bean:message key="web.record.details.proContacts"/>
 							<button type="button" class="btn btn-primary pull-right manage-button-padding"  ng-click="detailsCtrl.manageContacts()">

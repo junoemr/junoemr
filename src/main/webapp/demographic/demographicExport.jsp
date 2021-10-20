@@ -183,14 +183,7 @@ function toggle(source) {
 </head>
 
 <body>
-<%
-if (!userRole.toLowerCase().contains("admin")) { %>
-    <div class="alert alert-block alert-error">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-     <bean:message key="demographic.demographicexport.msgsorry" />
-    </div>
-<%
-} else if (!tmp_dir_ready) { %>
+<% if (!tmp_dir_ready) { %>
     <div class="alert alert-block alert-error">
     <button type="button" class="close" data-dismiss="alert">&times;</button>
      <bean:message key="demographic.demographicexport.msgerror" />
