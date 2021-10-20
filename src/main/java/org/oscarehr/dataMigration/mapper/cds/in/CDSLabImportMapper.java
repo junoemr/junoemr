@@ -222,11 +222,18 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 	private String getOBRName(LaboratoryResults importLabResults)
 	{
 		String name = StringUtils.trimToNull(importLabResults.getTestName());
-		if(name == null)
+		String nameReportedByLab = StringUtils.trimToNull(importLabResults.getTestNameReportedByLab());
+
+		if(name != null )
 		{
-			name = UNKNOWN_OBR_NAME;
+			return name;
 		}
-		return name;
+		else if (nameReportedByLab != null)
+		{
+			return nameReportedByLab;
+		}
+		else
+			return UNKNOWN_OBR_NAME;
 	}
 
 	private String getOBXName(LaboratoryResults importLabResults)
