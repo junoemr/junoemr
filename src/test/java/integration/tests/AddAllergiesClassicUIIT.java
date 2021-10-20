@@ -91,7 +91,7 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		String errorMessageQuickButton = " is NOT added to Allergies by quick button successfully.";
 		String errorMessageCustomized = " is NOT added to Customized Allergies successfully.";
 
-		List<String> chartTypes = Arrays.asList(eChartPage, allergiesPage);
+		List<String> pageTypes = Arrays.asList(eChartPage, allergiesPage);
 		List<String> allergyNames = Arrays.asList(allergyNameSearch, allergyNameQuickButton, allergyNameCustom);
 		List<String> errorMessages = Arrays.asList(errorMessageSearch, errorMessageQuickButton, errorMessageCustomized);
 
@@ -126,17 +126,17 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		addAllergyDetails(reaction, startDate, ageOfOnset, lifeStage, severity, onset);
 
 		HashMap<String, Boolean> assertionTestData = new HashMap<String, Boolean>();
-		for (String chartType : chartTypes)
+		for (String pageType : pageTypes)
 		{
-			if (!driver.getWindowHandle().equals(pageHandleMap.get(chartType)))
+			if (!driver.getWindowHandle().equals(pageHandleMap.get(pageType)))
 			{
-				PageUtil.switchToWindow(pageHandleMap.get(chartType), driver);
+				PageUtil.switchToWindow(pageHandleMap.get(pageType), driver);
 				driver.navigate().refresh();
 				driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 			}
 			for (int i = 0; i < allergyNames.size(); i++)
 			{
-				assertionTestData.put(createErrorMessageString(chartType, allergyNames.get(i), errorMessages.get(i)),
+				assertionTestData.put(createErrorMessageString(pageType, allergyNames.get(i), errorMessages.get(i)),
 					PageUtil.isExistsBy(By.partialLinkText(allergyNames.get(i).toUpperCase()), driver));
 			}
 		}
