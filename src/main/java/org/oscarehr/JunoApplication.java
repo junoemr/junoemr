@@ -34,11 +34,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ImportResource;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.io.IOException;
 
@@ -80,16 +77,7 @@ public class JunoApplication extends SpringBootServletInitializer
 			JunoApplication.initSpring(new SpringApplicationBuilder(JunoApplication.class).web(WebApplicationType.SERVLET)).run(args);
 		}
 	}
-	
-	@Bean
-	public TaskScheduler taskScheduler() {
-		final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-		scheduler.setPoolSize(2);
-		scheduler.initialize();
-		return scheduler;
-	}
-	
-	
+
 	private static SpringApplicationBuilder initSpring(SpringApplicationBuilder application)
 	{
 		return application

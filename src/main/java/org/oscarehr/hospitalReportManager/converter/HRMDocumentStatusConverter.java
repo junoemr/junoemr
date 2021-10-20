@@ -21,16 +21,18 @@
  * Canada
  */
 
-package org.oscarehr.hospitalReportManager.model;
+package org.oscarehr.hospitalReportManager.converter;
 
+import org.oscarehr.hospitalReportManager.model.HRMDocument;
+import org.oscarehr.hospitalReportManager.model.HRMDocument.STATUS;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
 @Converter(autoApply=true)
-public class HRMDocumentStatusConverter implements AttributeConverter<HRMDocument.STATUS, String>
+public class HRMDocumentStatusConverter implements AttributeConverter<STATUS, String>
 {
 	@Override
-	public String convertToDatabaseColumn(HRMDocument.STATUS status)
+	public String convertToDatabaseColumn(STATUS status)
 	{
 		if (status == null)
 		{
@@ -42,7 +44,7 @@ public class HRMDocumentStatusConverter implements AttributeConverter<HRMDocumen
 	}
 	
 	@Override
-	public HRMDocument.STATUS convertToEntityAttribute(String string)
+	public STATUS convertToEntityAttribute(String string)
 	{
 		if (string == null)
 		{

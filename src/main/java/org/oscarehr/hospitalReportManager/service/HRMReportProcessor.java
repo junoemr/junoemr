@@ -47,7 +47,6 @@ import oscar.log.LogConst;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -194,20 +193,15 @@ public class HRMReportProcessor
 	 */
 	private String decryptContents(GenericFile encryptedFile) throws Exception
 	{
-		try (FileInputStream inputStream = new FileInputStream(encryptedFile.getFileObject()))
-		{
-			byte[] buffer = new byte[(int) encryptedFile.getFileObject().length()];
-			inputStream.read(buffer);
+		byte[] buffer = encryptedFile.toByteArray();
+		Hex hex = new Hex(StandardCharsets.UTF_8.toString());
+		byte[] keyBytes = hex.decode(DECRYPTION_KEY.getBytes(StandardCharsets.UTF_8));
 			
-			Hex hex = new Hex(StandardCharsets.UTF_8.toString());
-			byte[] keyBytes = hex.decode(DECRYPTION_KEY.getBytes(StandardCharsets.UTF_8));
+		SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");;
+		Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding", "SunJCE");
+		cipher.init(Cipher.DECRYPT_MODE, key);
 			
-			SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");;
-			Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding", "SunJCE");
-			cipher.init(Cipher.DECRYPT_MODE, key);
-			
-			String plaintext = new String(cipher.doFinal(buffer));
-			return plaintext;
-		}
+		String plaintext = new String(cipher.doFinal(buffer));
+		return plaintext;
 	}
 }
