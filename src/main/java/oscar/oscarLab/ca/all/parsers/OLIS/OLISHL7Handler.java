@@ -345,7 +345,8 @@ public class OLISHL7Handler extends MessageHandler
 		}
 	}
 
-	public boolean isReportBlocked() {
+	public boolean isReportBlocked()
+	{
 		return reportBlocked;
 	}
 
@@ -366,6 +367,20 @@ public class OLISHL7Handler extends MessageHandler
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 		}
 		return false;
+	}
+
+	public boolean hasBlockedTest()
+	{
+		boolean isBlocked = false;
+		for(int i = 0; i < getOBRCount(); i++)
+		{
+			if(isOBRBlocked(i))
+			{
+				isBlocked = true;
+				break;
+			}
+		}
+		return isBlocked;
 	}
 
 	public String getOBRPerformingFacilityName(int obr) {
@@ -1199,8 +1214,9 @@ public class OLISHL7Handler extends MessageHandler
 	private void parseZPDSegment() throws HL7Exception {
 		Segment zpd = terser.getSegment("/.ZPD");
 		boolean rb = "Y".equals(oscar.Misc.getStr(Terser.get(zpd, 3, 0, 1, 1), ""));
-		if(!reportBlocked && rb) {
-			reportBlocked=true;
+		if(!reportBlocked && rb)
+		{
+			reportBlocked = true;
 		}
 	}
 

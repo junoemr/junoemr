@@ -1435,26 +1435,20 @@ public String strikeOutInvalidContent(String content, String status) {
                             <tr>
                                 <td bgcolor="white" colspan="2">
                                     <table width="100%" border="0" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+	                                    <% if (handler.isReportBlocked() || handler.hasBlockedTest()) {
+	                                    %>
+	                                    <tr>
+		                                    <td>
+			                                    <div class="FieldData" style="text-align: center;">
+				                                    <span style="color:red; font-weight:bold;">Do Not Disclose Without Explicit Patient Consent</span>
+			                                    </div>
+		                                    </td>
+	                                    </tr>
+	                                    <% } %>
                                         <tr>
                                             <td bgcolor="white">
-                                                <div class="FieldData">
-                                                <% if (handler.isReportBlocked()) { %>
-                                                <%
-                                                boolean hasBlockedTest=false;
-                                                for(int i=0;i<handler.getHeaders().size();i++) {
-                                                	int obr = handler.getMappedOBR(i);
-                                                	if(handler.isOBRBlocked(obr)) {
-                                                		hasBlockedTest=true;
-                                                		break;
-                                                	}
-                                                }
-                                                if(hasBlockedTest) {
-                                                %>
-                                                	<span style="color:red; font-weight:bold">Do Not Disclose Without Explicit Patient Consent</span>
-                                                	<br/>
-                                                <% } } %>
-
-                                                    <strong>Report Comments: </strong>
+	                                                <div class="FieldData">
+	                                                <strong>Report Comments: </strong>
                                                 </div>
                                             </td>
                                         </tr>
