@@ -368,10 +368,9 @@ public class OLISSearchAction extends DispatchAction {
 					}
 				}
 
-				String blockedInfoConsent = request.getParameter("blockedInformationConsent");
 				String blockedInfoIndividual = request.getParameter("blockedInformationIndividual");
 
-				if (blockedInfoConsent != null && blockedInfoConsent.equalsIgnoreCase("Z")) {
+				if (blockedInformationConsent != null && blockedInformationConsent.equalsIgnoreCase("Z")) {
 					// Log the consent override
 					OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
 					OscarLog logItem = new OscarLog();
@@ -465,10 +464,9 @@ public class OLISSearchAction extends DispatchAction {
 				((Z02Query) query).setPlacerGroupNumber(orc4);
 
 
-				String blockedInfoConsent = request.getParameter("blockedInformationConsent");
 				String blockedInfoIndividual = request.getParameter("blockedInformationIndividual");
 
-				if (blockedInfoConsent != null && blockedInfoConsent.equalsIgnoreCase("Z")) {
+				if (blockedInformationConsent != null && blockedInformationConsent.equalsIgnoreCase("Z")) {
 					// Log the consent override
 					OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
 					OscarLog logItem = new OscarLog();

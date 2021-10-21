@@ -335,12 +335,17 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 		</tr>
 		<tr>
 			<th width="20%">Consent to View Blocked Information?</th>
-			<td width="30%"><select id="blockedInformationConsent" name="blockedInformationConsent"><option value="">(none)</option>
-			<option value="Z">Temporary </option>
-			</select>
-			&nbsp;&nbsp;Authorized by: <select name="blockedInformationIndividual" id="blockedInformationIndividual">
-			<option value="patient">Patient</option><option value="substitute">Substitute Decision Maker</option><option value="">Neither</option>
-			</select> 
+			<td width="30%">
+				<select id="blockedInformationConsent" name="blockedInformationConsent">
+					<option value="">(none)</option>
+					<option value="Z">Temporary</option>
+				</select>
+			&nbsp;&nbsp;Authorized by:
+				<select name="blockedInformationIndividual" id="blockedInformationIndividual">
+					<option value="">Neither</option>
+					<option value="patient">Patient</option>
+					<option value="substitute">Substitute Decision Maker</option>
+				</select>
 			</td>
 		</tr>
 		<tr>

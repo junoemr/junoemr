@@ -296,10 +296,12 @@
 				<% } %>
 					<tr><td colspan="10">
 					<table class="sortable" id="resultsTable">
-					<tr><th class="unsortable"></th>
+					<tr>
 						<th class="unsortable"></th>
 						<th class="unsortable"></th>
 						<th class="unsortable"></th>
+						<th class="unsortable"></th>
+						<th class="width-md">Order #</th>
 						<th class="width-md">Collection Date/Time</th>
 						<th class="width-md">Last Updated in OLIS</th>
 						<th class="width-sm">Discipline</th>
@@ -336,6 +338,7 @@
 								<td>
 									<input type="button" onClick="preview('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_preview" value="Preview" />
 								</td>
+								<td><%=result.getAccessionNum()%></td>
 								<td><%=result.getSpecimenReceivedDateTime()%></td>
 								<td><%=result.getLastUpdateInOLIS()%></td>
 								<td><%=result.getOBRCategory(obrRep)%></td>
