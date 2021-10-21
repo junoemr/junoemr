@@ -50,14 +50,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.OscarLogDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.OscarLog;
-import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.dataMigration.model.demographic.Demographic;
 import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -75,7 +75,7 @@ import java.util.UUID;
 public class OLISSearchAction extends DispatchAction {
 
 	private final DemographicService demographicService = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
-	private final ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
+	private final ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
 
 	public static HashMap<String, Query> searchQueryMap = new HashMap<String, Query>();
 
@@ -271,12 +271,15 @@ public class OLISSearchAction extends DispatchAction {
 
 				try {
 					if (requestingHicProviderNo != null && requestingHicProviderNo.trim().length() > 0) {
-						Provider provider = providerDao.getProvider(requestingHicProviderNo);
+						ProviderData provider = providerDao.find(requestingHicProviderNo);
 						
-						ZRP1 zrp1 = new ZRP1(provider.getPractitionerNo(), userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_OLIS_IDTYPE), "ON", "HL70347", 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_LAST_NAME), 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_FIRST_NAME), 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_SECOND_NAME));
+						ZRP1 zrp1 = new ZRP1(provider.getOlisPractitionerNo(),
+								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_OLIS_IDTYPE),
+								"ON",
+								"HL70347",
+								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_LAST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_FIRST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_SECOND_NAME));
 
 						((Z01Query) query).setRequestingHic(zrp1);
 					}
@@ -420,12 +423,12 @@ public class OLISSearchAction extends DispatchAction {
 
 				try {
 					if (requestingHicProviderNo != null && requestingHicProviderNo.trim().length() > 0) {
-						Provider provider = providerDao.getProvider(requestingHicProviderNo);
+						ProviderData provider = providerDao.find(requestingHicProviderNo);
 
-						ZRP1 zrp1 = new ZRP1(provider.getPractitionerNo(), "MDL", "ON", "HL70347", 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_LAST_NAME), 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_FIRST_NAME), 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_SECOND_NAME));
+						ZRP1 zrp1 = new ZRP1(provider.getOlisPractitionerNo(), "MDL", "ON", "HL70347",
+								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_LAST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_FIRST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_SECOND_NAME));
 
 						((Z02Query) query).setRequestingHic(zrp1);
 					}
@@ -533,12 +536,12 @@ public class OLISSearchAction extends DispatchAction {
 
 				try {
 					if (requestingHicProviderNo != null && requestingHicProviderNo.trim().length() > 0) {
-						Provider provider = providerDao.getProvider(requestingHicProviderNo);
+						ProviderData provider = providerDao.find(requestingHicProviderNo);
 
-						ZRP1 zrp1 = new ZRP1(provider.getPractitionerNo(), "MDL", "ON", "HL70347", 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_LAST_NAME), 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_FIRST_NAME), 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_SECOND_NAME));
+						ZRP1 zrp1 = new ZRP1(provider.getOlisPractitionerNo(), "MDL", "ON", "HL70347",
+								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_LAST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_FIRST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_SECOND_NAME));
 
 						((Z04Query) query).setRequestingHic(zrp1);
 					}
@@ -801,11 +804,11 @@ public class OLISSearchAction extends DispatchAction {
 			request.setAttribute("searchUuid", searchUuid);
 			if(queryType.equals("Z04") && request.getParameterValues("requestingHic") != null && request.getParameterValues("requestingHic").length>1) {
 				for(String providerNo:request.getParameterValues("requestingHic")) {
-					Provider provider = providerDao.getProvider(providerNo);
-					ZRP1 zrp1 = new ZRP1(provider.getPractitionerNo(), "MDL", "ON", "HL70347", 
-							userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_LAST_NAME), 
-							userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_FIRST_NAME), 
-							userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_SECOND_NAME));
+					ProviderData provider = providerDao.find(providerNo);
+					ZRP1 zrp1 = new ZRP1(provider.getOlisPractitionerNo(), "MDL", "ON", "HL70347",
+							userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_LAST_NAME),
+							userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_FIRST_NAME),
+							userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_SECOND_NAME));
 					((Z04Query) query).setRequestingHic(zrp1);
 					Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), request, query);
 				}

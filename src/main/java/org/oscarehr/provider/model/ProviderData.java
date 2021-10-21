@@ -317,4 +317,13 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 	{
 		this.bookingNotificationNumbers = bookingNotificationNumbers.stream().reduce("", (String acc, String str) -> acc + "," + str);
 	}
+
+	public String getOlisPractitionerNo()
+	{
+		if(PROVIDER_TYPE_NURSE.equals(this.getProviderType()))
+		{
+			return this.getOntarioCnoNumber();
+		}
+		return this.getPractitionerNo();
+	}
 }

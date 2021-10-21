@@ -137,7 +137,7 @@ public class OLISPollingService
 				Z04Query providerQuery = new Z04Query();
 				// Setting HIC for Z04 Request
 			    ZRP1 zrp1 = new ZRP1(
-					    provider.getPractitionerNo(),
+					    provider.getOlisPractitionerNo(),
 					    olisIdType,
 					    "ON",
 					    "HL70347",
