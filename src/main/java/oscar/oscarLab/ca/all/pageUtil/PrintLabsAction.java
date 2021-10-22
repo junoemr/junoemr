@@ -40,6 +40,7 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.styledxmlparser.css.media.MediaDeviceDescription;
 import com.itextpdf.styledxmlparser.css.media.MediaType;
 import com.lowagie.text.DocumentException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -47,6 +48,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.olis.OLISResultsAction;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
@@ -87,8 +89,19 @@ public class PrintLabsAction extends Action{
 
         try
         {
-            String segmentId = request.getParameter("segmentID");
-            MessageHandler handler = Factory.getHandler(segmentId);
+	        MessageHandler handler;
+	        String segmentId = StringUtils.trimToNull(request.getParameter("segmentID"));
+	        String resultUuid = null;
+			if(segmentId == null || "0".equals(segmentId))
+			{
+				// for printing OLIS lab files that are not persisted
+				resultUuid = StringUtils.trimToNull(request.getParameter("uuid"));
+				handler = OLISResultsAction.searchResultsMap.get(resultUuid);
+			}
+			else
+			{
+				handler = Factory.getHandler(segmentId);
+			}
 			String filename = GenericFile.getSanitizedFileName(handler.getPatientName());
 
             if("CELLPATHR".equals(handler.getHeaders().get(0)))
@@ -100,7 +113,8 @@ public class PrintLabsAction extends Action{
             }
             else if(handler instanceof OLISHL7Handler)
             {
-				String labRequestUrl = request.getParameter("labRequestUrl") + "?segmentID=" + segmentId;
+				String params = (segmentId != null && !"0".equals(segmentId)) ? "segmentID=" + segmentId : "preview=true&uuid=" + resultUuid;
+				String labRequestUrl = request.getParameter("labRequestUrl") + "?" + params;
 
 				response.setContentType("application/pdf");
                 response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "_OLISLabReport.pdf\"");

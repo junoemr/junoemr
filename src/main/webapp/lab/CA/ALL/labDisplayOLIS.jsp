@@ -86,6 +86,7 @@ boolean ackFlag = false;
 ArrayList<ReportStatus> ackList = preview ? null : AcknowledgementData.getAcknowledgements(segmentID);
 MessageHandler handlerMain;
 String hl7 = "";
+String resultUuid = oscar.Misc.getStr(request.getParameter("uuid"), "");
 
 if (!preview) {
 
@@ -102,7 +103,6 @@ if (!preview) {
 	hl7 = Factory.getHL7Body(segmentID);
 
 } else {
-	String resultUuid = oscar.Misc.getStr(request.getParameter("uuid"), "");
 	handlerMain = OLISResultsAction.searchResultsMap.get(resultUuid);
 }
 
@@ -645,6 +645,7 @@ public String strikeOutInvalidContent(String content, String status) {
                                 <td align="left" class="MainTableTopRowRightColumn no-print" width="100%">
                                 	<input type="hidden" name="labName" value="<%=handler.getAccessionNum() %>"/>
                                     <input type="hidden" name="segmentID" value="<%= segmentID %>"/>
+	                                <input type="hidden" name="uuid" value="<%= resultUuid %>"/>
                                     <input type="hidden" name="multiID" value="<%= multiLabId %>" />
                                     <input type="hidden" name="providerNo" value="<%= providerNo %>"/>
                                     <input type="hidden" name="status" value="A"/>

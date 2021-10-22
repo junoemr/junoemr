@@ -16,9 +16,6 @@
 
 package oscar.oscarLab.ca.all.pageUtil;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -26,13 +23,16 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.olis.OLISResultsAction;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  *
@@ -47,11 +47,10 @@ public class PrintOLISLabsAction extends Action{
     public PrintOLISLabsAction() {
     }
     
-    public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response){
-        
-    	if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_lab", "r", null)) {
-			throw new SecurityException("missing required security object (_lab)");
-		}
+    public ActionForward execute(ActionMapping mapping,ActionForm form,HttpServletRequest request,HttpServletResponse response)
+    {
+	    LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+	    securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.LAB_READ);
     	
     	try {
 	    	String segmentID = request.getParameter("segmentID");
