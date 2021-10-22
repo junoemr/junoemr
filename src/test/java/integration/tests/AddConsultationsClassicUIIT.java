@@ -47,21 +47,20 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVis
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddConsultationsClassicUIIT extends SeleniumTestBase
 {
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"admission", "consultationRequestExt", "consultationRequests", "demographic", "log",
+			"measurementType", "program", "validations"
+		};
+	}
+
 	@Before
 	public void setup()
 	{
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
-	}
-
-	@After
-	public void cleanup()
-			throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
-	{
-		SchemaUtils.restoreTable(
-				"admission", "consultationRequestExt", "consultationRequests", "demographic", "log",
-				"measurementType", "program", "validations"
-				);
 	}
 
 	@Test

@@ -24,10 +24,8 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.apache.commons.lang.StringUtils;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,13 +33,10 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
-import java.sql.SQLException;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.PageUtil.accessEncounterPage;
 import static integration.tests.util.seleniumUtil.PageUtil.isErrorPage;
 
@@ -50,29 +45,22 @@ import static integration.tests.util.seleniumUtil.PageUtil.isErrorPage;
 
 public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 {
-	@Before
-	public void setup()
-			throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException
+	@Override
+	protected String[] getTablesToRestore()
 	{
-		SchemaUtils.restoreTable(
-				"admission", "caisi_role",  "casemgmt_note", "demographic", "documentDescriptionTemplate", "dxresearch",
-				"eChart", "Facility", "issue", "log", "LookupList", "LookupListItem", "measurementType", "measurements",
-				"OscarJob", "OscarJobType", "provider", "ProviderPreference",  "quickListUser", "roster_status",
-				"secUserRole", "tickler_text_suggest", "validations");
-
-		loadSpringBeans();
-		databaseUtil.createTestDemographic();
+		return new String[]{
+			"admission", "caisi_role",  "casemgmt_note", "demographic", "documentDescriptionTemplate", "dxresearch",
+			"eChart", "Facility", "issue", "log", "LookupList", "LookupListItem", "measurementType", "measurements",
+			"OscarJob", "OscarJobType", "provider", "ProviderPreference",  "quickListUser", "roster_status",
+			"secUserRole", "tickler_text_suggest", "validations"
+		};
 	}
 
-	@After
-	public void cleanup()
-			throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
+	@Before
+	public void setup()
 	{
-		SchemaUtils.restoreTable(
-				"admission", "caisi_role",  "casemgmt_note", "demographic", "documentDescriptionTemplate", "dxresearch",
-				"eChart", "Facility", "issue", "log", "LookupList", "LookupListItem", "measurementType", "measurements",
-				"OscarJob", "OscarJobType", "provider", "ProviderPreference",  "quickListUser", "roster_status",
-				"secUserRole", "tickler_text_suggest", "validations");
+		loadSpringBeans();
+		databaseUtil.createTestDemographic();
 	}
 
 	public void addMeasurements(String currWindowHandle, String flowsheetName, String flowsheetSelected, String measurementSelected )

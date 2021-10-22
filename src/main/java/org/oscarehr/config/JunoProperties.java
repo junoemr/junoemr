@@ -37,6 +37,7 @@ public class JunoProperties
 {
 	private JunoPropertiesConfig properties;
 	private RedisSessionStore redisSessionStore;
+	private Test test;
 
 	@Data
 	public static class JunoPropertiesConfig
@@ -51,5 +52,11 @@ public class JunoProperties
 		private String endpoint;
 		private String password;
 		private String storageKeyPrefix = "";
+	}
+
+	@Data
+	public static class Test
+	{
+		private boolean headless = true;
 	}
 }

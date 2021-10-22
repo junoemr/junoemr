@@ -25,9 +25,12 @@ package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.seleniumUtil.PageUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -62,26 +65,24 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdmini
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddAppointmentsIT extends SeleniumTestBase
 {
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"admission", "appointment", "demographic", "log", "log_ws_rest", "mygroup",
+			"program_provider", "property",	"provider", "providerArchive", "provider_billing", "providerbillcenter",
+			"ProviderPreference", "providersite", "secUserRole", "site",
+			"rschedule", "scheduledate", "scheduletemplate", "scheduletemplatecode"
+		};
+	}
+
 	@Before
 	public void setup() throws Exception
 	{
-		SchemaUtils.restoreTable("admission", "appointment", "demographic", "log", "log_ws_rest", "mygroup",
-				"program_provider", "property",	"provider", "providerArchive", "provider_billing", "providerbillcenter",
-				"ProviderPreference", "providersite", "secUserRole", "site",
-				"rschedule", "scheduledate", "scheduletemplate", "scheduletemplatecode");
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
 		databaseUtil.createTestProvider();
 		databaseUtil.createProviderSite();
-	}
-
-	@After
-	public void cleanup() throws Exception
-	{
-		SchemaUtils.restoreTable("admission", "appointment", "demographic", "log", "log_ws_rest", "mygroup",
-				"program_provider", "property",	"provider", "providerArchive", "provider_billing", "providerbillcenter",
-				"ProviderPreference", "providersite", "secUserRole", "site",
-				"rschedule", "scheduledate", "scheduletemplate", "scheduletemplatecode");
 	}
 
 	public void appointmentDateDisplay(By appointmentDateBy, String appointmentDate)

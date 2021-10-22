@@ -45,6 +45,9 @@ import java.util.HashSet;
 
 import org.springframework.boot.test.context.TestComponent;
 
+import java.time.LocalDate;
+import java.util.HashSet;
+
 import static integration.tests.util.data.PatientTestCollection.patientLNames;
 import static integration.tests.util.data.ProviderTestCollection.providerLNames;
 import static integration.tests.util.data.SiteTestCollection.shortNames;

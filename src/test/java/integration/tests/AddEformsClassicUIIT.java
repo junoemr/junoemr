@@ -26,14 +26,12 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
@@ -46,31 +44,25 @@ import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddEformsClassicUIIT extends SeleniumTestBase
 {
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate",
+			"eform_data", "eform_values", "Facility", "issue", "log", "log_ws_rest", "measurementType",
+			"LookupList", "LookupListItem", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
+			"providerArchive", "providerbillcenter", "ProviderPreference", "roster_status", "security", "secUserRole",
+			"tickler_text_suggest", "validations"
+		};
+	}
+
 	@Before
-	public void setup() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-		SchemaUtils.restoreTable(
-				"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate",
-				"eform_data", "eform_values", "Facility", "issue", "log", "log_ws_rest", "measurementType",
-				"LookupList", "LookupListItem", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
-				"providerArchive", "providerbillcenter", "ProviderPreference", "roster_status", "security", "secUserRole",
-				"tickler_text_suggest", "validations"
-		);
+	public void setup()
+		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
+	{
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
 		databaseUtil.createTestProvider();
-	}
-
-	@After
-	public void cleanup()
-			throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
-	{
-		SchemaUtils.restoreTable(
-				"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate",
-				"eform_data", "eform_values", "Facility", "issue", "log", "log_ws_rest", "measurementType",
-				"LookupList", "LookupListItem", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
-				"providerArchive", "providerbillcenter", "ProviderPreference", "roster_status", "security", "secUserRole",
-				"tickler_text_suggest", "validations"
-		);
 	}
 
 	@Test

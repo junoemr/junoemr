@@ -48,20 +48,19 @@ import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 
 public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 {
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"admission", "demographic", "dxresearch", "log", "measurementType", "quickListUser", "validations"
+		};
+	}
+
 	@Before
 	public void setup()
 	{
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
-	}
-
-	@After
-	public void cleanup()
-			throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
-	{
-		SchemaUtils.restoreTable(
-				"admission", "demographic", "dxresearch", "log", "measurementType", "quickListUser", "validations"
-		);
 	}
 
 	public void addDiseaseRegistry()
@@ -77,6 +76,7 @@ public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 		String hiv = "042";
 		String inr = "42731";
 
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")));
 		driver.findElement(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")).click();
 		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		PageUtil.switchToLastWindow(driver);
