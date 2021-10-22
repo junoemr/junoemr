@@ -102,6 +102,15 @@ public class OLISSearchAction extends DispatchAction
 				// Log the consent override
 				logConsentGiven(loggedInInfo.getLoggedInProviderNo(), q.getDemographicNo(), request);
 			}
+
+			// ensure the demographic carries through to results when re-submitting queries
+			String demographicNo = StringUtils.trimToNull(request.getParameter("demographic"));
+			if(demographicNo != null)
+			{
+				Demographic demo = demographicService.getDemographicModel(Integer.parseInt(demographicNo));
+				request.setAttribute("demographic", demo);
+			}
+
 			Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), request, q);
 			
 		}

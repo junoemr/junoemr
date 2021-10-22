@@ -190,12 +190,35 @@
 				<input type="hidden" name="redo" value="true" />
 				<input type="hidden" name="uuid" value="<%=(String)request.getAttribute("searchUuid")%>" />
 				<input type="hidden" name="force" value="true" />
+				<input type="hidden" name="blockedInformationConsent" value="T" />
+				<input type="hidden" name="demographic" value="<%=(demographic != null) ? demographic.getId() : "" %>" />
 				<input type="submit" value="Submit Override Consent" /> 
 				Authorized by: 
 				<select id="blockedInformationIndividual" name="blockedInformationIndividual">
-					<option value="patient">Patient</option>
-					<option value="substitute">Substitute Decision Maker</option>					
+					<option value="Z">Patient</option>
+					<option value="X">Substitute Decision Maker</option>
 				</select>
+				<div>
+					<span>Substitute Decision Maker</span>
+					<label>Given Name:
+						<input type="text" name="substituteGivenName">
+					</label>
+					<label>Last Name:
+						<input type="text" name="substituteLastName">
+					</label>
+					<label>Relationship:
+						<select name="substituteRelationship">
+							<option value="A0">Guardian for the Person</option>
+							<option value="A1">Attorney for Personal Care</option>
+							<option value="A2">Representative appointed by Consent and Capacity Board</option>
+							<option value="A3">Spouse/Partner</option>
+							<option value="A4">Parent</option>
+							<option value="A5">Child</option>
+							<option value="A6">Sibling</option>
+							<option value="A7">Other Relative</option>
+						</select>
+					</label>
+				</div>
 			</form>
 			<%
 			}
