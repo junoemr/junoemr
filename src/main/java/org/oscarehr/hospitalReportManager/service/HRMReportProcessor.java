@@ -171,9 +171,7 @@ public class HRMReportProcessor
 		{
 			String plainText = decryptContents(encryptedFile);
 			GenericFile hrmFile = FileFactory.createHRMFile(encryptedFile.getName().replaceAll("_encrypted", ""), dateSubDirectory);
-			
-			FileOutputStream stream = new FileOutputStream(hrmFile.getFileObject());
-			stream.write(plainText.getBytes(StandardCharsets.UTF_8));
+			hrmFile.asFileOutputStream().write(plainText.getBytes(StandardCharsets.UTF_8));
 			
 			return hrmFile;
 		}
