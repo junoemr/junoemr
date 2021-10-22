@@ -15,6 +15,7 @@ import com.indivica.olis.parameters.OBX3;
 import com.indivica.olis.parameters.QRD7;
 import com.indivica.olis.parameters.ZPD1;
 import com.indivica.olis.parameters.ZRP1;
+import com.indivica.olis.parameters.ZSD;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -100,4 +101,9 @@ public class Z04Query extends DateRangeQuery
     public void setConsentToViewBlockedInformation(ZPD1 consentToViewBlockedInformation) {
 		throw new RuntimeException("Not valid for this type of query.");
     }
+	@Override
+	public void setSubstituteDecisionMakerInfo(ZSD substituteDecisionMakerInfo)
+	{
+		throw new RuntimeException("Not valid for this type of query.");
+	}
 }

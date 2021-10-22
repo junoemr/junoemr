@@ -93,6 +93,7 @@ public class LogConst {
 	public static final String CON_DOCUMENT = "document";
 	public static final String CON_HL7_LAB = "lab";
 	public static final String CON_HRM = "hrm";
+	public static final String CON_OLIS_LAB = "OLIS lab";
 	public static final String CON_CML_LAB = "cml lab";
 	public static final String CON_MDS_LAB = "mds lab";
 	public static final String CON_PATHNET_LAB = "pathnet lab";

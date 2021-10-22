@@ -338,14 +338,37 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<td width="30%">
 				<select id="blockedInformationConsent" name="blockedInformationConsent">
 					<option value="">(none)</option>
-					<option value="Z">Temporary</option>
+					<option value="T">Temporary</option>
 				</select>
 			&nbsp;&nbsp;Authorized by:
-				<select name="blockedInformationIndividual" id="blockedInformationIndividual">
-					<option value="">Neither</option>
-					<option value="patient">Patient</option>
-					<option value="substitute">Substitute Decision Maker</option>
+				<select name="blockedInformationIndividual">
+					<option value="">(none)</option>
+					<option value="Z">Patient</option>
+					<option value="X">Substitute Decision Maker</option>
 				</select>
+			</td>
+		</tr>
+		<tr>
+			<th width="20%">Substitute Decision Maker</th>
+			<td width="30%">
+				<label>Given Name:
+					<input type="text" name="substituteGivenName">
+				</label>
+				<label>Last Name:
+					<input type="text" name="substituteLastName">
+				</label>
+				<label>Relationship:
+					<select name="substituteRelationship">
+						<option value="A0">Guardian for the Person</option>
+						<option value="A1">Attorney for Personal Care</option>
+						<option value="A2">Representative appointed by Consent and Capacity Board</option>
+						<option value="A3">Spouse/Partner</option>
+						<option value="A4">Parent</option>
+						<option value="A5">Child</option>
+						<option value="A6">Sibling</option>
+						<option value="A7">Other Relative</option>
+					</select>
+				</label>
 			</td>
 		</tr>
 		<tr>
@@ -613,12 +636,40 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 		<tr>
 			<td width="50%" colspan=2><span><input class="checkbox" type="checkbox" name="retrieveAllResults" id="retrieveAllResults"> Retrieve All Test Results?</span></td>
 			<th width="20%">Consent to View Blocked Information?</th>
-			<td width="30%"><select id="blockedInformationConsent" name="blockedInformationConsent"><option value="">(none)</option>
-			<option value="Z">Temporary </option>
-			</select>
-			<br />Authorized by: <select name="blockedInformationIndividual" id="blockedInformationIndividual">
-			<option value="patient">Patient</option><option value="substitute">Substitute Decision Maker</option><option value="">Neither</option>
-			</select>
+			<td width="30%">
+				<select id="blockedInformationConsent" name="blockedInformationConsent">
+					<option value="">(none)</option>
+					<option value="T">Temporary </option>
+				</select>
+				<br />Authorized by:
+					<select name="blockedInformationIndividual">
+						<option value="">(none)</option>
+						<option value="Z">Patient</option>
+						<option value="X">Substitute Decision Maker</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th width="20%">Substitute Decision Maker</th>
+			<td width="30%">
+				<label>Given Name:
+					<input type="text" name="substituteGivenName">
+				</label>
+				<label>Last Name:
+					<input type="text" name="substituteLastName">
+				</label>
+				<label>Relationship:
+					<select name="substituteRelationship">
+						<option value="A0">Guardian for the Person</option>
+						<option value="A1">Attorney for Personal Care</option>
+						<option value="A2">Representative appointed by Consent and Capacity Board</option>
+						<option value="A3">Spouse/Partner</option>
+						<option value="A4">Parent</option>
+						<option value="A5">Child</option>
+						<option value="A6">Sibling</option>
+						<option value="A7">Other Relative</option>
+					</select>
+				</label>
 			</td>
 		</tr>
 		<tr>

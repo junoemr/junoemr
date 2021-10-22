@@ -36,6 +36,7 @@ import com.indivica.olis.parameters.ZBX1;
 import com.indivica.olis.parameters.ZPD1;
 import com.indivica.olis.parameters.ZPD3;
 import com.indivica.olis.parameters.ZRP1;
+import com.indivica.olis.parameters.ZSD;
 import com.indivica.olis.queries.Query;
 import com.indivica.olis.queries.Z01Query;
 import com.indivica.olis.queries.Z02Query;
@@ -46,13 +47,12 @@ import com.indivica.olis.queries.Z07Query;
 import com.indivica.olis.queries.Z08Query;
 import com.indivica.olis.queries.Z50Query;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.oscarehr.common.dao.OscarLogDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
-import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.dataMigration.model.demographic.Demographic;
 import org.oscarehr.demographic.service.DemographicService;
@@ -61,6 +61,8 @@ import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -72,14 +74,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-public class OLISSearchAction extends DispatchAction {
+import static com.indivica.olis.parameters.ZPD1.CONSENT_MARKER_SUBSTITUTE;
 
+public class OLISSearchAction extends DispatchAction
+{
 	private final DemographicService demographicService = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
 	private final ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
 
 	public static HashMap<String, Query> searchQueryMap = new HashMap<String, Query>();
 
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
 
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 		
@@ -90,27 +95,12 @@ public class OLISSearchAction extends DispatchAction {
 			request.setAttribute("searchUuid", uuid);
 			boolean force = "true".equals(request.getParameter("force"));
 			Query q = (Query)searchQueryMap.get(uuid).clone();
-			if (force) { 
-				q.setConsentToViewBlockedInformation(new ZPD1("Z"));
+			if (force)
+			{
+				fillConsentOverrideSegments(request, q);
 
-				String blockedInfoIndividual = request.getParameter("blockedInformationIndividual");
 				// Log the consent override
-				OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
-				OscarLog logItem = new OscarLog();
-				logItem.setAction("OLIS search");
-				logItem.setContent("consent override");
-				logItem.setContentId("demographicNo=" + q.getDemographicNo() + ",givenby=" + blockedInfoIndividual);					
-				if (loggedInInfo.getLoggedInProvider() != null) {
-					logItem.setProviderNo(loggedInInfo.getLoggedInProviderNo());
-				}
-				else {
-					logItem.setProviderNo("-1");
-				}
-
-				logItem.setIp(request.getRemoteAddr());
-
-				logDao.persist(logItem);
-
+				logConsentGiven(loggedInInfo.getLoggedInProviderNo(), q.getDemographicNo(), request);
 			}
 			Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), request, q);
 			
@@ -198,12 +188,7 @@ public class OLISSearchAction extends DispatchAction {
 				}
 
 
-				String blockedInformationConsent = request.getParameter("blockedInformationConsent");
-
-				if (blockedInformationConsent != null && blockedInformationConsent.trim().length() > 0) {
-					((Z01Query) query).setConsentToViewBlockedInformation(new ZPD1(blockedInformationConsent));
-				}
-
+				fillConsentOverrideSegments(request, query);
 
 				String consentBlockAllIndicator = request.getParameter("consentBlockAllIndicator");
 
@@ -368,25 +353,8 @@ public class OLISSearchAction extends DispatchAction {
 					}
 				}
 
-				String blockedInfoIndividual = request.getParameter("blockedInformationIndividual");
-
-				if (blockedInformationConsent != null && blockedInformationConsent.equalsIgnoreCase("Z")) {
-					// Log the consent override
-					OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
-					OscarLog logItem = new OscarLog();
-					logItem.setAction("OLIS search");
-					logItem.setContent("consent override");
-					logItem.setContentId("demographicNo=" + demographicNo + ",givenby=" + blockedInfoIndividual);					
-					if (loggedInInfo.getLoggedInProvider() != null)
-						logItem.setProviderNo(loggedInInfo.getLoggedInProviderNo());
-					else
-						logItem.setProviderNo("-1");
-
-					logItem.setIp(request.getRemoteAddr());
-					
-					logDao.persist(logItem);
-
-				}
+				// Log the consent override
+				logConsentGiven(loggedInInfo.getLoggedInProviderNo(), demographicNo, request);
 
 			} else if (queryType.equalsIgnoreCase("Z02")) {
 				query = new Z02Query();
@@ -402,13 +370,7 @@ public class OLISSearchAction extends DispatchAction {
 					MiscUtils.getLogger().error("Can't set retrieve all results option on OLIS query", e);
 				}
 
-
-				String blockedInformationConsent = request.getParameter("blockedInformationConsent");
-
-				if (blockedInformationConsent != null && blockedInformationConsent.trim().length() > 0) {
-					((Z02Query) query).setConsentToViewBlockedInformation(new ZPD1(blockedInformationConsent));
-				}
-
+				fillConsentOverrideSegments(request, query);
 
 				String consentBlockAllIndicator = request.getParameter("consentBlockAllIndicator");
 
@@ -463,25 +425,8 @@ public class OLISSearchAction extends DispatchAction {
 				orc4.setValue(4, "ISO");
 				((Z02Query) query).setPlacerGroupNumber(orc4);
 
-
-				String blockedInfoIndividual = request.getParameter("blockedInformationIndividual");
-
-				if (blockedInformationConsent != null && blockedInformationConsent.equalsIgnoreCase("Z")) {
-					// Log the consent override
-					OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
-					OscarLog logItem = new OscarLog();
-					logItem.setAction("OLIS search");
-					logItem.setContent("consent override");
-					logItem.setContentId("demographicNo=" + demographicNo + ",givenby=" + blockedInfoIndividual);					
-					if (loggedInInfo.getLoggedInProvider() != null)
-						logItem.setProviderNo(loggedInInfo.getLoggedInProviderNo());
-					else
-						logItem.setProviderNo("-1");
-
-					logItem.setIp(request.getRemoteAddr());
-
-					logDao.persist(logItem);
-				}
+				// Log the consent override
+				logConsentGiven(loggedInInfo.getLoggedInProviderNo(), demographicNo, request);
 
 
 			} else if (queryType.equalsIgnoreCase("Z04")) {
@@ -818,6 +763,49 @@ public class OLISSearchAction extends DispatchAction {
 		
 		return mapping.findForward("results");
 	
+	}
+
+	private void fillConsentOverrideSegments(HttpServletRequest request, Query query)
+	{
+		String blockedInformationConsent = StringUtils.trimToNull(request.getParameter("blockedInformationConsent"));
+		String blockedInfoIndividual = StringUtils.trimToNull(request.getParameter("blockedInformationIndividual"));
+
+		if(StringUtils.isNotBlank(blockedInformationConsent))
+		{
+			query.setConsentToViewBlockedInformation(new ZPD1(blockedInfoIndividual));
+
+			if(CONSENT_MARKER_SUBSTITUTE.equals(blockedInfoIndividual))
+			{
+				String substituteGivenName = StringUtils.trimToNull(request.getParameter("substituteGivenName"));
+				String substituteLastName = StringUtils.trimToNull(request.getParameter("substituteLastName"));
+				String substituteRelationship = StringUtils.trimToNull(request.getParameter("substituteRelationship"));
+
+				query.setSubstituteDecisionMakerInfo(
+						new ZSD(substituteGivenName, substituteLastName, ZSD.RelationshipToPatient.valueOf(substituteRelationship)));
+			}
+		}
+	}
+
+	private void logConsentGiven(String loggedInProviderId, String demographicIdStr, HttpServletRequest request)
+	{
+		String providerNo = StringUtils.isBlank(loggedInProviderId) ? ProviderData.SYSTEM_PROVIDER_NO : loggedInProviderId;
+		Integer demographicId = StringUtils.isBlank(demographicIdStr) ? null : Integer.parseInt(demographicIdStr);
+
+		String blockedInformationConsent = StringUtils.trimToNull(request.getParameter("blockedInformationConsent"));
+		String blockedInfoIndividual = StringUtils.trimToNull(request.getParameter("blockedInformationIndividual"));
+		if(StringUtils.isNotBlank(blockedInformationConsent))
+		{
+			String givenBy = "patient";
+			if(CONSENT_MARKER_SUBSTITUTE.equals(blockedInfoIndividual))
+			{
+				String substituteGivenName = StringUtils.trimToNull(request.getParameter("substituteGivenName"));
+				String substituteLastName = StringUtils.trimToNull(request.getParameter("substituteLastName"));
+				givenBy = substituteLastName + ", " + substituteGivenName;
+			}
+
+			LogAction.addLogEntry(providerNo, demographicId, LogConst.ACTION_READ, LogConst.CON_OLIS_LAB, LogConst.STATUS_SUCCESS, null, request.getRemoteAddr(),
+					"consent override given by: " + givenBy);
+		}
 	}
 	
 	private Date changeToEndOfDay(Date d) {

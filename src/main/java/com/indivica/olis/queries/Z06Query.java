@@ -13,6 +13,7 @@ import com.indivica.olis.parameters.OBR22;
 import com.indivica.olis.parameters.ORC21;
 import com.indivica.olis.parameters.QRD7;
 import com.indivica.olis.parameters.ZPD1;
+import com.indivica.olis.parameters.ZSD;
 
 /**
  * Z06 - Retrieve Laboratory Information Updates for Ordering Facility 
@@ -66,4 +67,9 @@ public class Z06Query extends DateRangeQuery
     public void setConsentToViewBlockedInformation(ZPD1 consentToViewBlockedInformation) {
 		throw new RuntimeException("Not valid for this type of query.");
     }
+	@Override
+	public void setSubstituteDecisionMakerInfo(ZSD substituteDecisionMakerInfo)
+	{
+		throw new RuntimeException("Not valid for this type of query.");
+	}
 }
