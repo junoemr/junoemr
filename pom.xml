@@ -78,6 +78,10 @@
 			<id>archiva.internal</id>
 			<url>https://mvn.cloudpractice.ca/repository/internal</url>
 		</repository>
+		<repository>
+			<id>jaspersoft-third-party</id>
+			<url>https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
