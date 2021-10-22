@@ -30,38 +30,27 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.Issue;
-import org.oscarehr.common.dao.DxresearchDAO;
-import org.oscarehr.common.model.Dxresearch;
-import org.oscarehr.common.model.Provider;
+import org.oscarehr.dataMigration.model.dx.DxCode;
+import org.oscarehr.dataMigration.model.dx.DxRecord;
+import org.oscarehr.dx.service.DxResearchService;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.to.model.DiagnosisTo1;
 import org.oscarehr.ws.rest.to.model.SummaryItemTo1;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 
 @Component
 public class OngoingConcernDxRegSummary extends IssueNoteSummary implements Summary  {
-	private static final Logger logger = MiscUtils.getLogger();
-	
+
 	@Autowired
-    @Qualifier("DxresearchDAO")
-    protected DxresearchDAO dxresearchDao;
-	
-	@Autowired
-	private ProviderDao providerDao;
-	
+	private DxResearchService dxResearchService;
+
 	protected void getSummaryListForIssuedNotes(LoggedInInfo loggedInInfo,Integer demographicNo, List<SummaryItemTo1> list, String[] issueCodes){
-		
-		List<Dxresearch> dxList =  dxresearchDao.findNonDeletedByDemographicNo(demographicNo);
-		List<Integer> usedDx = new ArrayList<Integer>();
+
+		List<DxRecord> dxRecords = dxResearchService.getAssignedDxRecords(demographicNo);
 		List<Issue> issueList = new ArrayList<Issue>();
 		for (int j = 0; j < issueCodes.length; ++j) {
 			issueList.addAll(caseManagementMgr.getIssueInfoByCode(loggedInInfo.getLoggedInProviderNo(), issueCodes[j]));
@@ -70,24 +59,22 @@ public class OngoingConcernDxRegSummary extends IssueNoteSummary implements Summ
 		
 		Collection<CaseManagementNote> notes = caseManagementMgr.getActiveNotes(
 				"" + demographicNo, issueIds);
-		
+
 		String cppExts = "";
-		int count = 0;
-		for(CaseManagementNote note:notes){
+
+		for(CaseManagementNote note : notes) {
 			String classification = null;
-			Set<CaseManagementIssue> issueSet = note.getIssues();
+			Set<CaseManagementIssue> issuesForNote = note.getIssues();
 			StringBuilder issueBuilder = new StringBuilder();
-			for (CaseManagementIssue s : issueSet) {
+			for (CaseManagementIssue s : issuesForNote) {
 				issueBuilder.append(s.getIssue().getCode());
-				for(Dxresearch dx:dxList){
-					if(s.getIssue().getType().equals(dx.getCodingSystem()) && s.getIssue().getCode().equals(dx.getDxresearchCode())){
-						usedDx.add(dx.getId());
-						logger.debug("Added dx  id "+dx.getId());
-						classification = "Dx: "+dxresearchDao.getDescription(dx.getCodingSystem(),dx.getDxresearchCode());
+				for(DxRecord dx: dxRecords) {
+					DxCode dxCode = dx.getDxCode();
+					Issue issue = s.getIssue();
+					if(issue.getType().equals(dxCode.getCodingSystem().getValue()) && issue.getCode().equals(dxCode.getCode())){
+						classification = "Dx: " + dxCode.getDescription();
 					}
 				}
-				
-				
 			}
 			String issueString = issueBuilder.toString();
 
@@ -96,64 +83,24 @@ public class OngoingConcernDxRegSummary extends IssueNoteSummary implements Summ
 				// Note: This statement won't ever get hit because getCppExtsItem checks for a specific list of issues
 				cppExts = preferenceManager.getCppExtsItem(loggedInInfo, caseManagementMgr.getExtByNote(note.getId()), issueString);
 			}
-			logger.debug("IssueString "+issueString+" ccpExts "+cppExts);
-			SummaryItemTo1 summaryItem = new SummaryItemTo1(count, note.getNote() + cppExts,"action","notes"+issueString);
+
+			SummaryItemTo1 summaryItem = new SummaryItemTo1(0, note.getNote() + cppExts,"action","notes"+issueString);
 			summaryItem.setDate(note.getObservation_date());
 			summaryItem.setEditor(note.getProviderName());
 			summaryItem.setNoteId(note.getId());
 			if(classification != null){
 				summaryItem.setClassification(classification);
 			}
-			
+
 			list.add(summaryItem);
-			count++;
 		}
-		
-		for(Dxresearch dx:dxList){
-			logger.debug("checking for dx id"+dx.getId()+" = "+(!usedDx.contains(dx.getId())));
-			if(!usedDx.contains(dx.getId())){
-				String dxDesc = dxresearchDao.getDescription(dx.getCodingSystem(),dx.getDxresearchCode());
-				if(dxDesc != null){
-					SummaryItemTo1 summaryItem = new SummaryItemTo1(count, "Dx: "+dxDesc,"add","dx_reg");
-					summaryItem.setDate(dx.getStartDate());
-					summaryItem.setEditor(getProviderName(dx.getProviderNo()));
-					summaryItem.setNoteId(null);
-					summaryItem.setClassification("DX-REG");
-					DiagnosisTo1 diagnosisTo1 = new DiagnosisTo1();
-					diagnosisTo1.setCode(dx.getDxresearchCode());
-					diagnosisTo1.setCodingSystem(dx.getCodingSystem());
-					diagnosisTo1.setDescription(dxDesc);
-					summaryItem.setExtra(diagnosisTo1);
-					count++;
-					list.add(summaryItem);
-				}
-			}
-		}
-		
+
 		// Reverse date sorting with null having lowest priority (ie: will be last).
 		list.sort((SummaryItemTo1 i1, SummaryItemTo1 i2) -> ObjectUtils.compare(i2.getDate(), i1.getDate()));
 		
 		for(int i = 0; i < list.size(); i++){
 			list.get(i).setId(i);
 		}
-		
-	}
-	
-	
-	private String getProviderName(String providerNo){
-		String providerName = "";
-		Provider provider = providerDao.getProvider(providerNo);
 
-		if (provider != null) {
-			if (provider.getLastName() != null) {
-				providerName = provider.getLastName() + ", ";
-			}
-	
-			if (provider.getFirstName() != null) {
-				providerName += provider.getFirstName();
-			}
-		}
-		return providerName;
 	}
-	
 }

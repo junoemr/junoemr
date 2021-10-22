@@ -302,6 +302,12 @@ public class RecordUxService extends AbstractServiceImpl {
 				summaryList.add(new SummaryTo1("Ongoing Concerns", count++, SummaryTo1.ONGOINGCONCERNS_CODE));
 			}
 
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.DX_READ)
+				&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.DISEASE_REGISTRY_POS))
+			{
+				summaryList.add(new SummaryTo1("Disease Registry", count++, SummaryTo1.DISEASE_REGISTRY_CODE));
+			}
+
 			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.CPP_NOTE_READ)
 					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.MED_HX_POS))
 			{
@@ -355,7 +361,8 @@ public class RecordUxService extends AbstractServiceImpl {
         result.put("preventions","preventionsSummary");
     	result.put("meds","rxSummary");
     	result.put("othermeds","issueNoteSummary");
-        result.put("ongoingconcerns","ongoingConcernDxRegSummary"); 
+        result.put("ongoingconcerns","ongoingConcernDxRegSummary");
+        result.put("diseaseregistry", "diseaseRegistrySummary");
         result.put("medhx","issueNoteSummary"); 
 		result.put("socfamhx","issueNoteSummary"); 		
 		result.put("reminders","issueNoteSummary");
@@ -416,6 +423,14 @@ public class RecordUxService extends AbstractServiceImpl {
 	public SummaryTo1 getOngoingConcerns(@PathParam("demographicNo") Integer demographicNo)
 	{
 		return getFullSummmary(demographicNo, SummaryTo1.ONGOINGCONCERNS_CODE);
+	}
+
+	@GET
+	@Path("/{demographicNo}/getDiseaseRegistry")
+	@Produces(MediaType.APPLICATION_JSON)
+	public SummaryTo1 getDiseaseRegistry(@PathParam("demographicNo") Integer demographicNo)
+	{
+		return getFullSummmary(demographicNo, SummaryTo1.DISEASE_REGISTRY_CODE);
 	}
 
 	@GET

@@ -130,6 +130,13 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			return false;
 		};
 
+		controller.openDiseaseRegistry = (demographicNo) =>
+		{
+			const win = "Disease Registry " + demographicNo;
+			const url = "../oscarResearch/oscarDxResearch/setupDxResearch.do?quickList=&demographicNo=" + demographicNo;
+			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600");
+		}
+
 		controller.openAddForms = function openForms()
 		{
 			// open forms tab with "Library" list selected
@@ -544,6 +551,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			{
 				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.PreventionCreate);
 			}
+			else if (module.summaryCode === 'diseaseregistry')
+			{
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.DxCreate);
+			}
 			return enabled;
 		}
 		controller.onSummaryModAdd = function onSummaryModAdd(module, successCallback, dismissCallback)
@@ -573,6 +584,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			else if (module.summaryCode === 'preventions')
 			{
 				controller.openPreventions(controller.demographicNo);
+			}
+			else if (module.summaryCode === 'diseaseregistry')
+			{
+				controller.openDiseaseRegistry(controller.demographicNo);
 			}
 		};
 
