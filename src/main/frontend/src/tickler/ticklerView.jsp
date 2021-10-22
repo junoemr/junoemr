@@ -136,10 +136,10 @@
 						<i class="fa fa-chevron-up" ng-show="ticklerViewCtrl.showComments"
 						   aria-hidden="true"></i>
 					</a>
-					<button class="btn btn-xs btn-success"
-							ng-show="ticklerViewCtrl.ticklerWriteAccess"
-							ng-click="ticklerViewCtrl.addComment()">Add
-					</button>
+                    <button class="btn btn-xs btn-success"
+                            ng-disabled="!ticklerViewCtrl.canEdit()"
+                            ng-click="ticklerViewCtrl.addComment()">Add
+                    </button>
 				</div>
 				<div class="form-group" ng-show="ticklerViewCtrl.showCommentFormControl">
 					<div class="input-group">
@@ -206,11 +206,11 @@
 	-->
 	<div class="pull-left">
 		<button class="btn btn-warning" ng-click="ticklerViewCtrl.completeTickler()"
-				ng-show="ticklerViewCtrl.ticklerWriteAccess">
+				ng-disabled="!ticklerViewCtrl.canEdit()">
 			<bean:message key="tickler.view.complete" bundle="ui"/>
 		</button>
 		<button class="btn btn-danger" ng-click="ticklerViewCtrl.deleteTickler()"
-				ng-show="ticklerViewCtrl.ticklerWriteAccess">
+		        ng-disabled="!ticklerViewCtrl.canDelete()">
 			<bean:message key="global.delete" bundle="ui"/>
 		</button>
 	</div>
@@ -221,11 +221,11 @@
 		<bean:message key="global.print" bundle="ui"/>
 	</button>
 	<button class="btn btn-success" ng-click="ticklerViewCtrl.saveChanges()"
-			ng-show="ticklerViewCtrl.ticklerWriteAccess">
+	        ng-disabled="!ticklerViewCtrl.canEdit()">
 		<bean:message key="tickler.view.save" bundle="ui"/>
 	</button>
 	<button class="btn btn-success" ng-click="ticklerViewCtrl.saveChangesAndWriteEncounter()"
-	        ng-show="ticklerViewCtrl.ticklerWriteAccess">
+	        ng-disabled="!ticklerViewCtrl.canEdit()">
 		<bean:message key="tickler.view.saveWithEncounter" bundle="ui"/>
 	</button>
 </div>

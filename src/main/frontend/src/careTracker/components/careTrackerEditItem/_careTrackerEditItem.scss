@@ -1,0 +1,37 @@
+.care-tracker-edit-item {
+	margin: 4px 0;
+	border: 1px solid var(--color-neutral-lighter);
+	border-radius: 4px;
+	padding: 8px;
+	background-color: var(--color-neutral-lightest);
+	position: relative;
+
+	.item-header {
+		@include juno-font-body-small;
+		font-weight: bold;
+	}
+
+	.item-description {
+		@include juno-font-body-smallest;
+	}
+
+	.row-padding {
+		padding: 0 2px;
+	}
+	.add-button-wrapper {
+		width: 128px;
+	}
+	.delete-button-wrapper {
+		width: 48px;
+		padding: 4px;
+		i {
+			font-size: 16px;
+		}
+	}
+
+	.item-close-button {
+		position: absolute;
+		top: 4px;
+		right: 4px;
+	}
+}

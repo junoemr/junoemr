@@ -23,20 +23,20 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.List;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.managers.AllergyManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.conversion.AllergyConverter;
 import org.oscarehr.ws.rest.to.AllergyResponse;
 import org.oscarehr.ws.rest.to.model.AllergyTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import java.util.List;
 
 
 @Path("/allergies")
@@ -50,6 +50,8 @@ public class AllergyService extends AbstractServiceImpl {
 	@Path("/active")
 	@Produces("application/json")
 	public AllergyResponse getCurrentAllergies(@QueryParam("demographicNo") Integer demographicNo) {
+
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicNo, Permission.ALLERGY_READ);
 		List<Allergy> allergies = allergyManager.getActiveAllergies(getLoggedInInfo(), demographicNo);
 		
 		List<AllergyTo1> allergiesT = new AllergyConverter().getAllAsTransferObjects(getLoggedInInfo(), allergies);

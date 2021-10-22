@@ -199,7 +199,8 @@ public class SchemaUtils
 	}
 
 	
-	public static void restoreAllTables() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
+	public static void restoreAllTables()
+		throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
 	{
 		long start = System.currentTimeMillis();
 		String schema=ConfigUtils.getProperty("db_schema");

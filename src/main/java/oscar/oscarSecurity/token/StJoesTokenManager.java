@@ -40,8 +40,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.PMmodule.dao.SecUserRoleDao;
-import org.oscarehr.PMmodule.model.SecUserRole;
+import org.oscarehr.security.dao.SecUserRoleDao;
+import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.PMmodule.service.ProviderManager;
 import org.oscarehr.common.dao.FacilityDao;
 import org.oscarehr.common.dao.SecurityTokenDao;

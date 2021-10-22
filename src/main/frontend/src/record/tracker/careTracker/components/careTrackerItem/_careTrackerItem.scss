@@ -1,0 +1,42 @@
+.care-tracker-item {
+	position: relative;
+
+	.item-header {
+		@include juno-font-body-small;
+		font-weight: bold;
+	}
+
+	.action-button-container {
+		width: 192px;
+	}
+
+	.boolean-value-indicator {
+		margin: 0 8px;
+	}
+	.boolean-checks {
+		--juno-form-input-label-padding-left: 4px;
+	}
+	.item-description {
+		@include juno-font-body-smallest;
+		padding: 4px 16px;
+	}
+	.item-guideline {
+		@include juno-font-body-smallest;
+		padding: 4px 0 8px 0;
+	}
+	.row-margin {
+		margin: 0 -2px;
+	}
+	.column-margin {
+		// keep padding on top for item wrapping
+		margin: 8px 2px 0 2px;
+	}
+
+	@media print {
+		page-break-inside: avoid;
+
+		.new-data-input {
+			display: none;
+		}
+	}
+}

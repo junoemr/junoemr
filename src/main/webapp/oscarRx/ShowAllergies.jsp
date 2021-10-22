@@ -32,12 +32,16 @@
 <%@page import="oscar.oscarRx.pageUtil.AllergyDisplay"%>
 <%@page import="java.util.List"%>
 <%@page import="oscar.OscarProperties"%>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
+<%@ page import="org.oscarehr.security.model.Permission" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
    String roleName2$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
+   String currrentUserId = (String) session.getAttribute("user");
    boolean authed=true;
 %>
 <security:oscarSec roleName="<%=roleName2$%>" objectName="_allergy" rights="r" reverse="<%=true%>">
@@ -69,7 +73,7 @@
 oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBean)pageContext.findAttribute("bean");
 String annotation_display = org.oscarehr.casemgmt.model.CaseManagementNoteLink.DISP_ALLERGY;
 
-com.quatro.service.security.SecurityManager securityManager = new com.quatro.service.security.SecurityManager();
+SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 %>
 <html:html locale="true">
 <head>
@@ -80,14 +84,14 @@ com.quatro.service.security.SecurityManager securityManager = new com.quatro.ser
 <style type="text/css">
 .view_menu{
 font-style:normal;
-font-size:12;
+font-size:12px;
 font-weight:normal;
 padding-right:12px;
 }
 
 .view_selected{
 font-style:normal;
-font-size:12;
+font-size:12px;
 font-weight:normal;
 padding-right:12px;
 
@@ -99,8 +103,8 @@ padding-left:20px;
 }
 
 table.allergy_legend td{
-font-size:8;
-padding-right:6;
+font-size:8px;
+padding-right:6px;
 }
 
 .at_border{
@@ -132,8 +136,8 @@ table.allergy_table td{
 <style type="text/css">
 
 table.allergy_legend td{
-font-size:10;
-padding-right:6;
+font-size:10px;
+padding-right:6px;
 }
 
 </style>
@@ -388,7 +392,7 @@ boolean filterOut=false;
 											<td>
 												<%
 													// annotations only avaiable for local allergies
-													if (displayAllergy.getRemoteFacilityId()==null)
+													if (displayAllergy.getRemoteFacilityId()==null && securityInfoManager.hasPrivileges(currrentUserId, demographicId, Permission.ENCOUNTER_NOTE_CREATE))
 													{
 														%>
 															<a href="#" title="Annotation" onclick="window.open('../annotation/annotation.jsp?display=<%=annotation_display%>&table_id=<%=displayAllergy.getId()%>&demo=<jsp:getProperty name="patient" property="demographicNo"/>','anwin','width=400,height=500');"><img src="../images/notes.gif" border="0"></a>
@@ -398,7 +402,8 @@ boolean filterOut=false;
 											</td>
 										<td>
 									<%									
-									if (displayAllergy.getRemoteFacilityId()==null && securityManager.hasDeleteAccess("_allergies",roleName2$)) {
+									if (displayAllergy.getRemoteFacilityId()==null && securityInfoManager.hasPrivileges(currrentUserId, demographicId, Permission.ALLERGY_DELETE))
+									{
 									%>
 									<a href="deleteAllergy.do?ID=<%= String.valueOf(displayAllergy.getId()) %>&demographicNo=<%=demoNo %>&action=<%=actionPath %>" onClick="return confirm('Are you sure you want to set the allergy <%=displayAllergy.getDescription() %> to <%=labelConfirmAction%>?');"><%=labelAction%></a>
 									<% } %>
@@ -415,7 +420,7 @@ boolean filterOut=false;
 				</table>
 				</td>
 			</tr>
-			<%if(securityManager.hasWriteAccess("_allergies",roleName2$)) {%>
+			<%if(securityInfoManager.hasPrivileges(currrentUserId, demographicId, Permission.ALLERGY_CREATE)) {%>
 			<tr> 
 				<td>
 				<div class="DivContentSectionHead"><bean:message
@@ -542,7 +547,7 @@ boolean filterOut=false;
 	</tr>
 
 	<tr>
-		<td width="100%" height="0%" style="padding: 5" bgcolor="#DCDCDC"
+		<td width="100%" height="0%" style="padding: 5px" bgcolor="#DCDCDC"
 			colspan="2"></td>
 	</tr>
 	<% } %>

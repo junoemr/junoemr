@@ -25,6 +25,8 @@ package integration.tests.util;
 import integration.tests.config.TestConfig;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
@@ -38,6 +40,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -54,6 +57,9 @@ public class SeleniumTestBase
 
 	@Autowired
 	protected DatabaseUtil databaseUtil;
+
+	@Autowired
+	protected JunoProperties junoProperties;
 
 
 	public static final Integer WEB_DRIVER_IMPLICIT_TIMEOUT = 60;
@@ -91,7 +97,10 @@ public class SeleniumTestBase
 	{
 		FirefoxBinary ffb = new FirefoxBinary();
 		FirefoxOptions ffo = new FirefoxOptions();
-		ffb.addCommandLineOptions("--headless");
+		if(junoProperties.getTest().isHeadless())
+		{
+			ffb.addCommandLineOptions("--headless");
+		}
 		ffo.setBinary(ffb);
 		driver = new FirefoxDriver(ffo);
 		Navigation.doLogin(
@@ -105,6 +114,17 @@ public class SeleniumTestBase
 		webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	}
 
+	@Before
+	@After
+	public void resetDatabase()
+		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
+	{
+		if(getTablesToRestore().length > 0)
+		{
+			SchemaUtils.restoreTable(getTablesToRestore());
+		}
+	}
+
 	@After
 	public void closeWebDriver()
 	{
@@ -114,5 +134,10 @@ public class SeleniumTestBase
 	protected static void loadSpringBeans()
 	{
 		DaoTestFixtures.setupBeanFactory();
+	}
+
+	protected String[] getTablesToRestore()
+	{
+		return new String[0];
 	}
 }

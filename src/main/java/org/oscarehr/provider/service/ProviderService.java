@@ -24,10 +24,10 @@ package org.oscarehr.provider.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.PMmodule.dao.SecUserRoleDao;
-import org.oscarehr.PMmodule.model.SecUserRole;
+import org.oscarehr.security.dao.SecUserRoleDao;
+import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.common.dao.ProviderSiteDao;
-import org.oscarehr.common.dao.SecRoleDao;
+import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.exception.NoSuchRecordException;
@@ -45,6 +45,7 @@ import org.oscarehr.ws.rest.transfer.providerManagement.ProviderEditFormTo1;
 import org.oscarehr.ws.rest.transfer.providerManagement.SecurityRecordTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.oscarProvider.data.ProviderBillCenter;
 
@@ -55,7 +56,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service("provider.service.ProviderService")
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class ProviderService
 {
 	@Autowired
@@ -255,7 +256,7 @@ public class ProviderService
 		List<Integer> roleIds = new ArrayList<>();
 		for (SecUserRole role : userRoles)
 		{
-			roleIds.add(secRoleDao.findByName(role.getRoleName()).getId());
+			roleIds.add(role.getSecRole().getId());
 		}
 		providerEditFormTo1.setUserRoles(roleIds);
 
@@ -349,9 +350,9 @@ public class ProviderService
 		// assign provider roles
 		if (providerEditFormTo1.getUserRoles() != null)
 		{
-			providerRoleService.assignProviderRoles(providerEditFormTo1.getUserRoles(), providerNo);
+			providerRoleService.assignProviderRoles(providerEditFormTo1.getUserRoles(), String.valueOf(providerNo));
 			providerRoleService.removeOtherProviderRoles(providerEditFormTo1.getUserRoles(), providerNo);
-			providerRoleService.setDefaultPrimaryRole(providerNo);
+			providerRoleService.setDefaultPrimaryRole(String.valueOf(providerNo));
 		}
 	}
 
@@ -485,6 +486,11 @@ public class ProviderService
 		}
 		existingRecord.setUserName(source.getUserName());
 		existingRecord.setEmail(source.getEmail());
+		existingRecord.setBExpireset(source.getBExpireset());
+		existingRecord.setDateExpiredate(source.getDateExpiredate());
+		existingRecord.setBLocallockset(source.getBLocallockset());
+		existingRecord.setBRemotelockset(source.getBRemotelockset());
+		existingRecord.setForcePasswordReset(source.isForcePasswordReset());
 	}
 
 	public void createAndSaveProviderImdHealthUuid(ProviderData providerData)

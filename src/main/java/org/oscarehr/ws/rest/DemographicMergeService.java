@@ -23,8 +23,14 @@
  */
 package org.oscarehr.ws.rest;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.oscarehr.demographic.model.DemographicMerged;
+import org.oscarehr.managers.DemographicManager;
+import org.oscarehr.security.model.Permission;
+import org.oscarehr.ws.rest.conversion.DemographicMergedConverter;
+import org.oscarehr.ws.rest.to.OscarSearchResponse;
+import org.oscarehr.ws.rest.to.model.DemographicMergedTo1;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -32,23 +38,16 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-
-import org.oscarehr.demographic.model.DemographicMerged;
-import org.oscarehr.managers.DemographicManager;
-import org.oscarehr.ws.rest.conversion.DemographicMergedConverter;
-import org.oscarehr.ws.rest.to.OscarSearchResponse;
-import org.oscarehr.ws.rest.to.model.DemographicMergedTo1;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Defines a service contract for main operations on demographic. 
  */
 @Path("/demographics/merge")
 @Component("demographicMergeService")
-public class DemographicMergeService extends AbstractServiceImpl {
-
-
+public class DemographicMergeService extends AbstractServiceImpl
+{
 	@Autowired
 	private DemographicManager demographicManager;
 	
@@ -60,12 +59,16 @@ public class DemographicMergeService extends AbstractServiceImpl {
 	 */
 	@GET
 	@Path("/{parentId}")
-	public OscarSearchResponse<DemographicMergedTo1> getMergedDemographicIds(@PathParam("parentId") Integer parentId) {
+	public OscarSearchResponse<DemographicMergedTo1> getMergedDemographicIds(@PathParam("parentId") Integer parentId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
+
 		DemographicMergedConverter converter = new DemographicMergedConverter();
-		List<DemographicMerged> children = demographicManager.getMergedDemographics(getLoggedInInfo(),parentId);
+		List<DemographicMerged> children = demographicManager.getMergedDemographics(getLoggedInInfo(), parentId);
 		OscarSearchResponse<DemographicMergedTo1> response = new OscarSearchResponse<DemographicMergedTo1>();
-		for (DemographicMerged dm : children) {
-			response.getContent().add(converter.getAsTransferObject(getLoggedInInfo(),dm));
+		for(DemographicMerged dm : children)
+		{
+			response.getContent().add(converter.getAsTransferObject(getLoggedInInfo(), dm));
 		}
 		return response;
 	}
@@ -81,10 +84,13 @@ public class DemographicMergeService extends AbstractServiceImpl {
 	 */
 	@PUT
 	@Path("/")
-	public void mergeDemographic(@QueryParam("parentId") Integer parentId, @QueryParam("childId") Integer childId) {
+	public void mergeDemographic(@QueryParam("parentId") Integer parentId, @QueryParam("childId") Integer childId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_UPDATE);
+
 		List<Integer> children = new ArrayList<Integer>();
 		children.add(childId);
-		demographicManager.mergeDemographics(getLoggedInInfo(),parentId, children);
+		demographicManager.mergeDemographics(getLoggedInInfo(), parentId, children);
 	}
 
 	/**
@@ -98,10 +104,13 @@ public class DemographicMergeService extends AbstractServiceImpl {
 	 */
 	@DELETE
 	@Path("/")
-	public void unmergeDemographic(@QueryParam("parentId") Integer parentId, @QueryParam("childsId") Integer childId) {
+	public void unmergeDemographic(@QueryParam("parentId") Integer parentId, @QueryParam("childsId") Integer childId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_UPDATE);
+
 		List<Integer> children = new ArrayList<Integer>();
 		children.add(childId);
-		demographicManager.unmergeDemographics(getLoggedInInfo(),parentId, children);
+		demographicManager.unmergeDemographics(getLoggedInInfo(), parentId, children);
 	}
 
 }

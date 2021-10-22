@@ -17,6 +17,7 @@ export default class MessageToMessageDtoConverter extends AbstractConverter<Mess
 			conversationId: from.conversationId,
 			subject: from.subject,
 			message: from.message,
+			// @ts-ignore
 			createdAtDateTime: from.createdAtDateTime.toDate(),
 			metaData: JSON.stringify(from.metaData),
 			isRead: from.isRead,

@@ -23,21 +23,18 @@
  */
 package org.oscarehr.demographic.dao;
 
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import javax.persistence.Query;
-
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.common.dao.SecObjPrivilegeDao;
-import org.oscarehr.common.model.SecObjPrivilege;
-import org.oscarehr.common.model.SecObjPrivilegePrimaryKey;
 import org.oscarehr.demographic.model.DemographicMerged;
+import org.oscarehr.security.dao.SecObjPrivilegeDao;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.Query;
+import java.util.Date;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Repository
 @Transactional
@@ -146,18 +143,6 @@ public class DemographicMergedDao extends AbstractDao<DemographicMerged>
 		demographicMerged.setLastUpdateUser(providerNo);
 		demographicMerged.setLastUpdateDate(new Date());
 		persist(demographicMerged);
-
-		// Relic from the old merge method, unsure if this is needed at all
-		SecObjPrivilegePrimaryKey mergeKey = new SecObjPrivilegePrimaryKey("_all","_eChart$" + demographicNo);
-		if(secObjPrivilegeDao.find(mergeKey) == null)
-		{
-			SecObjPrivilege secObjPrivilege = new SecObjPrivilege();
-			secObjPrivilege.setId(mergeKey);
-			secObjPrivilege.setPrivilege("|or|");
-			secObjPrivilege.setPriority(0);
-			secObjPrivilege.setProviderNo("0");
-			secObjPrivilegeDao.persist(secObjPrivilege);
-		}
 
 		return true;
 	}

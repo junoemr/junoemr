@@ -5,38 +5,11 @@
 	$common-border-radius: 8px;
 
 	.note-list-header {
-		margin: 4px 0 8px 0;
-		a {
-			&:hover {
-				text-decoration: none;
-			}
-			&.focus {
-				outline: none;
-			}
-		}
-
-		.expand-filters-bar {
-			background-color: $color-neutral-lighter;
-			border: 1px solid $color-neutral-light;
-			color: $color-primary-base;
-			height: 34px;
-			padding: 0 8px;
-			.icon {
-				font-size: 16px;
-			}
-		}
-		.note-list-filters {
-			background-color: $color-neutral-white;
-			border: 1px solid $color-neutral-light;
-			border-top: none;
-			border-radius: 0 0 $common-border-radius $common-border-radius;
-			padding: 8px 8px 0 8px;
-
-			.btn {
-				height: $form-input-height; // match the input height
-			}
+		.btn {
+			height: $form-input-height; // match the input height
 		}
 	}
+
 
 	.note-list-body {
 

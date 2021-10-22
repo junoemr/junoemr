@@ -24,11 +24,15 @@ package org.oscarehr.ws.rest.transfer.providerManagement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
 import org.oscarehr.common.model.Security;
+import oscar.util.ConversionUtils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SecurityRecordTo1
 {
@@ -38,6 +42,11 @@ public class SecurityRecordTo1
 	private String password;
 	private String providerNo;
 	private String pin;
+	private boolean pinLockLocal;
+	private boolean pinLockRemote;
+	private boolean forcePasswordReset;
+	private boolean expirySet;
+	private LocalDate expiryDate;
 
 	public static List<SecurityRecordTo1> fromList(List<Security> securityList)
 	{
@@ -56,6 +65,11 @@ public class SecurityRecordTo1
 		this.email 			= security.getEmail();
 		this.providerNo = security.getProviderNo();
 		// password and pin intentionally omitted
+		this.pinLockLocal = (security.getBLocallockset() == 1);
+		this.pinLockRemote = (security.getBRemotelockset() == 1);
+		this.forcePasswordReset = security.isForcePasswordReset();
+		this.expirySet = security.isExpireSet();
+		this.expiryDate = ConversionUtils.toNullableLocalDate(security.getDateExpiredate());
 	}
 
 	public SecurityRecordTo1(){};
@@ -74,66 +88,11 @@ public class SecurityRecordTo1
 		security.setPassword(this.getPassword());
 		security.setProviderNo(this.getProviderNo());
 		security.setPin(this.getPin());
+		security.setBLocallockset(this.pinLockLocal ? 1 : 0);
+		security.setBRemotelockset(this.pinLockRemote ? 1 : 0);
+		security.setForcePasswordReset(this.forcePasswordReset);
+		security.setBExpireset(this.expirySet ? 1 : 0);
+		security.setDateExpiredate(ConversionUtils.toNullableLegacyDate(this.expiryDate));
 		return security;
-	}
-
-	public Integer getSecurityNo()
-	{
-		return securityNo;
-	}
-
-	public void setSecurityNo(Integer securityNo)
-	{
-		this.securityNo = securityNo;
-	}
-
-	public String getUserName()
-	{
-		return userName;
-	}
-
-	public void setUserName(String userName)
-	{
-		this.userName = userName;
-	}
-
-	public String getEmail()
-	{
-		return email;
-	}
-
-	public void setEmail(String email)
-	{
-		this.email = email;
-	}
-
-	public String getPassword()
-	{
-		return password;
-	}
-
-	public void setPassword(String password)
-	{
-		this.password = password;
-	}
-
-	public String getProviderNo()
-	{
-		return providerNo;
-	}
-
-	public void setProviderNo(String providerNo)
-	{
-		this.providerNo = providerNo;
-	}
-
-	public String getPin()
-	{
-		return pin;
-	}
-
-	public void setPin(String pin)
-	{
-		this.pin = pin;
 	}
 }

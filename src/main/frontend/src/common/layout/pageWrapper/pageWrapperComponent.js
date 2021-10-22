@@ -25,7 +25,6 @@ angular.module("Common.Layout").component('pageWrapper', {
 	templateUrl: 'src/common/layout/pageWrapper/pageWrapper.jsp',
 	bindings: {
 		showHeader: "<?",
-		dontSetHeight: "<?", // page wrapper will not set page height. Page will naturally grow.
 	},
 	transclude: {
 		"header": "?pageHeader",
@@ -41,15 +40,6 @@ angular.module("Common.Layout").component('pageWrapper', {
 			if  (ctrl.showHeader === null || ctrl.showHeader === undefined)
 			{
 				ctrl.showHeader = true;
-			}
-			ctrl.dontSetHeight = ctrl.dontSetHeight || false;
-		}
-
-		ctrl.componentClasses = () =>
-		{
-			return {
-				'no-header': !ctrl.showHeader,
-				'set-height': !ctrl.dontSetHeight,
 			}
 		}
 	}],

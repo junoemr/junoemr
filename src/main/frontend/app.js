@@ -28,6 +28,8 @@ require('./scss/juno.scss');
 require('font-awesome/css/font-awesome.min.css');
 require('angular-drag-and-drop-lists');
 require('file-saver');
+require('chart.js');
+require('angular-chart.js');
 
 import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
 import {EDIT_PROVIDER_MODE} from "./src/admin/section/editProviderPage/editProviderAdminConstants";
@@ -43,25 +45,18 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'ngTable',
 	'ngStorage',
 	'Common',
-	'Common.Services',
-	'Common.Filters',
-	'Common.Directives',
-	'Common.Components',
-	'Common.Util',
+	'DecisionSupport',
+	'CareTracker',
 	'Layout',
 	'Messaging',
 	'Tickler',
 	'Record',
-	'Record.Summary',
-	'Record.Tracker',
-	'Record.Details',
-	'Record.PHR',
-	'Record.Forms',
 	'Schedule',
 	'Settings',
 	'Report',
 	'Patient',
 	'Inbox',
+	'Interceptor',
 	'Help',
 	'Document',
 	'Dashboard',
@@ -69,7 +64,13 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Admin',
 ]);
 
-oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider, $httpProvider)
+oscarApp.config([
+	'$stateProvider',
+	'$urlRouterProvider',
+	'$httpProvider',
+	function($stateProvider,
+	         $urlRouterProvider,
+	         $httpProvider)
 {
 	//
 	// For any unmatched url, redirect to /state1
@@ -218,6 +219,11 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			url: '/manageUsers',
 			component: 'manageUsersAdmin',
 		})
+		.state('admin.manageRoles',
+			{
+				url: '/manageRoles',
+				component: 'securityRoleConfig',
+			})
 		.state('admin.manageAppointmentQueues',
 			{
 				url: '/manageAppointmentQueues',
@@ -262,6 +268,16 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 		{
 			url: '/billing',
 			component: 'systemPropertiesBilling',
+		})
+		.state('admin.configureHealthTracker',
+		{
+			url: '/configureHealthTracker',
+			component: 'careTrackerManager',
+		})
+		.state('admin.editCareTracker',
+		{
+			url: '/configureHealthTracker/careTracker/:careTrackerId',
+			component: 'careTrackerEdit',
 		})
 		.state('ticklers',
 		{
@@ -364,147 +380,181 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				{
 					return providerService.getMe();
 				}],
-				billingServiceTypes: ['billingService', function(billingService)
-				{
-					return billingService.getUniqueServiceTypes();
-				}],
-				providerList: ['providerService', function(providerService)
-				{
-					return providerService.searchProviders(
-					{
-						'active': true
-					});
-				}],
 				loadedSettings: ['providerService', function(providerService)
 				{
 					return providerService.getSettings();
 				}],
-				encounterForms: ['formService', function(formService)
-				{
-					return formService.getAllEncounterForms();
-				}],
-				eforms: ['formService', function(formService)
-				{
-					return formService.getAllEForms();
-				}],
-				teams: ['providerService', function(providerService)
-				{
-					return providerService.getActiveTeams();
-				}],
-				groupNames: ['formService', function(formService)
-				{
-					return formService.getGroupNames();
-				}],
-				loadedApps: ['appService', function(appService)
-				{
-					return appService.getApps();
-				}]
 			}
 		})
 		.state('settings.persona',
 			{
 				url: '/persona',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "personaSettings",
+				params: {
+					pref: null,
+				},
 				data: {
-					tab: 'persona'
-				}
+					tab: 'persona',
+				},
 			})
 		.state('settings.general',
 			{
 				url: '/general',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "generalSettings",
 				data: {
-					tab: 'general'
-				}
+					tab: 'general',
+				},
+				params: {
+					pref: null,
+				},
+				resolve: {
+					billingServiceTypes: ['billingService', function(billingService)
+					{
+						return billingService.getUniqueServiceTypes();
+					}],
+					providerList: ['providerService', function(providerService)
+					{
+						return providerService.searchProviders(
+							{
+								'active': true
+							});
+					}],
+				},
 			})
 		.state('settings.schedule',
 			{
 				url: '/schedule',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "scheduleSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'schedule'
-				}
+				},
+				resolve: {
+					encounterForms: ['formService', function(formService)
+					{
+						return formService.getAllEncounterForms();
+					}],
+					eforms: ['formService', function(formService)
+					{
+						return formService.getAllEForms();
+					}],
+				},
 			})
 		.state('settings.billing',
 			{
 				url: '/billing',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: 'billingSettings',
+				params: {
+					pref: null,
+				},
 				data: {
-					tab: 'billing'
-				}
+					tab: 'billing',
+				},
+				resolve: {
+					billingServiceTypes: ['billingService', function(billingService)
+					{
+						return billingService.getUniqueServiceTypes();
+					}],
+				},
 			})
 		.state('settings.rx',
 			{
 				url: '/rx',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "rxSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'rx'
-				}
+				},
 			})
 		.state('settings.masterdemo',
 			{
 				url: '/masterdemo',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "masterDemographicSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'masterdemo'
-				}
+				},
 			})
 		.state('settings.consults',
 			{
 				url: '/consults',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "consultSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'consults'
-				}
+				},
+				resolve: {
+					teams: ['providerService', function(providerService)
+					{
+						return providerService.getActiveTeams();
+					}],
+				},
 			})
 		.state('settings.documents',
 			{
 				url: '/documents',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "documentSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'documents'
-				}
+				},
 			})
 		.state('settings.summary',
 			{
 				url: '/summary',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "summarySettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'summary'
-				}
+				},
 			})
 		.state('settings.eforms',
 			{
 				url: '/eforms',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "eformSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'eforms'
-				}
+				},
+				resolve: {
+					groupNames: ['formService', function(formService)
+					{
+						return formService.getGroupNames();
+					}],
+				},
 			})
 		.state('settings.inbox',
 			{
 				url: '/inbox',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "inboxSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'inbox'
-				}
+				},
 			})
 		.state('settings.programs',
 			{
 				url: '/programs',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "programSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'programs'
 				}
@@ -512,11 +562,35 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 		.state('settings.integration',
 			{
 				url: '/integration',
-				templateUrl: 'src/settings/settings.jsp',
-				controller: 'Settings.SettingsController as settingsCtrl',
+				component: "integrationSettings",
+				params: {
+					pref: null,
+				},
 				data: {
 					tab: 'integration'
-				}
+				},
+			})
+		.state('settings.tracker',
+			{
+				url: '/healthTracker',
+				component: 'careTrackerManager',
+				params: {
+					pref: null,
+				},
+				data: {
+					tab: 'tracker'
+				},
+				resolve: {
+					user: ['providerService', function(providerService)
+					{
+						return providerService.getMe();
+					}]
+				},
+			})
+		.state('settings.editCareTracker',
+			{
+				url: '/healthTracker/careTracker/:careTrackerId',
+				component: 'careTrackerEdit',
 			})
 		.state('support',
 		{
@@ -537,27 +611,85 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			controller: 'Record.RecordController as recordCtrl',
 			resolve:
 			{
-				demo: ['$stateParams', 'demographicService', function($stateParams, demographicService)
-				{
-					return demographicService.getDemographic($stateParams.demographicNo);
-				}],
 				user: ['providerService', function(providerService)
 				{
 					return providerService.getMe();
 				}],
-			}
+			},
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.details',
 		{
 			url: '/details',
 			templateUrl: 'src/record/details/details.jsp',
-			controller: 'Record.Details.DetailsController as detailsCtrl'
+			controller: 'Record.Details.DetailsController as detailsCtrl',
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.summary',
 		{
 			url: '/summary?appointmentNo&encType',
 			templateUrl: 'src/record/summary/summary.jsp',
-			controller: 'Record.Summary.SummaryController as summaryCtrl'
+			controller: 'Record.Summary.SummaryController as summaryCtrl',
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
+		})
+		.state('record.summary.tracker',
+		{
+			url: '/tracker',
+			component: 'healthTracker',
+			resolve:
+			{
+				user: ['providerService', function (providerService)
+				{
+					return providerService.getMe();
+				}],
+				embeddedView: [function ()
+				{
+					return true;
+				}],
+			},
+			meta:
+				{
+					auth: {
+						checkDemographicAccess: true,
+					},
+				},
+		})
+		.state('record.summary.tracker.measurements',
+			{
+				url: '/measurements',
+				component: 'measurementPage',
+				meta:
+					{
+						auth: {
+							checkDemographicAccess: true,
+						},
+					},
+			})
+		.state('record.summary.tracker.careTracker',
+		{
+			url: '/careTracker/:careTrackerId',
+			component: 'careTracker',
+			meta:
+				{
+					auth: {
+						checkDemographicAccess: true,
+					},
+				},
 		})
 		.state('record.forms',
 		{
@@ -566,7 +698,13 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			controller: 'Record.Forms.FormController as formCtrl',
 			params: {
 				viewState: FORM_CONTROLLER_STATES.COMPLETED
-			}
+			},
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.forms.add',
 			{
@@ -575,7 +713,13 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				controller: 'Record.Forms.FormController as formCtrl',
 				params: {
 					viewState: FORM_CONTROLLER_STATES.ADD
-				}
+				},
+				meta:
+				{
+					auth: {
+						checkDemographicAccess: true,
+					},
+				},
 			})
 		.state('record.forms.completed',
 			{
@@ -584,7 +728,13 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				controller: 'Record.Forms.FormController as formCtrl',
 				params: {
 					viewState: FORM_CONTROLLER_STATES.COMPLETED
-				}
+				},
+				meta:
+				{
+					auth: {
+						checkDemographicAccess: true,
+					},
+				},
 			})
 		.state('record.forms.revisions',
 		{
@@ -593,7 +743,13 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 			controller: 'Record.Forms.FormController as formCtrl',
 			params: {
 				viewState: FORM_CONTROLLER_STATES.REVISION
-			}
+			},
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.forms.deleted',
 			{
@@ -602,19 +758,37 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				controller: 'Record.Forms.FormController as formCtrl',
 				params: {
 					viewState: FORM_CONTROLLER_STATES.DELETED
-				}
+				},
+				meta:
+				{
+					auth: {
+						checkDemographicAccess: true,
+					},
+				},
 			})
 		.state('record.consultRequests',
 		{
 			url: '/consults',
 			templateUrl: 'src/consults/consultRequestList.jsp',
-			controller: 'Consults.ConsultRequestListController as consultRequestListCtrl'
+			controller: 'Consults.ConsultRequestListController as consultRequestListCtrl',
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.consultResponses',
 		{
 			url: '/consultResponses',
 			templateUrl: 'src/consults/consultResponseList.jsp',
-			controller: 'Consults.ConsultResponseListController as consultResponseListCtrl'
+			controller: 'Consults.ConsultResponseListController as consultResponseListCtrl',
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.consultRequest',
 		{
@@ -634,7 +808,13 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				{
 					return providerService.getMe();
 				}]
-			}
+			},
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.consultResponse',
 		{
@@ -651,7 +831,13 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				{
 					return providerService.getMe();
 				}]
-			}
+			},
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state('record.tickler',
 		{
@@ -667,23 +853,92 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 						active: true
 					});
 				}]
-			}
-		}).state('record.tracker',
+			},
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
+		})
+		.state('record.tracker',
 		{
 			url: '/tracker',
-			templateUrl: 'src/record/tracker/tracker.jsp',
-			controller: 'Record.Tracker.TrackerController as trackerCtrl'
+			component: 'healthTracker',
+			resolve:
+			{
+				user: ['providerService', function (providerService)
+				{
+					return providerService.getMe();
+				}],
+			},
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
+		.state('record.tracker.measurements',
+			{
+				url: '/measurements',
+				component: 'measurementPage',
+				meta:
+					{
+						auth: {
+							checkDemographicAccess: true,
+						},
+					},
+			})
+		.state('record.tracker.careTracker',
+		{
+			url: '/careTracker/:careTrackerId',
+			component: 'careTracker',
+			meta:
+				{
+					auth: {
+						checkDemographicAccess: true,
+					},
+				},
+		})
+		.state('record.configureHealthTracker',
+		{
+			url: '/configureHealthTracker',
+			component: 'careTrackerManager',
+			resolve: {
+				user: ['providerService', function(providerService)
+				{
+					return providerService.getMe();
+				}]
+			},
+		})
+		.state('record.editCareTracker',
+			{
+				url: '/configureHealthTracker/careTracker/:careTrackerId',
+				component: 'careTrackerEdit',
+			})
         .state('record.patientEducation',
         {
             url: '/patientEducation',
-            component: 'imdHealthLanding'
+            component: 'imdHealthLanding',
+	        meta:
+	        {
+		        auth: {
+			        checkDemographicAccess: true,
+		        },
+	        },
         })
 		.state('record.phr',
 		{
 			url: '/phr',
 			templateUrl: 'src/record/phr/phr.jsp',
-			controller: 'Record.PHR.PHRController as phrCtrl'
+			controller: 'Record.PHR.PHRController as phrCtrl',
+			meta:
+			{
+				auth: {
+					checkDemographicAccess: true,
+				},
+			},
 		})
 		.state("record.messaging",
 		{
@@ -758,21 +1013,32 @@ oscarApp.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', functi
 				templateUrl: 'src/admin/section/fax/faxSendReceive.jsp',
 				controller: 'Admin.Section.Fax.FaxSendReceiveController as faxSendReceiveController'
 			});
-
-	// redirect to login page on 401 error.
-	$httpProvider.interceptors.push(['$q', function($q) {
-		return {
-			'responseError': function(rejection) {
-				if (rejection.status === 401 && rejection.data === "<error>Not authorized</error>")
-				{ // reload will cause server to redirect
-					location.reload();
-				}
-				return $q.reject(rejection);
-			}
-		};
-	}]);
+	$httpProvider.interceptors.push('errorInterceptor');
 }]);
 
+oscarApp.run([
+	'$rootScope',
+	'$location',
+	'$state',
+	'$uibModal',
+	'securityApiService',
+	function ($rootScope, $location, $state, $uibModal, securityApiService)
+	{
+		$rootScope.$on('$stateChangeStart', async function (event, toState, toParams, fromState, fromParams)
+		{
+			// check for specific demographic restrictions before state changes
+			if (toState.meta && toState.meta.auth && toState.meta.auth.checkDemographicAccess)
+			{
+				const canAccessDemographic = await securityApiService.canCurrentUserAccessDemographic(toParams.demographicNo);
+				if (!canAccessDemographic)
+				{
+					event.preventDefault();
+					$state.go(fromState);
+					Juno.Common.Util.errorAlert($uibModal, "Security Restriction", "You do not have required permissions to access this patient record");
+				}
+			}
+		})
+	}]);
 
 // For debugging purposes
 /*

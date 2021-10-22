@@ -28,6 +28,7 @@ import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import {SystemPreferenceApi} from "../../generated/api/SystemPreferenceApi";
 import {JUNO_BACKGROUND_STYLE, JUNO_STYLE} from "../common/components/junoComponentConstants";
+import {SecurityPermissions} from "../common/security/securityConstants";
 
 angular.module('Layout').component('leftAside', {
 	bindings: {
@@ -45,6 +46,7 @@ angular.module('Layout').component('leftAside', {
 		"scheduleService",
 		"providerService",
 		"securityService",
+		"securityRolesService",
 		"systemPreferenceService",
 		function (
 			$rootScope,
@@ -57,6 +59,7 @@ angular.module('Layout').component('leftAside', {
 			scheduleService,
 			providerService,
 			securityService,
+			securityRolesService,
 			systemPreferenceService)
 	{
 
@@ -71,6 +74,8 @@ angular.module('Layout').component('leftAside', {
 			'../ws/rs');
 		ctrl.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
 			'../ws/rs');
+
+		ctrl.SecurityPermissions = SecurityPermissions;
 
 		ctrl.tabEnum = Object.freeze({
 			appointments: 0,
@@ -94,32 +99,42 @@ angular.module('Layout').component('leftAside', {
 
 		ctrl.show_appointment_queue = false;
 
-		ctrl.init = function ()
+		ctrl.init = async function ()
 		{
-			scheduleService.loadEventStatuses().then(
-				function success()
-				{
-					ctrl.eventStatusOptions = scheduleService.eventStatuses;
+			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentRead))
+			{
+				await scheduleService.loadEventStatuses();
+			}
 
-					ctrl.datepickerSelectedDate = Juno.Common.Util.formatMomentDate(moment());
-					ctrl.changeTab(ctrl.activeTab);
-
-					ctrl.loadWatches();
-					ctrl.initListAutoRefresh();
-					ctrl.initialized = true;
-				}
-			);
+			ctrl.eventStatusOptions = scheduleService.eventStatuses;
+			ctrl.datepickerSelectedDate = Juno.Common.Util.formatMomentDate(moment());
 
 			ctrl.provider = securityService.getUser();
 			ctrl.telehealthEnabled = ctrl.loadTelehealthEnabled();
 			ctrl.loadProviderSettings();
 
-
 			// only show the appointment queue if enabled
-			systemPreferenceService.isPreferenceEnabled("aqs_enabled", false).then((enabled) =>
+			ctrl.show_appointment_queue = await systemPreferenceService.isPreferenceEnabled("aqs_enabled", false);
+
+			if(ctrl.componentEnabled())
 			{
-				ctrl.show_appointment_queue = enabled;
-			});
+				if (ctrl.isAppointmentPatientViewEnabled())
+				{
+					ctrl.changeTab(ctrl.tabEnum.appointments);
+				}
+				else if (ctrl.isAppointmentQueueViewEnabled())
+				{
+					ctrl.changeTab(ctrl.tabEnum.appointmentQueue);
+				}
+				else if (ctrl.isRecentPatientViewEnabled())
+				{
+					ctrl.changeTab(ctrl.tabEnum.recent);
+				}
+
+				ctrl.loadWatches();
+				ctrl.initListAutoRefresh();
+			}
+			ctrl.initialized = true;
 		};
 
 		ctrl.loadProviderSettings = function ()
@@ -244,6 +259,32 @@ angular.module('Layout').component('leftAside', {
 		ctrl.isAppointmentQueueView = function ()
 		{
 			return (ctrl.activeTab === ctrl.tabEnum.appointmentQueue);
+		}
+
+		ctrl.isRecentPatientViewEnabled = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(
+				SecurityPermissions.DemographicRead, SecurityPermissions.EchartRead);
+		}
+		ctrl.isAppointmentPatientViewEnabled = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(
+				SecurityPermissions.AppointmentRead, SecurityPermissions.EchartRead);
+		}
+		ctrl.isAppointmentQueueViewEnabled = () =>
+		{
+			return ctrl.show_appointment_queue && securityRolesService.hasSecurityPrivileges(
+				SecurityPermissions.AppointmentRead, SecurityPermissions.AqsQueuedAppointmentsRead);
+		}
+
+		ctrl.componentEnabled = () =>
+		{
+			return ctrl.isRecentPatientViewEnabled() || ctrl.isAppointmentPatientViewEnabled() || ctrl.isAppointmentQueueViewEnabled();
+		}
+
+		ctrl.isAppointmentStatusSelectEnabled = () =>
+		{
+			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentUpdate);
 		}
 
 		ctrl.refreshRecentPatientList = function ()

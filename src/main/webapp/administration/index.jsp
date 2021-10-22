@@ -354,15 +354,6 @@ if(showMenu==null && loadPage==null){
         <h5><bean:message key="admin.admin.btnInsertTemplate" /></h5></a>
       </div>
 	</security:oscarSec>
-
-	<!--
-	<security:oscarSec roleName="<%=roleName$%>" objectName="_admin,_admin.userAdmin" rights="r" reverse="<%=false%>">      
-      <div class="well quick-links">
-        <a href='javascript:void(0);' class="xlink" rel="${ctx}/admin/providerPrivilege.jsp"><i class="icon-wrench icon-4x"></i>
-        <h5><bean:message key="admin.admin.assignRightsObject"/></h5></a>
-      </div>
-	</security:oscarSec>
-	-->
  </div>     
               
 <%}%>             

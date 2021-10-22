@@ -27,7 +27,6 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.seleniumUtil.PageUtil;
 import java.io.IOException;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +36,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -58,22 +56,19 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 
 	public static String templateTitleGeneral = "P:General";
 
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"admission", "log", "program_provider",
+			"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
+			"scheduledate", "scheduleholiday", "scheduletemplate", "scheduletemplatecode"
+		};
+	}
+
 	@Before
 	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
-		SchemaUtils.restoreTable("admission", "log", "program_provider",
-				"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
-				"scheduledate", "scheduleholiday", "scheduletemplate", "scheduletemplatecode");
-		loadSpringBeans();
-		databaseUtil.createTestProvider();
-	}
-
-	@After
-	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
-	{
-		SchemaUtils.restoreTable("admission", "log", "program_provider",
-				"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
-				"scheduledate", "scheduleholiday", "scheduletemplate", "scheduletemplatecode");
 		loadSpringBeans();
 		databaseUtil.createTestProvider();
 	}

@@ -15,6 +15,7 @@ export default class AttachmentToAttachmentDtoConverter extends AbstractConverte
 			name: from.name,
 			mimeType: from.type,
 			base64Data: includeAttachmentData ? await from.getBase64Data() : null,
+			// @ts-ignore
 			createdAtDateTime: from.createdAtDateTime.toDate(),
 		};
 	}

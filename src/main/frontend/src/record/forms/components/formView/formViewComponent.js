@@ -20,7 +20,8 @@
 * Victoria, British Columbia
 * Canada
 */
-import {FORM_CONTROLLER_STATES, FORM_CONTROLLER_SORT_MODES, FORM_CONTROLLER_FORM_TYPES} from "../../formsConstants";
+import {FORM_CONTROLLER_FORM_TYPES, FORM_CONTROLLER_SORT_MODES, FORM_CONTROLLER_STATES} from "../../formsConstants";
+import {SecurityPermissions} from "../../../../common/security/securityConstants";
 
 angular.module('Record.Forms').component('formViewComponent', {
     templateUrl: 'src/record/forms/components/formView/formView.jsp',
@@ -33,44 +34,74 @@ angular.module('Record.Forms').component('formViewComponent', {
 
         filterForms: '&',
         reloadForms: '&'
-
     },
-    controller:[ 'formService', '$scope', '$stateParams', 'NgTableParams', function (formService, $scope, $stateParams, NgTableParams)
+    controller:[
+        'formService',
+        '$scope',
+        '$stateParams',
+        'NgTableParams',
+        'securityRolesService',
+        function (
+            formService,
+            $scope,
+            $stateParams,
+            NgTableParams,
+            securityRolesService)
     {
         let ctrl = this;
 
         $scope.FORM_CONTROLLER_FORM_TYPES = FORM_CONTROLLER_FORM_TYPES;
         ctrl.sortMode = FORM_CONTROLLER_SORT_MODES.FORM_NAME;
+        ctrl.SecurityPermissions = SecurityPermissions;
+
+        ctrl.canOpenForm = (form) =>
+        {
+            return (form.id || !form.id && securityRolesService.hasSecurityPrivileges(SecurityPermissions.FormCreate))
+        }
+        ctrl.canOpenEForm = (eform) =>
+        {
+            return (eform.id || !eform.id && securityRolesService.hasSecurityPrivileges(SecurityPermissions.EformCreate))
+        }
 
         ctrl.openEForm = function (form)
         {
-            if (ctrl.instancedForms)
+            if(ctrl.canOpenEForm(form))
             {
-                formService.openEFormInstancePopup($stateParams.demographicNo, form.id).then(function (val) {
-                    ctrl.reloadForms({});
-                });
-            }
-            else
-            {
-                formService.openEFormPopup($stateParams.demographicNo, form.formId).then(function (val) {
-                    ctrl.reloadForms({});
-                });
+                if (ctrl.instancedForms)
+                {
+                    formService.openEFormInstancePopup($stateParams.demographicNo, form.id).then(function (val)
+                    {
+                        ctrl.reloadForms({});
+                    });
+                }
+                else
+                {
+                    formService.openEFormPopup($stateParams.demographicNo, form.formId).then(function (val)
+                    {
+                        ctrl.reloadForms({});
+                    });
+                }
             }
         };
 
         ctrl.openForm = function (form)
         {
-            if (ctrl.instancedForms)
+            if(ctrl.canOpenForm(form))
             {
-                formService.openFormInstancePopup(form.name, $stateParams.demographicNo, $stateParams.appointmentNo, form.id).then(function (val) {
-                    ctrl.reloadForms({});
-                });
-            }
-            else
-            {
-                formService.openFormPopup(ctrl.providerNo, $stateParams.demographicNo, $stateParams.appointmentNo, form.subject).then(function (val) {
-                    ctrl.reloadForms({});
-                });
+                if (ctrl.instancedForms)
+                {
+                    formService.openFormInstancePopup(form.name, $stateParams.demographicNo, $stateParams.appointmentNo, form.id).then(function (val)
+                    {
+                        ctrl.reloadForms({});
+                    });
+                }
+                else
+                {
+                    formService.openFormPopup(ctrl.providerNo, $stateParams.demographicNo, $stateParams.appointmentNo, form.subject).then(function (val)
+                    {
+                        ctrl.reloadForms({});
+                    });
+                }
             }
         };
 
@@ -78,6 +109,19 @@ angular.module('Record.Forms').component('formViewComponent', {
         {
             return ctrl.filterForms({form:form, index:index, array:array});
         };
+
+        ctrl.canDeleteForm = (type) =>
+        {
+            if(type === FORM_CONTROLLER_FORM_TYPES.EFORM)
+            {
+                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EformDelete);
+            }
+            else if(type === FORM_CONTROLLER_FORM_TYPES.FORM)
+            {
+                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FormDelete);
+            }
+            return false;
+        }
 
         ctrl.deleteForm = function (id, type)
         {
@@ -97,6 +141,19 @@ angular.module('Record.Forms').component('formViewComponent', {
                 )
             }
         };
+
+        ctrl.canRestoreForm = (type) =>
+        {
+            if(type === FORM_CONTROLLER_FORM_TYPES.EFORM)
+            {
+                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.EformUpdate);
+            }
+            else if(type === FORM_CONTROLLER_FORM_TYPES.FORM)
+            {
+                return securityRolesService.hasSecurityPrivileges(SecurityPermissions.FormUpdate);
+            }
+            return false;
+        }
 
         ctrl.restoreForm = function (id, type)
         {
@@ -136,6 +193,7 @@ angular.module('Record.Forms').component('formViewComponent', {
                         ctrl.sortMode = params.orderBy();
                     }
                 });
+            ctrl.disabled = ctrl.disabled || false;
 
             ctrl.cols = [
                 {title: 'Form Name', field: 'name', visible: true, sortable: 'name', displayClass: 'col-md-3'},

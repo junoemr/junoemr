@@ -47,6 +47,13 @@ public class CDSAlertImportMapper extends AbstractCDSNoteImportMapper<AlertsAndS
 		if(reminderNote.getNoteText().isEmpty())
 		{
 			logEvent("Reminder Note [" + reminderNote.getObservationDate() + "] has no text value");
+			/*
+			If NoteText is empty, you're unable to click on it in the old UI and it won't appear in the new UI.
+			Having AlertDescription and Notes from CDS in discrete fields was required by OMD.
+			There is no guarantee either will actually exist, so if the AlertDescription is empty,
+			add a descriptive placeholder, stating the annotation will contain the note.
+			*/
+			reminderNote.setNoteText("Imported Reminder Note with no Description. See annotation for note.");
 		}
 
 		reminderNote.setAnnotation(StringUtils.trimToEmpty(importStructure.getNotes()));

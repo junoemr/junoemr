@@ -34,20 +34,21 @@ import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
 import org.oscarehr.PMmodule.model.ProgramProvider;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.DocumentStorageDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
-import org.oscarehr.common.dao.SecRoleDao;
 import org.oscarehr.common.model.DocumentStorage;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.SecRole;
+import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SessionConstants;
@@ -64,7 +65,6 @@ import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -78,6 +78,9 @@ public class AddEditDocumentAction extends DispatchAction {
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	private DocumentService documentService = SpringUtils.getBean(DocumentService.class);
+	private static final EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
+	private static final DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+	private static final ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
 
 	public ActionForward html5MultiUpload(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		ResourceBundle props = ResourceBundle.getBundle("oscarResources");
@@ -85,7 +88,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		AddEditDocumentForm fm = (AddEditDocumentForm) form;
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, Permission.DOCUMENT_CREATE);
 
 		FormFile docFile = fm.getFiledata();
 		String fileName = docFile.getFileName();
@@ -146,7 +149,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		AddEditDocumentForm fm = (AddEditDocumentForm) form;
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, Permission.DOCUMENT_CREATE);
 
 		FormFile docFile = fm.getDocFile();
 		String fileName = docFile.getFileName();
@@ -194,8 +197,7 @@ public class AddEditDocumentAction extends DispatchAction {
 		AddEditDocumentForm fm = (AddEditDocumentForm) form;
 
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
-		
+
 		if (fm.getMode().equals("") && fm.getFunction().equals("") && fm.getFunctionId().equals("")) {
 			// file size exceeds the upload limit
 			HashMap<String, String> errors = new HashMap<String, String>();
@@ -206,6 +208,7 @@ public class AddEditDocumentAction extends DispatchAction {
 			return mapping.findForward("failEdit");
 		}
 		else if (fm.getMode().equals("add")) {
+			securityInfoManager.requireAllPrivilege(loggedInProviderNo, Permission.DOCUMENT_CREATE);
 			// if add/edit success then send redirect, if failed send a forward (need the formdata and errors hashtables while trying to avoid POSTDATA messages)
 			if (addDocument(fm, mapping, request) == true) { // if success
 				ActionRedirect redirect = new ActionRedirect(mapping.findForward("successAdd"));
@@ -231,6 +234,7 @@ public class AddEditDocumentAction extends DispatchAction {
 			}
 		}
 		else {
+			securityInfoManager.requireAllPrivilege(loggedInProviderNo, Permission.DOCUMENT_UPDATE);
 			ActionForward forward = editDocument(fm, mapping, request);
 			return forward;
 		}
@@ -313,26 +317,26 @@ public class AddEditDocumentAction extends DispatchAction {
 				}
 
 				Integer documentNo = document.getDocumentNo();
-				LogAction.addLogEntry((String) request.getSession().getAttribute("user"), demoNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT,
+				String userId = (String) request.getSession().getAttribute("user");
+				LogAction.addLogEntry(userId, demoNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT,
 						LogConst.STATUS_SUCCESS, String.valueOf(documentNo), request.getRemoteAddr(), fileName1);
 
 				// add note if document is added under a patient
-				if (module.equals(CtlDocument.MODULE_DEMOGRAPHIC)) {// doc is uploaded under a patient,moduleId become demo no.
+				if (module.equals(CtlDocument.MODULE_DEMOGRAPHIC))
+				{
+					// doc is uploaded under a patient,moduleId become demo no.
+					ProviderData systemProvider = providerDao.find(ProviderData.SYSTEM_PROVIDER_NO);
 	
 					Date now = EDocUtil.getDmsDateTimeAsDate();
 					String docDesc = document.getDocdesc();
 	
 					CaseManagementNote cmn = new CaseManagementNote();
-					cmn.setUpdate_date(now);
+					cmn.setUpdateDate(now);
 					java.sql.Date od1 = MyDateFormat.getSysDate(ConversionUtils.toDateString(document.getObservationdate()));
-					cmn.setObservation_date(od1);
-					cmn.setDemographic_no(String.valueOf(demoNo));
-					HttpSession se = request.getSession();
-					String user_no = (String) se.getAttribute("user");
-					String prog_no = new EctProgram(se).getProgram(user_no);
-					WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(se.getServletContext());
-					CaseManagementManager cmm = (CaseManagementManager) ctx.getBean("caseManagementManager");
-					cmn.setProviderNo("-1");// set the provider no to be -1 so the editor appear as 'System'.
+					cmn.setObservationDate(od1);
+					cmn.setDemographic(demographicDao.find(demoNo));
+					String prog_no = new EctProgram(request.getSession()).getProgram(userId);
+					cmn.setProvider(systemProvider);// set the provider no to be -1 so the editor appear as 'System'.
 	
 					Provider provider = EDocUtil.getProvider(fm.getDocCreator());
 					String provFirstName = "";
@@ -346,34 +350,13 @@ public class AddEditDocumentAction extends DispatchAction {
 	
 					cmn.setNote(strNote);
 					cmn.setSigned(true);
-					cmn.setSigning_provider_no("-1");
-					cmn.setProgram_no(prog_no);
-	
-					SecRoleDao secRoleDao = (SecRoleDao) SpringUtils.getBean("secRoleDao");
-					SecRole doctorRole = secRoleDao.findByName("doctor");
-					cmn.setReporter_caisi_role(doctorRole.getId().toString());
-	
-					cmn.setReporter_program_team("0");
-					cmn.setPassword("NULL");
-					cmn.setLocked(false);
+					cmn.setSigningProvider(systemProvider);
+					cmn.setProgramNo(prog_no);
 					cmn.setHistory(strNote);
-					cmn.setPosition(0);
-	
-					Long note_id = cmm.saveNoteSimpleReturnID(cmn);
-	
-					// Debugging purposes on the live server
-					MiscUtils.getLogger().info("Document Note ID: "+note_id.toString());
-	
-					// Add a noteLink to casemgmt_note_link
-					CaseManagementNoteLink cmnl = new CaseManagementNoteLink();
-					cmnl.setTableName(CaseManagementNoteLink.DOCUMENT);
-					cmnl.setTableId(documentNo.longValue());
-					cmnl.setNoteId(note_id);
-	
+
 					request.setAttribute("document_no", documentNo);
-					MiscUtils.getLogger().info(" document no"+documentNo);
-	
-					EDocUtil.addCaseMgmtNoteLink(cmnl);
+					CaseManagementNote savedNote = encounterNoteService.saveDocumentNote(cmn, document);
+					MiscUtils.getLogger().info("Document Note ID: " + savedNote.getId().toString());
 				}
 			}
 		} 
@@ -392,9 +375,8 @@ public class AddEditDocumentAction extends DispatchAction {
 
 	private ActionForward editDocument(AddEditDocumentForm fm, ActionMapping mapping, HttpServletRequest request)
 	{
-
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(loggedInProviderNo, SecurityInfoManager.WRITE, null, "_edoc");
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, Permission.DOCUMENT_UPDATE);
 
 		HashMap<String, String> errors = new HashMap<>();
 		boolean documentValid = true;

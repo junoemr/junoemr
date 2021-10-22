@@ -96,8 +96,8 @@ public class SecurityDao  extends AbstractDao<Security> {
 	}
 	
     public List<Security> findByLikeUserName(String userName) {
-    	Query query = entityManager.createQuery("select x from Security x where x.userName like ?1");
-    	query.setParameter(1, userName);
+    	Query query = entityManager.createQuery("select x from Security x where x.userName like :userName");
+    	query.setParameter("userName", userName);
     	
     	@SuppressWarnings("unchecked")
         List<Security> secList = query.getResultList();

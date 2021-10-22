@@ -25,6 +25,11 @@
 
 package oscar.oscarPrevention;
 
+import org.apache.log4j.Logger;
+import org.oscarehr.careTrackerDecisionSupport.model.DsInfoCache;
+import org.oscarehr.careTrackerDecisionSupport.model.DsInfoLookup;
+import org.oscarehr.util.MiscUtils;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,17 +39,17 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Vector;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.util.MiscUtils;
 
 /**
  *
  * @author Jay Gallagher
  */
-public class Prevention {
+public class Prevention implements DsInfoCache, DsInfoLookup
+{
    private static Logger log = MiscUtils.getLogger();
 
    String sex;
@@ -56,6 +61,11 @@ public class Prevention {
 
    ArrayList<String> messageList = new ArrayList<String>();
    ArrayList<String> reminder = new ArrayList<String>();
+
+    private final Map<String, List<String>> criticalAlertHash = new HashMap<>();
+    private final Map<String, List<String>> warningHash = new HashMap<>();
+    private final Map<String, List<String>> recommendationHash = new HashMap<>();
+    private final Map<String, Boolean> hiddenPreventions = new HashMap<>();
 
    int ageInMonths = -1;
 
@@ -86,14 +96,68 @@ public class Prevention {
    public java.lang.String getName() { return name; }
    public void setName(java.lang.String name) { this.name = name; }
 
+
+
+    @Override
+    public void addCriticalAlert(String measurement, String warningMessage)
+    {
+        if(criticalAlertHash.containsKey(measurement))
+        {
+            criticalAlertHash.get(measurement).add(warningMessage);
+        }
+        else
+        {
+            List<String> messageList = new ArrayList<>();
+            messageList.add(warningMessage);
+            criticalAlertHash.put(measurement, messageList);
+        }
+    }
+
+    @Override
+    public boolean hasCriticalAlert(String measurement)
+    {
+        return criticalAlertHash.get(measurement) != null;
+    }
+
+    @Override
+    public List<String> getCriticalAlerts(String measurement)
+    {
+        return criticalAlertHash.get(measurement);
+    }
+
    public void addWarning(String warn){
       messageList.add(warn);
    }
 
-   public void addWarning(String prevName, String warn) {
+    @Override
+    public void addWarning(String prevName, String warn)
+    {
         addWarning(warn);
         warnings.put(prevName, warn);
-   }
+
+        if(warningHash.containsKey(prevName))
+        {
+            warningHash.get(prevName).add(warn);
+        }
+        else
+        {
+            List<String> messageList = new ArrayList<>();
+            messageList.add(warn);
+            warningHash.put(prevName, messageList);
+        }
+    }
+
+    @Override
+    public boolean hasWarning(String prevName)
+    {
+        return warningHash.containsKey(prevName);
+    }
+
+    @Override
+    public List<String> getWarnings(String prevName)
+    {
+        return warningHash.get(prevName);
+    }
 
    public ArrayList<String> getWarnings(){
       return messageList;
@@ -104,12 +168,54 @@ public class Prevention {
        return warnings;
    }
 
+    @Override
+    public void addRecommendation(String prevName, String recommendationMessage)
+    {
+        if(recommendationHash.containsKey(prevName))
+        {
+            recommendationHash.get(prevName).add(recommendationMessage);
+        }
+        else
+        {
+            List<String> messageList = new ArrayList<>();
+            messageList.add(recommendationMessage);
+            recommendationHash.put(prevName, messageList);
+        }
+        addReminder(recommendationMessage);
+    }
+
+    @Override
+    public boolean hasRecommendation(String measurement)
+    {
+        return recommendationHash.get(measurement) != null;
+    }
+
+    @Override
+    public List<String> getRecommendations(String measurement)
+    {
+        return recommendationHash.get(measurement);
+    }
+
+
    public void addReminder(String warn){
       reminder.add(warn);
    }
    public ArrayList<String> getReminder(){
       return reminder;
    }
+
+    @Override
+    public void addHidden(String measurement, boolean hidden)
+    {
+        hiddenPreventions.put(measurement, hidden);
+    }
+
+    @Override
+    public boolean getHidden(String measurement)
+    {
+        if(hiddenPreventions.get(measurement) == null) return false;
+        return hiddenPreventions.get(measurement);
+    }
 
    public boolean isMale(){
       boolean retval = false;
@@ -152,6 +258,7 @@ public class Prevention {
       return ageInMonths;
    }
 
+   @Override
    public int getAgeInYears(){
 	   if(DOB !=null)
 		   return getNumYears(DOB,Calendar.getInstance().getTime());
@@ -399,4 +506,27 @@ public class Prevention {
       this.DOB = DOB;
    }
 
+    @Override
+    public int getMonthsSinceLastRecordedDate(String typeCode)
+    {
+        return getHowManyMonthsSinceLast(typeCode);
+    }
+
+    @Override
+    public Optional<Double> getLatestValueNumeric(String typeCode)
+    {
+        return Optional.empty();
+    }
+
+    @Override
+    public String getLatestValue(String typeCode)
+    {
+        return null;
+    }
+
+    @Override
+    public String getGender()
+    {
+        return this.sex;
+    }
 }

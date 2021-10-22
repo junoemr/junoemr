@@ -243,7 +243,7 @@
                 <td><html:text property="description" styleId="appt-description" size="40"></html:text></td>
                 </c:if>
                 <c:if test = "${ canDisable eq 0}">
-                <td><html:text property="description" readonly="true" styleId="appt-description" size="40"></html:text></td>
+                <td><html:text property="description" readonly="true" title="System managed status descriptions cannot be changed" styleId="appt-description" size="40"></html:text></td>
                 </c:if>
             </tr>
             <tr>

@@ -23,7 +23,6 @@
 
 package org.oscarehr.casemgmt.web;
 
-import com.quatro.model.security.Secrole;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import net.sf.json.processors.JsDateJsonBeanProcessor;
@@ -35,10 +34,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.oscarehr.PMmodule.dao.ProgramProviderDAO;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.PMmodule.model.Program;
-import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.service.AdmissionManager;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.billing.CA.service.BillingUrlService;
@@ -58,12 +54,10 @@ import org.oscarehr.casemgmt.service.CaseManagementPrint;
 import org.oscarehr.casemgmt.web.CaseManagementViewAction.IssueDisplay;
 import org.oscarehr.casemgmt.web.formbeans.CaseManagementEntryFormBean;
 import org.oscarehr.common.dao.OscarAppointmentDao;
-import org.oscarehr.common.dao.ProviderDefaultProgramDao;
 import org.oscarehr.common.dao.ResidentOscarMsgDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.ProviderDefaultProgram;
 import org.oscarehr.common.model.ResidentOscarMsg;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.eyeform.web.FollowUpAction;
@@ -72,6 +66,8 @@ import org.oscarehr.eyeform.web.TestBookAction;
 import org.oscarehr.managers.TicklerManager;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.security.dao.SecRoleDao;
+import org.oscarehr.security.model.SecRole;
 import org.oscarehr.util.EncounterUtil;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -635,33 +631,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 			note.setSigning_provider_no("");
 		}
 
-		// Determines what program & role to assign the note to
-		ProgramProviderDAO programProviderDao = (ProgramProviderDAO) SpringUtils.getBean("programProviderDAO");
-		ProviderDefaultProgramDao defaultProgramDao = (ProviderDefaultProgramDao) SpringUtils.getBean("providerDefaultProgramDao");
-		boolean programSet = false;
-
-		List<ProviderDefaultProgram> programs = defaultProgramDao.getProgramByProviderNo(providerNo);
-		HashMap<Program, List<Secrole>> rolesForDemo = NotePermissionsAction.getAllProviderAccessibleRolesForDemo(providerNo, demographicNo);
-		for (ProviderDefaultProgram pdp : programs) {
-			for (Program p : rolesForDemo.keySet()) {
-				if (pdp.getProgramId() == p.getId().intValue()) {
-					List<ProgramProvider> programProviderList = programProviderDao.getProgramProviderByProviderProgramId(providerNo, (long) pdp.getProgramId());
-
-					note.setProgram_no("" + pdp.getProgramId());
-					note.setReporter_caisi_role("" + programProviderList.get(0).getRoleId());
-
-					programSet = true;
-				}
-			}
-		}
-
-		if (!programSet && !rolesForDemo.isEmpty()) {
-			Program program = rolesForDemo.keySet().iterator().next();
-			ProgramProvider programProvider = programProviderDao.getProgramProvider(providerNo, (long) program.getId());
-			note.setProgram_no("" + programProvider.getProgramId());
-			note.setReporter_caisi_role("" + programProvider.getRoleId());
-		}
-
+		determineNoteRole(note, providerNo, demographicNo);
 		note.setReporter_program_team("0");
 
 		CaseManagementCPP cpp = this.caseManagementMgr.getCPP(demographicNo);
@@ -1304,23 +1274,6 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 
 		note.setUpdate_date(now);
 
-		// Checks whether the user can set the program via the UI - if so, make sure that they can't screw it up if they do
-		if (OscarProperties.getInstance().getBooleanProperty("note_program_ui_enabled", "true")) {
-			String noteProgramNo = request.getParameter("_note_program_no");
-			String noteRoleId = request.getParameter("_note_role_id");
-
-			if (noteProgramNo != null && noteRoleId != null && noteProgramNo.trim().length() > 0 && noteRoleId.trim().length() > 0) {
-				if (noteProgramNo.equalsIgnoreCase("-2") || noteRoleId.equalsIgnoreCase("-2")) {
-					throw new Exception("Patient is not admitted to any programs user has access to. [roleId=-2, programNo=-2]");
-				} else if (!noteProgramNo.equalsIgnoreCase("-1") && !noteRoleId.equalsIgnoreCase("-1")) {
-					note.setProgram_no(noteProgramNo);
-					note.setReporter_caisi_role(noteRoleId);
-				}
-			} else {
-				throw new Exception("Missing role id or program number. [roleId=" + noteRoleId + ", programNo=" + noteProgramNo + "]");
-			}
-		}
-
 		if (sessionBean.appointmentNo != null && sessionBean.appointmentNo.length() > 0) {
 			note.setAppointmentNo(Integer.parseInt(sessionBean.appointmentNo));
 		}
@@ -1563,7 +1516,7 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 
 		String noteTxt = request.getParameter("noteTxt");
 		noteTxt = org.apache.commons.lang.StringUtils.trimToNull(noteTxt);
-		if (noteTxt == null || noteTxt.equals("")) return null;
+		if (noteTxt == null || noteTxt.equals("") || noteTxt.endsWith("Tel-Progress Note]")) return null;
 
 		logger.debug("Saving Note" + request.getParameter("nId"));
 		logger.debug("Text -- " + noteTxt);
@@ -1575,7 +1528,9 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		String noteId = request.getParameter("nId");
 		boolean newNote;
 		Date now = new Date();
-		if (noteId.substring(0, 1).equals("0")) {
+
+		if (noteId.substring(0, 1).equals("0"))
+		{
 			note = new CaseManagementNote();
 			note.setDemographic_no(demo);
 			history = new String();
@@ -2980,15 +2935,6 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		cmn.setEncounter_type(EncounterUtil.EncounterType.FACE_TO_FACE_WITH_CLIENT.getOldDbValue());
 		cmn.setNote(strNote);
 		cmn.setObservation_date(creationDate);
-		/*
-		String programIdStr = (String) request.getSession().getAttribute(SessionConstants.CURRENT_PROGRAM_ID);
-		if(programIdStr==null)
-			programIdStr = (String) request.getSession().getAttribute("case_program_id");
-		Integer programId = null;
-		if (programIdStr != null) programId = Integer.valueOf(programIdStr);
-		
-		cmn.setProgram_no(String.valueOf(programId));
-		*/
 		cmn.setProviderNo(loggedInProvider.getProviderNo());
 		cmn.setRevision(revision);
 		cmn.setSigned(true);
@@ -3077,36 +3023,18 @@ public class CaseManagementEntryAction extends BaseCaseManagementEntryAction {
 		return null;
 	}
 
+	@Deprecated // to be removed
 	public static boolean determineNoteRole(CaseManagementNote note, String providerNo, String demographicNo) {
-		// Determines what program & role to assign the note to
-		ProgramProviderDAO programProviderDao = (ProgramProviderDAO) SpringUtils.getBean("programProviderDAO");
-		ProviderDefaultProgramDao defaultProgramDao = (ProviderDefaultProgramDao) SpringUtils.getBean("providerDefaultProgramDao");
-		boolean programSet = false;
 
-		if (note.getProgram_no() != null && note.getProgram_no().length() > 0 && !"null".equals(note.getProgram_no())) {
-			ProgramProvider pp = programProviderDao.getProgramProvider(note.getProviderNo(), Long.valueOf(note.getProgram_no()));
-			if (pp != null) {
-				note.setReporter_caisi_role(String.valueOf(pp.getRoleId()));
-				programSet = true;
-			}
-		}
+		ProgramManager programManager = SpringUtils.getBean(ProgramManager.class);
+		SecRoleDao secRoleDao = SpringUtils.getBean(SecRoleDao.class);
 
-		if (!programSet) {
-			List<ProviderDefaultProgram> programs = defaultProgramDao.getProgramByProviderNo(providerNo);
-			HashMap<Program, List<Secrole>> rolesForDemo = NotePermissionsAction.getAllProviderAccessibleRolesForDemo(providerNo, demographicNo);
-			for (ProviderDefaultProgram pdp : programs) {
-				for (Program p : rolesForDemo.keySet()) {
-					if (pdp.getProgramId() == p.getId().intValue()) {
-						List<ProgramProvider> programProviderList = programProviderDao.getProgramProviderByProviderProgramId(providerNo, (long) pdp.getProgramId());
+		String defaultProgramId = String.valueOf(programManager.getDefaultProgramId());
+		SecRole defaultRole = secRoleDao.findSystemDefaultRole();
 
-						note.setProgram_no("" + pdp.getProgramId());
-						note.setReporter_caisi_role("" + programProviderList.get(0).getRoleId());
+		note.setProgram_no(defaultProgramId);
+		note.setReporter_caisi_role(defaultRole.getId().toString());
 
-						programSet = true;
-					}
-				}
-			}
-		}
-		return programSet;
+		return true;
 	}
 }

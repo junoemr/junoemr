@@ -88,6 +88,7 @@
 									ca-model="eventController.selectedEventStatus"
 									ca-options="eventController.eventStatuses"
 									ca-change="eventController.onStatusChange()"
+									ca-disabled="eventController.inReadOnlyMode()"
 							>
 							</juno-appointment-status-select>
 						</div>
@@ -110,7 +111,7 @@
 												juno-model="eventController.patientTypeahead"
 												juno-add-button-title="New Demographic"
 												juno-on-add-fn="newDemographic"
-                                                juno-disabled="eventData.virtual && eventController.editMode"
+                                                juno-disabled="eventController.inReadOnlyMode() || eventData.virtual && eventController.editMode"
                                                 title="{{ eventController.getPatientToolTip() }}"
 										>
 										</juno-patient-search-typeahead>
@@ -119,18 +120,22 @@
 									     ng-if="eventController.showPatientChartLinks()">
 										<div class="btn-group modal-patient-links pull-right">
 											<button type="button" class="btn btn-default"
+											        ng-disabled="!eventController.isEncounterLinkEnabled()"
 											        ng-click="eventController.openEncounterPage()">
 												<span>E</span>
 											</button>
 											<button type="button" class="btn btn-default"
+											        ng-disabled="!eventController.isBillingLinkEnabled()"
 											        ng-click="eventController.openBillingPage()">
 												<span>B</span>
 											</button>
 											<button type="button" class="btn btn-default"
+											        ng-disabled="!eventController.isMasterFileLinkEnabled()"
 											        ng-click="eventController.openMasterRecord()">
 												<span>M</span>
 											</button>
 											<button type="button" class="btn btn-default"
+											        ng-disabled="!eventController.isRxLinkEnabled()"
 											        ng-click="eventController.openRxWindow()">
 												<span>Rx</span>
 											</button>
@@ -165,6 +170,7 @@
 												ca-options="eventController.appointmentTypeList"
 												ca-empty-option="true"
 												ca-text-placeholder="Select an Appointment Type"
+												ca-disabled="eventController.inReadOnlyMode()"
 										>
 										</ca-field-select>
 									</div>
@@ -177,6 +183,7 @@
 												ca-input-size="col-md-6"
 												ca-model="eventData.critical"
 												ca-template="juno"
+												ca-disabled="eventController.inReadOnlyMode()"
 										>
 										</ca-field-boolean>
 										<ca-field-boolean
@@ -187,9 +194,10 @@
 														ca-input-size="col-md-6"
 														ca-model="eventData.virtual"
 														ca-template="juno"
-														ca-disabled="telehealthMode === TELEHEALTH_MODES.NONE ||
-														 						 telehealthMode === TELEHEALTH_MODES.NO_CONNECTION  ||
-														 						 eventController.editMode"
+														ca-disabled="eventController.inReadOnlyMode() ||
+														             eventController.inEditMode() ||
+														             telehealthMode === TELEHEALTH_MODES.NONE ||
+														             telehealthMode === TELEHEALTH_MODES.NO_CONNECTION"
 														title="{{ eventController.getTelehealthToolTip() }}"
 										>
 										</ca-field-boolean>
@@ -216,6 +224,7 @@
 												ca-model="eventData.startDate"
 												ca-error="{{displayMessages.field_errors()['startDate']}}"
 												ca-orientation="auto"
+												ca-disabled="eventController.inReadOnlyMode()"
 										></ca-field-date>
 									</div>
 									<div class="col-md-4 padding-left-0">
@@ -226,7 +235,8 @@
 												ca-error="{{displayMessages.field_errors()['startTime']}}"
 												ca-template="no_button"
 												ca-disable-widget="true"
-												ca-minute-step="parentScope.timeIntervalMinutes()">
+												ca-minute-step="parentScope.timeIntervalMinutes()"
+												ca-disabled="eventController.inReadOnlyMode()">
 										</ca-field-time>
 									</div>
 									<div class="col-md-3 padding-left-0">
@@ -235,7 +245,8 @@
 												ca-name="duration"
 												ca-model="eventData.duration"
 												ca-error="{{displayMessages.field_errors()['duration']}}"
-												ca-rows="1">
+												ca-rows="1"
+												ca-disabled="eventController.inReadOnlyMode()">
 										</ca-field-text>
 									</div>
 								</div>
@@ -249,6 +260,7 @@
 												ca-model="eventData.reasonCode"
 												ca-options="eventController.reasonCodeList"
 												ca-empty-option="false"
+												ca-disabled="eventController.inReadOnlyMode()"
 										>
 										</ca-field-select>
 									</div>
@@ -256,7 +268,7 @@
 										<!-- location/site -->
 										<ca-field-select
 												ca-hide="!eventController.sitesEnabled"
-                                                ca-disabled="eventData.virtual && eventController.editMode"
+                                                ca-disabled="eventController.inReadOnlyMode() || eventData.virtual && eventController.editMode"
 												ca-name="site"
 												ca-title="Site"
 												ca-template="label"
@@ -286,6 +298,7 @@
 										ca-rows="1"
 										ca-error="{{displayMessages.field_errors()['notes']}}"
 										ca-max-characters="255"
+										ca-disabled="eventController.inReadOnlyMode()"
 								>
 								</ca-field-text>
 							</div>
@@ -298,6 +311,7 @@
 										ca-rows="1"
 										ca-error="{{displayMessages.field_errors()['event_reason']}}"
 										ca-max-characters="80"
+										ca-disabled="eventController.inReadOnlyMode()"
 								>
 								</ca-field-text>
 							</div>
@@ -465,7 +479,7 @@
 					ng-show="eventController.hasAppointmentId()"
 					juno-confirm-click="eventController.del()"
 					juno-confirm-message="Are you sure you want to delete this appointment?"
-					ng-disabled="isWorking()">Delete
+					ng-disabled="isWorking() || !eventController.deleteButtonEnabled()">Delete
 			</button>
 		</div>
 		<div class="pull-right">
@@ -473,14 +487,14 @@
 					type="button"
 					class="btn btn-default"
 					ng-click="eventController.saveDoNotBook()"
-					ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Do Not Book
+					ng-disabled="isWorking() || eventController.inReadOnlyMode() || eventController.isDoubleBookPrevented">Do Not Book
 			</button>
 
 			<button
 					type="button"
 					class="btn btn-default"
 					ng-click="eventController.saveAndReceipt()"
-					ng-disabled="isWorking() || eventController.isDoubleBookPrevented || !isPatientSelected()">Receipt
+					ng-disabled="isWorking() || eventController.inReadOnlyMode() || eventController.isDoubleBookPrevented || !isPatientSelected()">Receipt
 			</button>
 
 			<button
@@ -490,7 +504,7 @@
 					tooltip-append-to-body="true"
 					uib-tooltip="{{eventController.keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 					ng-click="eventController.saveAndPrint()"
-					ng-disabled="isWorking() || eventController.isDoubleBookPrevented || !isPatientSelected()">Print
+					ng-disabled="isWorking() || eventController.inReadOnlyMode() || eventController.isDoubleBookPrevented || !isPatientSelected()">Print
 			</button>
 
 			<button
@@ -500,7 +514,7 @@
 							tooltip-placement="top"
 							tooltip-append-to-body="true"
 							ng-click="eventController.save(true);"
-							ng-disabled="isWorking() || eventController.isDoubleBookPrevented"
+							ng-disabled="isWorking() || eventController.inReadOnlyMode() || eventController.isDoubleBookPrevented"
 							title="Create the appointment and send a notification email to the user">
 				Create & Notify
 			</button>
@@ -528,7 +542,7 @@
 					ng-class="{
 						'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
 					    'double-book-prevented':eventController.isDoubleBookPrevented}"
-					ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Create
+					ng-disabled="isWorking() || eventController.inReadOnlyMode() || eventController.isDoubleBookPrevented">Create
 			</button>
 
 			<button
@@ -542,7 +556,7 @@
 					ng-class="{
 						'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
 					    'double-book-prevented':eventController.isDoubleBookPrevented}"
-					ng-disabled="isWorking() || eventController.isDoubleBookPrevented">Modify
+					ng-disabled="isWorking() || eventController.inReadOnlyMode() || eventController.isDoubleBookPrevented">Modify
 			</button>
 
 			<%--<button--%>

@@ -255,7 +255,7 @@
 
 			function reloadNav(sectionName)
 			{
-				junoEncounter.getSectionRemote(sectionName, false, false);
+				junoEncounter.getSectionRemote(sectionName, false, false, getEChartUUID());
 			}
 
 
@@ -625,7 +625,7 @@
 										<c:when test="${ section.remainingNotes > 0 && loop.last }">
 											<a href="#"
 											   class="expandCasemgmtSidebar encounterNoteTitle"
-											   onclick="junoEncounter.getSectionRemote('${sectionName}', true, false); return false;"
+											   onclick="junoEncounter.getSectionRemote('${sectionName}', true, false, getEChartUUID()); return false;"
 											   title="${section.remainingNotes} more items">
 												<img id="img${sectionName}5"
 													 src="${ctx}/oscarEncounter/graphics/expand.gif"/>&nbsp;&nbsp;

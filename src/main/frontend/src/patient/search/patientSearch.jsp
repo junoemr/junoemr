@@ -35,173 +35,175 @@
 		</div>
 	</div>
 
-	<div class="col-lg-12 patient-search-content">
-		<form role="form"
-			  id="search-form"
-			  ng-submit="$ctrl.searchPatients()">
-			<div class="form-group">
-				<div class="row search-filters">
-					<div class="col-sm-3 col-xs-12">
-						<label>Search By</label>
-						<select ng-model="$ctrl.search.type"
-								ng-change="$ctrl.onChangeSearchType($ctrl.search.type)"
-								class="form-control">
-							<option value="{{$ctrl.SEARCH_MODE.Name}}">
-								<bean:message key="patientsearch.type.name" bundle="ui"/>
-							</option>
-							<option value="{{$ctrl.SEARCH_MODE.Phone}}">
-								<bean:message key="patientsearch.type.phone" bundle="ui"/>
-							</option>
-							<option value="{{$ctrl.SEARCH_MODE.DOB}}">
-								<bean:message key="patientsearch.type.dob" bundle="ui"/>
-							</option>
-							<option value="{{$ctrl.SEARCH_MODE.Address}}">
-								<bean:message key="patientsearch.type.address" bundle="ui"/>
-							</option>
-							<option value="{{$ctrl.SEARCH_MODE.Hin}}">
-								<bean:message key="patientsearch.type.hin" bundle="ui"/>
-							</option>
-							<option value="{{$ctrl.SEARCH_MODE.Email}}">
-								<bean:message key="patientsearch.type.email" bundle="ui"/>
-							</option>
-							<option value="{{$ctrl.SEARCH_MODE.ChartNo}}">
-								<bean:message key="patientsearch.type.chartNo" bundle="ui"/>
-							</option>
-							<option value="{{$ctrl.SEARCH_MODE.DemographicNo}}">
-								<bean:message key="patientsearch.type.demographicNo" bundle="ui"/>
-							</option>
-						</select>
-					</div>
+	<juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.DemographicRead">
+		<div class="col-lg-12 patient-search-content">
+			<form role="form"
+				  id="search-form"
+				  ng-submit="$ctrl.searchPatients()">
+				<div class="form-group">
+					<div class="row search-filters">
+						<div class="col-sm-3 col-xs-12">
+							<label>Search By</label>
+							<select ng-model="$ctrl.search.type"
+									ng-change="$ctrl.onChangeSearchType($ctrl.search.type)"
+									class="form-control">
+								<option value="{{$ctrl.SEARCH_MODE.Name}}">
+									<bean:message key="patientsearch.type.name" bundle="ui"/>
+								</option>
+								<option value="{{$ctrl.SEARCH_MODE.Phone}}">
+									<bean:message key="patientsearch.type.phone" bundle="ui"/>
+								</option>
+								<option value="{{$ctrl.SEARCH_MODE.DOB}}">
+									<bean:message key="patientsearch.type.dob" bundle="ui"/>
+								</option>
+								<option value="{{$ctrl.SEARCH_MODE.Address}}">
+									<bean:message key="patientsearch.type.address" bundle="ui"/>
+								</option>
+								<option value="{{$ctrl.SEARCH_MODE.Hin}}">
+									<bean:message key="patientsearch.type.hin" bundle="ui"/>
+								</option>
+								<option value="{{$ctrl.SEARCH_MODE.Email}}">
+									<bean:message key="patientsearch.type.email" bundle="ui"/>
+								</option>
+								<option value="{{$ctrl.SEARCH_MODE.ChartNo}}">
+									<bean:message key="patientsearch.type.chartNo" bundle="ui"/>
+								</option>
+								<option value="{{$ctrl.SEARCH_MODE.DemographicNo}}">
+									<bean:message key="patientsearch.type.demographicNo" bundle="ui"/>
+								</option>
+							</select>
+						</div>
 
-					<div class="col-sm-3 col-xs-12">
-						<label>Search Term</label>
-						<input ng-model="$ctrl.search.term"
-						       ng-ref="$ctrl.searchTermRef"
-							   type="text"
-							   class="form-control"
-							   placeholder="{{$ctrl.searchTermPlaceHolder}}"/>
-					</div>
+						<div class="col-sm-3 col-xs-12">
+							<label>Search Term</label>
+							<input ng-model="$ctrl.search.term"
+							       ng-ref="$ctrl.searchTermRef"
+							       type="text"
+							       class="form-control"
+							       placeholder="{{$ctrl.searchTermPlaceHolder}}"/>
+						</div>
 
-					<div class="col-sm-3 col-xs-12">
-						<label>What to Show</label>
-						<select ng-model="$ctrl.search.status" class="form-control">
-							<option value="{{$ctrl.STATUS_MODE.ALL}}">
-								<bean:message key="patientsearch.showAll" bundle="ui"/>
-							</option>
-							<option value="{{$ctrl.STATUS_MODE.ACTIVE}}">
-								<bean:message key="patientsearch.showActiveOnly" bundle="ui"/>
-							</option>
-							<option value="{{$ctrl.STATUS_MODE.INACTIVE}}">
-								<bean:message key="patientsearch.showInactiveOnly" bundle="ui"/>
-							</option>
-						</select>
-					</div>
+						<div class="col-sm-3 col-xs-12">
+							<label>What to Show</label>
+							<select ng-model="$ctrl.search.status" class="form-control">
+								<option value="{{$ctrl.STATUS_MODE.ALL}}">
+									<bean:message key="patientsearch.showAll" bundle="ui"/>
+								</option>
+								<option value="{{$ctrl.STATUS_MODE.ACTIVE}}">
+									<bean:message key="patientsearch.showActiveOnly" bundle="ui"/>
+								</option>
+								<option value="{{$ctrl.STATUS_MODE.INACTIVE}}">
+									<bean:message key="patientsearch.showInactiveOnly" bundle="ui"/>
+								</option>
+							</select>
+						</div>
 
-					<div class="col-sm-2 col-xs-3">
-						<label>Options</label>
-						<div class="col-xs-12 demo-search-options">
-							<a class="btn dropdown-toggle" data-toggle="dropdown">
-								<span class="glyphicon glyphicon-cog"></span>
-								<span class="caret"></span>
-							</a>
-							<ul class="dropdown-menu">
-								<li>
-									<a ng-click="$ctrl.toggleParam('integrator'); $event.stopPropagation();">
-										<input ng-model="$ctrl.search.integrator"
-											   type="checkbox"
-											   ng-click="$event.stopPropagation();"/>
-										<bean:message key="patientsearch.includeIntegrator" bundle="ui"/>
-									</a>
-								</li>
-								<li>
-									<a ng-click="$ctrl.toggleParam('outofdomain'); $event.stopPropagation();">
-										<input ng-model="$ctrl.search.outofdomain"
-											   type="checkbox"
-											   ng-click="$event.stopPropagation();"/>
-										<bean:message key="patientsearch.outOfDomain" bundle="ui"/>
-									</a>
-								</li>
-							</ul>
+						<div class="col-sm-2 col-xs-3">
+							<label>Options</label>
+							<div class="col-xs-12 demo-search-options">
+								<a class="btn dropdown-toggle" data-toggle="dropdown">
+									<span class="glyphicon glyphicon-cog"></span>
+									<span class="caret"></span>
+								</a>
+								<ul class="dropdown-menu">
+									<li>
+										<a ng-click="$ctrl.toggleParam('integrator'); $event.stopPropagation();">
+											<input ng-model="$ctrl.search.integrator"
+												   type="checkbox"
+												   ng-click="$event.stopPropagation();"/>
+											<bean:message key="patientsearch.includeIntegrator" bundle="ui"/>
+										</a>
+									</li>
+									<li>
+										<a ng-click="$ctrl.toggleParam('outofdomain'); $event.stopPropagation();">
+											<input ng-model="$ctrl.search.outofdomain"
+												   type="checkbox"
+												   ng-click="$event.stopPropagation();"/>
+											<bean:message key="patientsearch.outOfDomain" bundle="ui"/>
+										</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="row search-buttons">
+						<div class="col-xs-12">
+							<button class="btn btn-primary"
+									type="submit">
+								<bean:message key="global.search" bundle="ui"/>
+							</button>
+							<button class="btn btn-default"
+									type="button"
+									ng-click="$ctrl.clearSearchParams()">
+								<bean:message key="global.clear" bundle="ui"/>
+							</button>
 						</div>
 					</div>
 				</div>
-				<div class="row search-buttons">
-					<div class="col-xs-12">
-						<button class="btn btn-primary"
-								type="submit">
-							<bean:message key="global.search" bundle="ui"/>
-						</button>
-						<button class="btn btn-default"
-								type="button"
-								ng-click="$ctrl.clearSearchParams()">
-							<bean:message key="global.clear" bundle="ui"/>
-						</button>
-					</div>
-				</div>
+			</form>
+			<div class="col-xs-6">
+				<button class="btn btn-warning"
+						ng-show="$ctrl.integratorResults != null && $ctrl.integratorResults.total > 0"
+						ng-click="$ctrl.showIntegratorResults()"><span
+						class="glyphicon glyphicon-exclamation-sign"></span>
+					<bean:message key="patientsearch.remoteMatches" bundle="ui"/>
+				</button>
 			</div>
-		</form>
-		<div class="col-xs-6">
-			<button class="btn btn-warning"
-					ng-show="$ctrl.integratorResults != null && $ctrl.integratorResults.total > 0"
-					ng-click="$ctrl.showIntegratorResults()"><span
-					class="glyphicon glyphicon-exclamation-sign"></span>
-				<bean:message key="patientsearch.remoteMatches" bundle="ui"/>
-			</button>
+
+			<table ng-table="$ctrl.tableParams"
+				   show-filter="false"
+				   class="table table-hover table-striped table-bordered"
+				   id="patient-search-table">
+				<tbody>
+				<tr ng-repeat="patient in $data"
+					ng-mouseover="patient.$selected=true"
+					ng-mouseout="patient.$selected=false"
+					ng-class="{'active': patient.$selected}"
+					ng-click="$ctrl.loadRecord(patient.demographicNo)">
+
+					<td data-title="'<bean:message key="patientsearch.header.id" bundle="ui"/>'"
+						sortable="'DemographicNo'">
+						{{patient.demographicNo}}
+					</td>
+					<td data-title="'<bean:message key="patientsearch.header.name" bundle="ui"/>'"
+						sortable="'DemographicName'">
+						{{patient.lastName}}, {{patient.firstName}}
+					</td>
+					<td data-title="'<bean:message key="patientsearch.header.chartNo" bundle="ui"/>'"
+						sortable="'ChartNo'">
+						{{patient.chartNo}}
+					</td>
+					<td data-title="'<bean:message key="patientsearch.header.gender" bundle="ui"/>'"
+						class="text-center"
+						sortable="'Sex'">
+						{{patient.sex}}
+					</td>
+					<td data-title="'<bean:message key="patientsearch.header.dob" bundle="ui"/>'"
+						class="text-center"
+						sortable="'DOB'">
+						{{patient.formattedDOB}}
+					<td data-title="'<bean:message key="patientsearch.header.doctor" bundle="ui"/>'"
+						sortable="'ProviderName'">
+						{{patient.providerName}}
+					</td>
+					<td data-title="'<bean:message key="patientsearch.header.rosterStatus" bundle="ui"/>'"
+						class="text-center"
+						sortable="'RosterStatus'">
+						{{patient.rosterStatus}}
+					</td>
+					<td data-title="'<bean:message key="patientsearch.header.patientStatus" bundle="ui"/>'"
+						class="text-center"
+						sortable="'Status'">
+						{{patient.patientStatus}}
+					</td>
+					<td data-title="'<bean:message key="patientsearch.header.phone" bundle="ui"/>'"
+						sortable="'Phone'">
+						{{patient.phone}}
+					</td>
+				</tr>
+				</tbody>
+
+			</table>
 		</div>
-
-		<table ng-table="$ctrl.tableParams"
-			   show-filter="false"
-			   class="table table-hover table-striped table-bordered"
-			   id="patient-search-table">
-			<tbody>
-			<tr ng-repeat="patient in $data"
-				ng-mouseover="patient.$selected=true"
-				ng-mouseout="patient.$selected=false"
-				ng-class="{'active': patient.$selected}"
-				ng-click="$ctrl.loadRecord(patient.demographicNo)">
-
-				<td data-title="'<bean:message key="patientsearch.header.id" bundle="ui"/>'"
-					sortable="'DemographicNo'">
-					{{patient.demographicNo}}
-				</td>
-				<td data-title="'<bean:message key="patientsearch.header.name" bundle="ui"/>'"
-					sortable="'DemographicName'">
-					{{patient.lastName}}, {{patient.firstName}}
-				</td>
-				<td data-title="'<bean:message key="patientsearch.header.chartNo" bundle="ui"/>'"
-					sortable="'ChartNo'">
-					{{patient.chartNo}}
-				</td>
-				<td data-title="'<bean:message key="patientsearch.header.gender" bundle="ui"/>'"
-					class="text-center"
-					sortable="'Sex'">
-					{{patient.sex}}
-				</td>
-				<td data-title="'<bean:message key="patientsearch.header.dob" bundle="ui"/>'"
-					class="text-center"
-					sortable="'DOB'">
-					{{patient.formattedDOB}}
-				<td data-title="'<bean:message key="patientsearch.header.doctor" bundle="ui"/>'"
-					sortable="'ProviderName'">
-					{{patient.providerName}}
-				</td>
-				<td data-title="'<bean:message key="patientsearch.header.rosterStatus" bundle="ui"/>'"
-					class="text-center"
-					sortable="'RosterStatus'">
-					{{patient.rosterStatus}}
-				</td>
-				<td data-title="'<bean:message key="patientsearch.header.patientStatus" bundle="ui"/>'"
-					class="text-center"
-					sortable="'Status'">
-					{{patient.patientStatus}}
-				</td>
-				<td data-title="'<bean:message key="patientsearch.header.phone" bundle="ui"/>'"
-					sortable="'Phone'">
-					{{patient.phone}}
-				</td>
-			</tr>
-			</tbody>
-
-		</table>
-	</div>
+	</juno-security-check>
 </div>

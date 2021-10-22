@@ -1,5 +1,5 @@
 import PartialDateConverter from "../../lib/common/partialDate/converter/partialDateConverter";
-import PartialDateModelConverter from "../../lib/common/partialDate/converter/partialDateModelConverter";
+import PartialDateModelSerializer from "../../lib/common/partialDate/converter/partialDateModelSerializer";
 
 angular.module('Record.Summary').component('groupNotesComponent', {
 	templateUrl: 'src/record/summary/groupNotes.jsp',
@@ -44,8 +44,7 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 			controller.working = false;
 
 			//set hidden which can can move out of hidden to $scope values
-			var now = new Date();
-			controller.groupNotesForm.annotation_attrib = "anno" + now.getTime();
+			controller.groupNotesForm.annotation_attrib = "anno" + new Date().getTime();
 
 			controller.$onInit = () =>
 			{
@@ -62,6 +61,28 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 				{
 					controller.displayGroupNote(controller.page.items, controller.action);
 				}
+
+				diseaseRegistryService.getIssueQuickLists().then(
+					function success(results)
+					{
+						controller.page.quickLists = results;
+					},
+					function error(errors)
+					{
+						console.log(errors);
+					});
+
+				controller.displayIssueId(controller.page.code);
+
+				//action is NULL when new , action is some id when not
+				if (controller.action != null)
+				{
+					controller.displayGroupNote(controller.page.items, controller.action);
+				}
+				else
+				{
+					//new entry
+				}
 			}
 
 		// Called after this controller's element and its children have been linked. so ref is set up
@@ -69,28 +90,6 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 		{
 			focusService.focusRef(controller.groupNotesFormRef);
 		}
-
-
-		//get access rights
-		securityService.hasRight("_eChart", "u", $stateParams.demographicNo).then(
-			function success(results)
-			{
-				controller.page.cannotChange = !results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-
-		diseaseRegistryService.getIssueQuickLists().then(
-			function success(results)
-			{
-				controller.page.quickLists = results;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
 
 		controller.addDxItem = function addDxItem(item)
 		{
@@ -120,16 +119,6 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 				{
 					console.log(errors);
 				});
-		};
-
-		//disable click and keypress if user only has read-access
-		controller.checkAction = function checkAction(event)
-		{
-			if (controller.page.cannotChange)
-			{
-				event.preventDefault();
-				event.stopPropagation();
-			}
 		};
 
 		controller.isWorking = function isWorking()
@@ -235,6 +224,7 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 			}
 		};
 
+
 		controller.setAvailablePositions = function setAvailablePositions()
 		{
 			controller.availablePositions = [];
@@ -294,7 +284,7 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 			groupNotesFormTransfer.encounterNote.assignedIssues = controller.groupNotesForm.assignedCMIssues;
 			groupNotesFormTransfer.encounterNote.summaryCode = controller.page.code;
 
-			let partialDateModelConverter = new PartialDateModelConverter();
+			let partialDateModelConverter = new PartialDateModelSerializer();
 
 			let startDate = groupNotesFormTransfer.groupNoteExt.startDate;
 			if (startDate)

@@ -27,6 +27,7 @@ package org.oscarehr.ws.external.soap.v1;
 import org.apache.cxf.annotations.GZIP;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.managers.AllergyManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.external.soap.v1.transfer.AllergyTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,21 +40,31 @@ import java.util.List;
 @WebService
 @Component
 @GZIP(threshold = AbstractWs.GZIP_THRESHOLD)
-public class AllergyWs extends AbstractWs {
+public class AllergyWs extends AbstractWs
+{
 	@Autowired
 	private AllergyManager allergyManager;
 
-	public AllergyTransfer getAllergy(Integer allergyId) {
+	public AllergyTransfer getAllergy(Integer allergyId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ALLERGY_READ);
+
 		Allergy allergy = allergyManager.getAllergy(getLoggedInInfo(), allergyId);
 		return (AllergyTransfer.toTransfer(allergy));
 	}
 
-	public AllergyTransfer[] getAllergiesUpdatedAfterDate(Date updatedAfterThisDateInclusive, int itemsToReturn) {
+	public AllergyTransfer[] getAllergiesUpdatedAfterDate(Date updatedAfterThisDateInclusive, int itemsToReturn)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ALLERGY_READ);
+
 		List<Allergy> allergies = allergyManager.getUpdatedAfterDate(getLoggedInInfo(), updatedAfterThisDateInclusive, itemsToReturn);
 		return (AllergyTransfer.toTransfers(allergies));
 	}
 
-	public AllergyTransfer[] getAllergiesByProgramProviderDemographicDate(Integer programId, String providerNo, Integer demographicId, Calendar updatedAfterThisDateInclusive, int itemsToReturn) {
+	public AllergyTransfer[] getAllergiesByProgramProviderDemographicDate(Integer programId, String providerNo, Integer demographicId, Calendar updatedAfterThisDateInclusive, int itemsToReturn)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(),Permission.ALLERGY_READ);
+
 		List<Allergy> allergies = allergyManager.getAllergiesByProgramProviderDemographicDate(getLoggedInInfo(), programId, providerNo, demographicId, updatedAfterThisDateInclusive, itemsToReturn);
 		return (AllergyTransfer.toTransfers(allergies));
 	}

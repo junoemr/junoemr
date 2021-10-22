@@ -231,6 +231,30 @@ body {
 	}
 }
 
+// will override bootstrap alerts.
+// not in the bootstrap variables since they don't work with css variables
+.alert {
+	margin-bottom: 8px;
+	padding: 7px; // padding of 7 pus font size 14 gets an alert height of 32px
+	@include juno-font-default-size(14px);
+
+	&.alert-info {
+		background-color: var(--color-primary-lightest);
+		border-color: var(--color-primary-lighter);
+		color: var(--color-primary-dark);
+	}
+	&.alert-warning {
+		background-color: var(--color-yellow-lightest);
+		border-color: var(--color-yellow-lighter);
+		color: var(--color-yellow-darker);
+	}
+	&.alert-danger {
+		background-color: var(--color-red-lightest);
+		border-color: var(--color-red-lighter);
+		color: var(--color-red-dark);
+	}
+}
+
 // Makes checkbox flush with input (as long as checkbox margin is 0)
 .big-checkbox {
 	height: 34px;
@@ -331,8 +355,24 @@ a,.clickable {
 	width: 100%;
 }
 
+.width-80 {
+	width: 80%;
+}
+
+.width-70 {
+	width: 70%;
+}
+
+.width-60 {
+	width: 60%;
+}
+
 .width-50 {
 	width: 50%;
+}
+
+.width-40 {
+	width: 40%;
 }
 
 .width-33 {
@@ -341,4 +381,10 @@ a,.clickable {
 
 .width-25 {
 	width: 25%;
+}
+
+@media print {
+	.no-print {
+		display: none !important;
+	}
 }

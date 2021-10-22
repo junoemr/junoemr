@@ -23,6 +23,8 @@
 
  */
 
+import {SecurityPermissions} from "../../common/security/securityConstants";
+
 angular.module('Record.Summary').component('encounterNote', {
 	templateUrl: "src/record/summary/encounterNoteTemplate.jsp",
 	bindings: {
@@ -39,10 +41,12 @@ angular.module('Record.Summary').component('encounterNote', {
 		'$state',
 		'$stateParams',
 		'formService',
+		'securityRolesService',
 		function ($scope,
 		          $state,
 		          $stateParams,
-				  formService)
+				  formService,
+				  securityRolesService)
 	{
 		var ctrl = this;
 
@@ -108,6 +112,13 @@ angular.module('Record.Summary').component('encounterNote', {
 			return ctrl.note.editable && ((ctrl.isRegularNote()) || (ctrl.note.cpp && !ctrl.note.archived));
 		};
 
+		ctrl.editButtonEnabled = () =>
+		{
+			// require create permissions for now, since the backend has no PUT operations for notes
+			return (ctrl.isRegularNote() && securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterNoteCreate)
+				|| (ctrl.note.cpp && securityRolesService.hasSecurityPrivileges(SecurityPermissions.CppNoteCreate)));
+		}
+
 		ctrl.editButtonClick = function editButtonClick()
 		{
 			if(ctrl.isRegularNote())
@@ -121,7 +132,7 @@ angular.module('Record.Summary').component('encounterNote', {
 						successCallback: function successCallback(updatedNote)
 						{
 							ctrl.inOpenEdit = false;
-							console.info('callback success', updatedNote);
+							console.debug('callback success', updatedNote);
 							// clear the existing properties and replace with the updated ones
 							angular.copy(updatedNote, ctrl.note);
 							ctrl.note.revision = Number(ctrl.note.revision) + 1;
@@ -144,7 +155,7 @@ angular.module('Record.Summary').component('encounterNote', {
 						successCallback: function successCallback(updatedNote)
 						{
 							ctrl.inOpenEdit = false;
-							console.info('callback success', updatedNote);
+							console.debug('callback success', updatedNote);
 							// clear the existing properties and replace with the updated ones
 							angular.copy(updatedNote, ctrl.note);
 							ctrl.note.revision = Number(ctrl.note.revision) + 1;
@@ -191,7 +202,11 @@ angular.module('Record.Summary').component('encounterNote', {
 
 		ctrl.getNoteHeader = function firstLine()
 		{
-			return  ctrl.note.note.trim().split('\n')[0]; // First line of the note text, split by newline
+			if(ctrl.note && ctrl.note.note)
+			{
+				return ctrl.note.note.trim().split('\n')[0]; // First line of the note text, split by newline
+			}
+			return "";
 		};
 
 		ctrl.allowNoteExpansion = function allowNoteExpansion()
