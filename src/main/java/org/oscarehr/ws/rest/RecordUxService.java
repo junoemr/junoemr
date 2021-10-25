@@ -46,6 +46,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import org.oscarehr.ws.rest.conversion.EncounterTemplateConverter;
+import org.oscarehr.ws.rest.conversion.summary.LabsDocsSummary;
 import org.oscarehr.ws.rest.conversion.summary.Summary;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.EncounterTemplateResponse;
@@ -266,7 +267,9 @@ public class RecordUxService extends AbstractServiceImpl {
 			if (securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.DOCUMENT_READ, Permission.LAB_READ)
 					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.INCOMING_POS))
 			{
-				summaryList.add(new SummaryTo1("Incoming", count++, SummaryTo1.INCOMING_CODE));
+				SummaryTo1 labDocSummary = new SummaryTo1("Incoming", count++, SummaryTo1.INCOMING_CODE);
+				labDocSummary.setDisplaySize(String.valueOf(LabsDocsSummary.DISPLAY_SIZE));
+				summaryList.add(labDocSummary);
 			}
 
 			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.DECISION_SUPPORT_READ)
