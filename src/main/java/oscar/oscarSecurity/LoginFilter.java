@@ -79,6 +79,12 @@ public class LoginFilter implements Filter {
 		"/myoscar_login_tester2.jsp",
 		"/share/javascript/jquery/",
 		"/prometheus/metrics",
+		"/actuator/info",
+		"/actuator/prometheus",
+		"/actuator/health",
+		"/actuator/health/custom",
+		"/actuator/health/liveness",
+		"/actuator/health/readiness",
 		"/oauth",
 		"/oauth/action.do",
 		"/oauth/index.jsp"
