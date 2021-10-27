@@ -28,6 +28,7 @@ package org.oscarehr.common.dao;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
@@ -51,6 +52,7 @@ import static org.junit.Assert.fail;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Ignore
 public class SecObjPrivilegeDaoTest extends DaoTestFixtures
 {
 	@Autowired

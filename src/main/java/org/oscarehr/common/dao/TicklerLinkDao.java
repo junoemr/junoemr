@@ -43,10 +43,10 @@ public class TicklerLinkDao extends AbstractDao<TicklerLink>{
 	    return find(id);
 	}
 
-	public List<TicklerLink> getLinkByTableId(String tableName, Long tableId) {
+	public List<TicklerLink> getLinkByTableId(String tableName, String tableId) {
 		Query query = entityManager.createQuery("SELECT tLink from TicklerLink tLink WHERE tLink.tableName = ?1 and tLink.tableId = ?2 order by tLink.id");
 		query.setParameter(1, tableName);
-		query.setParameter(2,tableId);
+		query.setParameter(2, tableId);
 
 		@SuppressWarnings("unchecked")
 		List<TicklerLink> results = query.getResultList();
