@@ -23,6 +23,7 @@
  */
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.NotImplementedException;
@@ -90,6 +91,7 @@ import java.util.ResourceBundle;
  */
 @Path("/forms")
 @Component("formsService")
+@Tag(name = "Form")
 @Transactional
 public class FormsService extends AbstractServiceImpl {
 	Logger logger = MiscUtils.getLogger();

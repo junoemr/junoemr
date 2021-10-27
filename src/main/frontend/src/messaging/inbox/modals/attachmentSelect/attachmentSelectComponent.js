@@ -32,6 +32,7 @@ import {AllowedAttachmentTypes} from "../../../../lib/messaging/constants/Allowe
 import FileUtil from "../../../../lib/util/FileUtil";
 import AttachmentFactory from "../../../../lib/messaging/factory/AttachmentFactory";
 import Attachment from "../../../../lib/messaging/model/Attachment";
+import DemographicEFormInstanceService from "../../../../lib/eform/service/DemographicEFormInstanceService";
 
 angular.module("Messaging.Modals").component('attachmentSelect', {
 	templateUrl: 'src/messaging/inbox/modals/attachmentSelect/attachmentSelect.jsp',
@@ -55,7 +56,8 @@ angular.module("Messaging.Modals").component('attachmentSelect', {
 
 			ctrl.selectedAttachments = []; // Type JunoFile[]
 			ctrl.currentFileList = []; // Type JunoFile[]
-			ctrl.documentFileList = []; // Type JunoFile[]
+			ctrl.documentFileList = []; // Type implements JunoFile[]
+			ctrl.eformFileList = []; // Type implements JunoFile[]
 			ctrl.canReadChart = false;
 
 			ctrl.$onInit = async () =>
@@ -64,7 +66,10 @@ angular.module("Messaging.Modals").component('attachmentSelect', {
 				ctrl.canReadChart = await ctrl.checkCanReadChart();
 				ctrl.messagingBackendType = ctrl.resolve.messagingBackendType;
 
-				await ctrl.loadDocumentFiles();
+				await Promise.all([
+					ctrl.loadDocumentFiles(),
+					ctrl.loadEForms()
+				]);
 
 				// set default to patient documents
 				if (ctrl.canReadChart)
@@ -88,6 +93,9 @@ angular.module("Messaging.Modals").component('attachmentSelect', {
 						break;
 					case FileSource.DOCUMENTS:
 						ctrl.currentFileList = ctrl.documentFileList;
+						break;
+					case FileSource.EFORMS:
+						ctrl.currentFileList = ctrl.eformFileList;
 						break;
 				}
 			}
@@ -129,6 +137,12 @@ angular.module("Messaging.Modals").component('attachmentSelect', {
 					// JunoDocument conforms to JunoFile.
 					ctrl.documentFileList = await demographicDocumentService.getDemographicDocuments(await ctrl.messageable.localId());
 				}
+			}
+
+			ctrl.loadEForms = async () =>
+			{
+				const eformService = new DemographicEFormInstanceService();
+				ctrl.eformFileList = await eformService.getDemographicEForms(await ctrl.messageable.localId());
 			}
 
 			/**

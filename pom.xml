@@ -1959,6 +1959,10 @@
 								org.oscarehr.ws.rest.AppointmentService
 								org.oscarehr.ws.rest.CareTrackerWebService
 								org.oscarehr.ws.rest.CareTrackersWebService
+                org.oscarehr.ws.rest.eform.EFormInstanceWebService
+                org.oscarehr.ws.rest.EFormService
+                org.oscarehr.ws.rest.EFormsService
+                org.oscarehr.ws.rest.FormsService
 								org.oscarehr.ws.rest.DecisionSupportWebService
 								org.oscarehr.ws.rest.DemographicService
 								org.oscarehr.ws.rest.DemographicsService
