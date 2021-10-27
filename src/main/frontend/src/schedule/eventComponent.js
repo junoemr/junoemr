@@ -203,6 +203,7 @@ angular.module('Schedule').component('eventComponent', {
 
 			controller.isDoubleBook = false;
 			controller.isDoubleBookPrevented = false;
+			controller.isAlreadyDoubleBook = false; // flag for previously existing appointments only
 			controller.siteOptions = [];
 
 			controller.providerModel = {
@@ -364,6 +365,7 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.eventData.confirmed = data.eventData.confirmed;
 
 					controller.checkEventConflicts(); // uses the eventData
+					controller.isAlreadyDoubleBook = controller.isDoubleBookPrevented;
 
 					// either load the patient data and init the autocomplete
 					// or ensure the patient model is clear
@@ -707,9 +709,9 @@ angular.module('Schedule').component('eventComponent', {
 				if (momentStart.isValid() && momentEnd.isValid() && momentStart.isSameOrBefore(momentEnd))
 				{
 					// Loop through the events for this day
-					for (var i = 0; i < $scope.events.length; i++)
+					for (let i = 0; i < $scope.events.length; i++)
 					{
-						var event = $scope.events[i];
+						const event = $scope.events[i];
 
 						// filter events that should not be checked (background, wrong schedule, etc.)
 						if (event.rendering === "background"
@@ -721,9 +723,9 @@ angular.module('Schedule').component('eventComponent', {
 
 
 						// if start time is between event start and end
-						var eventStart = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.start);
-						var eventEnd = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.end);
-						var eventDoNotBook = event.data.doNotBook;
+						const eventStart = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.start);
+						const eventEnd = Juno.Common.Util.getDatetimeNoTimezoneMoment(event.end);
+						const eventDoNotBook = event.data.doNotBook;
 
 						if (eventStart.isValid() && eventEnd.isValid() &&
 							((momentStart.isSameOrAfter(eventStart) && momentStart.isBefore(eventEnd)) ||
@@ -1031,21 +1033,21 @@ angular.module('Schedule').component('eventComponent', {
 			{
 				$scope.$watch('eventController.patientTypeahead', function (newValue, oldValue)
 				{
-					if (newValue != oldValue)
+					if (newValue !== oldValue)
 					{
 						$scope.loadPatientFromTypeahead(controller.patientTypeahead);
 					}
 				}, true);
 				$scope.$watch('[eventData.startTime, eventData.duration]', function (newValue, oldValue)
 				{
-					if (newValue != oldValue)
+					if (newValue !== oldValue)
 					{
 						controller.checkEventConflicts();
 					}
 				});
 				$scope.$watch('eventData.type', function (newValue, oldValue)
 				{
-					if (newValue != oldValue)
+					if (newValue !== oldValue)
 					{
 						controller.autofillDataFromType(newValue);
 					}
@@ -1132,6 +1134,10 @@ angular.module('Schedule').component('eventComponent', {
 			controller.deleteButtonEnabled = () =>
 			{
 				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentDelete);
+			}
+			controller.isBookingDisabled = () =>
+			{
+				return $scope.isWorking() || controller.inReadOnlyMode() || (controller.isDoubleBookPrevented && !controller.isAlreadyDoubleBook);
 			}
 
 			$scope.hasSites = function hasSites()

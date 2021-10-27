@@ -487,14 +487,14 @@
 					type="button"
 					class="btn btn-default"
 					ng-click="eventController.saveDoNotBook()"
-					ng-disabled="isWorking() || eventController.inReadOnlyMode() || eventController.isDoubleBookPrevented">Do Not Book
+					ng-disabled="eventController.isBookingDisabled()">Do Not Book
 			</button>
 
 			<button
 					type="button"
 					class="btn btn-default"
 					ng-click="eventController.saveAndReceipt()"
-					ng-disabled="isWorking() || eventController.inReadOnlyMode() || eventController.isDoubleBookPrevented || !isPatientSelected()">Receipt
+					ng-disabled="eventController.isBookingDisabled() || !isPatientSelected()">Receipt
 			</button>
 
 			<button
@@ -504,7 +504,7 @@
 					tooltip-append-to-body="true"
 					uib-tooltip="{{eventController.keyBinding.getTooltip(keyBindSettings, 'ctrl+enter')}}"
 					ng-click="eventController.saveAndPrint()"
-					ng-disabled="isWorking() || eventController.inReadOnlyMode() || eventController.isDoubleBookPrevented || !isPatientSelected()">Print
+					ng-disabled="eventController.isBookingDisabled() || !isPatientSelected()">Print
 			</button>
 
 			<button
@@ -514,7 +514,7 @@
 							tooltip-placement="top"
 							tooltip-append-to-body="true"
 							ng-click="eventController.save(true);"
-							ng-disabled="isWorking() || eventController.inReadOnlyMode() || eventController.isDoubleBookPrevented"
+							ng-disabled="eventController.isBookingDisabled()"
 							title="Create the appointment and send a notification email to the user">
 				Create & Notify
 			</button>
@@ -542,7 +542,7 @@
 					ng-class="{
 						'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
 					    'double-book-prevented':eventController.isDoubleBookPrevented}"
-					ng-disabled="isWorking() || eventController.inReadOnlyMode() || eventController.isDoubleBookPrevented">Create
+					ng-disabled="eventController.isBookingDisabled()">Create
 			</button>
 
 			<button
@@ -556,7 +556,7 @@
 					ng-class="{
 						'double-book': (eventController.isDoubleBook && !eventController.isDoubleBookPrevented),
 					    'double-book-prevented':eventController.isDoubleBookPrevented}"
-					ng-disabled="isWorking() || eventController.inReadOnlyMode() || eventController.isDoubleBookPrevented">Modify
+					ng-disabled="eventController.isBookingDisabled()">Modify
 			</button>
 
 			<%--<button--%>
