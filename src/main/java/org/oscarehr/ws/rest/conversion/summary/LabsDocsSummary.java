@@ -48,17 +48,22 @@ import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.StringUtils;
 
 @Component
-public class LabsDocsSummary implements Summary {
+public class LabsDocsSummary implements Summary
+{
+	public static final int DISPLAY_SIZE = 20;
+
 	private static Logger logger = MiscUtils.getLogger();
 	protected static final String ELLIPSES = "...";
 	protected static final int MAX_LEN_TITLE = 48;
 	protected static final int CROP_LEN_TITLE = 45;
 	protected static final int MAX_LEN_KEY = 12;
 	protected static final int CROP_LEN_KEY = 9;
-	
-	public  SummaryTo1 getSummary(LoggedInInfo loggedInInfo,Integer demographicNo,String summaryCode){
-		
-		SummaryTo1 summary = new SummaryTo1("Incoming",0,SummaryTo1.INCOMING_CODE);
+
+	@Override
+	public SummaryTo1 getSummary(LoggedInInfo loggedInInfo, Integer demographicNo, String summaryCode)
+	{
+		SummaryTo1 summary = new SummaryTo1("Incoming", 0, SummaryTo1.INCOMING_CODE);
+		summary.setDisplaySize(String.valueOf(DISPLAY_SIZE));
 		
 		List<SummaryItemTo1> list = summary.getSummaryItem();
 		int count = 0;

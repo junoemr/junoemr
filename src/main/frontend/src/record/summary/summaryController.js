@@ -79,6 +79,17 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		// store the child component refresh function so that this controller can trigger it.
 		controller.noteListComponentRefreshFunction = null;
 
+		controller.incomingFilterOptions = [
+			{
+				label: "Documents",
+				value: "document",
+			},
+			{
+				label: "Reports",
+				value: "lab",
+			},
+		];
+
 		controller.$onInit = () =>
 		{
 			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EchartRead))
@@ -608,6 +619,15 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					return false;
 			}
 		};
+
+		controller.getSummaryModuleFilterOptions = (module) =>
+		{
+			if(module.summaryCode === "incoming")
+			{
+				return controller.incomingFilterOptions;
+			}
+			return [];
+		}
 
 		// called when a child component is initialized. this allows the controller to call select child methods
 		controller.registerEncNoteListFunctions = function(refresh)
