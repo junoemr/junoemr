@@ -27,6 +27,7 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -88,6 +89,7 @@ public class EditEncounterNotesIT extends SeleniumTestBase
 	}
 
 	@Test
+	@Ignore
 	public void editEncounterNotesJUNOUITest()
 	{
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + SUMMARY_URL);
