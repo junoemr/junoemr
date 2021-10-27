@@ -54,6 +54,7 @@ import javax.xml.validation.SchemaFactory;
 import java.io.File;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Optional;
 
 
 public class OLISUtils
@@ -96,14 +97,15 @@ public class OLISUtils
 		String sendingFacility = h.getPlacerGroupNumber();
 		logger.debug("SENDING FACILITY: " + sendingFacility);
 		String accessionNumber = h.getAccessionNum();
+		String fillerOrderNo = h.getFillerOrderNumber();
 		String hin = h.getHealthNum();
 		String collectionDate = h.getCollectionDateTime(0);
 		collectionDate = (StringUtils.isNotBlank(collectionDate)) ? collectionDate.substring(0, 10).replaceAll("-", "") : null;
 
-		return isDuplicate(loggedInInfo, sendingFacility, accessionNumber, msg, hin, collectionDate);
+		return isDuplicate(loggedInInfo, sendingFacility, accessionNumber, fillerOrderNo, msg, hin, collectionDate);
 	}
 
-	public static boolean isDuplicate(LoggedInInfo loggedInInfo, String sendingFacility, String accessionNumber, String msg, String hin, String olisCollectionDate)
+	public static boolean isDuplicate(LoggedInInfo loggedInInfo, String sendingFacility, String accessionNumber, String fillerOrderNo, String msg, String hin, String olisCollectionDate)
 	{
 		logger.debug("Facility " + sendingFacility + " Accession # " + accessionNumber);
 
@@ -221,10 +223,14 @@ public class OLISUtils
 			}
 			else
 			{
-				//TODO figure out OLIS duplicates vs revisions (with matching accession) detection
 				// need to check duplicates because sometimes the first lab of a provider query will be the last lab from the previous query
 				List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(accessionNumber, OLISHL7Handler.OLIS_MESSAGE_TYPE);
-				return !dupResults.isEmpty();
+
+				Optional<Hl7TextInfo> duplicate = dupResults
+						.stream()
+						.filter((result -> fillerOrderNo.equals(result.getFillerOrderNum())))
+						.findFirst();
+				return duplicate.isPresent();
 			}
 		}
 		else

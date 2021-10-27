@@ -2318,8 +2318,15 @@ public class OLISHL7Handler extends MessageHandler
 		return (name);
 	}
 
-	public String getFillerOrderNumber(){
-		return "";
+	/**
+	 * acts as the unique lab version number
+	 */
+	public String getFillerOrderNumber()
+	{
+		// not totally sure which fields to use here.
+		// OLIS doesn't want to give us an official way to check versions.
+		// use the lastUpdatedDate date for now.
+		return getLastUpdateInOLISUnformatted();
 	}
     public String getEncounterId(){
     	return "";

@@ -116,13 +116,13 @@ if (handlerMain instanceof OLISHL7Handler) {
 else {
 %> <jsp:forward page="labDisplay.jsp" /> <%
 }
-if (!preview && "true".equals(request.getParameter("showLatest"))) {
 
-	String multiLabId = Hl7textResultsData.getMatchingLabs(segmentID);
+String multiLabId = preview ? "" : Hl7textResultsData.getMatchingLabs(segmentID);
+if(!preview && "true".equals(request.getParameter("showLatest")))
+{
+	// use the newest lab as the segmentId to display
 	segmentID = multiLabId.split(",")[multiLabId.split(",").length - 1];
 }
-
-String multiLabId = preview ? "" :  Hl7textResultsData.getMatchingLabs(segmentID);
 
 for (String tempId : multiLabId.split(",")) {
 	if (tempId.equals(segmentID) || tempId.equals("")) { continue; }
