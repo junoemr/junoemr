@@ -2552,7 +2552,7 @@ public class OLISHL7Handler extends MessageHandler
 		List<String> ccDocList = new LinkedList<>();
 		try
 		{
-			int i = 1;
+			int i = 0;
 			String nextDoc = getFullDocName("/.OBR-28(" + i + ")-");
 
 			while(!nextDoc.equals(""))

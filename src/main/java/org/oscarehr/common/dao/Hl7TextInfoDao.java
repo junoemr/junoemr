@@ -212,14 +212,22 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
     	 query.setParameter("labNo", labNo);
     	 return query.getResultList();
     }
-    
+
 	@SuppressWarnings("unchecked")
-    public List<Object[]> findByLabIdViaMagic(Integer labNo) {
+    public List<Object[]> findByLabIdViaMagic(Integer labNo, boolean prioritizeFinalCount)
+    {
 		String sql = "FROM Hl7TextInfo a, Hl7TextInfo b " +
 				"WHERE a.accessionNumber <> '' " +
 				"AND a.accessionNumber = b.accessionNumber " +
 				"AND b.labNumber = :labNo " +
-				"ORDER BY a.obrDate, a.finalResultCount, a.labNumber";
+				"ORDER BY a.obrDate, ";
+
+		if(prioritizeFinalCount)
+		{
+			sql += "a.finalResultCount, ";
+		}
+		sql += "a.labNumber";
+
 	    Query q = entityManager.createQuery(sql);
 	    q.setParameter("labNo", labNo);
 	    return q.getResultList();

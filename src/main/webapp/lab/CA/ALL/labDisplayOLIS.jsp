@@ -117,20 +117,30 @@ else {
 %> <jsp:forward page="labDisplay.jsp" /> <%
 }
 
-String multiLabId = preview ? "" : Hl7textResultsData.getMatchingLabs(segmentID);
-if(!preview && "true".equals(request.getParameter("showLatest")))
+List<Integer> multiLabIds = preview ? new ArrayList<>(0) : Hl7textResultsData.getMatchingLabs(Integer.parseInt(segmentID), false);
+String multiLabId = preview ? "" : Hl7textResultsData.idsToString(multiLabIds);
+
+if(!preview && "true".equals(request.getParameter("showLatest")) && !multiLabIds.isEmpty())
 {
 	// use the newest lab as the segmentId to display
-	segmentID = multiLabId.split(",")[multiLabId.split(",").length - 1];
+	segmentID = String.valueOf(multiLabIds.get(multiLabIds.size()-1));
 }
 
-for (String tempId : multiLabId.split(",")) {
-	if (tempId.equals(segmentID) || tempId.equals("")) { continue; }
-	else {
-		try {
-			handler.importSourceOrganizations((OLISHL7Handler)Factory.getHandler(tempId));
-		} catch (Exception e) {
-			org.oscarehr.util.MiscUtils.getLogger().error("error",e);
+for(Integer tempId : multiLabIds)
+{
+	if(String.valueOf(tempId).equals(segmentID))
+	{
+		continue;
+	}
+	else
+	{
+		try
+		{
+			handler.importSourceOrganizations((OLISHL7Handler) Factory.getHandler(tempId));
+		}
+		catch(Exception e)
+		{
+			org.oscarehr.util.MiscUtils.getLogger().error("error", e);
 		}
 	}
 }
@@ -671,32 +681,35 @@ public String strikeOutInvalidContent(String content, String status) {
                         </table>
                         <table width="100%" border="1" cellspacing="0" cellpadding="3" bgcolor="#9999CC" bordercolordark="#bfcbe3">
                             <%
-                            if (multiLabId != null){
-                                String[] multiID = multiLabId.split(",");
-                                if (multiID.length > 1){
-                                    %>
-                                    <tr>
-                                        <td class="Cell" colspan="2" align="middle">
-                                            <div class="Field2">
-                                                Version:&#160;&#160;
-                                                <%
-                                                for (int i=0; i < multiID.length; i++){
-                                                    if (multiID[i].equals(segmentID)){
-                                                        %>v<%= i+1 %>&#160;<%
+                            if (!multiLabIds.isEmpty())
+							{
+                                %>
+                                <tr>
+                                    <td class="Cell" colspan="2" align="middle">
+                                        <div class="Field2">
+                                            Version:&#160;&#160;
+                                            <%
+                                            for (int i=0; i < multiLabIds.size(); i++)
+											{
+												String multiIdSegmentId = String.valueOf(multiLabIds.get(i));
+                                                if (multiIdSegmentId.equals(segmentID))
+												{
+                                                    %>v<%= i+1 %>&#160;<%
+                                                }
+												else
+												{
+                                                    if ( searchProviderNo != null ) { // null if we were called from e-chart
+                                                        %><a href="labDisplay.jsp?segmentID=<%=multiIdSegmentId%>&multiID=<%=multiLabId%>&providerNo=<%= providerNo %>&searchProviderNo=<%= searchProviderNo %>">v<%= i+1 %></a>&#160;<%
                                                     }else{
-                                                        if ( searchProviderNo != null ) { // null if we were called from e-chart
-                                                            %><a href="labDisplay.jsp?segmentID=<%=multiID[i]%>&multiID=<%=multiLabId%>&providerNo=<%= providerNo %>&searchProviderNo=<%= searchProviderNo %>">v<%= i+1 %></a>&#160;<%
-                                                        }else{
-                                                            %><a href="labDisplay.jsp?segmentID=<%=multiID[i]%>&multiID=<%=multiLabId%>&providerNo=<%= providerNo %>">v<%= i+1 %></a>&#160;<%
-                                                        }
+                                                        %><a href="labDisplay.jsp?segmentID=<%=multiIdSegmentId%>&multiID=<%=multiLabId%>&providerNo=<%= providerNo %>">v<%= i+1 %></a>&#160;<%
                                                     }
                                                 }
-                                                %>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <%
-                                }
+                                            }
+                                            %>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <%
                             }
                             %>
                             <tr>

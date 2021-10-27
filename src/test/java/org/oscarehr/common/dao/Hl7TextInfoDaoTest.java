@@ -70,7 +70,7 @@ public class Hl7TextInfoDaoTest extends DaoTestFixtures
 
 	@Test
 	public void testfindByLabIdViaMagic() {
-		hl7TextInfoDao.findByLabIdViaMagic(10);
+		hl7TextInfoDao.findByLabIdViaMagic(10, true);
 	}
 
 	@Test
