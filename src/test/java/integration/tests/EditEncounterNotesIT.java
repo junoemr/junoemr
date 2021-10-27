@@ -88,6 +88,8 @@ public class EditEncounterNotesIT extends SeleniumTestBase
 		Assert.assertTrue("Edited Note is NOT saved", Pattern.compile(editedNote).matcher(text).find());
 	}
 
+	// XXX: This test was ignored because if failed after switching Juno to run with jdk17.  It's
+	//      probably not worth fixing until juno has been fixed to officially run with that jdk.
 	@Test
 	@Ignore
 	public void editEncounterNotesJUNOUITest()
