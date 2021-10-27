@@ -1878,6 +1878,7 @@
 						<oscar.skip.dbinit>true</oscar.skip.dbinit>
 					</systemPropertyVariables>
 					<useManifestOnlyJar>false</useManifestOnlyJar>
+          <trimStackTrace>false</trimStackTrace>
 				</configuration>
 				<executions>
 					<execution>

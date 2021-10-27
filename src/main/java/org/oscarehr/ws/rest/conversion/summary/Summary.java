@@ -27,6 +27,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.SummaryTo1;
 
 
-public interface Summary {
-	public SummaryTo1 getSummary(LoggedInInfo loggedInInfo,Integer demographicNo,String summaryCode);
+public interface Summary
+{
+	SummaryTo1 getSummary(LoggedInInfo loggedInInfo, Integer demographicNo, String summaryCode);
 }

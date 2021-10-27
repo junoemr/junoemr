@@ -36,24 +36,27 @@ angular.module('Record.Summary').component('summaryModule', {
 		clickableTitle: '<', //true means title is clickable
 
 		enableFilter: '<',
+		filterTypeOptions: '<?',
 		addButton: '<',
 		addButtonEnabled: '<',
 	},
 	controller: [function ()
 	{
-		var ctrl = this;
+		const ctrl = this;
 
 		ctrl.displayDateFormat = Juno.Common.Util.DisplaySettings.dateFormat;
 
 		ctrl.$onInit = function()
 		{
 			// initialize internal variables
-			ctrl.itemFilter = null;
+			ctrl.itemFilter = "";
+			ctrl.itemTypeFilter = "";
 			ctrl.showAllItems = false;
 
 			// set default binding values
 			ctrl.itemDisplayCount = ctrl.itemDisplayCount || 5;
 			ctrl.enableFilter = ctrl.enableFilter || false;
+			ctrl.filterTypeOptions = ctrl.filterTypeOptions || [];
 			ctrl.addButton = ctrl.addButton || false;
 			ctrl.clickableTitle = ctrl.clickableTitle || false;
 			ctrl.maxItemNameLength = ctrl.maxItemNameLength || 34;
@@ -61,11 +64,15 @@ angular.module('Record.Summary').component('summaryModule', {
 			ctrl.onclickAdd = ctrl.onclickAdd || null;
 			ctrl.onclickTitle = ctrl.onclickTitle || null;
 			ctrl.hideDate = ctrl.hideDate || false;
+
+			// init models for each of the type filters
+			ctrl.filterTypeOptionModels = [];
+			ctrl.filterTypeOptions.forEach(option => ctrl.filterTypeOptionModels[option.value] = false);
 		};
 
 		ctrl.$onChanges = function(bindingHash)
 		{
-			// bindingsHash only has data for changed bindings, so check for object existance
+			// bindingsHash only has data for changed bindings, so check for object existence
 			if(Juno.Common.Util.exists(bindingHash.itemDisplayCount))
 			{
 				ctrl.itemDisplayCount = bindingHash.itemDisplayCount.currentValue;
@@ -81,6 +88,10 @@ angular.module('Record.Summary').component('summaryModule', {
 			if(Juno.Common.Util.exists(bindingHash.enableFilter))
 			{
 				ctrl.enableFilter = bindingHash.enableFilter.currentValue;
+			}
+			if(Juno.Common.Util.exists(bindingHash.filterTypeOptions))
+			{
+				ctrl.filterTypeOptions = bindingHash.filterTypeOptions.currentValue;
 			}
 		};
 
@@ -125,6 +136,16 @@ angular.module('Record.Summary').component('summaryModule', {
 		ctrl.toggleShowAllItems = function toggleShowAllItems()
 		{
 			ctrl.showAllItems = !ctrl.showAllItems;
+		}
+
+		ctrl.setTypeFilter = (enabled, filterValue) =>
+		{
+			ctrl.itemTypeFilter = enabled ? filterValue : "";
+
+			// turn other type filters off
+			Object.keys(ctrl.filterTypeOptionModels)
+			.filter(key => (key !== filterValue))
+			.forEach(key => ctrl.filterTypeOptionModels[key] = false);
 		}
 	}]
 });

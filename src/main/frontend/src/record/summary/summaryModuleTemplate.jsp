@@ -15,20 +15,23 @@
 				<i class="icon icon-plus-circle"></i>
 			</button>
 		</div>
-		<ca-field-text
-				ng-if="$ctrl.enableFilter"
-				ca-name="summary-mod-item-filter"
-				ca-title="Filter"
-				ca-no-label="true"
-				ca-input-size="col-md-12"
-				ca-model="$ctrl.itemFilter"
-				ca-rows="1"
-		>
-		</ca-field-text>
+        <div ng-if="$ctrl.enableFilter && $ctrl.filterTypeOptions.length > 0" class="grid-column-2 grid-gap-8 grid-align-items-start m-b-8">
+            <juno-check-box ng-repeat="filterType in $ctrl.filterTypeOptions"
+                            class="grid-item"
+                            label="{{filterType.label}}"
+                            ng-model="$ctrl.filterTypeOptionModels[filterType.value]"
+                            change="$ctrl.setTypeFilter(value, filterType.value)">
+            </juno-check-box>
+        </div>
+        <juno-input ng-if="$ctrl.enableFilter"
+                    title="Filter"
+                    ng-model="$ctrl.itemFilter"
+                    placeholder="Filter by name">
+        </juno-input>
 	</div>
 	<div class="summary-module-body">
 		<ul>
-			<li ng-repeat="item in $ctrl.module.summaryItem | filter: $ctrl.itemFilter"
+			<li ng-repeat="item in $ctrl.module.summaryItem | filter: {displayName: $ctrl.itemFilter, type: $ctrl.itemTypeFilter}"
 			    ng-show="($ctrl.showAllItems || $index < $ctrl.itemDisplayCount)">
 
 				<a ng-click="$ctrl.itemCallback(item)"
