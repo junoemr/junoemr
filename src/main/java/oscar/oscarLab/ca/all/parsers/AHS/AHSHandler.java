@@ -26,6 +26,7 @@ package oscar.oscarLab.ca.all.parsers.AHS;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.ConversionUtils;
@@ -90,8 +91,10 @@ public abstract class AHSHandler extends ORU_R01MessageHandler
 	/* ===================================== PID ====================================== */
 
 	@Override
-	public String getPatientName() {
-		return (getFirstName() + " " + getLastName());
+	public String getPatientName()
+	{
+		String middleNameStr = StringUtils.isNotBlank(getMiddleName()) ? getMiddleName() + " " : "";
+		return (getFirstName() + " " + middleNameStr + getLastName());
 	}
 
 	@Override
@@ -111,8 +114,9 @@ public abstract class AHSHandler extends ORU_R01MessageHandler
 
 
 	@Override
-	public String getHealthNum() {
-		return get("/.PID-2-1");
+	public String getHealthNum()
+	{
+		return getString(get("/.PID-2-1"));
 	}
 
 	/* ===================================== OBR ====================================== */

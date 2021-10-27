@@ -21,6 +21,7 @@
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%@page import="java.util.List"%>
 <%@ page import="org.oscarehr.labs.service.Hl7TextInfoService" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -274,7 +275,7 @@ String curUser_no = (String) session.getAttribute("user");
                                     <input type="hidden" name="labType<%=segmentID+result.labType%>" value="<%=result.labType%>"/>
                                     <input type="hidden" name="ackStatus" value="<%= result.isMatchedToPatient() %>" />
                                     <input type="hidden" name="patientName" value="<%=StringEscapeUtils.escapeHtml(result.patientName) %>"/>
-                                    <%=result.getHealthNumber() %>
+                                    <%=StringUtils.trimToEmpty(result.getHealthNumber()) %>
                                 </td>
                                 <td nowrap>
                                     <% if ( result.isMDS() ){ %>

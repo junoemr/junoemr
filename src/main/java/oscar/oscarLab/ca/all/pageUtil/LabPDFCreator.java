@@ -525,7 +525,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								}
 								if(isTypeCLS)
 								{
-									cell.setPhrase(new Phrase(handler.getOBXResultStatus(j, k), lineFont));
+									cell.setPhrase(new Phrase(handler.getOBXResultStatusDisplayValue(j, k), lineFont));
 									table.addCell(cell);
 								}
 							}
@@ -642,7 +642,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 								cell.setPhrase(new Phrase(handler.getTimeStamp(j, k), lineFont));
 								table.addCell(cell);
-								cell.setPhrase(new Phrase(handler.getOBXResultStatus(j, k), lineFont));
+								cell.setPhrase(new Phrase(handler.getOBXResultStatusDisplayValue(j, k), lineFont));
 								cell.setBorder(Rectangle.RIGHT | Rectangle.LEFT);
 								table.addCell(cell);
 							}
@@ -991,7 +991,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 		}
         else
         {
-			cell.setPhrase(new Phrase((handler.getOrderStatus().equals("F") ? "Final" : (handler.getOrderStatus().equals("C") ? "Corrected" : "Partial")), font));
+			cell.setPhrase(new Phrase(handler.getOrderStatusDisplayValue(), font));
 			rInfoTable.addCell(cell);
         }
         cell.setPhrase(new Phrase("Client Ref. #: ", boldFont));
@@ -1114,7 +1114,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
         
         clientPhrase = new Phrase();
         clientPhrase.add(new Chunk("Report Status: ", boldFont));
-        clientPhrase.add(new Chunk((handler.getOrderStatus().equals("F") ? "Final" : (handler.getOrderStatus().equals("C") ? "Corrected" : "Preliminary"))+"\t\t\t\t\t\t", font));
+        clientPhrase.add(new Chunk(handler.getOrderStatusDisplayValue()+"\t\t\t\t\t\t", font));
         patientInfo.add(clientPhrase);
         
         clientPhrase = new Phrase();

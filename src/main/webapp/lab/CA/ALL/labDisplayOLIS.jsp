@@ -687,7 +687,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                             </td>
                                             <td>
                                                 <div class="FieldData">
-                                                    <%= ( (String) ( handler.getOrderStatus().equals("F") ? "Final" : handler.getOrderStatus().equals("C") ? "Corrected" : "Partial") )%>
+                                                    <%= handler.getOrderStatusDisplayValue()%>
                                                 </div>
                                             </td>
                                         </tr>
