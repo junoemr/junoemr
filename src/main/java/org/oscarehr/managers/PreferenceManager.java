@@ -69,7 +69,7 @@ public class PreferenceManager {
 	public static final String MED_HX_POS = "summary.item.med_hx.position";
 	public static final String ONGOING_POS = "summary.item.ongoing_concerns.position";
 	public static final String REMINDERS_POS = "summary.item.reminders.position";
-	public static final String DISEASE_REGISTRY_POS = "summary.item.diease_registry.position";
+	public static final String DISEASE_REGISTRY_POS = "summary.item.disease_registry.position";
 	
 	public static final String SOC_HX_START_DATE = "cpp.social_hx.start_date";
 	public static final String SOC_HX_RES_DATE = "cpp.social_hx.res_date";
@@ -98,10 +98,10 @@ public class PreferenceManager {
 		{
 			boolean displayItem = false;
 
-			Property itemVisiblility = providerManager.getProviderProperties(loggedInInfo, loggedInInfo.getLoggedInProviderNo(), item);
-			if(itemVisiblility != null)
+			Property itemVisibility = providerManager.getProviderProperties(loggedInInfo, loggedInInfo.getLoggedInProviderNo(), item);
+			if(itemVisibility != null)
 			{
-				String value = itemVisiblility.getValue();
+				String value = itemVisibility.getValue();
 				displayItem = !value.isEmpty() && !value.equals("off");
 			}
 			else if (isVisibleByDefault(item))
