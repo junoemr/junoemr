@@ -661,7 +661,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                                     }
                                                     else
                                                     {
-                                                        orderStatus = (handler.getOrderStatus().equals("F") ? "Final" : handler.getOrderStatus().equals("C") ? "Corrected" : (handler.getMsgType().equals("PATHL7") && handler.getOrderStatus().equals("P")) ? "Preliminary" : handler.getOrderStatus().equals("X") ? "DELETED" : handler.getOrderStatus());
+                                                        orderStatus = (handler.getOrderStatusDisplayValue());
                                                     }
                                                     %>
                                                     <%=orderStatus%>
@@ -1021,7 +1021,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 		                                            <td align="left"><%=handler.getOBXReferenceRange( j, k)%></td>
 		                                            <td align="left"><%=handler.getOBXUnits( j, k) %></td>
 		                                            <td align="center"><%= handler.getTimeStamp(j, k) %></td>
-		                                            <td align="center"><%= handler.getOBXResultStatus( j, k) %></td>
+		                                            <td align="center"><%= handler.getOBXResultStatusDisplayValue( j, k) %></td>
 	                                       		</tr>
 	                                       <% } else if (handler.getOBXIdentifier(j,k).equals(headers.get(i)) && obxName.equals("")) { %>
 	                                       			<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
@@ -1040,7 +1040,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
 			                                            <td align="left"><%=handler.getOBXReferenceRange( j, k)%></td>
 			                                            <td align="left"><%=handler.getOBXUnits( j, k) %></td>
 			                                            <td align="center"><%= handler.getTimeStamp(j, k) %></td>
-			                                            <td align="center"><%= handler.getOBXResultStatus( j, k) %></td>
+			                                            <td align="center"><%= handler.getOBXResultStatusDisplayValue( j, k) %></td>
 		                                       		 </tr>
 
 	                                    	 	<%} else { %>
@@ -1178,7 +1178,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                                     <td align="left"><%=handler.getOBXReferenceRange( j, k)%></td>
                                                     <td align="left"><%=handler.getOBXUnits( j, k) %></td>
                                                     <td align="center"><%= handler.getTimeStamp(j, k) %></td>
-                                                    <td align="center"><%= handler.getOBXResultStatus( j, k) %></td><%
+                                                    <td align="center"><%= handler.getOBXResultStatusDisplayValue( j, k) %></td><%
                                                 }
                                    			}//end of PATHL7 else %>
                                         </tr>

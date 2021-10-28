@@ -674,7 +674,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 						if ($scope.calendarViewName === controller.calendarViewEnum.agendaDay)
 						{
 							if (controller.appointmentCountOptions.enabled) {
-								const dateText = moment($scope.datepickerSelectedDate)
+								const dateText = moment(controller.datepickerSelectedDate)
 									.format(Juno.Common.Util.DisplaySettings.calendarDateFormat);
 
 								const selectedProviderNo = controller.selectedSchedule.providerNos[0];

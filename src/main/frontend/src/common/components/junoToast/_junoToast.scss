@@ -5,7 +5,7 @@
 	--color: var(--color-neutral-white);
 	--border: none;
 	--border-radius: 0.5em;
-	--padding: 8px 48px;
+	--padding: 0.6em 3em;
 	--max-width: calc(min(800px, 100vw));
 	--min-width: calc(min(512px, 100vw));
 	--font-size: 14px;
@@ -52,8 +52,8 @@
 
 	.toast-icon {
 		position: absolute;
-		right: 8px;
-		top: 8px;
+		right: 0.33em;
+		top: 0.33em;
 		font-size: var(--icon-size);
 	}
 

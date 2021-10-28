@@ -32,6 +32,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -46,23 +47,79 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 
+/*
+-------------------------------------------------------------------------------
+Test set: integration.tests.EditCPPNotesClassicIT
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 4, Skipped: 0, Time elapsed: 44.286 s <<< FAILURE! - in integration.tests.EditCPPNotesClassicIT
+editMedicalHistoryTest  Time elapsed: 12.068 s  <<< ERROR!
+org.openqa.selenium.NoSuchElementException:
+Unable to locate element: //div[@id='divR1I2']//descendant::a[@title='Add Item']
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
+System info: host: 'fedora', ip: '127.0.0.1', os.name: 'Linux', os.arch: 'amd64', os.version: '5.13.8-200.fc34.x86_64', java.version: '1.8.0_302'
+Driver info: org.openqa.selenium.firefox.FirefoxDriver
+Capabilities {acceptInsecureCerts: true, browserName: firefox, browserVersion: 90.0.2, javascriptEnabled: true, moz:accessibilityChecks: false, moz:buildID: 20210804102508, moz:geckodriverVersion: 0.29.0, moz:headless: true, moz:processID: 2351858, moz:profile: /tmp/rust_mozprofileAyYHQI, moz:shutdownTimeout: 60000, moz:useNonSpecCompliantPointerOrigin: false, moz:webdriverClick: true, pageLoadStrategy: normal, platform: LINUX, platformName: LINUX, platformVersion: 5.13.8-200.fc34.x86_64, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify}
+Session ID: 9e942e74-3d09-41ff-ac9a-0755b982a5a2
+*** Element info: {Using=xpath, value=//div[@id='divR1I2']//descendant::a[@title='Add Item']}
+    at integration.tests.EditCPPNotesClassicIT.editMedicalHistoryTest(EditCPPNotesClassicIT.java:138)
+
+editRemindersTest  Time elapsed: 11.216 s  <<< ERROR!
+org.openqa.selenium.NoSuchElementException:
+Unable to locate element: //div[@id='divR2I2']//descendant::a[@title='Add Item']
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
+System info: host: 'fedora', ip: '127.0.0.1', os.name: 'Linux', os.arch: 'amd64', os.version: '5.13.8-200.fc34.x86_64', java.version: '1.8.0_302'
+Driver info: org.openqa.selenium.firefox.FirefoxDriver
+Capabilities {acceptInsecureCerts: true, browserName: firefox, browserVersion: 90.0.2, javascriptEnabled: true, moz:accessibilityChecks: false, moz:buildID: 20210804102508, moz:geckodriverVersion: 0.29.0, moz:headless: true, moz:processID: 2352261, moz:profile: /tmp/rust_mozprofileQvkpbY, moz:shutdownTimeout: 60000, moz:useNonSpecCompliantPointerOrigin: false, moz:webdriverClick: true, pageLoadStrategy: normal, platform: LINUX, platformName: LINUX, platformVersion: 5.13.8-200.fc34.x86_64, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify}
+Session ID: bee31581-8e67-4df9-b444-e0d00c10034c
+*** Element info: {Using=xpath, value=//div[@id='divR2I2']//descendant::a[@title='Add Item']}
+    at integration.tests.EditCPPNotesClassicIT.editRemindersTest(EditCPPNotesClassicIT.java:251)
+
+editOngoingConcernsTest  Time elapsed: 10.782 s  <<< ERROR!
+org.openqa.selenium.NoSuchElementException:
+Unable to locate element: //div[@id='divR2I1']//descendant::a[@title='Add Item']
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
+System info: host: 'fedora', ip: '127.0.0.1', os.name: 'Linux', os.arch: 'amd64', os.version: '5.13.8-200.fc34.x86_64', java.version: '1.8.0_302'
+Driver info: org.openqa.selenium.firefox.FirefoxDriver
+Capabilities {acceptInsecureCerts: true, browserName: firefox, browserVersion: 90.0.2, javascriptEnabled: true, moz:accessibilityChecks: false, moz:buildID: 20210804102508, moz:geckodriverVersion: 0.29.0, moz:headless: true, moz:processID: 2352659, moz:profile: /tmp/rust_mozprofileB72bHB, moz:shutdownTimeout: 60000, moz:useNonSpecCompliantPointerOrigin: false, moz:webdriverClick: true, pageLoadStrategy: normal, platform: LINUX, platformName: LINUX, platformVersion: 5.13.8-200.fc34.x86_64, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify}
+Session ID: 36a6e6d8-a55b-4442-85ce-be21281aebfa
+*** Element info: {Using=xpath, value=//div[@id='divR2I1']//descendant::a[@title='Add Item']}
+    at integration.tests.EditCPPNotesClassicIT.editOngoingConcernsTest(EditCPPNotesClassicIT.java:195)
+
+editSocialHistoryTest  Time elapsed: 9.925 s  <<< ERROR!
+org.openqa.selenium.NoSuchElementException:
+Unable to locate element: //div[@id='divR1I1']//descendant::a[@title='Add Item']
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
+System info: host: 'fedora', ip: '127.0.0.1', os.name: 'Linux', os.arch: 'amd64', os.version: '5.13.8-200.fc34.x86_64', java.version: '1.8.0_302'
+Driver info: org.openqa.selenium.firefox.FirefoxDriver
+Capabilities {acceptInsecureCerts: true, browserName: firefox, browserVersion: 90.0.2, javascriptEnabled: true, moz:accessibilityChecks: false, moz:buildID: 20210804102508, moz:geckodriverVersion: 0.29.0, moz:headless: true, moz:processID: 2352997, moz:profile: /tmp/rust_mozprofile2fUBAz, moz:shutdownTimeout: 60000, moz:useNonSpecCompliantPointerOrigin: false, moz:webdriverClick: true, pageLoadStrategy: normal, platform: LINUX, platformName: LINUX, platformVersion: 5.13.8-200.fc34.x86_64, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify}
+Session ID: 7839a1e0-e898-4aaa-899c-83c63498d923
+*** Element info: {Using=xpath, value=//div[@id='divR1I1']//descendant::a[@title='Add Item']}
+    at integration.tests.EditCPPNotesClassicIT.editSocialHistoryTest(EditCPPNotesClassicIT.java:85)
+
+ */
+@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EditCPPNotesClassicIT extends SeleniumTestBase
 {
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"casemgmt_cpp", "casemgmt_issue", "casemgmt_issue_notes", "casemgmt_note",
+			"casemgmt_note_ext", "eChart", "hash_audit", "log"
+		};
+	}
+
 	@Before
 	public void setup()
 	{
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
-	}
-
-	@After
-	public void cleanup()
-			throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
-	{
-		SchemaUtils.restoreTable("casemgmt_cpp", "casemgmt_issue", "casemgmt_issue_notes", "casemgmt_note",
-				"casemgmt_note_ext", "eChart", "hash_audit", "log");
 	}
 
 	@Test

@@ -317,7 +317,7 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 	}
 
 	@Override
-	protected String getOrderingProvider(int i, int k) throws HL7Exception
+	protected String getOrderingProvider(int i, int k)
 	{
 		String familyName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-2"));
 		String givenName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-3"));
@@ -331,7 +331,7 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 	}
 
 	@Override
-	protected String getResultCopiesTo(int i, int k) throws HL7Exception
+	protected String getResultCopiesTo(int i, int k)
 	{
 		String familyName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-2"));
 		String givenName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-3"));

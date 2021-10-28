@@ -57,6 +57,19 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 	String statusExpectedCusomized2 = "Customized 2";
 	String statusExpectedCancelled = "Cancelled";
 
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"admission", "appointment","appointmentArchive", "caisi_role",  "demographic",
+			"documentDescriptionTemplate", "issue", "log", "log_ws_rest", "LookupList", "LookupListItem",
+			"measurementType", "mygroup", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
+			"provider_billing", "providerArchive", "providerbillcenter", "ProviderPreference", "providersite",
+			"rschedule", "secUserRole", "scheduledate", "scheduletemplate", "scheduletemplatecode", "site",
+			"tickler_text_suggest"
+		};
+	}
+
 	@Before
 	public void setup() throws Exception
 	{
@@ -64,17 +77,6 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 		databaseUtil.createTestDemographic();
 		databaseUtil.createTestProvider();
 		databaseUtil.createProviderSite();
-	}
-
-	@After
-	public void cleanup() throws Exception
-	{
-		SchemaUtils.restoreTable("admission", "appointment","appointmentArchive", "caisi_role",  "demographic",
-				"documentDescriptionTemplate", "issue", "log", "log_ws_rest", "LookupList", "LookupListItem",
-				"measurementType", "mygroup", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
-				"provider_billing", "providerArchive", "providerbillcenter", "ProviderPreference", "providersite",
-				"rschedule", "secUserRole", "scheduledate", "scheduletemplate", "scheduletemplatecode", "site",
-				"tickler_text_suggest" );
 	}
 
 	public static String apptStatusHoverOver()

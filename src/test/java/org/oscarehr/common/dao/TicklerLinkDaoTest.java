@@ -30,7 +30,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
@@ -52,14 +54,19 @@ public class TicklerLinkDaoTest extends DaoTestFixtures
 	@Autowired TicklerDao ticklerDao;
 
 	@Before
+	@After
 	public void before() throws Exception {
 		SchemaUtils.restoreTable("tickler_link", "tickler");
 	}
 
 	@Test
 	public void testCreate() throws Exception {
+		Tickler tickler1 = new Tickler();
+		ticklerDao.persist(tickler1);
 		TicklerLink entity = new TicklerLink();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
+		entity.setTickler(tickler1);
+		entity.setMeta(null);
 		ticklerLinkDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
@@ -72,33 +79,44 @@ public class TicklerLinkDaoTest extends DaoTestFixtures
 		
 		String tableId1 = "101";
 		String tableId2 = "202";
-		
+
+		Tickler tickler1 = new Tickler();
+		ticklerDao.persist(tickler1);
+
 		TicklerLink ticklerLink1 = new TicklerLink();
 		EntityDataGenerator.generateTestDataForModelClass(ticklerLink1);
 		ticklerLink1.setTableName(tableName1);
 		ticklerLink1.setTableId(tableId1);
+		ticklerLink1.setTickler(tickler1);
+		ticklerLink1.setMeta(null);
 		ticklerLinkDao.persist(ticklerLink1);
 		
 		TicklerLink ticklerLink2 = new TicklerLink();
 		EntityDataGenerator.generateTestDataForModelClass(ticklerLink2);
 		ticklerLink2.setTableName(tableName2);
 		ticklerLink2.setTableId(tableId1);
+		ticklerLink2.setTickler(tickler1);
+		ticklerLink2.setMeta(null);
 		ticklerLinkDao.persist(ticklerLink2);
 		
 		TicklerLink ticklerLink3 = new TicklerLink();
 		EntityDataGenerator.generateTestDataForModelClass(ticklerLink3);
 		ticklerLink3.setTableName(tableName1);
 		ticklerLink3.setTableId(tableId1);
+		ticklerLink3.setTickler(tickler1);
+		ticklerLink3.setMeta(null);
 		ticklerLinkDao.persist(ticklerLink3);
 		
 		TicklerLink ticklerLink4 = new TicklerLink();
 		EntityDataGenerator.generateTestDataForModelClass(ticklerLink4);
 		ticklerLink4.setTableName(tableName1);
 		ticklerLink4.setTableId(tableId2);
+		ticklerLink4.setTickler(tickler1);
+		ticklerLink4.setMeta(null);
 		ticklerLinkDao.persist(ticklerLink4);
-		
-		List<TicklerLink> expectedResult = new ArrayList<TicklerLink>(Arrays.asList(ticklerLink1, ticklerLink3));		
-		List<TicklerLink> result = ticklerLinkDao.getLinkByTableId(tableName1, Long.parseLong(tableId1));
+
+		List<TicklerLink> expectedResult = new ArrayList<TicklerLink>(Arrays.asList(ticklerLink1, ticklerLink3));
+		List<TicklerLink> result = ticklerLinkDao.getLinkByTableId(tableName1, tableId1);
 		
 		Logger logger = MiscUtils.getLogger();
 		if (result.size() != expectedResult.size()) {

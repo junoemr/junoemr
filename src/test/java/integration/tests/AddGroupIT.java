@@ -55,17 +55,20 @@ public class AddGroupIT extends SeleniumTestBase
 	public static final String valueOfDrBerry = groupName + drBerry.providerNo;
 	public static final String valueOfDrCherry = groupName + drCherry.providerNo;
 
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"admission", "log", "log_ws_rest", "mygroup", "provider", "providerbillcenter"
+		};
+	}
+
 	@Before
 	public void setup()
+		throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
 	{
 		loadSpringBeans();
 		databaseUtil.createTestProvider();
-	}
-
-	@After
-	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
-	{
-		SchemaUtils.restoreTable("admission", "log", "log_ws_rest", "mygroup", "provider", "providerbillcenter");
 	}
 
 	public void addGroup(String groupName, int groupSize)
