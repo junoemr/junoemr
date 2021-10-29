@@ -1,3 +1,7 @@
+import LoadingQueue from "../lib/util/LoadingQueue";
+import ToastService from "../lib/alerts/service/ToastService";
+import {SecurityPermissions} from "../common/security/securityConstants";
+
 angular.module('Consults').controller('Consults.ConsultResponseController', [
 
 	'$scope',
@@ -32,6 +36,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 		controller.SecurityPermissions = SecurityPermissions;
 
 		controller.loadingQueue = new LoadingQueue();
+		controller.toastService = new ToastService();
 
 		controller.initialize = function()
 		{
@@ -172,12 +177,14 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				function success(results)
 				{
 					if(results.summaryItem.length === 0)
-						alert("No family history");
+					{
+						controller.toastService.notificationToast("No family history");
+					}
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
-					alert("Error grabbing family history!");
+					controller.toastService.errorToast("Error grabbing family history!", true);
 					console.log(errors);
 				});
 		};
@@ -187,12 +194,14 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				function success(results)
 				{
 					if(results.summaryItem.length === 0)
-						alert("No medical history");
+					{
+						controller.toastService.notificationToast("No medical history");
+					}
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
-					alert("Error grabbing medical history!");
+					controller.toastService.errorToast("Error grabbing medical history!", true);
 					console.log(errors);
 				});
 		};
@@ -202,12 +211,14 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				function success(results)
 				{
 					if(results.summaryItem.length === 0)
-						alert("No social history");
+					{
+						controller.toastService.notificationToast("No social history");
+					}
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
-					alert("Error grabbing social history!");
+					controller.toastService.errorToast("Error grabbing social history!", true);
 					console.log(errors);
 				});
 		};
@@ -217,27 +228,50 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				function success(results)
 				{
 					if(results.summaryItem.length === 0)
-						alert("No ongoing concerns");
+					{
+						controller.toastService.notificationToast("No ongoing concerns");
+					}
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
-					alert("Error grabbing ongoing concerns!");
+					controller.toastService.errorToast("Error grabbing ongoing concerns!", true);
 					console.log(errors);
 				});
 		};
+
+		controller.getDxRegistry = function getDxRegistry(boxId)
+		{
+			summaryService.getDiseaseRegistry(consult.demographic.demographicNo).then(
+				function success(results)
+				{
+					if (results.summaryItem.length === 0)
+					{
+						controller.toastService.notificationToast("No Dx codes registered");
+					}
+					controller.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					controller.toastService.errorToast("Error grabbing Dx codes!", true);
+					console.log(errors);
+				});
+		};
+
 		controller.getOtherMeds = function getOtherMeds(boxId)
 		{
 			summaryService.getOtherMeds(consult.demographic.demographicNo).then(
 				function success(results)
 				{
 					if(results.summaryItem.length === 0)
-						alert("No other meds");
+					{
+						controller.toastService.notificationToast("No other meds");
+					}
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
-					alert("Error grabbing other meds!");
+					controller.toastService.errorToast("Error grabbing other meds!", true);
 					console.log(errors);
 				});
 		};
@@ -247,7 +281,9 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 				function success(results)
 				{
 					if(results.summaryItem.length === 0)
-						alert("No reminders");
+					{
+						controller.toastService.notificationToast("No reminders");
+					}
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)

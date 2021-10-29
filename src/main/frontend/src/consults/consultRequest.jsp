@@ -251,6 +251,10 @@
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Ongoing Concerns
 									</button>
+									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getDxRegistry('clinicalInfo');">
+										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+										Dx Registry
+									</button>
 									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getOtherMeds('clinicalInfo');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Other Meds
@@ -286,6 +290,10 @@
 									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getOngoingConcerns('concurrentProblems');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Ongoing Concerns
+									</button>
+									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getDxRegistry('concurrentProblems');">
+										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+										Dx Registry
 									</button>
 									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getOtherMeds('concurrentProblems');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
