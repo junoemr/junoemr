@@ -258,6 +258,17 @@
 				junoEncounter.getSectionRemote(sectionName, false, false, getEChartUUID());
 			}
 
+			// required for OCEAN
+			function newNote(e)
+			{
+				if (e != null)
+				{
+					Event.stop(e);
+				}
+				encounterNote.createNewNote();
+				return false;
+			}
+
 
 			<%-- ============================================================================== --%>
 			<%-- Local functions                                                                --%>
