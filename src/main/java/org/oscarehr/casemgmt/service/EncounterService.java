@@ -30,6 +30,8 @@ import org.oscarehr.casemgmt.dto.EncounterSection;
 import org.oscarehr.casemgmt.model.ClientImage;
 import org.oscarehr.common.model.EncounterTemplate;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,6 +126,9 @@ public class EncounterService
 
 	@Autowired
 	private EncounterFamilyHistoryService encounterFamilyHistoryService;
+
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
 
 	@Autowired
 	private EncounterHRMService encounterHRMService;
@@ -371,6 +376,11 @@ public class EncounterService
 
 		encounterPageData.setLinkToOldEncounterPageEnabled(
 				OscarProperties.getInstance().isJunoEncounterLinkToOldEncounterPageEnabled());
+
+		encounterPageData.setCareConnectEnabled(
+			systemPreferenceService.isPreferenceEnabled(UserProperty.CARE_CONNECT_ENABLED, false));
+		encounterPageData.setImdHealthEnabled(
+			systemPreferenceService.isPreferenceEnabled(UserProperty.INTEGRATION_IMDHEALTH_ENABLED, false));
 
 		return encounterPageData;
 	}
