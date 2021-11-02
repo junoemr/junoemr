@@ -263,9 +263,14 @@ function write2TextArea()
 				</tr>
 				<tr></tr>
 				<tr>
-					<td id="results-area"><logic:present name="results">
-						<bean:write name="results" filter="false" />
-					</logic:present></td>
+					<td id="results-area">
+						<logic:present name="results">
+							<logic:present name="limitsEnforced">
+								<h5>Results are limited to <bean:write name="resultLimit" filter="false"/> rows.</h5>
+							</logic:present>
+							<bean:write name="results" filter="false"/>
+						</logic:present>
+					</td>
 				</tr>
 			</table>
 			</td>

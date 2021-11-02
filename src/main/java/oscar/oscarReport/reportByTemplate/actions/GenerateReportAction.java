@@ -28,6 +28,7 @@
 package oscar.oscarReport.reportByTemplate.actions;
 
 import com.Ostermiller.util.CSVParser;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -55,7 +56,7 @@ import java.util.zip.ZipOutputStream;
 public class GenerateReportAction extends Action
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private static final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 
     public ActionForward execute(ActionMapping mapping, ActionForm form,
                                  HttpServletRequest request, HttpServletResponse response)
@@ -64,75 +65,54 @@ public class GenerateReportAction extends Action
 	    String sessionProviderNo = (String) request.getSession().getAttribute("user");
 	    securityInfoManager.requireOnePrivilege(sessionProviderNo, SecurityInfoManager.READ, null, "_admin", "_report", "_admin.reporting");
 
+	    String getCsv = StringUtils.trimToNull(request.getParameter("getCSV"));
+	    String getXls = StringUtils.trimToNull(request.getParameter("getXLS"));
+		boolean asCsv = StringUtils.isNotBlank(getCsv);
+
 	    try
 	    {
 		    Reporter reporter = ReportFactory.getReporter(request.getParameter("type"));
-		    String getCsv = request.getParameter("getCSV");
-		    String getXls = request.getParameter("getXLS");
+			boolean prepareForFile = !StringUtils.isAllBlank(getCsv, getXls);
 
-		    if(reporter.generateReport(request))
+		    if(reporter.generateReport(request, prepareForFile))
 		    {
-			    Integer sequenceLength = (Integer) request.getAttribute("sequenceLength");
-
-			    if(getCsv != null)
-			    {
-				    if(sequenceLength == null)
-				    {
-					    generateCsvFile(request, response);
-				    }
-				    else
-				    {
-					    try
-					    {
-						    generateCsvZip(request, response, sequenceLength);
-					    }
-					    catch(IOException io)
-					    {
-						    MiscUtils.getLogger().error("Error Generating CSV Zip File: ", io);
-					    }
-
-				    }
-				    return null;
-			    }
-			    else if(getXls != null)
-			    {
-				    if(sequenceLength == null)
-				    {
-					    String csv = (String) request.getSession().getAttribute("csv");
-					    response.setContentType("application/octet-stream");
-					    response.setHeader("Content-Disposition", "attachment; filename=\"oscarReport.xls\"");
-
-					    HSSFWorkbook xlsFile = generateXlsWorkbook(csv);
-
-					    try
-					    {
-						    xlsFile.write(response.getOutputStream());
-					    }
-					    catch(Exception e)
-					    {
-						    MiscUtils.getLogger().error("Error Writing XLS file: ", e);
-					    }
-				    }
-				    else
-				    {
-					    try
-					    {
-						    generateXlsZip(request, response, sequenceLength);
-					    }
-					    catch(IOException io)
-					    {
-						    MiscUtils.getLogger().error("Error Generating XLS Zip File: ", io);
-					    }
-
-				    }
-				    return null;
-			    }
-			    else
-			    {
-				    return mapping.findForward("success");
-			    }
+				if(prepareForFile)
+				{
+					Integer sequenceLength = (Integer) request.getAttribute("sequenceLength");
+					if(sequenceLength == null)
+					{
+						String csv = (String) request.getSession().getAttribute("csv");
+						if(asCsv)
+						{
+							generateCsvFile(csv, response);
+						}
+						else
+						{
+							generateXlsFile(csv, response);
+						}
+					}
+					else
+					{
+						if(asCsv)
+						{
+							generateCsvZip(request, response, sequenceLength);
+						}
+						else
+						{
+							generateXlsZip(request, response, sequenceLength);
+						}
+					}
+					return null;
+				}
+				else
+				{
+					return mapping.findForward("success");
+				}
 		    }
-
+	    }
+	    catch(IOException io)
+	    {
+		    logger.error("Error Generating " + (asCsv ? "CSV" : "XLS") + " Zip File: ", io);
 	    }
 	    catch(Exception e)
 	    {
@@ -141,21 +121,19 @@ public class GenerateReportAction extends Action
 		return mapping.findForward("fail");
     }
 
-	private void generateCsvFile(HttpServletRequest request, HttpServletResponse response)
+	private void generateCsvFile(String csv, HttpServletResponse response) throws IOException
 	{
-		String csv = (String) request.getSession().getAttribute("csv");
-
-		response.setContentType("application/octet-stream");
+		response.setContentType("text/csv");
 		response.setHeader("Content-Disposition", "attachment; filename=\"oscarReport.csv\"");
+		response.getWriter().write(csv);
+	}
 
-		try
-		{
-			response.getWriter().write(csv);
-		}
-		catch(Exception e)
-		{
-			MiscUtils.getLogger().error("Error Writing CSV file: ", e);
-		}
+	private void generateXlsFile(String csv, HttpServletResponse response) throws IOException
+	{
+		response.setContentType("application/vnd.ms-excel");
+		response.setHeader("Content-Disposition", "attachment; filename=\"oscarReport.xls\"");
+		HSSFWorkbook xlsFile = generateXlsWorkbook(csv);
+		xlsFile.write(response.getOutputStream());
 	}
 
 	private HSSFWorkbook generateXlsWorkbook(String csv)
