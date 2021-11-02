@@ -82,9 +82,9 @@ public class LoginFilter implements Filter {
 		"/actuator/info",
 		"/actuator/prometheus",
 		"/actuator/health",
-		"/actuator/health/custom",
 		"/actuator/health/liveness",
 		"/actuator/health/readiness",
+		"/actuator/health/system",
 		"/oauth",
 		"/oauth/action.do",
 		"/oauth/index.jsp"
