@@ -1,14 +1,21 @@
 pipeline {
     agent any
+    tools {
+        maven 'Maven 3.6.3'
+        jdk 'jdk16'
+    }
     stages {
-        stage('Build') {
+        stage ('Initialize') {
             steps {
-                echo 'Build'
+                sh '''
+                    echo "PATH = ${PATH}"
+                    echo "M2_HOME = ${M2_HOME}"
+                '''
             }
         }
-        stage('Test'){
+        stage('Test') {
             steps {
-                echo 'Test'
+                sh 'mvn -Doscar.dbinit.skip=false clean verify'
             }
         }
     }
