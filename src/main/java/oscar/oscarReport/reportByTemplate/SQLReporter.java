@@ -36,6 +36,7 @@ import org.oscarehr.report.reportByTemplate.exception.ReportByTemplateException;
 import org.oscarehr.report.reportByTemplate.service.ReportByTemplateService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import oscar.OscarProperties;
 import oscar.oscarDB.DBHandler;
 import oscar.oscarReport.data.RptResultStruct;
@@ -130,7 +131,8 @@ public class SQLReporter implements Reporter
 
 						if(!allowRun)
 						{
-							request.setAttribute("errormsg", "Error: The report examines more than the maximum " + maxRows + " rows");
+							request.setAttribute("errormsg", "Error: The report examines more than the maximum " + maxRows + " rows." +
+									" Please try limiting your report to a smaller data set and trying again.");
 							request.setAttribute("explainResults", explainResultList);
 							request.setAttribute("templateid", templateIdStr);
 							return false;
@@ -162,15 +164,20 @@ public class SQLReporter implements Reporter
 			updateLog(logEntry, rowCount);
 		}
 		// since users can write custom queries this error is expected and should not generate an error in the log
-		catch(ReportByTemplateException | SQLException | PersistenceException e)
+		catch(ReportByTemplateException e)
 		{
-			logger.warn("An Exception occurred while generating a report by template (from user defined query): " + e.getMessage());
-			rsHtml = "An SQL query error has occurred<br>" + e.getMessage();
+			logger.warn("report by template error: " + e.getMessage());
+			rsHtml = "Template Error:<br>" + e.getMessage();
+		}
+		catch(SQLException | InvalidDataAccessResourceUsageException | PersistenceException e)
+		{
+			logger.warn("An SQL Exception occurred while generating a report by template (from user defined query): " + e.getMessage());
+			rsHtml = "An SQL query error has occurred, please check the query syntax and try again.<br>" + e.getMessage();
 		}
 		catch(Exception sqe)
 		{
 			logger.error("Error", sqe);
-			rsHtml += "<br>" + sqe.getMessage();
+			rsHtml += "An Unknown Error has occurred. Please contact support if this error persists.";
 		}
 
 		request.setAttribute("sql", nativeSQL);
