@@ -157,6 +157,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 	}
 
 	@Test
+	@Ignore
 	public void addAppointmentsSchedulePageWeeklyViewTest() throws InterruptedException {
 		//Weekly View - next week
 		driver.findElement(By.xpath("//input[@name='weekview']")).click();
@@ -183,6 +184,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 	}
 
 	@Test
+	@Ignore
 	public void addAppointmentsSchedulePageFlipViewTest() throws InterruptedException {
 		//Flip View - next Month
 		driver.findElement(By.xpath("//input[@name='flipview']")).click();
@@ -275,6 +277,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 	}
 
 	@Test
+	@Ignore
 	public void addAppointmentsGroupViewTest() throws InterruptedException
 	{
 		String groupName = "TestGroup";

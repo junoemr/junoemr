@@ -437,6 +437,21 @@ public abstract class MessageHandler
 	}
 
 	/**
+	 *  Return the status of the report in a human-readable format
+	 */
+	public String getOrderStatusDisplayValue()
+	{
+		String orderStatusCode = getString(getOrderStatus());
+		switch (orderStatusCode)
+		{
+			case "F": return "Final";
+			case "C": return "Corrected";
+			case "X": return "DELETED";
+			default: return orderStatusCode;
+		}
+	}
+
+	/**
 	 * get the internal juno order status code
 	 * @return - internal juno order status code
 	 */
@@ -754,6 +769,14 @@ public abstract class MessageHandler
 	public String getOBXResultStatus( int i, int j)
 	{
 		return "";
+	}
+
+	/**
+	 *  Return the result status from the jth OBX segment of the ith OBR group, in a human-readable format
+	 */
+	public String getOBXResultStatusDisplayValue(int i, int j)
+	{
+		return getOBXResultStatus(i, j);
 	}
 
 	/**

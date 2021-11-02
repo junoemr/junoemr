@@ -380,7 +380,7 @@ public class EaapsHandler extends DefaultGenericHandler implements oscar.oscarLa
 		{
 			// this is refactored from legacy logic
 			DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
-			encounterNoteService.saveDocumentNote(cmn, documentDao.find(EDocUtil.getLastDocumentNo()));
+			encounterNoteService.saveDocumentNote(cmn, documentDao.find(Integer.parseInt(EDocUtil.getLastDocumentNo())));
 		}
 		else
 		{

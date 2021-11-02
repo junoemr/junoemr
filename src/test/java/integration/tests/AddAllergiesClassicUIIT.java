@@ -41,6 +41,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -70,6 +71,8 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		);
 	}
 
+	// Ignored because it can't connect to drugref
+	@Ignore
 	@Test
 	public void addAllergiesClassicUITest() throws InterruptedException
 	{

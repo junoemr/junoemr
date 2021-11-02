@@ -28,6 +28,7 @@ import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -133,6 +134,7 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 	}
 
 	@Test
+	@Ignore
 	public void addLoginRecordsClassicUITest()
 		throws InterruptedException
 	{
@@ -175,6 +177,7 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 	}
 
 	@Test
+	@Ignore
 	public void addLoginRecordsJUNOUITest()
 			throws InterruptedException
 	{

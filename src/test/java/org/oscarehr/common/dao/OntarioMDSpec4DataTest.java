@@ -53,6 +53,8 @@ import java.text.DateFormat;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -60,6 +62,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -123,8 +126,9 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
 	protected AdmissionDao admissionDao;
 
 	protected Integer oscarProgramID;
-	
+
 	@Before
+	@After
 	public void before() throws Exception {
 		//SchemaUtils.restoreAllTables();
 		SchemaUtils.restoreTable(
@@ -147,7 +151,13 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
 		    "ctl_document",
 			"program_queue",
 		    "Facility",
-			"issue"
+			"issue",
+			"DemographicContact",
+			"appointment",
+			"casemgmt_note_link",
+			"drugs",
+			"measurements",
+			"preventions"
         );
 	}
 
@@ -647,6 +657,7 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
 			secuserrole.setProviderNo(providerNo);
 			secuserrole.setRoleName(rolename);
 			secuserrole.setActive(active);
+			secuserrole.setLastUpdateDate(Date.from(LocalDate.of(2021,1,1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 			return secuserrole;
 
 		}
