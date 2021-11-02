@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.oscarehr.common.annotation.SiteLocation;
 import org.oscarehr.common.listeners.BeanValidationEventListener;
+import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.integration.aqs.model.QueuedAppointmentLink;
 import org.oscarehr.provider.model.ProviderData;
 import oscar.util.ConversionUtils;
@@ -110,6 +111,10 @@ public class Appointment extends AbstractModel<Integer> implements Serializable
 
 	@Column(name = "demographic_no")
 	private int demographicNo;
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "demographic_no", referencedColumnName = "demographic_no", updatable = false, insertable = false)
+	private Demographic demographic;
 
 	@Column(name = "program_id")
 	private int programId;
@@ -260,6 +265,11 @@ public class Appointment extends AbstractModel<Integer> implements Serializable
 
 	public int getDemographicNo() {
 		return demographicNo;
+	}
+
+	public Optional<Demographic> getDemographic()
+	{
+		return Optional.ofNullable(this.demographic);
 	}
 
 	public boolean hasDemographic()

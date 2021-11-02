@@ -338,6 +338,15 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		this.lastName = lastName;
 	}
 
+	/**
+	 * get demographic display name in format <first name> <first letter of last name>
+	 * @return the name
+	 */
+	public String getDisplayNameShort()
+	{
+		return String.format("%s %s", getFirstName(), getLastName() != null && getLastName().length() > 0 ? getLastName().substring(0, 1) : "");
+	}
+
 	public String getDisplayName()
 	{
 		return getFormattedName();
