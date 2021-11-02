@@ -28,6 +28,7 @@ import java.sql.Timestamp;
 /**
  * deprecated Use JPA instead, no new code should be written against this class.
  */
+@Deprecated
 public final class DBPreparedHandlerParam {
    private Date dateValue;
    private String stringValue;

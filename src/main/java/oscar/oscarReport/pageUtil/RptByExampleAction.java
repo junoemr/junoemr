@@ -126,6 +126,9 @@ public class RptByExampleAction extends Action
 					request.setAttribute("results", results);
 					request.setAttribute("resultText", results);
 
+					request.setAttribute("limitsEnforced", enforceQueryRestrictions);
+					request.setAttribute("resultLimit", maxResults);
+
 					return mapping.findForward("success");
 				}
 				else
@@ -189,11 +192,11 @@ public class RptByExampleAction extends Action
 	{
 		try
 		{
-			Long rowCount = -1L;
+			long rowCount = -1L;
 			if(resultSet != null)
 			{
 				resultSet.last();
-				rowCount = new Integer(resultSet.getRow()).longValue();
+				rowCount = (long) resultSet.getRow();
 			}
 
 			reportByExamples.setDatetimeEnd(new Date());

@@ -28,8 +28,7 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author rjonasz
  */
-public interface Reporter {
-    
-    public boolean generateReport( HttpServletRequest request);
-    
+public interface Reporter
+{
+    boolean generateReport(HttpServletRequest request, boolean prepareForFile);
 }
