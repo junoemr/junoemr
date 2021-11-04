@@ -86,7 +86,7 @@ public class AppointmentStatusList
 		return new AppointmentStatusList(orderedStatusList, descriptionMap, appointmentStatusList);
 	}
 
-	public AppointmentStatusList(
+	AppointmentStatusList(
 		List<String> orderedStatusList,
 		Map<String, String> descriptionMap,
 		List<AppointmentStatus> appointmentStatusList
@@ -126,8 +126,6 @@ public class AppointmentStatusList
 				appointmentStatus.getIcon(),
 				appointmentStatus.getActive() == 1
 			));
-			
-		}
 
 		return calendarAppointmentStatusList;
 	}
