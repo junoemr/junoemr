@@ -86,7 +86,7 @@ public class AppointmentStatusList
 		return new AppointmentStatusList(orderedStatusList, descriptionMap, appointmentStatusList);
 	}
 
-	public AppointmentStatusList(
+	AppointmentStatusList(
 		List<String> orderedStatusList,
 		Map<String, String> descriptionMap,
 		List<AppointmentStatus> appointmentStatusList
@@ -116,15 +116,18 @@ public class AppointmentStatusList
 				systemCode = SYSTEM_CODE_BILLED;
 			}
 
-			calendarAppointmentStatusList.add(new CalendarAppointmentStatus(
-				appointmentStatus.getJunoColor(),
-				appointmentStatus.getStatus(),
-				getTitle(appointmentStatus.getStatus(), DEFAULT_CALENDAR_LOCALE),
-				rotates,
-				appointmentStatus.getId(),
-				systemCode,
-				appointmentStatus.getIcon()
-			));
+			if (appointmentStatus.getActive() == 1)
+			{
+				calendarAppointmentStatusList.add(new CalendarAppointmentStatus(
+					appointmentStatus.getJunoColor(),
+					appointmentStatus.getStatus(),
+					getTitle(appointmentStatus.getStatus(), DEFAULT_CALENDAR_LOCALE),
+					rotates,
+					appointmentStatus.getId(),
+					systemCode,
+					appointmentStatus.getIcon()
+				));
+			}
 		}
 
 		return calendarAppointmentStatusList;
