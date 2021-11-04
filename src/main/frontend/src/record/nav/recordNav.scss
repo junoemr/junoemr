@@ -1,0 +1,30 @@
+.record-nav {
+
+	$border-bottom-size: 4px;
+	@include juno-tab-md(calc(#{$page-tabs-height} - #{$border-bottom-size}));
+	@include juno-tab-color-scheme-white($border-bottom-size);
+	@include juno-font-tab;
+
+	@include juno-breakpoints(1600px, $screen-nav-md, $screen-nav-sm);
+
+	.navbar-toggle {
+		i {
+			color: var(--color-primary-base);
+			font-size: 32px;
+		}
+	}
+
+	.sub-nav {
+		.dropdown-menu {
+			background-color: var(--color-neutral-white);
+			li {
+				a {
+					color: var(--color-neutral-dark);
+				}
+				a:hover {
+					background-color: var(--color-neutral-lightest);
+				}
+			}
+		}
+	}
+}

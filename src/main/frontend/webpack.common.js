@@ -370,6 +370,8 @@ module.exports = {
 			'./src/record/details/components/additionalInformationSection/additionalInformationSectionComponent.js',
 			'./src/record/details/components/demographicContactsModal/demographicContactsModalComponent.js',
 			'./src/record/details/components/patientInviteConfirmModal/mhaPatientInviteConfirmModalComponent.js',
+			'./src/record/nav/module.js',
+			'./src/record/nav/recordNavComponent.ts',
 			'./src/record/phr/module.js',
 			'./src/record/phr/phrController.js',
 
