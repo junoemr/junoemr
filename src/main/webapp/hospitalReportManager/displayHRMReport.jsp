@@ -18,21 +18,31 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
+
+
+
 <%
-    String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
-    boolean authed=true;
+    SecurityInfoManager securityService = SpringUtils.getBean(SecurityInfoManager.class);
+
+    LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+    String providerNo = loggedInInfo.getLoggedInProviderNo();
+
+    HRMDocumentToDemographic demographicLink = (HRMDocumentToDemographic) request.getAttribute("demographicLink");
 %>
-<security:oscarSec roleName="<%=roleName$%>" objectName="_lab" rights="r" reverse="<%=true%>">
-    <%authed=false; %>
-    <%response.sendRedirect("../securityError.jsp?type=_lab");%>
-</security:oscarSec>
-<%
-    if(!authed) {
-        return;
+
+<%  if ((demographicLink == null || demographicLink.getDemographicNo() == null)
+        && !securityService.hasPrivileges(providerNo, Permission.HRM_READ)) { %>
+    <h2> You do not have the correct permissions to access this page<h2>
+<% return;
+    } else if ((demographicLink != null && demographicLink.getDemographicNo() != null)
+    && !securityService.hasPrivileges(providerNo, demographicLink.getDemographicNo(), Permission.HRM_READ)) {
+%>
+    <h2> You do not have the correct permissions to access this demographic or page</h2>
+<% return;
     }
 %>
 
-<%@page import="java.util.LinkedList, org.oscarehr.hospitalReportManager.*, org.oscarehr.hospitalReportManager.model.*, java.util.List, org.oscarehr.util.SpringUtils, org.oscarehr.PMmodule.dao.ProviderDao, java.util.Date" %>
+<%@page import="java.util.LinkedList, java.util.List, org.oscarehr.util.SpringUtils, org.oscarehr.PMmodule.dao.ProviderDao, java.util.Date" %>
 <%@ page import="org.oscarehr.dataMigration.model.hrm.HrmObservation" %>
 <%@ page import="oscar.util.ConversionUtils" %>
 <%@ page import="org.oscarehr.demographic.model.Demographic" %>
@@ -44,6 +54,8 @@
 <%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider" %>
 <%@ page import="org.oscarehr.hospitalReportManager.HRMDisplayReportAction" %>
 <%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocument" %>
+<%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
+<%@ page import="org.oscarehr.security.model.Permission" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%!
@@ -111,10 +123,8 @@
     HRMReport hrmReport = (HRMReport) request.getAttribute("hrmReport");
     Integer hrmReportId = (Integer) request.getAttribute("hrmReportId");
 
-    HRMDocumentToDemographic demographicLink = (HRMDocumentToDemographic) request.getAttribute("demographicLink");
     List<HRMDocumentToProvider> providerLinkList = (List<HRMDocumentToProvider>) request.getAttribute("providerLinkList");
 
-    LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
     ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
     DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
 %>
@@ -470,8 +480,7 @@
 
 <% if (hrmReport==null) { %>
 <h1>HRM report not found! Please check the file location.</h1>
-<%  return;
-} %>
+<%  return; } %>
 
 <%
     String btnDisabled = "disabled";
