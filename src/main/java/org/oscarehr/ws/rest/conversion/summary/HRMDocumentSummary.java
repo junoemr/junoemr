@@ -27,6 +27,8 @@ package org.oscarehr.ws.rest.conversion.summary;
 import org.oscarehr.hospitalReportManager.dto.HRMDemographicDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.service.HRMService;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.SummaryItemTo1;
 import org.oscarehr.ws.rest.to.model.SummaryTo1;
@@ -51,12 +53,21 @@ public class HRMDocumentSummary implements Summary
 {
 	@Autowired
 	HRMService hrmService;
+
+	@Autowired
+	SecurityInfoManager securityInfoManager;
 	
 	@Override
 	public SummaryTo1 getSummary(LoggedInInfo loggedInInfo, Integer demographicNo, String summaryCode)
 	{
 		SummaryTo1 hrmDocumentSummary = new SummaryTo1("hrmdocument", 0, SummaryTo1.HRM_DOCUMENTS);
-		
+
+		// Extra paranoid, so another check at this level.
+		if (!securityInfoManager.hasPrivileges(loggedInInfo.getLoggedInProviderNo(), demographicNo, Permission.HRM_READ))
+		{
+			return hrmDocumentSummary;
+		}
+
 		// Format of the Map is <"sendingFacility:facilityReportNumber:DeliverToId", HRMDemographicDocument">
 		Map<String, HRMDemographicDocument> documents = hrmService.getHrmDocumentsForDemographic(demographicNo);
 		

@@ -25,6 +25,7 @@ import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -47,9 +48,9 @@ public class HRMModifyDocumentAction extends DispatchAction {
 	public ActionForward undefined(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String method = request.getParameter("method");
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "w", null)) {
-        	throw new SecurityException("missing required security object (_hrm)");
-        }
+		if (!securityInfoManager.hasPrivileges(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE)) {
+			throw new SecurityException("Insufficient permissions");
+		}
 		
 		if (method != null) {
 			if (method.equalsIgnoreCase("makeIndependent"))
@@ -80,9 +81,9 @@ public class HRMModifyDocumentAction extends DispatchAction {
 	public ActionForward makeIndependent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String reportId = request.getParameter("reportId");
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "w", null)) {
-        	throw new SecurityException("missing required security object (_hrm)");
-        }
+		if (!securityInfoManager.hasPrivileges(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE)) {
+			throw new SecurityException("Insufficient permissions");
+		}
 		
 		try {
 			HRMDocument document = hrmDocumentDao.find(Integer.parseInt(reportId));
@@ -117,9 +118,9 @@ public class HRMModifyDocumentAction extends DispatchAction {
 	public ActionForward signOff(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String reportId = request.getParameter("reportId");
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "w", null)) {
-        	throw new SecurityException("missing required security object (_hrm)");
-        }
+		if (!securityInfoManager.hasPrivileges(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE)) {
+			throw new SecurityException("Insufficient permissions");
+		}
 		
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 		String providerNo=loggedInInfo.getLoggedInProviderNo();
@@ -162,9 +163,9 @@ public class HRMModifyDocumentAction extends DispatchAction {
 	public ActionForward assignProvider(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String hrmDocumentId = request.getParameter("reportId");
 		String providerNo = request.getParameter("providerNo");
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "w", null)) {
-        	throw new SecurityException("missing required security object (_hrm)");
+
+		if (!securityInfoManager.hasPrivileges(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE)) {
+        	throw new SecurityException("Insuffient permission");
         }
 		
 
@@ -196,9 +197,9 @@ public class HRMModifyDocumentAction extends DispatchAction {
 	public ActionForward removeDemographic(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String hrmDocumentId = request.getParameter("reportId");
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "w", null)) {
-        	throw new SecurityException("missing required security object (_hrm)");
-        }
+		if (!securityInfoManager.hasPrivileges(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE)) {
+			throw new SecurityException("Insufficient permissions");
+		}
 		
 		try {
 			List<HRMDocumentToDemographic> currentMappingList = hrmDocumentToDemographicDao.findByHrmDocumentId(Integer.parseInt(hrmDocumentId));
@@ -223,10 +224,10 @@ public class HRMModifyDocumentAction extends DispatchAction {
 		String hrmDocumentId = request.getParameter("reportId");
 		String demographicNo = request.getParameter("demographicNo");
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "w", null)) {
-        	throw new SecurityException("missing required security object (_hrm)");
-        }
-		
+		if (!securityInfoManager.hasPrivileges(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE)) {
+			throw new SecurityException("Insufficient permissions");
+		}
+
 		try {
 			try {
 				List<HRMDocumentToDemographic> currentMappingList = hrmDocumentToDemographicDao.findByHrmDocumentId(Integer.parseInt(hrmDocumentId));
@@ -261,9 +262,9 @@ public class HRMModifyDocumentAction extends DispatchAction {
 		String hrmDocumentId = request.getParameter("reportId");
 		String subClassId = request.getParameter("subClassId");
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "w", null)) {
-        	throw new SecurityException("missing required security object (_hrm)");
-        }
+		if (!securityInfoManager.hasPrivileges(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE)) {
+			throw new SecurityException("Insufficient permissions");
+		}
 		
 		try {
 			hrmDocumentSubClassDao.setAllSubClassesForDocumentAsInactive(Integer.parseInt(hrmDocumentId));
@@ -289,9 +290,9 @@ public class HRMModifyDocumentAction extends DispatchAction {
 	public ActionForward removeProvider(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String providerMappingId = request.getParameter("providerMappingId");
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "w", null)) {
-        	throw new SecurityException("missing required security object (_hrm)");
-        }
+		if (!securityInfoManager.hasPrivileges(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE)) {
+			throw new SecurityException("Insufficient permissions");
+		}
 		
 		try {
 			hrmDocumentToProviderDao.remove(Integer.parseInt(providerMappingId));
@@ -312,9 +313,9 @@ public class HRMModifyDocumentAction extends DispatchAction {
 
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "w", null)) {
-        	throw new SecurityException("missing required security object (_hrm)");
-        }
+		if (!securityInfoManager.hasPrivileges(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE)) {
+			throw new SecurityException("Insufficient permissions");
+		}
 		
 		try {
 			HRMDocumentComment comment = new HRMDocumentComment();
@@ -336,10 +337,10 @@ public class HRMModifyDocumentAction extends DispatchAction {
 	
 	public ActionForward deleteComment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String commentId = request.getParameter("commentId");
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "w", null)) {
-        	throw new SecurityException("missing required security object (_hrm)");
-        }
+
+		if (!securityInfoManager.hasPrivileges(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE)) {
+			throw new SecurityException("Insufficient permissions");
+		}
 		
 		try {
 			hrmDocumentCommentDao.deleteComment(Integer.parseInt(commentId));
@@ -352,33 +353,37 @@ public class HRMModifyDocumentAction extends DispatchAction {
 		return mapping.findForward("ajax");
 	}
 
-	public ActionForward setDescription(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+	public ActionForward setDescription(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
 		String documentId = request.getParameter("reportId");
 		String descriptionString = request.getParameter("description");
 
-		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "w", null)) {
-        	throw new SecurityException("missing required security object (_hrm)");
-        }
-		
-		try {
-			boolean updated=false;
+		if (!securityInfoManager
+			.hasPrivileges(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
+				Permission.HRM_UPDATE))
+		{
+			throw new SecurityException("Insufficient permissions");
+		}
+
+		try
+		{
+			boolean updated = false;
 			HRMDocument document = hrmDocumentDao.find(Integer.parseInt(documentId));
-			if(document != null) {
+			if (document != null)
+			{
 				document.setDescription(descriptionString);
 				hrmDocumentDao.merge(document);
-				updated=true;
+				updated = true;
 			}
 			request.setAttribute("success", updated);
-		} catch (Exception e) {
+		} catch (Exception e)
+		{
 			MiscUtils.getLogger().error("Couldn't set description for HRM document", e);
 			request.setAttribute("success", false);
 		}
-		
+
 		return mapping.findForward("ajax");
 	}
-	
-
-
 }

@@ -290,12 +290,12 @@ public class HRMService
 
 	public Map<String, HRMDemographicDocument> getHrmDocumentsForDemographic(Integer demographicNo)
 	{
-		List<HRMDocument> allHrmDocsForDemo = hrmDocumentDao.findByDemographicId(demographicNo);
-
 		List<Integer> doNotShowList = new LinkedList<>();
 		HashMap<String, HRMDocument> labReports = new HashMap<>();
 
 		Map<String, HRMDemographicDocument> out = new HashMap<>();
+
+		List<HRMDocument> allHrmDocsForDemo = hrmDocumentDao.findByDemographicId(demographicNo);
 
 		for (HRMDocument doc : allHrmDocsForDemo)
 		{
