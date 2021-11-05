@@ -64,7 +64,7 @@ public class RecentDemographicAccessService
 		{
 			record = new RecentDemographicAccess(providerNo, demographicNo);
 			record.setAccessDateTimeToNow();
-			recentDemographicAccessDao.persist(record);
+			recentDemographicAccessDao.persistAndFlush(record);
 		}
 		else
 		{
