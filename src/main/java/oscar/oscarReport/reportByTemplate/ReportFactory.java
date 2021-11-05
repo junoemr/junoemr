@@ -40,24 +40,31 @@ public class ReportFactory {
     public ReportFactory() {
     }
 
-    public static Reporter getReporter(String type) {
-          
-        if( type == null || type.equals("") || type.equalsIgnoreCase(SQL_TYPE) ) {
+    public static Reporter getReporter(String type)
+    {
+        if(type == null || type.equals("") || type.equalsIgnoreCase(SQL_TYPE))
+        {
             return new SQLReporter();
         }
-        else if( type.equalsIgnoreCase(UnusedMinutes) ) {
+        else if(type.equalsIgnoreCase(UnusedMinutes))
+        {
             return new UnusedMinutesReporter();
         }
-        else if( type.equalsIgnoreCase(ThirdAppt) ) {
+        else if(type.equalsIgnoreCase(ThirdAppt))
+        {
             return new ThirdApptTimeReporter();
         }
-        else if( type.equalsIgnoreCase(INR) ) {
+        else if(type.equalsIgnoreCase(INR))
+        {
             return new INRReporter();
         }
-        else if( type.equalsIgnoreCase(CONTINUITY)) {
+        else if(type.equalsIgnoreCase(CONTINUITY))
+        {
             return new DepressionContinuityReporter();
         }
         else
-            return null;
+        {
+            throw new IllegalArgumentException("Unknown reporting type: " + type);
+        }
     }
 }
