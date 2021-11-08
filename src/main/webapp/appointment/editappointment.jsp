@@ -1434,8 +1434,9 @@
 			// The user can type anything into the location field if mutisites is off.
 			// If multisites is on, treat location as a site id, otherwise ignore it
 			var multisitesEnabled = jQuery('#multisites-enabled').attr("enabled") === "true";
-			var appointmentSite = multisitesEnabled ? "" : jQuery(document.forms.EDITAPPT.location).val();
+			var appointmentSite = multisitesEnabled ? jQuery(document.forms.EDITAPPT.location).val() : "";
 			myhealthaccess.getAppointment("<%=request.getContextPath()%>",
+					appointmentSite,
 					appointmentSite,
 					"<%=request.getParameter("appointment_no")%>").then((res) =>
 			{
@@ -1477,12 +1478,15 @@
 					updateTelehealthControls();
 				});
 
+			    var multisitesEnabled = jQuery('#multisites-enabled').attr("enabled") === "true";
+			    var appointmentSite = multisitesEnabled ? jQuery(document.forms.EDITAPPT.location).val() : "";
+
 				jQuery("#send-telehealth-link-btn").click(() =>
 				{
 					if (mhaAppointment)
 					{
 						myhealthaccess.sendTelehealthAppointmentNotification("<%=request.getContextPath()%>",
-								jQuery(document.forms.EDITAPPT.location).val(), mhaAppointment).then(() =>
+								appointmentSite, mhaAppointment).then(() =>
 						{
 							jQuery("#send-telehealth-link-msg-sent").css("opacity", "1.0");
 							window.setTimeout(() => {
@@ -1496,7 +1500,7 @@
 					else
 					{// non mha appt
 						myhealthaccess.sendGeneralAppointmentNotification("<%=request.getContextPath()%>",
-								jQuery(document.forms.EDITAPPT.location).val(), "<%=request.getParameter("appointment_no")%>").then(() =>
+								appointmentSite, "<%=request.getParameter("appointment_no")%>").then(() =>
 						{
 							jQuery("#send-telehealth-link-msg-sent").css("opacity", "1.0");
 							window.setTimeout(() => {
