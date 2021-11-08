@@ -105,8 +105,8 @@ String curUser_no = (String)session.getAttribute("user");
 ProviderData provider = new ProviderData();
 
 provider.set(request.getParameter("provider_no"));
-provider.setLastName(request.getParameter("last_name"));
-provider.setFirstName(request.getParameter("first_name"));
+provider.setLastName(StringUtils.trimToNull(request.getParameter("last_name")));
+provider.setFirstName(StringUtils.trimToNull(request.getParameter("first_name")));
 provider.setProviderType(request.getParameter("provider_type"));
 provider.setSpecialty(request.getParameter("specialty"));
 provider.setTeam(request.getParameter("team"));
