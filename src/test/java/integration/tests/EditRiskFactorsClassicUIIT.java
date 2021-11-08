@@ -23,12 +23,13 @@
 
 package integration.tests;
 
+import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
+import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,20 +37,12 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.sql.SQLException;
-import java.util.concurrent.TimeUnit;
-
-import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
-import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
-
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class EditOtherMedsClassicUIIT extends SeleniumTestBase
+public class EditRiskFactorsClassicUIIT extends SeleniumTestBase
 {
 	@Override
 	protected String[] getTablesToRestore()
@@ -68,52 +61,52 @@ public class EditOtherMedsClassicUIIT extends SeleniumTestBase
 	}
 
 	@Test
-	public void editOtherMedsTest()
+	public void editRiskFactorsTest()
 	{
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
-		String otherMedsCPP = "Other Meds in CPP";
-		String otherMedsEncounter = "Other Meds in Encounter";
-		String editedOtherMedsCPP = "Edited Other Meds in CPP";
-		String archivedOtherMeds = "Archived Other Meds";
+		String riskFactorsCPP = "Risk Factors in CPP";
+		String riskFactorsEncounter = "Risk Factors in Encounter";
+		String editedriskFactorsCPP = "Edited Risk Factors in CPP";
+		String archivedriskFactors = "Archived Risk Factors";
 		String startDate = "2020-01-01";
 		String resolutionDate = "2021-01-01";
 		PageUtil.switchToLastWindow(driver);
 		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 
-		//Add Other Meds Notes
-		driver.findElement(By.xpath("//div[@id='menuTitleoMeds']//descendant::a[contains(., '+')]")).click();
+		//Add Risk Factors Notes
+		driver.findElement(By.xpath("//div[@id='menuTitleriskFactors']//descendant::a[contains(., '+')]")).click();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
-		driver.findElement(By.id("noteEditTxt")).sendKeys(otherMedsEncounter);
+		driver.findElement(By.id("noteEditTxt")).sendKeys(riskFactorsEncounter);
 		driver.findElement(By.id("startdate")).sendKeys(startDate);
 		driver.findElement(By.id("resolutiondate")).sendKeys(resolutionDate);
 		driver.findElement(By.xpath("//input[@title='Copy to Current Note']")).click();
 		driver.findElement(By.id("noteEditTxt")).clear();
-		driver.findElement(By.id("noteEditTxt")).sendKeys(otherMedsCPP);
+		driver.findElement(By.id("noteEditTxt")).sendKeys(riskFactorsCPP);
 		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
 		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		driver.findElement(By.id("saveImg")).click();
 		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);//wait until note is saved.
-		Assert.assertTrue("Other Meds Note is NOT Added in CPP successfully",
-				PageUtil.isExistsBy(By.linkText(otherMedsCPP), driver));
- 		Assert.assertTrue("Other Meds Note is NOT Copied in Encounter note successfully",
-				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + otherMedsEncounter + "')]"), driver));
+		Assert.assertTrue("Risk Factors Note is NOT Added in CPP successfully",
+				PageUtil.isExistsBy(By.linkText(riskFactorsCPP), driver));
+ 		Assert.assertTrue("Risk Factors Note is NOT Copied in Encounter note successfully",
+				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + riskFactorsEncounter + "')]"), driver));
 
-		//Edit Other Meds Note
-		driver.findElement(By.linkText(otherMedsCPP)).click();
+		//Edit Risk Factors Note
+		driver.findElement(By.linkText(riskFactorsCPP)).click();
 		driver.findElement(By.id("noteEditTxt")).clear();
-		driver.findElement(By.id("noteEditTxt")).sendKeys(editedOtherMedsCPP);
+		driver.findElement(By.id("noteEditTxt")).sendKeys(editedriskFactorsCPP);
 		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
-		Assert.assertTrue("Other Meds Note is NOT Edited in CPP successfully",
-				PageUtil.isExistsBy(By.linkText(editedOtherMedsCPP), driver));
+		Assert.assertTrue("Risk Factors Note is NOT Edited in CPP successfully",
+				PageUtil.isExistsBy(By.linkText(editedriskFactorsCPP), driver));
 
-		//Archive Other Meds Note
-		driver.findElement(By.xpath("//div[@id='menuTitleoMeds']//descendant::a[contains(., '+')]")).click();
+		//Archive Risk Factors Note
+		driver.findElement(By.xpath("//div[@id='menuTitleriskFactors']//descendant::a[contains(., '+')]")).click();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
-		driver.findElement(By.id("noteEditTxt")).sendKeys(archivedOtherMeds);
+		driver.findElement(By.id("noteEditTxt")).sendKeys(archivedriskFactors);
 		driver.findElement(By.xpath("//input[@title='Archive']")).click();
-		driver.findElement(By.linkText("Other Meds")).click();
+		driver.findElement(By.linkText("Risk Factors")).click();
 		PageUtil.switchToLastWindow(driver);
-		Assert.assertTrue("Other Meds Note is NOT Archived successfully",
-				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedOtherMeds + "')]"), driver));
+		Assert.assertTrue("Risk Factors Note is NOT Archived successfully",
+				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedriskFactors + "')]"), driver));
 	}
 }
