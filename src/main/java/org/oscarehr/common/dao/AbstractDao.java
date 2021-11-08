@@ -79,15 +79,6 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	}
 
 	/**
-	 * persist/create a new entity and force the entity manager to write it to the database
-	 */
-	public void persistAndFlush(AbstractModel<?> o)
-	{
-		entityManager.persist(o);
-		entityManager.flush();
-	}
-
-	/**
 	 * You can only remove attached instances.
 	 */
 	public void remove(AbstractModel<?> o) {
