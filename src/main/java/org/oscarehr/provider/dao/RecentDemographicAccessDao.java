@@ -59,4 +59,21 @@ public class RecentDemographicAccessDao extends AbstractDao<RecentDemographicAcc
 
 		return query.getResultList();
 	}
+
+	/**
+	 * Native query to perform an upsert. this is required due to concurrency issues with an "if(not exists) persist" approach
+	 * @param recentDemographicAccess the entity to upsert
+	 */
+	public void upsert(RecentDemographicAccess recentDemographicAccess)
+	{
+		String querySql = "INSERT INTO `provider_recent_demographic_access` (provider_no, demographic_no, access_datetime) " +
+				"VALUES (:providerId, :demographicId, :accessDateTime) " +
+				"ON DUPLICATE KEY UPDATE access_datetime = :accessDateTime";
+		Query query = entityManager.createNativeQuery(querySql);
+		query.setParameter("providerId", recentDemographicAccess.getProviderNo());
+		query.setParameter("demographicId", recentDemographicAccess.getDemographicNo());
+		query.setParameter("accessDateTime", recentDemographicAccess.getAccessDateTime());
+
+		query.executeUpdate();
+	}
 }
