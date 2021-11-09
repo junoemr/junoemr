@@ -52,6 +52,11 @@ public class MeasurementTypeCriteriaSearch extends AbstractCriteriaSearch
 		}
 
 		criteria.add(junction);
+
+		// order by length, then alphabetically
+		criteria.addOrder(new OrderByLength("typeDisplayName", this.isSortDirAscending()));
+		criteria.addOrder(getOrder("typeDisplayName"));
+
 		return criteria;
 	}
 }

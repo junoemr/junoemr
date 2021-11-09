@@ -23,6 +23,7 @@
 package org.oscarehr.common.search;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -95,6 +96,11 @@ public abstract class AbstractCriteriaSearch
 		setSortDir(SORTDIR.asc);
 	}
 
+	public boolean isSortDirAscending()
+	{
+		return SORTDIR.asc.equals(sortDir);
+	}
+
 	public void setSortDirDescending()
 	{
 		setSortDir(SORTDIR.desc);
@@ -126,5 +132,22 @@ public abstract class AbstractCriteriaSearch
 	public void setJunctionTypeOR()
 	{
 		this.setJunctionType(JUNCTION_TYPE.disjunction);
+	}
+
+	/**
+	 * custom order by class to let us order results by string length
+	 */
+	protected static class OrderByLength extends Order
+	{
+		public OrderByLength(String propertyName, boolean ascending)
+		{
+			super(propertyName, ascending);
+		}
+
+		@Override
+		public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery)
+		{
+			return " LENGTH(" + this.getPropertyName() + ") " + (super.isAscending() ? "asc" : "desc");
+		}
 	}
 }
