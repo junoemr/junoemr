@@ -158,10 +158,10 @@
 									/>
 								</div>
 							</div>
-							<!-- patient type/critical -->
+							<!-- appointment type/critical -->
 							<div class="col-md-6">
-								<div class="row">
-									<div class="col-md-8">
+								<div class="flex-row flex-gap-8 align-items-center">
+									<div class="flex-item-grow">
 										<ca-field-select
 												ca-name="type"
 												ca-title="Appointment Type"
@@ -174,33 +174,21 @@
 										>
 										</ca-field-select>
 									</div>
-									<div class="col-md-4 top-checkbox-container">
-										<ca-field-boolean
-												ca-form-group-class="vertical-align"
-												ca-name="check-critical"
-												ca-title="Critical"
-												ca-label-size="col-md-6"
-												ca-input-size="col-md-6"
-												ca-model="eventData.critical"
-												ca-template="juno"
-												ca-disabled="eventController.inReadOnlyMode()"
-										>
-										</ca-field-boolean>
-										<ca-field-boolean
-														ca-form-group-class="vertical-align"
-														ca-name="check-telehealth"
-														ca-title="Telehealth"
-														ca-label-size="col-md-6"
-														ca-input-size="col-md-6"
-														ca-model="eventData.virtual"
-														ca-template="juno"
-														ca-disabled="eventController.inReadOnlyMode() ||
-														             eventController.inEditMode() ||
-														             telehealthMode === TELEHEALTH_MODES.NONE ||
-														             telehealthMode === TELEHEALTH_MODES.NO_CONNECTION"
-														title="{{ eventController.getTelehealthToolTip() }}"
-										>
-										</ca-field-boolean>
+									<div class="flex-col align-items-end">
+										<juno-check-box class="m-b-4"
+                                                        ng-model="eventData.critical"
+                                                        disabled="eventController.inReadOnlyMode()"
+                                                        label="Critical">
+										</juno-check-box>
+										<juno-select ng-model="eventData.virtualAppointmentType"
+										             options="virtualAppointmentOptions"
+										             placeholder="Virtual Type"
+                                                     disabled="eventController.inReadOnlyMode() ||
+                                                               eventController.inEditMode() ||
+														       telehealthMode === TELEHEALTH_MODES.NONE ||
+														       telehealthMode === TELEHEALTH_MODES.NO_CONNECTION"
+										             title="Select a virtual appointment type to create a virtual appointment.">
+										</juno-select>
 									</div>
 								</div>
 							</div>

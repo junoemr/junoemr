@@ -82,6 +82,17 @@
 			<id>jaspersoft-third-party</id>
 			<url>https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
 		</repository>
+		<repository>
+			<id>openshift.nexus</id>
+			<url>http://nexus.apps.prod.cldmd.net/nexus/content/groups/public/</url>
+		</repository>
+		<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/cloudpracticeinc/*</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -1383,7 +1394,7 @@
 		<dependency>
 			<groupId>ca.cloudpractice</groupId>
 			<artifactId>aqs-java-client</artifactId>
-			<version>0.3.6</version>
+			<version>0.4.14</version>
 		</dependency>
 
 		<!-- Memcached session manager -->

@@ -26,6 +26,9 @@ package org.oscarehr.ws.rest.to.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Appointment.BookingSource;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
@@ -76,10 +79,13 @@ public class AppointmentTo1 implements Serializable {
 	private BookingSource bookingSource;
 	
 	private Integer reasonCode;
-	
 
 	private Demographic demographic;
 	private Provider provider;
+
+	@Getter
+	@Setter
+	private Appointment.VirtualAppointmentType virtualAppointmentType;
 	
 	
 	public Integer getId() {

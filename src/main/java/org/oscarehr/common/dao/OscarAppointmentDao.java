@@ -823,7 +823,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 				"  dc.cust3 AS cust_alert,\n" +
 				"  p.value AS color_property,\n" +
 				"  MAX(t.tickler_no) AS max_tickler_no,\n" +
-				"  GROUP_CONCAT(t.message SEPARATOR '\n') AS tickler_messages\n" +
+				"  GROUP_CONCAT(t.message SEPARATOR '\n') AS tickler_messages,\n" +
+				"  a.virtual_type\n" +
 				"FROM appointment a\n" +
 				"LEFT JOIN appointment_status aps ON BINARY SUBSTRING(a.status, 1, 1) = aps.status\n" +
 				"LEFT JOIN demographic d ON a.demographic_no = d.demographic_no\n" +
@@ -945,6 +946,7 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 			String colorProperty = (String) result[index++];
 			Integer maxTicklerNo = (Integer) result[index++];
 			String ticklerMessages = (String) result[index++];
+			Appointment.VirtualAppointmentType virtualAppointmentType = Optional.ofNullable((String) result[index++]).map(Appointment.VirtualAppointmentType::valueOf).orElse(Appointment.VirtualAppointmentType.NONE);
 
 			if(status != null)
 			{
@@ -1027,8 +1029,8 @@ public class OscarAppointmentDao extends AbstractDao<Appointment> {
 					ticklerMessages,
 					isVirtual,
 					isConfirmed,
-					creatorSecurityId
-
+					creatorSecurityId,
+					virtualAppointmentType
 			));
 
 		}
