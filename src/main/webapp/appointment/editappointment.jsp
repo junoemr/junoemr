@@ -163,8 +163,10 @@
 
 	String useProgramLocation = OscarProperties.getInstance().getProperty("useProgramLocation");
 	String moduleNames = OscarProperties.getInstance().getProperty("ModuleNames");
+
 	boolean caisiEnabled = moduleNames != null && org.apache.commons.lang.StringUtils.containsIgnoreCase(moduleNames, "Caisi");
 	boolean locationEnabled = caisiEnabled && (useProgramLocation != null && useProgramLocation.equals("true"));
+	boolean multisitesEnabled = props.isMultisiteEnabled();
 %>
 <%@ page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.List" %>
@@ -490,7 +492,6 @@
 	<div id="editAppointment"
 		 style="display:<%= (isMobileOptimized && bFirstDisp) ? "none":"block"%>;">
         <%-- Use the enabled attribute of this element in Javascript to determine if multisites is on or off --%>
-        <span style="display: none" id="multisites-enabled" enabled="<%=props.isMultisiteEnabled()%>"></span>
 		<FORM NAME="EDITAPPT" METHOD="post" ACTION="appointmentcontrol.jsp"
 			  ONSUBMIT="return validateForm();"><INPUT TYPE="hidden"
 												NAME="displaymode" value="">
@@ -952,6 +953,10 @@
 							<input type="hidden" name="isVirtual"
 									<%= appt.getIsVirtual() ? "value='on'" : "" %>/>
 								<% if(appt.getIsVirtual()) { %>
+                                &nbsp;
+                                &nbsp;
+                                &nbsp;
+                                &nbsp;
 								<a href="#"
 									 onClick='popupPage(800, 1280,
 													 "../integrations/myhealthaccess.do?method=connect" +
@@ -1431,10 +1436,9 @@
 
 		function updateTelehealthControls()
 		{
-			// The user can type anything into the location field if mutisites is off.
-			// If multisites is on, treat location as a site id, otherwise ignore it
-			var multisitesEnabled = jQuery('#multisites-enabled').attr("enabled") === "true";
-			var appointmentSite = multisitesEnabled ? jQuery(document.forms.EDITAPPT.location).val() : "";
+			<%-- The user can type anything into the location field if mutisites is off.
+			If multisites is on, treat location as a site id, otherwise ignore it --%>
+			var appointmentSite = <%= multisitesEnabled %> ? jQuery(document.forms.EDITAPPT.location).val() : "";
 			myhealthaccess.getAppointment("<%=request.getContextPath()%>",
 					appointmentSite,
 					"<%=request.getParameter("appointment_no")%>").then((res) =>
@@ -1477,8 +1481,7 @@
 					updateTelehealthControls();
 				});
 
-			    var multisitesEnabled = jQuery('#multisites-enabled').attr("enabled") === "true";
-			    var appointmentSite = multisitesEnabled ? jQuery(document.forms.EDITAPPT.location).val() : "";
+			    var appointmentSite = <%= multisitesEnabled %> ? jQuery(document.forms.EDITAPPT.location).val() : "";
 
 				jQuery("#send-telehealth-link-btn").click(() =>
 				{
