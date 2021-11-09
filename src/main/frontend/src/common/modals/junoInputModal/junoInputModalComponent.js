@@ -48,7 +48,7 @@ angular.module('Common.Components').component('junoInputModal',
 
 		ctrl.typeaheadOptions = [];
 
-		ctrl.$onInit = () =>
+		ctrl.$onInit = async () =>
 		{
 			ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 			ctrl.inputModalType = ctrl.resolve.type || JUNO_INPUT_MODAL_TYPE.TEXT;
@@ -66,20 +66,16 @@ angular.module('Common.Components').component('junoInputModal',
 			ctrl.placeholder = ctrl.resolve.placeholder || "Enter text here";
 		}
 
-		ctrl.typeaheadSearch = async (value) =>
+		ctrl.typeaheadOptionsCallback = async (value) =>
 		{
-			ctrl.typeaheadOptions = [];
 			if(ctrl.resolve.options && ctrl.resolve.options instanceof Function)
 			{
 				ctrl.typeaheadOptions = await ctrl.resolve.options(value);
 			}
-			else
-			{
-				ctrl.typeaheadOptions = ctrl.resolve.options;
-			}
+			return ctrl.typeaheadOptions;
 		}
 
-		ctrl.setTypeahedValue = (value) =>
+		ctrl.setTypeaheadValue = (value) =>
 		{
 			this.typeaheadValue = value;
 		}

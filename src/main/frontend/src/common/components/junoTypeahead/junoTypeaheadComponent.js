@@ -107,15 +107,16 @@ angular.module('Common.Components').component('junoTypeahead',
 
 		ctrl.getOptions = async (viewValue) =>
 		{
+			let options = ctrl.options;
 			if (ctrl.filterOptions)
 			{
-				return filterFilter(ctrl.options, viewValue);
+				options = filterFilter(ctrl.options, viewValue);
 			}
 			else if (ctrl.getOptionsCallback)
 			{
-				return await ctrl.getOptionsCallback({value: viewValue});
+				options = await ctrl.getOptionsCallback({value: viewValue});
 			}
-			return ctrl.options;
+			return options;
 		}
 
 		ctrl.onSelect = () =>
