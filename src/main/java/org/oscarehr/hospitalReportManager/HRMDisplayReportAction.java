@@ -37,6 +37,7 @@ import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
 import org.oscarehr.hospitalReportManager.dao.HRMProviderConfidentialityStatementDao;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -63,10 +64,11 @@ public class HRMDisplayReportAction extends DispatchAction {
 		
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 		Integer demographicNumberForLog = null;
-		
-		if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_hrm", "r", null)) {
+
+		if(!securityInfoManager.hasPrivileges(loggedInInfo.getLoggedInProviderNo(), Permission.HRM_READ))
+		{
 			LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), LogConst.ACTION_READ, LogConst.CON_HRM, LogConst.STATUS_FAILURE, hrmDocumentId, request.getRemoteAddr());
-			throw new SecurityException("missing required security object (_hrm)");
+			throw new SecurityException("missing required permission: " + Permission.HRM_READ.name());
 		}
 		
 		if (hrmDocumentId != null) {

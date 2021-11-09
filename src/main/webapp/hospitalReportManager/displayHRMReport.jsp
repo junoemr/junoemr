@@ -18,7 +18,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
-
+'
 
 
 <%
@@ -30,15 +30,19 @@
     HRMDocumentToDemographic demographicLink = (HRMDocumentToDemographic) request.getAttribute("demographicLink");
 %>
 
-<%  if ((demographicLink == null || demographicLink.getDemographicNo() == null)
-        && !securityService.hasPrivileges(providerNo, Permission.HRM_READ)) { %>
-    <h2> You do not have the correct permissions to access this page<h2>
-<% return;
-    } else if ((demographicLink != null && demographicLink.getDemographicNo() != null)
-    && !securityService.hasPrivileges(providerNo, demographicLink.getDemographicNo(), Permission.HRM_READ)) {
-%>
-    <h2> You do not have the correct permissions to access this demographic or page</h2>
-<% return;
+<%
+    if ((demographicLink == null || demographicLink.getDemographicNo() == null)
+        && !securityService.hasPrivileges(providerNo, Permission.HRM_READ))
+    {
+        response.sendRedirect("../securityError.jsp?type=HRM_READ");
+        return;
+    }
+    else if ((demographicLink != null && demographicLink.getDemographicNo() != null)
+            && !securityService.hasPrivileges(providerNo, demographicLink.getDemographicNo(), Permission.HRM_READ))
+    {
+        String demoQueryComponent = URLEncoder.encode("demographic " + demographicLink.getDemographicNo());
+        response.sendRedirect("../securityError.jsp?type=HRM_READ," + demoQueryComponent);
+        return;
     }
 %>
 
@@ -56,6 +60,10 @@
 <%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocument" %>
 <%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
 <%@ page import="org.oscarehr.security.model.Permission" %>
+<%@ page import="org.apache.http.client.utils.URLEncodedUtils" %>
+<%@ page import="org.apache.http.NameValuePair" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.net.URLEncoder" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%!
