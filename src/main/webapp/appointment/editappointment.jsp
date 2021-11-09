@@ -952,6 +952,10 @@
 							<input type="hidden" name="isVirtual"
 									<%= appt.getIsVirtual() ? "value='on'" : "" %>/>
 								<% if(appt.getIsVirtual()) { %>
+                                &nbsp;
+                                &nbsp;
+                                &nbsp;
+                                &nbsp;
 								<a href="#"
 									 onClick='popupPage(800, 1280,
 													 "../integrations/myhealthaccess.do?method=connect" +
