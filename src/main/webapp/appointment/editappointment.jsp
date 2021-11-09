@@ -1437,7 +1437,6 @@
 			var appointmentSite = multisitesEnabled ? jQuery(document.forms.EDITAPPT.location).val() : "";
 			myhealthaccess.getAppointment("<%=request.getContextPath()%>",
 					appointmentSite,
-					appointmentSite,
 					"<%=request.getParameter("appointment_no")%>").then((res) =>
 			{
 				var appt = JSON.parse(res).body;
