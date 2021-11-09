@@ -101,6 +101,9 @@ angular.module('Common.Services').factory(
 					}
 				};
 
+				const inChrome = (navigator.userAgent.search("Chrome") >= 0);
+				$scope.autocompleteOff = inChrome ? "chrome-off" : "off";
+
 				// watch the focus field: when it matches the name, focus the element
 				$scope.$watch('focus_field', function()
 				{

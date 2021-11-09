@@ -32,7 +32,7 @@
 		<input
 						id="name-{{$ctrl.name}}"
 						type="text"
-						autocomplete="off"
+						autocomplete="{{$ctrl.autocompleteValue()}}"
 						ng-class="$ctrl.inputClasses()"
 						ng-model="$ctrl.selectedValue"
 						ng-model-options="{debounce: 50}"

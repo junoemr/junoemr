@@ -68,6 +68,8 @@ angular.module('Common.Components').component('junoTypeahead',
 			}
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.TOP;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+
+			ctrl.inChrome = (navigator.userAgent.search("Chrome") >= 0);
 		};
 
 		ctrl.$doCheck = () =>
@@ -163,6 +165,11 @@ angular.module('Common.Components').component('junoTypeahead',
 			return {
 				"shift-right-for-icon": !!ctrl.icon,
 			}
+		}
+
+		ctrl.autocompleteValue = () =>
+		{
+			return ctrl.inChrome ? "chrome-off" : "off";
 		}
 
 	}]
