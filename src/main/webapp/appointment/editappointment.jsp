@@ -1438,7 +1438,9 @@
 		{
 			<%-- The user can type anything into the location field if mutisites is off.
 			If multisites is on, treat location as a site id, otherwise ignore it --%>
-			var appointmentSite = <%= multisitesEnabled %> ? jQuery(document.forms.EDITAPPT.location).val() : "";
+
+            var multisitesEnabled = <%= multisitesEnabled %>
+            var appointmentSite = multisitesEnabled ? jQuery(document.forms.EDITAPPT.location).val() : "";
 			myhealthaccess.getAppointment("<%=request.getContextPath()%>",
 					appointmentSite,
 					"<%=request.getParameter("appointment_no")%>").then((res) =>
@@ -1481,7 +1483,8 @@
 					updateTelehealthControls();
 				});
 
-			    var appointmentSite = <%= multisitesEnabled %> ? jQuery(document.forms.EDITAPPT.location).val() : "";
+			    var multisitesEnabled = <%= multisitesEnabled %>
+			    var appointmentSite = multisitesEnabled ? jQuery(document.forms.EDITAPPT.location).val() : "";
 
 				jQuery("#send-telehealth-link-btn").click(() =>
 				{
