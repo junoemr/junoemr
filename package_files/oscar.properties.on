@@ -872,7 +872,7 @@ web_service_client.received_timeout_ms=3000
 # clinicaid_api_domain=https://demo.clinicaid.ca
 
 # OscarHost Login page
-oscarhost_login=https://www.junoemr.com/login/{oscar_practice_id}
+oscarhost_login=https://login.junoemr.com/login/{oscar_practice_id}
 
 # Set the location to write fax files to
 fax_file_location=/var/lib/OscarDocument/{oscar_practice_id}/fax/outgoing/
