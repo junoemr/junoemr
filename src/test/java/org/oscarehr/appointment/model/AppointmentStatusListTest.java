@@ -64,7 +64,6 @@ public class AppointmentStatusListTest
 		appointmentStatus.setId(1);
 		appointmentStatus.setDescription("description1");
 		appointmentStatus.setIcon("icon1");
-		appointmentStatus.setActive(0);
 
 		appointmentStatuses.add(appointmentStatus);
 
@@ -81,8 +80,7 @@ public class AppointmentStatusListTest
 			true,
 			1,
 			null,
-			"icon1",
-			false
+			"icon1"
 		));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
@@ -103,7 +101,6 @@ public class AppointmentStatusListTest
 		appointmentStatus.setId(1);
 		appointmentStatus.setDescription("description1");
 		appointmentStatus.setIcon("icon1");
-		appointmentStatus.setActive(1);
 
 		appointmentStatuses.add(appointmentStatus);
 
@@ -120,8 +117,7 @@ public class AppointmentStatusListTest
 			true,
 			1,
 			null,
-			"icon1",
-			true
+			"icon1"
 		));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
@@ -142,7 +138,6 @@ public class AppointmentStatusListTest
 		appointmentStatus.setId(1);
 		appointmentStatus.setDescription("description1");
 		appointmentStatus.setIcon("icon1");
-		appointmentStatus.setActive(0);
 
 		appointmentStatuses.add(appointmentStatus);
 
@@ -159,8 +154,7 @@ public class AppointmentStatusListTest
 			false,
 			1,
 			"billed",
-			"icon1",
-			false
+			"icon1"
 		));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
@@ -181,7 +175,6 @@ public class AppointmentStatusListTest
 		appointmentStatus1.setId(1);
 		appointmentStatus1.setDescription("description1");
 		appointmentStatus1.setIcon("icon1");
-		appointmentStatus1.setActive(1);
 
 		appointmentStatuses.add(appointmentStatus1);
 
@@ -191,7 +184,6 @@ public class AppointmentStatusListTest
 		appointmentStatus2.setId(1);
 		appointmentStatus2.setDescription("description1");
 		appointmentStatus2.setIcon("icon1");
-		appointmentStatus2.setActive(0);
 
 		appointmentStatuses.add(appointmentStatus2);
 
@@ -208,8 +200,7 @@ public class AppointmentStatusListTest
 			true,
 			1,
 			null,
-			"icon1",
-			true
+			"icon1"
 		));
 
 		expectedResult.add(new CalendarAppointmentStatus(
@@ -219,8 +210,7 @@ public class AppointmentStatusListTest
 			false,
 			1,
 		"billed",
-			"icon1",
-			false
+			"icon1"
 		));
 
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());

@@ -33,10 +33,10 @@ public class CalendarAppointmentStatus
 	private Integer sortOrder;
 	private String systemCode;
 	private String icon;
-	private boolean enabled;
 
 	public CalendarAppointmentStatus(String color, String displayLetter, String name,
-		boolean rotates, Integer sortOrder, String systemCode, String icon, boolean enabled)
+		boolean rotates,
+		Integer sortOrder, String systemCode, String icon)
 	{
 		this.color = color;
 		this.displayLetter = displayLetter;
@@ -45,7 +45,6 @@ public class CalendarAppointmentStatus
 		this.sortOrder = sortOrder;
 		this.systemCode = systemCode;
 		this.icon = icon;
-		this.enabled = enabled;
 	}
 
 	public String getColor()
@@ -82,7 +81,7 @@ public class CalendarAppointmentStatus
 	public int hashCode()
 	{
 
-		return Objects.hash(color, displayLetter, name, rotates, sortOrder, systemCode, icon, enabled);
+		return Objects.hash(color, displayLetter, name, rotates, sortOrder, systemCode, icon);
 	}
 
 	public String getIcon()
@@ -102,8 +101,7 @@ public class CalendarAppointmentStatus
 			Objects.equals(name, that.name) &&
 			Objects.equals(sortOrder, that.sortOrder) &&
 			Objects.equals(systemCode, that.systemCode) &&
-			Objects.equals(icon, that.icon) &&
-			Objects.equals(enabled, that.enabled);
+			Objects.equals(icon, that.icon);
 	}
 
 	@Override
@@ -118,10 +116,5 @@ public class CalendarAppointmentStatus
 			", systemCode='" + systemCode + '\'' +
 			", icon='" + icon + '\'' +
 			'}';
-	}
-
-	public boolean isEnabled()
-	{
-		return enabled;
 	}
 }
