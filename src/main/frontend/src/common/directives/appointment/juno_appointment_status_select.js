@@ -43,7 +43,8 @@ angular.module('Common').directive(
 					}
 				});
 
-				const validOptionsAsObj = validOptions.reduce((acc, status) => {
+				const validOptionsAsObj = validOptions.reduce((acc, status) =>
+				{
 					acc[status.displayLetter] = status;
 					return acc;
 				}, {})
