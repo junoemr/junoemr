@@ -22,6 +22,7 @@
 */
 
 import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
+import DeviceInfo from "../../../lib/util/DeviceInfo";
 
 angular.module('Common.Components').component('junoInput', {
 	templateUrl: 'src/common/components/junoInput/junoInput.jsp',
@@ -77,7 +78,7 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.oldNgModel = ctrl.ngModel;
 
-			ctrl.inChrome = (navigator.userAgent.search("Chrome") >= 0);
+			ctrl.deviceInfo = new DeviceInfo();
 		};
 
 		$scope.$watch("$ctrl.ngModel", () =>
@@ -154,7 +155,7 @@ angular.module('Common.Components').component('junoInput', {
 		{
 			if(!ctrl.allowAutocomplete)
 			{
-				return ctrl.inChrome ? "chrome-off" : "off";
+				return ctrl.deviceInfo.autocompleteOffValue;
 			}
 			return null;
 		}

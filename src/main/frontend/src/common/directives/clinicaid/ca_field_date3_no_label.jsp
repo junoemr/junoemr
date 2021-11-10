@@ -16,7 +16,7 @@
 					 ng-disabled="disabled"
 					 tabindex="{{tab_index}}"
 					 placeholder="yyyy"
-					 autocomplete="off"
+					 autocomplete="{{autocompleteOff}}"
 					 spellcheck="off"
 					 maxlength="4"/>-
 
@@ -30,7 +30,7 @@
 					 ng-disabled="disabled"
 					 tabindex="{{tab_index}}"
 					 placeholder="mm"
-					 autocomplete="off"
+					 autocomplete="{{autocompleteOff}}"
 					 spellcheck="off"
 					 maxlength="2"/>-
 
@@ -44,7 +44,7 @@
 					 ng-disabled="disabled"
 					 tabindex="{{tab_index}}"
 					 placeholder="dd"
-					 autocomplete="off"
+					 autocomplete="{{autocompleteOff}}"
 					 spellcheck="off"
 					 maxlength="2"/>
 	</div>

@@ -30,6 +30,7 @@ require('angular-drag-and-drop-lists');
 require('file-saver');
 require('chart.js');
 require('angular-chart.js');
+require('detect-browser');
 
 import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
 import {EDIT_PROVIDER_MODE} from "./src/admin/section/editProviderPage/editProviderAdminConstants";

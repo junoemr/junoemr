@@ -1,5 +1,7 @@
 'use strict';
 
+import DeviceInfo from "../../lib/util/DeviceInfo";
+
 angular.module('Common.Services').factory(
 	'fieldHelperService',
 	[
@@ -101,8 +103,7 @@ angular.module('Common.Services').factory(
 					}
 				};
 
-				const inChrome = (navigator.userAgent.search("Chrome") >= 0);
-				$scope.autocompleteOff = inChrome ? "chrome-off" : "off";
+				$scope.autocompleteOff = new DeviceInfo().autocompleteOffValue;
 
 				// watch the focus field: when it matches the name, focus the element
 				$scope.$watch('focus_field', function()
