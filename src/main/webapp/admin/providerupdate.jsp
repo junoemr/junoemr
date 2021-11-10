@@ -168,8 +168,8 @@ if (securityInfoManager.userCanModify(request.getParameter("current_user"),reque
 
 		if (provider != null)
 		{
-			provider.setLastName(request.getParameter("last_name"));
-			provider.setFirstName(request.getParameter("first_name"));
+			provider.setLastName(StringUtils.trimToNull(request.getParameter("last_name")));
+			provider.setFirstName(StringUtils.trimToNull(request.getParameter("first_name")));
 			provider.setProviderType(request.getParameter("provider_type"));
 			provider.setSpecialty(request.getParameter("specialty"));
 			provider.setTeam(request.getParameter("team"));
