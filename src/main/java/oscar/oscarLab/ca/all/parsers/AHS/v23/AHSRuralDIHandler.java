@@ -84,6 +84,12 @@ public class AHSRuralDIHandler extends AHSHandler
 		super(msg);
 	}
 
+	@Override
+	public boolean canUpload()
+	{
+		return true;
+	}
+
     /* ===================================== Hl7 Parsing ====================================== */
 
 	/* ===================================== MSH ====================================== */

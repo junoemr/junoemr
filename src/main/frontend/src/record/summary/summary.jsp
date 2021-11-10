@@ -111,6 +111,7 @@
 							onclick-title="summaryCtrl.onSummaryModClickTitle(module)"
 							clickable-title="summaryCtrl.isModTitleClickable(mod)"
 							enable-filter="true"
+                            filter-type-options="summaryCtrl.getSummaryModuleFilterOptions(mod)"
 					>
 					</summary-module>
 				</div>

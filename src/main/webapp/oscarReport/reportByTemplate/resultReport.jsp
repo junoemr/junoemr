@@ -88,7 +88,11 @@ function clearSession(){
 		ReportObjectGeneric curreport = (ReportObjectGeneric) request.getAttribute("reportobject");
         
 		Integer sequenceLength = (Integer)request.getAttribute("sequenceLength");
-		
+
+		Boolean limitsEnforced = (Boolean) request.getAttribute("limitsEnforced");
+		Integer uiLimit = (Integer) request.getAttribute("uiLimit");
+		Integer spreadsheetLimit = (Integer) request.getAttribute("csvLimit");
+
 		
 		List<String> sqlList = new ArrayList<String>();
 		List<String> htmlList = new ArrayList<String>();
@@ -110,21 +114,27 @@ function clearSession(){
 				value="<%=curreport.getTemplateId()%>" />
 		</jsp:include></td>
 		<td class="MainTableRightColumn" valign="top">
-		<div class="reportTitle"><%=curreport.getTitle()%></div>
-		<div class="reportDescription"><%=curreport.getDescription()%></div>
-		<a href="#" style="font-size: 10px; text-decoration: none;"
-			class="showhidequery" onclick="showHideItem('sqlDiv')">Hide/Show
-		Query</a>
-		<div class="sqlBorderDiv" id="sqlDiv" style="display: none;"><b>Query:</b><br />
-		<code style="font-size: 11px;">
-			<%
-			for(int x=0;x<sqlList.size();x++)
-			{
-				out.println((x+1) + ")" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(sqlList.get(x).trim()) + "<br/>");
-			}
-			%>
-		</code>
-		</div>
+			<div class="reportTitle"><%=curreport.getTitle()%></div>
+			<div class="reportDescription"><%=curreport.getDescription()%></div>
+			<a href="#" style="font-size: 10px; text-decoration: none;"
+			   class="showhidequery" onclick="showHideItem('sqlDiv')">Hide/Show
+				Query</a>
+			<div class="sqlBorderDiv" id="sqlDiv" style="display: none;"><b>Query:</b><br/>
+				<code style="font-size: 11px;">
+					<%
+						for(int x = 0; x < sqlList.size(); x++)
+						{
+							out.println((x + 1) + ")" + org.apache.commons.lang.StringEscapeUtils.escapeHtml(sqlList.get(x).trim()) + "<br/>");
+						}
+					%>
+				</code>
+			</div>
+			<% if(limitsEnforced)
+			{ %>
+			<div>
+				<h5>Results are limited to <%=uiLimit%> rows to prevent slowdowns. Export to a spreadsheet for up to <%=spreadsheetLimit%> rows, or consider narrowing the report scope.</h5>
+			</div>
+			<%}%>
 		<div class="reportBorderDiv">
 		<%
 

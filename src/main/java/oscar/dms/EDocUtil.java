@@ -974,8 +974,7 @@ public final class EDocUtil {
         
 	public static String getHtmlTicklers(LoggedInInfo loggedInInfo,String docId ) {
                                       
-            Long table_id=Long.valueOf(docId);
-            List<TicklerLink> linkList = ticklerLinkDao.getLinkByTableId("DOC",table_id );
+            List<TicklerLink> linkList = ticklerLinkDao.getLinkByTableId("DOC", docId);
             String HtmlTickler="";
             Integer ticklerNo;
         

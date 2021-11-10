@@ -78,6 +78,10 @@
 			<id>archiva.internal</id>
 			<url>https://mvn.cloudpractice.ca/repository/internal</url>
 		</repository>
+		<repository>
+			<id>jaspersoft-third-party</id>
+			<url>https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -1889,6 +1893,7 @@
 						<oscar.skip.dbinit>true</oscar.skip.dbinit>
 					</systemPropertyVariables>
 					<useManifestOnlyJar>false</useManifestOnlyJar>
+          <trimStackTrace>false</trimStackTrace>
 				</configuration>
 				<executions>
 					<execution>
@@ -1969,6 +1974,10 @@
 								org.oscarehr.ws.rest.AppointmentService
 								org.oscarehr.ws.rest.CareTrackerWebService
 								org.oscarehr.ws.rest.CareTrackersWebService
+                org.oscarehr.ws.rest.eform.EFormInstanceWebService
+                org.oscarehr.ws.rest.EFormService
+                org.oscarehr.ws.rest.EFormsService
+                org.oscarehr.ws.rest.FormsService
 								org.oscarehr.ws.rest.DecisionSupportWebService
 								org.oscarehr.ws.rest.DemographicService
 								org.oscarehr.ws.rest.DemographicsService

@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,6 +53,7 @@ public class DataExportDaoTest extends DaoTestFixtures
 	Logger logger = MiscUtils.getLogger();
 
 	@Before
+	@After
 	public void setUp() throws Exception {
 		SchemaUtils.restoreTable("dataExport");
 	}
@@ -62,15 +64,15 @@ public class DataExportDaoTest extends DaoTestFixtures
 		//Date date1 = new Date(dfm.parse("20091231").getTime());
 
 		DataExport de1 = new DataExport();
-		Timestamp ts1 = new Timestamp(1000);
+		Timestamp ts1 = new Timestamp(1000000000);
 		de1.setDaterun(ts1);
 
 		DataExport de2 = new DataExport();
-		Timestamp ts2 = new Timestamp(2000);
+		Timestamp ts2 = new Timestamp(2000000000);
 		de2.setDaterun(ts2);
 
 		DataExport de3 = new DataExport();
-		Timestamp ts3 = new Timestamp(1500);
+		Timestamp ts3 = new Timestamp(1500000000);
 		de3.setDaterun(ts3);
 
 		dataExportDao.persist(de1);

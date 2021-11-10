@@ -28,6 +28,7 @@ import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -53,6 +54,18 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 
 public class RescheduleAppointmentsIT extends SeleniumTestBase
 {
+    @Override
+    protected String[] getTablesToRestore()
+    {
+        return new String[]{
+            "admission", "appointment","appointmentArchive", "billingservice", "caisi_role",
+            "demographic", "documentDescriptionTemplate", "Facility", "issue", "log", "log_ws_rest", "LookupList",
+            "LookupListItem", "measurementType", "OscarJob", "OscarJobType",
+            "provider", "provider_recent_demographic_access", "providerbillcenter", "ProviderPreference", "providersite",
+            "secUserRole", "site", "tickler_text_suggest"
+        };
+    }
+
     @Before
     public void setup() throws Exception
     {
@@ -62,17 +75,8 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
         databaseUtil.createProviderSite();
     }
 
-    @After
-    public void cleanup() throws Exception
-    {
-        SchemaUtils.restoreTable("admission", "appointment","appointmentArchive", "billingservice", "caisi_role",
-                "demographic", "documentDescriptionTemplate", "Facility", "issue", "log", "log_ws_rest", "LookupList",
-                "LookupListItem", "measurementType", "OscarJob", "OscarJobType",
-                "provider", "provider_recent_demographic_access", "providerbillcenter", "ProviderPreference", "providersite",
-                "secUserRole", "site", "tickler_text_suggest" );
-    }
-
     @Test
+	@Ignore
     public void rescheduleAppointmentTestsClassicUI()
             throws InterruptedException
     {

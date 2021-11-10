@@ -147,6 +147,25 @@ angular.module("Common.Services").service("summaryService", [
 			return deferred.promise;
 		};
 
+		service.getDiseaseRegistry = function(demographicNo)
+		{
+			let deferred = $q.defer();
+
+			$http.get(service.apiPath + '/' + encodeURIComponent(demographicNo) +
+				'/getDiseaseRegistry').then(
+				function success(results)
+				{
+					deferred.resolve(results.data);
+				},
+				function error(errors)
+				{
+					console.log("summaryService::getDiseaseRegistry error", errors);
+					deferred.reject("An error occurred while fetching disease registry");
+				});
+
+			return deferred.promise;
+		};
+
 		service.getOtherMeds = function getOtherMeds(demographicNo)
 		{
 			var deferred = $q.defer();

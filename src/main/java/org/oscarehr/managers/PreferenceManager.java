@@ -24,6 +24,7 @@
 package org.oscarehr.managers;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.List;
 
 import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
@@ -68,6 +69,7 @@ public class PreferenceManager {
 	public static final String MED_HX_POS = "summary.item.med_hx.position";
 	public static final String ONGOING_POS = "summary.item.ongoing_concerns.position";
 	public static final String REMINDERS_POS = "summary.item.reminders.position";
+	public static final String DISEASE_REGISTRY_POS = "summary.item.disease_registry.position";
 	
 	public static final String SOC_HX_START_DATE = "cpp.social_hx.start_date";
 	public static final String SOC_HX_RES_DATE = "cpp.social_hx.res_date";
@@ -90,28 +92,40 @@ public class PreferenceManager {
 	public static final String ASSESSMENTS_POS = "summary.item.assessments.position";
 	public static final String INCOMING_POS = "summary.item.incoming.position";
 	public static final String DS_SUPPORT_POS = "summary.item.dssupport.position";
-	
-	
+
 	public boolean displaySummaryItem(LoggedInInfo loggedInInfo, String item){
 		if(isCustomSummaryEnabled(loggedInInfo))
 		{
-			Property results = providerManager.getProviderProperties(loggedInInfo, loggedInInfo.getLoggedInProviderNo(), item);
-			if(results != null)
+			boolean displayItem = false;
+
+			Property itemVisibility = providerManager.getProviderProperties(loggedInInfo, loggedInInfo.getLoggedInProviderNo(), item);
+			if(itemVisibility != null)
 			{
-				String value = results.getValue();
-				return !value.isEmpty() && !value.equals("off");
+				String value = itemVisibility.getValue();
+				displayItem = !value.isEmpty() && !value.equals("off");
+			}
+			else if (isVisibleByDefault(item))
+			{
+				displayItem = true;
 			}
 			else
 			{
-				//check if the old cpp position property exist
-				return isOldCppPosition(loggedInInfo, item);
+				displayItem = isVisibleInClassicUICPP(loggedInInfo, item);
 			}
+
+			return displayItem;
 		}
 		// default these to false instead
 		return !DS_SUPPORT_POS.equals(item);
 	}
+
+	private boolean isVisibleByDefault(String item)
+	{
+		String[] visibleByDefault = {DISEASE_REGISTRY_POS};
+		return Arrays.asList(visibleByDefault).contains(item);
+	}
 	
-	private boolean isOldCppPosition(LoggedInInfo loggedInInfo, String property){
+	private boolean isVisibleInClassicUICPP(LoggedInInfo loggedInInfo, String property){
 		if(property.equals(SOC_HX_POS)){
 			return displaySummaryItem(loggedInInfo, OLD_SOCIAL_HISTORY_POS);
 		}else if(property.equals(MED_HX_POS)){

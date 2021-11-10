@@ -26,16 +26,15 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
 import java.util.Set;
@@ -54,7 +53,6 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdmini
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-
 public class AddLoginRecordsIT extends SeleniumTestBase
 {
 	String userNameApple = drApple.firstName + "." + drApple.lastName;
@@ -68,21 +66,22 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 	String messageContentExpected =
 			"Password must contain at least 3 of the following: capital chars, lower chars, digits, special chars.";
 
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"admission", "log", "property", "provider", "providerbillcenter", "security", "secUserRole"
+		};
+	}
+
 	@Before
 	public void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
-		SchemaUtils.restoreTable("admission", "log", "property", "provider", "providerbillcenter", "security", "secUserRole");
 		loadSpringBeans();
 		databaseUtil.createTestProvider();
 	}
 
-	@After
-	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
-	{
-		SchemaUtils.restoreTable("admission", "log", "property", "provider", "providerbillcenter", "security", "secUserRole");
-	}
-
-	private String passwordValidation(String passwordInput)
+	public String passwordValidation(String passwordInput) throws InterruptedException
 	{
 		driver.findElement(By.xpath("//input[@name='password']")).sendKeys(passwordInput);
 		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
@@ -135,7 +134,9 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 	}
 
 	@Test
+	@Ignore
 	public void addLoginRecordsClassicUITest()
+		throws InterruptedException
 	{
 		String currWindowHandle = driver.getWindowHandle();
 		//Assign Roles
@@ -176,6 +177,7 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 	}
 
 	@Test
+	@Ignore
 	public void addLoginRecordsJUNOUITest()
 			throws InterruptedException
 	{

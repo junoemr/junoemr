@@ -27,7 +27,6 @@ import integration.tests.sql.SqlFiles;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,19 +52,21 @@ import static integration.tests.util.junoUtil.Navigation.EFORM_URL;
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EFormIT extends SeleniumTestBase
 {
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"casemgmt_note", "eChart", "eform", "eform_data", "eform_instance",
+			"eform_values", "measurementType", "validations"
+		};
+	}
+
 	@Before
 	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
 		SchemaUtils.loadFileIntoMySQL(SqlFiles.EFORM_ADD_TRAVLE_FORM_V4);
-	}
-
-	@After
-	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
-	{
-		SchemaUtils.restoreTable("casemgmt_note", "eChart", "eform", "eform_data", "eform_instance",
-				"eform_values", "measurementType", "validations");
 	}
 
 	@Test

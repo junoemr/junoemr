@@ -28,6 +28,7 @@ import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -53,17 +54,19 @@ public class AssignRolesIT extends SeleniumTestBase
     public static String xpathOption = "//following-sibling::td/select[@name='roleNew']";
     public static String xpathDropdown = xpathProvider + xpathOption;
 
+    @Override
+    protected String[] getTablesToRestore()
+    {
+        return new String[]{
+            "admission", "log", "property", "program_provider", "provider", "providerbillcenter", "secUserRole"
+        };
+    }
+
     @Before
     public void setup() throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
     {
         loadSpringBeans();
         databaseUtil.createTestProvider();
-    }
-
-    @After
-    public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
-    {
-        SchemaUtils.restoreTable("admission", "log", "property", "program_provider", "provider", "providerbillcenter", "secUserRole");
     }
 
     public static void assignRoles(String xpathDropdown, String xpathProviderNo, String role, String xpathAction)
@@ -81,6 +84,7 @@ public class AssignRolesIT extends SeleniumTestBase
     }
 
     @Test
+	@Ignore
     public void assignRolesClassicUITest()
             throws InterruptedException
     {

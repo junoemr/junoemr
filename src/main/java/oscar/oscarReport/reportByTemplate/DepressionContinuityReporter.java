@@ -64,7 +64,7 @@ public class DepressionContinuityReporter implements Reporter
 	{
 	}
 
-	public boolean generateReport(HttpServletRequest request)
+	public boolean generateReport(HttpServletRequest request, boolean prepareForFile)
 	{
 		String templateId = request.getParameter("templateId");
 		ReportObject curReport = reportByTemplateService.getAsLegacyReport(Integer.parseInt(templateId), false);

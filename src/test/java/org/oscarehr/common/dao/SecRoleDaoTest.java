@@ -70,16 +70,19 @@ public class SecRoleDaoTest extends DaoTestFixtures
 		SecRole secRole1 = new SecRole();
 		EntityDataGenerator.generateTestDataForModelClass(secRole1);
 		secRole1.setName(name1);
+		secRole1.setDeletedBy(secRole1.getDeletedBy().substring(0, 6));
 		dao.persist(secRole1);
 		
 		SecRole secRole2 = new SecRole();
 		EntityDataGenerator.generateTestDataForModelClass(secRole2);
 		secRole2.setName(name2);
+		secRole2.setDeletedBy(secRole1.getDeletedBy().substring(0, 6));
 		dao.persist(secRole2);
 		
 		SecRole secRole3 = new SecRole();
 		EntityDataGenerator.generateTestDataForModelClass(secRole3);
 		secRole3.setName(name3);
+		secRole3.setDeletedBy(secRole1.getDeletedBy().substring(0, 6));
 		dao.persist(secRole3);
 		
 		List<SecRole> expectedResult = new ArrayList<SecRole>(Arrays.asList(secRole1, secRole2, secRole3));		
@@ -92,7 +95,8 @@ public class SecRoleDaoTest extends DaoTestFixtures
 		}
 
 		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
+			if (!secRolesEquals(expectedResult.get(i), result.get(i)))
+			{
 				logger.warn("Items do not match.");
 				fail("Items do not match.");
 			}
@@ -132,11 +136,26 @@ public class SecRoleDaoTest extends DaoTestFixtures
 		}
 
 		for (int i = 0; i < expectedResult.size(); i++) {
-			if (!expectedResult.get(i).equals(result.get(i))){
+			if (!secRolesEquals(expectedResult.get(i), result.get(i)))
+			{
 				logger.warn("Items do not match.");
 				fail("Items do not match.");
 			}
 		}
 		assertTrue(true);
+	}
+
+	private boolean secRolesEquals(SecRole secRole1, SecRole secRole2)
+	{
+		if(
+			secRole1.getName().equals(secRole2.getName()) &&
+			secRole1.getDescription().equals(secRole2.getDescription()) &&
+			secRole1.isSystemManaged() == secRole2.isSystemManaged()
+		)
+		{
+			return true;
+		}
+
+		return false;
 	}
 }

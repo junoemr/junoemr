@@ -89,12 +89,6 @@ public class SunquestHandler extends AHSHandler
 
     /* ===================================== PID ====================================== */
 
-    @Override
-	public String getPatientName()
-	{
-		return(getFirstName()+" "+getMiddleName()+" "+getLastName());
-	}
-
 	/* ===================================== OBR ====================================== */
 
 	@Override

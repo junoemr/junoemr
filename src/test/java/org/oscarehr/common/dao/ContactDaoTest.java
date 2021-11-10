@@ -77,16 +77,19 @@ public class ContactDaoTest extends DaoTestFixtures
 		EntityDataGenerator.generateTestDataForModelClass(contact1);
 		contact1.setLastName("Smith");
 		contact1.setFirstName("Jon");
+		contact1.setDeleted(false);
 
 		Contact contact2 = new Contact();
 		EntityDataGenerator.generateTestDataForModelClass(contact2);
 		contact2.setLastName("Smith");
 		contact2.setFirstName("Jon");
+		contact2.setDeleted(false);
 
 		Contact contact3 = new Contact();
 		EntityDataGenerator.generateTestDataForModelClass(contact3);
 		contact3.setLastName("Smith");
 		contact3.setFirstName("Jim");
+		contact3.setDeleted(false);
 
 		contactDao.persist(contact1);
 		contactDao.persist(contact2);
@@ -128,16 +131,19 @@ public class ContactDaoTest extends DaoTestFixtures
 		Contact contact1 = new Contact();
 		EntityDataGenerator.generateTestDataForModelClass(contact1);
 		contact1.setLastName("Smith");
+		contact1.setDeleted(false);
 		contactDao.persist(contact1);
 		
 		Contact contact2 = new Contact();
 		EntityDataGenerator.generateTestDataForModelClass(contact2);
 		contact2.setLastName("Jackson");
+		contact2.setDeleted(false);
 		contactDao.persist(contact2);
-		
+
 		Contact contact3 = new Contact();
 		EntityDataGenerator.generateTestDataForModelClass(contact3);
 		contact3.setLastName("Smith");
+		contact3.setDeleted(false);
 		contactDao.persist(contact3);
 
 		List<Contact> result = contactDao.search(searchMode, orderBy, keyword);
@@ -177,14 +183,17 @@ public class ContactDaoTest extends DaoTestFixtures
 		Contact contact1 = new Contact();
 		EntityDataGenerator.generateTestDataForModelClass(contact1);
 		contact1.setProvince("BC");
+		contact1.setDeleted(false);
 		
 		Contact contact2 = new Contact();
 		EntityDataGenerator.generateTestDataForModelClass(contact2);
 		contact2.setProvince("ON");
+		contact2.setDeleted(false);
 
 		Contact contact3 = new Contact();
 		EntityDataGenerator.generateTestDataForModelClass(contact3);
 		contact3.setProvince("ON");
+		contact3.setDeleted(false);
 
 		contactDao.persist(contact1);
 		contactDao.persist(contact2);
