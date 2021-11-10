@@ -110,7 +110,7 @@ public class AppointmentStatusList
 		{
 			boolean rotates = true;
 			String systemCode = null;
-			if(STATUS_BILLED.equals(appointmentStatus.getStatus()))
+			if (STATUS_BILLED.equals(appointmentStatus.getStatus()))
 			{
 				rotates = false;
 				systemCode = SYSTEM_CODE_BILLED;
@@ -126,6 +126,7 @@ public class AppointmentStatusList
 				appointmentStatus.getIcon(),
 				appointmentStatus.getActive() == 1
 			));
+		}
 
 		return calendarAppointmentStatusList;
 	}
