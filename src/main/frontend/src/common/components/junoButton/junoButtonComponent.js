@@ -63,7 +63,10 @@ angular.module('Common.Components').component('junoButton', {
 
 		ctrl.componentClasses = () =>
 		{
-			return [ctrl.componentStyle];
+			return [
+				ctrl.componentStyle,
+				ctrl.hasTopLabel() ? "has-label-top" : "",
+			];
 		}
 
 		ctrl.buttonClasses = () =>
@@ -87,6 +90,13 @@ angular.module('Common.Components').component('junoButton', {
 				};
 			}
 			return {};
+		}
+
+		ctrl.hasTopLabel = () =>
+		{
+			return ctrl.label &&
+				ctrl.label.length > 0 &&
+				ctrl.labelPosition === LABEL_POSITION.TOP;
 		}
 	}]
 });

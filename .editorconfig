@@ -2,7 +2,7 @@
 charset = utf-8
 end_of_line = lf
 indent_size = 2
-indent_style = space
+indent_style = tab
 insert_final_newline = false
 max_line_length = 100
 tab_width = 2
@@ -16,7 +16,7 @@ ij_wrap_on_typing = false
 
 [*.css]
 indent_size = 4
-tab_width = 4
+indent_style = tab
 ij_continuation_indent_size = 8
 ij_css_align_closing_brace_with_properties = false
 ij_css_blank_lines_around_nested_selector = 1
@@ -55,7 +55,7 @@ ij_haml_keep_indents_on_empty_lines = false
 [*.java]
 indent_size = 4
 indent_style = tab
-tab_width = 4
+tab_width = 2
 ij_java_align_consecutive_assignments = false
 ij_java_align_consecutive_variable_declarations = false
 ij_java_align_group_field_declarations = false
@@ -346,6 +346,7 @@ ij_sass_use_double_quotes = true
 ij_sass_value_alignment = 0
 
 [*.scss]
+indent_style = tab
 ij_scss_align_closing_brace_with_properties = false
 ij_scss_blank_lines_around_nested_selector = 1
 ij_scss_blank_lines_between_blocks = 1
@@ -592,7 +593,7 @@ ij_shell_use_unix_line_separator = true
 indent_size = 4
 indent_style = tab
 max_line_length = 80
-tab_width = 4
+tab_width = 2
 ij_javascript_align_imports = false
 ij_javascript_align_multiline_array_initializer_expression = false
 ij_javascript_align_multiline_binary_operation = false
