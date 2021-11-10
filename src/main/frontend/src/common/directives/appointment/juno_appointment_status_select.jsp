@@ -30,8 +30,9 @@
 			        ng-disabled="disabled"
 			        tabindex="{{tab_index}}">
 				<option ng-if="include_empty_option == 'true'" value=""></option>
-				<option ng-repeat="option in options"
+				<option ng-repeat="option in getValidOptions()"
 				        value="{{option.displayLetter}}"
+                        		ng-disabled="!option.enabled"
 				        <%--style="background-color: {{option.color}}"--%>
 				>
 					{{option.name}}
