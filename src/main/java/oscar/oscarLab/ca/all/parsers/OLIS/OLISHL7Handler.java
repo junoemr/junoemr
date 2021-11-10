@@ -77,6 +77,8 @@ public class OLISHL7Handler extends MessageHandler
 	protected boolean isFinal = true;
 	protected boolean isCorrected = false;
 	protected boolean reportBlocked = false;
+	protected boolean reportInvalidated = false;
+	protected boolean reportIsFullReplacement = false;
 	protected Message msg = null;
 	protected ArrayList<ArrayList<Segment>> obrGroups = null;
 
@@ -977,6 +979,11 @@ public class OLISHL7Handler extends MessageHandler
 						for (int l = 0; l < segs.length; l++) {
 							Segment obxSeg = (Segment) segs[l];
 							obxSegs.add(obxSeg);
+
+							if("W".equals(Terser.get(obxSeg, 11, 0, 1, 1)))
+							{
+								reportInvalidated = true;
+							}
 						}
 
 					} else if (obrFlag && segmentName.equals("OBR")) {
@@ -1073,6 +1080,12 @@ public class OLISHL7Handler extends MessageHandler
 				value = getString(Terser.get(zbr, index, 0, 1, 1));
 				sourceOrganizations.put(key, value);
 			}
+			String clinicInfo = getString(Terser.get(zbr, 13, 0, 1, 1));
+			if("Y".equals(clinicInfo))
+			{
+				reportIsFullReplacement = true;
+			}
+
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 		}
@@ -1476,6 +1489,20 @@ public class OLISHL7Handler extends MessageHandler
 			default:
 				return "";
 		}
+	}
+
+	@Override
+	public String getOrderStatusDisplayValue()
+	{
+		if(reportIsFullReplacement)
+		{
+			return "Full Replace Amendment";
+		}
+		else if (reportInvalidated)
+		{
+			return "Amended/Invalidation";
+		}
+		return super.getOrderStatusDisplayValue();
 	}
 
 	public String getPointOfCare(int i) {
