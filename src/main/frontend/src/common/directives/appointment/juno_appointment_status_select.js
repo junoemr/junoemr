@@ -33,15 +33,8 @@ angular.module('Common').directive(
 			{
 				// $scope.options is an object... not an array.
 				const selectedStatus = $scope.model;
-				const validOptions = [];
-
-				Object.values($scope.options).forEach(status =>
-				{
-					if (status.enabled || status.displayLetter === selectedStatus)
-					{
-						validOptions.push(status);
-					}
-				});
+				const validOptions = Object.values($scope.options)
+					.filter((status) => status.enabled || status.displayLetter === selectedStatus)
 
 				const validOptionsAsObj = validOptions.reduce((acc, status) =>
 				{
