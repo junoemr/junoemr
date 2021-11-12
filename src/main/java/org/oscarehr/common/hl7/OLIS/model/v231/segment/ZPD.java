@@ -26,55 +26,44 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.v231.datatype.CE;
-import ca.uhn.hl7v2.model.v231.datatype.FT;
-import ca.uhn.hl7v2.model.v231.datatype.ID;
-import ca.uhn.hl7v2.model.v231.datatype.SI;
+import ca.uhn.hl7v2.model.Type;
+import ca.uhn.hl7v2.model.v231.datatype.HD;
+import ca.uhn.hl7v2.model.v231.datatype.ST;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
-import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
 /**
- * 10.2.5.4 NTE-ZNT Segment Pair
+ * 10.2.5.3 ZPD – PID Extension Segment
  */
-public class ZNT extends AbstractSegment
+public class ZPD extends AbstractSegment
 {
-	private static final Logger logger = MiscUtils.getLogger();
-
-	public ZNT(Group parent, ModelClassFactory factory)
+	public ZPD(Group parent, ModelClassFactory factory)
 	{
 		super(parent, factory);
 		Message message = this.getMessage();
 
 		try
 		{
-			this.add(SI.class, true, 1, 4, new Object[]{message}, "Set ID");
-			this.add(ID.class, true, 1, 1, new Object[]{message}, "Source of Comment");
-			this.add(FT.class, true, 1, 65536, new Object[]{message}, "Comment");
-			this.add(CE.class, true, 1, 242, new Object[]{message}, "Comment Type");
+			this.add(ST.class, false, 1,20, new Object[]{message}, "Patient Consent Indicator");
+			this.add(ST.class, false, 1,1, new Object[]{message}, "Patient Identification Verified Flag");
+			this.add(ST.class, false, 1,1, new Object[]{message}, "Patient Consent Block-All Indicator");
 		}
-		catch(HL7Exception e)
+		catch (HL7Exception var)
 		{
-			logger.error("Can't instantiate " + this.getClass().getName());
-			throw new RuntimeException(e);
+			MiscUtils.getLogger().error("Can't instantiate " + this.getClass().getName(), var);
 		}
 	}
 
-	public SI getZnt1_setId() throws HL7Exception
+	public HD getZpd1_patientConsentIndicator() throws HL7Exception
 	{
-		return (SI) this.getField(1, 0);
+		return (HD) this.getField(1, 0);
 	}
-	public ID getZnt2_sourceOfComment() throws HL7Exception
+	public HD getZpd2_patientIdentificationVerifiedFlag() throws HL7Exception
 	{
-		return (ID) this.getField(2, 0);
+		return (HD) this.getField(2, 0);
 	}
-	public FT getZnt3_comment() throws HL7Exception
+	public HD getZpd3_patientConsentBlockAllIndicator() throws HL7Exception
 	{
-		return (FT) this.getField(3, 0);
+		return (HD) this.getField(3, 0);
 	}
-	public CE getZnt4_commentType() throws HL7Exception
-	{
-		return (CE) this.getField(4, 0);
-	}
-
 }

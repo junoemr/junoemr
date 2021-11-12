@@ -1995,14 +1995,18 @@ public String strikeOutInvalidContent(String content, String status) {
                                             </tr>
                                         	<%
                                         }
-                                        for (l=0; l < handler.getOBXCommentCount(obr, obx); l++){%>
-                                            <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
-                                                <td valign="top" align="left" colspan="7" style="font-family:courier;">
-                                                <div style="width:700px">
-                                                	<%=handler.getOBXComment(obr, obx, l)%><span style="margin-left:15px;font-size:8px; color:#333333;word-break:normal;"><%=handler.getOBXSourceOrganization(obr, obx, l)%></span>
-                                                </div>
-                                                </td>
-                                            </tr>
+                                        for (l=0; l < handler.getOBXCommentCount(obr, obx); l++)
+										{%>
+					                        <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
+						                        <td valign="top" align="left" colspan="7" style="font-family:courier;">
+							                        <div style="width:700px">
+								                        <%=handler.getOBXComment(obr, obx, l)%>
+								                        <span style="margin-left:15px;font-size:8px; color:#333333;word-break:normal;">
+									                        <%=handler.getOBXSourceOrganization(obr, obx, l)%>
+								                        </span>
+							                        </div>
+						                        </td>
+					                        </tr>
                                         <%}
                                     }
                                 }

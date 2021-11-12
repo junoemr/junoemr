@@ -32,7 +32,7 @@ import ca.uhn.hl7v2.model.v231.segment.MSH;
 import ca.uhn.hl7v2.model.v231.segment.QAK;
 import ca.uhn.hl7v2.parser.DefaultModelClassFactory;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
-import org.oscarehr.common.hl7.OLIS.model.v231.group.ORU_R01_PIDPD1NK1NTEPV1PV2ZV1ORCOBRNTEOBXNTECTI;
+import org.oscarehr.common.hl7.OLIS.model.v231.group.ERP_R09_RESPONSE;
 
 import java.util.List;
 
@@ -59,7 +59,7 @@ public class ERP_R09 extends AbstractMessage
 			this.add(ERR.class, false, false);
 			this.add(QAK.class, false, false);
 			this.add(ERQ.class, false, false);
-			this.add(ORU_R01_PIDPD1NK1NTEPV1PV2ZV1ORCOBRNTEOBXNTECTI.class, false, true);
+			this.add(ERP_R09_RESPONSE.class, false, true);
 			this.add(DSC.class, false, false);
 		}
 		catch (HL7Exception e)
@@ -99,24 +99,24 @@ public class ERP_R09 extends AbstractMessage
 		return this.getTyped("ERQ", ERQ.class);
 	}
 
-	public ORU_R01_PIDPD1NK1NTEPV1PV2ZV1ORCOBRNTEOBXNTECTI getPIDPD1NK1NTEPV1PV2ORCOBRNTEOBXNTECTI()
+	public ERP_R09_RESPONSE getRESPONSE()
 	{
-		return this.getTyped("ORU_R01_PIDPD1NK1NTEPV1PV2ZV1ORCOBRNTEOBXNTECTI", ORU_R01_PIDPD1NK1NTEPV1PV2ZV1ORCOBRNTEOBXNTECTI.class);
+		return this.getTyped("RESPONSE", ERP_R09_RESPONSE.class);
 	}
 
-	public ORU_R01_PIDPD1NK1NTEPV1PV2ZV1ORCOBRNTEOBXNTECTI getPIDPD1NK1NTEPV1PV2ORCOBRNTEOBXNTECTI(int rep)
+	public ERP_R09_RESPONSE getRESPONSE(int rep)
 	{
-		return this.getTyped("ORU_R01_PIDPD1NK1NTEPV1PV2ZV1ORCOBRNTEOBXNTECTI", rep, ORU_R01_PIDPD1NK1NTEPV1PV2ZV1ORCOBRNTEOBXNTECTI.class);
+		return this.getTyped("RESPONSE", rep, ERP_R09_RESPONSE.class);
 	}
 
-	public int getORU_R01_PIDPD1NK1NTEPV1PV2ZV1ORCOBRNTEOBXNTECTIReps()
+	public int getRESPONSEReps()
 	{
-		return this.getReps("ORU_R01_PIDPD1NK1NTEPV1PV2ZV1ORCOBRNTEOBXNTECTI");
+		return this.getReps("RESPONSE");
 	}
 
-	public List<ORU_R01_PIDPD1NK1NTEPV1PV2ZV1ORCOBRNTEOBXNTECTI> getORU_R01_PIDPD1NK1NTEPV1PV2ZV1ORCOBRNTEOBXNTECTIAll() throws HL7Exception
+	public List<ERP_R09_RESPONSE> getRESPONSEAll() throws HL7Exception
 	{
-		return this.getAllAsList("ORU_R01_PIDPD1NK1NTEPV1PV2ZV1ORCOBRNTEOBXNTECTI", ORU_R01_PIDPD1NK1NTEPV1PV2ZV1ORCOBRNTEOBXNTECTI.class);
+		return this.getAllAsList("RESPONSE", ERP_R09_RESPONSE.class);
 	}
 
 	public DSC getDSC()

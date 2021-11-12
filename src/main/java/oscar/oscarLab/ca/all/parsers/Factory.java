@@ -256,7 +256,7 @@ public final class Factory {
 			Message msg = p.parse(hl7Body.replaceAll("\n", "\r\n"));
 			if (OLISHL7Handler.handlerTypeMatch(msg))
 			{
-				handler = new OLISHL7Handler(hl7Body);
+				handler = new OLISHL7Handler(msg);
 			}
 		}
 		else //handle default ORU^R01 messages

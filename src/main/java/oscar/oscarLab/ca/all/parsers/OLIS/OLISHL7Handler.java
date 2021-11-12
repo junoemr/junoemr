@@ -21,10 +21,7 @@ import ca.uhn.hl7v2.model.Structure;
 import ca.uhn.hl7v2.model.Type;
 import ca.uhn.hl7v2.model.Varies;
 import ca.uhn.hl7v2.model.v231.segment.MSH;
-import ca.uhn.hl7v2.parser.Parser;
-import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
-import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.bouncycastle.util.encoders.Base64;
@@ -35,7 +32,7 @@ import org.oscarehr.olis.model.OLISRequestNomenclature;
 import org.oscarehr.olis.model.OLISResultNomenclature;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
@@ -63,7 +60,7 @@ import static org.oscarehr.olis.service.OLISPollingService.OLIS_DATE_FORMAT;
 /**
  * @author Adam Balanga
  */
-public class OLISHL7Handler extends MessageHandler
+public class OLISHL7Handler extends ORU_R01MessageHandler
 {
 	public static final String OLIS_MESSAGE_TYPE = "OLIS_HL7";
 	public static final String TEXT_HIGHLIGHT_COLOUR = "#767676";
@@ -74,12 +71,13 @@ public class OLISHL7Handler extends MessageHandler
 	private static final Logger logger = Logger.getLogger(OLISHL7Handler.class);
 	private static final String finalStatus = "CFEX";
 
+	protected ERP_R09 msg = null;
+
 	protected boolean isFinal = true;
 	protected boolean isCorrected = false;
 	protected boolean reportBlocked = false;
 	protected boolean reportInvalidated = false;
 	protected boolean reportIsFullReplacement = false;
-	protected Message msg = null;
 	protected ArrayList<ArrayList<Segment>> obrGroups = null;
 
 	private boolean centered = false;
@@ -99,7 +97,7 @@ public class OLISHL7Handler extends MessageHandler
 	private HashMap<String, String> telecomUseCode;
 	private HashMap<String, String> telecomEquipType;
 
-	private HashMap<Integer, Segment> obrDiagnosis;
+//	private HashMap<Integer, Segment> obrDiagnosis;
 	private ArrayList<String> disciplines;
 	private List<OLISError> errors;
 
@@ -189,13 +187,23 @@ public class OLISHL7Handler extends MessageHandler
 	private ArrayList<String> headers = null;
 
 	/** Creates a new instance of OLISHL7Handler */
-	public OLISHL7Handler() {
+	public OLISHL7Handler() throws HL7Exception
+	{
 		super();
+		init(null);
 	}
 
 	public OLISHL7Handler(String hl7message) throws HL7Exception
 	{
+		super(hl7message);
 		init(hl7message);
+	}
+
+	public OLISHL7Handler(Message message) throws HL7Exception
+	{
+		super(message);
+		this.msg = (ERP_R09) this.message;
+		init(null);
 	}
 
 	String[] getDentistLicenceNumber() {
@@ -863,13 +871,15 @@ public class OLISHL7Handler extends MessageHandler
 		return obrParentMap.containsValue(String.valueOf(obr));
 	}
 
-	public String getDiagnosis(int obr) {
-		try {
-			return obrDiagnosis.containsKey(obr) ? getString(Terser.get(obrDiagnosis.get(obr), 3, 0, 2, 1)) : "";
-		} catch (HL7Exception e) {
-			MiscUtils.getLogger().error("OLIS HL7 Error", e);
-		}
-		return "";
+	public String getDiagnosis(int obr)
+	{
+//		try {
+			return getString(get("/.ORDER_OBSERVATION(" + obr + ")/DG1-3-2-1"));
+//			return obrDiagnosis.containsKey(obr) ? getString(Terser.get(obrDiagnosis.get(obr), 3, 0, 2, 1)) : "";
+//		} catch (HL7Exception e) {
+//			MiscUtils.getLogger().error("OLIS HL7 Error", e);
+//		}
+//		return "";
 	}
 
 	public int getMappedOBR(int obr)
@@ -906,7 +916,7 @@ public class OLISHL7Handler extends MessageHandler
 	public void init(String hl7Body) throws HL7Exception {
 		initDefaultSourceOrganizations();
 
-		obrDiagnosis = new HashMap<Integer, Segment>();
+//		obrDiagnosis = new HashMap<Integer, Segment>();
 
 		obrParentMap = new HashMap<String, String>();
 
@@ -925,14 +935,8 @@ public class OLISHL7Handler extends MessageHandler
 		sourceOrganizations = new HashMap<String, String>();
 		obrSpecimenSource = new ArrayList<String>();
 		obrStatus = new ArrayList<String>();
-		Parser p = new PipeParser();
 
-		p.setValidationContext(new NoValidation());
-
-		msg = p.parse(hl7Body.replaceAll("\n", "\r\n"));
 		headers = new ArrayList<String>();
-		this.message = msg;
-		terser = new Terser(msg);
 		int zbrNum = 1;
 		int obrCount = getOBRCount();
 		int obrNum = 1;
@@ -944,18 +948,29 @@ public class OLISHL7Handler extends MessageHandler
 
 		// We only need to parse a few segments if there are no OBRs.
 		if (obrCount == 0) {
-			for (; k < segments.length; k++) {
-				segmentName = segments[k].substring(0, 3);
-				if (segmentName.equals("ZPD")) {
-					parseZPDSegment();
-				}
-				if (segmentName.equals("ERR")) {
-					parseERRSegment();
-				}
-			}
+
+			parseZPDSegment();
+			parseERRSegment();
+
+//			Segment zpd = terser.getSegment("/.ZPD");
+//
+//
+//			for (; k < segments.length; k++) {
+//				segmentName = segments[k].substring(0, 3);
+//				if (segmentName.equals("ZPD")) {
+//					parseZPDSegment();
+//				}
+//				if (segmentName.equals("ERR")) {
+//					parseERRSegment();
+//				}
+//			}
 			return;
 		}
-		for (int i = 0; i < obrCount; i++) {
+
+		parsePIDSegment();
+
+		for (int i = 0; i < obrCount; i++)
+		{
 			ArrayList<Segment> obxSegs = new ArrayList<Segment>();
 
 			headers.add(getOBRName(i));
@@ -1031,12 +1046,12 @@ public class OLISHL7Handler extends MessageHandler
 							obrParentMap.put(parent, String.valueOf(obrNum));
 						}
 
-					} else if (segmentName.equals("DG1")) {
-						Structure[] segs = terser.getFinder().getRoot().getAll(segments[k]);
-						for (int l = 0; l < segs.length; l++) {
-							Segment dg1Seg = (Segment) segs[l];
-							obrDiagnosis.put(obrNum - 1, dg1Seg);
-						}
+//					} else if (segmentName.equals("DG1")) {
+//						Structure[] segs = terser.getFinder().getRoot().getAll(segments[k]);
+//						for (int l = 0; l < segs.length; l++) {
+//							Segment dg1Seg = (Segment) segs[l];
+//							obrDiagnosis.put(obrNum - 1, dg1Seg);
+//						}
 					}
 				} catch (Exception e) {
 					MiscUtils.getLogger().error("OLIS HL7 Error", e);
@@ -1059,15 +1074,12 @@ public class OLISHL7Handler extends MessageHandler
 		}
 	}
 
-	private void parseZBRSegment(int zbrNum) {
+	private void parseZBRSegment(int zbrNum)
+	{
 		try {
 			String key = "", value = "";
-			Segment zbr = null;
-			if (zbrNum == 1) {
-				zbr = terser.getSegment("/.ZBR");
-			} else {
-				zbr = (Segment) terser.getFinder().getRoot().get("ZBR" + zbrNum);
-			}
+			Segment zbr = terser.getSegment("/.ORDER_OBSERVATION(" + zbrNum + ")/ZBR");
+
 			int[] indexes = { 2, 3, 4, 6, 8 };
 			for (int index : indexes) {
 				if (getString(Terser.get(zbr, index, 0, 6, 2)).equals("")) {
@@ -1264,21 +1276,13 @@ public class OLISHL7Handler extends MessageHandler
 		Segment zbr;
 		for(int obrRep = 0; obrRep < obrCount; obrRep++)
 		{
-			String obrRepStr = (obrRep == 0) ? "" : String.valueOf(obrRep + 1);
-			if(obrRep == 0)
-			{
-				zbr = terser.getSegment("/.ZBR");
-			}
-			else
-			{
-				zbr = (Segment) terser.getFinder().getRoot().get("ZBR" + obrRepStr);
-			}
+			zbr = terser.getSegment("/.ORDER_OBSERVATION(" + obrRep + ")/ZBR");
 
-			String collectionDateStr = StringUtils.trimToNull(get("/.OBR" + obrRepStr + "-7"));
+			String collectionDateStr = StringUtils.trimToNull(get("/.ORDER_OBSERVATION(" + obrRep + ")/OBR-7"));
 			String placerGroupNo = this.getPlacerGroupNumber();
 			String requestSortKey = getString(Terser.get(zbr, 11, 0, 1, 1));
 
-			String obxCategory = StringUtils.trimToNull(get("/.OBR" + obrRepStr + "-4-1-1"));
+			String obxCategory = StringUtils.trimToNull(get("/.ORDER_OBSERVATION(" + obrRep + ")/OBR-4-1-1"));
 			String olisSortKey = null;
 			String olisAlternateName1 = null;
 			if(obxCategory != null)
@@ -1678,32 +1682,35 @@ public class OLISHL7Handler extends MessageHandler
 	 * Methods to get information about the Observation Request
 	 */
 	@Override
-	public int getOBRCount() {
-
-		if (obrGroups != null) {
-			return (obrGroups.size());
-		} else {
-			int i = 1;
-			// String test;
-			Segment test;
-			try {
-
-				test = terser.getSegment("/.OBR");
-				while (test != null) {
-					i++;
-					test = (Segment) terser.getFinder().getRoot().get("OBR" + i);
-				}
-
-			} catch (Exception e) {
-				// ignore exceptions
-			}
-
-			return (i - 1);
-		}
+	public int getOBRCount()
+	{
+//		return getReps("RESPONSE", 0, "ORDER_OBSERVATION");
+		return msg.getRESPONSE().getORDER_OBSERVATIONReps();
+//		if (obrGroups != null) {
+//			return (obrGroups.size());
+//		} else {
+//			int i = 1;
+//			// String test;
+//			Segment test;
+//			try {
+//
+//				test = terser.getSegment("/.OBR");
+//				while (test != null) {
+//					i++;
+//					test = (Segment) terser.getFinder().getRoot().get("OBR" + i);
+//				}
+//
+//			} catch (Exception e) {
+//				// ignore exceptions
+//			}
+//
+//			return (i - 1);
+//		}
 	}
 
 	@Override
-	public String getOBRName(int i) {
+	public String getOBRName(int i)
+	{
 
 		String obrName;
 		i++;
