@@ -14,17 +14,15 @@
 package oscar.oscarLab.ca.all.parsers.OLIS;
 
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.GenericComposite;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.Structure;
-import ca.uhn.hl7v2.model.Type;
-import ca.uhn.hl7v2.model.Varies;
 import ca.uhn.hl7v2.model.v231.segment.MSH;
 import ca.uhn.hl7v2.util.Terser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.bouncycastle.util.encoders.Base64;
+import org.oscarehr.common.hl7.OLIS.model.v231.group.ERP_R09_NOTE;
 import org.oscarehr.common.hl7.OLIS.model.v231.message.ERP_R09;
 import org.oscarehr.olis.dao.OLISRequestNomenclatureDao;
 import org.oscarehr.olis.dao.OLISResultNomenclatureDao;
@@ -78,11 +76,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	protected boolean reportBlocked = false;
 	protected boolean reportInvalidated = false;
 	protected boolean reportIsFullReplacement = false;
-	protected ArrayList<ArrayList<Segment>> obrGroups = null;
 
 	private boolean centered = false;
-	private ArrayList<String> obrSpecimenSource;
-	private ArrayList<String> obrStatus;
 	private HashMap<String, String> sourceOrganizations;
 
 	private HashMap<String, String> defaultSourceOrganizations;
@@ -97,9 +92,9 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	private HashMap<String, String> telecomUseCode;
 	private HashMap<String, String> telecomEquipType;
 
-//	private HashMap<Integer, Segment> obrDiagnosis;
 	private ArrayList<String> disciplines;
 	private List<OLISError> errors;
+	private List<ERP_R09_NOTE> reportNotes;
 
 	public static boolean handlerTypeMatch(Message message)
 	{
@@ -165,9 +160,9 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return sourceOrganizations.containsKey(org) ? sourceOrganizations.get(org) : defaultSourceOrganizations.get(org);
 	}
 
-	public String getObrStatus(int index)
+	public String getObrStatus(int rep)
 	{
-		return obrStatus.get(index);
+		return getString(get("/.ORDER_OBSERVATION(" + rep + ")/OBR-25-1-1"));
 	}
 
 	public String getObrStatusDisplayValue(int index)
@@ -180,8 +175,11 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return getObrTestResultStatusMessage(getObrStatus(index));
 	}
 
-	public String getObrSpecimenSource(int index) {
-		return obrSpecimenSource.get(index);
+	public String getObrSpecimenSource(int obrRep)
+	{
+		String specimenSource = getString(get("/.ORDER_OBSERVATION(" + obrRep + ")/OBR-15-1-2"));
+		String specimenSiteModifier = getString(get("/.ORDER_OBSERVATION(" + obrRep + ")/OBR-15-5-2"));
+		return StringUtils.trimToEmpty(specimenSource + " " + specimenSiteModifier);
 	}
 
 	private ArrayList<String> headers = null;
@@ -360,23 +358,10 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return reportBlocked;
 	}
 
-	public boolean isOBRBlocked(int obr) {
-		obr++;
-		try {
-			String indicator;
-			Segment zbr = null;
-			if (obr == 1) {
-				zbr = terser.getSegment("/.ZBR");
-			} else {
-				zbr = (Segment) terser.getFinder().getRoot().get("ZBR" + obr);
-			}
-			indicator = Terser.get(zbr, 1, 0, 1, 1);
-			return "Y".equals(indicator);
-
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("OLIS HL7 Error", e);
-		}
-		return false;
+	public boolean isOBRBlocked(int obr)
+	{
+		String indicator = get("/.ORDER_OBSERVATION(" + obr + ")/ZBR-1-1-1");
+		return "Y".equals(indicator);
 	}
 
 	public boolean hasBlockedTest()
@@ -393,17 +378,12 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return isBlocked;
 	}
 
-	public String getOBRPerformingFacilityName(int obr) {
-		obr++;
-		try {
-			String key = "", value = "", ident = "";
-			Segment zbr = null;
-			if (obr == 1) {
-				zbr = terser.getSegment("/.ZBR");
-			} else {
-				zbr = (Segment) terser.getFinder().getRoot().get("ZBR" + obr);
-			}
-			key = getString(Terser.get(zbr, 6, 0, 6, 2));
+	public String getOBRPerformingFacilityName(int obr)
+	{
+		try
+		{
+			String ident = "";
+			String key = getString(get("/.ORDER_OBSERVATION(" + obr + ")/ZBR-6-6-2"));
 			if (key != null && key.indexOf(":") > 0) {
 				ident = key.substring(0, key.indexOf(":"));
 				ident = getOrganizationType(ident);
@@ -412,7 +392,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			if (key == null || "".equals(key.trim())) {
 				return "";
 			}
-			value = getString(Terser.get(zbr, 6, 0, 1, 1));
+
+			String value = getString(get("/.ORDER_OBSERVATION(" + obr + ")/ZBR-6-1-1"));
 			return String.format("%s (%s %s)", value, ident, key);
 
 		} catch (Exception e) {
@@ -421,16 +402,13 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return "";
 	}
 
-	public HashMap<String, String> getPerformingFacilityAddress(int obr) {
-		obr++;
-		try {
+	public HashMap<String, String> getPerformingFacilityAddress(int obr)
+	{
+		try
+		{
 			String value = "";
-			Segment zbr = null;
-			if (obr == 1) {
-				zbr = terser.getSegment("/.ZBR");
-			} else {
-				zbr = (Segment) terser.getFinder().getRoot().get("ZBR" + obr);
-			}
+			Segment zbr = terser.getSegment("/.ORDER_OBSERVATION(" + obr + ")/ZBR");
+
 			HashMap<String, String> address;
 
 			String identifier = getString(Terser.get(zbr, 7, 0, 7, 1));
@@ -824,27 +802,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 
 	public String getLastUpdateInOLISUnformatted()
 	{
-		try
-		{
-			 String date = null;
-
-			 int obrNum = getOBRCount();
-			 Segment obr = null;
-			 if (obrNum == 1) {
-				obr = terser.getSegment("/.OBR");
-			 } else {
-				obr = (Segment) terser.getFinder().getRoot().get("OBR" + obrNum);
-			 }
-
-			 date = Terser.get(obr, 22, 0,1,1);
-
-			return date;
-		}
-		catch(HL7Exception e)
-		{
-			MiscUtils.getLogger().error("OLIS HL7 Error", e);
-			return "";
-		}
+		int obrCount = getOBRCount();
+		return getString(get("/.ORDER_OBSERVATION(" + obrCount + ")/OBR-22-1-1"));
 	}
 	
 	public String getLastUpdateInOLIS() {
@@ -853,7 +812,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			return "";
 	}
 
-	public String getOBXCEParentId(int obr, int obx) {
+	public String getOBXCEParentId(int obr, int obx)
+	{
 		return getOBXField(obr, obx, 4, 0, 1);
 	}
 
@@ -861,25 +821,20 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 
 	public int getChildOBR(String parentId) {
 		try {
-			return Integer.valueOf(obrParentMap.get(parentId));
+			return Integer.parseInt(obrParentMap.get(parentId));
 		} catch (Exception e) {
 			return -1;
 		}
 	}
 
-	public boolean isChildOBR(int obr) {
+	public boolean isChildOBR(int obr)
+	{
 		return obrParentMap.containsValue(String.valueOf(obr));
 	}
 
 	public String getDiagnosis(int obr)
 	{
-//		try {
-			return getString(get("/.ORDER_OBSERVATION(" + obr + ")/DG1-3-2-1"));
-//			return obrDiagnosis.containsKey(obr) ? getString(Terser.get(obrDiagnosis.get(obr), 3, 0, 2, 1)) : "";
-//		} catch (HL7Exception e) {
-//			MiscUtils.getLogger().error("OLIS HL7 Error", e);
-//		}
-//		return "";
+		return getString(get("/.ORDER_OBSERVATION(" + obr + ")/DG1-3-2-1"));
 	}
 
 	public int getMappedOBR(int obr)
@@ -913,10 +868,9 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public void init(String hl7Body) throws HL7Exception {
+	public void init(String hl7Body) throws HL7Exception
+	{
 		initDefaultSourceOrganizations();
-
-//		obrDiagnosis = new HashMap<Integer, Segment>();
 
 		obrParentMap = new HashMap<String, String>();
 
@@ -933,153 +887,63 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		initTelecomEquipTypes();
 
 		sourceOrganizations = new HashMap<String, String>();
-		obrSpecimenSource = new ArrayList<String>();
-		obrStatus = new ArrayList<String>();
+		disciplines = new ArrayList<>();
+		reportNotes = new ArrayList<>();
 
-		headers = new ArrayList<String>();
-		int zbrNum = 1;
+		headers = new ArrayList<>();
 		int obrCount = getOBRCount();
-		int obrNum = 1;
-		boolean obrFlag;
-		String segmentName;
-		String[] segments = terser.getFinder().getRoot().getNames();
-		obrGroups = new ArrayList<ArrayList<Segment>>();
-		int k = 0;
+		parseZPDSegment();
+		parseERRSegment();
 
 		// We only need to parse a few segments if there are no OBRs.
-		if (obrCount == 0) {
-
-			parseZPDSegment();
-			parseERRSegment();
-
-//			Segment zpd = terser.getSegment("/.ZPD");
-//
-//
-//			for (; k < segments.length; k++) {
-//				segmentName = segments[k].substring(0, 3);
-//				if (segmentName.equals("ZPD")) {
-//					parseZPDSegment();
-//				}
-//				if (segmentName.equals("ERR")) {
-//					parseERRSegment();
-//				}
-//			}
+		if (obrCount == 0)
+		{
 			return;
 		}
 
-		parsePIDSegment();
-
-		for (int i = 0; i < obrCount; i++)
-		{
-			ArrayList<Segment> obxSegs = new ArrayList<Segment>();
-
-			headers.add(getOBRName(i));
-			obrNum = i + 1;
-			obrFlag = false;
-			for (; k < segments.length; k++) {
-				try {
-					segmentName = segments[k].substring(0, 3);
-					if (segmentName.equals("ZPD")) {
-						parseZPDSegment();
-					}
-					if (segmentName.equals("ERR")) {
-						parseERRSegment();
-					}
-					if (segmentName.equals("PID")) {
-						parsePIDSegment();
-					} else if (segmentName.equals("ZBR")) {
-						parseZBRSegment(zbrNum++);
-					} else if (obrFlag && segmentName.equals("OBX")) {
-						Structure[] segs = terser.getFinder().getRoot().getAll(segments[k]);
-						for (int l = 0; l < segs.length; l++) {
-							Segment obxSeg = (Segment) segs[l];
-							obxSegs.add(obxSeg);
-
-							if("W".equals(Terser.get(obxSeg, 11, 0, 1, 1)))
-							{
-								reportInvalidated = true;
-							}
-						}
-
-					} else if (obrFlag && segmentName.equals("OBR")) {
-						break;
-					} else if (segments[k].equals("OBR" + obrNum) || (obrNum == 1 && segments[k].equals("OBR"))) {
-						obrFlag = true;
-						Segment obr = null;
-						if (obrNum == 1) {
-							obr = terser.getSegment("/.OBR");
-						} else {
-							obr = (Segment) terser.getFinder().getRoot().get("OBR" + obrNum);
-						}
-
-						String weirdFixToGetObr1512 = null;
-						Type obr15Types[] = obr.getField(15);
-						if(obr15Types != null && obr15Types.length>0) {
-							Type obr15Type = obr.getField(15)[0];
-							if(obr15Type instanceof Varies) {
-								Type tt =((Varies) obr15Type).getData();
-								if(tt instanceof GenericComposite ){
-									Type comp = ((GenericComposite)tt).getComponent(1);
-									if(comp instanceof Varies) {
-										Type ttt = ((Varies)comp).getData();
-										weirdFixToGetObr1512 = ttt.toString();
-									}
-								}
-							}
-						}
-
-						String s1 = getString(Terser.get(obr, 15, 0, 1, 2)); // getString(terser.get("/.OBR-15-1-2"));
-						if(Terser.get(obr, 15, 0, 1, 2) == null && weirdFixToGetObr1512 != null) {
-							s1 = weirdFixToGetObr1512;
-						}
-						String s2 = getString(Terser.get(obr, 15, 0, 5, 2)); // getString(terser.get("/.OBR-15-5-2"));
-						String specimen = String.format("%s%s%s", s1, s1.equals("") || s2.equals("") ? "" : " ", s2);
-						obrSpecimenSource.add(specimen);
-						String status = getString(Terser.get(obr, 25, 0, 1, 1));
-						char statusChar = status.charAt(0);
-						isFinal &= isStatusFinal(statusChar);
-						isCorrected |= statusChar == 'C';
-						obrStatus.add(status);
-
-						String parent = getString(Terser.get(obr, 26, 0, 2, 1));
-						if (!"".equals(parent)) {
-							obrParentMap.put(parent, String.valueOf(obrNum));
-						}
-
-//					} else if (segmentName.equals("DG1")) {
-//						Structure[] segs = terser.getFinder().getRoot().getAll(segments[k]);
-//						for (int l = 0; l < segs.length; l++) {
-//							Segment dg1Seg = (Segment) segs[l];
-//							obrDiagnosis.put(obrNum - 1, dg1Seg);
-//						}
-					}
-				} catch (Exception e) {
-					MiscUtils.getLogger().error("OLIS HL7 Error", e);
-				}
-			}
-			obrGroups.add(obxSegs);
-		}
+		parsePIDSegment(terser.getSegment("/.PID"));
 
 		obrSortKeys = mapOBRSortKeys();
 		obxSortKeyArray = new ArrayList<>(obrCount);
 
-		for(int obrRep = 0; obrRep < obrCount; obrRep++)
+		for(int i = 0; i < obrCount; i++)
 		{
-			obxSortKeyArray.add(mapOBXSortKey(obrRep));
-		}
+			headers.add(getOBRName(i));
+			parseZBRSegment(terser.getSegment("/.ORDER_OBSERVATION(" + i + ")/ZBR"));
 
-		disciplines = new ArrayList<>();
-		for (int i = 0; i < getOBRCount(); i++) {
+			for(int j = 0; j < getOBXCount(i); j++)
+			{
+				String resultStatus = getOBXResultStatus(i, j);
+				if("W".equals(resultStatus))
+				{
+					reportInvalidated = true;
+				}
+			}
+
+			char statusChar = getObrStatus(i).charAt(0);
+			isFinal &= isStatusFinal(statusChar);
+			isCorrected |= statusChar == 'C';
+
+			String parent = getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-26-2-1"));
+			if(StringUtils.isNotBlank(parent))
+			{
+				obrParentMap.put(parent, String.valueOf(i));
+			}
+
+			obxSortKeyArray.add(mapOBXSortKey(i));
 			disciplines.add(getOBRCategory(i));
+
+			for(int k=0; k < getOBRCommentCount(i); k++)
+			{
+				reportNotes.add(msg.getRESPONSE().getORDER_OBSERVATION(i).getNOTE(k));
+			}
 		}
 	}
 
-	private void parseZBRSegment(int zbrNum)
+	private void parseZBRSegment(Segment zbr)
 	{
 		try {
 			String key = "", value = "";
-			Segment zbr = terser.getSegment("/.ORDER_OBSERVATION(" + zbrNum + ")/ZBR");
-
 			int[] indexes = { 2, 3, 4, 6, 8 };
 			for (int index : indexes) {
 				if (getString(Terser.get(zbr, index, 0, 6, 2)).equals("")) {
@@ -1103,8 +967,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		}
 	}
 
-	private void parsePIDSegment() throws HL7Exception {
-		Segment pid = terser.getSegment("/.PID");
+	private void parsePIDSegment(Segment pid) throws HL7Exception
+	{
 		int rep = -1;
 		String identifier = "";
 		String value = "";
@@ -1236,7 +1100,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		}
 	}
 
-	private void parseZPDSegment() throws HL7Exception {
+	private void parseZPDSegment() throws HL7Exception
+	{
 		Segment zpd = terser.getSegment("/.ZPD");
 		boolean rb = "Y".equals(oscar.Misc.getStr(Terser.get(zpd, 3, 0, 1, 1), ""));
 		if(!reportBlocked && rb)
@@ -1245,9 +1110,10 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		}
 	}
 
-	private void parseERRSegment() throws HL7Exception {
+	private void parseERRSegment() throws HL7Exception
+	{
 		Segment err = terser.getSegment("/.ERR");
-		errors = new ArrayList<OLISError>();
+		errors = new ArrayList<>();
 		String segment, sequence, field, identifier, text;
 		int rep = -1;
 		while ((identifier = Terser.get(err, 1, ++rep, 4, 1)) != null) {
@@ -1340,11 +1206,11 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 				}
 			}
 
-			Optional<Segment> zbxSegment = getZBX(obrRep, obxRep);
-			if(zbxSegment.isPresent())
+			Segment zbxSegment = terser.getSegment("/.ORDER_OBSERVATION(" + obrRep + ")/OBSERVATION(" + obxRep + ")/ZBX");
+			if(zbxSegment != null)
 			{
-				String zbxDateStr = Terser.get(zbxSegment.get(), 1, 0, 1, 1);
-				msgKey = Terser.get(zbxSegment.get(), 2, 0, 1, 1);
+				String zbxDateStr = Terser.get(zbxSegment, 1, 0, 1, 1);
+				msgKey = Terser.get(zbxSegment, 2, 0, 1, 1);
 				zbxDate = ConversionUtils.toNullableZonedDateTime(zbxDateStr, DateTimeFormatter.ofPattern(OLIS_DATE_FORMAT));
 			}
 			OLISResultSortKey key = new OLISResultSortKey(
@@ -1364,6 +1230,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 
 	private Optional<Segment> getZBX(int i, int j) throws HL7Exception
 	{
+
+
 		int obrCount = 0;
 		int obxCount = 0;
 		// Compensating for -1 parameters for OBR and OBX
@@ -1509,20 +1377,9 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return super.getOrderStatusDisplayValue();
 	}
 
-	public String getPointOfCare(int i) {
-		i++;
-		try {
-			Segment obr = null;
-			if (i == 1) {
-				obr = terser.getSegment("/.OBR");
-			} else {
-				obr = (Segment) terser.getFinder().getRoot().get("OBR" + i);
-			}
-			return getString(Terser.get(obr, 30, 0, 1, 1));
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("OLIS HL7 Error", e);
-		}
-		return "";
+	public String getPointOfCare(int i)
+	{
+		return getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-30-1-1"));
 	}
 
 	public String getPointOfCareMessage(int i)
@@ -1583,10 +1440,11 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	}
 
 	@SuppressWarnings("unused")
-	public void processEncapsulatedData(HttpServletRequest request, HttpServletResponse response, int obr, int obx) {
+	public void processEncapsulatedData(HttpServletRequest request, HttpServletResponse response, int obr, int obx) throws HL7Exception
+	{
 		getOBXField(obr, obx, 5, 0, 2);
 		String subtype = getOBXField(obr, obx, 5, 0, 3);
-		String data = getOBXEDField(obr, obx, 5, 0, 5);
+		String data = get("/.ORDER_OBSERVATION(" + obr + ")/OBSERVATION(" + obx + ")/OBX-5-5-1");
 		try {
 			if (subtype.equals("PDF")) {
 				response.setContentType("application/pdf");
@@ -1629,52 +1487,26 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		}
 	}
 
-	public String getCollectorsComment(int i) {
-		String comment;
-		i++;
-		try {
-			if (i == 1) {
-				comment = getString(terser.get("/.OBR-39-2"));
-			} else {
-				Segment obrSeg = (Segment) terser.getFinder().getRoot().get("OBR" + i);
-				comment = getString(Terser.get(obrSeg, 39, 0, 2, 1));
-			}
-			return comment;
-
-		} catch (Exception e) {
-			return ("");
-		}
-
+	public String getCollectorsComment(int i)
+	{
+		return getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-39-2"));
 	}
 
-	public String getCollectorsCommentSourceOrganization(int i) {
-		String ident;
-		String id;
-		i++;
-		try {
-			if (i == 1) {
-				id = getString(terser.get("/.ZBR-3-6-2"));
-				ident = getString(terser.get("/.ZBR-3-1"));
+	public String getCollectorsCommentSourceOrganization(int i)
+	{
+		String id = getString(get("/.ORDER_OBSERVATION(" + i + ")/ZBR-3-6-2"));
+		String ident = getString(get("/.ORDER_OBSERVATION(" + i + ")/ZBR-3-1"));
 
-			} else {
-				Segment zbrSeg = (Segment) terser.getFinder().getRoot().get("ZBR" + i);
-				ident = getString(Terser.get(zbrSeg, 3, 0, 1, 1));
-				id = getString(Terser.get(zbrSeg, 3, 0, 6, 2));
-			}
-			if (id != null && id.trim().length() > 0) {
-				id = id.substring(id.indexOf(":") + 1);
-			}
-			return ident + " (" + id + ")";
-
-		} catch (Exception e) {
-			return ("");
+		if(StringUtils.isNotBlank(id))
+		{
+			id = id.substring(id.indexOf(":") + 1);
 		}
-
+		return ident + " (" + id + ")";
 	}
 
 	@Override
-	public String getMsgPriority() {
-		// TODO-legacy: Check if need implementation
+	public String getMsgPriority()
+	{
 		return ("");
 	}
 
@@ -1684,106 +1516,55 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	@Override
 	public int getOBRCount()
 	{
-//		return getReps("RESPONSE", 0, "ORDER_OBSERVATION");
 		return msg.getRESPONSE().getORDER_OBSERVATIONReps();
-//		if (obrGroups != null) {
-//			return (obrGroups.size());
-//		} else {
-//			int i = 1;
-//			// String test;
-//			Segment test;
-//			try {
-//
-//				test = terser.getSegment("/.OBR");
-//				while (test != null) {
-//					i++;
-//					test = (Segment) terser.getFinder().getRoot().get("OBR" + i);
-//				}
-//
-//			} catch (Exception e) {
-//				// ignore exceptions
-//			}
-//
-//			return (i - 1);
-//		}
 	}
 
 	@Override
 	public String getOBRName(int i)
 	{
-
-		String obrName;
-		i++;
-		try {
-			if (i == 1) {
-
-				obrName = getString(terser.get("/.OBR-4-2"));
-				if (obrName.equals("")) obrName = getString(terser.get("/.OBR-4-1"));
-
-			} else {
-				Segment obrSeg = (Segment) terser.getFinder().getRoot().get("OBR" + i);
-				obrName = getString(Terser.get(obrSeg, 4, 0, 2, 1));
-				if (obrName.equals("")) obrName = getString(Terser.get(obrSeg, 4, 0, 1, 1));
-
-			}
-
-			return (obrName);
-
-		} catch (Exception e) {
-			return ("");
+		String obrName = get("/.ORDER_OBSERVATION(" + i + ")/OBR-4-2");
+		if(StringUtils.isBlank(obrName))
+		{
+			obrName = get("/.ORDER_OBSERVATION(" + i + ")/OBR-4-1");
 		}
+		return getString(obrName);
 	}
 
 	@Override
-	public String getTimeStamp(int i, int j) {
-		String timeStamp;
-		i++;
-		try {
-			if (i == 1) {
-				timeStamp = formatDateTime(getString(terser.get("/.OBR-7-1")));
-			} else {
-				Segment obrSeg = (Segment) terser.getFinder().getRoot().get("OBR" + i);
-				timeStamp = formatDateTime(getString(Terser.get(obrSeg, 7, 0, 1, 1)));
-			}
-			return (timeStamp);
-		} catch (Exception e) {
-			return ("");
-		}
+	public String getTimeStamp(int i, int j)
+	{
+		return formatDateTime(get("/.ORDER_OBSERVATION(" + i + ")/OBR-7-1"));
 	}
 
 	@Override
-	public boolean isOBXAbnormal(int i, int j) {
+	public boolean isOBXAbnormal(int i, int j)
+	{
 		String abnormalFlag = getOBXAbnormalFlag(i, j);
 		if (abnormalFlag.equals("") || abnormalFlag.equals("N")) return (false);
 		else return (true);
 	}
 
 	@Override
-	public String getOBXAbnormalFlag(int i, int j) {
+	public String getOBXAbnormalFlag(int i, int j)
+	{
 		return (getOBXField(i, j, 8, 0, 1));
 	}
 
 	@Override
-	public String getObservationHeader(int i, int j) {
-
+	public String getObservationHeader(int i, int j)
+	{
 		return getOBRName(i);
-		// stored in different places for different messages
-		// return("");
-
 	}
 
 	@Override
-	public int getOBXCount(int i) {
-		try {
-			ArrayList<Segment> obxSegs = obrGroups.get(i);
-			return (obxSegs.size());
-		} catch (Exception e) {
-			return 0;
-		}
+	public int getOBXCount(int i)
+	{
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATIONReps();
 	}
 
 	@Override
-	public String getOBXValueType(int i, int j) {
+	public String getOBXValueType(int i, int j)
+	{
 		return (getOBXField(i, j, 2, 0, 1));
 	}
 
@@ -1809,29 +1590,22 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		}
 	}
 
-	public String getOBRCategory(int i) {
-		i++;
-		try {
-			Segment obr = null;
-			if (i == 1) {
-				obr = terser.getSegment("/.OBR");
-			} else {
-				obr = (Segment) terser.getFinder().getRoot().get("OBR" + i);
-			}
-
-			String obxCategory = Terser.get(obr, 4, 0, 1, 1);
-			OLISRequestNomenclatureDao requestDao = (OLISRequestNomenclatureDao) SpringUtils.getBean("OLISRequestNomenclatureDao");
-			OLISRequestNomenclature requestNomenclature = requestDao.findByNameId(obxCategory);
-			String nomenclatureCategory = "";
-			if (requestNomenclature != null)
-			{
-				nomenclatureCategory = StringUtils.trimToEmpty(requestNomenclature.getCategory());
-			}
-			return nomenclatureCategory;
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("OLIS HL7 Error", e);
+	public String getOBRCategory(int obrRep)
+	{
+		String obxCategory = get("/.ORDER_OBSERVATION(" + obrRep + ")/OBR-4-1-1");
+		if(obxCategory == null)
+		{
+			logger.error("Missing obxCategory [" + obrRep + "]");
+			return "";
 		}
-		return "";
+		OLISRequestNomenclatureDao requestDao = (OLISRequestNomenclatureDao) SpringUtils.getBean("OLISRequestNomenclatureDao");
+		OLISRequestNomenclature requestNomenclature = requestDao.findByNameId(obxCategory);
+		String nomenclatureCategory = "";
+		if(requestNomenclature != null)
+		{
+			nomenclatureCategory = StringUtils.trimToEmpty(requestNomenclature.getCategory());
+		}
+		return nomenclatureCategory;
 	}
 
 	@Override
@@ -1918,7 +1692,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public int getOBXFinalResultCount() {
+	public int getOBXFinalResultCount()
+	{
 		int obrCount = getOBRCount();
 		int obxCount;
 		int count = 0;
@@ -1937,7 +1712,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	 * Retrieve the possible segment headers from the OBX fields
 	 */
 	@Override
-	public ArrayList<String> getHeaders() {
+	public ArrayList<String> getHeaders()
+	{
 		return this.headers;
 	}
 
@@ -1945,128 +1721,69 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	 * Methods to get information from observation notes
 	 */
 	@Override
-	public int getOBRCommentCount(int i) {
-
-		try {
-			String[] segments = terser.getFinder().getRoot().getNames();
-			int k = getNTELocation(i, -1);
-			int count = 0;
-
-			// make sure to count all the nte segments in the group
-			if (k < segments.length && segments[k].substring(0, 3).equals("NTE")) {
-				count++;
-				++k;
-				while ((k = indexOfNextNTE(segments, k)) != -1) {
-					count++;
-					k++;
-				}
-			}
-
-			return (count);
-		} catch (Exception e) {
-			logger.error("OBR Comment count error", e);
-
-			return (0);
-		}
-
+	public int getOBRCommentCount(int i)
+	{
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getNOTEReps();
 	}
 
 	@Override
-	public String getOBRComment(int i, int j) {
-
-		try {
-			String[] segments = terser.getFinder().getRoot().getNames();
-			int k = getNTELocation(i, -1);
-			if (j > 0) {
-				k = indexOfNextNTE(segments, k + 1, j);
-			}
-			Structure[] nteSegs = terser.getFinder().getRoot().getAll(segments[k]);
-			Segment nteSeg = (Segment) nteSegs[0];
-			return formatString(getString(Terser.get(nteSeg, 3, 0, 1, 1)));
-
-		} catch (Exception e) {
-			logger.error("Could not retrieve OBR comments", e);
-
-			return ("");
-		}
+	public String getOBRComment(int i, int k)
+	{
+		return formatString(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getNOTE(k).getNTE().getNte3_Comment(0).getValue()));
 	}
 
-	public String getOBRSourceOrganization(int i, int j) {
-		try {
-			String[] segments = terser.getFinder().getRoot().getNames();
-			int k = getNTELocation(i, -1);
-			if (j > 0) {
-				k = indexOfNextNTE(segments, k + 1, j);
-			}
-			k++;
-			Structure[] ZNTSegs = terser.getFinder().getRoot().getAll(segments[k]);
-			Segment ZNTSeg = (Segment) ZNTSegs[0];
-			String key = Terser.get(ZNTSeg, 1, 0, 2, 1);
-			if (key == null || key.indexOf(":") == -1) {
-				return "";
-			}
-			String ident = key.substring(0, key.indexOf(":"));
-			ident = getOrganizationType(ident);
-			key = key.substring(key.indexOf(":") + 1);
-			return StringUtils.trimToEmpty(sourceOrganizations.get(key)) + " (" + ident + " " + key + ")";
-
-		} catch (Exception e) {
-			logger.error("Could not retrieve OBX comment ZNT", e);
-
-			return ("");
+	public String getOBRSourceOrganization(int i, int k)
+	{
+		String key = get("/.ORDER_OBSERVATION(" + i + ")/NOTE(" + k + ")/ZNT-1-2-1");
+		if (key == null || !key.contains(":")) {
+			return "";
 		}
+		String ident = key.substring(0, key.indexOf(":"));
+		ident = getOrganizationType(ident);
+		key = key.substring(key.indexOf(":") + 1);
+		return StringUtils.trimToEmpty(sourceOrganizations.get(key)) + " (" + ident + " " + key + ")";
 	}
 
-	public String getCollectionDateTime(int obrIndex) {
-		obrIndex++;
-		Segment obr;
+	public String getCollectionDateTime(int obrIndex)
+	{
+		String from = getString(get("/.ORDER_OBSERVATION(" + obrIndex + ")/OBR-7-1-1"));
+		String to = getString(get("/.ORDER_OBSERVATION(" + obrIndex + ")/OBR-8-1-1"));
 
-		try {
-			if (obrIndex == 1) {
-				obr = terser.getSegment("/.OBR");
-			} else {
-				obr = (Segment) terser.getFinder().getRoot().get("OBR" + obrIndex);
-			}
-			String from = getString(Terser.get(obr, 7, 0, 1, 1));
-			if (from.length() > 13) {
-				from = formatDateTime(from);
-			}
-			String to = getString(Terser.get(obr, 8, 0, 1, 1));
-			if (to.length() > 13) {
-				to = formatDateTime(to);
-			}
-			boolean hasBoth = stringIsNotNullOrEmpty(from) && stringIsNotNullOrEmpty(to);
-			return String.format("%s %s %s", from, hasBoth ? "-" : "", to);
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("OLIS HL7 Error", e);
+		if(from.length() > 13)
+		{
+			from = formatDateTime(from);
 		}
-		return "";
+		if(to.length() > 13)
+		{
+			to = formatDateTime(to);
+		}
+		boolean hasBoth = stringIsNotNullOrEmpty(from) && stringIsNotNullOrEmpty(to);
+		return String.format("%s %s %s", from, hasBoth ? "-" : "", to);
 	}
 
-	public String getOrganizationType(String ident) {
-		if (ident.equals("2.16.840.1.113883.3.59.1")) {
+	public String getOrganizationType(String ident)
+	{
+		if(ident.equals("2.16.840.1.113883.3.59.1"))
+		{
 			return "Lab";
 		}
-		if (ident.equals("2.16.840.1.113883.3.59.2")) {
+		if(ident.equals("2.16.840.1.113883.3.59.2"))
+		{
 			return "SCC";
 		}
-		if (ident.equals("2.16.840.1.113883.3.59.3")) {
+		if(ident.equals("2.16.840.1.113883.3.59.3"))
+		{
 			return "Hospital";
 		}
 		return "";
 	}
 
-	public String getSpecimenCollectedBy(int obr) {
+	public String getSpecimenCollectedBy(int obr)
+	{
 		try {
-			obr++;
 			String key = "", value = "", ident = "";
-			Segment zbr = null;
-			if (obr == 1) {
-				zbr = terser.getSegment("/.ZBR");
-			} else {
-				zbr = (Segment) terser.getFinder().getRoot().get("ZBR" + obr);
-			}
-			key = getString(Terser.get(zbr, 3, 0, 6, 2));
+
+			key = getString(get("/.ORDER_OBSERVATION(" + obr + ")/ZBR-3-6-2"));
 			if (key != null && key.indexOf(":") > 0) {
 				ident = key.substring(0, key.indexOf(":"));
 				ident = getOrganizationType(ident);
@@ -2075,7 +1792,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			if (key == null || key.trim().equals("")) {
 				return "";
 			}
-			value = getString(Terser.get(zbr, 3, 0, 1, 1));
+			value = getString(get("/.ORDER_OBSERVATION(" + obr + ")/ZBR-3-1-1"));
 			return String.format("%s (%s %s)", value, ident, key);
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
@@ -2083,217 +1800,77 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return "";
 	}
 
-	public String getCollectionVolume(int obrIndex) {
-		obrIndex++;
-		Segment obr;
-
-		try {
-			if (obrIndex == 1) {
-				obr = terser.getSegment("/.OBR");
-			} else {
-				obr = (Segment) terser.getFinder().getRoot().get("OBR" + obrIndex);
-			}
-			String volume = getString(Terser.get(obr, 9, 0, 1, 1));
-			String units = getString(Terser.get(obr, 9, 0, 2, 1));
-			return volume + " " + units;
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("OLIS HL7 Error", e);
-		}
-		return "";
+	public String getCollectionVolume(int obrIndex)
+	{
+		String volume = getString(get("/.ORDER_OBSERVATION(" + obrIndex + ")/OBR-9-1-1"));
+		String units = getString(get("/.ORDER_OBSERVATION(" + obrIndex + ")/OBR-9-2-1"));
+		return volume + " " + units;
 	}
 
-	public String getNoOfSampleContainers(int obrIndex) {
-		obrIndex++;
-		Segment obr;
-
-		try {
-			if (obrIndex == 1) {
-				obr = terser.getSegment("/.OBR");
-			} else {
-				obr = (Segment) terser.getFinder().getRoot().get("OBR" + obrIndex);
-			}
-			String count = getString(Terser.get(obr, 37, 0, 1, 1));
-
-			return count;
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("OLIS HL7 Error", e);
-		}
-		return "";
+	public String getNoOfSampleContainers(int obrIndex)
+	{
+		return getString(get("/.ORDER_OBSERVATION(" + obrIndex + ")/OBR-37-1-1"));
 	}
 
 	/**
 	 * Methods to get information from observation notes
 	 */
-	public int getReportCommentCount() {
-
-		try {
-			String[] segments = terser.getFinder().getRoot().getNames();
-			int k = getNTELocation(-1, -1);
-			int count = 0;
-
-			// make sure to count all the nte segments in the group
-			if (k < segments.length && segments[k].substring(0, 3).equals("NTE")) {
-				count++;
-				++k;
-				while ((k = indexOfNextNTE(segments, k)) != -1) {
-					count++;
-					k++;
-				}
-			}
-
-			return (count);
-		} catch (Exception e) {
-			logger.error("OBR Comment count error", e);
-
-			return (0);
-		}
-
+	public int getReportCommentCount()
+	{
+		return reportNotes.size();
 	}
 
-	public String getReportComment(int j) {
-
-		try {
-			String[] segments = terser.getFinder().getRoot().getNames();
-			int k = getNTELocation(-1, -1);
-			if (j > 0) {
-				k = indexOfNextNTE(segments, k + 1, j);
-			}
-			Structure[] nteSegs = terser.getFinder().getRoot().getAll(segments[k]);
-			Segment nteSeg = (Segment) nteSegs[0];
-			return formatString(getString(Terser.get(nteSeg, 3, 0, 1, 1)));
-
-		} catch (Exception e) {
-			logger.error("Could not retrieve OBR comments", e);
-
-			return ("");
-		}
+	public String getReportComment(int k)
+	{
+		return formatString(getString(reportNotes.get(k).getNTE().getNte3_Comment(0).getValue()));
 	}
 
-	public String getReportSourceOrganization(int j) {
+	public String getReportSourceOrganization(int k)
+	{
 		try {
-			String[] segments = terser.getFinder().getRoot().getNames();
-			int k = getNTELocation(-1, -1);
-			if (j > 0) {
-				k = indexOfNextNTE(segments, k + 1, j);
-			}
-			k++;
-			Structure[] ZNTSegs = terser.getFinder().getRoot().getAll(segments[k]);
-			Segment ZNTSeg = (Segment) ZNTSegs[0];
-			String key = Terser.get(ZNTSeg, 1, 0, 2, 1);
-			if (key == null || key.indexOf(":") == -1) {
+			String key = reportNotes.get(k).getZNT().getZnt1_sourceOrganization().getHd2_UniversalID().getValue();
+			if (key == null || !key.contains(":"))
+			{
 				return "";
 			}
 			String ident = key.substring(0, key.indexOf(":"));
 			ident = getOrganizationType(ident);
 			key = key.substring(key.indexOf(":") + 1);
 			return String.format("%s (%s %s)", StringUtils.trimToEmpty(sourceOrganizations.get(key)), ident, key);
-		} catch (Exception e) {
+		}
+		catch(Exception e)
+		{
 			logger.error("Could not retrieve OBX comment ZNT", e);
-
 			return ("");
 		}
-	}
-
-	public int indexOfNextNTE(String[] segments, int pos) {
-		return indexOfNextNTE(segments, pos, 1);
-	}
-
-	public int indexOfNextNTE(String[] segments, int pos, int skip) {
-		String segId = "";
-		int count = 0;
-		while (pos < segments.length) {
-			segId = segments[pos].substring(0, 3);
-			if (segId.equals("OBR")) {
-				break;
-			}
-			if (segId.equals("OBX")) {
-				break;
-			}
-			if (segId.equals("NTE")) {
-				count++;
-				if (count >= skip) {
-					return pos;
-				}
-			}
-			pos++;
-		}
-		return -1;
 	}
 
 	/**
 	 * Methods to get information from observation notes
 	 */
 	@Override
-	public int getOBXCommentCount(int i, int j) {
-		// jth obx of the ith obr
-
-		try {
-
-			String[] segments = terser.getFinder().getRoot().getNames();
-			int k = getNTELocation(i, j);
-
-			int count = 0;
-			if (k < segments.length && segments[k].substring(0, 3).equals("NTE")) {
-				count++;
-				++k;
-				while ((k = indexOfNextNTE(segments, k)) != -1) {
-					count++;
-					k++;
-				}
-			}
-
-			return (count);
-		} catch (Exception e) {
-			logger.error("OBR Comment count error", e);
-
-			return (0);
-		}
-
+	public int getOBXCommentCount(int i, int j)
+	{
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNOTEReps();
 	}
 
 	@Override
-	public String getOBXComment(int i, int j, int nteNum) {
-		try {
-			String[] segments = terser.getFinder().getRoot().getNames();
-			int k = getNTELocation(i, j);
-			if (nteNum > 0) {
-				k = indexOfNextNTE(segments, k, nteNum + 1);
-			}
-			Structure[] nteSegs = terser.getFinder().getRoot().getAll(segments[k]);
-			Segment nteSeg = (Segment) nteSegs[0];
-			return formatString(getString(Terser.get(nteSeg, 3, 0, 1, 1)));
-
-		} catch (Exception e) {
-			logger.error("Could not retrieve OBX comments", e);
-
-			return ("");
-		}
+	public String getOBXComment(int i, int j, int nteNum)
+	{
+		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNOTE(nteNum).getNTE().getNte3_Comment(0).getValue();
 	}
 
-	public String getOBXSourceOrganization(int i, int j, int nteNum) {
-		try {
-			String[] segments = terser.getFinder().getRoot().getNames();
-			int k = getNTELocation(i, j);
-			if (nteNum > 0) {
-				k = indexOfNextNTE(segments, k, nteNum + 1);
-			}
-			k++;
-			Structure[] ZNTSegs = terser.getFinder().getRoot().getAll(segments[k]);
-			Segment ZNTSeg = (Segment) ZNTSegs[0];
-			String key = Terser.get(ZNTSeg, 1, 0, 2, 1);
-			if (key == null || key.indexOf(":") == -1) {
-				return "";
-			}
-			String ident = key.substring(0, key.indexOf(":"));
-			ident = getOrganizationType(ident);
-			key = key.substring(key.indexOf(":") + 1);
-			return String.format("%s (%s %s)", StringUtils.trimToEmpty(sourceOrganizations.get(key)), ident, key);
-
-		} catch (Exception e) {
-			logger.error("Could not retrieve OBX comment ZNT", e);
-
-			return ("");
+	public String getOBXSourceOrganization(int i, int j, int nteNum)
+	{
+		String key = get("/.ORDER_OBSERVATION(" + i + ")/OBSERVATION(" + j + ")/NOTE(" + nteNum + ")/ZNT-1-2-1");
+		if (key == null || !key.contains(":"))
+		{
+			return "";
 		}
+		String ident = key.substring(0, key.indexOf(":"));
+		ident = getOrganizationType(ident);
+		key = key.substring(key.indexOf(":") + 1);
+		return String.format("%s (%s %s)", StringUtils.trimToEmpty(sourceOrganizations.get(key)), ident, key);
 	}
 
 	/*
@@ -2355,6 +1932,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	/**
 	 * acts as the unique lab version number
 	 */
+	@Override
 	public String getFillerOrderNumber()
 	{
 		// not totally sure which fields to use here.
@@ -2362,17 +1940,24 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		// use the lastUpdatedDate date for now.
 		return getLastUpdateInOLISUnformatted();
 	}
-    public String getEncounterId(){
-    	return "";
-    }
-    public String getRadiologistInfo(){
+
+	@Override
+	public String getEncounterId()
+	{
 		return "";
 	}
-    
-    public String getNteForOBX(int i, int j){
-    	
-    	return "";
-    }
+
+	@Override
+	public String getRadiologistInfo()
+	{
+		return "";
+	}
+
+	@Override
+	public String getNteForOBX(int i, int j)
+	{
+		return "";
+	}
 	/**
 	 * Methods to get information about the patient
 	 */
@@ -2624,66 +2209,28 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public String audit() {
+	public String audit()
+	{
 		return "";
 	}
-	
+
 	@Override
-	public String getNteForPID() {
-    	return "";
-    }
-
-	protected String getOBXField(int i, int j, int field, int rep, int comp) {
-		ArrayList<Segment> obxSegs = obrGroups.get(i);
-
-		try {
-			Segment obxSeg = obxSegs.get(j);
-			return (getString(Terser.get(obxSeg, field, rep, comp, 1))).trim();
-		} catch (Exception e) {
-			return ("");
-		}
+	public String getNteForPID()
+	{
+		return "";
 	}
 
-	protected String getOBXEDField(int i, int j, int field, int rep, int comp) {
-		ArrayList<Segment> obxSegs = obrGroups.get(i);
-
-		try {
-			Segment obxSeg = obxSegs.get(j);
-			return Terser.get(obxSeg, field, rep, comp, 1);
-		} catch (Exception e) {
-			return ("");
+	protected String getOBXField(int i, int j, int field, int rep, int comp)
+	{
+		try
+		{
+			Segment obx = terser.getSegment("/.ORDER_OBSERVATION(" + i + ")/OBSERVATION(" + j + ")/OBX");
+			return getString(Terser.get(obx, field, rep, comp, 1));
 		}
-	}
-
-	private int getNTELocation(int i, int j) {
-
-		int obrCount = 0;
-		int obxCount = 0;
-		// Compensating for -1 parameters for OBR and OBX
-		j++;
-		i++;
-		String[] segments = terser.getFinder().getRoot().getNames();
-
-		String segId = "";
-		for (int k = 0; k != segments.length && obxCount <= j && obrCount <= i; k++) {
-			segId = segments[k].substring(0, 3);
-
-			// We count all OBRs we see.
-			if (segId.equals("OBR")) {
-				obrCount++;
-			}
-
-			// We count only OBX's for the desired OBR
-			else if (segId.equals("OBX") && obrCount == i) {
-				obxCount++;
-			}
-
-			// Check that this segment is an NTE and we are in the right OBR/OBX position.
-			else if (segId.equals("NTE") && obxCount == j && obrCount == i) {
-				return k;
-			}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
 		}
-		return segments.length - 1;
 	}
 
 	private String getFullDocName(String docSeg) throws HL7Exception {
@@ -2802,26 +2349,38 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return UtilDateUtilities.DateToString(date, stringFormat) + " " + getOffsetName(offset);
 	}
 
-	private String getOffsetName(String offset) {
-		if (offset.equals("-0400")) {
+	private String getOffsetName(String offset)
+	{
+		if(offset.equals("-0400"))
+		{
 			return "EDT";
-		} else if (offset.equals("-0500")) {
+		}
+		else if(offset.equals("-0500"))
+		{
 			return "EST";
-		} else if (offset.equals("-0600")) {
+		}
+		else if(offset.equals("-0600"))
+		{
 			return "CST";
-		} else if (!offset.trim().equals("")) {
+		}
+		else if(!offset.trim().equals(""))
+		{
 			return "UTC" + offset;
 		}
 		return "";
 	}
 
-	public void importSourceOrganizations(OLISHL7Handler instance) {
-		if (instance == null) {
+	public void importSourceOrganizations(OLISHL7Handler instance)
+	{
+		if(instance == null)
+		{
 			return;
 		}
 		HashMap<String, String> foreignSource = instance.sourceOrganizations;
-		for (String key : foreignSource.keySet()) {
-			if (!sourceOrganizations.containsKey(key)) {
+		for(String key : foreignSource.keySet())
+		{
+			if(!sourceOrganizations.containsKey(key))
+			{
 				sourceOrganizations.put(key, foreignSource.get(key));
 			}
 		}
