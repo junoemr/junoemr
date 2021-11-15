@@ -89,10 +89,13 @@ public class ClinicManageAction extends DispatchAction
 	    String serviceLocationCode = systemPreferences.getPreferenceValue("service_location_code", "");
         frm.set("clinicServiceLocationCode", serviceLocationCode);
         
-	    BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
-	    List<Object[]> rawBCServiceCodes = billingBCDao.findBillingVisits(BillingServiceDao.BC);
-	    List<BCBillingVisitCodeTo1> bcServiceCodes = BCBillingVisitCodeTo1.fromList(rawBCServiceCodes);
-	    request.setAttribute("serviceLocationCodes", bcServiceCodes);
+        if (oscarProperties.isBritishColumbiaInstanceType())
+		{
+			BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
+			List<Object[]> rawBCServiceCodes = billingBCDao.findBillingVisits(BillingServiceDao.BC);
+			List<BCBillingVisitCodeTo1> bcServiceCodes = BCBillingVisitCodeTo1.fromList(rawBCServiceCodes);
+			request.setAttribute("serviceLocationCodes", bcServiceCodes);
+		}
         
         request.setAttribute("clinicForm", form);
         request.setAttribute("hasCustomBillingAddress", hasCustomBillingAddress);
