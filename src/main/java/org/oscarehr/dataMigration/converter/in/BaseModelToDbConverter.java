@@ -135,6 +135,11 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 		}
 		return dbProvider;
 	}
+	
+	protected List<ProviderData> searchProviders(ProviderCriteriaSearch searchParams)
+	{
+		return providerDataDao.criteriaSearch(searchParams);
+	}
 
 	private Provider getDefaultProvider()
 	{

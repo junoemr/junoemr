@@ -22,6 +22,7 @@
  */
 package oscar.util;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -81,7 +82,7 @@ public class RESTClient
 	{
 		return executeRequest(url, HttpMethod.POST, headers, queryParams, body, responseClass);
 	}
-
+	
 	// ---------------------------- HTTP GET ----------------------------------------- //
 
 	public <T> T doGet(String url, Class<T> responseClass)
@@ -99,6 +100,12 @@ public class RESTClient
 		return executeRequest(url, HttpMethod.GET, headers, queryParams, null, responseClass);
 	}
 
+	public <T> T doGet(String url, HttpHeaders headers, Map<String, Object> queryParams, ParameterizedTypeReference<T> typeRef)
+	{
+		return executeRequest(url, HttpMethod.GET, headers, queryParams, null, typeRef);
+	}
+	
+	
 	// ---------------------------- HTTP PUT ----------------------------------------- //
 
 	public <U, T> T doPut(String url, U body, Class<T> responseClass)
@@ -137,19 +144,30 @@ public class RESTClient
 					S body,
 					Class<T> responseClass)
 	{
-		MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
-
-		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.getMessageConverters().add(messageConverter);
-		restTemplate.setErrorHandler(errorHandler);
+		RestTemplate restTemplate = buildRestTemplate();
 		HttpEntity<S> request = new HttpEntity<S>(body, headers);
+		String uri = buildUriString(url, queryParams);
 
-		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url);
-		uriBuilder = setQueryParams(uriBuilder, queryParams);
-
-		ResponseEntity<T> response = restTemplate.exchange(uriBuilder.build().toUriString(), method, request, responseClass);
+		ResponseEntity<T> response = restTemplate.exchange(uri, method, request, responseClass);
 		return response.getBody();
 	}
+	
+	protected <S, T, U> T executeRequest(
+			String url,
+			HttpMethod method,
+			HttpHeaders headers,
+			Map<String, Object> queryParams,
+			S body,
+			ParameterizedTypeReference<T> typeRef)
+	{
+		RestTemplate restTemplate = buildRestTemplate();
+		HttpEntity<S> request = new HttpEntity<S>(body, headers);
+		String uri = buildUriString(url, queryParams);
+		
+		ResponseEntity<T> response = restTemplate.exchange(uri, method, request, typeRef);
+		return response.getBody();
+	}
+	
 
 	public ResponseErrorHandler getErrorHandler()
 	{
@@ -177,5 +195,24 @@ public class RESTClient
 			}
 		}
 		return uriBuilder;
+	}
+	
+	private RestTemplate buildRestTemplate()
+	{
+		MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
+		
+		RestTemplate restTemplate = new RestTemplate();
+		restTemplate.getMessageConverters().add(messageConverter);
+		restTemplate.setErrorHandler(errorHandler);
+		
+		return restTemplate;
+	}
+	
+	private String buildUriString(String url, Map<String, Object> queryParams)
+	{
+		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url);
+		uriBuilder = setQueryParams(uriBuilder, queryParams);
+		
+		return uriBuilder.build().toUriString();
 	}
 }

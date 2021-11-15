@@ -57,7 +57,7 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 
 		document.setCreatedBy(getAuthorPhysician(importStructure.getSourceAuthorPhysician()));
 		document.setResponsible(document.getCreatedBy());
-		document.setReviewer(getReviewer(importStructure.getReportReviewed()));
+		document.setReviewer(getFirstReviewer(importStructure.getReportReviewed()));
 
 		document.setAnnotation(importStructure.getNotes());
 		document.setStatus(Document.STATUS.ACTIVE);

@@ -58,6 +58,21 @@ export default class SystemPreferenceService
 		}
 	}
 
+    /**
+     * Get the value of all system properties specified
+     * @param propertyNames - an array of property names to fetch
+     * @return object consisting of {propertyName: propertyValue}
+     */
+	public async getProperties(...propertyNames: string[]): Promise<any> {
+        let propertyValues = await Promise.all(propertyNames.map(propertyName => this.getProperty(propertyName)));
+
+        return propertyValues.reduce((acc, propertyValue, index) => {
+            acc[propertyNames[index]] = propertyValue;
+            return acc;
+        }, {});
+    }
+
+
 	/**
 	 * Get the value of system property setting, from the server. Returning default if the server does not have a value
 	 * for that property.

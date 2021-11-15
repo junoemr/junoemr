@@ -37,7 +37,6 @@ import org.oscarehr.integration.myhealthaccess.dto.AppointmentCacheTo1;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.dto.integrationPushUpdate.PatientConnectionTo1;
 import org.oscarehr.integration.myhealthaccess.exception.RecordNotFoundException;
-import org.oscarehr.integration.myhealthaccess.model.MHAPatient;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.myhealthaccess.service.ClinicService;
 import org.oscarehr.integration.myhealthaccess.service.PatientService;
@@ -218,16 +217,13 @@ public class IntegrationPushUpdateService
 				throw new RecordNotFoundException("No demographic with demographic_no: [" + patientConnectionTo1.getDemographicNo() + "]");
 			}
 
-			if (demographic.getHin() != null && !demographic.getHin().isEmpty() && MHAPatient.isValidProvinceCode(demographic.getHcType()))
+			try
 			{
-				try
-				{
-					patientService.updatePatientConnection(integration, loginTokenTo1.getToken(), demographic, patientConnectionTo1.getRejected());
-				}
-				catch(RecordNotFoundException e)
-				{
-					// No MHA patient for this demographic. suppress.
-				}
+				patientService.updatePatientConnection(integration, loginTokenTo1.getToken(), demographic, patientConnectionTo1.getRejected());
+			}
+			catch(RecordNotFoundException e)
+			{
+				// No MHA patient for this demographic. suppress.
 			}
 		}
 	}

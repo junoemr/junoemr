@@ -15,7 +15,7 @@
 		<input id="input-{{name}}"
 		       type="text"
 		       class="form-control input-group bootstrap-timepicker {{input_group_class}}"
-		       autocomplete="off"
+		       autocomplete="{{autocompleteOff}}"
 		       spellcheck="false"
 		       placeholder="00:00 AM"
 		       title="{{hint}}"

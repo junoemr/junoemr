@@ -42,6 +42,7 @@ import oscar.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -239,7 +240,7 @@ public class PreventionManager
 	 * @param filterTerm the term to filter on, set to null for all items
 	 * @return the relevant preventions
 	 */
-	public List<PreventionTypeTransfer> searchPreventionTypes(String filterTerm)
+	public List<PreventionTypeTransfer> searchPreventionTypes(String filterTerm, Comparator<PreventionTypeTransfer> comparator)
 	{
 		ArrayList<PreventionTypeTransfer> transfers = new ArrayList<>();
 		PreventionDisplayConfig pdc = PreventionDisplayConfig.getInstance();
@@ -264,6 +265,12 @@ public class PreventionManager
 				transfers.add(transfer);
 			}
 		}
+
+		if(comparator != null)
+		{
+			transfers.sort(comparator);
+		}
+
 		return transfers;
 	}
 }

@@ -66,6 +66,7 @@
     "ng-table": "~3",
     "ngstorage": "^0.3.11",
     "pym.js": "^1.2.0",
-    "ui-select": "^0.19.8"
+    "ui-select": "^0.19.8",
+    "detect-browser": "^5.2.1"
   }
 }

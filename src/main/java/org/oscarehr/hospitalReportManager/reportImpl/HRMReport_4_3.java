@@ -32,16 +32,19 @@ import oscar.util.ConversionUtils;
 import xml.hrm.v4_3.DateFullOrPartial;
 import xml.hrm.v4_3.Demographics;
 import xml.hrm.v4_3.OmdCds;
+import xml.hrm.v4_3.PersonNameSimple;
 import xml.hrm.v4_3.PersonNameStandard;
-import xml.hrm.v4_3.PersonNameStandard.LegalName.OtherName;
+import xml.hrm.v4_3.PersonNameStandard.LegalName.OtherName;;
 import xml.hrm.v4_3.ReportFormat;
 import xml.hrm.v4_3.ReportsReceived;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class HRMReport_4_3 implements HRMReport
 {
@@ -90,19 +93,29 @@ public class HRMReport_4_3 implements HRMReport
 	public String getLegalName()
 	{
 		PersonNameStandard name = demographics.getNames();
-		return name.getLegalName().getLastName().getPart() + ", " + name.getLegalName().getFirstName().getPart();
+		return getLegalLastName() + ", " + getLegalFirstName();
 	}
 
 	public String getLegalLastName()
 	{
-		PersonNameStandard name = demographics.getNames();
-		return name.getLegalName().getLastName().getPart();
+		PersonNameStandard.LegalName legalName = demographics.getNames().getLegalName();
+		if (legalName != null && legalName.getLastName() != null)
+		{
+			return legalName.getLastName().getPart();
+		}
+		
+		return "";
 	}
 
 	public String getLegalFirstName()
 	{
-		PersonNameStandard name = demographics.getNames();
-		return name.getLegalName().getFirstName().getPart();
+		PersonNameStandard.LegalName legalName = demographics.getNames().getLegalName();
+		if (legalName != null && legalName.getFirstName() != null)
+		{
+			return legalName.getFirstName().getPart();
+		}
+		
+		return "";
 	}
 
 	public List<String> getLegalOtherNames()
@@ -121,42 +134,86 @@ public class HRMReport_4_3 implements HRMReport
 	{
 		List<Integer> dateOfBirthList = new ArrayList<Integer>();
 		XMLGregorianCalendar fullDate = dateFP(demographics.getDateOfBirth());
-		dateOfBirthList.add(fullDate.getYear());
-		dateOfBirthList.add(fullDate.getMonth());
-		dateOfBirthList.add(fullDate.getDay());
-
+		if (fullDate != null)
+		{
+			dateOfBirthList.add(fullDate.getYear());
+			dateOfBirthList.add(fullDate.getMonth());
+			dateOfBirthList.add(fullDate.getDay());
+		}
+		
 		return dateOfBirthList;
+	}
+	
+	public Optional<LocalDate> getDateOfBirthAsLocalDate()
+	{
+		XMLGregorianCalendar fullDate = dateFP(demographics.getDateOfBirth());
+		if (fullDate != null)
+		{
+			return Optional.ofNullable(LocalDate.of(fullDate.getYear(), fullDate.getMonth(), fullDate.getDay()));
+		}
+		
+		return Optional.empty();
 	}
 
 	public String getDateOfBirthAsString()
 	{
 		List<Integer> dob = getDateOfBirth();
-		return dob.get(0) + "-" + dob.get(1) + "-" + dob.get(2);
+		if (dob != null && !dob.isEmpty())
+		{
+			return dob.get(0) + "-" + String.format("%02d", dob.get(1)) + "-" + String.format("%02d", dob.get(2));
+		}
+		
+		return "";
 	}
 
 	public String getHCN()
 	{
-		return demographics.getHealthCard().getNumber();
+		if (demographics.getHealthCard() != null)
+		{
+			return demographics.getHealthCard().getNumber();
+		}
+		
+		return "";
 	}
 
 	public String getHCNVersion()
 	{
-		return demographics.getHealthCard().getVersion();
+		if (demographics.getHealthCard() != null)
+		{
+			return demographics.getHealthCard().getVersion();
+		}
+		
+		return "";
 	}
 
 	public Calendar getHCNExpiryDate()
 	{
-		return demographics.getHealthCard().getExpirydate().toGregorianCalendar();
+		if (demographics.getHealthCard() != null)
+		{
+			return demographics.getHealthCard().getExpirydate().toGregorianCalendar();
+		}
+		
+		return null;
 	}
 
 	public String getHCNProvinceCode()
 	{
-		return demographics.getHealthCard().getProvinceCode();
+		if (demographics.getHealthCard() != null)
+		{
+			return demographics.getHealthCard().getProvinceCode();
+		}
+		
+		return "";
 	}
 
 	public String getGender()
 	{
-		return demographics.getGender().value();
+		if (demographics.getGender() != null)
+		{
+			return demographics.getGender().value();
+		}
+		
+		return "";
 	}
 
 	public String getUniqueVendorIdSequence()
@@ -315,21 +372,37 @@ public class HRMReport_4_3 implements HRMReport
 		if(hrmReport.getPatientRecord().getReportsReceived() != null &&
 				!hrmReport.getPatientRecord().getReportsReceived().isEmpty() &&
 				hrmReport.getPatientRecord().getReportsReceived().get(0).getEventDateTime() != null)
-			return dateFP(hrmReport.getPatientRecord().getReportsReceived().get(0).getEventDateTime()).toGregorianCalendar();
+		{
+			XMLGregorianCalendar calendar = dateFP(hrmReport.getPatientRecord().getReportsReceived().get(0).getEventDateTime());
+			
+			if (calendar != null)
+			{
+				return calendar.toGregorianCalendar();
+			}
+		}
 		return null;
 	}
 
 	public List<String> getFirstReportAuthorPhysician()
 	{
 		List<String> physicianName = new ArrayList<String>();
-		String physicianHL7String = hrmReport.getPatientRecord().getReportsReceived().get(0).getAuthorPhysician().getLastName();
-		String[] physicianNameArray = physicianHL7String.split("^");
-		physicianName.add(physicianNameArray[0]);
-		physicianName.add(physicianNameArray[1]);
-		physicianName.add(physicianNameArray[2]);
-		physicianName.add(physicianNameArray[3]);
-		physicianName.add(physicianNameArray[6]);
-
+		PersonNameSimple physicianHL7 = hrmReport.getPatientRecord().getReportsReceived().get(0).getAuthorPhysician();
+		
+		if (physicianHL7 != null && physicianHL7.getLastName() != null)
+		{
+			String physicianHL7RawString = physicianHL7.getLastName();
+			String[] physicianNameArray = physicianHL7RawString.split("\\^");
+			
+			if (physicianNameArray.length == 7)
+			{
+				physicianName.add(physicianNameArray[0]);
+				physicianName.add(physicianNameArray[1]);
+				physicianName.add(physicianNameArray[2]);
+				physicianName.add(physicianNameArray[3]);
+				physicianName.add(physicianNameArray[6]);
+			}
+		}
+		
 		return physicianName;
 	}
 
@@ -380,6 +453,7 @@ public class HRMReport_4_3 implements HRMReport
 				{
 					observation.setObservationDateTime(
 							ConversionUtils.fillPartialCalendar(
+									obrDate.getDateTime(),
 									obrDate.getFullDate(),
 									obrDate.getYearMonth(),
 									obrDate.getYearOnly())
@@ -396,10 +470,16 @@ public class HRMReport_4_3 implements HRMReport
 		if(hrmReport.getPatientRecord().getReportsReceived() != null &&
 				!hrmReport.getPatientRecord().getReportsReceived().isEmpty() &&
 				hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent() != null &&
+				!hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent().isEmpty() &&
 				hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent().get(0) != null &&
 				hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent().get(0).getObservationDateTime() != null)
 		{
-			return dateFP(hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent().get(0).getObservationDateTime()).toGregorianCalendar();
+			
+			XMLGregorianCalendar calendar = dateFP(hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent().get(0).getObservationDateTime());
+			if (calendar != null)
+			{
+				return calendar.toGregorianCalendar();
+			}
 		}
 
 		return null;
@@ -464,7 +544,6 @@ public class HRMReport_4_3 implements HRMReport
 	{
 		this.hrmParentDocumentId = hrmParentDocumentId;
 	}
-
 
 	private XMLGregorianCalendar dateFP(DateFullOrPartial dfp)
 	{

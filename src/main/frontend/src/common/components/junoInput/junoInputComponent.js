@@ -22,6 +22,7 @@
 */
 
 import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
+import DeviceInfo from "../../../lib/util/DeviceInfo";
 
 angular.module('Common.Components').component('junoInput', {
 	templateUrl: 'src/common/components/junoInput/junoInput.jsp',
@@ -47,7 +48,8 @@ angular.module('Common.Components').component('junoInput', {
 		// if true do not draw the input "box" just draw its contents
 		noBox: "<?",
 		componentStyle: "<?",
-		icon: "@?"
+		icon: "@?",
+		allowAutocomplete: "<?",
 	},
 	controller: [ "$scope", function ($scope) {
 		let ctrl = this;
@@ -66,6 +68,7 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.onlyNumeric = ctrl.onlyNumeric || false;
 			ctrl.icon = ctrl.icon || null;
 			ctrl.hideCharacterLimit = ctrl.hideCharacterLimit || true;
+			ctrl.allowAutocomplete = ctrl.allowAutocomplete || false;
 
 			if (ctrl.showInvalidFocus === undefined)
 			{
@@ -74,6 +77,8 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.oldNgModel = ctrl.ngModel;
+
+			ctrl.deviceInfo = new DeviceInfo();
 		};
 
 		$scope.$watch("$ctrl.ngModel", () =>
@@ -144,6 +149,15 @@ angular.module('Common.Components').component('junoInput', {
 		ctrl.onBlur = () =>
 		{
 			ctrl.isFocused = false;
+		}
+
+		ctrl.autocompleteValue = () =>
+		{
+			if(!ctrl.allowAutocomplete)
+			{
+				return ctrl.deviceInfo.autocompleteOffValue;
+			}
+			return null;
 		}
 	}]
 });

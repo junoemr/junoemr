@@ -44,11 +44,15 @@ public class RecentDemographicAccess extends AbstractModel<RecentDemographicAcce
 
 	public RecentDemographicAccess()
 	{
-		recentDemographicAccessPK = new RecentDemographicAccessPK();
+		this(new RecentDemographicAccessPK());
 	}
 	public RecentDemographicAccess(Integer providerNo, Integer demographicNo)
 	{
-		this.setId(new RecentDemographicAccessPK(providerNo, demographicNo));
+		this(new RecentDemographicAccessPK(providerNo, demographicNo));
+	}
+	public RecentDemographicAccess(RecentDemographicAccessPK id)
+	{
+		this.recentDemographicAccessPK = id;
 	}
 
 	@Override

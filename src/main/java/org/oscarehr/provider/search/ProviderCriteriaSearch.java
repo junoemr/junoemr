@@ -22,64 +22,51 @@
  */
 package org.oscarehr.provider.search;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 
+@Getter
+@Setter
 public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 {
 
 	private String providerNo = null;
 	private String lastName = null;
 	private String firstName = null;
+	
+	private String practitionerNo = null;
+	private String ontarioCnoNumber = null;
 
 	@Override
 	public Criteria setCriteriaProperties(Criteria criteria)
 	{
 		// set the search filters
-		if(getProviderNo() != null)
+		if (getProviderNo() != null)
 		{
 			criteria.add(Restrictions.eq("id", String.valueOf(getProviderNo())));
 		}
-		if(getFirstName() != null)
+		if (getFirstName() != null)
 		{
 			criteria.add(Restrictions.eq("firstName", getFirstName()));
 		}
-		if(getLastName() != null)
+		if (getLastName() != null)
 		{
 			criteria.add(Restrictions.eq("lastName", getLastName()));
 		}
+		
+		if (getPractitionerNo() != null)
+		{
+			criteria.add(Restrictions.eq("practitionerNo", getPractitionerNo()));
+		}
+		
+		if (getOntarioCnoNumber() != null)
+		{
+			criteria.add(Restrictions.eq("ontarioCnoNumber", getOntarioCnoNumber()));
+		}
 
 		return criteria;
-	}
-
-	public String getProviderNo()
-	{
-		return providerNo;
-	}
-
-	public void setProviderNo(String providerNo)
-	{
-		this.providerNo = providerNo;
-	}
-
-	public String getLastName()
-	{
-		return lastName;
-	}
-
-	public void setLastName(String lastName)
-	{
-		this.lastName = lastName;
-	}
-
-	public String getFirstName()
-	{
-		return firstName;
-	}
-
-	public void setFirstName(String firstName)
-	{
-		this.firstName = firstName;
 	}
 }

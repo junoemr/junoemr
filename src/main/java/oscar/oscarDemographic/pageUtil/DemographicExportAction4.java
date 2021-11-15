@@ -1896,8 +1896,10 @@ public class DemographicExportAction4 extends Action {
 										}
 
 										// Source Facility
-										if (hrmDoc.getSourceFacility() != null) {
-											rpr.setSourceFacility(hrmDoc.getSourceFacility());
+										if (hrmDoc.getSendingFacility() != null) {
+											// not a typo:  Specification is that the source facility
+											// is the user friendly name which maps the sendingFacilityId
+											rpr.setSourceFacility(hrmDoc.getSendingFacility());
 										}
 
 										// reviewing info

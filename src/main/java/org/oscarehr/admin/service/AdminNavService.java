@@ -556,6 +556,8 @@ public class AdminNavService
 		{
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.keyPairGen"), "frame?frameUrl=" + contextPath + "/admin/keygen/keyManager.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.manageFacilities"), "frame?frameUrl=" + contextPath + "/FacilityManager.do"));
+			systemManagementItems.add( new AdminNavItemTo1( "Create New Flowsheet", "frame?frameUrl=" + contextPath + "/oscarEncounter/oscarMeasurements/adminFlowsheet/NewFlowsheet.jsp"));
+			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.flowsheetManager"), "frame?frameUrl=" + contextPath + "/admin/manageFlowsheets.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.admin.add_lot_nr.title"), "frame?frameUrl=" + contextPath + "/admin/lotnraddrecordhtm.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.lotnrsearchrecordshtm.title"), "frame?frameUrl=" + contextPath + "/admin/lotnrsearchrecordshtm.jsp"));
 			systemManagementItems.add( new AdminNavItemTo1( resourcebundle.getString("admin.jobs.title"), "frame?frameUrl=" + contextPath + "/admin/jobs.jsp"));
@@ -640,8 +642,15 @@ public class AdminNavService
 
 		integrationItems.add(new AdminNavItemTo1("REST Clients", "frame?frameUrl=" + contextPath + "/admin/api/clients.jsp"));
 		integrationItems.add(new AdminNavItemTo1("REST API", "frame?frameUrl=" + contextPath + "/admin/api/api.jsp"));
+		/*
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("provider.btnSetIntegratorPreferences"), "frame?frameUrl=" + contextPath + URLEncoder.encode("/setProviderStaleDate.do?method=viewIntegratorProperties")));
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.sendOruR01"), "frame?frameUrl=" + contextPath + "/lab/CA/ALL/sendOruR01.jsp"));
+		*/
+
+		if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM))
+		{
+			integrationItems.add(new AdminNavItemTo1("Health Report Manager (HRM)", "hrmAdmin"));
+		}
 
 		if (oscarProperties.getProperty("olis_keystore", "").length() > 0)
 		{

@@ -80,7 +80,7 @@ public class EditOtherMedsClassicUIIT extends SeleniumTestBase
 		PageUtil.switchToLastWindow(driver);
 		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 
-		//Add Social History Notes
+		//Add Other Meds Notes
 		driver.findElement(By.xpath("//div[@id='menuTitleoMeds']//descendant::a[contains(., '+')]")).click();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(otherMedsEncounter);
@@ -98,7 +98,7 @@ public class EditOtherMedsClassicUIIT extends SeleniumTestBase
  		Assert.assertTrue("Other Meds Note is NOT Copied in Encounter note successfully",
 				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + otherMedsEncounter + "')]"), driver));
 
-		//Edit Social History Note
+		//Edit Other Meds Note
 		driver.findElement(By.linkText(otherMedsCPP)).click();
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(editedOtherMedsCPP);
@@ -106,7 +106,7 @@ public class EditOtherMedsClassicUIIT extends SeleniumTestBase
 		Assert.assertTrue("Other Meds Note is NOT Edited in CPP successfully",
 				PageUtil.isExistsBy(By.linkText(editedOtherMedsCPP), driver));
 
-		//Archive Social History Note
+		//Archive Other Meds Note
 		driver.findElement(By.xpath("//div[@id='menuTitleoMeds']//descendant::a[contains(., '+')]")).click();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(archivedOtherMeds);

@@ -98,7 +98,7 @@ public class CommonLabResultData {
 	}
 
 	public static String[] getLabTypes() {
-		return new String[] { "MDS", "CML", "BCP", "HL7", "DOC", "Epsilon" };
+		return new String[] { "MDS", "CML", "BCP", "HL7", "DOC", "Epsilon", "HRM" };
 	}
 
 	//Populate Lab data for consultation request

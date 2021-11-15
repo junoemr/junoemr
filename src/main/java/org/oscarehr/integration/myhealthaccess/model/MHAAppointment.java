@@ -49,6 +49,7 @@ public class MHAAppointment
 		REGULAR,
 		ONE_TIME_LINK,
 		ON_DEMAND_AUDIO_CALL,
+		CHAT,
 	}
 
 	public MHAAppointment(AppointmentTo1 appointmentTo1)
