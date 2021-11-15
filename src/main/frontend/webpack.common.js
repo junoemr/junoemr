@@ -413,6 +413,7 @@ module.exports = {
 			'./src/admin/section/securityRole/securityRoleConfigModalComponent.js',
 			'./src/admin/section/securityRole/securityRoleSetModalComponent.js',
 			'./src/admin/section/integrationModules/integrationModulesComponent.js',
+			'./src/admin/section/hrm/hrmAdminComponent.js',
 			'./src/admin/section/iceFall/iceFallAdminComponent.js',
 			'./src/admin/section/iceFall/settings/iceFallAdminSettingsComponent.js',
 			'./src/admin/section/iceFall/activity/iceFallAdminActivityComponent.js',

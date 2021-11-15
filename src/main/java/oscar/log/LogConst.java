@@ -58,6 +58,7 @@ public class LogConst {
 	public static final String ACTION_UNLINK = "unlink";
 	public static final String ACTION_SENT = "sent";
 	public static final String ACTION_DOWNLOAD = "download";
+	public static final String ACTION_PROCESS = "process";
 
 	/* Content/Module constants
 	 * These should describe what module the action applies to.

@@ -74,9 +74,15 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 
 	private Integer DemographicNo;
 	private String hin;
+	
 	@Getter
 	@Setter
 	private String healthCardVersion;
+	
+	@Getter
+	@Setter
+	private String healthCardProvince;
+	
 	@Getter
 	@Setter
 	private String notHealthCardVersion;
@@ -152,6 +158,11 @@ public class DemographicCriteriaSearch extends AbstractCriteriaSearch
 						Restrictions.isNull("ver"),
 						Restrictions.ne("ver", getNotHealthCardVersion())));
 			}
+		}
+		
+		if (getHealthCardProvince() != null)
+		{
+			junction.add(getRestrictionCriterion("hcType", getHealthCardProvince()));
 		}
 
 		// birthdate searches are always exact due to how the values are stored

@@ -34,7 +34,7 @@
 							module="mod"
 							item-display-count="mod.displaySize"
 							onclick-item="summaryCtrl.gotoState(item, module, successCallback, dismissCallback)"
-							add-button="true"
+							add-button="summaryCtrl.showAddButton(mod)"
 							add-button-enabled="summaryCtrl.summaryModAddEnabled(mod)"
 							onclick-add="summaryCtrl.onSummaryModAdd(module, successCallback, dismissCallback)"
 							onclick-title="summaryCtrl.onSummaryModClickTitle(module)"
@@ -43,8 +43,7 @@
 					>
 					</summary-module>
 				</div>
-			</div>
-
+            </div>
 			<div class="col-md-6 col-sm-7 col-xs-10 col-sm-offset-0 col-xs-offset-1"
 				 ng-click="summaryCtrl.checkAction($event)"
 				 ng-keypress="summaryCtrl.checkAction($event)">
@@ -75,6 +74,7 @@
 							<span class="fa fa-print"></span>
 							Print
 						</button>
+
 					</div>
 				</div>
 				<div class="col-md-12 note-list">
@@ -98,7 +98,6 @@
 					</div><!-- tab content -->
 				</div>
 			</div>
-
 			<div class="col-md-3 col-md-offset-0 col-xs-10 col-xs-offset-1"
 				 id="summary-section-right"
 				 ng-click="summaryCtrl.checkAction($event)"
@@ -111,11 +110,13 @@
 							onclick-title="summaryCtrl.onSummaryModClickTitle(module)"
 							clickable-title="summaryCtrl.isModTitleClickable(mod)"
 							enable-filter="true"
-                            filter-type-options="summaryCtrl.getSummaryModuleFilterOptions(mod)"
+                            				add-button="summaryCtrl.showAddButton(mod)"
+                            				filter-type-options="summaryCtrl.getSummaryModuleFilterOptions(mod)"
 					>
 					</summary-module>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>
 </juno-security-check>

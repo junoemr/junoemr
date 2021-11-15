@@ -1917,13 +1917,17 @@ import java.util.zip.ZipInputStream;
                         HRMDocumentToDemographic hrmDocToDemo = new HRMDocumentToDemographic();
 
                         hrmDoc.setReportFile(HRMfile);
-                        if (repR[i].getSourceFacility()!=null) hrmDoc.setSourceFacility(repR[i].getSourceFacility());
+                        if (repR[i].getSourceFacility()!=null)
+						{
+							// not a typo: The CDS source facility is the name which the sending facility id maps to.
+							hrmDoc.setSendingFacility(repR[i].getSourceFacility());
+						}
                         if (repR[i].getReceivedDateTime()!=null) {
                             hrmDoc.setTimeReceived(dateTimeFPtoDate(repR[i].getReceivedDateTime(), timeShiftInDays));
                         } else {
                             hrmDoc.setTimeReceived(new Date());
                         }
-                        if (repR[i].getHRMResultStatus()!=null) hrmDoc.setReportStatus(repR[i].getHRMResultStatus());
+                        if (repR[i].getHRMResultStatus()!=null) hrmDoc.setReportStatus(HRMDocument.STATUS.fromValueString(repR[i].getHRMResultStatus()));
                         if (repR[i].getClass1()!=null) hrmDoc.setReportType(repR[i].getClass1().toString());
                         if (repR[i].getEventDateTime()!=null) hrmDoc.setReportDate(dateTimeFPtoDate(repR[i].getEventDateTime(), timeShiftInDays));
                         hrmDocDao.persist(hrmDoc);

@@ -155,7 +155,7 @@ public class ClinicaidAPIService
 
 		return lastUsableResult;
 	}
-
+	
 	public Map<String, String> checkEligibility(Demographic demo) throws IOException, InterruptedException
 	{
 		String urlString = sessionManager.getApiDomain() + apiPath + "patient/eligibility/";
@@ -205,7 +205,7 @@ public class ClinicaidAPIService
 
 		return response;
 	}
-
+	
 	public String buildClinicaidURL(HttpServletRequest request, String action)
 	{
 		String clinicaidLink = sessionManager.getClinicaidDomain();

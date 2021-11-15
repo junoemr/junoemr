@@ -28,9 +28,12 @@ import org.apache.commons.lang.StringUtils;
 @Entity
 @Table(name = "providerLabRouting")
 public class ProviderLabRoutingModel extends AbstractModel<Integer> implements Serializable {
-
+	
+	public static final Integer PROVIDER_UNMATCHED = 0;
+	
 	public static final String LAB_TYPE_LABS  = "HL7";
 	public static final String LAB_TYPE_DOCUMENTS  = "DOC";
+	public static final String LAB_TYPE_HRM = "HRM";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,6 +57,10 @@ public class ProviderLabRoutingModel extends AbstractModel<Integer> implements S
 	
 	@Column(name = "lab_type")
 	private String labType;
+	
+	@Column(name = "obr_date")
+	@Temporal(TemporalType.DATE)
+	private Date obrDate;
 	
 	@Override
 	public Integer getId() {
@@ -121,5 +128,15 @@ public class ProviderLabRoutingModel extends AbstractModel<Integer> implements S
 	protected void jpaUpdateTimestamp()
 	{
 		this.timestamp = new Date();
+	}
+	
+	public Date getObrDate()
+	{
+		return obrDate;
+	}
+	
+	public void setObrDate(Date obrDate)
+	{
+		this.obrDate = obrDate;
 	}
 }

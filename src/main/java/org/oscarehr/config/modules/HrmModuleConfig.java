@@ -23,20 +23,26 @@
 
 package org.oscarehr.config.modules;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.hospitalReportManager.service.HRMScheduleService;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 import oscar.OscarProperties;
+
+import javax.annotation.PostConstruct;
 
 @Configuration
 @Conditional(HrmModuleConfig.Condition.class)
-@ImportResource({"classpath*:applicationContextHRM.xml"})
 public class HrmModuleConfig
 {
+	@Autowired
+	HRMScheduleService hrmScheduleService;
+	
 	private static final Logger logger = MiscUtils.getLogger();
-
+	
 	public HrmModuleConfig()
 	{
 		logger.info("Loaded HRM module");
@@ -47,6 +53,19 @@ public class HrmModuleConfig
 		public OscarProperties.Module getModule()
 		{
 			return OscarProperties.Module.MODULE_HRM;
+		}
+	}
+	
+	@PostConstruct
+	public void startSchedule()
+	{
+		
+		String intervalProp = OscarProperties.getInstance().getProperty("omd.hrm.poll_interval_sec");
+		int frequency = NumberUtils.toInt(intervalProp);
+		
+		if (frequency != 0)
+		{
+			hrmScheduleService.scheduleRegularFetch(frequency);
 		}
 	}
 }

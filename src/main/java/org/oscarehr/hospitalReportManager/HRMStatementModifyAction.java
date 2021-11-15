@@ -12,8 +12,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
-import org.oscarehr.hospitalReportManager.dao.HRMProviderConfidentialityStatementDao;
 import org.oscarehr.hospitalReportManager.model.HRMProviderConfidentialityStatement;
+import org.oscarehr.hospitalReportManager.dao.HRMProviderConfidentialityStatementDao;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 

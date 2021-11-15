@@ -75,6 +75,7 @@ public class SummaryTo1 {
 	public static final String ALLERGIES = "allergies";
 	public static final String RISK_FACTORS = "riskfactors";
 	public static final String PREVENTIONS = "preventions";
+	public static final String HRM_DOCUMENTS ="hrmdocuments";
 	
 	Integer id;
 	String displayName;

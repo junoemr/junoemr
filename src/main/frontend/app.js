@@ -167,6 +167,11 @@ oscarApp.config([
 			url: '/panelManagement',
 			component: 'panelManagementAdmin'
 		})
+		.state('admin.hrm',
+		{
+			url: '/hrmAdmin',
+			component: 'hrmAdmin',
+		})
         .state('admin.iMDHealth',
         {
             url: '/imdHealth',
