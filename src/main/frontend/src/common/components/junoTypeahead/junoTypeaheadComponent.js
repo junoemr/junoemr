@@ -22,6 +22,7 @@
  */
 
 import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
+import DeviceInfo from "../../../lib/util/DeviceInfo";
 
 angular.module('Common.Components').component('junoTypeahead',
 {
@@ -68,6 +69,8 @@ angular.module('Common.Components').component('junoTypeahead',
 			}
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.TOP;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+
+			ctrl.deviceInfo = new DeviceInfo();
 		};
 
 		ctrl.$doCheck = () =>

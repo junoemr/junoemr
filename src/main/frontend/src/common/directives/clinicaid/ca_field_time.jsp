@@ -15,7 +15,7 @@
 			<input id="input-{{name}}"
 						 type="text"
 						 class="form-control"
-						 autocomplete="off"
+						 autocomplete="{{autocompleteOff}}"
 						 spellcheck="false"
 						 placeholder="00:00 AM"
 						 ng-focus="focus_fn()"
