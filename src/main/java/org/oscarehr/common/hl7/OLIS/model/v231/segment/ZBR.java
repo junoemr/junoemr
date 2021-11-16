@@ -66,61 +66,61 @@ public class ZBR extends AbstractSegment
 		}
 	}
 
-	public ST getZbr1_testRequestBlockingIndicator() throws HL7Exception
+	public ST getZbr1_testRequestBlockingIndicator()
 	{
-		return (ST) this.getField(1, 0);
+		return (ST) this.getTypedField(1, 0);
 	}
-	public XON getZbr2_testRequestPlacer() throws HL7Exception
+	public XON getZbr2_testRequestPlacer()
 	{
-		return (XON) this.getField(2, 0);
+		return (XON) this.getTypedField(2, 0);
 	}
-	public XON getZbr3_specimenCollector() throws HL7Exception
+	public XON getZbr3_specimenCollector()
 	{
-		return (XON) this.getField(3, 0);
+		return (XON) this.getTypedField(3, 0);
 	}
-	public XON getZbr4_reportingLaboratory() throws HL7Exception
+	public XON getZbr4_reportingLaboratory()
 	{
-		return (XON) this.getField(4, 0);
+		return (XON) this.getTypedField(4, 0);
 	}
-	public XAD getZbr5_reportingLaboratoryAddress() throws HL7Exception
+	public XAD getZbr5_reportingLaboratoryAddress()
 	{
-		return (XAD) this.getField(5, 0);
+		return (XAD) this.getTypedField(5, 0);
 	}
-	public XON getZbr6_performingLaboratory() throws HL7Exception
+	public XON getZbr6_performingLaboratory()
 	{
-		return (XON) this.getField(6, 0);
+		return (XON) this.getTypedField(6, 0);
 	}
-	public XAD getZbr7_performingLaboratoryAddress() throws HL7Exception
+	public XAD getZbr7_performingLaboratoryAddress()
 	{
-		return (XAD) this.getField(7, 0);
+		return (XAD) this.getTypedField(7, 0);
 	}
-	public XON getZbr8_destinationLaboratory() throws HL7Exception
+	public XON getZbr8_destinationLaboratory()
 	{
-		return (XON) this.getField(8, 0);
+		return (XON) this.getTypedField(8, 0);
 	}
-	public IS getZbr9_reportableTestIndicator() throws HL7Exception
+	public IS getZbr9_reportableTestIndicator()
 	{
-		return (IS) this.getField(9, 0);
+		return (IS) this.getTypedField(9, 0);
 	}
-	public IS getZbr10_businessRuleInterventionCode() throws HL7Exception
+	public IS getZbr10_businessRuleInterventionCode()
 	{
-		return (IS) this.getField(10, 0);
+		return (IS) this.getTypedField(10, 0);
 	}
-	public ST getZbr11_testRequestSortKey() throws HL7Exception
+	public ST getZbr11_testRequestSortKey()
 	{
-		return (ST) this.getField(11, 0);
+		return (ST) this.getTypedField(11, 0);
 	}
-	public ST getZbr12_referredTestIndicator() throws HL7Exception
+	public ST getZbr12_referredTestIndicator()
 	{
-		return (ST) this.getField(12, 0);
+		return (ST) this.getTypedField(12, 0);
 	}
-	public ST getZbr13_fullReplaceAmendment() throws HL7Exception
+	public ST getZbr13_fullReplaceAmendment()
 	{
-		return (ST) this.getField(13, 0);
+		return (ST) this.getTypedField(13, 0);
 	}
-	public ST getZbr14_testRequestReplaceAmendment() throws HL7Exception
+	public ST getZbr14_testRequestReplaceAmendment()
 	{
-		return (ST) this.getField(14, 0);
+		return (ST) this.getTypedField(14, 0);
 	}
 
 }

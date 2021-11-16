@@ -52,12 +52,12 @@ public class ZBX extends AbstractSegment
 		}
 	}
 
-	public TS getZbx1_testResultReleaseDateTime() throws HL7Exception
+	public TS getZbx1_testResultReleaseDateTime()
 	{
-		return (TS) this.getField(1, 0);
+		return (TS) this.getTypedField(1, 0);
 	}
-	public ST getZbx2_testResultSortKey() throws HL7Exception
+	public ST getZbx2_testResultSortKey()
 	{
-		return (ST) this.getField(2, 0);
+		return (ST) this.getTypedField(2, 0);
 	}
 }

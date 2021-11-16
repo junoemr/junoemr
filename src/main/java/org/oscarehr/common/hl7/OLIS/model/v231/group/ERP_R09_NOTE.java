@@ -46,7 +46,7 @@ public class ERP_R09_NOTE extends AbstractGroup
 		}
 		catch(HL7Exception e)
 		{
-			log.error("Unexpected error creating ERP_R09_RESPONSE - this is probably a bug in the source code generator.", e);
+			log.error("Unexpected error creating ERP_R09_NOTE - this is probably a bug in the source code generator.", e);
 		}
 	}
 

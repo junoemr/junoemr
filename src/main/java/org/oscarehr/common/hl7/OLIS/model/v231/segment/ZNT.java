@@ -54,8 +54,8 @@ public class ZNT extends AbstractSegment
 		}
 	}
 
-	public HD getZnt1_sourceOrganization() throws HL7Exception
+	public HD getZnt1_sourceOrganization()
 	{
-		return (HD) this.getField(1, 0);
+		return this.getTypedField(1, 0);
 	}
 }

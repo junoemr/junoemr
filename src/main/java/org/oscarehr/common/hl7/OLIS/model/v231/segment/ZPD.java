@@ -26,8 +26,6 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.AbstractSegment;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.Type;
-import ca.uhn.hl7v2.model.v231.datatype.HD;
 import ca.uhn.hl7v2.model.v231.datatype.ST;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 import org.oscarehr.util.MiscUtils;
@@ -54,16 +52,16 @@ public class ZPD extends AbstractSegment
 		}
 	}
 
-	public HD getZpd1_patientConsentIndicator() throws HL7Exception
+	public ST getZpd1_patientConsentIndicator()
 	{
-		return (HD) this.getField(1, 0);
+		return this.getTypedField(1, 0);
 	}
-	public HD getZpd2_patientIdentificationVerifiedFlag() throws HL7Exception
+	public ST getZpd2_patientIdentificationVerifiedFlag()
 	{
-		return (HD) this.getField(2, 0);
+		return this.getTypedField(2, 0);
 	}
-	public HD getZpd3_patientConsentBlockAllIndicator() throws HL7Exception
+	public ST getZpd3_patientConsentBlockAllIndicator()
 	{
-		return (HD) this.getField(3, 0);
+		return this.getTypedField(3, 0);
 	}
 }
