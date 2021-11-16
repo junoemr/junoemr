@@ -26,6 +26,7 @@ package org.oscarehr.hospitalReportManager.service;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import lombok.Synchronized;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
@@ -56,7 +57,7 @@ public class HRMSftpService
 	// CONNECTION SETTINGS
 	private static final String OMD_HRM_USER = OscarProperties.getInstance().getProperty("omd.hrm.user");
 	private static final String OMD_HRM_IP = OscarProperties.getInstance().getProperty("omd.hrm.address");
-	private static final int OMD_HRM_PORT = Integer.parseInt(OscarProperties.getInstance().getProperty("omd.hrm.port"));
+	private static final Integer OMD_HRM_PORT = NumberUtils.toInt(OscarProperties.getInstance().getProperty("omd.hrm.port"), 0);
 	private static final String REMOTE_PATH = OscarProperties.getInstance().getProperty("omd.hrm.remote_path");
 	
 	// LOCAL CONFIG
