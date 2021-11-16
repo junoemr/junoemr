@@ -36,7 +36,7 @@ public class Navigation
 {
 	private static final OscarProperties properties = OscarProperties.getInstance();
 
-	public static final String OSCAR_URL = "http://localhost";
+	public static final String OSCAR_URL = "http://juno-maven";
 	public static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do" +
 		"?providerNo=" + AuthUtils.TEST_PROVIDER_ID +
 		"&appointmentNo=" +
@@ -63,7 +63,17 @@ public class Navigation
 	 */
 	public static void doLogin(String username, String password, String pin, String baseUrl, WebDriver driver)
 	{
-		logger.info("Logging in....");
+		logger.info("Logging in....(url = " + baseUrl + ")");
+/*
+		try
+		{
+			Thread.sleep(100000);
+		}
+		catch (InterruptedException e)
+		{
+
+		}
+*/
 
 		driver.get(baseUrl + "/index.jsp");
 		WebElement userNameInput = driver.findElement(By.name("username"));

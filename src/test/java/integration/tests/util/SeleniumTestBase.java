@@ -25,6 +25,8 @@ package integration.tests.util;
 import integration.tests.config.TestConfig;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
@@ -36,6 +38,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.AuthUtils;
@@ -47,6 +50,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Properties;
 import org.springframework.context.annotation.Import;
 
 @Import(TestConfig.class)
@@ -65,7 +69,7 @@ public class SeleniumTestBase
 	public static final Integer WEB_DRIVER_IMPLICIT_TIMEOUT = 60;
 	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 120;
 	private static final String GECKO_DRIVER="src/test/resources/vendor/geckodriver";
-	private static final String INTEGRATION_PROPERTIES_FILE = "src/test/resources/integration.properties";
+	private static final String DEFAULT_INTEGRATION_PROPERTIES_FILE = "src/test/resources/docker_integration.properties";
 
 	protected static WebDriver driver;
 	protected static Logger logger= MiscUtils.getLogger();
@@ -78,8 +82,14 @@ public class SeleniumTestBase
 	synchronized public static void buildWebDriver() throws SQLException, InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException
 	{
+		String integrationPropertiesFile = System.getProperty("integration_properties_file");
+		if(integrationPropertiesFile == null)
+		{
+			integrationPropertiesFile = DEFAULT_INTEGRATION_PROPERTIES_FILE;
+		}
+
 		oscar.OscarProperties p = oscar.OscarProperties.getInstance();
-		p.readFromFile(INTEGRATION_PROPERTIES_FILE);
+		p.readFromFile(integrationPropertiesFile);
 
 		//load database (during the integration-test phase this will only populate table creation maps)
 		SchemaUtils.createDatabaseAndTables();
@@ -95,6 +105,7 @@ public class SeleniumTestBase
 	@Before
 	public void login()
 	{
+		/*
 		FirefoxBinary ffb = new FirefoxBinary();
 		FirefoxOptions ffo = new FirefoxOptions();
 		if(junoProperties.getTest().isHeadless())
@@ -103,6 +114,22 @@ public class SeleniumTestBase
 		}
 		ffo.setBinary(ffb);
 		driver = new FirefoxDriver(ffo);
+		 */
+
+		FirefoxOptions firefoxOptions = new FirefoxOptions();
+
+		try
+		{
+			driver = new RemoteWebDriver(new URL("http://juno-selenium-firefox:4444/"),
+				firefoxOptions);
+		}
+		catch (MalformedURLException e)
+		{
+
+		}
+
+
+
 		Navigation.doLogin(
 			AuthUtils.TEST_USER_NAME,
 			AuthUtils.TEST_PASSWORD,
