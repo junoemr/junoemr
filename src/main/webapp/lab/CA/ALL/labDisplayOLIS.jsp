@@ -1953,8 +1953,7 @@ public String strikeOutInvalidContent(String content, String status) {
    											<% 		if (category.toUpperCase().trim().equals("MICROBIOLOGY")) {%>
    											<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
    												<td align="center" colspan="7">
-   														S=Sensitive R=Resistant I=Intermediate MS=Moderately Sensitive VS=Very Sensitive
-
+												    I=Intermediate, MS=Moderately Susceptible, NI=No Interpretation, R=Resistant, S=Susceptible, S-DD=Susceptible Dose Dependent, VS=Very Susceptible
    												</td>
    											</tr>
 											<%
