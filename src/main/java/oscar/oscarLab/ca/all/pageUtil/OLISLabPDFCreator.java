@@ -712,7 +712,7 @@ public class OLISLabPDFCreator extends PdfPageEventHelper
 					table.addCell(cell);
 
 					//If the status is final
-					if(handler.isStatusFinal(handler.getOBXResultStatus(obr, obx).charAt(0))){
+					if(handler.isStatusFinal(handler.getOBXResultStatus(obr, obx))){
 						String parentId = handler.getOBXCEParentId(obr, obx);
 						//If there is a parent ID then outputs a table for Agent and Sensitivity
 						if (!stringIsNullOrEmpty(parentId)){

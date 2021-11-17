@@ -76,7 +76,7 @@ public class ERP_R09_PATIENT extends AbstractGroup
 	}
 	public int getNOTEReps()
 	{
-		return this.getReps("ZNT");
+		return this.getReps("NOTE");
 	}
 	public List<ERP_R09_NOTE> getNOTEAll() throws HL7Exception
 	{

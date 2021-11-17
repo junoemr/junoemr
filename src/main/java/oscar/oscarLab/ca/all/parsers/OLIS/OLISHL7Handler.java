@@ -13,16 +13,20 @@
 
 package oscar.oscarLab.ca.all.parsers.OLIS;
 
+import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
-import ca.uhn.hl7v2.model.Structure;
 import ca.uhn.hl7v2.model.v231.segment.MSH;
+import ca.uhn.hl7v2.parser.CustomModelClassFactory;
+import ca.uhn.hl7v2.parser.ModelClassFactory;
+import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.util.Terser;
+import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.bouncycastle.util.encoders.Base64;
-import org.oscarehr.common.hl7.OLIS.model.v231.group.ERP_R09_NOTE;
 import org.oscarehr.common.hl7.OLIS.model.v231.message.ERP_R09;
 import org.oscarehr.olis.dao.OLISRequestNomenclatureDao;
 import org.oscarehr.olis.dao.OLISResultNomenclatureDao;
@@ -48,7 +52,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,10 +94,15 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	private HashMap<String, String> addressTypeNames;
 	private HashMap<String, String> telecomUseCode;
 	private HashMap<String, String> telecomEquipType;
+	private HashMap<Integer, Integer> obrParentMap;
 
 	private ArrayList<String> disciplines;
 	private List<OLISError> errors;
-	private List<ERP_R09_NOTE> reportNotes;
+	private ArrayList<String> headers;
+
+	private ArrayList<HashMap<String, String>> patientHomeTelecom;
+	private ArrayList<HashMap<String, String>> patientWorkTelecom;
+	private ArrayList<HashMap<String, String>> patientAddresses;
 
 	public static boolean handlerTypeMatch(Message message)
 	{
@@ -113,8 +121,9 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return false;
 	}
 
-	private void initDefaultSourceOrganizations() {
-		defaultSourceOrganizations = new HashMap<String, String>();
+	private void initDefaultSourceOrganizations()
+	{
+		defaultSourceOrganizations = new HashMap<>();
 		defaultSourceOrganizations.put("4001", "BSD Lab1");
 		defaultSourceOrganizations.put("4002", "BSD Lab2");
 		defaultSourceOrganizations.put("4003", "BSD Lab3");
@@ -156,7 +165,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	@Override
 	public void postUpload() {}
 
-	public String getSourceOrganization(String org) {
+	public String getSourceOrganization(String org)
+	{
 		return sourceOrganizations.containsKey(org) ? sourceOrganizations.get(org) : defaultSourceOrganizations.get(org);
 	}
 
@@ -182,18 +192,24 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return StringUtils.trimToEmpty(specimenSource + " " + specimenSiteModifier);
 	}
 
-	private ArrayList<String> headers = null;
-
 	/** Creates a new instance of OLISHL7Handler */
 	public OLISHL7Handler() throws HL7Exception
 	{
 		super();
-		init(null);
 	}
 
 	public OLISHL7Handler(String hl7message) throws HL7Exception
 	{
-		super(hl7message);
+		HapiContext context = new DefaultHapiContext();
+		context.setValidationContext(new NoValidation());
+		ModelClassFactory modelClassFactory = new CustomModelClassFactory(ERP_R09.ROOT_PACKAGE);
+		context.setModelClassFactory(modelClassFactory);
+		context.getParserConfiguration().setDefaultObx2Type("ST");
+
+		Parser p = context.getPipeParser();
+		this.message = p.parse(hl7message);
+		this.msg = (ERP_R09) this.message;
+		this.terser = new Terser(msg);
 		init(hl7message);
 	}
 
@@ -240,19 +256,24 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return patientIdentifiers.get("SS");
 	}
 
-	public String[] getPatientIdentifier(String ident) {
+	public String[] getPatientIdentifier(String ident)
+	{
 		return patientIdentifiers.get(ident);
 	}
 
-	public Set<String> getPatientIdentifiers() {
+	public Set<String> getPatientIdentifiers()
+	{
 		return patientIdentifiers.keySet();
 	}
 
-	public String getNameOfIdentifier(String ident) {
+	public String getNameOfIdentifier(String ident)
+	{
 		return patientIdentifierNames.get(ident);
 	}
 
-	private void initPatientIdentifierNames() {
+	private void initPatientIdentifierNames()
+	{
+		patientIdentifierNames = new HashMap<>();
 		patientIdentifierNames.put("ANON", "Non Nominal Identifier");
 		patientIdentifierNames.put("DDSL", "Dentist Licence Number");
 		patientIdentifierNames.put("DL", "Driver's Licence Number");
@@ -266,11 +287,14 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 
 	}
 
-	public String getAddressTypeName(String ident) {
+	public String getAddressTypeName(String ident)
+	{
 		return addressTypeNames.get(ident);
 	}
 
-	private void initAddressTypeNames() {
+	private void initAddressTypeNames()
+	{
+		addressTypeNames = new HashMap<>();
 		addressTypeNames.put("M", "Mailing Address");
 		addressTypeNames.put("B", "Business");
 		addressTypeNames.put("O", "Office");
@@ -278,7 +302,9 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		addressTypeNames.put("E", "Emergency Contact");
 	}
 
-	private void initTelecomUseCodes() {
+	private void initTelecomUseCodes()
+	{
+		telecomUseCode = new HashMap<>();
 		telecomUseCode.put("PRN", "Primary Residence Number");
 		telecomUseCode.put("ORN", "Other Residence Number");
 		telecomUseCode.put("WPN", "Work Number");
@@ -288,7 +314,9 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		telecomUseCode.put("NET", "Network (email) Address");
 	}
 
-	private void initTelecomEquipTypes() {
+	private void initTelecomEquipTypes()
+	{
+		telecomEquipType = new HashMap<>();
 		telecomEquipType.put("PH", "Telephone");
 		telecomEquipType.put("FX", "Fax");
 		telecomEquipType.put("CP", "Cellular Phone");
@@ -296,23 +324,20 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		telecomEquipType.put("Internet", "Internet Address");
 	}
 
-	private ArrayList<HashMap<String, String>> patientAddresses;
-
-	public ArrayList<HashMap<String, String>> getPatientAddresses() {
+	public ArrayList<HashMap<String, String>> getPatientAddresses()
+	{
 		return patientAddresses;
 	}
 
-	private ArrayList<HashMap<String, String>> patientHomeTelecom;
-
-	public ArrayList<HashMap<String, String>> getPatientHomeTelecom() {
+	public ArrayList<HashMap<String, String>> getPatientHomeTelecom()
+	{
 		return patientHomeTelecom;
 	}
 
-	public ArrayList<HashMap<String, String>> getPatientWorkTelecom() {
+	public ArrayList<HashMap<String, String>> getPatientWorkTelecom()
+	{
 		return patientWorkTelecom;
 	}
-
-	private ArrayList<HashMap<String, String>> patientWorkTelecom;
 
 	public String getAdmittingProviderName() {
 		try {
@@ -803,13 +828,14 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	public String getLastUpdateInOLISUnformatted()
 	{
 		int obrCount = getOBRCount();
-		return getString(get("/.ORDER_OBSERVATION(" + obrCount + ")/OBR-22-1-1"));
+		return getString(get("/.ORDER_OBSERVATION(" + (obrCount-1) + ")/OBR-22-1-1"));
 	}
-	
-	public String getLastUpdateInOLIS() {
-			String date = getLastUpdateInOLISUnformatted();
-			if (date.length() > 0) return formatDateTime(date);
-			return "";
+
+	public String getLastUpdateInOLIS()
+	{
+		String date = getLastUpdateInOLISUnformatted();
+		if(date.length() > 0) return formatDateTime(date);
+		return "";
 	}
 
 	public String getOBXCEParentId(int obr, int obx)
@@ -817,19 +843,31 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return getOBXField(obr, obx, 4, 0, 1);
 	}
 
-	HashMap<String, String> obrParentMap;
-
-	public int getChildOBR(String parentId) {
-		try {
-			return Integer.parseInt(obrParentMap.get(parentId));
-		} catch (Exception e) {
+	/**
+	 * @param setId parent set Id - 1 indexed (matches hl7 id value)
+	 * @return mapped child id, 0 indexed
+	 */
+	public int getChildOBR(String setId)
+	{
+		try
+		{
+			int parentIndex = Integer.parseInt(setId);
+			return obrParentMap.get(parentIndex);
+		}
+		catch(Exception e)
+		{
+			logger.error("Invalid obr child lookup", e);
 			return -1;
 		}
 	}
 
+	/**
+	 * @param obr segment index - 0 indexed
+	 * @return true if a mapped value exists
+	 */
 	public boolean isChildOBR(int obr)
 	{
-		return obrParentMap.containsValue(String.valueOf(obr));
+		return obrParentMap.containsValue(obr);
 	}
 
 	public String getDiagnosis(int obr)
@@ -871,24 +909,14 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	public void init(String hl7Body) throws HL7Exception
 	{
 		initDefaultSourceOrganizations();
-
-		obrParentMap = new HashMap<String, String>();
-
-		patientIdentifierNames = new HashMap<String, String>();
 		initPatientIdentifierNames();
-
-		addressTypeNames = new HashMap<String, String>();
 		initAddressTypeNames();
-
-		telecomUseCode = new HashMap<String, String>();
 		initTelecomUseCodes();
-
-		telecomEquipType = new HashMap<String, String>();
 		initTelecomEquipTypes();
 
-		sourceOrganizations = new HashMap<String, String>();
+		obrParentMap = new HashMap<>();
+		sourceOrganizations = new HashMap<>();
 		disciplines = new ArrayList<>();
-		reportNotes = new ArrayList<>();
 
 		headers = new ArrayList<>();
 		int obrCount = getOBRCount();
@@ -920,23 +948,19 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 				}
 			}
 
-			char statusChar = getObrStatus(i).charAt(0);
-			isFinal &= isStatusFinal(statusChar);
-			isCorrected |= statusChar == 'C';
+			String status = getObrStatus(i);
+			isFinal &= isStatusFinal(status);
+			isCorrected |= status.equals("C");
 
-			String parent = getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-26-2-1"));
-			if(StringUtils.isNotBlank(parent))
+			String parentSetId = getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-26-2-1"));
+			if(StringUtils.isNotBlank(parentSetId))
 			{
-				obrParentMap.put(parent, String.valueOf(i));
+				// key is 1 indexed to match the lab data setId as is, value is 0 indexed like other obr lookups
+				obrParentMap.put(Integer.parseInt(parentSetId), i);
 			}
 
 			obxSortKeyArray.add(mapOBXSortKey(i));
 			disciplines.add(getOBRCategory(i));
-
-			for(int k=0; k < getOBRCommentCount(i); k++)
-			{
-				reportNotes.add(msg.getRESPONSE().getORDER_OBSERVATION(i).getNOTE(k));
-			}
 		}
 	}
 
@@ -1228,47 +1252,13 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return obxKeys;
 	}
 
-	private Optional<Segment> getZBX(int i, int j) throws HL7Exception
+	public boolean isStatusFinal(String status)
 	{
-
-
-		int obrCount = 0;
-		int obxCount = 0;
-		// Compensating for -1 parameters for OBR and OBX
-		j++;
-		i++;
-		String[] segments = terser.getFinder().getRoot().getNames();
-
-		for (int k = 0; k != segments.length && obxCount <= j && obrCount <= i; k++)
-		{
-			String segment = segments[k];
-			String segId = segment.substring(0, 3);
-
-			// We count all OBRs we see.
-			if (segId.equals("OBR")) {
-				obrCount++;
-			}
-
-			// We count only OBX's for the desired OBR
-			else if (segId.equals("OBX") && obrCount == i) {
-				obxCount++;
-			}
-
-			// Check that this segment is a ZBX and we are in the right OBR/OBX position.
-			else if (segId.equals("ZBX") && obxCount == j && obrCount == i)
-			{
-				Structure[] zbxSegs = terser.getFinder().getRoot().getAll(segment);
-				return Optional.of((Segment) zbxSegs[0]);
-			}
-		}
-		return Optional.empty();
+		return finalStatus.contains(status);
 	}
 
-	public boolean isStatusFinal(char status) {
-		return finalStatus.contains(String.valueOf(status));
-	}
-
-	public String getNatureOfAbnormalTest(int obr, int obx) {
+	public String getNatureOfAbnormalTest(int obr, int obx)
+	{
 		String nature = getString(getOBXField(obr, obx, 10, 0, 1));
 		return stringIsNotNullOrEmpty(nature) ? getNatureOfAbnormalTest(nature) : "";
 	}
@@ -1817,18 +1807,18 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	 */
 	public int getReportCommentCount()
 	{
-		return reportNotes.size();
+		return msg.getRESPONSE().getPATIENT().getNOTEReps();
 	}
 
 	public String getReportComment(int k)
 	{
-		return formatString(getString(reportNotes.get(k).getNTE().getNte3_Comment(0).getValue()));
+		return formatString(getString(msg.getRESPONSE().getPATIENT().getNOTE(k).getNTE().getNte3_Comment(0).getValue()));
 	}
 
 	public String getReportSourceOrganization(int k)
 	{
 		try {
-			String key = reportNotes.get(k).getZNT().getZnt1_sourceOrganization().getHd2_UniversalID().getValue();
+			String key = msg.getRESPONSE().getPATIENT().getNOTE(k).getZNT().getZnt1_sourceOrganization().getHd2_UniversalID().getValue();
 			if (key == null || !key.contains(":"))
 			{
 				return "";
@@ -1857,7 +1847,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	@Override
 	public String getOBXComment(int i, int j, int nteNum)
 	{
-		return msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNOTE(nteNum).getNTE().getNte3_Comment(0).getValue();
+		return formatString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNOTE(nteNum).getNTE().getNte3_Comment(0).getValue());
 	}
 
 	public String getOBXSourceOrganization(int i, int j, int nteNum)
@@ -2094,12 +2084,17 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public String getAccessionNum() {
-		try {
-			return (getString(terser.get("/.ORC-4-1")));
-		} catch (Exception e) {
-			return ("");
-		}
+	public String getAccessionNum()
+	{
+		return getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getORC().getOrc4_PlacerGroupNumber().getEi1_EntityIdentifier().getValue());
+//		try
+//		{
+//			return (getString(terser.get("/.ORC-4-1")));
+//		}
+//		catch(Exception e)
+//		{
+//			return ("");
+//		}
 	}
 
 	public String getAccessionNumSourceOrganization() {
@@ -2229,6 +2224,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		}
 		catch(Exception e)
 		{
+			logger.error("invalid obx segment lookup: obr(" + i + "), obx(" + j + ")-" + field + "(" + rep + ")-" + comp, e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -2407,7 +2403,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 
 	public String formatString(String str)
 	{
-		if (StringUtils.isEmpty(str))
+		if (StringUtils.isBlank(str))
 		{
 			return "";
 		}

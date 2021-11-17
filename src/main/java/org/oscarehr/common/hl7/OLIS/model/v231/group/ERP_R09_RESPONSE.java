@@ -69,4 +69,9 @@ public class ERP_R09_RESPONSE extends AbstractGroup
 	{
 		return this.getAllAsList("ORDER_OBSERVATION", ERP_R09_ORDER_OBSERVATION.class);
 	}
+
+	public ERP_R09_PATIENT getPATIENT()
+	{
+		return this.getTyped("PATIENT", ERP_R09_PATIENT.class);
+	}
 }

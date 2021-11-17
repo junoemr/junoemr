@@ -1500,12 +1500,14 @@ public String strikeOutInvalidContent(String content, String status) {
 
                         int obr;
 
-                        for(i=0;i<headers.size();i++) {
-                        	obr = handler.getMappedOBR(i);
-                            linenum = obr + 1;
-                            if (handler.isChildOBR(linenum)) {
-                            	continue;
-                            }
+                        for(i = 0; i < headers.size(); i++)
+                        {
+	                        obr = handler.getMappedOBR(i);
+	                        linenum = obr + 1;
+	                        if(handler.isChildOBR(obr))
+	                        {
+		                        continue;
+	                        }
                         %>
                         <table style="page-break-inside:avoid;" bgcolor="#003399" border="0" cellpadding="0" cellspacing="0" width="100%">
                             <%
@@ -1921,7 +1923,7 @@ public String strikeOutInvalidContent(String content, String status) {
    												<td align="center"><%=statusMsg %></td>
    											</tr>
    											<%
-   											if (handler.isStatusFinal(handler.getOBXResultStatus(obr, obx).charAt(0))) {
+   											if (handler.isStatusFinal(handler.getOBXResultStatus(obr, obx))) {
   												String parentId = handler.getOBXCEParentId(obr, obx);
   												if (!stringIsNullOrEmpty(parentId)) {
    											%>
@@ -1931,7 +1933,7 @@ public String strikeOutInvalidContent(String content, String status) {
    														<tr><th>Agent</th><th>Sensitivity</th> </tr>
    												    <%
 
-   												    int childOBR = handler.getChildOBR(parentId) - 1;
+   												    int childOBR = handler.getChildOBR(parentId);
    												    if (childOBR != -1) {
 	   												    int childLength = handler.getOBXCount(childOBR);
 	   												    for (int ceIndex = 0; ceIndex < childLength; ceIndex++) {

@@ -141,8 +141,8 @@ public final class Factory {
 		catch(Exception e)
 		{
 			logger.error("Could not retrieve lab for segmentID(" + hl7TextMessage.getId() + ")", e);
+			throw e;
 		}
-		return new DefaultGenericHandler();
 	}
 
 	public static String getHL7Body(String segmentID) {
@@ -253,7 +253,7 @@ public final class Factory {
 			context.setModelClassFactory(modelClassFactory);
 			context.getParserConfiguration().setDefaultObx2Type("ST");
 
-			Message msg = p.parse(hl7Body.replaceAll("\n", "\r\n"));
+			Message msg = p.parse(hl7Body);
 			if (OLISHL7Handler.handlerTypeMatch(msg))
 			{
 				handler = new OLISHL7Handler(msg);
