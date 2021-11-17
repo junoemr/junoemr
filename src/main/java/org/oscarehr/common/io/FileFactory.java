@@ -25,6 +25,7 @@ package org.oscarehr.common.io;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 
@@ -38,6 +39,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -125,6 +128,38 @@ public class FileFactory
 	{
 		return createNewFormattedFile(fileInputStream, fileName, Paths.get(GenericFile.LOG_EXPORT_DIR, identifier).toString(), false);
 	}
+	
+	/**
+	 * Create an empty HRM file inside a subdirectory represented by the yyyyMMdd format of the LocalDate passed in.
+	 * Additional subdirectories nested under the date are created in the order of the variadic parameters.
+	 *
+	 * @param fileName basic file name
+	 * @param date LocalDate representing subdirectory which the file will be created in
+	 * @param morePaths additional nested subdirectories to be added in order, after the date
+	 * @return Generic file
+	 */
+	public static XMLFile createHRMFile(String fileName, LocalDate date, String... morePaths) throws IOException
+	{
+		String[] varArgs = ArrayUtils.addAll(new String[]{date.format((DateTimeFormatter.ofPattern("yyyyMMdd")))}, morePaths);
+
+		File file = new File(Paths.get(GenericFile.HRM_BASE_DIR, varArgs).toString(), fileName);
+		
+		if (!FileFactory.directoryExists(file.getParentFile()) && !file.getParentFile().mkdirs())
+		{
+			throw new IOException("Could not make subdirectories for file: " + file.getPath());
+		}
+		if (FileFactory.fileExists(file))
+		{
+			throw new IOException("File already exists: " + file.getPath());
+		}
+		if (!file.createNewFile())
+		{
+			throw new IOException("Could not create file: " + file.getPath());
+		}
+		
+		return new XMLFile(file);
+	}
+	
 
 	/**
 	 * create a new temp file
@@ -643,6 +678,11 @@ public class FileFactory
 	private static boolean fileExists(File file)
 	{
 		return file.exists() && file.isFile();
+	}
+	
+	private static boolean directoryExists(File file)
+	{
+		return file.exists() && file.isDirectory();
 	}
 
 	private static boolean isFileInDirectory(String fileName, String directory)

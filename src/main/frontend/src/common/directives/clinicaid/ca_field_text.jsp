@@ -17,6 +17,7 @@
 		<input id="input-{{name}}"
 		       type="{{ hideText ? 'password' : 'text'}}"
 		       class="form-control"
+		       autocomplete="{{autocompleteOff}}"
 		       placeholder="{{text_placeholder}}"
 		       ng-class="{'no_scroll_bar': max_characters > 0}"
 		       maxlength="{{max_characters}}"
@@ -25,7 +26,7 @@
 		       ng-change="change_fn()"
 		       ng-disabled="disabled"
 		       tabindex="{{tab_index}}"
-					 maxlength="{{text_length}}">
+		       maxlength="{{text_length}}">
 		</input>
 		<span class="label label-default textarea-char-counter"
 					ng-class="{'hidden': max_characters == null}">

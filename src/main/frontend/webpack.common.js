@@ -371,6 +371,8 @@ module.exports = {
 			'./src/record/details/components/additionalInformationSection/additionalInformationSectionComponent.js',
 			'./src/record/details/components/demographicContactsModal/demographicContactsModalComponent.js',
 			'./src/record/details/components/patientInviteConfirmModal/mhaPatientInviteConfirmModalComponent.js',
+			'./src/record/nav/module.js',
+			'./src/record/nav/recordNavComponent.ts',
 			'./src/record/phr/module.js',
 			'./src/record/phr/phrController.js',
 
@@ -416,6 +418,7 @@ module.exports = {
 			'./src/admin/section/securityRole/securityRoleConfigModalComponent.js',
 			'./src/admin/section/securityRole/securityRoleSetModalComponent.js',
 			'./src/admin/section/integrationModules/integrationModulesComponent.js',
+			'./src/admin/section/hrm/hrmAdminComponent.js',
 			'./src/admin/section/iceFall/iceFallAdminComponent.js',
 			'./src/admin/section/iceFall/settings/iceFallAdminSettingsComponent.js',
 			'./src/admin/section/iceFall/activity/iceFallAdminActivityComponent.js',

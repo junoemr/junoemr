@@ -21,38 +21,40 @@
 * Canada
 --%>
 
-<div class="health-tracker-component">
-    <div ng-if="!$ctrl.embeddedView" class="flex-row justify-content-end">
-        <div class="options-button-wrapper">
-            <juno-button component-style="$ctrl.componentStyle"
-                         button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-                         button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-                         disabled="$ctrl.isLoading"
-                         click="$ctrl.onManageCareTrackers()">
-                <div class="flex-row align-items-center">
-                    <i class="icon icon-gears"></i>
-                    <span>Manage Health Tracker</span>
-                </div>
-            </juno-button>
-        </div>
-    </div>
-
-    <juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.CareTrackerRead">
-        <div class="flex-row">
-            <div class="flex-column no-print tracker-nav">
-                <accordion-list item-list="$ctrl.accordianListItems" item-clicked="$ctrl.onCareTrackerSelect(item)">
-                </accordion-list>
+<page-wrapper show-header="false" class="health-tracker-component">
+    <page-body>
+        <div ng-if="!$ctrl.embeddedView" class="flex-row justify-content-end">
+            <div class="options-button-wrapper">
                 <juno-button component-style="$ctrl.componentStyle"
                              button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-                             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
+                             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
                              disabled="$ctrl.isLoading"
-                             click="$ctrl.onViewAllPatientMeasurements()">
-                    View All Measurements
+                             click="$ctrl.onManageCareTrackers()">
+                    <div class="flex-row align-items-center">
+                        <i class="icon icon-gears"></i>
+                        <span>Manage Health Tracker</span>
+                    </div>
                 </juno-button>
             </div>
-            <div class="ui-view-wrapper flex-grow">
-                <ui-view></ui-view>
-            </div>
         </div>
-    </juno-security-check>
-</div>
+
+        <juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.CareTrackerRead">
+            <div class="flex-row">
+                <div class="flex-column no-print tracker-nav">
+                    <accordion-list item-list="$ctrl.accordianListItems" item-clicked="$ctrl.onCareTrackerSelect(item)">
+                    </accordion-list>
+                    <juno-button component-style="$ctrl.componentStyle"
+                                 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+                                 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT"
+                                 disabled="$ctrl.isLoading"
+                                 click="$ctrl.onViewAllPatientMeasurements()">
+                        View All Measurements
+                    </juno-button>
+                </div>
+                <div class="ui-view-wrapper flex-grow">
+                    <ui-view></ui-view>
+                </div>
+            </div>
+        </juno-security-check>
+    </page-body>
+</page-wrapper>

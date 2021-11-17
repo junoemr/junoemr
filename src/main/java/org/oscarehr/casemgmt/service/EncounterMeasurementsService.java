@@ -336,7 +336,7 @@ public class EncounterMeasurementsService extends EncounterSectionService
 				EncounterSectionNote sectionNote = new EncounterSectionNote();
 
 				data = measures.get(0);
-				LocalDateTime date = ConversionUtils.toLocalDateTime(data.getDateObservedAsDate());
+				LocalDateTime date = ConversionUtils.toNullableLocalDateTime(data.getDateObservedAsDate());
 				if (date == null)
 				{
 					date = ConversionUtils.toLocalDateTime(data.getDateEnteredAsDate());

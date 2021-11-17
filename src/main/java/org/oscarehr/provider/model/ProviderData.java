@@ -40,6 +40,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -214,6 +216,16 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 			lastName += ", ";
 		}
 		return lastName + firstName;
+	}
+
+	@PrePersist
+	@PreUpdate
+	public void preventEmptyNames()
+	{
+		if(StringUtils.isBlank(this.getLastName()) || StringUtils.isBlank(this.getFirstName()))
+		{
+			throw new IllegalStateException("Provider first and last names cannot be blank");
+		}
 	}
 
 	@Override

@@ -5,17 +5,17 @@
 
 	<div class="details-fields">
 		<juno-input ng-model="$ctrl.ngModel.lastName"
-		            class = "extra-indent"
-						label="Last Name"
-						uppercase="true"
-						component-style="$ctrl.componentStyle">
+		            class="extra-indent"
+		            label="Last Name"
+		            uppercase="true"
+		            component-style="$ctrl.componentStyle">
 		</juno-input>
 
 		<juno-input ng-model="$ctrl.ngModel.firstName"
-						label="First Name"
-		                class="justify-content-space-between"
-						uppercase="true"
-						component-style="$ctrl.componentStyle">
+		            label="First Name"
+		            class="justify-content-space-between"
+		            uppercase="true"
+		            component-style="$ctrl.componentStyle">
 		</juno-input>
 
 		<juno-input ng-model="$ctrl.ngModel.middleName"
@@ -25,11 +25,11 @@
 		</juno-input>
 
 		<juno-date-select ng-model="$ctrl.ngModel.dateOfBirth"
-						label="Date of Birth"
-						show-age="true"
-		                  class = "extra-indent"
-						on-validity-change="$ctrl.dobValid = valid;"
-						component-style="$ctrl.componentStyle"
+		                  label="Date of Birth"
+		                  show-age="true"
+		                  class="extra-indent"
+		                  on-validity-change="$ctrl.dobValid = valid;"
+		                  component-style="$ctrl.componentStyle"
 		>
 		</juno-date-select>
 

@@ -21,7 +21,9 @@
 * Canada
 --%>
 <div id="edit-provider-admin">
-	<div class="edit-provider-fields" ng-class="{'fields-disabled': $ctrl.mode === $ctrl.modes.VIEW}">
+	<form onsubmit="return false;"
+	      class="edit-provider-fields"
+	      ng-class="{'fields-disabled': $ctrl.mode === $ctrl.modes.VIEW}">
 		<div class="col-sm-6">
 			<!-- User Information -->
 			<panel id="edit-provider-user-information">
@@ -951,7 +953,7 @@
 			</panel>
 
 		</div>
-	</div>
+	</form>
 	<div class="bottom-options-bar">
 		<div class="col-sm-12 flex-row justify-content-center md-margin-top">
 			<button class="btn btn-primary" ng-if="$ctrl.mode === $ctrl.modes.ADD" ng-click="$ctrl.submit()">Add User</button>

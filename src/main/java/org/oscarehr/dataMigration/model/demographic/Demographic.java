@@ -186,7 +186,7 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 		}
 		return null;
 	}
-
+	
 	public void setAddress(Address address)
 	{
 		this.addAddress(address);

@@ -50,7 +50,7 @@ angular.module('Common.Components').component('junoListItemSelector', {
 			ctrl.reComputeLists();
 		}
 
-		$scope.$watch("$ctrl.ngModel", (oldVal, newVal) =>
+		$scope.$watch("$ctrl.ngModel", (newVal, oldVal) =>
 		{
 			if(oldVal !== newVal)
 			{

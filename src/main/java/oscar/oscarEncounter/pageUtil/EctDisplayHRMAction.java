@@ -23,6 +23,7 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
+import oscar.OscarProperties.Module;
 import oscar.util.DateUtils;
 import oscar.util.StringUtils;
 
@@ -47,8 +48,8 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 
 		Integer demographicNo = Integer.parseInt(bean.demographicNo);
 
-		if(!securityInfoManager.hasPrivileges(loggedInInfo.getLoggedInProviderNo(), demographicNo, Permission.HRM_READ)
-				|| !OscarProperties.getInstance().hasHRMDocuments())
+		if (!OscarProperties.getInstance().isModuleEnabled(Module.MODULE_HRM) ||
+			!securityInfoManager.hasPrivileges(loggedInInfo.getLoggedInProviderNo(), demographicNo, Permission.HRM_READ))
 		{
 			return true; // HRM section does not show up at all
 		}
@@ -79,7 +80,7 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 				HRMDocument hrmDocument = entry.getValue().getHrmDocument();
 				List<Integer> duplicateIdList = entry.getValue().getDuplicateIds();
 
-				String reportStatus = hrmDocument.getReportStatus();
+				String reportStatus = hrmDocument.getReportStatus().toValueString();
 				String dispFilename = hrmDocument.getReportType();
 				String dispDocNo    = hrmDocument.getId().toString();
 				String description = hrmDocument.getDescription();

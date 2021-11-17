@@ -90,7 +90,6 @@ public class GenericFile
 	}
 
 	public static final String BASE_DIRECTORY = props.getProperty("BASE_DOCUMENT_DIR");
-
 	public static final String DOCUMENT_BASE_DIR = props.getProperty("DOCUMENT_DIR");
 	public static final String DOCUMENT_ORIGINAL_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_ORIGINAL_DIR")).getPath();
 	public static final String DOCUMENT_CORRUPT_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("DOCUMENT_CORRUPT_DIR")).getPath();
@@ -135,62 +134,62 @@ public class GenericFile
 		this.invalidContentType = "application/octet-stream";
 	}
 
-	public boolean moveToDocuments() throws IOException
+	public GenericFile moveToDocuments() throws IOException
 	{
 		return moveFile(DOCUMENT_BASE_DIR);
 	}
-	public boolean moveToBillingRemittance() throws IOException
+	public GenericFile moveToBillingRemittance() throws IOException
 	{
 		return moveFile(BILLING_REMITTANCE_DIR);
 	}
-	public boolean moveToBillingRemittanceFailed() throws IOException
+	public GenericFile moveToBillingRemittanceFailed() throws IOException
 	{
 		return moveFile(BILLING_REMITTANCE_FAILED_DIR);
 	}
-	public boolean moveToCorrupt() throws IOException
+	public GenericFile moveToCorrupt() throws IOException
 	{
 		return moveFile(DOCUMENT_CORRUPT_DIR);
 	}
-	public boolean moveToOutgoingFaxPending() throws IOException
+	public GenericFile moveToOutgoingFaxPending() throws IOException
 	{
 		return moveFile(OUTBOUND_FAX_DIR_PENDING);
 	}
-	public boolean moveToOutgoingFaxSent() throws IOException
+	public GenericFile moveToOutgoingFaxSent() throws IOException
 	{
 		return moveFile(OUTBOUND_FAX_DIR_SENT);
 	}
-	public boolean moveToOutgoingFaxUnsent() throws IOException
+	public GenericFile moveToOutgoingFaxUnsent() throws IOException
 	{
 		return moveFile(OUTBOUND_FAX_DIR_UNSENT);
 	}
-	public boolean moveToOriginal() throws IOException
+	public GenericFile moveToOriginal() throws IOException
 	{
 		return moveFile(DOCUMENT_ORIGINAL_DIR);
 	}
-	public boolean moveToLabs() throws IOException
+	public GenericFile moveToLabs() throws IOException
 	{
 		return moveFile(LAB_BASE_DIR);
 	}
-	public boolean moveToLogImport(String identifier) throws IOException
+	public GenericFile moveToLogImport(String identifier) throws IOException
 	{
 		return moveFile(Paths.get(LOG_IMPORT_DIR, identifier).toString());
 	}
-	public boolean moveToLogExport(String identifier) throws IOException
+	public GenericFile moveToLogExport(String identifier) throws IOException
 	{
 		return moveFile(Paths.get(LOG_EXPORT_DIR, identifier).toString());
 	}
-	public boolean moveToHRMDocuments() throws IOException
+	public GenericFile moveToHRMDocuments() throws IOException
 	{
 		return moveFile(HRM_BASE_DIR);
 	}
 
-	public boolean moveFile(String directory) throws IOException
+	public GenericFile moveFile(String directory) throws IOException
 	{
 		File directoryFile = new File(directory);
 		return moveFile(directoryFile);
 	}
 
-	public boolean moveFile(File directoryFile) throws IOException
+	public GenericFile moveFile(File directoryFile) throws IOException
 	{
 		if(!directoryFile.exists())
 		{
@@ -208,7 +207,7 @@ public class GenericFile
 		{
 			Files.move(javaFile.toPath(), destinationFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
 			javaFile = destinationFile;
-			return true;
+			return this;
 		}
 		throw new IOException("Invalid Directory: " + directoryFile.getPath());
 	}
