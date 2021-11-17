@@ -1959,6 +1959,25 @@ public String strikeOutInvalidContent(String content, String status) {
    											</tr>
 											<%
 													}
+													if (childOBR != -1)
+													{
+		                                                for (int j=0; j < handler.getOBXCount(childOBR); j++)
+		                                                {
+															for (int jj=0; jj < handler.getOBXCommentCount(childOBR, j); jj++)
+															{%>
+									                        <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
+										                        <td valign="top" align="left" colspan="7" style="font-family:courier;">
+											                        <div style="width:700px">
+												                        <%=handler.getOBXComment(childOBR, j, jj)%>
+												                        <span style="margin-left:15px;font-size:8px; color:#333333;word-break:normal;">
+													                        <%=handler.getOBXSourceOrganization(childOBR, j, jj)%>
+												                        </span>
+											                        </div>
+										                        </td>
+									                        </tr>
+									                        <%}
+								                        }
+							                        }
   												}
    											}
                                         } else {

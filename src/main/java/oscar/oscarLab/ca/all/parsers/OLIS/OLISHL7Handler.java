@@ -2087,14 +2087,6 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	public String getAccessionNum()
 	{
 		return getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getORC().getOrc4_PlacerGroupNumber().getEi1_EntityIdentifier().getValue());
-//		try
-//		{
-//			return (getString(terser.get("/.ORC-4-1")));
-//		}
-//		catch(Exception e)
-//		{
-//			return ("");
-//		}
 	}
 
 	public String getAccessionNumSourceOrganization() {
