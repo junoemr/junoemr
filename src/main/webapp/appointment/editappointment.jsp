@@ -150,11 +150,11 @@
 	}
 
 	BillingONExtDao billingOnExtDao = (BillingONExtDao) SpringUtils.getBean(BillingONExtDao.class);
-	oscar.OscarProperties pros = oscar.OscarProperties.getInstance();
-	String strEditable = pros.getProperty("ENABLE_EDIT_APPT_STATUS");
-	String apptStatusHere = pros.getProperty("appt_status_here");
+	oscar.OscarProperties props = oscar.OscarProperties.getInstance();
+	String strEditable = props.getProperty("ENABLE_EDIT_APPT_STATUS");
+	String apptStatusHere = props.getProperty("appt_status_here");
 
-	boolean appointmentReminderEnabled = pros.isPropertyActive("appointment_reminder_enabled");
+	boolean appointmentReminderEnabled = props.isPropertyActive("appointment_reminder_enabled");
 
     AppointmentStatusService appointmentStatusService = SpringUtils.getBean(AppointmentStatusService.class);
     List<AppointmentStatus> allStatus = appointmentStatusService.getActiveAppointmentStatuses();
@@ -163,8 +163,10 @@
 
 	String useProgramLocation = OscarProperties.getInstance().getProperty("useProgramLocation");
 	String moduleNames = OscarProperties.getInstance().getProperty("ModuleNames");
+
 	boolean caisiEnabled = moduleNames != null && org.apache.commons.lang.StringUtils.containsIgnoreCase(moduleNames, "Caisi");
 	boolean locationEnabled = caisiEnabled && (useProgramLocation != null && useProgramLocation.equals("true"));
+	boolean multisitesEnabled = props.isMultisiteEnabled();
 %>
 <%@ page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.List" %>
@@ -489,6 +491,7 @@
 		 In the mobile version, we only display the edit section first if we are returning from a search -->
 	<div id="editAppointment"
 		 style="display:<%= (isMobileOptimized && bFirstDisp) ? "none":"block"%>;">
+        <%-- Use the enabled attribute of this element in Javascript to determine if multisites is on or off --%>
 		<FORM NAME="EDITAPPT" METHOD="post" ACTION="appointmentcontrol.jsp"
 			  ONSUBMIT="return validateForm();"><INPUT TYPE="hidden"
 												NAME="displaymode" value="">
@@ -548,7 +551,6 @@
 
 				}
 
-				OscarProperties props = OscarProperties.getInstance();
 				String displayStyle = "display:none";
 				String myGroupNo = providerPreference.getMyGroupNo();
 				boolean bMultipleSameDayGroupAppt = false;
@@ -792,7 +794,7 @@
 								String searchMode = request.getParameter("search_mode");
 								if (searchMode == null || searchMode.isEmpty())
 								{
-									searchMode = OscarProperties.getInstance().getProperty("default_search_mode", "search_name");
+									searchMode = props.getInstance().getProperty("default_search_mode", "search_name");
 								}
 							%>
 							<INPUT TYPE="hidden" NAME="search_mode" VALUE="<%=searchMode%>">
@@ -861,7 +863,7 @@
 						  cols="18"><%=bFirstDisp ? appt.getNotes() : request.getParameter("notes")%></textarea>
 						</div>
 					</li>
-					<% if (pros.isPropertyActive("mc_number"))
+					<% if (props.isPropertyActive("mc_number"))
 					{
 						String mcNumber = OtherIdManager.getApptOtherId(appointment_no, "appt_mc_number");
 					%>
@@ -951,10 +953,10 @@
 							<input type="hidden" name="isVirtual"
 									<%= appt.getIsVirtual() ? "value='on'" : "" %>/>
 								<% if(appt.getIsVirtual()) { %>
-								&nbsp;
-								&nbsp;
-								&nbsp;
-								&nbsp;
+                                &nbsp;
+                                &nbsp;
+                                &nbsp;
+                                &nbsp;
 								<a href="#"
 									 onClick='popupPage(800, 1280,
 													 "../integrations/myhealthaccess.do?method=connect" +
@@ -1434,8 +1436,13 @@
 
 		function updateTelehealthControls()
 		{
+			<%-- The user can type anything into the location field if mutisites is off.
+			If multisites is on, treat location as a site id, otherwise ignore it --%>
+
+            var multisitesEnabled = <%= multisitesEnabled %>
+            var appointmentSite = multisitesEnabled ? jQuery(document.forms.EDITAPPT.location).val() : "";
 			myhealthaccess.getAppointment("<%=request.getContextPath()%>",
-					jQuery(document.forms.EDITAPPT.location).val(),
+					appointmentSite,
 					"<%=request.getParameter("appointment_no")%>").then((res) =>
 			{
 				var appt = JSON.parse(res).body;
@@ -1476,12 +1483,15 @@
 					updateTelehealthControls();
 				});
 
+			    var multisitesEnabled = <%= multisitesEnabled %>
+			    var appointmentSite = multisitesEnabled ? jQuery(document.forms.EDITAPPT.location).val() : "";
+
 				jQuery("#send-telehealth-link-btn").click(() =>
 				{
 					if (mhaAppointment)
 					{
 						myhealthaccess.sendTelehealthAppointmentNotification("<%=request.getContextPath()%>",
-								jQuery(document.forms.EDITAPPT.location).val(), mhaAppointment).then(() =>
+								appointmentSite, mhaAppointment).then(() =>
 						{
 							jQuery("#send-telehealth-link-msg-sent").css("opacity", "1.0");
 							window.setTimeout(() => {
@@ -1495,7 +1505,7 @@
 					else
 					{// non mha appt
 						myhealthaccess.sendGeneralAppointmentNotification("<%=request.getContextPath()%>",
-								jQuery(document.forms.EDITAPPT.location).val(), "<%=request.getParameter("appointment_no")%>").then(() =>
+								appointmentSite, "<%=request.getParameter("appointment_no")%>").then(() =>
 						{
 							jQuery("#send-telehealth-link-msg-sent").css("opacity", "1.0");
 							window.setTimeout(() => {
@@ -1510,7 +1520,6 @@
 			<%
 			}
 			%>
-
 		});
 
 	</script>
