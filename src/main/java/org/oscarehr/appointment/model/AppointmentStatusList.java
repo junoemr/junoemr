@@ -123,8 +123,10 @@ public class AppointmentStatusList
 				rotates,
 				appointmentStatus.getId(),
 				systemCode,
-				appointmentStatus.getIcon()
+				appointmentStatus.getIcon(),
+				appointmentStatus.getActive() == 1
 			));
+			
 		}
 
 		return calendarAppointmentStatusList;
