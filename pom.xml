@@ -75,14 +75,13 @@
 			<url>file://${basedir}/local_repo</url>
 		</repository>
 		<repository>
+			<id>openshift.nexus</id>
+			<url>http://nexus.apps.prod.cldmd.net/</url>
+		</repository>
+		<repository>
 			<id>jaspersoft-third-party</id>
 			<url>https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
 		</repository>
-    <repository>
-      <id>github</id>
-      <name>GitHub cloudpracticeinc Apache Maven Packages</name>
-      <url>https://maven.pkg.github.com/cloudpracticeinc/aqs</url>
-    </repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -1403,11 +1402,11 @@
 			<version>1.18.20</version>
 		</dependency>
 		<!-- AQS -->
-    <dependency>
-      <groupId>ca.cloudpractice</groupId>
-      <artifactId>aqs-java-client</artifactId>
-      <version>0.3.6</version>
-    </dependency>
+		<dependency>
+			<groupId>ca.cloudpractice</groupId>
+			<artifactId>aqs-java-client</artifactId>
+			<version>0.3.6</version>
+		</dependency>
 
 		<!-- Memcached session manager -->
 		<dependency>
