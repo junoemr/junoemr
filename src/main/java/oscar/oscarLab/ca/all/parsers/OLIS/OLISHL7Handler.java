@@ -69,6 +69,9 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	protected static final String OLIS_SENDING_APPLICATION_ID = "OLIS";
 	protected static final String OLIS_SENDING_APPLICATION_ID_TYPE = "X500";
 
+	protected static final OLISRequestNomenclatureDao requestNomenclatureDao = SpringUtils.getBean(OLISRequestNomenclatureDao.class);
+	protected static final OLISResultNomenclatureDao resultNomenclatureDao = SpringUtils.getBean(OLISResultNomenclatureDao.class);
+
 	private static final Logger logger = Logger.getLogger(OLISHL7Handler.class);
 	private static final String finalStatus = "CFEX";
 
@@ -1158,8 +1161,6 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	 */
 	protected List<OLISRequestSortKey> mapOBRSortKeys() throws HL7Exception
 	{
-		OLISRequestNomenclatureDao requestNomenclatureDao = SpringUtils.getBean(OLISRequestNomenclatureDao.class);
-
 		int obrCount = getOBRCount();
 		List<OLISRequestSortKey> obrKeys = new ArrayList<>(obrCount);
 
@@ -1207,8 +1208,6 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	 */
 	protected List<OLISResultSortKey> mapOBXSortKey(int obrRep) throws HL7Exception
 	{
-		OLISResultNomenclatureDao resultNomenclatureDao = SpringUtils.getBean(OLISResultNomenclatureDao.class);
-
 		int obxCount = getOBXCount(obrRep);
 		List<OLISResultSortKey> obxKeys = new ArrayList<>(obxCount);
 		for(int obxRep = 0; obxRep < obxCount; obxRep++)
@@ -1588,8 +1587,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			logger.error("Missing obxCategory [" + obrRep + "]");
 			return "";
 		}
-		OLISRequestNomenclatureDao requestDao = (OLISRequestNomenclatureDao) SpringUtils.getBean("OLISRequestNomenclatureDao");
-		OLISRequestNomenclature requestNomenclature = requestDao.findByNameId(obxCategory);
+		OLISRequestNomenclature requestNomenclature = requestNomenclatureDao.findByNameId(obxCategory);
 		String nomenclatureCategory = "";
 		if(requestNomenclature != null)
 		{
@@ -1599,24 +1597,28 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public String getOBXName(int i, int j) {
+	public String getOBXName(int i, int j)
+	{
 		String obxName = getOBXField(i, j, 3, 0, 1);
+		OLISResultNomenclature resultNomenclature = resultNomenclatureDao.findByNameId(obxName);
 
-		try {
-			OLISResultNomenclatureDao resultDao = (OLISResultNomenclatureDao) SpringUtils.getBean("OLISResultNomenclatureDao");
-			OLISResultNomenclature resultNomenclature = resultDao.findByNameId(obxName);
-			String nomenclatureName = "";
-			if (resultNomenclature != null)
+		String nomenclatureName = null;
+		if (resultNomenclature != null)
+		{
+			nomenclatureName = StringUtils.trimToNull(resultNomenclature.getAltName1());
+			if(nomenclatureName == null)
 			{
-				nomenclatureName = StringUtils.trimToEmpty(resultNomenclature.getName());
+				nomenclatureName = StringUtils.trimToNull(resultNomenclature.getName());
 			}
-			return nomenclatureName;
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 		}
-		// If we're unable to find a LOINC match for the identifier then try to parse out the obx name.
-		obxName = getOBXField(i, j, 3, 0, 2);
-		return "".equals(obxName) ? " " : obxName.indexOf(":") == -1 ? obxName : obxName.substring(0, obxName.indexOf(":"));
+		if(nomenclatureName == null)
+		{
+			// If we're unable to find a LOINC match for the identifier then try to parse out the obx name.
+			obxName = getOBXField(i, j, 3, 0, 2);
+			nomenclatureName = StringUtils.trimToEmpty("".equals(obxName) ? " " : !obxName.contains(":") ? obxName : obxName.substring(0, obxName.indexOf(":")));
+		}
+
+		return nomenclatureName;
 	}
 
 	public String getOBXCEName(int i, int j) {
@@ -1643,7 +1645,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public String getOBXResult(int i, int j) {
+	public String getOBXResult(int i, int j)
+	{
 		return (getOBXField(i, j, 5, 0, 1));
 	}
 
