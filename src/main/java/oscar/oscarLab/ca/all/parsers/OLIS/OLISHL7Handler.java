@@ -2292,8 +2292,25 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			}
 
 		}
-		if (terser.get(docSeg + "1") != null) {
-			docName = docName + " " + "<span style=\"margin-left:15px; font-size:8px; color:#333333;\">" + modifier + " " + terser.get(docSeg + "1") + "</span>";
+
+		String licenseInfo = "";
+		String licenseNo = terser.get(docSeg + "1");
+		if (StringUtils.isNotBlank(licenseNo))
+		{
+			licenseInfo = StringUtils.trimToEmpty(modifier + " " + licenseNo);
+		}
+
+		String jurisdiction = "";
+		String provinceCode = terser.get(docSeg + "22-1");
+		String provinceName = terser.get(docSeg + "22-2");
+		if(StringUtils.isNotBlank(provinceCode) && !provinceCode.equals("ON"))
+		{
+			jurisdiction = " (" + provinceName + ")";
+		}
+
+		if (StringUtils.isNotBlank(licenseInfo) || StringUtils.isNotBlank(jurisdiction))
+		{
+			docName += " " + "<span style=\"margin-left:15px; font-size:8px; color:#333333;\">" + licenseInfo + jurisdiction + "</span>";
 		}
 
 		return (docName);
