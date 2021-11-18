@@ -22,14 +22,22 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Step that does that actual cache save and restore
-      - uses: actions/cache@v1
+      - name: Cache maven dependencies
+        uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      - name: Cache npm
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
       # Runs a single command using the runners shell
       - name: Build and run tests
-        run: docker-compose -f "docker/maven/docker-compose.yml" up --exit-code-from juno-maven
+        run: docker-compose -f "docker/maven/docker-compose-github.yml" up --exit-code-from juno-maven
