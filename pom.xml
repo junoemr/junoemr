@@ -78,18 +78,6 @@
       <id>nexus.cloudpractice</id>
       <url>http://nexus.apps.prod.cldmd.net/nexus/content/repositories/cloud-practice/</url>
     </repository>
-<!--
-
-		<rpository>
-			<id>openshift.nexus</id>
-			<url>http://nexus.apps.prod.cldmd.net/</url>
-		</repository>
-    <repository>
-      <id>github</id>
-      <name>GitHub cloudpracticeinc Apache Maven Packages</name>
-      <url>https://maven.pkg.github.com/cloudpracticeinc/aqs-java-client</url>
-    </repository>
--->
 		<repository>
 			<id>jaspersoft-third-party</id>
 			<url>https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
