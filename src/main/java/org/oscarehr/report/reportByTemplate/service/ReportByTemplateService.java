@@ -97,11 +97,15 @@ public class ReportByTemplateService
 			ReportTemplates template = reportByTemplateDao.find(templateId);
 
 			// determine if the provider can set the verification status
-			// if the provider is not a super user, retain the existing status.
+			// if the provider is not a super-user, changes to the template void the template super-admin verified state
 			ProviderData provider = providerDataDao.find(providerNoStr);
 			if(provider.isSuperAdmin())
 			{
 				template.setAdminVerified(setVerified);
+			}
+			else
+			{
+				template.setAdminVerified(false);
 			}
 			//update the template entry
 			template = setTemplateQueryInfo(template, readXml(xmlTemplate));

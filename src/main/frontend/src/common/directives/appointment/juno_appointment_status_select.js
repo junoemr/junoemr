@@ -25,6 +25,26 @@ angular.module('Common').directive(
 
 		var linkFunction = function linkFunction($scope, element, attribute, controller)
 		{
+			// We need a list of all possible appointment statuses (even if some may be inactive)
+			// because the current appointment status might be one of those inactive ones.
+			// If that's the case, we'll leave it in the menu (but disable it),
+			// and remove all of the the other inactive ones.
+			$scope.getValidOptions = () =>
+			{
+				// $scope.options is an object... not an array.
+				const selectedStatus = $scope.model;
+				const validOptions = Object.values($scope.options)
+					.filter((status) => status.enabled || status.displayLetter === selectedStatus)
+
+				const validOptionsAsObj = validOptions.reduce((acc, status) =>
+				{
+					acc[status.displayLetter] = status;
+					return acc;
+				}, {})
+
+				return validOptionsAsObj;
+			}
+
 			$scope.select_change_fn = function select_change_fn()
 			{
 				$scope.setStatus();

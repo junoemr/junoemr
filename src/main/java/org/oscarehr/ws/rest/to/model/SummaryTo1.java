@@ -67,6 +67,7 @@ public class SummaryTo1 {
 	public static final String MEDICALHISTORY_CODE = "medhx"; 
 	public static final String MEDICATIONS_CODE = "meds";  
 	public static final String ONGOINGCONCERNS_CODE = "ongoingconcerns";
+	public static final String DISEASE_REGISTRY_CODE = "diseaseregistry";
 	public static final String REMINDERS_CODE = "reminders";
 	public static final String SOCIALFAMILYHISTORY_CODE = "socfamhx";
 	public static final String SOCIALHISTORY_CODE = "sochx";
@@ -74,6 +75,7 @@ public class SummaryTo1 {
 	public static final String ALLERGIES = "allergies";
 	public static final String RISK_FACTORS = "riskfactors";
 	public static final String PREVENTIONS = "preventions";
+	public static final String HRM_DOCUMENTS ="hrmdocuments";
 	
 	Integer id;
 	String displayName;

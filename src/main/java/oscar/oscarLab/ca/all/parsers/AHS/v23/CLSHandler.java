@@ -96,6 +96,11 @@ public class CLSHandler extends AHSHandler
 		return get("/.PID-2-1");
 	}
 
+	@Override
+	public String getPatientName() {
+		return (getFirstName() + " " + getLastName());
+	}
+
 	/* ===================================== OBR ====================================== */
 
 	public String getTimeStamp(int i, int j) {

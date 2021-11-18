@@ -533,6 +533,12 @@ public class ManageTeleplanAction extends DispatchAction {
 				request.setAttribute("error", transfer.getError());
 				request.setAttribute("Result", transfer.getResult());
 				request.setAttribute("Msgs", transfer.getMessage());
+
+				if(transfer.getEligible())
+				{
+					demo.setHcRenewDate(new Date());
+					dDao.save(demo);
+				}
 			}
 			catch(Exception e)
 			{
@@ -558,8 +564,7 @@ public class ManageTeleplanAction extends DispatchAction {
 
 					while((line = buff.readLine()) != null)
 					{
-
-						if(line != null && line.startsWith("ELIG_ON_DOS:"))
+						if(line.startsWith("ELIG_ON_DOS:"))
 						{
 							String el = line.substring(12).trim();
 							if(el.equalsIgnoreCase("no"))

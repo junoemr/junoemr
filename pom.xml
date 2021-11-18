@@ -82,6 +82,17 @@
 			<id>jaspersoft-third-party</id>
 			<url>https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
 		</repository>
+		<repository>
+			<id>openshift.nexus</id>
+			<url>http://nexus.apps.prod.cldmd.net/nexus/content/groups/public/</url>
+		</repository>
+		<repository>
+			<id>github</id>
+			<url>https://maven.pkg.github.com/cloudpracticeinc/*</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -140,12 +151,15 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!--
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-		-->
+
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
@@ -225,12 +239,6 @@
 			<artifactId>commons-lang</artifactId>
 			<version>2.6</version>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.12.0</version>
-		</dependency>
-
 		<dependency>
 			<groupId>commons-validator</groupId>
 			<artifactId>commons-validator</artifactId>
@@ -1297,16 +1305,16 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>simpleclient</artifactId>
-            <version>0.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>simpleclient_servlet</artifactId>
-            <version>0.1.0</version>
-        </dependency>
+		<dependency>
+			<groupId>io.prometheus</groupId>
+			<artifactId>simpleclient</artifactId>
+			<version>0.12.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.prometheus</groupId>
+			<artifactId>simpleclient_servlet</artifactId>
+			<version>0.12.0</version>
+		</dependency>
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
@@ -1405,7 +1413,7 @@
 		<dependency>
 			<groupId>ca.cloudpractice</groupId>
 			<artifactId>aqs-java-client</artifactId>
-			<version>0.3.6</version>
+			<version>0.4.14</version>
 		</dependency>
 
 		<!-- Memcached session manager -->
@@ -1433,9 +1441,13 @@
 			<artifactId>jcl-core</artifactId>
 			<version>2.8</version>
 		</dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+        </dependency>
 
 
-	</dependencies>
+    </dependencies>
 
 	<build>
 		<resources>
@@ -1468,6 +1480,13 @@
 						<enabled>true</enabled>
 					</layers>
 				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>build-info</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
@@ -1489,6 +1508,10 @@
 						<nonFilteredFileExtension>doc</nonFilteredFileExtension>
 					</nonFilteredFileExtensions>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -1979,9 +2002,16 @@
 						<systemProperty>
 							<key>openApiSpecBuilder.resourceClassCsv</key>
 							<value>
+								org.oscarehr.ws.rest.SystemPreferenceWebService
+								org.oscarehr.ws.rest.ScheduleService
+								org.oscarehr.ws.rest.SitesService
 								org.oscarehr.ws.rest.AppointmentService
 								org.oscarehr.ws.rest.CareTrackerWebService
 								org.oscarehr.ws.rest.CareTrackersWebService
+                org.oscarehr.ws.rest.eform.EFormInstanceWebService
+                org.oscarehr.ws.rest.EFormService
+                org.oscarehr.ws.rest.EFormsService
+                org.oscarehr.ws.rest.FormsService
 								org.oscarehr.ws.rest.DecisionSupportWebService
 								org.oscarehr.ws.rest.DemographicService
 								org.oscarehr.ws.rest.DemographicsService
@@ -1998,6 +2028,7 @@
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueueWebService
+                org.oscarehr.ws.rest.integrations.hrm.HrmWebService
 								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
 								org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService
 								org.oscarehr.ws.rest.MeasurementsWebService
@@ -2013,6 +2044,9 @@
 								org.oscarehr.ws.rest.myhealthaccess.MhaPatientWebService
 								org.oscarehr.ws.rest.myhealthaccess.patient.AccessWebService
 								org.oscarehr.ws.rest.myhealthaccess.SSOWebService
+								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
+								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
+								org.oscarehr.ws.rest.integrations.aqs.QueueWebService
 								org.oscarehr.ws.rest.NotesService
 								org.oscarehr.ws.rest.PreventionService
 								org.oscarehr.ws.rest.ProviderPreferenceWebService
@@ -2519,6 +2553,28 @@
 									<generatePackage>xml.hrm.v4_3</generatePackage>
 								</configuration>
 							</execution>
+                            				<execution>
+                                				<id>hrm4.1-schema-generation</id>
+                                				<goals>
+                                    					<goal>generate</goal>
+                                				</goals>
+                                				<phase>generate-resources</phase>
+                                				<configuration>
+                                    					<extension>true</extension>
+                                    					<!-- no header to prevent all the generated files being changed on automatic re-compile -->
+                                    					<noFileHeader>true</noFileHeader>
+                                    					<args>
+                                        					<arg>-Xinheritance</arg>
+                                    					</args>
+                                    				<bindingDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/hrm/v4_1</bindingDirectory>
+                                    					<bindingIncludes>
+                                        					<include>bindings.xjb</include>
+                                    					</bindingIncludes>
+                                    					<schemaDirectory>${basedir}/src/main/resources/org/oscarehr/common/xml/hrm/v4_1</schemaDirectory>
+                                    					<generateDirectory>${basedir}/src/gen/java</generateDirectory>
+                                    					<generatePackage>xml.hrm.v4_1</generatePackage>
+                                				</configuration>
+                            			</execution>
 						</executions>
 						<configuration>
 							<extension>true</extension>

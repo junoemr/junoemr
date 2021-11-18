@@ -56,6 +56,9 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.parsers.AHS.v22.SpecimenGateHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.AHSMeditechHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.AHSRuralDIHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v23.AHSRuralHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.AITLHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIORMHandler;
@@ -88,7 +91,20 @@ public final class Factory {
 
 	private static final Logger logger = MiscUtils.getLogger();
 
-	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet("AHS", "CCLAB", "CCENDO", "CCCARDIOLOGY", "CCIMAGING", "CCDOC","CLS","CLSDI", "EI", JunoGenericLabHandler.LAB_TYPE_VALUE);
+	private static final HashSet<String> REFACTORED_LAB_TYPES = Sets.newHashSet(
+		"AHS",
+		AHSRuralHandler.AHS_RURAL_LAB_TYPE,
+		AHSMeditechHandler.AHS_MEDITECH_LAB_TYPE,
+		AHSRuralDIHandler.AHS_RURAL_DI_LAB_TYPE,
+		"CCLAB",
+		"CCENDO",
+		"CCCARDIOLOGY",
+		"CCIMAGING",
+		"CCDOC",
+		"CLS",
+		"CLSDI",
+		"EI",
+		JunoGenericLabHandler.LAB_TYPE_VALUE);
 
 	private Factory() {
 		// static methods no need for instance
@@ -251,6 +267,12 @@ public final class Factory {
 				handler = new EIHandler(msg);
 			else if(CLSDIHandler.handlerTypeMatch(msg))
 				handler = new CLSDIHandler(msg);
+			else if(AHSRuralHandler.handlerTypeMatch(msg))
+				handler = new AHSRuralHandler(msg);
+			else if(AHSMeditechHandler.handlerTypeMatch(msg))
+				handler = new AHSMeditechHandler(msg);
+			else if(AHSRuralDIHandler.handlerTypeMatch(msg))
+				handler = new AHSRuralDIHandler(msg);
 			else if(SunquestHandler.handlerTypeMatch(msg))
 				handler = new SunquestHandler(msg);
 			else if(SpecimenGateHandler.handlerTypeMatch(msg))

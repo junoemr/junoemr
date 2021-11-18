@@ -101,6 +101,8 @@ public class ProviderSettings
 	private boolean cppOngoingConcernsResDate;
 	private boolean cppOngoingConcernsProblemStatus;
 
+	private boolean cppDisplayDiseaseRegistry;
+
 	private boolean cppDisplayMedHx;
 	private boolean cppMedHxStartDate;
 	private boolean cppMedHxResDate;

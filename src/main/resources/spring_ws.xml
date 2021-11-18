@@ -377,6 +377,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DiseaseRegistryService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DocumentTypesWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DocumentWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.eform.EFormInstanceWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EncounterSectionsService"/>
@@ -390,6 +391,8 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueueWebService"/>
 			<!-- AQS -->
+
+            		<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService"/>
             <bean autowire="byName" class="org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService"/>
             <bean autowire="byName" class="org.oscarehr.ws.rest.LabWebService"/>

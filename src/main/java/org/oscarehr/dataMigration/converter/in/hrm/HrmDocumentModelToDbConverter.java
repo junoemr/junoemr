@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.converter.in.hrm;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
@@ -33,15 +34,22 @@ import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDocument, HRMDocument>
 {
+	private Logger logger = MiscUtils.getLogger();
+	
 	@Override
 	public HRMDocument convert(HrmDocument input)
 	{
@@ -51,32 +59,53 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		hrmDocument.setReportStatus(reportStatus(input.getReportStatus()));
 		hrmDocument.setTimeReceived(ConversionUtils.toNullableLegacyDateTime(input.getReceivedDateTime()));
 		hrmDocument.setReportDate(ConversionUtils.toNullableLegacyDateTime(input.getReportDateTime()));
-		hrmDocument.setSourceFacility(input.getSourceFacility());
+		hrmDocument.setSendingFacility(input.getSendingFacility());
 		hrmDocument.setSendingFacilityId(input.getSendingFacilityId());
 		hrmDocument.setSendingFacilityReportId(input.getSendingFacilityReport());
 		hrmDocument.setMessageUniqueId(input.getMessageUniqueId());
 		hrmDocument.setDeliverToUserId(input.getDeliverToUserId());
-
-		hrmDocument.setReportFile(getReportFileName(input.getReportFile()));
+		
+		hrmDocument.setReportFile(getReportFileRelativePath(input.getReportFile()));
 		hrmDocument.setReportFileSchemaVersion(input.getReportFileSchemaVersion());
 
 		hrmDocument.setDocumentSubClassList(convertSubClassList(hrmDocument, input.getObservations()));
 		hrmDocument.setCommentList(convertCommentList(hrmDocument, input.getComments()));
-		hrmDocument.setDocumentToProviderList(convertProviderLinks(hrmDocument, input.getReviewers()));
+		
+		hrmDocument.setReportHash(input.getMessageUniqueId());
+		hrmDocument.setNumDuplicatesReceived(0);
+		
+		List<HRMDocumentToProvider> providerLinks = new ArrayList<HRMDocumentToProvider>();
+		
+		HRMDocumentToProvider deliverToProviderLink = createDeliverToLink(hrmDocument, input.getDeliverToUserId());
+		if (deliverToProviderLink != null)
+		{
+			providerLinks.add(deliverToProviderLink);
+		}
+		
+		if (input.getReviewers() != null && !input.getReviewers().isEmpty())
+		{
+			providerLinks.addAll(convertReviewerLinks(hrmDocument, input.getReviewers()));
+		}
+		
+		hrmDocument.setDocumentToProviderList(providerLinks);
 
 		return hrmDocument;
 	}
 
-	protected String getReportFileName(GenericFile file)
+	protected String getReportFileRelativePath(GenericFile file)
 	{
-		if(file != null)
+		if (file != null)
 		{
-			return file.getName();
+			Path hrmBaseDirectory = Paths.get(GenericFile.HRM_BASE_DIR);
+			Path relativePath = hrmBaseDirectory.relativize(Paths.get(file.getPath()));
+			
+			return relativePath.toString();
 		}
+		
 		return null;
 	}
 
-	protected String reportType(HrmDocument.REPORT_CLASS reportClass)
+	protected String reportType(HrmDocument.ReportClass reportClass)
 	{
 		String reportType = null;
 		if(reportClass != null)
@@ -86,13 +115,14 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		return reportType;
 	}
 
-	protected String reportStatus(HrmDocument.REPORT_STATUS reportStatus)
+	protected HRMDocument.STATUS reportStatus(HrmDocument.ReportStatus reportStatus)
 	{
-		String status = null;
+		HRMDocument.STATUS status = null;
 		if(reportStatus != null)
 		{
-			status = reportStatus.getValue();
+			status = HRMDocument.STATUS.fromValueString(reportStatus.getValue());
 		}
+		
 		return status;
 	}
 
@@ -129,7 +159,7 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		return hrmDocumentCommentList;
 	}
 
-	protected List<HRMDocumentToProvider> convertProviderLinks(HRMDocument hrmDocument, List<Reviewer> reviewers)
+	protected List<HRMDocumentToProvider> convertReviewerLinks(HRMDocument hrmDocument, List<Reviewer> reviewers)
 	{
 		List<HRMDocumentToProvider> hrmDocumentToProviderList = new ArrayList<>(reviewers.size());
 		for(Reviewer reviewer : reviewers)
@@ -148,5 +178,64 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 			hrmDocumentToProviderList.add(hrmDocumentToProvider);
 		}
 		return hrmDocumentToProviderList;
+	}
+	
+	/**
+	 * Find the provider associated with the deliverToID.  If the ID starts with a "D", the id refers to the CPSID
+	 * of a physician.  If it starts with an "N", then it's the CNO number of a nurse.
+	 * @param deliverToID Practitioner No of the provider for the link
+	 * @returns provider link if provider exists in the system, otherwise null
+	 */
+	protected HRMDocumentToProvider createDeliverToLink(HRMDocument document, String deliverToID)
+	{
+		HRMDocumentToProvider link = null;
+
+		if (ConversionUtils.hasContent(deliverToID))
+		{
+			ProviderCriteriaSearch searchParams = buildCriteriaSearch(deliverToID);
+			List<ProviderData> providers = searchProviders(searchParams);
+
+			if (providers == null || providers.size() == 0)
+			{
+				logger.info(String.format("Could not match provider (%s) for HRM document (unlinked): %s",
+					document.getDeliverToUserId(),
+					document.getReportFile()));
+			}
+			else if (providers.size() == 1)
+			{
+				ProviderData foundProvider = providers.get(0);
+
+				link = new HRMDocumentToProvider();
+				link.setProviderNo(String.valueOf(foundProvider.getProviderNo()));
+				link.setHrmDocument(document);
+			}
+			else
+			{
+				logger.info(String.format("Multiple providers (%s) matched for HRM document (unlinked): %s",
+					document.getDeliverToUserId(),
+					document.getReportFile()));
+			}
+		}
+
+		return link;
+	}
+
+	private ProviderCriteriaSearch buildCriteriaSearch(String deliverToID)
+	{
+		String practitionerNumber = deliverToID.substring(1);
+
+		ProviderCriteriaSearch searchParams = new ProviderCriteriaSearch();
+		HrmDocument.DeliveryPrefix prefix = HrmDocument.DeliveryPrefix.fromString(deliverToID.substring(0, 1));
+
+		if (HrmDocument.DeliveryPrefix.DOCTOR.equals(prefix))
+		{
+			searchParams.setPractitionerNo(practitionerNumber);
+		}
+		else if (HrmDocument.DeliveryPrefix.NURSE.equals(prefix))
+		{
+			searchParams.setOntarioCnoNumber(practitionerNumber);
+		}
+
+		return searchParams;
 	}
 }

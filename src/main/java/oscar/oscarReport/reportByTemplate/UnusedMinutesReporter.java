@@ -47,8 +47,9 @@ public class UnusedMinutesReporter implements Reporter
      */
     public UnusedMinutesReporter() {
     }
-    
-    public boolean generateReport( HttpServletRequest request ) {
+
+    public boolean generateReport(HttpServletRequest request, boolean prepareForFile)
+    {
         String templateId = request.getParameter("templateId");
 	    ReportObject curReport = reportByTemplateService.getAsLegacyReport(Integer.parseInt(templateId), false);
 	    String date_from = request.getParameter("date_from");

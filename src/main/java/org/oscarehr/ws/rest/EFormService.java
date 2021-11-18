@@ -24,6 +24,7 @@
 
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import net.sf.json.JSONObject;
 import org.apache.log4j.Logger;
 import org.oscarehr.eform.dao.EFormDao;
@@ -48,6 +49,7 @@ import javax.ws.rs.core.MediaType;
 
 @Path("/eform")
 @Component("EFormService")
+@Tag(name = "EForm")
 public class EFormService extends AbstractServiceImpl {
 	Logger logger = Logger.getLogger(EFormService.class);
 

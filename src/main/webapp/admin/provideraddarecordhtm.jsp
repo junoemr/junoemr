@@ -111,22 +111,41 @@ function setfocus() {
   document.searchprovider.provider_no.select();
 }
 
-function onsub() {
-  if(document.searchprovider.provider_no.value=="" ||
-     document.searchprovider.last_name.value=="" ||
-	 document.searchprovider.first_name.value=="" ||
-     document.searchprovider.provider_type.value==""  ) {
-     alert("<bean:message key="global.msgInputKeyword"/>");
-     return false;
-  }
-  if(!(document.searchprovider.provider_no.value=="-new-" || document.searchprovider.provider_no.value.match(/^[1-9]\d*$/))){
-  		alert("Provider No. must be a number.");
-  		return false;
-  }
-  else {
-    	return true;
-  }
+function isBlank(str)
+{
+	return (!str || /^\s*$/.test(str));
+}
 
+function onsub()
+{
+	var errors = [];
+	if (isBlank(document.searchprovider.provider_no.value))
+	{
+		errors.push("Provider No is required");
+	}
+	else if (!(document.searchprovider.provider_no.value === "-new-" || document.searchprovider.provider_no.value.match(/^[1-9]\d*$/)))
+	{
+		errors.push("Provider No. must be a number.");
+	}
+	if (isBlank(document.searchprovider.last_name.value))
+	{
+		errors.push("Last Name is required");
+	}
+	if (isBlank(document.searchprovider.first_name.value))
+	{
+		errors.push("First Name is required");
+	}
+	if (isBlank(document.searchprovider.provider_type.value))
+	{
+		errors.push("Provider Type is required");
+	}
+
+	if(errors.length > 0)
+	{
+		alert(errors.join("\n"));
+		return false;
+	}
+	return true;
 }
 function upCaseCtrl(ctrl) {
   ctrl.value = ctrl.value.toUpperCase();

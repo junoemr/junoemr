@@ -47,7 +47,8 @@ public class INRReporter implements Reporter {
     public INRReporter() {
     }
     
-    public boolean generateReport( HttpServletRequest request) {
+    public boolean generateReport( HttpServletRequest request, boolean prepareForFile)
+    {
         String templateId = request.getParameter("templateId");
 		ReportObject curReport = reportByTemplateService.getAsLegacyReport(Integer.parseInt(templateId), false);
         String fromDate = request.getParameter("from_date");

@@ -31,10 +31,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 
 import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -72,18 +72,17 @@ public class AddEformsClassicUIIT extends SeleniumTestBase
 		String subject = "EFormTest";
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuTitleeforms")));
+		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		driver.findElement(By.xpath("//div[@id='menuTitleeforms']//descendant::a[contains(., '+')]")).click();
-		Thread.sleep(10000);
+		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(2000);
 		driver.findElement(By.linkText("letter")).click();
 		PageUtil.switchToLastWindow(driver);
 		driver.findElement(By.id("subject")).sendKeys(subject);
 		driver.findElement((By.xpath("//input[@value='Submit']"))).click();
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
-		Thread.sleep(2000);
+		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		Assert.assertTrue("Eform Letter is NOT added successfully.", PageUtil.isExistsBy(By.partialLinkText(subject), driver));
 	}
 }

@@ -258,6 +258,17 @@
 				junoEncounter.getSectionRemote(sectionName, false, false, getEChartUUID());
 			}
 
+			// required for OCEAN
+			function newNote(e)
+			{
+				if (e != null)
+				{
+					Event.stop(e);
+				}
+				encounterNote.createNewNote();
+				return false;
+			}
+
 
 			<%-- ============================================================================== --%>
 			<%-- Local functions                                                                --%>
@@ -464,6 +475,18 @@
 					</td>
 					<td align=right>
 							<span class="HelpAboutLogout">
+                                				<c:if test="${junoEncounterForm.pageData.imdHealthEnabled}">
+                                                    			<script src="../integration/imdHealth/imdHealthUtils.js"></script>
+                                    					<a style="font-size:10px;font-style:normal;"  href="javascript:void(0)" onclick="Juno.Integration.iMDHealth.openIMDHealth()">
+                                        					<b>Patient Education</b>
+                                    					</a> |
+                                				</c:if>
+                                				<c:if test="${junoEncounterForm.pageData.careConnectEnabled}">
+                                                    			<c:url value="../integration/careConnect/careConnectForm.jsp" var="careConnectUrl">
+                                                        			<c:param name="demoNo" value="${junoEncounterForm.pageData.demographicNo}"/>
+                                                    			</c:url>
+                                    					<a style="font-size:10px;font-style:normal;"  href="javascript:void(0)" onclick="window.open('${careConnectUrl}', 'CareConnectPopup', 'width=1200,height=800');">CareConnect</a> |
+                                				</c:if>
 								<c:if test="${junoEncounterForm.pageData.linkToOldEncounterPageEnabled}">
 									<a style="font-size:10px;font-style:normal;"
 									   href="javascript:void(0)"

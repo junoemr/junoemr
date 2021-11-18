@@ -34,9 +34,10 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
+import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -78,8 +79,8 @@ public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")));
 		driver.findElement(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")).click();
+		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(2000);
 		driver.findElement(By.xpath("//input[@name='xml_research1']")).sendKeys(heartFailure);
 		driver.findElement(By.xpath("//input[@name='xml_research2']")).sendKeys(diabetes);
 		driver.findElement(By.xpath("//input[@name='xml_research3']")).sendKeys(painAssistant);
@@ -100,13 +101,13 @@ public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 	{
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
-		Thread.sleep(5000);
+		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		addDiseaseRegistry();
 
 		//** Verify from Disease Registry **
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("Disease Registry")));
+		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		driver.findElement(By.id("imgDx5")).click();
 		Assert.assertTrue("CHR PULMONARY HEART DIS icd is NOT added successfully",
 				PageUtil.isExistsBy(By.linkText("CHR PULMONARY HEART DIS*"), driver));
@@ -129,7 +130,7 @@ public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 
 		//** Verify from Measurements **
 		driver.navigate().refresh();
-		Thread.sleep(1000);
+		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		driver.findElement(By.id("imgmeasurements5")).click();
 		Assert.assertTrue("HIV Flowsheet is NOT added successfully",
 				PageUtil.isExistsBy(By.linkText("HIV Flowsheet"), driver));

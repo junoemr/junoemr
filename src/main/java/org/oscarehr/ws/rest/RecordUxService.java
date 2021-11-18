@@ -24,6 +24,29 @@
 package org.oscarehr.ws.rest;
 
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.StreamingOutput;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
@@ -46,6 +69,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
 import org.oscarehr.ws.rest.conversion.EncounterTemplateConverter;
+import org.oscarehr.ws.rest.conversion.summary.LabsDocsSummary;
 import org.oscarehr.ws.rest.conversion.summary.Summary;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.EncounterTemplateResponse;
@@ -55,29 +79,9 @@ import org.oscarehr.ws.rest.to.model.SummaryTo1;
 import org.oscarehr.ws.rest.transfer.DashboardTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.oscarProvider.data.ProviderMyOscarIdData;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import oscar.OscarProperties;
+import oscar.oscarProvider.data.ProviderMyOscarIdData;
 
 
 
@@ -254,6 +258,7 @@ public class RecordUxService extends AbstractServiceImpl {
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		String loggedInProviderId = getLoggedInProviderId();
+		OscarProperties properties = OscarProperties.getInstance();
 
 		logger.debug("getting summary:"+summaryName+" for demo "+demographicNo+"  loggedInInfo "+loggedInInfo);
 		List<SummaryTo1> summaryList = null;
@@ -266,7 +271,9 @@ public class RecordUxService extends AbstractServiceImpl {
 			if (securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.DOCUMENT_READ, Permission.LAB_READ)
 					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.INCOMING_POS))
 			{
-				summaryList.add(new SummaryTo1("Incoming", count++, SummaryTo1.INCOMING_CODE));
+				SummaryTo1 labDocSummary = new SummaryTo1("Incoming", count++, SummaryTo1.INCOMING_CODE);
+				labDocSummary.setDisplaySize(String.valueOf(LabsDocsSummary.DISPLAY_SIZE));
+				summaryList.add(labDocSummary);
 			}
 
 			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.DECISION_SUPPORT_READ)
@@ -300,6 +307,12 @@ public class RecordUxService extends AbstractServiceImpl {
 					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ONGOING_POS))
 			{
 				summaryList.add(new SummaryTo1("Ongoing Concerns", count++, SummaryTo1.ONGOINGCONCERNS_CODE));
+			}
+
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.DX_READ)
+				&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.DISEASE_REGISTRY_POS))
+			{
+				summaryList.add(new SummaryTo1("Disease Registry", count++, SummaryTo1.DISEASE_REGISTRY_CODE));
 			}
 
 			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.CPP_NOTE_READ)
@@ -336,17 +349,16 @@ public class RecordUxService extends AbstractServiceImpl {
 			{
 				summaryList.add(new SummaryTo1("Allergies", count++, SummaryTo1.ALLERGIES));
 			}
-
-			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.FORM_READ, Permission.EFORM_READ)
-					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ASSESSMENTS_POS))
+			
+			if(properties.isModuleEnabled(OscarProperties.Module.MODULE_HRM)
+					&& securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.HRM_READ))
 			{
-				summaryList.add(new SummaryTo1("Forms", count++, SummaryTo1.FORMS_CODE));
+				summaryList.add(new SummaryTo1("HRM Documents", count++, SummaryTo1.HRM_DOCUMENTS));
 			}
 		}
 		return summaryList;
 	}
 	
-
 	private static final Map<String, String> MY_MAP = createMap();
 
     private static Map<String, String> createMap() {
@@ -355,7 +367,8 @@ public class RecordUxService extends AbstractServiceImpl {
         result.put("preventions","preventionsSummary");
     	result.put("meds","rxSummary");
     	result.put("othermeds","issueNoteSummary");
-        result.put("ongoingconcerns","ongoingConcernDxRegSummary"); 
+        result.put("ongoingconcerns","ongoingConcernDxRegSummary");
+        result.put("diseaseregistry", "diseaseRegistrySummary");
         result.put("medhx","issueNoteSummary"); 
 		result.put("socfamhx","issueNoteSummary"); 		
 		result.put("reminders","issueNoteSummary");
@@ -366,7 +379,8 @@ public class RecordUxService extends AbstractServiceImpl {
 		result.put("incoming","labsDocsSummary");
 		result.put("dssupport","decisionSupportSummary");
 		result.put("allergies","allergiesSummary");
-		result.put("riskfactors","issueNoteSummary"); 
+		result.put("riskfactors","issueNoteSummary");
+		result.put("hrmdocuments", "HRMDocumentSummary");
 		
         return Collections.unmodifiableMap(result);
     }
@@ -416,6 +430,14 @@ public class RecordUxService extends AbstractServiceImpl {
 	public SummaryTo1 getOngoingConcerns(@PathParam("demographicNo") Integer demographicNo)
 	{
 		return getFullSummmary(demographicNo, SummaryTo1.ONGOINGCONCERNS_CODE);
+	}
+
+	@GET
+	@Path("/{demographicNo}/getDiseaseRegistry")
+	@Produces(MediaType.APPLICATION_JSON)
+	public SummaryTo1 getDiseaseRegistry(@PathParam("demographicNo") Integer demographicNo)
+	{
+		return getFullSummmary(demographicNo, SummaryTo1.DISEASE_REGISTRY_CODE);
 	}
 
 	@GET

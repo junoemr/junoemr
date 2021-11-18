@@ -416,6 +416,11 @@ public class ProviderManager2
 			settings.setCppOngoingConcernsProblemStatus("on".equals(map.get(PreferenceManager.ONGOING_PROBLEM_STATUS).getValue()) ? true : false);
 		}
 
+		if (map.get(PreferenceManager.DISEASE_REGISTRY_POS) != null)
+		{
+			settings.setCppDisplayDiseaseRegistry("on".equals(map.get(PreferenceManager.DISEASE_REGISTRY_POS).getValue()));
+		}
+
 		/*
 		 *
 		 * if .position dosen't exist = on
@@ -889,6 +894,9 @@ public class ProviderManager2
 		property.setValue(settings.isCppOngoingConcernsResDate() ? "on" : "off");
 		property = getMappedOrNewProperty(map, PreferenceManager.ONGOING_PROBLEM_STATUS, providerNo);
 		property.setValue(settings.isCppOngoingConcernsProblemStatus() ? "on" : "off");
+
+		property = getMappedOrNewProperty(map, PreferenceManager.DISEASE_REGISTRY_POS, providerNo);
+		property.setValue(settings.isCppDisplayDiseaseRegistry() ? "on" : "off");
 
 		property = getMappedOrNewProperty(map, PreferenceManager.MED_HX_POS, providerNo);
 		property.setValue(settings.isCppDisplayMedHx() ? "on" : "off");

@@ -2,6 +2,7 @@ import {SecurityPermissions} from "../common/security/securityConstants";
 import {LABEL_POSITION} from "../common/components/junoComponentConstants";
 import {ProvidersServiceApi} from "../../generated";
 import LoadingQueue from "../lib/util/LoadingQueue";
+import ToastService from "../lib/alerts/service/ToastService";
 
 angular.module('Consults').controller('Consults.ConsultRequestController', [
 
@@ -53,6 +54,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		controller.minutes = staticDataService.getMinutes();
 
 		controller.loadingQueue = new LoadingQueue();
+		controller.toastService = new ToastService();
 
 		controller.parseTime = function parseTime(time)
 		{
@@ -243,12 +245,14 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function success(results)
 				{
 					if (results.summaryItem.length === 0)
-						alert("No family history");
+					{
+						controller.toastService.notificationToast("No family history");
+					}
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
-					alert("Error grabbing family history!");
+					controller.toastService.errorToast("Error grabbing family history!", true);
 					console.error(errors);
 				});
 		};
@@ -259,12 +263,14 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function success(results)
 				{
 					if (results.summaryItem.length === 0)
-						alert("No medical history");
+					{
+						controller.toastService.notificationToast("No medical history");
+					}
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
-					alert("Error grabbing medical history!");
+					controller.toastService.errorToast("Error grabbing medical history!", true);
 					console.error(errors);
 				});
 		};
@@ -275,12 +281,14 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function success(results)
 				{
 					if (results.summaryItem.length === 0)
-						alert("No social history");
+					{
+						controller.toastService.notificationToast("No social history");
+					}
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
-					alert("Error grabbing social history!");
+					controller.toastService.errorToast("Error grabbing social history!", true);
 					console.error(errors);
 				});
 		};
@@ -291,12 +299,32 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function success(results)
 				{
 					if (results.summaryItem.length === 0)
-						alert("No ongoing concerns");
+					{
+						controller.toastService.notificationToast("No ongoing concerns");
+					}
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
-					alert("Error grabbing ongoing concerns!");
+					controller.toastService.errorToast("Error grabbing ongoing concerns!", true);
+					console.error(errors);
+				});
+		};
+
+		controller.getDxRegistry = function getDxRegistry(boxId)
+		{
+			summaryService.getDiseaseRegistry(consult.demographicId).then(
+				function success(results)
+				{
+					if (results.summaryItem.length === 0)
+					{
+						controller.toastService.notificationToast("No Dx codes registered");
+					}
+					controller.writeToBox(results, boxId);
+				},
+				function error(errors)
+				{
+					controller.toastService.errorToast("Error grabbing Dx codes!", true);
 					console.error(errors);
 				});
 		};
@@ -307,12 +335,14 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function success(results)
 				{
 					if (results.summaryItem.length === 0)
-						alert("No other meds");
+					{
+						controller.toastService.notificationToast("No other meds");
+					}
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
-					alert("Error grabbing other meds!");
+					controller.toastService.errorToast("Error grabbing other meds!", true);
 					console.error(errors);
 				});
 		};
@@ -323,12 +353,14 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function success(results)
 				{
 					if (results.summaryItem.length === 0)
-						alert("No reminders");
+					{
+						controller.toastService.notificationToast("No reminders");
+					}
 					controller.writeToBox(results, boxId);
 				},
 				function error(errors)
 				{
-					alert("Error grabbing reminders!");
+					controller.toastService.errorToast("Error grabbing reminders!", true);
 					console.error(errors);
 				});
 		};
@@ -439,12 +471,12 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 
 			if (consult.id == null && !securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationCreate))
 			{
-				alert("You don't have right to save new consult");
+				controller.toastService.errorToast("You don't have right to save new consult");
 				valid = false;
 			}
 			else if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationUpdate))
 			{
-				alert("You don't have right to update consult");
+				controller.toastService.errorToast("You don't have right to update consult");
 				valid = false;
 			}
 			if (controller.invalidData())

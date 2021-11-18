@@ -10,7 +10,7 @@
 				 ng-keyup="key_up($event)"
 				 ng-keydown="key_down($event)"
 				 tabindex="{{tab_index}}"
-				 autocomplete="off"
+				 autocomplete="{{autocompleteOff}}"
 				 placeholder="yyyy-mm-dd"/>
 	<span class="{{ date_picker_id }}-body" style="position: relative">
 	</span>

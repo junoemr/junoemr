@@ -79,6 +79,17 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		// store the child component refresh function so that this controller can trigger it.
 		controller.noteListComponentRefreshFunction = null;
 
+		controller.incomingFilterOptions = [
+			{
+				label: "Documents",
+				value: "document",
+			},
+			{
+				label: "Reports",
+				value: "lab",
+			},
+		];
+
 		controller.$onInit = () =>
 		{
 			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EchartRead))
@@ -129,6 +140,13 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600");
 			return false;
 		};
+
+		controller.openDiseaseRegistry = (demographicNo) =>
+		{
+			const win = "Disease Registry " + demographicNo;
+			const url = "../oscarResearch/oscarDxResearch/setupDxResearch.do?quickList=&demographicNo=" + demographicNo;
+			window.open(url, win, "scrollbars=yes, location=no, width=900, height=600");
+		}
 
 		controller.openAddForms = function openForms()
 		{
@@ -368,7 +386,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				controller.editGroupedNotes('lg', mod, item.id, successCallback, dismissCallback);
 
 			}
-			else if (item.type == 'lab' || item.type == 'document' || item.type == 'rx' || item.type == 'allergy' || item.type == 'prevention' || item.type == 'dsguideline')
+			else if (item.type == 'lab' || item.type == 'document' || item.type == 'rx' || item.type == 'allergy' || item.type == 'prevention' || item.type == 'dsguideline' || item.type == 'hrm')
 			{
 				let win;
 				if (item.type == 'rx')
@@ -382,6 +400,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				else if (item.type == 'prevention')
 				{
 					win = "prevention" + $stateParams.demographicNo;
+				}
+				else if (item.type == 'hrm')
+				{
+					win = "HRM Documents" + $stateParams.demographicNo;
 				}
 				else
 				{
@@ -544,6 +566,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			{
 				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.PreventionCreate);
 			}
+			else if (module.summaryCode === 'diseaseregistry')
+			{
+				enabled = securityRolesService.hasSecurityPrivileges(SecurityPermissions.DxCreate);
+			}
 			return enabled;
 		}
 		controller.onSummaryModAdd = function onSummaryModAdd(module, successCallback, dismissCallback)
@@ -573,6 +599,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			else if (module.summaryCode === 'preventions')
 			{
 				controller.openPreventions(controller.demographicNo);
+			}
+			else if (module.summaryCode === 'diseaseregistry')
+			{
+				controller.openDiseaseRegistry(controller.demographicNo);
 			}
 		};
 
@@ -608,6 +638,27 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 					return false;
 			}
 		};
+		
+		controller.showAddButton = (module) =>
+		{
+			switch (module.summaryCode)
+			{
+				case "hrmdocuments":
+				case "incoming":
+					return false;
+				default:
+					return true;
+			}
+		}
+
+		controller.getSummaryModuleFilterOptions = (module) =>
+		{
+			if(module.summaryCode === "incoming")
+			{
+				return controller.incomingFilterOptions;
+			}
+			return [];
+		}
 
 		// called when a child component is initialized. this allows the controller to call select child methods
 		controller.registerEncNoteListFunctions = function(refresh)

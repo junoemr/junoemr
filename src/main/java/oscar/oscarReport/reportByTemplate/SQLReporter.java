@@ -36,7 +36,9 @@ import org.oscarehr.report.reportByTemplate.dao.ReportTemplatesDao;
 import org.oscarehr.report.reportByTemplate.exception.ReportByTemplateException;
 import org.oscarehr.report.reportByTemplate.service.ReportByTemplateService;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessResourceUsageException;
+import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
 import oscar.oscarDB.DBHandler;
 import oscar.oscarReport.data.RptResultStruct;
@@ -57,21 +59,31 @@ import java.util.List;
  *
  * @author rjonasz
  */
+@Service
 public class SQLReporter implements Reporter
 {
-
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties properties = OscarProperties.getInstance();
 	private static final Long maxRows = Long.parseLong(properties.getProperty("report_by_template.max_rows"));
 	private static final Integer maxResults = Integer.parseInt(properties.getProperty("report_by_template.max_results"));
+	private static final Integer maxResultsCsv = Integer.parseInt(properties.getProperty("report_by_template.csv_max_results"));
 	private static final Boolean enableQueryRestrictions = properties.isPropertyActive("report_by_template.enable_restrictions");
 	private static final Boolean enforceQueryRestrictions = properties.isPropertyActive("report_by_template.enforce_restrictions");
 
-	private static ReportByTemplateService reportByTemplateService = SpringUtils.getBean(ReportByTemplateService.class);
-	private static LogReportByTemplateDao logReportByTemplateDao = SpringUtils.getBean(LogReportByTemplateDao.class);
-	private static LogReportByTemplateExplainDao logReportByTemplateExplainDao = SpringUtils.getBean(LogReportByTemplateExplainDao.class);
-	private static ReportTemplatesDao rptTemplatesDao = SpringUtils.getBean(ReportTemplatesDao.class);
-	private static SystemMetricsService systemMetricsService = SpringUtils.getBean(SystemMetricsService.class);
+	@Autowired
+	private ReportByTemplateService reportByTemplateService;
+
+	@Autowired
+	private LogReportByTemplateDao logReportByTemplateDao;
+
+	@Autowired
+	private LogReportByTemplateExplainDao logReportByTemplateExplainDao;
+
+	@Autowired
+	private ReportTemplatesDao rptTemplatesDao;
+
+	@Autowired
+	private SystemMetricsService systemMetricsService;
 
 	/**
 	 * Creates a new instance of SQLReporter
@@ -80,10 +92,11 @@ public class SQLReporter implements Reporter
 	{
 	}
 
-	public boolean generateReport( HttpServletRequest request)
+	public boolean generateReport(HttpServletRequest request, boolean prepareForFile)
 	{
 		String templateIdStr = request.getParameter("templateId");
 		String providerNo = (String) request.getSession().getAttribute("user");
+		boolean limitsEnforced = false;
 
 		String rsHtml = "An exception has occurred. If this problem persists please contact support for assistance.";
 		String csv = "";
@@ -128,12 +141,15 @@ public class SQLReporter implements Reporter
 					// admin verified reports bypass the maximum row limitations
 					if(enforceQueryRestrictions && !curReport.isSuperAdminVerified())
 					{
-						nativeSQL = SQLReportHelper.applyEnforcedLimit(nativeSQL, maxResults);
+						limitsEnforced = true;
+						Integer resultLimit = (prepareForFile) ? maxResultsCsv : maxResults;
+						nativeSQL = SQLReportHelper.applyEnforcedLimit(nativeSQL, resultLimit);
 						boolean allowRun = SQLReportHelper.allowQueryRun(explainResultList, maxRows);
 
 						if(!allowRun)
 						{
-							request.setAttribute("errormsg", "Error: The report examines more than the maximum " + maxRows + " rows");
+							request.setAttribute("errormsg", "Error: The report examines more than the maximum " + maxRows + " rows." +
+									" Please try limiting your report to a smaller data set and trying again.");
 							request.setAttribute("explainResults", explainResultList);
 							request.setAttribute("templateid", templateIdStr);
 							return false;
@@ -144,26 +160,41 @@ public class SQLReporter implements Reporter
 
 			//TODO use the entityManager sql equivalent. can't get the column headers until spring upgrade to 2.0 or higher
 			ResultSet rs = DBHandler.GetSQL(nativeSQL);
-			rsHtml = RptResultStruct.getStructure2(rs);  //makes html from the result set
-			StringWriter swr = new StringWriter();
-			CSVPrinter csvp = new CSVPrinter(swr);
-			csvp.writeln(UtilMisc.getArrayFromResultSet(rs));
-			csv = swr.toString();
+
+			if(prepareForFile)
+			{
+				StringWriter swr = new StringWriter();
+				CSVPrinter csvp = new CSVPrinter(swr);
+				csvp.writeln(UtilMisc.getArrayFromResultSet(rs));
+				csv = swr.toString();
+
+				request.getSession().setAttribute("csv", csv);
+				request.setAttribute("csv", csv);
+			}
+			else
+			{
+				rsHtml = RptResultStruct.getStructure2(rs);  //makes html from the result set
+			}
 
 			rs.last();
-			long rowCount = new Integer(rs.getRow()).longValue();
+			long rowCount = rs.getRow();
 			updateLog(logEntry, rowCount);
 		}
 		// since users can write custom queries this error is expected and should not generate an error in the log
-		catch(ReportByTemplateException | SQLException | PersistenceException e)
+		catch(ReportByTemplateException e)
 		{
-			logger.warn("An Exception occurred while generating a report by template (from user defined query): " + e.getMessage());
-			rsHtml = "An SQL query error has occurred<br>" + e.getMessage();
+			logger.warn("report by template error: " + e.getMessage());
+			rsHtml = "Template Error:<br>" + e.getMessage();
+		}
+		catch(SQLException | InvalidDataAccessResourceUsageException | PersistenceException e)
+		{
+			logger.warn("An SQL Exception occurred while generating a report by template (from user defined query): " + e.getMessage());
+			rsHtml = "An SQL query error has occurred, please check the query syntax and try again.<br>" + e.getMessage();
 		}
 		catch(Exception sqe)
 		{
 			logger.error("Error", sqe);
-			rsHtml += "<br>" + sqe.getMessage();
+			rsHtml += "An Unknown Error has occurred. Please contact support if this error persists.";
 		}
 		finally
 		{
@@ -171,11 +202,13 @@ public class SQLReporter implements Reporter
 			systemMetricsService.decrementCurrentRunningRbtCount();
 		}
 
-		request.getSession().setAttribute("csv", csv);
-		request.setAttribute("csv", csv);
 		request.setAttribute("sql", nativeSQL);
 		request.setAttribute("reportobject", curReport);
 		request.setAttribute("resultsethtml", rsHtml);
+
+		request.setAttribute("limitsEnforced", limitsEnforced);
+		request.setAttribute("uiLimit", maxResults);
+		request.setAttribute("csvLimit", maxResultsCsv);
 
 		return true;
 	}

@@ -10,33 +10,33 @@
 	</p>
 
 	<juno-input ng-if="$ctrl.inputModalType === $ctrl.JUNO_INPUT_MODAL_TYPE.TEXT"
-							class="modal-input"
-							ng-model="$ctrl.value"
-							invalid="!$ctrl.validations.value() && $ctrl.hasSubmitted"
-                            placeholder="{{$ctrl.placeholder}}"
-							character-limit="$ctrl.resolve.characterLimit"
-							component-style="$ctrl.resolve.style">
+	            class="modal-input"
+	            ng-model="$ctrl.value"
+	            invalid="!$ctrl.validations.value() && $ctrl.hasSubmitted"
+	            placeholder="{{$ctrl.placeholder}}"
+	            character-limit="$ctrl.resolve.characterLimit"
+	            component-style="$ctrl.resolve.style">
 	</juno-input>
 
 	<juno-select ng-if="$ctrl.inputModalType === $ctrl.JUNO_INPUT_MODAL_TYPE.SELECT"
-							 class="modal-input"
-							 ng-model="$ctrl.value"
-							 options="$ctrl.resolve.options"
-							 placeholder="{{$ctrl.placeholder}}"
-							 component-style="$ctrl.resolve.style"
+	             class="modal-input"
+	             ng-model="$ctrl.value"
+	             options="$ctrl.resolve.options"
+	             placeholder="{{$ctrl.placeholder}}"
+	             component-style="$ctrl.resolve.style"
 	>
 	</juno-select>
 
 	<juno-typeahead ng-if="$ctrl.inputModalType === $ctrl.JUNO_INPUT_MODAL_TYPE.TYPEAHEAD"
-							 class="modal-input"
-							 model="$ctrl.value"
-							 options="$ctrl.typeaheadOptions"
-	                         filter-options="false"
-                             on-change="$ctrl.typeaheadSearch(value)"
-                             on-selected="$ctrl.setTypeahedValue(value)"
-							 placeholder="{{$ctrl.placeholder}}"
-							 component-style="$ctrl.resolve.style"
-	                         typeahead-min-length="{{$ctrl.resolve.typeaheadMinLength}}"
+	                class="modal-input"
+	                model="$ctrl.value"
+	                options="$ctrl.typeaheadOptions"
+	                get-options-callback="$ctrl.typeaheadOptionsCallback(value)"
+	                filter-options="false"
+	                on-selected="$ctrl.setTypeaheadValue(value)"
+	                placeholder="{{$ctrl.placeholder}}"
+	                component-style="$ctrl.resolve.style"
+	                typeahead-min-length="{{$ctrl.resolve.typeaheadMinLength}}"
 	>
 	</juno-typeahead>
 	

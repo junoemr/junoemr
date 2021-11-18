@@ -24,11 +24,37 @@ import javax.persistence.OneToMany;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Data
 @Entity
 public class HRMDocument extends AbstractModel<Integer>
 {
+	public enum STATUS
+	{
+		SIGNED("S"),
+		CANCELLED("C");
+		
+		private String value;
+		
+		STATUS(String value)
+		{
+			this.value = value;
+		}
+		
+		public String toValueString() {
+			return value;
+		}
+		
+		public static STATUS fromValueString(String value)
+		{
+			return Stream.of(STATUS.values())
+			             .filter(status -> status.toValueString().equals(value))
+			             .findFirst()
+			             .orElseThrow(IllegalArgumentException::new);
+		}
+	}
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -38,10 +64,10 @@ public class HRMDocument extends AbstractModel<Integer>
 	private String reportHash;
 	private String reportLessTransactionInfoHash;
 	private String reportLessDemographicInfoHash;
-	private String reportStatus;
+	private STATUS reportStatus;
 	private String reportFile;
 	private String reportFileSchemaVersion;
-	private String sourceFacility;
+	private String sendingFacility;
 	private String sendingFacilityId;
 	private String sendingFacilityReportId;
 	private String messageUniqueId;
@@ -76,7 +102,7 @@ public class HRMDocument extends AbstractModel<Integer>
 	{
 		return id;
 	}
-
+	
 	/**
 	 * This comparator sorts HRM Docs ascending based on the time received
 	 */
