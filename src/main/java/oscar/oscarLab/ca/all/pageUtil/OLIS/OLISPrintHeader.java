@@ -41,14 +41,19 @@ public class OLISPrintHeader implements IEventHandler
 	private static final int fontSizeNormal = 8;
 	private static final int line1YPos = fontSizeNormal + 10;
 	private static final int line2YPos = fontSizeNormal + 20;
+	private static final int TEXT_WRAP_THRESHOLD = 50;
 
 	private final String header;
 	private final String subHeader;
+	private final String patientName;
+	private final String patientData;
 
-	public OLISPrintHeader(String header, String subHeader)
+	public OLISPrintHeader(String header, String subHeader, String patientDisplayName, String patientDisplayData)
 	{
 		this.header = header;
 		this.subHeader = subHeader;
+		this.patientName = patientDisplayName;
+		this.patientData = patientDisplayData;
 	}
 
 	@SneakyThrows
@@ -68,11 +73,24 @@ public class OLISPrintHeader implements IEventHandler
 		canvas.setFontSize(fontSizeNormal);
 		canvas.setFont(normalFont);
 
-		// Write text at position
+		// Write header info
 		canvas.showTextAligned(header, pageSize.getLeft() + margin, pageSize.getTop() - line1YPos, TextAlignment.LEFT);
 
 		canvas.setFont(boldFont);
 		canvas.showTextAligned(subHeader, pageSize.getLeft() + margin, pageSize.getTop() - line2YPos, TextAlignment.LEFT);
 		canvas.close();
+
+		// write patient info
+		canvas.setFont(normalFont);
+		String combined = patientName + " | " + patientData;
+		if(combined.length() <= TEXT_WRAP_THRESHOLD)
+		{
+			canvas.showTextAligned(combined, pageSize.getRight() - margin, pageSize.getTop() - line1YPos, TextAlignment.RIGHT);
+		}
+		else
+		{
+			canvas.showTextAligned(patientName, pageSize.getRight() - margin, pageSize.getTop() - line1YPos, TextAlignment.RIGHT);
+			canvas.showTextAligned(patientData, pageSize.getRight() - margin, pageSize.getTop() - line2YPos, TextAlignment.RIGHT);
+		}
 	}
 }

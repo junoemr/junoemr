@@ -30,6 +30,8 @@
 <%@ page import="org.oscarehr.common.dao.DemographicDao" %>
 <%@ page import="org.oscarehr.common.model.Demographic" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.apache.commons.lang3.StringUtils" %>
+<%@ page import="org.apache.commons.text.StringEscapeUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -145,6 +147,9 @@ for(Integer tempId : multiLabIds)
 	}
 }
 
+String patientDisplayName = handler.getPatientName();
+String patientHealthNo = handler.getHealthNum();
+
 if(preview)
 {
 	demographicIDThatWillMatch = MessageUploader.willOLISLabReportMatch(
@@ -152,8 +157,27 @@ if(preview)
 			handler.getFirstName(),
 			handler.getSex(),
 			handler.getDOB(),
-			handler.getHealthNum());
+			patientHealthNo);
 }
+
+String patientPrintHeaderData;
+if(StringUtils.isBlank(patientHealthNo))
+{
+	String[] values = handler.getMedicalRecordNumber();
+	String value = values[0];
+	String attrib = values[1];
+
+	patientPrintHeaderData = "MRN: " + value;
+	if(attrib != null)
+	{
+		patientPrintHeaderData += " (" + StringUtils.trimToEmpty(handler.getSourceOrganization(attrib)) + ")";
+	}
+}
+else
+{
+	patientPrintHeaderData = "HIN: " + patientHealthNo;
+}
+
 
 // check for errors printing
 if (request.getAttribute("printError") != null && (Boolean) request.getAttribute("printError")){
@@ -175,7 +199,7 @@ public String strikeOutInvalidContent(String content, String status) {
 	<!--  This is an OLIS lab display -->
     <head>
         <html:base/>
-        <title><%=handler.getPatientName()+" Lab Results"%></title>
+        <title><%=patientDisplayName+" Lab Results"%></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script language="javascript" type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/Oscar.js" ></script>
         <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/share/css/OscarStandardLayout.css">
@@ -661,6 +685,8 @@ public String strikeOutInvalidContent(String content, String status) {
                                     <input type="hidden" name="status" value="A"/>
                                     <input type="hidden" name="comment" value=""/>
                                     <input type="hidden" name="labType" value="HL7"/>
+	                                <input type="hidden" name="patientDisplayName" value="<%=StringEscapeUtils.escapeHtml4(patientDisplayName)%>"/>
+                                    <input type="hidden" name="patientPrintHeaderData" value="<%=StringEscapeUtils.escapeHtml4(patientPrintHeaderData)%>"/>
                                     <% if ( !ackFlag ) { %>
                                     <input type="submit" value="<bean:message key="oscarMDS.segmentDisplay.btnAcknowledge"/>" onclick="return getComment();">
                                     <% } %>
@@ -743,7 +769,7 @@ public String strikeOutInvalidContent(String content, String status) {
                                                                     </td>
                                                                     <td>
                                                                         <div class="FieldData">
-                                                                            <%=handler.getHealthNum()%>
+                                                                            <%=patientHealthNo%>
                                                                         </div>
                                                                     </td>
 
@@ -791,7 +817,7 @@ public String strikeOutInvalidContent(String content, String status) {
                                                                     <td>
                                                                         <div class="FieldData" >
                                                                             <% if ( searchProviderNo == null ) { // we were called from e-chart%>
-                                                                            <span><%=handler.getPatientName()%>
+                                                                            <span><%=patientDisplayName%>
                                                                             	<%
                                                                             		if(preview) {
                                                                             			if(demographicIDThatWillMatch != null) {
@@ -807,7 +833,7 @@ public String strikeOutInvalidContent(String content, String status) {
                                                                             <% } else { // we were called from lab module%>
                                                                             <a href="javascript:popupStart(360, 680, '<%= request.getContextPath() %>/oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">
 
-                                                                                <%=handler.getPatientName()%>
+                                                                                <%=patientDisplayName%>
                                                                             </a>
                                                                               <% } %>
                                                                         </div>

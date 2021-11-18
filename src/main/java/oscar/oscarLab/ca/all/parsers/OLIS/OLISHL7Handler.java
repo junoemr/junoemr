@@ -245,7 +245,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return patientIdentifiers.get("ML");
 	}
 
-	String[] getMedicalRecordNumber() {
+	public String[] getMedicalRecordNumber()
+	{
 		return patientIdentifiers.get("MR");
 	}
 

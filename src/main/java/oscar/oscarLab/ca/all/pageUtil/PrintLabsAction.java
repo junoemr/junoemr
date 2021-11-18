@@ -179,7 +179,9 @@ public class PrintLabsAction extends Action{
 
 		pdfDocument.addEventHandler(PdfDocumentEvent.START_PAGE, new OLISPrintHeader(
 				"Ministry of Health and Long-Term Care",
-				"Ontario Laboratories Information System (OLIS)"));
+				"Ontario Laboratories Information System (OLIS)",
+				StringUtils.trimToEmpty(request.getParameter("patientDisplayName")),
+				StringUtils.trimToEmpty(request.getParameter("patientPrintHeaderData"))));
 
 		OLISPrintFooter printFooter = new OLISPrintFooter(loggedInInfo.getLoggedInProvider().getDisplayName());
 		pdfDocument.addEventHandler(PdfDocumentEvent.END_PAGE, printFooter);
