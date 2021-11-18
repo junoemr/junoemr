@@ -74,7 +74,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	protected static final OLISResultNomenclatureDao resultNomenclatureDao = SpringUtils.getBean(OLISResultNomenclatureDao.class);
 
 	private static final Logger logger = Logger.getLogger(OLISHL7Handler.class);
-	private static final String finalStatus = "CFEX";
+	private static final String finalOBRStatus = "CFEX";
+	private static final String finalOBXStatus = "F";
 
 	protected ERP_R09 msg = null;
 
@@ -963,7 +964,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			}
 
 			String status = getObrStatus(i);
-			isFinal &= isStatusFinal(status);
+			isFinal &= isOBRStatusFinal(status);
 			isCorrected |= status.equals("C");
 
 			String parentSetId = getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-26-2-1"));
@@ -1262,9 +1263,14 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return obxKeys;
 	}
 
-	public boolean isStatusFinal(String status)
+	public boolean isOBRStatusFinal(String status)
 	{
-		return finalStatus.contains(status);
+		return finalOBRStatus.contains(status);
+	}
+
+	public boolean isOBXStatusFinal(String status)
+	{
+		return finalOBXStatus.contains(status);
 	}
 
 	public String getNatureOfAbnormalTest(int obr, int obx)
