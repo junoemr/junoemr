@@ -22,6 +22,18 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: 'Download .m2 dir'
+        uses: actions/download-artifact@v2
+        with:
+          name: m2_dir
+
       # Runs a single command using the runners shell
       - name: Build and run tests
         run: docker-compose -f "docker/maven/docker-compose.yml" up --exit-code-from juno-maven 
+
+      - name: 'Upload .m2 dir as Artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: m2_dir
+          path: ~/.m2
+          retention-days: 5
