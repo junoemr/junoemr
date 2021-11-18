@@ -1522,10 +1522,21 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	@Override
 	public String getOBRName(int i)
 	{
-		String obrName = get("/.ORDER_OBSERVATION(" + i + ")/OBR-4-2");
-		if(StringUtils.isBlank(obrName))
+		String obrName = null;
+		String nameId = get("/.ORDER_OBSERVATION(" + i + ")/OBR-4-1");
+		OLISRequestNomenclature requestNomenclature = requestNomenclatureDao.findByNameId(nameId);
+		if(requestNomenclature != null)
 		{
-			obrName = get("/.ORDER_OBSERVATION(" + i + ")/OBR-4-1");
+			obrName = requestNomenclature.getAltName1();
+			if(obrName == null)
+			{
+				obrName = requestNomenclature.getName();
+			}
+		}
+		if(obrName == null)
+		{
+			// default to name in hl7
+			obrName = get("/.ORDER_OBSERVATION(" + i + ")/OBR-4-2");
 		}
 		return getString(obrName);
 	}
