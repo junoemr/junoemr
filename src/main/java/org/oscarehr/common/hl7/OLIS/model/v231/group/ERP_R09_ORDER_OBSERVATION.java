@@ -75,9 +75,19 @@ public class ERP_R09_ORDER_OBSERVATION extends AbstractGroup
 		return this.getTyped("ZBR", ZBR.class);
 	}
 
-	public DG1 getDG1()
+	public DG1 getDG1(int rep)
 	{
-		return this.getTyped("DG1", DG1.class);
+		return this.getTyped("DG1", rep, DG1.class);
+	}
+
+	public int getDG1Reps()
+	{
+		return this.getReps("DG1");
+	}
+
+	public List<DG1> getDG1All() throws HL7Exception
+	{
+		return this.getAllAsList("DG1", DG1.class);
 	}
 
 	public ERP_R09_NOTE getNOTE(int rep)

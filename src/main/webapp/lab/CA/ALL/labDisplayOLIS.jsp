@@ -1658,14 +1658,15 @@ public String strikeOutInvalidContent(String content, String status) {
                                         </tr>
                                         <% } %>
                                         <%
-                                        String diagnosis = handler.getDiagnosis(obr);
-                                        if (!stringIsNullOrEmpty(diagnosis)) {
+                                        List<String> diagnoses = handler.getDiagnosis(obr);
+                                        if (!diagnoses.isEmpty()) {
                                         %>
                                         <tr>
                                             <td bgcolor="#FFCC00" colspan="2">
                                                 <div class="FieldData">
-                                                    <strong>Diagnosis:</strong><br/>
-                                                    <%=diagnosis%>
+                                                    <strong>Diagnosis:</strong>
+	                                                <br/>
+                                                    <%=String.join("<br/>", diagnoses)%>
                                                 </div>
                                             </td>
                                         </tr>

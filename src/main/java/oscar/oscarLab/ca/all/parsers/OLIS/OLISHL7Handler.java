@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static org.oscarehr.olis.service.OLISPollingService.OLIS_DATE_FORMAT;
 
@@ -873,9 +874,19 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return obrParentMap.containsValue(obr);
 	}
 
-	public String getDiagnosis(int obr)
+	public List<String> getDiagnosis(int obr)
 	{
-		return getString(get("/.ORDER_OBSERVATION(" + obr + ")/DG1-3-2-1"));
+		try
+		{
+			return msg.getRESPONSE().getORDER_OBSERVATION(obr).getDG1All().stream()
+					.map((dg1) -> dg1.getDg13_DiagnosisCodeDG1().getCe2_Text().getValue())
+					.collect(Collectors.toList());
+		}
+		catch(HL7Exception e)
+		{
+			logger.error("hl7 lookup error", e);
+		}
+		return new ArrayList<>(0);
 	}
 
 	public int getMappedOBR(int obr)

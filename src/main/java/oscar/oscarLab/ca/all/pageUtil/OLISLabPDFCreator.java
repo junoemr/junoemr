@@ -23,25 +23,6 @@
  */
 package oscar.oscarLab.ca.all.pageUtil;
 
-import java.awt.Color;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.Hl7TextMessageDao;
-import org.oscarehr.common.model.Hl7TextMessage;
-import org.oscarehr.common.model.Provider;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -57,13 +38,30 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfPageEventHelper;
 import com.lowagie.text.pdf.PdfWriter;
-
+import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.Hl7TextMessageDao;
+import org.oscarehr.common.model.Hl7TextMessage;
+import org.oscarehr.common.model.Provider;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
 import oscar.oscarLab.ca.all.util.Utilities;
 import oscar.util.UtilDateUtilities;
+
+import javax.servlet.http.HttpServletRequest;
+import java.awt.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 
 public class OLISLabPDFCreator extends PdfPageEventHelper
@@ -405,11 +403,11 @@ public class OLISLabPDFCreator extends PdfPageEventHelper
 			cell.setPhrase(new Phrase(getFullAddress(handler.getPerformingFacilityAddress(obr)), font));
 			categoryTable.addCell(cell);
 		}
-		String diagnosis = handler.getDiagnosis(obr);
-		if (!stringIsNullOrEmpty(diagnosis)){
+		List<String> diagnoses = handler.getDiagnosis(obr);
+		if (!diagnoses.isEmpty()){
 			cell.setPhrase(new Phrase("Diagnosis: ", font));
 			categoryTable.addCell(cell);
-			cell.setPhrase(new Phrase(diagnosis, font));
+			cell.setPhrase(new Phrase(String.join("\n", diagnoses), font));
 			categoryTable.addCell(cell);
 		}
 
