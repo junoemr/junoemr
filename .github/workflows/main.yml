@@ -33,11 +33,11 @@ jobs:
       - name: Cache npm
         uses: actions/cache@v2
         with:
-          path: ~/.npm
+          path: ~/.npm.docker
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
 
       # Runs a single command using the runners shell
       - name: Build and run tests
-        run: docker-compose -f "docker/maven/docker-compose-github.yml" up --exit-code-from juno-maven
+        run: docker-compose -f "docker/maven/docker-compose.yml" up --exit-code-from juno-maven
