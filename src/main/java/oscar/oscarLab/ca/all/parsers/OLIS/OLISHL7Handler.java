@@ -1640,8 +1640,17 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return obxIdent != null && (obxIdent.toUpperCase().startsWith("LN"));
 	}
 
-	public String getOBXCESensitivity(int i, int j) {
-		return (getOBXField(i, j, 5, 0, 1));
+	public String getOBXCESensitivity(int i, int j)
+	{
+		String obxValueType = getOBXValueType(i,j);
+		switch(obxValueType)
+		{
+			case "SN": return getOBXSNResult(i, j);
+			case "TS": return getOBXTSResult(i, j);
+			case "DT": return getOBXDTResult(i, j);
+			case "TM": return getOBXTMResult(i, j);
+			default: return getOBXResult(i, j);
+		}
 	}
 
 	@Override
@@ -1680,7 +1689,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public String getOBXResultStatus(int i, int j) {
+	public String getOBXResultStatus(int i, int j)
+	{
 		return (getOBXField(i, j, 11, 0, 1));
 	}
 
