@@ -307,7 +307,21 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		{
 			if (dosage.matches(".*-.*"))
 			{
-				return dosage.split("-");
+				String[] minmax = dosage.split("-");
+				String min = Util.leadingNum(minmax[0]);
+				String max = Util.leadingNum(minmax[1]);
+				if (min.isEmpty() && !max.isEmpty())
+				{
+					min = max;
+				}
+				if (max.isEmpty() && !min.isEmpty())
+				{
+					max = min;
+				}
+				minmax[0] = min;
+				minmax[1] = max;
+
+				return minmax;
 			}
 			return new String[] {dosage, dosage};
 		}
