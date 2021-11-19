@@ -36,7 +36,9 @@ public class Navigation
 {
 	private static final OscarProperties properties = OscarProperties.getInstance();
 
-	public static final String OSCAR_URL = "http://juno-maven";
+	public static final String OSCAR_URL_DEFAULT = "http://localhost";
+	public static final String OSCAR_URL_DOCKER = "http://juno-maven";
+
 	public static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do" +
 		"?providerNo=" + AuthUtils.TEST_PROVIDER_ID +
 		"&appointmentNo=" +
@@ -110,6 +112,12 @@ public class Navigation
 
 	public static String getOscarUrl(String serverPort)
 	{
-		return OSCAR_URL + ":" + serverPort + "/" + properties.getProjectHome();
+		String url = OSCAR_URL_DEFAULT;
+		if(OscarProperties.isDockerTestingEnabled())
+		{
+			url = OSCAR_URL_DOCKER;
+		}
+
+		return url + ":" + serverPort + "/" + properties.getProjectHome();
 	}
 }

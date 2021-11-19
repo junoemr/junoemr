@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
 import org.springframework.context.annotation.Import;
+import oscar.OscarProperties;
 
 @Import(TestConfig.class)
 public class SeleniumTestBase
@@ -69,7 +70,9 @@ public class SeleniumTestBase
 	public static final Integer WEB_DRIVER_IMPLICIT_TIMEOUT = 60;
 	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 120;
 	private static final String GECKO_DRIVER="src/test/resources/vendor/geckodriver";
+	private static final String DOCKER_INTEGRATION_PROPERTIES_FILE = "src/test/resources/docker_integration.properties";
 	private static final String DEFAULT_INTEGRATION_PROPERTIES_FILE = "src/test/resources/integration.properties";
+	private static final String DOCKER_SELENIUM_TEST_URL = "http://juno-selenium-firefox:4444/";
 
 	protected static WebDriver driver;
 	protected static Logger logger= MiscUtils.getLogger();
@@ -82,10 +85,10 @@ public class SeleniumTestBase
 	synchronized public static void buildWebDriver() throws SQLException, InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException
 	{
-		String integrationPropertiesFile = System.getProperty("integration_properties_file");
-		if(integrationPropertiesFile == null)
+		String integrationPropertiesFile = DEFAULT_INTEGRATION_PROPERTIES_FILE;
+		if(OscarProperties.isDockerTestingEnabled())
 		{
-			integrationPropertiesFile = DEFAULT_INTEGRATION_PROPERTIES_FILE;
+			integrationPropertiesFile = DOCKER_INTEGRATION_PROPERTIES_FILE;
 		}
 
 		oscar.OscarProperties p = oscar.OscarProperties.getInstance();
@@ -105,30 +108,30 @@ public class SeleniumTestBase
 	@Before
 	public void login()
 	{
-		/*
-		FirefoxBinary ffb = new FirefoxBinary();
-		FirefoxOptions ffo = new FirefoxOptions();
-		if(junoProperties.getTest().isHeadless())
-		{
-			ffb.addCommandLineOptions("--headless");
-		}
-		ffo.setBinary(ffb);
-		driver = new FirefoxDriver(ffo);
-		 */
-
 		FirefoxOptions firefoxOptions = new FirefoxOptions();
 
-		try
+		if(OscarProperties.isDockerTestingEnabled())
 		{
-			driver = new RemoteWebDriver(new URL("http://juno-selenium-firefox:4444/"),
-				firefoxOptions);
+			try
+			{
+				driver = new RemoteWebDriver(new URL(DOCKER_SELENIUM_TEST_URL), firefoxOptions);
+			}
+			catch (MalformedURLException e)
+			{
+				logger.error("Error starting remote web driver", e);
+			}
+
 		}
-		catch (MalformedURLException e)
+		else
 		{
-
+			FirefoxBinary ffb = new FirefoxBinary();
+			if(junoProperties.getTest().isHeadless())
+			{
+				ffb.addCommandLineOptions("--headless");
+			}
+			firefoxOptions.setBinary(ffb);
+			driver = new FirefoxDriver(firefoxOptions);
 		}
-
-
 
 		Navigation.doLogin(
 			AuthUtils.TEST_USER_NAME,

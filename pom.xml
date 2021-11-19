@@ -74,10 +74,6 @@
       <id>local_repo</id>
       <url>file://${basedir}/local_repo</url>
     </repository>
-    <repository>
-      <id>nexus.cloudpractice</id>
-      <url>http://nexus.apps.prod.cldmd.net/nexus/content/repositories/cloud-practice/</url>
-    </repository>
 		<repository>
 			<id>jaspersoft-third-party</id>
 			<url>https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
@@ -85,13 +81,6 @@
 		<repository>
 			<id>openshift.nexus</id>
 			<url>http://nexus.apps.prod.cldmd.net/nexus/content/groups/public/</url>
-		</repository>
-		<repository>
-			<id>github</id>
-			<url>https://maven.pkg.github.com/cloudpracticeinc/*</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
 		</repository>
 	</repositories>
 	<pluginRepositories>
@@ -1512,6 +1501,10 @@
 			<plugin>
 				<groupId>pl.project13.maven</groupId>
 				<artifactId>git-commit-id-plugin</artifactId>
+        <configuration>
+          <offline>true</offline>
+          <verbose>false</verbose>
+        </configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
