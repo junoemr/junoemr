@@ -134,7 +134,7 @@ public class HrmDocumentDbToModelConverter extends
 			category = new HrmCategory();
 			category.setId(hrmCategory.getId());
 			category.setName(hrmCategory.getCategoryName());
-			category.setSubClassNameMnemonic(hrmCategory.getSubClassNameMnemonic());
+			category.setDisabledAt(hrmCategory.getDisabledAt());
 		}
 		return category;
 	}

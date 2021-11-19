@@ -1,0 +1,7 @@
+ALTER TABLE HRMSubClass DROP COLUMN IF EXISTS subClassMnemonic;
+ALTER TABLE HRMSubClass DROP COLUMN IF EXISTS subclassDescription;
+ALTER TABLE HRMSubClass ADD COLUMN IF NOT EXISTS acc_subclass_name VARCHAR(255) AFTER subClassName;
+ALTER TABLE HRMSubClass ADD COLUMN IF NOT EXISTS disabled_at DATETIME AFTER hrmCategoryId;
+
+ALTER TABLE HRMCategory DROP COLUMN subclassNameMnemonic;
+ALTER TABLE HRMCategory ADD COLUMN disabled_at DATETIME AFTER categoryName;

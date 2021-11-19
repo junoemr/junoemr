@@ -23,11 +23,17 @@
 package org.oscarehr.dataMigration.model.hrm;
 
 import lombok.Data;
+import java.time.LocalDate;
 
 @Data
 public class HrmCategory
 {
 	private Integer id;
 	private String name;
-	private String subClassNameMnemonic;
+	private LocalDate disabledAt;
+
+	public boolean isDisabled()
+	{
+		return this.disabledAt == null;
+	}
 }

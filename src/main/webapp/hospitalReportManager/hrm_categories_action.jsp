@@ -36,11 +36,9 @@ if(!authed) {
 	if ("add".equals(action))
 	{
 		String categoryName=request.getParameter("categoryName");
-		String subClassNameMnemonic=request.getParameter("subClassNameMnemonic");
-		
+
 		HRMCategory category=new HRMCategory();
 		category.setCategoryName(categoryName);
-		category.setSubClassNameMnemonic(subClassNameMnemonic);
 		
 		hrmCategoryDao.persist(category);
 	}

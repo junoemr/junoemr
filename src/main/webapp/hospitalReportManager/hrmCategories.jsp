@@ -60,12 +60,6 @@ if(!authed) {
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">SubClass Name Mnemonic:</label>
-			<div class="controls">
-				<input type="text" name="subClassNameMnemonic" /> (should be of the format &lt;subclass_name&gt;:&lt;subclass_mnemonic&gt;)
-			</div>
-		</div>
-		<div class="control-group">
 			<input type="submit" class="btn btn-primary" value="Add" />
 		</div>
 	</fieldset>	
@@ -87,7 +81,6 @@ if(!authed) {
 		<tr>
 			<td><%=category.getId()%>&nbsp;</td>
 			<td><%=StringEscapeUtils.escapeHtml(category.getCategoryName())%>&nbsp;</td>
-			<td><%=StringEscapeUtils.escapeHtml(category.getSubClassNameMnemonic())%>&nbsp;</td>
 		</tr>
 	<%
 		}
