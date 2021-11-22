@@ -83,6 +83,7 @@ import org.oscarehr.encounterNote.service.MedicalHistoryNoteService;
 import org.oscarehr.encounterNote.service.ReminderNoteService;
 import org.oscarehr.encounterNote.service.SocialHistoryNoteService;
 import org.oscarehr.labs.service.LabService;
+import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.message.service.MessageService;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.model.Prevention;
@@ -132,6 +133,8 @@ public class CoPDImportService
 	private static final String IMPORT_PROVIDER = properties.getProperty("copd_import_service.system_provider_no", "999900");
 	private static final String DEFAULT_PROVIDER_LAST_NAME = properties.getProperty("copd_import_service.default_provider.last_name", "CoPD-provider");
 	private static final String DEFAULT_PROVIDER_FIRST_NAME = properties.getProperty("copd_import_service.default_provider.first_name", "CoPD-missing");
+	protected static final String DEFAULT_USER_INTERFACE_KEY = "cobalt";
+	protected static final String DEFAULT_USER_INTERFACE_VALUE = "yes";
 
 	@Autowired
 	DemographicService demographicService;
@@ -204,6 +207,9 @@ public class CoPDImportService
 
 	@Autowired
 	ProviderRoleService providerRoleService;
+
+	@Autowired
+	ProviderManager2 providerManager2;
 
 	private static long missingDocumentCount = 0;
 
@@ -400,6 +406,7 @@ public class CoPDImportService
 		if(providerLookupCache.containsKey(cacheKey))
 		{
 			provider = providerLookupCache.get(cacheKey);
+			providerManager2.updateSingleSetting(provider.getId(), DEFAULT_USER_INTERFACE_KEY, DEFAULT_USER_INTERFACE_VALUE);
 			logger.info("Use existing cached Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 		}
 		else
@@ -420,12 +427,14 @@ public class CoPDImportService
 				String billCenterCode = properties.getProperty("default_bill_center", "");
 				provider = providerService.addNewProvider(IMPORT_PROVIDER, provider, billCenterCode);
 				providerRoleService.setDefaultRoleForNewProvider(provider.getId());
+				providerManager2.updateSingleSetting(provider.getId(), DEFAULT_USER_INTERFACE_KEY, DEFAULT_USER_INTERFACE_VALUE);
 
 				logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 			}
 			else if(matchedProviders.size() == 1)
 			{
 				provider = matchedProviders.get(0);
+				providerManager2.updateSingleSetting(provider.getId(), DEFAULT_USER_INTERFACE_KEY, DEFAULT_USER_INTERFACE_VALUE);
 				logger.info("Use existing uncached Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 			}
 			else

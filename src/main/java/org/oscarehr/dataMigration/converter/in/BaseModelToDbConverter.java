@@ -27,6 +27,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.search.ProviderCriteriaSearch;
@@ -45,6 +46,8 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 	protected static final String IMPORT_PROVIDER = properties.getProperty("import_service.system_provider_no", "999900");
 	protected static final String DEFAULT_PROVIDER_LAST_NAME = properties.getProperty("import_service.default_provider.last_name", "import");
 	protected static final String DEFAULT_PROVIDER_FIRST_NAME = properties.getProperty("import_service.default_provider.first_name", "provider");
+	protected static final String DEFAULT_USER_INTERFACE_KEY = "cobalt";
+	protected static final String DEFAULT_USER_INTERFACE_VALUE = "yes";
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final HashMap<String, ProviderData> providerLookupCache = new HashMap<>();
@@ -54,6 +57,9 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 
 	@Autowired
 	private ProviderService providerService;
+
+	@Autowired
+	private ProviderManager2 providerManager2;
 
 	@Autowired
 	private ProviderRoleService providerRoleService;
@@ -99,6 +105,7 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 		if(providerLookupCache.containsKey(cacheKey))
 		{
 			dbProvider = providerLookupCache.get(cacheKey);
+			providerManager2.updateSingleSetting(dbProvider.getId(), DEFAULT_USER_INTERFACE_KEY, DEFAULT_USER_INTERFACE_VALUE);
 			logger.info("Use existing cached Provider record " + dbProvider.getId() + " (" + dbProvider.getLastName() + "," + dbProvider.getFirstName() + ")");
 		}
 		else
@@ -119,12 +126,14 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 				String billCenterCode = properties.getProperty("default_bill_center", "");
 				dbProvider = providerService.addNewProvider(IMPORT_PROVIDER, dbProvider, billCenterCode);
 				providerRoleService.setDefaultRoleForNewProvider(dbProvider.getId());
+				providerManager2.updateSingleSetting(dbProvider.getId(), DEFAULT_USER_INTERFACE_KEY, DEFAULT_USER_INTERFACE_VALUE);
 
 				logger.info("Created new Provider record " + dbProvider.getId() + " (" + dbProvider.getLastName() + "," + dbProvider.getFirstName() + ")");
 			}
 			else if(matchedProviders.size() == 1)
 			{
 				dbProvider = matchedProviders.get(0);
+				providerManager2.updateSingleSetting(dbProvider.getId(), DEFAULT_USER_INTERFACE_KEY, DEFAULT_USER_INTERFACE_VALUE);
 				logger.info("Use existing uncached Provider record " + dbProvider.getId() + " (" + dbProvider.getLastName() + "," + dbProvider.getFirstName() + ")");
 			}
 			else
