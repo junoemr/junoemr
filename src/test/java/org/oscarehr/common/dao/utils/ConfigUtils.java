@@ -52,7 +52,6 @@ public class ConfigUtils
 		try
         {
 			String overrideProperties = System.getProperty("oscar_override_properties");
-			logger.info("loading "+ overrideProperties);
 	        properties = getProperties(overrideProperties, defaultPropertiesUrl);
         }
         catch (IOException e)
@@ -81,16 +80,19 @@ public class ConfigUtils
 	 */
 	protected static Properties getProperties(String propertiesUrl, String defaultPropertiesUrl) throws IOException
 	{
-		Properties p=new Properties();
-		readFromFile(defaultPropertiesUrl, p);
+		Properties extraProperties = new Properties();
 
-		if (propertiesUrl!=null)
+		logger.info("Loading extra properties from " + defaultPropertiesUrl);
+		readFromFile(defaultPropertiesUrl, extraProperties);
+
+		if (propertiesUrl != null)
 		{
-			p=new Properties(p);
-			readFromFile(propertiesUrl, p);
+			logger.info("Loading more extra properties from " + propertiesUrl);
+			extraProperties = new Properties(extraProperties);
+			readFromFile(propertiesUrl, extraProperties);
 		}
 
-		return(p);
+		return(extraProperties);
 	}
 
 	protected static Properties getProperties()
