@@ -33,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
@@ -99,6 +100,7 @@ public class SendMessagesClassicUIIT extends SeleniumTestBase
 	{
 		String subjectPatientAttached = "Message with Patient Attached";
 		String patientLName = patientLNames[1];
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("oscar_new_msg")));
 		driver.findElement(By.id("oscar_new_msg")).click();
 		PageUtil.switchToLastWindow(driver);
 		String currWindowHandle = driver.getWindowHandle();
@@ -109,6 +111,7 @@ public class SendMessagesClassicUIIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(patientLName);
 		driver.findElement(By.xpath("//input[@name='searchDemo']")).click();
 		PageUtil.switchToLastWindow(driver);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("2")));
 		driver.findElement(By.linkText("2")).click();
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.findElement(By.xpath("//input[@value='Send Message']")).click();

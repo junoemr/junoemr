@@ -49,7 +49,9 @@ public class EditRiskFactorsClassicUIIT extends SeleniumTestBase
 	{
 		return new String[]{
 				"casemgmt_cpp", "casemgmt_issue", "casemgmt_issue_notes", "casemgmt_note",
-				"casemgmt_note_ext", "eChart", "hash_audit", "log"
+				"casemgmt_note_ext", "eChart", "hash_audit", "log", "admission", "demographic",
+				"log_ws_rest", "measurementType", "partial_date", "property", "validations"
+
 		};
 	}
 

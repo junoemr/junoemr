@@ -199,7 +199,8 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		driver.findElement(By.id("input-notes")).sendKeys(notesUpdated);
 		driver.findElement(By.id("input-event_reason")).clear();
 		driver.findElement(By.id("input-event_reason")).sendKeys(reasonUpdated);
-		driver.findElement(By.xpath("//label[@class='form-control checkmark']")).click();
+		//driver.findElement(By.xpath("//label[@class='form-control checkmark']")).click();
+		driver.findElement(By.xpath("//label[contains(., 'Critical')]")).click();
 		driver.findElement(By.xpath("//button[contains(., 'Modify')]")).click();
 		Assert.assertTrue("Patient is NOT updated successfully.",
 				PageUtil.isExistsBy(By.partialLinkText(dad.lastName), driver));
@@ -210,7 +211,7 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		String reasonCode = getDropdownValue(By.id("input-reason-code"));
 		String notes = driver.findElement(By.id("input-notes")).getAttribute("value");
 		String reason = driver.findElement(By.id("input-event_reason")).getAttribute("value");
-		boolean critialStatus = driver.findElement(By.xpath("//label[@class='form-control checkmark']")).isSelected();
+		boolean critialStatus = driver.findElement(By.xpath("//label[contains(., 'Critical')]")).isSelected();
 
 		Assert.assertEquals("Type is NOT updated successfully.", typeUpdated, type);
 		Assert.assertEquals("Duration is NOT updated successfully.", apptDurationUpdated, apptDuration);

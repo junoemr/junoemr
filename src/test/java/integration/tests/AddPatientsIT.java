@@ -65,7 +65,7 @@ public class AddPatientsIT extends SeleniumTestBase
 	{
 		return new String[]{
 			"demographicArchive", "demographiccust", "demographicExt", "demographicExtArchive", "log", "log_ws_rest",
-			"program", "provider_recent_demographic_access"
+			"program", "provider_recent_demographic_access", "admission", "demographic", "property"
 		};
 	}
 
