@@ -22,7 +22,7 @@ services:
     depends_on: [juno-test-db, juno-selenium-firefox]
     build: .
     #image: maven:3.6.3-openjdk-8
-    command: mvn -Drun_tests_with_docker=true -Duser.home=/home/maven clean test
+    command: mvn -Drun_tests_with_docker=true -Duser.home=/home/maven clean verify
     volumes:
       - ../../:/usr/src/mymaven:Z
       - ~/.m2:/home/maven/.m2:Z
