@@ -107,6 +107,7 @@
 										</label>
 										<juno-patient-search-typeahead
 												id="input-patient"
+												ng-ref="eventController.patientSearchRef"
 												juno-icon-right="true"
 												juno-model="eventController.patientTypeahead"
 												juno-add-button-title="New Demographic"

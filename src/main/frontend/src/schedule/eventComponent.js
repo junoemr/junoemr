@@ -32,6 +32,7 @@ angular.module('Schedule').component('eventComponent', {
 		'securityService',
 		'securityRolesService',
 		'scheduleService',
+		'focusService',
 
 		function (
 			$scope,
@@ -47,6 +48,7 @@ angular.module('Schedule').component('eventComponent', {
 			securityService,
 			securityRolesService,
 			scheduleService,
+			focusService,
 		)
 		{
 
@@ -488,6 +490,19 @@ angular.module('Schedule').component('eventComponent', {
 						}
 				);
 			};
+
+			controller.$postLink = () =>
+			{
+				// wrapped in a timeout because ref does not properly initialize at this phase when inside a transclude for some reason
+				$timeout(function ()
+				{
+					// autofocus demographic search if there is no patient
+					if (controller.patientSearchRef && !$scope.isPatientSelected())
+					{
+						focusService.element(controller.patientSearchRef.find(":input:first"));
+					}
+				}, 0);
+			}
 
 			//=========================================================================
 			// Private methods
