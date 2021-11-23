@@ -349,6 +349,12 @@ public class RecordUxService extends AbstractServiceImpl {
 			{
 				summaryList.add(new SummaryTo1("Allergies", count++, SummaryTo1.ALLERGIES));
 			}
+
+			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.FORM_READ, Permission.EFORM_READ)
+				&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ASSESSMENTS_POS))
+			{
+				summaryList.add(new SummaryTo1("Forms", count++, SummaryTo1.FORMS_CODE));
+			}
 			
 			if(properties.isModuleEnabled(OscarProperties.Module.MODULE_HRM)
 					&& securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.HRM_READ))
