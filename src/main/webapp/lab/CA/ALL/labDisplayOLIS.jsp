@@ -2006,7 +2006,24 @@ public String strikeOutInvalidContent(String content, String status) {
    											</tr>
 											<%
 													}
-  												}
+													// display child obr comments at the bottom of the section
+													for (int n=0; n < handler.getOBRCommentCount(childOBR); n++)
+													{%>
+					                        <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
+						                        <td valign="top" align="left" colspan="7">
+							                        <%=handler.getOBRComment(childOBR, n)%>
+							                        <span style="margin-left:15px;font-size:8px; color:#333333;word-break:normal;">
+								                        <%=handler.getOBRSourceOrganization(childOBR, n)%>
+		                                            </span>
+						                        </td>
+					                        </tr>
+		                                            <%}
+		                                            // add some spacing after commments%>
+                                            <tr style="height: 8px;" bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
+						                        <td colspan="7">&nbsp</td>
+					                        </tr><%
+
+                                                }
    											}
                                         } else {
                                         	%>
