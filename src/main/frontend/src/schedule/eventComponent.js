@@ -10,6 +10,7 @@ import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import {MhaAppointmentApi, MhaDemographicApi, MhaIntegrationApi, SitesApi} from "../../generated";
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {VirtualAppointmentType, virtualAppointmentTypeOptions} from "../lib/appointment/model/VirtualAppointmentType";
+import ToastService from "../lib/alerts/service/ToastService";
 
 angular.module('Schedule').component('eventComponent', {
 	templateUrl: "src/schedule/event.jsp",
@@ -54,6 +55,10 @@ angular.module('Schedule').component('eventComponent', {
 
 			let controller = this;
 
+			//=========================================================================
+			// Services
+			//=========================================================================/
+
 			$scope.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
 				'../ws/rs');
 
@@ -70,6 +75,9 @@ angular.module('Schedule').component('eventComponent', {
 					'../ws/rs');
 
 			let sitesApi = new SitesApi($http, $httpParamSerializer, '../ws/rs');
+
+			controller.toastService = new ToastService();
+
 			//=========================================================================
 			// Access Control
 			//=========================================================================/
@@ -1218,19 +1226,8 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.working = false;
 				}, function (result)
 				{
-					console.log($scope.displayMessages.field_errors()['location']);
-					if (!$scope.displayMessages.has_standard_errors())
-					{
-						console.log(result);
-						if (result.error.message)
-						{
-							$scope.displayMessages.add_standard_error(result.error.message);
-						}
-						else
-						{
-							$scope.displayMessages.add_generic_fatal_error();
-						}
-					}
+					let message = result.error.message ? result.error.message : "Unknown Error";
+					controller.toastService.errorToast("Failed to save changes: " + message);
 					$scope.working = false;
 				});
 			};
@@ -1362,9 +1359,10 @@ angular.module('Schedule').component('eventComponent', {
 					controller.parentScope.refetchEvents();
 					controller.modalInstance.close();
 					$scope.working = false;
-				}, function ()
+				}, function (result)
 				{
-					$scope.displayMessages.add_generic_fatal_error();
+					let message = result.error.message ? result.error.message : "Unknown Error";
+					controller.toastService.errorToast("Failed to save changes: " + message, true);
 					$scope.working = false;
 				});
 			};

@@ -476,7 +476,7 @@
 					type="button"
 					class="btn btn-default"
 					ng-click="eventController.saveDoNotBook()"
-					ng-disabled="eventController.isBookingDisabled()">Do Not Book
+					ng-disabled="eventController.isBookingDisabled() || eventData.virtual && eventController.editMode">Do Not Book
 			</button>
 
 			<button
