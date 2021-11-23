@@ -52,7 +52,7 @@ public class AddEformsClassicUIIT extends SeleniumTestBase
 			"eform_data", "eform_values", "Facility", "issue", "log", "log_ws_rest", "measurementType",
 			"LookupList", "LookupListItem", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
 			"providerArchive", "providerbillcenter", "ProviderPreference", "roster_status", "security", "secUserRole",
-			"tickler_text_suggest", "validations"
+			"tickler_text_suggest", "validations", "log_ws_rest", "provider_recent_demographic_access"
 		};
 	}
 

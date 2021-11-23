@@ -51,8 +51,11 @@ import org.springframework.boot.web.server.LocalServerPort;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.Set;
 import org.springframework.context.annotation.Import;
 import oscar.OscarProperties;
+
+import static org.junit.Assert.fail;
 
 @Import(TestConfig.class)
 public class SeleniumTestBase
@@ -145,13 +148,29 @@ public class SeleniumTestBase
 	}
 
 	@Before
-	@After
 	public void resetDatabase()
 		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
 		if(getTablesToRestore().length > 0)
 		{
 			SchemaUtils.restoreTable(getTablesToRestore());
+			//SchemaUtils.restoreAllTables();
+		}
+	}
+
+	@After
+	public void resetAndCheckDatabase()
+		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
+	{
+		if(getTablesToRestore().length > 0)
+		{
+			SchemaUtils.restoreTable(getTablesToRestore());
+			Set<String> errors = SchemaUtils.getFailedChecksums();
+
+			if(errors.size() > 0)
+			{
+				fail(String.join("\n", errors));
+			}
 		}
 	}
 

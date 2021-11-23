@@ -130,7 +130,8 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
 	@Before
 	@After
 	public void before() throws Exception {
-		//SchemaUtils.restoreAllTables();
+		SchemaUtils.restoreAllTables();
+		/*
 		SchemaUtils.restoreTable(
 		    "program",
 			"provider",
@@ -159,6 +160,7 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
 			"measurements",
 			"preventions"
         );
+		 */
 	}
 
 	Document getDocument(String doctype,String docdesc,String docxml,String docfilename,String doccreator,String responsible,String source,Integer program_id,

@@ -55,7 +55,7 @@ public class SendMessagesClassicUIIT extends SeleniumTestBase
 			"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate", "Facility",
 			"issue", "log", "LookupList", "LookupListItem", "measurementType", "messagelisttbl", "messagetbl", "msgDemoMap",
 			"OscarJob", "OscarJobType", "provider", "providerbillcenter", "ProviderPreference", "secUserRole",
-			"tickler_text_suggest", "validations"
+			"tickler_text_suggest", "validations", "log_ws_rest"
 		};
 	}
 

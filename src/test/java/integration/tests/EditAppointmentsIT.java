@@ -70,7 +70,7 @@ public class EditAppointmentsIT extends SeleniumTestBase
 			"measurementType", "mygroup", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
 			"provider_billing", "providerArchive", "providerbillcenter", "ProviderPreference", "providersite",
 			"rschedule", "secUserRole", "scheduledate", "scheduletemplate", "scheduletemplatecode", "site",
-			"tickler_text_suggest"
+			"tickler_text_suggest", "provider_recent_demographic_access"
 		};
 	}
 

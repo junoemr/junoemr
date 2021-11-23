@@ -57,7 +57,8 @@ public class EFormIT extends SeleniumTestBase
 	{
 		return new String[]{
 			"casemgmt_note", "eChart", "eform", "eform_data", "eform_instance",
-			"eform_values", "measurementType", "validations"
+			"eform_values", "measurementType", "validations", "provider_recent_demographic_access",
+			"log_ws_rest", "demographic", "admission", "log"
 		};
 	}
 

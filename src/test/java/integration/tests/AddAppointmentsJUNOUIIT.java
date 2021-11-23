@@ -57,28 +57,27 @@ public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 	static String patientName = patientLName + "," + patientFName;
 	String patientNameJUNO = patientLName + ", " + patientFName;
 
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"admission", "appointment", "appointment_status",
+			"demographic", "log", "log_ws_rest", "mygroup", "program_provider", "property",
+			"provider", "providerArchive", "provider_billing", "providerbillcenter",
+			"ProviderPreference", "providersite", "secUserRole", "site", "rschedule",
+			"scheduledate", "scheduletemplate", "scheduletemplatecode",
+			"provider_recent_demographic_access"
+		};
+	}
+
 	@Before
 	public void setup() throws Exception
 	{
-		SchemaUtils.restoreTable("admission", "appointment", "appointment_status", "demographic", "log", "log_ws_rest", "mygroup",
-			"program_provider", "property",	"provider", "providerArchive", "provider_billing", "providerbillcenter",
-			"ProviderPreference", "providersite", "secUserRole", "site",
-			"rschedule", "scheduledate", "scheduletemplate", "scheduletemplatecode");
-
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
 		databaseUtil.createTestProvider();
 		databaseUtil.createProviderSite();
 
-	}
-
-	@After
-	public void cleanup() throws Exception
-	{
-		SchemaUtils.restoreTable("admission", "appointment", "appointment_status", "demographic", "log", "log_ws_rest", "mygroup",
-				"program_provider", "property",	"provider", "providerArchive", "provider_billing", "providerbillcenter",
-				"ProviderPreference", "providersite", "secUserRole", "site",
-				"rschedule", "scheduledate", "scheduletemplate", "scheduletemplatecode");
 	}
 
 	public void selectTimeSlot(String startTimeExpected)

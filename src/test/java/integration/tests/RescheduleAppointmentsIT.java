@@ -58,11 +58,11 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
     protected String[] getTablesToRestore()
     {
         return new String[]{
-            "admission", "appointment","appointmentArchive", "billingservice", "caisi_role",
-            "demographic", "documentDescriptionTemplate", "Facility", "issue", "log", "log_ws_rest", "LookupList",
-            "LookupListItem", "measurementType", "OscarJob", "OscarJobType",
-            "provider", "provider_recent_demographic_access", "providerbillcenter", "ProviderPreference", "providersite",
-            "secUserRole", "site", "tickler_text_suggest"
+            "admission", "appointment", "appointmentArchive", "billingservice", "caisi_role",
+            "demographic", "documentDescriptionTemplate", "Facility", "issue", "log", "log_ws_rest",
+			"LookupList", "LookupListItem", "measurementType", "OscarJob", "OscarJobType",
+            "provider", "provider_recent_demographic_access", "providerbillcenter",
+			"ProviderPreference", "providersite", "secUserRole", "site", "tickler_text_suggest"
         };
     }
 

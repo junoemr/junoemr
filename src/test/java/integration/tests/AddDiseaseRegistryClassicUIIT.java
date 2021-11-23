@@ -53,7 +53,8 @@ public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 	protected String[] getTablesToRestore()
 	{
 		return new String[]{
-			"admission", "demographic", "dxresearch", "log", "measurementType", "quickListUser", "validations"
+			"admission", "demographic", "dxresearch", "log", "measurementType", "quickListUser",
+			"validations", "provider_recent_demographic_access", "log_ws_rest"
 		};
 	}
 

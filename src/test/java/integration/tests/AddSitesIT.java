@@ -51,7 +51,7 @@ public class AddSitesIT extends SeleniumTestBase
 	@After
 	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
 	{
-		SchemaUtils.restoreTable("admission", "log", "site");
+		SchemaUtils.restoreTable("admission", "log", "site", "log_ws_rest", "provider_recent_demographic_access");
 	}
 
 	public static void addNewSites(SiteTestData site)
