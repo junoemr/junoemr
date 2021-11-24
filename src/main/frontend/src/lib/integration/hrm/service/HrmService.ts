@@ -22,21 +22,38 @@
 */
 
 import {API_BASE_PATH} from "../../../constants/ApiConstants";
-import { HrmApi } from "../../../../../generated/api/HrmApi";
+import {HrmScheduleApi, HrmCategoriesApi, HrmCategoryApi} from "../../../../../generated";
 import HrmFetchResults from "../model/HrmFetchResults";
+import HrmCategory from "../model/HRMCategory"
+
+import {getAngular$http, getAngular$httpParamSerializer} from "../../../util/AngularUtil";
 
 export default class HrmService
 {
     protected _HRMSchedulerAPI: any;
+
+    protected _HRMCategoryAPI: any;
+
+    protected _HRMCategoriesAPI: any;
 
     // ==========================================================================
     // Public Methods
     // ==========================================================================
 
     public constructor() {
-        this._HRMSchedulerAPI = new HrmApi(
-            angular.injector(["ng"]).get("$http"),
-            angular.injector(["ng"]).get("$httpParamSerializer"),
+        this._HRMSchedulerAPI = new HrmScheduleApi(
+            getAngular$http(),
+            getAngular$httpParamSerializer(),
+            API_BASE_PATH);
+
+        this._HRMCategoryAPI = new HrmCategoryApi(
+            getAngular$http(),
+            getAngular$httpParamSerializer(),
+            API_BASE_PATH);
+
+        this._HRMCategoriesAPI = new HrmCategoriesApi(
+            getAngular$http(),
+            getAngular$httpParamSerializer(),
             API_BASE_PATH);
     }
 
@@ -52,4 +69,27 @@ export default class HrmService
         return new HrmFetchResults(rawResponse.data.body);
     }
 
+    public async getActiveCategories(): Promise<any>
+    {
+        const rawResponse = await this._HRMCategoriesAPI.getActiveCategories()
+        return HrmCategory.fromTransferArray(rawResponse.data.body);
+    }
+
+    public async createCategory(category: HrmCategory): Promise<any>
+    {
+      const rawResponse = await this._HRMCategoryAPI.createCategory(HrmCategory.toTransfer(category));
+      return HrmCategory.fromTransfer(rawResponse.data.body)
+    }
+
+    public async updateCategory(category: HrmCategory): Promise<any>
+    {
+      const rawResponse = await this._HRMCategoryAPI.updateCategory(category.id, HrmCategory.toTransfer(category));
+      return HrmCategory.fromTransfer(rawResponse.data.body);
+    }
+
+    public async deactivateCategory(category: HrmCategory): Promise<any>
+    {
+      const rawResponse = await this._HRMCategoryAPI.deactivateCategory(category.id);
+      return HrmCategory.fromTransfer(rawResponse.data.body);
+    }
 }

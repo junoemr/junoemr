@@ -20,24 +20,26 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.hrm;
 
-import lombok.Data;
-import org.oscarehr.hospitalReportManager.model.HRMSubClass;
+package org.oscarehr.dataMigration.converter.in.hrm;
 
-import java.time.LocalDate;
-import java.util.List;
+import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
+import org.oscarehr.dataMigration.model.hrm.HrmCategory;
+import org.oscarehr.hospitalReportManager.model.HRMCategory;
+import org.springframework.stereotype.Component;
 
-@Data
-public class HrmCategory
+@Component
+public class HrmCategoryModelToDbConverter extends BaseModelToDbConverter<HrmCategory, HRMCategory>
 {
-	private Integer id;
-	private String name;
-	private LocalDate disabledAt;
-	private List<HRMSubClass> subClasses;
 
-	public boolean isDisabled()
+	@Override
+	public HRMCategory convert(HrmCategory input)
 	{
-		return this.disabledAt == null;
+		HRMCategory entity = new HRMCategory();
+		entity.setId(input.getId());
+		entity.setCategoryName(input.getName());
+		entity.setDisabledAt((input.getDisabledAt()));
+
+		return entity;
 	}
 }

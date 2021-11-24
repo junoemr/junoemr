@@ -20,19 +20,23 @@
 * Victoria, British Columbia
 * Canada
 --%>
-<div id="ice-fall-admin">
-	<div class="ice-fall-nav navbar">
-		<ul class="nav navbar-nav">
-			<li ng-class="{'active': $ctrl.isTabActive('admin.iceFall.settings')}">
-				<a href="javascript:void(0)" ng-click="$ctrl.changeTab('admin.iceFall.settings')">Settings</a>
-			</li>
-			<li ng-class="{'active': $ctrl.isTabActive('admin.iceFall.activity')}">
-				<a href="javascript:void(0)" ng-click="$ctrl.changeTab('admin.iceFall.activity')">Activity</a>
-			</li>
-		</ul>
-	</div>
-	<hr>
-	<div class="ice-fall-content">
-		<ui-view></ui-view>
-	</div>
+
+<div id="hrm-index">
+    <div class="hrm-nav navbar">
+        <ul class="nav navbar-nav">
+            <li ng-class="{'active': $ctrl.isTabActive('admin.hrm.admin')}">
+                <a href="javascript:void(0)" ng-click="$ctrl.changeTab('admin.hrm.admin')">Status</a>
+            </li>
+            <li ng-class="{'active': $ctrl.isTabActive('admin.hrm.settings')}">
+                <a href="javascript:void(0)" ng-click="$ctrl.changeTab('admin.hrm.settings')">Settings</a>
+            </li>
+            <li ng-class="{'active': $ctrl.isTabActive('admin.hrm.category')}">
+                <a href="javascript:void(0)" ng-click="$ctrl.changeTab('admin.hrm.category')">Filing</a>
+            </li>
+        </ul>
+    </div>
+    <hr>
+    <div class="hrm-content">
+        <ui-view></ui-view>
+    </div>
 </div>

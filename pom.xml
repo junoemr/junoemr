@@ -1985,10 +1985,10 @@
 								org.oscarehr.ws.rest.AppointmentService
 								org.oscarehr.ws.rest.CareTrackerWebService
 								org.oscarehr.ws.rest.CareTrackersWebService
-                org.oscarehr.ws.rest.eform.EFormInstanceWebService
-                org.oscarehr.ws.rest.EFormService
-                org.oscarehr.ws.rest.EFormsService
-                org.oscarehr.ws.rest.FormsService
+                						org.oscarehr.ws.rest.eform.EFormInstanceWebService
+                						org.oscarehr.ws.rest.EFormService
+                						org.oscarehr.ws.rest.EFormsService
+               							 org.oscarehr.ws.rest.FormsService
 								org.oscarehr.ws.rest.DecisionSupportWebService
 								org.oscarehr.ws.rest.DemographicService
 								org.oscarehr.ws.rest.DemographicsService
@@ -2005,7 +2005,9 @@
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueueWebService
-                org.oscarehr.ws.rest.integrations.hrm.HrmWebService
+                						org.oscarehr.ws.rest.integrations.hrm.HrmScheduleWebService
+                						org.oscarehr.ws.rest.integrations.hrm.HrmCategoryWebService
+                						org.oscarehr.ws.rest.integrations.hrm.HrmCategoriesWebService
 								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
 								org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService
 								org.oscarehr.ws.rest.MeasurementsWebService

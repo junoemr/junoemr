@@ -20,24 +20,23 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.hrm;
 
-import lombok.Data;
-import org.oscarehr.hospitalReportManager.model.HRMSubClass;
+package org.oscarehr.dataMigration.mapper.hrm.in;
 
-import java.time.LocalDate;
-import java.util.List;
+import org.oscarehr.dataMigration.mapper.AbstractImportMapper;
+import org.oscarehr.dataMigration.model.hrm.HrmCategory;
+import org.oscarehr.ws.rest.transfer.integration.hrm.HRMCategoryTransferInbound;
+import org.springframework.stereotype.Component;
 
-@Data
-public class HrmCategory
+@Component
+public class HRMCategoryImportMapper extends AbstractImportMapper<HRMCategoryTransferInbound, HrmCategory>
 {
-	private Integer id;
-	private String name;
-	private LocalDate disabledAt;
-	private List<HRMSubClass> subClasses;
 
-	public boolean isDisabled()
+	@Override
+	public HrmCategory importToJuno(HRMCategoryTransferInbound importStructure) throws Exception
 	{
-		return this.disabledAt == null;
+		HrmCategory category = new HrmCategory();
+		category.setName(importStructure.getName());
+		return category;
 	}
 }

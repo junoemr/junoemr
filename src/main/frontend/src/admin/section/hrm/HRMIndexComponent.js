@@ -20,24 +20,23 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.hrm;
 
-import lombok.Data;
-import org.oscarehr.hospitalReportManager.model.HRMSubClass;
-
-import java.time.LocalDate;
-import java.util.List;
-
-@Data
-public class HrmCategory
-{
-	private Integer id;
-	private String name;
-	private LocalDate disabledAt;
-	private List<HRMSubClass> subClasses;
-
-	public boolean isDisabled()
+angular.module('Admin.Section').component('hrmIndex',
 	{
-		return this.disabledAt == null;
-	}
-}
+		templateUrl: 'src/admin/section/hrm/HRMIndex.jsp',
+		bindings: {},
+		controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state)
+		{
+			let ctrl = this;
+
+			ctrl.changeTab = function (state)
+			{
+				$state.go(state);
+			};
+
+			ctrl.isTabActive = function(tabState)
+			{
+				return tabState === $state.current.name;
+			}
+		}]
+	});

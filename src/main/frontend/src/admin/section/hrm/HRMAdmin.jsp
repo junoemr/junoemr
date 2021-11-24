@@ -21,7 +21,6 @@
 * Canada
 --%>
 <div id="hrm-admin" class="flex-col align-items-center justify-content-top h-100">
-    <div><h4>Health Report Manager (HRM) Admin</h4></div>
         <panel class="summary-container"
                component-style="$ctrl.COMPONENT_STYLE">
             <panel-header>
@@ -61,37 +60,6 @@
         </div>
         <div ng-if="$ctrl.working">
             <juno-loading-indicator indicator-type="dot-pulse"></juno-loading-indicator>
-        </div>
-    </div>
-    <div class="details-container flex-col align-items-start">
-        <div class="width-100 section">
-            <div class="flex-col justify-content-center header">
-                <h5>Connection</h5>
-            </div>
-            <div>
-                <p>Juno EMR is using the following connection settings:</p>
-                <div class="flex-col width-100 align-items-start">
-                    <div><span class="row-title">Address:</span> {{ $ctrl.address }}</div>
-                    <div><span class="row-title">User Name:</span> {{ $ctrl.user }}</div>
-                    <div><span class="row-title">Remote Path:</span> {{ $ctrl.remotePath }}</div>
-                    <div><span class="row-title">Port:</span>{{ $ctrl.port }}</div>
-                </div>
-            </div>
-        </div>
-        <div class="width-100 section">
-            <div class="flex-col justify-content-center header">
-                <h5>Downloading</h5>
-            </div>
-            <p>Juno EMR is automatically checking for new HRM reports every {{ $ctrl.interval }} minutes.</p>
-            </p>To check now, use the "Check For Reports" button above.</p>
-        </div>
-        <div class="width-100 section">
-            <div class="flex-col justify-content-center header">
-                <h5>Processing</h5>
-            </div>
-            <p>Juno EMR is decrypting your HRM reports.</p>
-            <p>Demographics and providers will be automatically linked to each message.
-               You can always change these assignments at any time using the HRM report viewer.</p>
         </div>
     </div>
 </div>

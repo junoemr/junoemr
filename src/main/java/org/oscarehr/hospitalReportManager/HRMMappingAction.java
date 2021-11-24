@@ -52,7 +52,7 @@ public class HRMMappingAction extends DispatchAction {
 			hrmSubClass.setClassName(className);
 			hrmSubClass.setSubClassName(subClass);
 			hrmSubClass.setSendingFacilityId(sendingFacilityId);
-			hrmSubClass.setHrmCategory(hrmCategoryDao.findById(Integer.parseInt(categoryId)).get(0));
+			//hrmSubClass.setHrmCategory(hrmCategoryDao.findById(Integer.parseInt(categoryId)).get(0));
 			
 			hrmSubClassDao.merge(hrmSubClass);
 			request.setAttribute("success", true);

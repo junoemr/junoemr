@@ -24,47 +24,38 @@
 package org.oscarehr.ws.rest.integrations.hrm;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.hospitalReportManager.model.HRMFetchResults;
-import org.oscarehr.hospitalReportManager.service.HRMScheduleService;
-import org.oscarehr.hospitalReportManager.service.HRMService;
-import org.oscarehr.ws.rest.AbstractServiceImpl;
+import org.oscarehr.dataMigration.mapper.hrm.out.HRMCategoryExportMapper;
+import org.oscarehr.dataMigration.model.hrm.HrmCategory;
+import org.oscarehr.hospitalReportManager.service.HRMCategoryService;
 import org.oscarehr.ws.rest.response.RestResponse;
+import org.oscarehr.ws.rest.transfer.integration.hrm.HRMCategoryTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
+import java.util.List;
 
-@Path("/integrations/hrm/")
-@Component("HRMWebService")
+@Path("/integrations/hrm/categories")
+@Component("HRMCategoriesWebService")
 @Produces(MediaType.APPLICATION_JSON)
-@Tag(name = "hrm")
-public class HrmWebService extends AbstractServiceImpl
+@Tag(name = "hrmCategories")
+public class HrmCategoriesWebService
 {
 	@Autowired
-	HRMScheduleService scheduleService;
-	
+	HRMCategoryExportMapper exportMapper;
+
 	@Autowired
-	HRMService hrmService;
-	
-	@POST
-	@Path("/scheduler/")
-	public RestResponse<HRMFetchResults> fetchNewDocuments() throws InterruptedException, ExecutionException, TimeoutException
-	{
-		HRMFetchResults results = scheduleService.scheduleFetchNow();
-		return RestResponse.successResponse(results);
-	}
-	
+	HRMCategoryService categoryService;
+
 	@GET
-	@Path("/scheduler/")
-	public RestResponse<HRMFetchResults> getLastFetchStatus() throws InterruptedException, ExecutionException, TimeoutException
+	@Path("/")
+	public RestResponse<List<HRMCategoryTransferOutbound>> getActiveCategories() throws Exception
 	{
-		HRMFetchResults results = hrmService.getLastFetchResults();
-		return RestResponse.successResponse(results);
+		List<HrmCategory> activeCategories = categoryService.getActiveCategories();
+		List<HRMCategoryTransferOutbound> transfer = exportMapper.exportAll(activeCategories);
+
+		return RestResponse.successResponse(transfer);
 	}
 }

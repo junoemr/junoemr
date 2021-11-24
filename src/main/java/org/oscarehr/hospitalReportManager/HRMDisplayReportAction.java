@@ -127,14 +127,14 @@ public class HRMDisplayReportAction extends DispatchAction {
 					}
 					
 					HRMCategory category = null;
-					if (hrmDocumentSubClass != null)
+				/*	if (hrmDocumentSubClass != null)
 					{
 						category = hrmCategoryDao.findBySubClassNameMnemonic(hrmDocumentSubClass.getSubClass() + ':' + hrmDocumentSubClass.getSubClassMnemonic());
 					}
 					else
 					{
 						category = hrmCategoryDao.findBySubClassNameMnemonic("DEFAULT");
-					}
+					}*/
 					
 					request.setAttribute("category", category);
 					

@@ -649,7 +649,7 @@ public class AdminNavService
 
 		if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM))
 		{
-			integrationItems.add(new AdminNavItemTo1("Health Report Manager (HRM)", "hrmAdmin"));
+			integrationItems.add(new AdminNavItemTo1("Health Report Manager (HRM)", "hrm/admin"));
 		}
 
 		if (oscarProperties.getProperty("olis_keystore", "").length() > 0)

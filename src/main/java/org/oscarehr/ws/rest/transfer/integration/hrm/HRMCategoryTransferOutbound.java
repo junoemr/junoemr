@@ -20,24 +20,15 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.hrm;
+
+package org.oscarehr.ws.rest.transfer.integration.hrm;
 
 import lombok.Data;
-import org.oscarehr.hospitalReportManager.model.HRMSubClass;
-
-import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class HrmCategory
+public class HRMCategoryTransferOutbound extends HRMCategoryTransferInbound
 {
-	private Integer id;
-	private String name;
-	private LocalDate disabledAt;
-	private List<HRMSubClass> subClasses;
-
-	public boolean isDisabled()
-	{
-		return this.disabledAt == null;
-	}
+	Integer id;
+	List<HRMSubClassTransfer> subclasses;
 }

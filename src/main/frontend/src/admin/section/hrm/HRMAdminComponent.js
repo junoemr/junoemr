@@ -29,44 +29,21 @@ import moment from "moment";
 
 angular.module('Admin.Section').component('hrmAdmin',
 	{
-		templateUrl: 'src/admin/section/hrm/hrmAdmin.jsp',
+		templateUrl: 'src/admin/section/hrm/HRMAdmin.jsp',
 		bindings: {},
 		controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$uibModal', function ($scope, $http, $httpParamSerializer, $state, $uibModal)
 		{
 			let ctrl = this;
-			let systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
 			let hrmService = new HrmService();
 			
 			ctrl.COMPONENT_STYLE = JUNO_STYLE.DEFAULT;
 			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
-			
-			ctrl.user = "";
-			ctrl.address = "";
-			ctrl.port = "";
-			ctrl.remotePath = "";
-			ctrl.interval = 0;
-			ctrl.working = false;
-			ctrl.latestResults = null;
-			
+
 			ctrl.$onInit = async () => {
 				ctrl.COMPONENT_STYLE = ctrl.COMPONENT_STYLE || JUNO_STYLE.DEFAULT;
 				
 				ctrl.latestResults = await hrmService.getLastResults();
-				
-				let propertyValues = await systemPreferenceService.getProperties(
-					"omd.hrm.user",
-					"omd.hrm.address",
-					"omd.hrm.port",
-					"omd.hrm.remote_path",
-					"omd.hrm.poll_interval_sec"
-				);
-				
-				ctrl.user = propertyValues["omd.hrm.user"];
-				ctrl.address = propertyValues["omd.hrm.address"];
-				ctrl.port = propertyValues["omd.hrm.port"];
-				ctrl.remotePath = "/" + propertyValues["omd.hrm.remote_path"];
-				ctrl.interval = (parseInt(propertyValues["omd.hrm.poll_interval_sec"]))/60;
 			};
 			
 			ctrl.fetchHRMDocs = async () => {

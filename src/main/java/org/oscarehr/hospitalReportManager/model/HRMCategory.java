@@ -49,6 +49,6 @@ public class HRMCategory extends AbstractModel<Integer>
 
 	public boolean isDisabled()
 	{
-		return this.disabledAt == null;
+		return this.disabledAt != null;
 	}
 }
