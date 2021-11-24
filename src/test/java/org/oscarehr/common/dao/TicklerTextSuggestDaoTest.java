@@ -52,11 +52,14 @@ public class TicklerTextSuggestDaoTest extends DaoTestFixtures
 	@Autowired
 	protected TicklerTextSuggestDao ticklerTextSuggestDao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "tickler_text_suggest");
-		
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"tickler_text_suggest"
+		};
 	}
+
 	@Test
 	public void testGetActiveTicklerTextSuggests() throws Exception {
 		

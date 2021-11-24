@@ -43,9 +43,12 @@ public class MdsOBRDaoTest extends DaoTestFixtures
 	@Autowired
 	protected MdsOBRDao mdsOBRDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("mdsOBR", "mdsOBX");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"mdsOBR", "mdsOBX"
+		};
 	}
 
 	@Test

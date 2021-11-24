@@ -58,9 +58,12 @@ public class PageMonitorDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("PageMonitor");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"PageMonitor"
+		};
 	}
 
 	@Test

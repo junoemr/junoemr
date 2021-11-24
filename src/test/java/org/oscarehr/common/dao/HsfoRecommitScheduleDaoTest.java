@@ -30,15 +30,20 @@ import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.HsfoRecommitSchedule;
+import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.SpringUtils;
 
-public class HsfoRecommitScheduleDaoTest {
+public class HsfoRecommitScheduleDaoTest extends DatabaseTestBase
+{
 
 	protected HsfoRecommitScheduleDao dao = SpringUtils.getBean(HsfoRecommitScheduleDao.class);
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("hsfo_recommit_schedule");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"hsfo_recommit_schedule"
+		};
 	}
 
 	@Test

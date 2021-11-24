@@ -42,8 +42,11 @@ public class CaseManagementNoteDaoTest extends DaoTestFixtures
 	@Autowired
 	protected CaseManagementNoteDAO caseManagementNoteDAO;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("casemgmt_note", "secRole", "program");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"casemgmt_note", "secRole", "program"
+		};
 	}
 }

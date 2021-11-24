@@ -55,20 +55,20 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddAllergiesClassicUIIT extends SeleniumTestBase
 {
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"admission", "allergies", "demographic", "log", "log_ws_rest", "measurementType",
+			"partial_date", "validations"
+		};
+	}
+
 	@Before
 	public void setup()
 	{
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
-	}
-
-	@After
-	public void cleanup()
-		throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException
-	{
-		SchemaUtils.restoreTable(
-			"admission", "allergies", "demographic", "log", "log_ws_rest", "measurementType", "partial_date", "validations"
-		);
 	}
 
 	// Ignored because it can't connect to drugref

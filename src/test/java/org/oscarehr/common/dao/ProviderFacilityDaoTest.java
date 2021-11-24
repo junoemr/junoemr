@@ -30,19 +30,22 @@ import org.junit.Test;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.ProviderFacility;
 import org.oscarehr.common.model.ProviderFacilityPK;
+import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.SpringUtils;
 
-public class ProviderFacilityDaoTest {
-
+public class ProviderFacilityDaoTest extends DatabaseTestBase
+{
 	protected ProviderFacilityDao dao = SpringUtils.getBean(ProviderFacilityDao.class);
 
 	public ProviderFacilityDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("provider_facility");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"provider_facility"
+		};
 	}
 
 	@Test

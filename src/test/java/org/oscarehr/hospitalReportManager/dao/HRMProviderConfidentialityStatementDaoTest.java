@@ -43,10 +43,12 @@ public class HRMProviderConfidentialityStatementDaoTest extends DaoTestFixtures
 	@Autowired
 	public HRMProviderConfidentialityStatementDao hrmProviderConfidentialityStatementDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("HRMProviderConfidentialityStatement");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"HRMProviderConfidentialityStatement"
+		};
 	}
 
 	@Test

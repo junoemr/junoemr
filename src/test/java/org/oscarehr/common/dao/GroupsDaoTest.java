@@ -30,15 +30,20 @@ import org.junit.Test;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Groups;
+import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.SpringUtils;
 
-public class GroupsDaoTest {
+public class GroupsDaoTest extends DatabaseTestBase
+{
 
 	protected GroupsDao dao = SpringUtils.getBean(GroupsDao.class);
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("groups_tbl");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"groups_tbl"
+		};
 	}
 
 	@Test

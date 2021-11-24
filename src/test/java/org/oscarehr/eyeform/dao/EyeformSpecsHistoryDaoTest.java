@@ -43,10 +43,12 @@ public class EyeformSpecsHistoryDaoTest extends DaoTestFixtures
 	@Autowired
 	public EyeformSpecsHistoryDao eyeformSpecsHistoryDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("EyeformSpecsHistory");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"EyeformSpecsHistory"
+		};
 	}
 
 	@Test

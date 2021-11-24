@@ -43,9 +43,12 @@ public class Hl7TextInfoDaoTest extends DaoTestFixtures
 	@Autowired
 	protected Hl7TextInfoDao hl7TextInfoDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("hl7TextInfo", "patientLabRouting", "hl7TextInfo", "providerLabRouting", "ctl_document", "demographic", "hl7TextMessage");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"hl7TextInfo", "patientLabRouting", "hl7TextInfo", "providerLabRouting", "ctl_document", "demographic", "hl7TextMessage"
+		};
 	}
 
 	@Test

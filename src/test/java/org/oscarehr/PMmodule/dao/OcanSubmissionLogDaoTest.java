@@ -51,10 +51,12 @@ public class OcanSubmissionLogDaoTest extends DaoTestFixtures
 	@Autowired
 	public OcanSubmissionLogDao ocanSubmissionLogDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("OcanSubmissionLog");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"OcanSubmissionLog"
+		};
 	}
 
 	@Test

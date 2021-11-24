@@ -50,9 +50,12 @@ public class WorkFlowDaoTest extends DaoTestFixtures
 	@Autowired
 	protected WorkFlowDao workFlowDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("workflow");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"workflow"
+		};
 	}
 
         @Test

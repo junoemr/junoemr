@@ -40,11 +40,14 @@ public class PatientLabRoutingDaoTest extends DaoTestFixtures
 	@Autowired
 	protected PatientLabRoutingDao patientLabRoutingDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("patientLabRouting", "labTestResults", "labPatientPhysicianInfo", "mdsOBX", "mdsMSH", "hl7_msh", 
-				"hl7_pid", "hl7_obr", "hl7_obx", "hl7_orc", "consultdocs", "mdsZRG", "mdsMSH",
-				"mdsPID","mdsPV1","mdsZFR","mdsOBR");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"patientLabRouting", "labTestResults", "labPatientPhysicianInfo", "mdsOBX", "mdsMSH", "hl7_msh",
+			"hl7_pid", "hl7_obr", "hl7_obx", "hl7_orc", "consultdocs", "mdsZRG", "mdsMSH",
+			"mdsPID","mdsPV1","mdsZFR","mdsOBR"
+		};
 	}
 
 	@Test

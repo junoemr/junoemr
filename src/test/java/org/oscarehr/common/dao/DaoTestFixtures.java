@@ -49,10 +49,14 @@ package org.oscarehr.common.dao;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.ConfigUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -65,10 +69,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static junit.framework.Assert.fail;
 
-public abstract class DaoTestFixtures
+public abstract class DaoTestFixtures extends DatabaseTestBase
 {
 	private static Logger logger=MiscUtils.getLogger();
 	
@@ -97,7 +102,7 @@ public abstract class DaoTestFixtures
 			//SpringUtils.beanFactory = context;
 		}
 	}
-	
+
 	@BeforeClass
 	public static void classSetUp() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException
 	{

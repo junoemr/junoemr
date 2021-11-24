@@ -48,10 +48,12 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddSitesIT extends SeleniumTestBase
 {
-	@After
-	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	@Override
+	protected String[] getTablesToRestore()
 	{
-		SchemaUtils.restoreTable("admission", "log", "site", "log_ws_rest", "provider_recent_demographic_access");
+		return new String[]{
+			"admission", "log", "site", "log_ws_rest", "provider_recent_demographic_access"
+		};
 	}
 
 	public static void addNewSites(SiteTestData site)

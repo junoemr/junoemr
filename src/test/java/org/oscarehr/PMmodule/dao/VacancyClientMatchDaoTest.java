@@ -53,10 +53,12 @@ public class VacancyClientMatchDaoTest extends DaoTestFixtures
 	@Autowired
 	public VacancyClientMatchDao vacancyClientMatchDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("vacancy_client_match");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"vacancy_client_match"
+		};
 	}
 
 	@Test

@@ -45,9 +45,12 @@ public class CtlBillingServiceAgeRulesDaoTest extends DaoTestFixtures
 	@Autowired
 	protected CtlBillingServiceAgeRulesDao ctlBillingServiceAgeRulesDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("ctl_billingservice_age_rules");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"ctl_billingservice_age_rules"
+		};
 	}
 
 	@Test

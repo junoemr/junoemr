@@ -44,6 +44,7 @@ import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.config.JunoProperties;
+import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -58,7 +59,7 @@ import oscar.OscarProperties;
 import static org.junit.Assert.fail;
 
 @Import(TestConfig.class)
-public class SeleniumTestBase
+public class SeleniumTestBase extends DatabaseTestBase
 {
 	@LocalServerPort
 	protected int randomTomcatPort;
@@ -147,33 +148,6 @@ public class SeleniumTestBase
 		webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	}
 
-	@Before
-	public void resetDatabase()
-		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
-	{
-		if(getTablesToRestore().length > 0)
-		{
-			SchemaUtils.restoreTable(getTablesToRestore());
-			//SchemaUtils.restoreAllTables();
-		}
-	}
-
-	@After
-	public void resetAndCheckDatabase()
-		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
-	{
-		if(getTablesToRestore().length > 0)
-		{
-			SchemaUtils.restoreTable(getTablesToRestore());
-			Set<String> errors = SchemaUtils.getFailedChecksums();
-
-			if(errors.size() > 0)
-			{
-				fail(String.join("\n", errors));
-			}
-		}
-	}
-
 	@After
 	public void closeWebDriver()
 	{
@@ -183,10 +157,5 @@ public class SeleniumTestBase
 	protected static void loadSpringBeans()
 	{
 		DaoTestFixtures.setupBeanFactory();
-	}
-
-	protected String[] getTablesToRestore()
-	{
-		return new String[0];
 	}
 }

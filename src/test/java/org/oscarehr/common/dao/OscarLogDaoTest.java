@@ -53,9 +53,12 @@ public class OscarLogDaoTest extends DaoTestFixtures
 	@Autowired
 	protected OscarLogDao oscarLogDao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("log");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"log"
+		};
 	}
 
 	@Test

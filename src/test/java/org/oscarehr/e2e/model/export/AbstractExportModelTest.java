@@ -25,7 +25,7 @@ package org.oscarehr.e2e.model.export;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
@@ -33,10 +33,19 @@ import org.oscarehr.e2e.constant.Constants;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-public abstract class AbstractExportModelTest extends DaoTestFixtures {
-	@BeforeClass
-	public static void abstractBeforeClass() throws Exception {
-		SchemaUtils.restoreTable(Constants.Runtime.TABLES);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public abstract class AbstractExportModelTest extends DaoTestFixtures
+{
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return Constants.Runtime.TABLES;
+	}
+
+	@Before
+	public void abstractBeforeClass() throws Exception
+	{
 		assertEquals(0, SchemaUtils.loadFileIntoMySQL(Constants.Runtime.E2E_SETUP));
 	}
 }

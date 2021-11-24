@@ -43,10 +43,12 @@ public class HRMDocumentSubClassDaoTest extends DaoTestFixtures
 	@Autowired
 	public HRMDocumentSubClassDao hrmDocumentSubClassDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("HRMDocumentSubClass");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"HRMDocumentSubClass"
+		};
 	}
 
 	@Test

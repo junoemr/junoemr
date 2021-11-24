@@ -45,7 +45,14 @@ public class RoomDaoTest extends DaoTestFixtures
 
 	@Before
 	public void before() throws Exception {
-		SchemaUtils.restoreTable("room", "Facility");
+		SchemaUtils.restoreTable();
+	}
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"room", "Facility"
+		};
 	}
 
 	@Test

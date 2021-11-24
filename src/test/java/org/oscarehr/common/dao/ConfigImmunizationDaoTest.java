@@ -50,9 +50,12 @@ public class ConfigImmunizationDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ConfigImmunizationDao configImmunizationDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "config_Immunization");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"config_Immunization"
+		};
 	}
 
 	@Test

@@ -54,12 +54,14 @@ public class OscarAppointmentDaoTest extends DaoTestFixtures
 	@Autowired
 	protected OscarAppointmentDao oscarAppointmentDao;
 
-	@Before
-	public void before() throws Exception {
-		//nothing here yet. should clean up the appointment table to a known state
-		SchemaUtils.restoreTable("appointment", "demographic", "lst_gender", "admission", 
-				"demographic_merged", "program", "health_safety", "provider", "providersite", "site", "program_team", "log", "Facility", 
-				"mygroup", "drugs","appointmentArchive");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"appointment", "demographic", "lst_gender", "admission",
+			"demographic_merged", "program", "health_safety", "provider", "providersite", "site", "program_team", "log", "Facility",
+			"mygroup", "drugs","appointmentArchive"
+		};
 	}
 
 	@Test

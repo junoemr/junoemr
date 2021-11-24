@@ -30,22 +30,28 @@ import org.junit.Test;
 import org.oscarehr.billing.CA.BC.model.CtlServiceCodesDxCodes;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.SpringUtils;
 
-public class CtlServiceCodesDxCodesDaoTest {
-
+public class CtlServiceCodesDxCodesDaoTest extends DatabaseTestBase
+{
 	public CtlServiceCodesDxCodesDao dao = SpringUtils.getBean(CtlServiceCodesDxCodesDao.class);
 
-	public CtlServiceCodesDxCodesDaoTest() {
+	public CtlServiceCodesDxCodesDaoTest()
+	{
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("ctl_servicecodes_dxcodes");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"ctl_servicecodes_dxcodes"
+		};
 	}
 
 	@Test
-	public void testCreate() throws Exception {
+	public void testCreate() throws Exception
+	{
 		CtlServiceCodesDxCodes entity = new CtlServiceCodesDxCodes();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		dao.persist(entity);

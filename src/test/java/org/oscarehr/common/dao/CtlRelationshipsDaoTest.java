@@ -49,10 +49,14 @@ public class CtlRelationshipsDaoTest extends DaoTestFixtures
 	@Autowired
 	protected CtlRelationshipsDao ctlRelationshipsDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "CtlRelationships");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"CtlRelationships"
+		};
 	}
+
 
 	@Test
 	public void testCreate()  {

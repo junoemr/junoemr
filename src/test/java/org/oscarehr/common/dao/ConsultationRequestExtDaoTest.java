@@ -51,9 +51,12 @@ public class ConsultationRequestExtDaoTest extends DaoTestFixtures
 
 	Logger logger = MiscUtils.getLogger();
 	
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("consultationRequestExt");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"consultationRequestExt"
+		};
 	}
 
 	@Test

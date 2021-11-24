@@ -53,9 +53,12 @@ public class DemographicContactDaoTest extends DaoTestFixtures
 
 	Logger logger = MiscUtils.getLogger();
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("DemographicContact");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"DemographicContact"
+		};
 	}
 
 	@Test

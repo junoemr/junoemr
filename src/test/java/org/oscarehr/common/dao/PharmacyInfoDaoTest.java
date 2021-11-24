@@ -46,10 +46,12 @@ public class PharmacyInfoDaoTest extends DaoTestFixtures
 	public PharmacyInfoDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("pharmacyInfo");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"pharmacyInfo"
+		};
 	}
 
 	@Test

@@ -127,13 +127,11 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
 
 	protected Integer oscarProgramID;
 
-	@Before
-	@After
-	public void before() throws Exception {
-		SchemaUtils.restoreAllTables();
-		/*
-		SchemaUtils.restoreTable(
-		    "program",
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"program",
 			"provider",
 			"program_provider",
 			"security",
@@ -149,9 +147,9 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
 			"casemgmt_note_ext",
 			"formLabReq07",
 			"document",
-		    "ctl_document",
+			"ctl_document",
 			"program_queue",
-		    "Facility",
+			"Facility",
 			"issue",
 			"DemographicContact",
 			"appointment",
@@ -159,8 +157,7 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
 			"drugs",
 			"measurements",
 			"preventions"
-        );
-		 */
+		};
 	}
 
 	Document getDocument(String doctype,String docdesc,String docxml,String docfilename,String doccreator,String responsible,String source,Integer program_id,

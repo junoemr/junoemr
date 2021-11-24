@@ -42,9 +42,12 @@ public class QuickListUserDaoTest extends DaoTestFixtures
 	@Autowired
 	protected QuickListUserDao quickListUserDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("quickListUser");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"quickListUser"
+		};
 	}
 
 	@Test

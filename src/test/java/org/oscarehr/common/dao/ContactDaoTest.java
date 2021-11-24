@@ -56,10 +56,13 @@ public class ContactDaoTest extends DaoTestFixtures
 	public void doSimpleExceptionTest() {
 		MiscUtils.getLogger().error("Unable to run doSimpleExceptionTest on this DAO");
 	}
-	
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("Contact");
+
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"Contact"
+		};
 	}
 
 	@Test

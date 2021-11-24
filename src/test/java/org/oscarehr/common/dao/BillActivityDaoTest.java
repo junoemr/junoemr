@@ -54,10 +54,14 @@ public class BillActivityDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
-	@Before
-	public void setup() throws Exception {
-		SchemaUtils.restoreTable(false, "billactivity");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"billactivity"
+		};
 	}
+
 
 	@Test
 	public void testCreate() throws Exception {

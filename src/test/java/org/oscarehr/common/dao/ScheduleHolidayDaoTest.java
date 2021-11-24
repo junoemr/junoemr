@@ -48,10 +48,12 @@ public class ScheduleHolidayDaoTest extends DaoTestFixtures
 	public ScheduleHolidayDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("scheduleholiday");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"scheduleholiday"
+		};
 	}
 
 	@Test

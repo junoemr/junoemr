@@ -43,9 +43,12 @@ public class EyeformFollowUpDaoTest extends DaoTestFixtures
 	@Autowired
 	public EyeformFollowUpDao eyeformFollowUpDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("EyeformFollowUp");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"EyeformFollowUp"
+		};
 	}
 
 	@Test

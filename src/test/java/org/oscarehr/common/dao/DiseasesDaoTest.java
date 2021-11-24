@@ -46,10 +46,12 @@ public class DiseasesDaoTest extends DaoTestFixtures
 	public DiseasesDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("diseases");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"diseases"
+		};
 	}
 
 	@Test

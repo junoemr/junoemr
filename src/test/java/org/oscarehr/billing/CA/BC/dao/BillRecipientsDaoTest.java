@@ -43,11 +43,14 @@ public class BillRecipientsDaoTest extends DaoTestFixtures
 	@Autowired
 	public BillRecipientsDao billRecipientsDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("bill_recipients");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"bill_recipients"
+		};
 	}
-	
+
 	@Test
 	public void testCreate() throws Exception {
 		BillRecipients entity = new BillRecipients();

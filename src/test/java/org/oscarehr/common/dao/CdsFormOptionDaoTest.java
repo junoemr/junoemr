@@ -26,15 +26,20 @@ package org.oscarehr.common.dao;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.MiscUtils;
 
-public class CdsFormOptionDaoTest {
+public class CdsFormOptionDaoTest extends DatabaseTestBase
+{
 
 	Logger logger = MiscUtils.getLogger();
 	
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("CdsFormOption");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"CdsFormOption"
+		};
 	}
 
 //	@Test @Ignore

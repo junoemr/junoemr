@@ -55,7 +55,7 @@ public class SendMessagesClassicUIIT extends SeleniumTestBase
 			"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate", "Facility",
 			"issue", "log", "LookupList", "LookupListItem", "measurementType", "messagelisttbl", "messagetbl", "msgDemoMap",
 			"OscarJob", "OscarJobType", "provider", "providerbillcenter", "ProviderPreference", "secUserRole",
-			"tickler_text_suggest", "validations", "log_ws_rest"
+			"tickler_text_suggest", "validations", "log_ws_rest", "property"
 		};
 	}
 
@@ -74,6 +74,7 @@ public class SendMessagesClassicUIIT extends SeleniumTestBase
 		PageUtil.switchToLastWindow(driver);
 
 		//** Send Message **
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Compose Message")));
 		driver.findElement(By.linkText("Compose Message")).click();
 		composeMessage(subject);
 		driver.findElement(By.xpath("//input[@value='Send Message']")).click();
