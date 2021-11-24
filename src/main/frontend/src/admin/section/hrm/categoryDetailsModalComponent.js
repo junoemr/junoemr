@@ -53,14 +53,10 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.title = "";
-				ctrl.isLoading = true;
-
-				ctrl.allSecurityPermissions = [];
-				ctrl.permissionsList = [];
-
 				ctrl.category = null;
+				ctrl.title = "";
 				ctrl.isCreate = false;
+				ctrl.isLoading = true;
 
 				ctrl.$onInit = async () =>
 				{

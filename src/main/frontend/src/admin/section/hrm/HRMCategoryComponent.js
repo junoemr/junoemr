@@ -54,16 +54,7 @@ angular.module('Admin.Section').component('hrmCategory',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.categories = []
-
-				ctrl.tableParams = new NgTableParams(
-					{
-						page: 1,
-						count: -1,
-						sorting: {
-							name: 'asc',
-						}
-					});
-
+				
 				ctrl.$onInit = async () => {
 					try
 					{
