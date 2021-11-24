@@ -24,6 +24,7 @@ import ca.uhn.hl7v2.parser.ModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.bouncycastle.util.encoders.Base64;
@@ -99,7 +100,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	private HashMap<String, String> addressTypeNames;
 	private HashMap<String, String> telecomUseCode;
 	private HashMap<String, String> telecomEquipType;
-	private HashMap<Integer, Integer> obrParentMap;
+	private MultiKeyMap<Integer, Integer> obrParentMap;
 
 	private ArrayList<String> disciplines;
 	private List<OLISError> errors;
@@ -844,27 +845,29 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return "";
 	}
 
-	public String getOBXCEParentId(int obr, int obx)
+	/**
+	 * @param obr segment index - 0 indexed
+	 * @param obx segment index - 0 indexed
+	 * @return index of linked OBR child segment, or -1
+	 */
+	public int getChildOBR(int obr, int obx)
 	{
-		return getOBXField(obr, obx, 4, 0, 1);
+		if(hasChildOBR(obr, obx))
+		{
+			return obrParentMap.get(obr, obx);
+		}
+		logger.error("invalid olis child segment lookup: OBR." + obr + ", OBX." + obx);
+		return -1;
 	}
 
 	/**
-	 * @param setId parent set Id - 1 indexed (matches hl7 id value)
-	 * @return mapped child id, 0 indexed
+	 * @param obr segment index - 0 indexed
+	 * @param obx segment index - 0 indexed
+	 * @return true if the given segment has a linked OBR child segment
 	 */
-	public int getChildOBR(String setId)
+	public boolean hasChildOBR(int obr, int obx)
 	{
-		try
-		{
-			int parentIndex = Integer.parseInt(setId);
-			return obrParentMap.get(parentIndex);
-		}
-		catch(Exception e)
-		{
-			logger.error("Invalid obr child lookup", e);
-			return -1;
-		}
+		return obrParentMap.containsKey(obr, obx);
 	}
 
 	/**
@@ -930,7 +933,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		initTelecomUseCodes();
 		initTelecomEquipTypes();
 
-		obrParentMap = new HashMap<>();
+		obrParentMap = new MultiKeyMap<>();
 		sourceOrganizations = new HashMap<>();
 		disciplines = new ArrayList<>();
 
@@ -968,11 +971,42 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			isFinal &= isOBRStatusFinal(status);
 			isCorrected |= status.equals("C");
 
-			String parentSetId = getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-26-2-1"));
-			if(StringUtils.isNotBlank(parentSetId))
+			String parentPlacerNo = getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-29-1"));
+			String parentResultId = getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-26-2-1"));
+
+			if(StringUtils.isNotBlank(parentPlacerNo) && StringUtils.isNotBlank(parentResultId))
 			{
-				// key is 1 indexed to match the lab data setId as is, value is 0 indexed like other obr lookups
-				obrParentMap.put(Integer.parseInt(parentSetId), i);
+				// find index of parent based on matching placer order number (child obr.29 matches parent obr.2)
+				Integer parentObr = null;
+				Integer parentObx = null;
+				for(int ii = 0; ii < obrCount; ii++)
+				{
+					String placerOrderNo = get("/.ORDER_OBSERVATION(" + ii + ")/OBR-2-1");
+					if(parentPlacerNo.equals(placerOrderNo))
+					{
+						parentObr = ii;
+						// find the index of the parent result. (child obr.26 matches parent obx.4)
+						for(int jj = 0; jj < getOBXCount(ii); jj++)
+						{
+							String serviceId = get("/.ORDER_OBSERVATION(" + ii + ")/OBSERVATION(" + jj + ")/OBX-4-1");
+							if(parentResultId.equals(serviceId))
+							{
+								parentObx = jj;
+								break;
+							}
+						}
+						break;
+					}
+				}
+				if(parentObr != null && parentObx != null)
+				{
+					// multi-key map, map obr+obx to this obr segment. All 0 indexed to match regular index lookups
+					obrParentMap.put(parentObr, parentObx, i);
+				}
+				else
+				{
+					logger.error("invalid olis parent/child mapping: OBR." + i);
+				}
 			}
 
 			obxSortKeyArray.add(mapOBXSortKey(i));

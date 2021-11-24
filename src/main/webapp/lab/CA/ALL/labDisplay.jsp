@@ -126,6 +126,14 @@
 		java.util.Date date = hl7TextMessage.getCreated();
 		String stringFormat = "yyyy-MM-dd HH:mm";
 		dateLabReceived = UtilDateUtilities.DateToString(date, stringFormat);
+
+		if(OLISHL7Handler.OLIS_MESSAGE_TYPE.equals(hl7TextMessage.getType()))
+		{
+			%>
+			<jsp:forward page="labDisplayOLIS.jsp" />
+			<%
+			return;
+		}
 	}
 
 	boolean isLinkedToDemographic = false;

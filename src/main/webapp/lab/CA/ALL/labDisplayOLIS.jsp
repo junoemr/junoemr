@@ -1950,9 +1950,8 @@ public String strikeOutInvalidContent(String content, String status) {
    												<td align="center"><%=statusMsg %></td>
    											</tr>
    											<%
-   											if (handler.isOBRStatusFinal(handler.getOBXResultStatus(obr, obx))) {
-  												String parentId = handler.getOBXCEParentId(obr, obx);
-  												if (!stringIsNullOrEmpty(parentId)) {
+   											if (handler.isOBRStatusFinal(handler.getOBXResultStatus(obr, obx)) && handler.hasChildOBR(obr, obx))
+											   {
    											%>
    											<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
    												<td colspan="7" align="center">
@@ -1960,7 +1959,7 @@ public String strikeOutInvalidContent(String content, String status) {
    														<tr><th>Agent</th><th>Sensitivity</th> </tr>
    												    <%
 
-   												    int childOBR = handler.getChildOBR(parentId);
+   												    int childOBR = handler.getChildOBR(obr, obx);
 											        if(childOBR != -1)
 											        {
 	   												    int childLength = handler.getOBXCount(childOBR);
@@ -2018,12 +2017,10 @@ public String strikeOutInvalidContent(String content, String status) {
 						                        </td>
 					                        </tr>
 		                                            <%}
-		                                            // add some spacing after commments%>
+		                                            // add some spacing after comments%>
                                             <tr style="height: 8px;" bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
 						                        <td colspan="7">&nbsp</td>
 					                        </tr><%
-
-                                                }
    											}
                                         } else {
                                         	%>
