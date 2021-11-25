@@ -21,22 +21,16 @@
  * Canada
  */
 
-package org.oscarehr.dataMigration.mapper.hrm.in;
+package org.oscarehr.hospitalReportManager.transfer;
 
-import org.oscarehr.dataMigration.mapper.AbstractImportMapper;
-import org.oscarehr.dataMigration.model.hrm.HrmCategory;
-import org.oscarehr.ws.rest.transfer.integration.hrm.HRMCategoryTransferInbound;
-import org.springframework.stereotype.Component;
+import lombok.Data;
 
-@Component
-public class HRMCategoryImportMapper extends AbstractImportMapper<HRMCategoryTransferInbound, HrmCategory>
+@Data
+public class HRMSubClassTransfer
 {
-
-	@Override
-	public HrmCategory importToJuno(HRMCategoryTransferInbound importStructure) throws Exception
-	{
-		HrmCategory category = new HrmCategory();
-		category.setName(importStructure.getName());
-		return category;
-	}
+	String className;
+	String subClassName;
+	String accompanyingSubClassName;
+	String facilityNumber;
+	String categoryId;
 }

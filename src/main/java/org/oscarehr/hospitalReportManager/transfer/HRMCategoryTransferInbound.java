@@ -21,7 +21,7 @@
  * Canada
  */
 
-package org.oscarehr.ws.rest.transfer.integration.hrm;
+package org.oscarehr.hospitalReportManager.transfer;
 
 import lombok.Data;
 

@@ -21,16 +21,14 @@
  * Canada
  */
 
-package org.oscarehr.ws.rest.transfer.integration.hrm;
+package org.oscarehr.hospitalReportManager.transfer;
 
 import lombok.Data;
+import java.util.List;
 
 @Data
-public class HRMSubClassTransfer
+public class HRMCategoryTransferOutbound extends HRMCategoryTransferInbound
 {
-	String className;
-	String subClassName;
-	String accompanyingSubClassName;
-	String facilityNumber;
-	String categoryId;
+	Integer id;
+	List<HRMSubClassTransfer> subclasses;
 }

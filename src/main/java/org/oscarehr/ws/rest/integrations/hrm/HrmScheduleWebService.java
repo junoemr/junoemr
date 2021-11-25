@@ -27,6 +27,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.hospitalReportManager.model.HRMFetchResults;
 import org.oscarehr.hospitalReportManager.service.HRMScheduleService;
 import org.oscarehr.hospitalReportManager.service.HRMService;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,11 +53,15 @@ public class HrmScheduleWebService extends AbstractServiceImpl
 	
 	@Autowired
 	HRMService hrmService;
+
+	@Autowired
+	SecurityInfoManager securityService;
 	
 	@POST
 	@Path("/")
 	public RestResponse<HRMFetchResults> fetchNewDocuments() throws InterruptedException, ExecutionException, TimeoutException
 	{
+		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
 		HRMFetchResults results = scheduleService.scheduleFetchNow();
 		return RestResponse.successResponse(results);
 	}
@@ -64,6 +70,7 @@ public class HrmScheduleWebService extends AbstractServiceImpl
 	@Path("/")
 	public RestResponse<HRMFetchResults> getLastFetchStatus() throws InterruptedException, ExecutionException, TimeoutException
 	{
+		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
 		HRMFetchResults results = hrmService.getLastFetchResults();
 		return RestResponse.successResponse(results);
 	}

@@ -21,18 +21,18 @@
  * Canada
  */
 
-package org.oscarehr.dataMigration.mapper.hrm.out;
+package org.oscarehr.hospitalReportManager.converter;
 
-import org.oscarehr.dataMigration.mapper.AbstractExportMapper;
+import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmCategory;
-import org.oscarehr.ws.rest.transfer.integration.hrm.HRMCategoryTransferOutbound;
+import org.oscarehr.hospitalReportManager.transfer.HRMCategoryTransferOutbound;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HRMCategoryExportMapper extends AbstractExportMapper<HRMCategoryTransferOutbound, HrmCategory>
+public class HRMCategoryExportMapper extends AbstractModelConverter<HrmCategory, HRMCategoryTransferOutbound>
 {
 	@Override
-	public HRMCategoryTransferOutbound exportFromJuno(HrmCategory exportStructure) throws Exception
+	public HRMCategoryTransferOutbound convert(HrmCategory exportStructure)
 	{
 		HRMCategoryTransferOutbound transfer = new HRMCategoryTransferOutbound();
 		transfer.setId(exportStructure.getId());

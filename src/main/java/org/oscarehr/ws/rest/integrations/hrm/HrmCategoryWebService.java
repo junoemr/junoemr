@@ -24,13 +24,16 @@
 package org.oscarehr.ws.rest.integrations.hrm;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.dataMigration.mapper.hrm.in.HRMCategoryImportMapper;
-import org.oscarehr.dataMigration.mapper.hrm.out.HRMCategoryExportMapper;
+import org.oscarehr.hospitalReportManager.converter.HRMCategoryImportMapper;
+import org.oscarehr.hospitalReportManager.converter.HRMCategoryExportMapper;
 import org.oscarehr.dataMigration.model.hrm.HrmCategory;
 import org.oscarehr.hospitalReportManager.service.HRMCategoryService;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.transfer.integration.hrm.HRMCategoryTransferInbound;
-import org.oscarehr.ws.rest.transfer.integration.hrm.HRMCategoryTransferOutbound;
+import org.oscarehr.hospitalReportManager.transfer.HRMCategoryTransferInbound;
+import org.oscarehr.hospitalReportManager.transfer.HRMCategoryTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.ws.rs.DELETE;
@@ -45,7 +48,7 @@ import javax.ws.rs.core.MediaType;
 @Component("HRMCategoryWebService")
 @Produces(MediaType.APPLICATION_JSON)
 @Tag(name = "hrmCategory")
-public class HrmCategoryWebService
+public class HrmCategoryWebService extends AbstractServiceImpl
 {
 	@Autowired
 	HRMCategoryImportMapper importMapper;
@@ -56,13 +59,18 @@ public class HrmCategoryWebService
 	@Autowired
 	HRMCategoryService categoryService;
 
+	@Autowired
+	SecurityInfoManager securityService;
+
 	@POST
 	@Path("/")
 	public RestResponse<HRMCategoryTransferOutbound> createCategory(HRMCategoryTransferInbound transferIn) throws Exception
 	{
-		HrmCategory categoryToCreate = importMapper.importToJuno(transferIn);
+		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_CREATE);
+
+		HrmCategory categoryToCreate = importMapper.convert(transferIn);
 		HrmCategory created = categoryService.createCategory(categoryToCreate);
-		HRMCategoryTransferOutbound transferOut = exportMapper.exportFromJuno(created);
+		HRMCategoryTransferOutbound transferOut = exportMapper.convert(created);
 		return RestResponse.successResponse(transferOut);
 	}
 
@@ -70,8 +78,10 @@ public class HrmCategoryWebService
 	@Path("/{categoryId}/")
 	public RestResponse<HRMCategoryTransferOutbound> deactivateCategory(@PathParam("categoryId") Integer categoryId) throws Exception
 	{
+		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_DELETE);
+
 		HrmCategory deactivated = categoryService.deactivateCategory(categoryId);
-		HRMCategoryTransferOutbound transferOut = exportMapper.exportFromJuno(deactivated);
+		HRMCategoryTransferOutbound transferOut = exportMapper.convert(deactivated);
 		return RestResponse.successResponse(transferOut);
 	}
 
@@ -79,11 +89,13 @@ public class HrmCategoryWebService
 	@Path("/{categoryId}/")
 	public RestResponse<HRMCategoryTransferOutbound> updateCategory(@PathParam("categoryId") Integer categoryId, HRMCategoryTransferInbound transferIn) throws Exception
 	{
-		HrmCategory categoryToUpdate = importMapper.importToJuno(transferIn);
+		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_UPDATE);
+
+		HrmCategory categoryToUpdate = importMapper.convert(transferIn);
 		categoryToUpdate.setId(categoryId);
 
 		HrmCategory updated = categoryService.updateCategory(categoryToUpdate);
-		HRMCategoryTransferOutbound transferOut = exportMapper.exportFromJuno(updated);
+		HRMCategoryTransferOutbound transferOut = exportMapper.convert(updated);
 		return RestResponse.successResponse(transferOut);
 	}
 }

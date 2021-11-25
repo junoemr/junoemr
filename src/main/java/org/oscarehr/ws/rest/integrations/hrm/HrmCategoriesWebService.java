@@ -24,11 +24,14 @@
 package org.oscarehr.ws.rest.integrations.hrm;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.dataMigration.mapper.hrm.out.HRMCategoryExportMapper;
+import org.oscarehr.hospitalReportManager.converter.HRMCategoryExportMapper;
 import org.oscarehr.dataMigration.model.hrm.HrmCategory;
 import org.oscarehr.hospitalReportManager.service.HRMCategoryService;
+import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.transfer.integration.hrm.HRMCategoryTransferOutbound;
+import org.oscarehr.hospitalReportManager.transfer.HRMCategoryTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.ws.rs.GET;
@@ -41,7 +44,7 @@ import java.util.List;
 @Component("HRMCategoriesWebService")
 @Produces(MediaType.APPLICATION_JSON)
 @Tag(name = "hrmCategories")
-public class HrmCategoriesWebService
+public class HrmCategoriesWebService extends AbstractServiceImpl
 {
 	@Autowired
 	HRMCategoryExportMapper exportMapper;
@@ -49,12 +52,16 @@ public class HrmCategoriesWebService
 	@Autowired
 	HRMCategoryService categoryService;
 
+	@Autowired
+	SecurityInfoManager securityService;
+
 	@GET
 	@Path("/")
 	public RestResponse<List<HRMCategoryTransferOutbound>> getActiveCategories() throws Exception
 	{
+		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
 		List<HrmCategory> activeCategories = categoryService.getActiveCategories();
-		List<HRMCategoryTransferOutbound> transfer = exportMapper.exportAll(activeCategories);
+		List<HRMCategoryTransferOutbound> transfer = exportMapper.convert(activeCategories);
 
 		return RestResponse.successResponse(transfer);
 	}

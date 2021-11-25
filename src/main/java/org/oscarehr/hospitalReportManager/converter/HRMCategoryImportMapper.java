@@ -21,14 +21,21 @@
  * Canada
  */
 
-package org.oscarehr.ws.rest.transfer.integration.hrm;
+package org.oscarehr.hospitalReportManager.converter;
 
-import lombok.Data;
-import java.util.List;
+import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.dataMigration.model.hrm.HrmCategory;
+import org.oscarehr.hospitalReportManager.transfer.HRMCategoryTransferInbound;
+import org.springframework.stereotype.Component;
 
-@Data
-public class HRMCategoryTransferOutbound extends HRMCategoryTransferInbound
+@Component
+public class HRMCategoryImportMapper extends AbstractModelConverter<HRMCategoryTransferInbound, HrmCategory>
 {
-	Integer id;
-	List<HRMSubClassTransfer> subclasses;
+	@Override
+	public HrmCategory convert(HRMCategoryTransferInbound importStructure)
+	{
+		HrmCategory category = new HrmCategory();
+		category.setName(importStructure.getName());
+		return category;
+	}
 }
