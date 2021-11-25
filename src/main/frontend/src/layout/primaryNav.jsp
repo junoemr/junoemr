@@ -8,9 +8,16 @@
 		<div class="container-fluid">
 			<div class="navbar-header">
 				<button class="btn btn-icon"
-				        ng-click="$ctrl.loadClassicUi();"
-				        title="<bean:message key="global.goToClassic" bundle="ui"/>" border="0">
-				<a class="icon icon-logo"></a>
+						ng-click="$ctrl.onClickNavIcon()"
+						title="{{ $ctrl.navTitle() }}"
+				>
+					<a ng-if="$ctrl.customNavIcon !== null && !$ctrl.customNavIcon"
+					   class="icon icon-logo">
+					</a>
+					<img ng-if="$Sctrl.customNavIcon !== null && $ctrl.customNavIcon"
+						 src="../imageRenderingServlet?source=custom_nav_icon"
+						 alt="dashboard icon"
+						 class="icon icon-custom"/>
 				</button>
 			</div>
 			<div class="navbar-collapse collapse" id="main-nav-collapse">

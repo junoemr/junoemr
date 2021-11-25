@@ -45,7 +45,10 @@ import org.oscarehr.caisi_integrator.ws.DemographicTransfer;
 import org.oscarehr.caisi_integrator.ws.DemographicWs;
 import org.oscarehr.casemgmt.dao.ClientImageDAO;
 import org.oscarehr.casemgmt.model.ClientImage;
+import org.oscarehr.clinic.service.ClinicImageService;
+import org.oscarehr.clinic.service.ClinicImageService.IMAGE_TYPE;
 import org.oscarehr.common.dao.DigitalSignatureDao;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.DigitalSignature;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.DigitalSignatureUtils;
@@ -72,8 +75,8 @@ public final class ImageRenderingServlet extends HttpServlet {
 	private static ClientImageDAO clientImageDAO = (ClientImageDAO) SpringUtils.getBean("clientImageDAO");
 	private static DigitalSignatureDao digitalSignatureDao = (DigitalSignatureDao) SpringUtils.getBean("digitalSignatureDao");
 
-	public static enum Source {
-		local_client, hnr_client, integrator_client, signature_preview, signature_stored,clinic_logo
+	public enum Source {
+		local_client, hnr_client, integrator_client, signature_preview, signature_stored, clinic_logo, custom_nav_icon,
 	}
 
 	@Override
@@ -100,6 +103,8 @@ public final class ImageRenderingServlet extends HttpServlet {
 				httpResponseCode = renderSignatureStored(request, response);
 			} else if (Source.clinic_logo.name().equals(source)) {
 				httpResponseCode = renderClinicLogoStored(request, response);
+			} else if (Source.custom_nav_icon.name().equals(source)) {
+				httpResponseCode = renderCustomNavIcon(request, response);
 			} else {
 				throw (new IllegalArgumentException("Unknown source type : " + source));
 			}
@@ -119,12 +124,15 @@ public final class ImageRenderingServlet extends HttpServlet {
 
 	/**
 	 * This convenience method is only suitable for small images as image is obviously not streamed since it's passed in.
-	 * 
+	 *
+	 * @deprecated
+	 * use renderImage(HttpServletResponse, GenericFile) instead
 	 * @param response
 	 * @param image
 	 * @param imageType image sub type of the contentType, i.e. "jpeg" "png"
 	 * @throws IOException
 	 */
+	@Deprecated
 	private static final int renderImage(HttpServletResponse response, byte[] image, String imageType) throws IOException {
 		if(image == null) { // this method should never be called with a null image
 			return HttpServletResponse.SC_NO_CONTENT;
@@ -143,9 +151,11 @@ public final class ImageRenderingServlet extends HttpServlet {
 		}
 		finally {
 			bos.flush();
+			bos.close();
 		}
 		return HttpServletResponse.SC_OK;
 	}
+
 	private static byte[] getDefaultImage(HttpServletRequest request) {
 		String defaultClientImage = "/images/defaultG_img.jpg";
 
@@ -168,16 +178,13 @@ public final class ImageRenderingServlet extends HttpServlet {
 		// this expects integratorFacilityId and caisiClientId as a parameter
 
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		
-		// security check
-		HttpSession session = request.getSession();
-		Provider provider = (Provider) session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER);
-		if (provider == null) {
+
+		if (!isLoggedIn(request))
+		{
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
 
 		try {
-			// get image
 			Integer integratorFacilityId = Integer.parseInt(request.getParameter("integratorFacilityId"));
 			Integer caisiClientId = Integer.parseInt(request.getParameter("caisiDemographicId"));
 			DemographicWs demographicWs = CaisiIntegratorManager.getDemographicWs(loggedInInfo, loggedInInfo.getCurrentFacility());
@@ -199,16 +206,13 @@ public final class ImageRenderingServlet extends HttpServlet {
 		// this expects linkingId as a parameter
 
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-		
-		// security check
-		HttpSession session = request.getSession();
-		Provider provider = (Provider) session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER);
-		if (provider == null) {
+
+		if (!isLoggedIn(request))
+		{
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
 
 		try {
-			// get image
 			Integer linkingId = Integer.parseInt(request.getParameter("linkingId"));
 			org.oscarehr.hnr.ws.Client hnrClient = CaisiIntegratorManager.getHnrClient(loggedInInfo, loggedInInfo.getCurrentFacility(),linkingId);
 
@@ -226,15 +230,12 @@ public final class ImageRenderingServlet extends HttpServlet {
 	private static final int renderLocalClient(HttpServletRequest request, HttpServletResponse response) {
 		// this expects clientId as a parameter
 
-		// security check
-		HttpSession session = request.getSession();
-		Provider provider = (Provider) session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER);
-		if (provider == null) {
+		if (!isLoggedIn(request))
+		{
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
 
 		try {
-			// get image
 			ClientImage clientImage = clientImageDAO.getClientImage(Integer.parseInt(request.getParameter("clientId")));
 			byte[] imageBytes;
 			if (clientImage != null && "jpg".equalsIgnoreCase(clientImage.getImage_type())) {
@@ -254,15 +255,13 @@ public final class ImageRenderingServlet extends HttpServlet {
 	private int renderSignaturePreview(HttpServletRequest request, HttpServletResponse response) {
 		// this expects signatureRequestId as a parameter
 
-		// security check
-		HttpSession session = request.getSession();
-		Provider provider = (Provider) session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER);
-		if (provider == null) {
+		if (!isLoggedIn(request))
+		{
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
 
+
 		try {
-			// get image
 			FileInputStream fileInputStream = null;
 			try {
 				String signatureRequestId = request.getParameter(DigitalSignatureUtils.SIGNATURE_REQUEST_ID_KEY);
@@ -293,10 +292,8 @@ public final class ImageRenderingServlet extends HttpServlet {
 	private static final int renderSignatureStored(HttpServletRequest request, HttpServletResponse response) {
 		// this expects digitalSignatureId as a parameter
 
-		// security check
-		HttpSession session = request.getSession();
-		Provider provider = (Provider) session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER);
-		if (provider == null) {
+		if (!isLoggedIn(request))
+		{
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
 
@@ -315,11 +312,9 @@ public final class ImageRenderingServlet extends HttpServlet {
 	}
 	
 	private static final int renderClinicLogoStored(HttpServletRequest request, HttpServletResponse response) {
-		
-		// security check
-		HttpSession session = request.getSession();
-		Provider provider = (Provider) session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER);
-		if (provider == null) {
+
+		if (!isLoggedIn(request))
+		{
 			return HttpServletResponse.SC_FORBIDDEN;
 		}
 
@@ -341,5 +336,55 @@ public final class ImageRenderingServlet extends HttpServlet {
 		}
 
 		return HttpServletResponse.SC_NOT_FOUND;
+	}
+
+	private static final int renderCustomNavIcon(HttpServletRequest request, HttpServletResponse response)
+	{
+		if (!isLoggedIn(request))
+		{
+			return HttpServletResponse.SC_FORBIDDEN;
+		}
+		try
+		{
+			GenericFile imageFile = ClinicImageService.getImage(IMAGE_TYPE.NAV_LOGO);
+			return renderImage(response, imageFile);
+		}
+		catch (FileNotFoundException e)
+		{
+			return HttpServletResponse.SC_NOT_FOUND;
+		}
+		catch (Exception e)
+		{
+			return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+		}
+	}
+
+	private static final int renderImage(HttpServletResponse response, GenericFile imageFile) throws IOException
+	{
+		byte[] buffer = new byte[1024];
+
+		try (InputStream fileStream = imageFile.asFileInputStream(); BufferedOutputStream output = new BufferedOutputStream(response.getOutputStream()))
+		{
+			File fileObj = imageFile.getFileObject();
+			Long fileSize = fileObj.length();
+
+			response.setContentLength(fileSize.intValue());
+			response.setContentType("image/" + imageFile.getExtension());
+
+			while(fileStream.read(buffer) != -1)
+			{
+				output.write(buffer);
+			}
+
+			output.flush();
+			return HttpServletResponse.SC_OK;
+		}
+	}
+
+	private static boolean isLoggedIn(HttpServletRequest request)
+	{
+		HttpSession session = request.getSession();
+		Provider provider = (Provider) session.getAttribute(SessionConstants.LOGGED_IN_PROVIDER);
+		return provider != null;
 	}
 }

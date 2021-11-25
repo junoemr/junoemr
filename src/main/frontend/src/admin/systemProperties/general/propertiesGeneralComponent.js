@@ -25,124 +25,140 @@ import {SystemPreferenceApi} from "../../../../generated/api/SystemPreferenceApi
 import {SYSTEM_PROPERTIES} from "../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Admin').component('systemPropertiesGeneral',
-    {
-        templateUrl: 'src/admin/systemProperties/general/propertiesGeneral.jsp',
-        bindings: {},
-        controller: [
-            '$scope',
-            '$http',
-            '$httpParamSerializer',
-	        '$uibModal',
-            function ($scope, $http, $httpParamSerializer, $uibModal) {
-                let propertyTypes =
-                {
-                    text: "string",
-	                toggle: "boolean",
-                }
-	
-	            $scope.PROPERTY_TYPES = propertyTypes;
-                
-                let ctrl = this;
-                let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
-                
-	            ctrl.validations =
-		            {
-			            phonePrefixValid: (prefix) =>
-			            {
-				            const reg = new RegExp(/^[0-9]{3}-?$/);
-				            const MIN_LENGTH = 3;
-				            const MAX_LENGTH = 4;
-
-				            return prefix === "" || !prefix ||
-					            (prefix.match(reg) != null && (prefix.length >= MIN_LENGTH && prefix.length <= MAX_LENGTH));
-			            }
-		            };
-	            
-                ctrl.properties = [
-                    {
-                        name: "Phone Prefix",
-                        description: "Change the default phone number prefix (XXX or XXX-)",
-                        propertyName: SYSTEM_PROPERTIES.DEFAULT_PHONE_PREFIX,
-	                    type: propertyTypes.text,
-	                    value: "",
-	                    validation: ctrl.validations.phonePrefixValid,
-                    },
-	                {
-		                name: "Family Doctor & Demographic Rostering",
-		                description: "Enable additional family doctor field in classic UI and demographic rostering section in Juno UI",
-		                propertyName: SYSTEM_PROPERTIES.ROSTERING_MODULE,
-		                type: propertyTypes.toggle,
-		                value: false,
-		                validation: false,
-	                },
+	{
+		templateUrl: 'src/admin/systemProperties/general/propertiesGeneral.jsp',
+		bindings: {},
+		controller: [
+			'$scope',
+			'$http',
+			'$httpParamSerializer',
+			'$uibModal',
+			function ($scope, $http, $httpParamSerializer, $uibModal) {
+				let propertyTypes =
 					{
-	                	name: "Additional Demographic Address",
-		                description: "Enable an additional demographic address",
-		                propertyName: SYSTEM_PROPERTIES.EXTRA_ADDRESS_FIELD,
-		                type: propertyTypes.toggle,
-		                value: false,
-		                validation: false,
-	                }
-                ];
+						text: "string",
+						toggle: "boolean",
+					}
 
-               ctrl.$onInit = () =>
-                {
-                    for (let property of ctrl.properties)
-                    {
-                    	ctrl.loadProperty(property);
-                    }
-                };
-               
-                ctrl.loadProperty = (property) =>
-                {
-                	if (property.type === propertyTypes.toggle)
-	                {
-		                systemPreferenceApi.getPreferenceEnabled(property.propertyName)
-			                .then((response) =>
-			                {
-				                property.value = response.data.body;
-			                })
-	                }
-                	else
-	                {
-	                	systemPreferenceApi.getPreferenceValue(property.propertyName)
-			                .then((response) =>
-		                    {
-			                    property.value = response.data.body;
-		                    })
-	                }
+				$scope.PROPERTY_TYPES = propertyTypes;
 
-                };
-                
+				let ctrl = this;
+				let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
 
-                /**
-                 * Persist new property value
-                 * @param property property to update
-                 * @param value set the value in the database
-                 */
-                ctrl.updateProperty = (property, value) =>
-                {
-                	if (property.validation && !property.validation(value))
-                	{
-		                return;
-	                }
-                	
-                	systemPreferenceApi.putPreferenceValue(property.propertyName, value)
-		                .then((response) =>
-		                {
-		                	if (property.type === propertyTypes.text)
-			                {
-				                Juno.Common.Util.successAlert($uibModal, "Success", property.name + " was updated");
-			                }
-		                })
-		                .catch((error)=>
-		                {
-			                if (property.type === propertyTypes.text)
-			                {
-				                Juno.Common.Util.errorAlert($uibModal, "Error", property.name + " could not be updated");
-			                }
-		                })
-                };
-            }
-        ]
-    });
+				ctrl.validations =
+					{
+						phonePrefixValid: (prefix) =>
+						{
+							const reg = new RegExp(/^[0-9]{3}-?$/);
+							const MIN_LENGTH = 3;
+							const MAX_LENGTH = 4;
+
+							return prefix === "" || !prefix ||
+								(prefix.match(reg) != null && (prefix.length >= MIN_LENGTH && prefix.length <= MAX_LENGTH));
+						}
+					};
+
+				ctrl.properties = [
+					{
+						name: "Phone Prefix",
+						description: "Change the default phone number prefix (XXX or XXX-)",
+						propertyName: SYSTEM_PROPERTIES.DEFAULT_PHONE_PREFIX,
+						type: propertyTypes.text,
+						value: "",
+						validation: ctrl.validations.phonePrefixValid,
+					},
+					{
+						name: "Family Doctor & Demographic Rostering",
+						description: "Enable additional family doctor field in classic UI and demographic rostering section in Juno UI",
+						propertyName: SYSTEM_PROPERTIES.ROSTERING_MODULE,
+						type: propertyTypes.toggle,
+						value: false,
+						validation: false,
+					},
+					{
+						name: "Additional Demographic Address",
+						description: "Enable an additional demographic address",
+						propertyName: SYSTEM_PROPERTIES.EXTRA_ADDRESS_FIELD,
+						type: propertyTypes.toggle,
+						value: false,
+						validation: false,
+					},
+					{
+						name: "Custom Nav Icon",
+						description: "Use a user supplied .png as the logo image Juno UI nav bar",
+						propertyName: SYSTEM_PROPERTIES.UI_CUSTOM_NAV_ICON,
+						type: propertyTypes.toggle,
+						value: false,
+						validation: false,
+					},
+					{
+						name: "Restrict to Juno UI",
+						description: "Disable link to classic UI when clicking the logo in the Juno UI nav bar",
+						propertyName: SYSTEM_PROPERTIES.UI_LOCK_TO_JUNO_UI,
+						type: propertyTypes.toggle,
+						value: false,
+						validation: false,
+					}
+				];
+
+				ctrl.$onInit = () =>
+				{
+					for (let property of ctrl.properties)
+					{
+						ctrl.loadProperty(property);
+					}
+				};
+
+				ctrl.loadProperty = (property) =>
+				{
+					if (property.type === propertyTypes.toggle)
+					{
+						systemPreferenceApi.getPreferenceEnabled(property.propertyName)
+						.then((response) =>
+						{
+							property.value = response.data.body;
+						})
+					}
+					else
+					{
+						systemPreferenceApi.getPreferenceValue(property.propertyName)
+						.then((response) =>
+						{
+							property.value = response.data.body;
+						})
+					}
+
+				};
+
+
+				/**
+				 * Persist new property value
+				 * @param property property to update
+				 * @param value set the value in the database
+				 */
+				ctrl.updateProperty = (property, value) =>
+				{
+					if (property.validation && !property.validation(value))
+					{
+						return;
+					}
+
+					systemPreferenceApi.putPreferenceValue(property.propertyName, value)
+					.then((response) =>
+					{
+						if (property.type === propertyTypes.text)
+						{
+							Juno.Common.Util.successAlert($uibModal, "Success", property.name + " was updated");
+						}
+					})
+					.catch((error)=>
+					{
+						if (property.type === propertyTypes.text)
+						{
+							Juno.Common.Util.errorAlert($uibModal, "Error", property.name + " could not be updated");
+						}
+					})
+				};
+			}
+		]
+	});
