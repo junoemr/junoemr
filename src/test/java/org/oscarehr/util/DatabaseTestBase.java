@@ -28,6 +28,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import oscar.OscarProperties;
 import java.sql.SQLException;
 import java.util.Set;
 
@@ -74,12 +75,18 @@ public class DatabaseTestBase
 	public void resetDatabase()
 		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
-		if(getTablesToRestore().length > 0)
+		if(OscarProperties.isTestDatabaseFullResetEnabled())
 		{
-			SchemaUtils.restoreTable(getTablesToRestore());
+			// Restore all tables.  Slow but checks for any residual db changes.
+			SchemaUtils.restoreAllTables();
+		}
+		else
+		{
+			if(getTablesToRestore().length > 0)
+			{
+				SchemaUtils.restoreTable(getTablesToRestore());
 
-			// XXX: Restore all tables.  Switch back to regular once it runs clean.
-			//SchemaUtils.restoreAllTables();
+			}
 		}
 
 		if(getTablesToClear().length > 0)

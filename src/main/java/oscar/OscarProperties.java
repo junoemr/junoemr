@@ -60,6 +60,7 @@ public class OscarProperties extends Properties {
 	private static final String MODULE_PROPERTY_NAME = "ModuleNames";
 
 	private static final String IS_DOCKER_TESTING_ENABLED = "is_docker_testing_enabled";
+	private static final String IS_TEST_DATABASE_FULL_RESET_ENABLED = "is_test_database_full_reset_enabled";
 
 
 	public enum Module
@@ -709,5 +710,10 @@ public class OscarProperties extends Properties {
 	public static boolean isDockerTestingEnabled()
 	{
 		return OscarProperties.isSystemPropertyActive(IS_DOCKER_TESTING_ENABLED);
+	}
+
+	public static boolean isTestDatabaseFullResetEnabled()
+	{
+		return OscarProperties.isSystemPropertyActive(IS_TEST_DATABASE_FULL_RESET_ENABLED);
 	}
 }

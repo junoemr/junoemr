@@ -197,7 +197,10 @@ public class SchemaUtils
 
 				if (checksum != null && !checksum.equals(defaultChecksum))
 				{
-					String errorMessage = "***** Checksums don't match for " + tableName;
+					String errorMessage = "***** Checksums don't match for table \"" + tableName + "\"\n" +
+						"***** This means a test modified the database and didn't clean up after itself." +
+						"***** It's possible that it wasn't this test's fault, but one of the previous tests.";
+
 					logger.error(errorMessage);
 					errors.add(errorMessage);
 				}
