@@ -35,6 +35,7 @@ public class SectionAccessUtil
 {
 	public static void accessAdministrationSectionClassicUI(WebDriver driver, String sectionName, String subSectionName)
 	{
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("admin-panel")));
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText(sectionName)));

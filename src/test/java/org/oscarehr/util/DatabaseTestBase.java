@@ -23,10 +23,11 @@
 
 package org.oscarehr.util;
 
+import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import oscar.OscarProperties;
 import java.sql.SQLException;
@@ -34,6 +35,8 @@ import java.util.Set;
 
 public class DatabaseTestBase
 {
+	private static Logger logger = MiscUtils.getLogger();
+
 	/**
 	 * Override this method and return the tables that need to be reset before and after running an
 	 * integration test.  Here is a template for the override:
@@ -66,9 +69,18 @@ public class DatabaseTestBase
 		return new String[0];
 	}
 
-	protected static String[] getClassTablesToRestore()
+	@BeforeClass
+	public static void resetDatabaseBeforeClass()
+		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
-		return new String[0];
+		// Restore the database state before running the class to make sure it is in a clean state
+		// before any tests run to make sure any pre-test tasks don't make things dirty
+		if(OscarProperties.isTestDatabaseFullResetEnabled())
+		{
+			logger.info("Restoring all test data");
+			// Restore all tables.  Slow but checks for any residual db changes.
+			SchemaUtils.restoreAllTables();
+		}
 	}
 
 	@Before
@@ -77,6 +89,10 @@ public class DatabaseTestBase
 	{
 		if(OscarProperties.isTestDatabaseFullResetEnabled())
 		{
+			// Make sure there are no changes before starting
+			checkDatabase();
+
+			logger.info("Restoring all test data");
 			// Restore all tables.  Slow but checks for any residual db changes.
 			SchemaUtils.restoreAllTables();
 		}
@@ -84,13 +100,14 @@ public class DatabaseTestBase
 		{
 			if(getTablesToRestore().length > 0)
 			{
+				logger.info("Restoring selected test data");
 				SchemaUtils.restoreTable(getTablesToRestore());
-
 			}
 		}
 
 		if(getTablesToClear().length > 0)
 		{
+			logger.info("Clearing selected test data");
 			SchemaUtils.restoreTable(false, getTablesToClear());
 		}
 	}
@@ -99,19 +116,28 @@ public class DatabaseTestBase
 	public void resetAndCheckDatabase()
 		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
+		logger.info("Restoring and checking test data");
 		if(getTablesToRestore().length > 0 || getTablesToClear().length > 0)
 		{
+			logger.info("Restoring all test data");
+
 			// Reset all tables changed or cleared
 			SchemaUtils.restoreTable(getTablesToRestore());
 			SchemaUtils.restoreTable(getTablesToClear());
+		}
 
-			// Make sure there are no residual db changes
-			Set<String> errors = SchemaUtils.getFailedChecksums();
+		checkDatabase();
+	}
 
-			if (errors.size() > 0)
-			{
-				Assert.fail(String.join("\n", errors));
-			}
+	private void checkDatabase()
+		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
+	{
+		// Make sure there are no residual db changes
+		Set<String> errors = SchemaUtils.getFailedChecksums();
+
+		if (errors.size() > 0)
+		{
+			Assert.fail(String.join("\n", errors));
 		}
 	}
 }

@@ -49,9 +49,6 @@ package org.oscarehr.common.dao;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.ConfigUtils;
@@ -69,7 +66,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import static junit.framework.Assert.fail;
 
