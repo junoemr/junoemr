@@ -24,6 +24,7 @@
 package org.oscarehr.util;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.oscarehr.common.dao.utils.SchemaUtils;
@@ -64,6 +65,11 @@ public class DatabaseTestBase
 		return new String[0];
 	}
 
+	protected static String[] getClassTablesToRestore()
+	{
+		return new String[0];
+	}
+
 	@Before
 	public void resetDatabase()
 		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
@@ -86,16 +92,19 @@ public class DatabaseTestBase
 	public void resetAndCheckDatabase()
 		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
-		// Reset all tables changed or cleared
-		SchemaUtils.restoreTable(getTablesToRestore());
-		SchemaUtils.restoreTable(getTablesToClear());
-
-		// Make sure there are no residual db changes
-		Set<String> errors = SchemaUtils.getFailedChecksums();
-
-		if(errors.size() > 0)
+		if(getTablesToRestore().length > 0 || getTablesToClear().length > 0)
 		{
-			Assert.fail(String.join("\n", errors));
+			// Reset all tables changed or cleared
+			SchemaUtils.restoreTable(getTablesToRestore());
+			SchemaUtils.restoreTable(getTablesToClear());
+
+			// Make sure there are no residual db changes
+			Set<String> errors = SchemaUtils.getFailedChecksums();
+
+			if (errors.size() > 0)
+			{
+				Assert.fail(String.join("\n", errors));
+			}
 		}
 	}
 }
