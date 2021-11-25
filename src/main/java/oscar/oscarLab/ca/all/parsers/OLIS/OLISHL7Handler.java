@@ -24,17 +24,23 @@ import ca.uhn.hl7v2.parser.ModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import lombok.Getter;
 import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.bouncycastle.util.encoders.Base64;
 import org.oscarehr.common.hl7.OLIS.model.v231.message.ERP_R09;
+import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.document.model.Document;
 import org.oscarehr.olis.dao.OLISRequestNomenclatureDao;
 import org.oscarehr.olis.dao.OLISResultNomenclatureDao;
 import org.oscarehr.olis.model.OLISRequestNomenclature;
 import org.oscarehr.olis.model.OLISResultNomenclature;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
@@ -58,6 +64,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static org.oscarehr.common.io.GenericFile.ALLOWED_CONTENT_TYPES;
 import static org.oscarehr.olis.service.OLISPollingService.OLIS_DATE_FORMAT;
 
 /**
@@ -73,6 +80,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 
 	protected static final OLISRequestNomenclatureDao requestNomenclatureDao = SpringUtils.getBean(OLISRequestNomenclatureDao.class);
 	protected static final OLISResultNomenclatureDao resultNomenclatureDao = SpringUtils.getBean(OLISResultNomenclatureDao.class);
+	protected static final DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
 
 	private static final Logger logger = Logger.getLogger(OLISHL7Handler.class);
 	private static final String finalOBRStatus = "CFEX";
@@ -109,6 +117,28 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	private ArrayList<HashMap<String, String>> patientHomeTelecom;
 	private ArrayList<HashMap<String, String>> patientWorkTelecom;
 	private ArrayList<HashMap<String, String>> patientAddresses;
+
+	@Getter
+	private enum OLIS_DOC_TYPES
+	{
+		PDF(ALLOWED_CONTENT_TYPES.APPLICATION_PDF.getContentType(), "pdf"),
+		DOC(ALLOWED_CONTENT_TYPES.APPLICATION_DOC.getContentType(), "doc"),
+		RTF(ALLOWED_CONTENT_TYPES.APPLICATION_RTF.getContentType(), "rtf"),
+		JPEG(ALLOWED_CONTENT_TYPES.IMAGE_JPEG.getContentType(), "jpg"),
+		GIF(ALLOWED_CONTENT_TYPES.IMAGE_GIF.getContentType(), "gif"),
+		TIFF(ALLOWED_CONTENT_TYPES.IMAGE_TIFF.getContentType(), "tiff"),
+		HTML(ALLOWED_CONTENT_TYPES.TEXT_HTML.getContentType(), "html"),
+		XML(ALLOWED_CONTENT_TYPES.TEXT_XML.getContentType(), "xml");
+
+		private final String mimeType;
+		private final String extension;
+
+		OLIS_DOC_TYPES(String mimeType, String extension)
+		{
+			this.mimeType = mimeType;
+			this.extension = extension;
+		}
+	}
 
 	public static boolean handlerTypeMatch(Message message)
 	{
@@ -1482,66 +1512,101 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return getOrderDate();
 	}
 
-	@SuppressWarnings("unused")
+	@Override
+	public boolean supportsEmbeddedDocuments()
+	{
+		return true;
+	}
+
+	@Override
+	public List<EmbeddedDocument> getEmbeddedDocuments()
+	{
+		List<EmbeddedDocument> embeddedDocuments = new LinkedList<>();
+		for(int i=0; i < getOBRCount(); i++)
+		{
+			for(int j=0; j < getOBXCount(i); j++)
+			{
+				if (getOBXValueType(i, j).equals("ED")) // Encapsulated Data type
+				{
+					logger.info("Found embedded Document in OLIS lab " + getAccessionNum() + " [OBR(" + i + "), OBX(" + j + ")], pulling it out");
+					String data = getOBXField(i, j, 5, 0, 5);
+					OLIS_DOC_TYPES docType = OLIS_DOC_TYPES.valueOf(getOBXField(i, j, 5, 0, 3));
+
+					EmbeddedDocument embeddedDocument = new EmbeddedDocument();
+					embeddedDocument.setBase64Data(data);
+					embeddedDocument.setMimeType(docType.getMimeType());
+
+					String fileName = "-" + getAccessionNum() + "-" + getFillerOrderNumber() + "-" + i + "-" + j + "." + docType.getExtension();
+					embeddedDocument.setFileName(fileName);
+					embeddedDocument.setDescription("embedded_" + docType.getExtension());
+					embeddedDocument.setSourceFacility("HL7Upload");
+					embeddedDocument.setSource("OLIS");
+
+					embeddedDocuments.add(embeddedDocument);
+				}
+			}
+		}
+		return embeddedDocuments;
+	}
+
+	/**
+	 * write embedded document data to the response output stream.
+	 * @param request the request
+	 * @param response the response
+	 * @param obr the obr segment index
+	 * @param obx the obx segment index
+	 * @throws HL7Exception if an hl7 parse error occurs
+	 */
 	public void processEncapsulatedData(HttpServletRequest request, HttpServletResponse response, int obr, int obx) throws HL7Exception
 	{
-		getOBXField(obr, obx, 5, 0, 2);
-		String subtype = getOBXField(obr, obx, 5, 0, 3);
-		String data = get("/.ORDER_OBSERVATION(" + obr + ")/OBSERVATION(" + obx + ")/OBX-5-5-1");
 		try
 		{
-			if(subtype.equals("PDF"))
+			String embeddedData = get("/.ORDER_OBSERVATION(" + obr + ")/OBSERVATION(" + obx + ")/OBX-5-5-1");
+
+			String mimeType;
+			String fileNameSuffix;
+
+			byte[] buffer;
+
+			/* We replace embedded document data with a document reference to save database space.
+			 * Check to see if this has been done, if so load the document.
+			 * Otherwise, read the data directly from the hl7. This is expected to occur in preview (unsaved) mode.
+			 */
+			java.util.regex.Matcher docIdMatcher = Pattern.compile(pdfReplacement + "(\\d+)").matcher(embeddedData);
+			if (docIdMatcher.find())
 			{
-				response.setContentType("application/pdf");
-				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Document.pdf\"");
+				Integer obxDocId = Integer.parseInt(docIdMatcher.group(1));
+				Document document = documentDao.find(obxDocId);
+				GenericFile documentFile = FileFactory.getDocumentFile(document.getDocfilename());
+
+				mimeType = documentFile.getContentType();
+				fileNameSuffix = (mimeType.startsWith("image") ? "Image" : "Document") + "." + documentFile.getExtension();
+
+				buffer = documentFile.toByteArray();
 			}
-			else if(subtype.equals("DOC"))
+			else
 			{
-				response.setContentType("application/doc");
-				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Document.doc\"");
-			}
-			else if(subtype.equals("JPEG"))
-			{
-				response.setContentType("image/jpeg");
-				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Image.jpg\"");
-			}
-			else if(subtype.equals("GIF"))
-			{
-				response.setContentType("image/gif");
-				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Image.gif\"");
-			}
-			else if(subtype.equals("TIFF"))
-			{
-				response.setContentType("image/tiff");
-				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Image.tiff\"");
-			}
-			else if(subtype.equals("RTF"))
-			{
-				response.setContentType("application/rtf");
-				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Document.rtf\"");
-			}
-			else if(subtype.equals("HTML"))
-			{
-				response.setContentType("text/html");
-				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Document.html\"");
-			}
-			else if(subtype.equals("XML"))
-			{
-				response.setContentType("text/xml");
-				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Document.xml\"");
+				String subtype = getOBXField(obr, obx, 5, 0, 3);
+				OLIS_DOC_TYPES docType = OLIS_DOC_TYPES.valueOf(subtype);
+
+				mimeType = docType.getMimeType();
+				boolean isImage = (OLIS_DOC_TYPES.GIF.equals(docType) || OLIS_DOC_TYPES.TIFF.equals(docType) || OLIS_DOC_TYPES.JPEG.equals(docType));
+				fileNameSuffix = (isImage ? "Image" : "Document") + "." + docType.getExtension();
+
+				buffer = Base64.decode(embeddedData);
 			}
 
+			// write the responce content
+			response.setContentType(mimeType);
+			response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_" + fileNameSuffix + "\"");
 
-			byte[] buf = Base64.decode(data);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			baos.write(buf, 0, buf.length);
+			baos.write(buffer, 0, buffer.length);
 			baos.writeTo(response.getOutputStream());
-
-
 		}
 		catch(IOException e)
 		{
-			MiscUtils.getLogger().error("OLIS HL7 Error", e);
+			logger.error("OLIS Embedded Document Error", e);
 		}
 	}
 

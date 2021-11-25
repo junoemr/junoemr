@@ -45,6 +45,7 @@ import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
+import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Hl7TextInfo;
@@ -68,6 +69,7 @@ import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarDemographic.data.DemographicMerged;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
+import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.HHSEmrDownloadHandler;
@@ -81,6 +83,7 @@ import oscar.util.UtilDateUtilities;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -91,8 +94,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-
-import static org.oscarehr.common.io.FileFactory.createEmbeddedLabFile;
 
 public final class MessageUploader {
 
@@ -282,7 +283,7 @@ public final class MessageUploader {
 				List<Hl7TextInfo> matchingTdisLab =  hl7TextInfoDao.searchByFillerOrderNumber(fillerOrderNum, sendingFacility);
 				if (matchingTdisLab.size() > 0)
 				{
-					hl7TextMessageDao.updateIfFillerOrderNumberMatches(new String(Base64.encodeBase64(hl7Body.getBytes(MiscUtils.DEFAULT_UTF8_ENCODING)), MiscUtils.DEFAULT_UTF8_ENCODING),fileId,matchingTdisLab.get(0).getLabNumber());
+					hl7TextMessageDao.updateIfFillerOrderNumberMatches(new String(Base64.encodeBase64(hl7Body.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8),fileId,matchingTdisLab.get(0).getLabNumber());
 					hl7TextInfoDao.updateReportStatusByLabId(reportStatus,matchingTdisLab.get(0).getLabNumber());
 					hasBeenUpdated = true;
 				}
@@ -293,60 +294,56 @@ public final class MessageUploader {
 			// If we get a document with identifier ED we need to switch up how we're storing it
 			// [1] Strip out the embedded PDF in the OBX message
 			// [2] Convert it to a document and get the document ID
-			boolean hasPDF = false;
-			List<String> embeddedPDFs = new ArrayList<>();
+//			boolean hasPDF = false;
+//			List<EmbeddedDocument> embeddedDocuments = messageHandler.getEmbeddedDocuments();
 
-			if (messageHandler.isSupportEmbeddedPdf())
-			{
-				String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
-				// Every PDF should be prefixed with this due to b64 encoding of PDF header
-
-				for (i = 0; i < messageHandler.getOBRCount(); i++)
-				{
-					for (int c =0; c < messageHandler.getOBXCount(i); c ++)
-					{
-						if (messageHandler.getOBXValueType(i, c).equals("ED"))
-						{
-							// Some embedded PDFs simply have the lab as-is, some have it split up like above
-							for (int k = 1; k <= referenceStrings.length; k++)
-							{
-								String embeddedPdf = messageHandler.getOBXResult(i, c, k);
-								if (embeddedPdf.startsWith(PATHL7Handler.embeddedPdfPrefix))
-								{
-									MiscUtils.getLogger().info("Found embedded PDF in lab upload, pulling it out");
-									hasPDF = true;
-									embeddedPDFs.add(embeddedPdf);
-								}
-							}
-						}
-					}
-				}
-			}
-
-			int docId = 0;
+//			if (messageHandler.supportsEmbeddedDocuments())
+//			{
+//				String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
+//				// Every PDF should be prefixed with this due to b64 encoding of PDF header
+//
+//				for (i = 0; i < messageHandler.getOBRCount(); i++)
+//				{
+//					for (int c =0; c < messageHandler.getOBXCount(i); c ++)
+//					{
+//						if (messageHandler.getOBXValueType(i, c).equals("ED"))
+//						{
+//							// Some embedded PDFs simply have the lab as-is, some have it split up like above
+//							for (int k = 1; k <= referenceStrings.length; k++)
+//							{
+//								String embeddedPdf = messageHandler.getOBXResult(i, c, k);
+//								if (embeddedPdf.startsWith(PATHL7Handler.embeddedPdfPrefix))
+//								{
+//									MiscUtils.getLogger().info("Found embedded PDF in lab upload, pulling it out");
+//									hasPDF = true;
+//									embeddedPDFs.add(embeddedPdf);
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
 
 			if (!isTDIS || !hasBeenUpdated)
 			{
-				if (hasPDF)
+				int docId = 0;
+				if (messageHandler.supportsEmbeddedDocuments())
 				{
-					int count = 0;
-					for (String pdf : embeddedPDFs)
+					for (EmbeddedDocument embeddedDocument : messageHandler.getEmbeddedDocuments())
 					{
-						String fileName = "-" + accessionNum + "-" + fillerOrderNum + "-" + count + "-" + (int)(Math.random()*1000000000) + ".pdf";
 						// Replace original PDF string with meta info to prevent saving > 500k char strings in table
-						docId = createDocumentFromEmbeddedPDF(pdf, fileName);
-						hl7Body = hl7Body.replace(pdf, PATHL7Handler.pdfReplacement + docId);
+						docId = createDocumentFromEmbeddedPDF(embeddedDocument);
+						hl7Body = hl7Body.replace(embeddedDocument.getBase64Data(), MessageHandler.pdfReplacement + docId);
 						if (docId <= 0)
 						{
 							throw new ParseException("did not save embedded lab document correctly", 0);
 						}
-						count ++;
 					}
 				}
 
 				hl7TextMessage.setFileUploadCheckId(fileId);
 				hl7TextMessage.setType(type);
-				hl7TextMessage.setBase64EncodedeMessage(new String(Base64.encodeBase64(hl7Body.getBytes(MiscUtils.DEFAULT_UTF8_ENCODING)), MiscUtils.DEFAULT_UTF8_ENCODING));
+				hl7TextMessage.setBase64EncodedeMessage(new String(Base64.encodeBase64(hl7Body.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
 				hl7TextMessage.setServiceName(serviceName);
 				hl7TextMessageDao.persist(hl7TextMessage);
 				insertID = hl7TextMessage.getId();
@@ -727,26 +724,26 @@ public final class MessageUploader {
 	}
 
 	/**
-	 * Helper function for creating a proper document from an embedded PDF string.
-	 * These PDFs are encoded in the lab message as a base64 string.
-	 * @param embeddedPDF base64-encoded String representing the PDF we want to save
+	 * Helper function for creating a proper document from an embedded base64 string.
+	 * These documents are encoded in the lab message as a base64 string.
+	 * @param embeddedDocument model with base64 encoded String data representing the document we want to save
 	 * @return an integer corresponding to the document ID we've created. Document gets saved
 	 * in same generic OscarDocument/{instance}/document directory
 	 */
-	private static int createDocumentFromEmbeddedPDF(String embeddedPDF, String fileName)
+	private static int createDocumentFromEmbeddedPDF(EmbeddedDocument embeddedDocument)
 			throws InterruptedException, IOException
 	{
-		InputStream fileStream = new ByteArrayInputStream(Base64.decodeBase64(embeddedPDF));
-
-		GenericFile embeddedLabDoc = createEmbeddedLabFile(fileStream, fileName);
+		InputStream fileStream = new ByteArrayInputStream(Base64.decodeBase64(embeddedDocument.getBase64Data()));
+		GenericFile embeddedLabDoc = FileFactory.createEmbeddedLabFile(fileStream, embeddedDocument.getFileName());
 
 		Document document = new Document();
 		document.setDocCreator(ProviderData.SYSTEM_PROVIDER_NO);
 		document.setResponsible(ProviderData.SYSTEM_PROVIDER_NO);
-		document.setDocfilename(fileName);
-		document.setDocdesc("embedded_pdf");
-		document.setSourceFacility("HL7Upload");
-		document.setSource("Excelleris");
+		document.setDocfilename(embeddedDocument.getFileName());
+		document.setContenttype(embeddedDocument.getMimeType());
+		document.setDocdesc(embeddedDocument.getDescription());
+		document.setSource(embeddedDocument.getSource());
+		document.setSourceFacility(embeddedDocument.getSourceFacility());
 
 		Document savedDoc = documentService.uploadNewDemographicDocument(document, embeddedLabDoc, null);
 

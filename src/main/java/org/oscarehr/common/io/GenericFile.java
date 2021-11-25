@@ -65,18 +65,21 @@ public class GenericFile
 		APPLICATION_XML("application/xml"),
 		APPLICATION_IMAGE("application/image"),
 		APPLICATION_DOC("application/doc"),
+		APPLICATION_RTF("application/rtf"),
 		APPLICATION_MSWORD("application/msword"),
 		APPLICATION_ZIP("application/zip"),
 		APPLICATION_OCTET_STREAM("application/octet-stream"),
 		TEXT_CSV("text/csv"),
 		TEXT_PLAIN("text/plain"),
 		TEXT_XML("text/xml"),
+		TEXT_HTML("text/html"),
 		IMAGE_TIFF("image/tiff"),
 		IMAGE_JPEG("image/jpeg"),
+		IMAGE_GIF("image/gif"),
 		IMAGE_PNG("image/png"),
 		IMAGE_BMP("image/bmp");
 
-		private String contentType;
+		private final String contentType;
 
 		public String getContentType()
 		{

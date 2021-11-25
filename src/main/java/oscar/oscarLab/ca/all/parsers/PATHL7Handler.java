@@ -86,13 +86,6 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 
 	public static final String VIHARTF = "CELLPATHR";
 
-	// Embedded PDF strings that show up in OBX messages
-	public static final String embeddedPdfPrefix = "JVBERi0xLj";
-	// TEMPORARY: labs have been uploaded with both of these prefixes. Need to support both as it's in a diverging state
-	public static final List<String> pdfReplacements = Arrays.asList("embedded_doc_id_", "embedded_doc_id");
-
-	public static final String pdfReplacement = "embedded_doc_id_";
-
     /**
      * Map Excelleris status codes to ones that we want to display to the user.
      * Applies only when uploading new labs.
@@ -147,7 +140,7 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 	}
 
     @Override
-    public boolean isSupportEmbeddedPdf()
+    public boolean supportsEmbeddedDocuments()
     {
         return true;
     }
