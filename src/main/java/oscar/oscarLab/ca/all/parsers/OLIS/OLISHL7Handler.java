@@ -1488,44 +1488,59 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		getOBXField(obr, obx, 5, 0, 2);
 		String subtype = getOBXField(obr, obx, 5, 0, 3);
 		String data = get("/.ORDER_OBSERVATION(" + obr + ")/OBSERVATION(" + obx + ")/OBX-5-5-1");
-		try {
-			if (subtype.equals("PDF")) {
+		try
+		{
+			if(subtype.equals("PDF"))
+			{
 				response.setContentType("application/pdf");
 				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Document.pdf\"");
-			} else if (subtype.equals("JPEG")) {
+			}
+			else if(subtype.equals("DOC"))
+			{
+				response.setContentType("application/doc");
+				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Document.doc\"");
+			}
+			else if(subtype.equals("JPEG"))
+			{
 				response.setContentType("image/jpeg");
 				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Image.jpg\"");
-			} else if (subtype.equals("GIF")) {
+			}
+			else if(subtype.equals("GIF"))
+			{
 				response.setContentType("image/gif");
 				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Image.gif\"");
-			} else if (subtype.equals("RTF")) {
+			}
+			else if(subtype.equals("TIFF"))
+			{
+				response.setContentType("image/tiff");
+				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Image.tiff\"");
+			}
+			else if(subtype.equals("RTF"))
+			{
 				response.setContentType("application/rtf");
 				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Document.rtf\"");
-			} else if (subtype.equals("HTML")) {
+			}
+			else if(subtype.equals("HTML"))
+			{
 				response.setContentType("text/html");
 				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Document.html\"");
-			} else if (subtype.equals("XML")) {
+			}
+			else if(subtype.equals("XML"))
+			{
 				response.setContentType("text/xml");
 				response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_Document.xml\"");
 			}
 
 
 			byte[] buf = Base64.decode(data);
-			/*
-			int pos = 0;
-			int read;
-			while (pos < buf.length) {
-				read = buf.length - pos > 1024 ? 1024 : buf.length - pos;
-				response.getOutputStream().write(buf, pos, read);
-				pos += read;
-			}
-			*/
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			baos.write(buf, 0, buf.length);
 			baos.writeTo(response.getOutputStream());
 
 
-		} catch (IOException e) {
+		}
+		catch(IOException e)
+		{
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 		}
 	}

@@ -72,6 +72,7 @@ import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.HHSEmrDownloadHandler;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
 import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
 import oscar.oscarLab.ca.all.parsers.SpireHandler;
 import oscar.util.ConversionUtils;
@@ -97,14 +98,14 @@ public final class MessageUploader {
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final String DEFAULT_BLANK_PROVIDER_NO = "0";
-	private static PatientLabRoutingDao patientLabRoutingDao = SpringUtils.getBean(PatientLabRoutingDao.class);
-	private static Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
-	private static Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
-	private static Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
-	private static DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-	private static ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
-	private static DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
-	private static DocumentService documentService = SpringUtils.getBean(DocumentService.class);
+	private static final PatientLabRoutingDao patientLabRoutingDao = SpringUtils.getBean(PatientLabRoutingDao.class);
+	private static final Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
+	private static final Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
+	private static final Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
+	private static final DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
+	private static final ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	private static final DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+	private static final DocumentService documentService = SpringUtils.getBean(DocumentService.class);
 
 	private MessageUploader() {
 		// there's no reason to instantiate a class with no fields.
@@ -166,7 +167,7 @@ public final class MessageUploader {
 			String accessionNum = messageHandler.getAccessionNum();
 			String fillerOrderNum = messageHandler.getFillerOrderNumber();
 			String sendingFacility = messageHandler.getPatientLocation();
-			ArrayList docNums = messageHandler.getDocNums();
+			List<String> docNums = messageHandler.getDocNums();
 			int finalResultCount = messageHandler.getOBXFinalResultCount();
 			String obrDate = messageHandler.getMsgDate();
 
@@ -384,7 +385,7 @@ public final class MessageUploader {
 				demProviderNo = DEFAULT_BLANK_PROVIDER_NO;
 			}
 
-			if (type.equals("OLIS_HL7") && demProviderNo.equals(DEFAULT_BLANK_PROVIDER_NO))
+			if (OLISHL7Handler.OLIS_MESSAGE_TYPE.equals(type) && demProviderNo.equals(DEFAULT_BLANK_PROVIDER_NO))
 			{
 				OLISSystemPreferencesDao olisPrefDao = SpringUtils.getBean(OLISSystemPreferencesDao.class);
 				OLISSystemPreferences olisPreferences = olisPrefDao.getPreferences();
@@ -406,7 +407,7 @@ public final class MessageUploader {
 				String search = null;
 				if (type.equals("Spire"))
 				{
-					limit = new Integer(1);
+					limit = 1;
 					orderByLength = true;
 					search = "provider_no";
 				}
@@ -463,7 +464,7 @@ public final class MessageUploader {
 				if(!custom_route_enabled)
 				{
 					/* allow property override setting to route all labs to a specific inbox or list of inboxes. */
-					ArrayList<String> providers = OscarProperties.getInstance().getRouteLabsToProviders(docNums);
+					List<String> providers = OscarProperties.getInstance().getRouteLabsToProviders(docNums);
 					providerRouteReport(String.valueOf(insertID), providers, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
 				}
 			}
@@ -544,7 +545,7 @@ public final class MessageUploader {
 	/**
 	 * Attempt to match the doctors from the lab to a provider
 	 */ 
-	private static void providerRouteReport(String labId, ArrayList<String> docNums, Connection conn, String altProviderNo, String labType, String search_on, Integer limit, boolean orderByLength) throws Exception {
+	private static void providerRouteReport(String labId, List<String> docNums, Connection conn, String altProviderNo, String labType, String search_on, Integer limit, boolean orderByLength) throws Exception {
 		ArrayList<String> providerNums = new ArrayList<String>();
 		String sqlSearchOn = "ohip_no";
 		String routeToProvider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");
@@ -617,7 +618,7 @@ public final class MessageUploader {
 	/**
 	 * Attempt to match the doctors from the lab to a provider
 	 */
-	private static void providerRouteReport(String labId, ArrayList<String> docNums, Connection conn, String altProviderNo, String labType) throws Exception {
+	private static void providerRouteReport(String labId, List<String> docNums, Connection conn, String altProviderNo, String labType) throws Exception {
 		providerRouteReport(labId, docNums, conn, altProviderNo, labType, null, null, false);
 	}
 
