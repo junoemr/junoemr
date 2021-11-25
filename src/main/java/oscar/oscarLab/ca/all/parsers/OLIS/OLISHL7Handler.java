@@ -1415,7 +1415,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		{
 			return "Amended/Invalidation";
 		}
-		return super.getOrderStatusDisplayValue();
+		String orderStatusCode = getString(getOrderStatus());
+		return getObrTestResultStatusValue(orderStatusCode);
 	}
 
 	public String getPointOfCare(int i)
@@ -1453,8 +1454,9 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	{
 		String dateString;
 
-		// labs with status O do not have obr-7 filled. all others should
-		if("O".equals(getObrStatus(0)))
+		// labs with some specific statuses do not have obr-7 filled. all others should
+		String obrStatus = getObrStatus(0);
+		if("O".equals(obrStatus) || "X".equals(obrStatus))
 		{
 			// TODO figure out the correct date to use in this case
 			dateString = get("/.ORC-9");
@@ -2146,7 +2148,8 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public String getOrderStatus() {
+	public String getOrderStatus()
+	{
 		return isCorrected ? "C" : isFinal ? "F" : "P";
 	}
 
