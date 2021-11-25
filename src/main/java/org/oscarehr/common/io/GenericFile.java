@@ -369,10 +369,9 @@ public class GenericFile
 		return FilenameUtils.getExtension(javaFile.getName());
 	}
 
-	public int getFileSize()
+	public long getFileSize()
 	{
-		Long size = javaFile.length();
-		return size.intValue();
+		return javaFile.length();
 	}
 
 	public FileInputStream toFileInputStream() throws FileNotFoundException
