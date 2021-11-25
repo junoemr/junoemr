@@ -15,9 +15,10 @@
 					   class="icon icon-logo">
 					</a>
 					<img ng-if="$Sctrl.customNavIcon !== null && $ctrl.customNavIcon"
-						 src="../imageRenderingServlet?source=custom_nav_icon"
+						 ng-src="../imageRenderingServlet?source=custom_nav_icon"
 						 alt="dashboard icon"
-						 class="icon icon-custom"/>
+						 class="icon icon-custom"
+					/>
 				</button>
 			</div>
 			<div class="navbar-collapse collapse" id="main-nav-collapse">

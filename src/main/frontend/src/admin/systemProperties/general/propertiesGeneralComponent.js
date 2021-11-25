@@ -85,7 +85,7 @@ angular.module('Admin').component('systemPropertiesGeneral',
 					},
 					{
 						name: "Custom Nav Icon",
-						description: "Use a user supplied .png as the logo image Juno UI nav bar",
+						description: "Use a user supplied .png as the logo image in the Juno UI nav bar",
 						propertyName: SYSTEM_PROPERTIES.UI_CUSTOM_NAV_ICON,
 						type: propertyTypes.toggle,
 						value: false,

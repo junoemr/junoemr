@@ -365,11 +365,8 @@ public final class ImageRenderingServlet extends HttpServlet {
 
 		try (InputStream fileStream = imageFile.asFileInputStream(); BufferedOutputStream output = new BufferedOutputStream(response.getOutputStream()))
 		{
-			File fileObj = imageFile.getFileObject();
-			Long fileSize = fileObj.length();
-
-			response.setContentLength(fileSize.intValue());
-			response.setContentType("image/" + imageFile.getExtension());
+			response.setContentLength(imageFile.getFileSize());
+			response.setContentType(imageFile.getContentType());
 
 			while(fileStream.read(buffer) != -1)
 			{
