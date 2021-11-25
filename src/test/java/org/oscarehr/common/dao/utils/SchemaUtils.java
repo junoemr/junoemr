@@ -168,37 +168,45 @@ public class SchemaUtils
 		Connection connection = getConnection();
 		Statement statement = connection.createStatement();
 
-		String schema = ConfigUtils.getProperty("db_schema");
-		statement.executeUpdate("use " + schema);
-
 		Set<String> errors = new HashSet<String>();
-		for (String tableName: createTableStatements.keySet())
+		try
 		{
-			// Check if there are any modified tables
-			String checksumValueSql = "CHECKSUM TABLE `" + tableName + "`";
-			ResultSet checksumResult = statement.executeQuery(checksumValueSql);
+			String schema = ConfigUtils.getProperty("db_schema");
+			statement.executeUpdate("use " + schema);
 
-			String defaultChecksum = null;
-			String checksum = null;
-			if(checksumResult.next())
+			for (String tableName : createTableStatements.keySet())
 			{
-				checksum = checksumResult.getString("Checksum");
-			}
+				// Check if there are any modified tables
+				String checksumValueSql = "CHECKSUM TABLE `" + tableName + "`";
+				ResultSet checksumResult = statement.executeQuery(checksumValueSql);
 
-			String checksumValueDefaultSql ="CHECKSUM TABLE `" + tableName + "_maventest`";
-			ResultSet checksumDefaultResult = statement.executeQuery(checksumValueDefaultSql);
+				String defaultChecksum = null;
+				String checksum = null;
+				if (checksumResult.next())
+				{
+					checksum = checksumResult.getString("Checksum");
+				}
 
-			if(checksumDefaultResult.next())
-			{
-				defaultChecksum = checksumDefaultResult.getString("Checksum");
-			}
+				String checksumValueDefaultSql = "CHECKSUM TABLE `" + tableName + "_maventest`";
+				ResultSet checksumDefaultResult = statement.executeQuery(checksumValueDefaultSql);
 
-			if(checksum != null && !checksum.equals(defaultChecksum))
-			{
-				String errorMessage = "***** Checksums don't match for " + tableName;
-				logger.error(errorMessage);
-				errors.add(errorMessage);
+				if (checksumDefaultResult.next())
+				{
+					defaultChecksum = checksumDefaultResult.getString("Checksum");
+				}
+
+				if (checksum != null && !checksum.equals(defaultChecksum))
+				{
+					String errorMessage = "***** Checksums don't match for " + tableName;
+					logger.error(errorMessage);
+					errors.add(errorMessage);
+				}
 			}
+		}
+		finally
+		{
+			statement.close();
+			connection.close();
 		}
 
 		return errors;
