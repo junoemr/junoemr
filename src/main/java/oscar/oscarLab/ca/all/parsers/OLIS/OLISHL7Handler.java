@@ -181,7 +181,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	@Override
 	public boolean canUpload()
 	{
-		return "OK".equalsIgnoreCase(getAckStatus());
+		return resultStatusOK();
 	}
 
 	public String getAckStatus()
@@ -196,6 +196,23 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			logger.error("Terser Error", e);
 		}
 		return queryAckStatus;
+	}
+
+	public boolean resultStatusNotFound()
+	{
+		return "NF".equalsIgnoreCase(getAckStatus());
+	}
+	public boolean resultStatusOK()
+	{
+		return "OK".equalsIgnoreCase(getAckStatus());
+	}
+	public boolean resultStatusApplicationError()
+	{
+		return "AE".equalsIgnoreCase(getAckStatus());
+	}
+	public boolean resultStatusApplicationReject()
+	{
+		return "AR".equalsIgnoreCase(getAckStatus());
 	}
 
 	@Override

@@ -87,6 +87,11 @@ public class OLISResultsAction extends DispatchAction
 
 				// collect hl7 response errors
 				errors.addAll(handler.getReportErrors().stream().map(OLISError::userFriendlyToString).collect(Collectors.toList()));
+				if(handler.resultStatusNotFound())
+				{
+					errors.add("Request did not find and data");
+					continue;
+				}
 
 				// skip responses with no test data
 				if(handler.getOBRCount() == 0)
