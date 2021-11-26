@@ -24,9 +24,11 @@
 package org.oscarehr.hospitalReportManager.transfer;
 
 import lombok.Data;
+import java.util.List;
 
 @Data
 public class HRMCategoryTransferInbound
 {
 	String name;
+	List<HRMSubClassTransferInbound> subClasses;
 }

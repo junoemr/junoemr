@@ -21,20 +21,23 @@
 * Canada
 */
 
-import {HRMCategoryTransferInbound, HRMCategoryTransferOutbound} from "../../../../../generated";
+import {HRMCategoryTransferInbound, HrmCategoryModel} from "../../../../../generated";
+import HrmSubClass from "./HrmSubClass";
 
 export default class HrmCategory
 {
   private _id: number;
   private _name: string;
+  private _subClasses: HrmSubClass[];
 
   public constructor()
   {
     this._id = null;
     this._name = null;
+    this._subClasses = null;
   }
 
-  public static fromTransferArray(transferList: HRMCategoryTransferOutbound[]): HrmCategory[]
+  public static fromTransferArray(transferList: HrmCategoryModel[]): HrmCategory[]
   {
     if (!transferList)
     {
@@ -44,7 +47,7 @@ export default class HrmCategory
     return transferList.map(HrmCategory.fromTransfer);
   }
 
-  public static fromTransfer(transfer: HRMCategoryTransferOutbound): HrmCategory
+  public static fromTransfer(transfer: HrmCategoryModel): HrmCategory
   {
     if (!transfer)
     {
@@ -54,6 +57,7 @@ export default class HrmCategory
     const category = new HrmCategory();
     category._id = transfer.id;
     category._name = transfer.name;
+    category._subClasses = HrmSubClass.fromTransferList(transfer.subClasses);
 
     return category;
   }
@@ -78,5 +82,13 @@ export default class HrmCategory
   set name(value: string)
   {
     this._name = value;
+  }
+
+  get subClasses(): HrmSubClass[] {
+    return this._subClasses;
+  }
+
+  set subClasses(value: HrmSubClass[]) {
+    this._subClasses = value;
   }
 }

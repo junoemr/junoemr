@@ -25,7 +25,7 @@ package org.oscarehr.hospitalReportManager.service;
 
 import org.oscarehr.dataMigration.converter.in.hrm.HrmCategoryModelToDbConverter;
 import org.oscarehr.dataMigration.converter.out.hrm.HrmCategoryDbToModelConverter;
-import org.oscarehr.dataMigration.model.hrm.HrmCategory;
+import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
 import org.oscarehr.hospitalReportManager.dao.HRMCategoryDao;
 import org.oscarehr.hospitalReportManager.model.HRMCategory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import javax.validation.ValidationException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +50,7 @@ public class HRMCategoryService
 	@Autowired
 	HrmCategoryModelToDbConverter toDBConverter;
 
-	public HrmCategory createCategory(HrmCategory category)
+	public HrmCategoryModel createCategory(HrmCategoryModel category)
 	{
 		if (isNameInUse(category.getName()))
 		{
@@ -63,7 +63,7 @@ public class HRMCategoryService
 		return toModelConverter.convert(entity);
 	}
 
-	public HrmCategory updateCategory(HrmCategory category)
+	public HrmCategoryModel updateCategory(HrmCategoryModel category)
 	{
 		Optional<HRMCategory> existing = categoryDao.findActiveByName(category.getName());
 		existing.ifPresent(existingCategory ->
@@ -81,19 +81,19 @@ public class HRMCategoryService
 		return toModelConverter.convert(entity);
 	}
 
-	public HrmCategory deactivateCategory(Integer categoryId)
+	public HrmCategoryModel deactivateCategory(Integer categoryId)
 	{
 		HRMCategory entity = categoryDao.find(categoryId);
 		if (!entity.isDisabled())
 		{
-			entity.setDisabledAt(LocalDate.now());
+			entity.setDisabledAt(LocalDateTime.now());
 			categoryDao.merge(entity);
 		}
 
 		return toModelConverter.convert(entity);
 	}
 
-	public List<HrmCategory> getActiveCategories()
+	public List<HrmCategoryModel> getActiveCategories()
 	{
 		List<HRMCategory> entity = categoryDao.getActiveCategories();
 		return toModelConverter.convert(entity);

@@ -24,17 +24,17 @@
 package org.oscarehr.hospitalReportManager.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.dataMigration.model.hrm.HrmCategory;
+import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
 import org.oscarehr.hospitalReportManager.transfer.HRMCategoryTransferInbound;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HRMCategoryImportMapper extends AbstractModelConverter<HRMCategoryTransferInbound, HrmCategory>
+public class HRMCategoryImportMapper extends AbstractModelConverter<HRMCategoryTransferInbound, HrmCategoryModel>
 {
 	@Override
-	public HrmCategory convert(HRMCategoryTransferInbound importStructure)
+	public HrmCategoryModel convert(HRMCategoryTransferInbound importStructure)
 	{
-		HrmCategory category = new HrmCategory();
+		HrmCategoryModel category = new HrmCategoryModel();
 		category.setName(importStructure.getName());
 		return category;
 	}

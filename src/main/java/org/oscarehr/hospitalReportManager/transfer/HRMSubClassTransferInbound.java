@@ -26,7 +26,7 @@ package org.oscarehr.hospitalReportManager.transfer;
 import lombok.Data;
 
 @Data
-public class HRMSubClassTransfer
+public class HRMSubClassTransferInbound
 {
 	String className;
 	String subClassName;

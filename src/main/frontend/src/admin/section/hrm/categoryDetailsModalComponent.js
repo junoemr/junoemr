@@ -42,9 +42,11 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 		controller: [
 			'$uibModal',
 			'securityRolesService',
+			'NgTableParams',
 			function (
 				$uibModal,
-				securityRolesService)
+				securityRolesService,
+				NgTableParams)
 			{
 				const ctrl = this;
 				const hrmService = new HrmService();
@@ -60,6 +62,15 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 
 				ctrl.$onInit = async () =>
 				{
+					ctrl.tableParams = new NgTableParams({
+						page: 1,
+						count: -1,
+						sorting: {
+							facilityNumber: 'asc',
+						}
+					});
+
+
 					ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 					ctrl.category = ctrl.resolve.category;
 

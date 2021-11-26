@@ -23,18 +23,17 @@
 package org.oscarehr.dataMigration.model.hrm;
 
 import lombok.Data;
-import org.oscarehr.hospitalReportManager.model.HRMSubClass;
-
-import java.time.LocalDate;
+import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class HrmCategory
+public class HrmCategoryModel extends AbstractTransientModel
 {
 	private Integer id;
 	private String name;
-	private LocalDate disabledAt;
-	private List<HRMSubClass> subClasses;
+	private LocalDateTime disabledAt;
+	private List<HrmSubClassModel> subClasses;
 
 	public boolean isDisabled()
 	{

@@ -23,24 +23,30 @@
 
 package org.oscarehr.dataMigration.converter.out.hrm;
 
-import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
-import org.oscarehr.dataMigration.model.hrm.HrmCategory;
+import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
 import org.oscarehr.hospitalReportManager.model.HRMCategory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class HrmCategoryDbToModelConverter extends BaseDbToModelConverter<HRMCategory, HrmCategory>
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+public class HrmCategoryDbToModelConverter extends AbstractModelConverter<HRMCategory, HrmCategoryModel>
 {
 
-	@Override
-	public HrmCategory convert(HRMCategory input)
-	{
-		HrmCategory model = new HrmCategory();
-		model.setId(input.getId());
-		model.setName(input.getCategoryName());
-		model.setDisabledAt(input.getDisabledAt());
+	@Autowired
+	HrmSubClassDbToModelConverter subClassConverter;
 
-		// TODO: Subclass list
+	@Override
+	public HrmCategoryModel convert(HRMCategory entity)
+	{
+		HrmCategoryModel model = new HrmCategoryModel();
+		model.setId(entity.getId());
+		model.setName(entity.getCategoryName());
+		model.setSubClasses(subClassConverter.convert(entity.getSubClassList(), model));
+		model.setDisabledAt(entity.getDisabledAt());
 
 		return model;
 	}

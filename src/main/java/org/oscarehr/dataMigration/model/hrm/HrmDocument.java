@@ -155,7 +155,7 @@ public class HrmDocument extends AbstractTransientModel
 	private String sendingFacilityId;
 	private String sendingFacilityReport;
 	private HrmDocument parentReport;
-	private HrmCategory category;
+	private HrmCategoryModel category;
 	private HrmDocumentMatchingData hashData;
 
 	private List<HrmComment> comments;

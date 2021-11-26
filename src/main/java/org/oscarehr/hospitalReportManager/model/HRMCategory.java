@@ -19,7 +19,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -33,7 +33,7 @@ public class HRMCategory extends AbstractModel<Integer>
 	private String categoryName;
 
 	@Column(name="disabled_at")
-	private LocalDate disabledAt;
+	private LocalDateTime disabledAt;
 
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmCategory")
 	private List<HRMDocument> documentList;

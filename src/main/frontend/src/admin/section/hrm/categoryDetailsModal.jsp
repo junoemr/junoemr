@@ -36,7 +36,34 @@
 				            label="Name">
 				</juno-input>
 			</div>
-			<div class="role-access overflow-auto flex-column">
+			<div class="category-subclasses overflow-auto flex-column">
+                <table ng-table="$ctrl.tableParams" class="table table-striped table-bordered">
+                    <tbody>
+                    <tr ng-repeat="subclass in $ctrl.category.subclasses">
+                        <td data-title="'Facility Number'">
+                            {{ subclass.facilityNumber }}
+                        </td>
+                        <td data-title="'Report Type'">
+                            {{ subclass.className }}
+                        </td>
+                        <td data-title="'Subclass'">
+                            {{ subclass.subClassName }}
+                        </td>
+                        <td data-title="'Accompanying Subclass'">
+                            {{ subclass.accompanyingSubClassName }}
+                        </td>
+                        <td>
+                            <juno-button component-style="$ctrl.componentStyle"
+                                         button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
+                                         button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+                                         click="$ctrl.onDeactivateSubClass(subclass)"
+                                         disabled="!$ctrl.canDeactivate()">
+                                X
+                            </juno-button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
 			</div>
 		</div>
 	</modal-body>

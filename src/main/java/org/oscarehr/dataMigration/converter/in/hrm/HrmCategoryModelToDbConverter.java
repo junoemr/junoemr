@@ -24,16 +24,16 @@
 package org.oscarehr.dataMigration.converter.in.hrm;
 
 import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
-import org.oscarehr.dataMigration.model.hrm.HrmCategory;
+import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
 import org.oscarehr.hospitalReportManager.model.HRMCategory;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HrmCategoryModelToDbConverter extends BaseModelToDbConverter<HrmCategory, HRMCategory>
+public class HrmCategoryModelToDbConverter extends BaseModelToDbConverter<HrmCategoryModel, HRMCategory>
 {
 
 	@Override
-	public HRMCategory convert(HrmCategory input)
+	public HRMCategory convert(HrmCategoryModel input)
 	{
 		HRMCategory entity = new HRMCategory();
 		entity.setId(input.getId());

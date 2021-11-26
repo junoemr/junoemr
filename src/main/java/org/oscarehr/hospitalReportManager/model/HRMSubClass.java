@@ -19,7 +19,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -39,7 +39,7 @@ public class HRMSubClass extends AbstractModel<Integer>
 	private String sendingFacilityId;
 
 	@Column(name="disabled_at")
-	private LocalDate disabledAt;
+	private LocalDateTime disabledAt;
 	
 	@ManyToOne
 	@JoinColumn(name="hrmCategoryId")

@@ -24,16 +24,16 @@
 package org.oscarehr.ws.rest.integrations.hrm;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.hospitalReportManager.converter.HRMCategoryExportMapper;
-import org.oscarehr.dataMigration.model.hrm.HrmCategory;
+import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
 import org.oscarehr.hospitalReportManager.service.HRMCategoryService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.hospitalReportManager.transfer.HRMCategoryTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -44,11 +44,9 @@ import java.util.List;
 @Component("HRMCategoriesWebService")
 @Produces(MediaType.APPLICATION_JSON)
 @Tag(name = "hrmCategories")
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class HrmCategoriesWebService extends AbstractServiceImpl
 {
-	@Autowired
-	HRMCategoryExportMapper exportMapper;
-
 	@Autowired
 	HRMCategoryService categoryService;
 
@@ -57,12 +55,11 @@ public class HrmCategoriesWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/")
-	public RestResponse<List<HRMCategoryTransferOutbound>> getActiveCategories() throws Exception
+	public RestResponse<List<HrmCategoryModel>> getActiveCategories() throws Exception
 	{
 		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
-		List<HrmCategory> activeCategories = categoryService.getActiveCategories();
-		List<HRMCategoryTransferOutbound> transfer = exportMapper.convert(activeCategories);
+		List<HrmCategoryModel> activeCategories = categoryService.getActiveCategories();
 
-		return RestResponse.successResponse(transfer);
+		return RestResponse.successResponse(activeCategories);
 	}
 }

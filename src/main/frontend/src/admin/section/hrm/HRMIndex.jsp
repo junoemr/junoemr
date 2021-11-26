@@ -31,7 +31,7 @@
                 <a href="javascript:void(0)" ng-click="$ctrl.changeTab('admin.hrm.settings')">Settings</a>
             </li>
             <li ng-class="{'active': $ctrl.isTabActive('admin.hrm.category')}">
-                <a href="javascript:void(0)" ng-click="$ctrl.changeTab('admin.hrm.category')">Filing</a>
+                <a href="javascript:void(0)" ng-click="$ctrl.changeTab('admin.hrm.category')">Classification</a>
             </li>
         </ul>
     </div>

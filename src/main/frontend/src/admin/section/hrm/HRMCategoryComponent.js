@@ -56,6 +56,14 @@ angular.module('Admin.Section').component('hrmCategory',
 				ctrl.categories = []
 				
 				ctrl.$onInit = async () => {
+					ctrl.tableParams = new NgTableParams({
+							page: 1,
+							count: -1,
+							sorting: {
+								name: 'asc',
+							}
+						});
+
 					try
 					{
 						const categories = await hrmService.getActiveCategories();

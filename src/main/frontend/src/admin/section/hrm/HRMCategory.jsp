@@ -42,7 +42,7 @@
                 {{ category.name }}
             </td>
             <td data-title="'Subclasses'">
-                {{ 0 }}
+                {{ category.subclasses.length }}
             </td>
             <td>
                 <juno-button component-style="$ctrl.componentStyle"

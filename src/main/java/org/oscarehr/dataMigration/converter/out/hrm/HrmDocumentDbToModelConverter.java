@@ -24,7 +24,7 @@ package org.oscarehr.dataMigration.converter.out.hrm;
 
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
-import org.oscarehr.dataMigration.model.hrm.HrmCategory;
+import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
 import org.oscarehr.dataMigration.model.hrm.HrmComment;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmDocumentMatchingData;
@@ -126,12 +126,12 @@ public class HrmDocumentDbToModelConverter extends
 		return comments;
 	}
 
-	protected HrmCategory getCategory(HRMCategory hrmCategory)
+	protected HrmCategoryModel getCategory(HRMCategory hrmCategory)
 	{
-		HrmCategory category = null;
+		HrmCategoryModel category = null;
 		if(hrmCategory != null)
 		{
-			category = new HrmCategory();
+			category = new HrmCategoryModel();
 			category.setId(hrmCategory.getId());
 			category.setName(hrmCategory.getCategoryName());
 			category.setDisabledAt(hrmCategory.getDisabledAt());
