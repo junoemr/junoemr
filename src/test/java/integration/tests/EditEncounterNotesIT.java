@@ -47,7 +47,6 @@ import static integration.tests.util.junoUtil.Navigation.SUMMARY_URL;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = WebEnvironment.DEFINED_PORT)
-
 public class EditEncounterNotesIT extends SeleniumTestBase
 {
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
@@ -56,9 +55,9 @@ public class EditEncounterNotesIT extends SeleniumTestBase
 	protected String[] getTablesToRestore()
 	{
 		return new String[]{
-			"admission", "casemgmt_note", "demographic",
-			"eChart", "eform_data", "eform_instance", "eform_values", "log", "log_ws_rest", "measurementType",
-			"provider_recent_demographic_access","validations"
+			"admission", "casemgmt_note", "demographic", "eChart", "eform_data", "eform_instance",
+			"eform_values", "log", "log_ws_rest", "measurementType",
+			"provider_recent_demographic_access","validations", "property"
 		};
 	}
 

@@ -87,13 +87,25 @@ public class DatabaseTestBase
 	public void resetDatabase()
 		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
-		if(OscarProperties.isTestDatabaseFullResetEnabled())
+		if(OscarProperties.isTestDatabaseFullResetEnabled() &&
+			(getTablesToRestore().length > 0 || getTablesToClear().length > 0))
 		{
-			// Make sure there are no changes before starting
+			// This section is used for debugging
+
+			// Reset the selected database tables
+			if(getTablesToRestore().length > 0)
+			{
+				logger.info("Restoring selected test data");
+				SchemaUtils.restoreTable(getTablesToRestore());
+			}
+
+			// Make sure there are no changes before starting, sometimes the spring-boot startup
+			// will make db changes, this will check to make sure that the tables that are being
+			// cleared cover this case.
 			checkDatabase();
 
 			logger.info("Restoring all test data");
-			// Restore all tables.  Slow but checks for any residual db changes.
+			// Restore all tables.  This is slow but checks for any residual db changes.
 			SchemaUtils.restoreAllTables();
 		}
 		else
@@ -104,6 +116,7 @@ public class DatabaseTestBase
 				SchemaUtils.restoreTable(getTablesToRestore());
 			}
 		}
+
 
 		if(getTablesToClear().length > 0)
 		{
@@ -124,9 +137,9 @@ public class DatabaseTestBase
 			// Reset all tables changed or cleared
 			SchemaUtils.restoreTable(getTablesToRestore());
 			SchemaUtils.restoreTable(getTablesToClear());
-		}
 
-		checkDatabase();
+			checkDatabase();
+		}
 	}
 
 	private void checkDatabase()

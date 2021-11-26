@@ -65,7 +65,7 @@ public class AddProvidersIT extends SeleniumTestBase
 	{
 		return new String[]{
 			"admission", "log", "program_provider", "provider", "provider_billing",
-			"providerbillcenter", "secUserRole"
+			"providerbillcenter", "secUserRole", "property"
 		};
 	}
 

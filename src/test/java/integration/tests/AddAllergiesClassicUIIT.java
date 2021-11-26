@@ -60,7 +60,7 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 	{
 		return new String[]{
 			"admission", "allergies", "demographic", "log", "log_ws_rest", "measurementType",
-			"partial_date", "validations"
+			"partial_date", "validations", "property"
 		};
 	}
 

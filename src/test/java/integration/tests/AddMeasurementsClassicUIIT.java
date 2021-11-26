@@ -52,7 +52,7 @@ public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 			"admission", "caisi_role",  "casemgmt_note", "demographic", "documentDescriptionTemplate", "dxresearch",
 			"eChart", "Facility", "issue", "log", "LookupList", "LookupListItem", "measurementType", "measurements",
 			"OscarJob", "OscarJobType", "provider", "ProviderPreference",  "quickListUser", "roster_status",
-			"secUserRole", "tickler_text_suggest", "validations", "log_ws_rest"
+			"secUserRole", "tickler_text_suggest", "validations", "log_ws_rest", "property"
 		};
 	}
 

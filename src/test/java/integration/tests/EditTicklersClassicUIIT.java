@@ -62,7 +62,7 @@ public class EditTicklersClassicUIIT extends SeleniumTestBase
 			"casemgmt_note_link", "demographic", "documentDescriptionTemplate", "Facility", "issue",
 			"log", "LookupList", "LookupListItem", "measurementType", "OscarJob", "OscarJobType",
 			"provider", "providerbillcenter", "ProviderPreference", "providersite", "secUserRole",
-			"site", "tickler", "tickler_comments", "tickler_text_suggest", "validations"
+			"site", "tickler", "tickler_comments", "tickler_text_suggest", "validations", "property"
 		};
 	}
 

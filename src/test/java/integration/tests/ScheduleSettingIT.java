@@ -62,7 +62,7 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 		return new String[]{
 			"admission", "log", "program_provider",
 			"provider", "provider_billing", "providerbillcenter", "rschedule", "secUserRole",
-			"scheduledate", "scheduleholiday", "scheduletemplate", "scheduletemplatecode"
+			"scheduledate", "scheduleholiday", "scheduletemplate", "scheduletemplatecode", "property"
 		};
 	}
 

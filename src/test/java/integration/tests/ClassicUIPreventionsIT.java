@@ -75,7 +75,6 @@ Session ID: c9167a0a-a7f2-485c-97b7-41f3bde5438c
 @Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-
 public class ClassicUIPreventionsIT extends SeleniumTestBase
 {
 	// Reused URLs to navigate to
@@ -88,7 +87,7 @@ public class ClassicUIPreventionsIT extends SeleniumTestBase
 	{
 		return new String[]{
 			"admission", "demographic", "demographicArchive", "demographiccust", "log", "preventions",
-			"preventionsExt"
+			"preventionsExt", "property"
 		};
 	}
 

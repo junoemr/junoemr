@@ -52,7 +52,7 @@ public class AddSitesIT extends SeleniumTestBase
 	protected String[] getTablesToRestore()
 	{
 		return new String[]{
-			"admission", "log", "site", "log_ws_rest", "provider_recent_demographic_access"
+			"admission", "log", "site", "log_ws_rest", "provider_recent_demographic_access", "property"
 		};
 	}
 

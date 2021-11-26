@@ -59,7 +59,8 @@ public class AddGroupIT extends SeleniumTestBase
 	protected String[] getTablesToRestore()
 	{
 		return new String[]{
-			"admission", "log", "log_ws_rest", "mygroup", "provider", "providerbillcenter"
+			"admission", "log", "log_ws_rest", "mygroup", "provider", "providerbillcenter",
+			"property"
 		};
 	}
 

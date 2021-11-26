@@ -54,7 +54,7 @@ public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 	{
 		return new String[]{
 			"admission", "demographic", "dxresearch", "log", "measurementType", "quickListUser",
-			"validations", "provider_recent_demographic_access", "log_ws_rest"
+			"validations", "provider_recent_demographic_access", "log_ws_rest", "property"
 		};
 	}
 

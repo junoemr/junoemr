@@ -26,7 +26,6 @@ package org.oscarehr.e2e.model.export;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;

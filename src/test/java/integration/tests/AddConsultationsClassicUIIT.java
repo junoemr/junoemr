@@ -52,7 +52,7 @@ public class AddConsultationsClassicUIIT extends SeleniumTestBase
 	{
 		return new String[]{
 			"admission", "consultationRequestExt", "consultationRequests", "demographic", "log",
-			"measurementType", "program", "validations", "log_ws_rest"
+			"measurementType", "program", "validations", "log_ws_rest", "property"
 		};
 	}
 
