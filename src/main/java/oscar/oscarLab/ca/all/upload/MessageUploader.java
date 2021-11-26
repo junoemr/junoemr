@@ -290,45 +290,15 @@ public final class MessageUploader {
 			}
 			int insertID = 0;
 
-			// Embedded Document - check has to be here
-			// If we get a document with identifier ED we need to switch up how we're storing it
-			// [1] Strip out the embedded PDF in the OBX message
-			// [2] Convert it to a document and get the document ID
-//			boolean hasPDF = false;
-//			List<EmbeddedDocument> embeddedDocuments = messageHandler.getEmbeddedDocuments();
-
-//			if (messageHandler.supportsEmbeddedDocuments())
-//			{
-//				String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
-//				// Every PDF should be prefixed with this due to b64 encoding of PDF header
-//
-//				for (i = 0; i < messageHandler.getOBRCount(); i++)
-//				{
-//					for (int c =0; c < messageHandler.getOBXCount(i); c ++)
-//					{
-//						if (messageHandler.getOBXValueType(i, c).equals("ED"))
-//						{
-//							// Some embedded PDFs simply have the lab as-is, some have it split up like above
-//							for (int k = 1; k <= referenceStrings.length; k++)
-//							{
-//								String embeddedPdf = messageHandler.getOBXResult(i, c, k);
-//								if (embeddedPdf.startsWith(PATHL7Handler.embeddedPdfPrefix))
-//								{
-//									MiscUtils.getLogger().info("Found embedded PDF in lab upload, pulling it out");
-//									hasPDF = true;
-//									embeddedPDFs.add(embeddedPdf);
-//								}
-//							}
-//						}
-//					}
-//				}
-//			}
-
 			if (!isTDIS || !hasBeenUpdated)
 			{
 				int docId = 0;
 				if (messageHandler.supportsEmbeddedDocuments())
 				{
+					// Embedded Document
+					// If we get a document with identifier ED we need to switch up how we're storing it
+					// [1] Strip out the embedded PDF in the OBX message
+					// [2] Convert it to a document and get the document ID
 					for (EmbeddedDocument embeddedDocument : messageHandler.getEmbeddedDocuments())
 					{
 						// Replace original PDF string with meta info to prevent saving > 500k char strings in table

@@ -590,6 +590,12 @@ public String strikeOutInvalidContent(String content, String status) {
                 font-family: Verdana, Arial, Helvetica;
             }
 
+            @media screen {
+	            .print-only {
+		            display: none;
+	            }
+            }
+
             @media print {
                 .no-print {
                     display: none;
@@ -1930,10 +1936,12 @@ public String strikeOutInvalidContent(String content, String status) {
    											</tr>
    											<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
    											<%if(!preview) { %>
-   												<td colspan="4" valign="left"><a href="PrintOLIS.do?segmentID=<%=segmentID%>&obr=<%=obr%>&obx=<%=obx%>" style="margin-left: 30px;">Click to view attachment.</a>
+   												<td class="no-print" colspan="4" valign="left"><a href="PrintOLIS.do?segmentID=<%=segmentID%>&obr=<%=obr%>&obx=<%=obx%>" style="margin-left: 30px;">Click to view attachment.</a>
+											    <td class="print-only" colspan="4" valign="left"><span style="margin-left: 12px;">This result has an attachment. Please print it separately and include it with this report</span></td>
    											<% } else { %>
-   												<td colspan="4" valign="left"><a href="PrintOLIS.do?uuid=<%=oscar.Misc.getStr(request.getParameter("uuid"), "")%>&obr=<%=obr%>&obx=<%=obx%>" style="margin-left: 30px;">Click to view attachment.</a>   											
-   											<% } %>
+   												<td class="no-print" colspan="4" valign="left"><a href="PrintOLIS.do?uuid=<%=oscar.Misc.getStr(request.getParameter("uuid"), "")%>&obr=<%=obr%>&obx=<%=obx%>" style="margin-left: 30px;">Click to view attachment.</a>
+											    <td class="print-only" colspan="4" valign="left"><span style="margin-left: 12px;">This result has an attachment. Please print it separately and include it with this report</span></td>
+											    <% } %>
    												</td>
    												<td align="left" colspan="2"><%=strikeOutInvalidContent(handler.getOBXUnits(obr, obx), status) %></td>
    												<td align="center"><%=statusMsg %></td>
