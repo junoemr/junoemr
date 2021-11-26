@@ -46,14 +46,22 @@ public class OLISError
 	{
 		String message = getText();
 
-		message = message.replaceAll("@ZRP\\.1\\.1", "Physician CPSID");
-		message = message.replaceAll("@ZRP\\.1\\.13", "Physician Id Type");
-		message = message.replaceAll("@ZRP\\.1\\.2", "Physician First Name");
-		message = message.replaceAll("@ZRP\\.1\\.3", "Physician Last Name");
-		message = message.replaceAll("@ZRP\\.1\\.4", "Physician Middle Name");
-		message = message.replaceAll("@PID\\.3\\.1", "Patient Health Number");
-		message = message.replaceAll("@PID\\.7", "Patient Date of Birth");
-		message = message.replaceAll("@PID\\.8", "Patient Sex");
+		message = message.replaceAll("'@ZRP\\.1\\.1'", "Requesting Physician CPSID");
+		message = message.replaceAll("'@ZRP\\.1\\.13'", "Requesting Physician Id Type");
+		message = message.replaceAll("'@ZRP\\.1\\.2'", "Requesting Physician First Name");
+		message = message.replaceAll("'@ZRP\\.1\\.3'", "Requesting Physician Last Name");
+		message = message.replaceAll("'@ZRP\\.1\\.4'", "Requesting Physician Middle Name");
+		message = message.replaceAll("'@PID\\.3\\.1'", "Patient Health Number");
+		message = message.replaceAll("'@PID\\.7'", "Patient Date of Birth");
+		message = message.replaceAll("'@PID\\.8'", "Patient Sex");
+		message = message.replaceAll("'@OBR\\.16\\.1'", "Ordering Practitioner CPSID");
+		message = message.replaceAll("'@OBR\\.16\\.13'", "Ordering Practitioner Id Type");
+		message = message.replaceAll("'@OBR\\.28\\.1'", "Copied To Practitioner CPSID");
+		message = message.replaceAll("'@OBR\\.28\\.13'", "Copied To Practitioner Id Type");
+		message = message.replaceAll("'@PV1\\.7\\.1'", "Attending Practitioner CPSID");
+		message = message.replaceAll("'@PV1\\.7\\.13'", "Attending Practitioner Id Type");
+		message = message.replaceAll("'@PV1\\.17\\.1'", "Admitting Practitioner CPSID");
+		message = message.replaceAll("'@PV1\\.17\\.13'", "Admitting Practitioner Id Type");
 
 		return "Error " + identifier + ": " + message;
 	}

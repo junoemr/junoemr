@@ -263,21 +263,25 @@ public class OLISSearchAction extends DispatchAction
 				// Requesting HIC (ZRP.1 -- pull data from db and add to query)
 				String requestingHicProviderNo = request.getParameter("requestingHic");
 
-				try {
-					if (requestingHicProviderNo != null && requestingHicProviderNo.trim().length() > 0) {
+				try
+				{
+					if(StringUtils.isNotBlank(requestingHicProviderNo))
+					{
 						ProviderData provider = providerDao.find(requestingHicProviderNo);
-						
+
 						ZRP1 zrp1 = new ZRP1(provider.getOlisPractitionerNo(),
-								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_OLIS_IDTYPE),
+								userPropertyDAO.getStringValue(provider.getId(), UserProperty.OFFICIAL_OLIS_IDTYPE),
 								"ON",
 								"HL70347",
-								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_LAST_NAME),
-								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_FIRST_NAME),
-								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_SECOND_NAME));
+								userPropertyDAO.getStringValue(provider.getId(), UserProperty.OFFICIAL_LAST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(), UserProperty.OFFICIAL_FIRST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(), UserProperty.OFFICIAL_SECOND_NAME));
 
 						((Z01Query) query).setRequestingHic(zrp1);
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't add requested requesting HIC data to OLIS query", e);
 				}
 
@@ -285,52 +289,89 @@ public class OLISSearchAction extends DispatchAction
 				// OBR.16
 				String orderingPractitionerProviderNo = request.getParameter("orderingPractitioner");
 
-				try {
-					if (orderingPractitionerProviderNo != null && orderingPractitionerProviderNo.trim().length() > 0) {
-						OBR16 obr16 = new OBR16(orderingPractitionerProviderNo, "MDL", "ON", "HL70347");
+				try
+				{
+					if(StringUtils.isNotBlank(orderingPractitionerProviderNo))
+					{
+						ProviderData orderingProvider = providerDao.find(orderingPractitionerProviderNo);
+						OBR16 obr16 = new OBR16(
+								orderingProvider.getOlisPractitionerNo(),
+								userPropertyDAO.getStringValue(orderingProvider.getId(), UserProperty.OFFICIAL_OLIS_IDTYPE),
+								"ON",
+								"HL70347");
 
 						((Z01Query) query).setOrderingPractitioner(obr16);
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't add requested ordering practitioner data to OLIS query", e);
 				}
 
 
 				String copiedToPractitionerProviderNo = request.getParameter("copiedToPractitioner");
 
-				try {
-					if (copiedToPractitionerProviderNo != null && copiedToPractitionerProviderNo.trim().length() > 0) {
-						OBR28 obr28 = new OBR28(copiedToPractitionerProviderNo, "MDL", "ON", "HL70347");
+				try
+				{
+					if(StringUtils.isNotBlank(copiedToPractitionerProviderNo))
+					{
+						ProviderData ccProvider = providerDao.find(copiedToPractitionerProviderNo);
+						OBR28 obr28 = new OBR28(
+								ccProvider.getOlisPractitionerNo(),
+								userPropertyDAO.getStringValue(ccProvider.getId(), UserProperty.OFFICIAL_OLIS_IDTYPE),
+								"ON",
+								"HL70347");
 
 						((Z01Query) query).setCopiedToPractitioner(obr28);
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't add requested copied to practitioner data to OLIS query", e);
 				}
 
 
 				String attendingPractitionerProviderNo = request.getParameter("attendingPractitioner");
 
-				try {
-					if (attendingPractitionerProviderNo != null && attendingPractitionerProviderNo.trim().length() > 0) {
-						PV17 pv17 = new PV17(attendingPractitionerProviderNo, "MDL", "ON", "HL70347");
+				try
+				{
+					if(StringUtils.isNotBlank(attendingPractitionerProviderNo))
+					{
+						ProviderData attendingProvider = providerDao.find(attendingPractitionerProviderNo);
+						PV17 pv17 = new PV17(
+								attendingProvider.getOlisPractitionerNo(),
+								userPropertyDAO.getStringValue(attendingProvider.getId(), UserProperty.OFFICIAL_OLIS_IDTYPE),
+								"ON",
+								"HL70347"
+						);
 
 						((Z01Query) query).setAttendingPractitioner(pv17);
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't add requested attending practitioner data to OLIS query", e);
 				}
 
 
 				String admittingPractitionerProviderNo = request.getParameter("admittingPractitioner");
 
-				try {
-					if (admittingPractitionerProviderNo != null && admittingPractitionerProviderNo.trim().length() > 0) {
-						PV117 pv117 = new PV117(admittingPractitionerProviderNo, "MDL", "ON", "HL70347");
+				try
+				{
+					if(StringUtils.isNotBlank(admittingPractitionerProviderNo))
+					{
+						ProviderData admittingProvider = providerDao.find(admittingPractitionerProviderNo);
+						PV117 pv117 = new PV117(
+								admittingProvider.getOlisPractitionerNo(),
+								userPropertyDAO.getStringValue(admittingProvider.getId(), UserProperty.OFFICIAL_OLIS_IDTYPE),
+								"ON",
+								"HL70347");
 
 						((Z01Query) query).setAdmittingPractitioner(pv117);
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't add requested admitting practitioner data to OLIS query", e);
 				}
 
