@@ -28,6 +28,18 @@ import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.parser.CustomModelClassFactory;
 import ca.uhn.hl7v2.parser.ModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.allergy.service.AllergyService;
@@ -66,13 +78,14 @@ import org.oscarehr.common.model.MessageList;
 import org.oscarehr.common.model.MessageTbl;
 import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.common.model.Tickler;
+import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
-import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
@@ -110,19 +123,6 @@ import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.FileAlreadyExistsException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Map;
-
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class CoPDImportService
@@ -133,8 +133,6 @@ public class CoPDImportService
 	private static final String IMPORT_PROVIDER = properties.getProperty("copd_import_service.system_provider_no", "999900");
 	private static final String DEFAULT_PROVIDER_LAST_NAME = properties.getProperty("copd_import_service.default_provider.last_name", "CoPD-provider");
 	private static final String DEFAULT_PROVIDER_FIRST_NAME = properties.getProperty("copd_import_service.default_provider.first_name", "CoPD-missing");
-	protected static final String DEFAULT_USER_INTERFACE_KEY = "cobalt";
-	protected static final String DEFAULT_USER_INTERFACE_VALUE = "yes";
 
 	@Autowired
 	DemographicService demographicService;
@@ -406,7 +404,7 @@ public class CoPDImportService
 		if(providerLookupCache.containsKey(cacheKey))
 		{
 			provider = providerLookupCache.get(cacheKey);
-			providerManager2.updateSingleSetting(provider.getId(), DEFAULT_USER_INTERFACE_KEY, DEFAULT_USER_INTERFACE_VALUE);
+			providerManager2.updateSingleSetting(provider.getId(), UserProperty.COBALT, UserProperty.PROPERTY_ON_NO);
 			logger.info("Use existing cached Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 		}
 		else
@@ -427,14 +425,13 @@ public class CoPDImportService
 				String billCenterCode = properties.getProperty("default_bill_center", "");
 				provider = providerService.addNewProvider(IMPORT_PROVIDER, provider, billCenterCode);
 				providerRoleService.setDefaultRoleForNewProvider(provider.getId());
-				providerManager2.updateSingleSetting(provider.getId(), DEFAULT_USER_INTERFACE_KEY, DEFAULT_USER_INTERFACE_VALUE);
+				providerManager2.updateSingleSetting(provider.getId(), UserProperty.COBALT, UserProperty.PROPERTY_ON_NO);
 
 				logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 			}
 			else if(matchedProviders.size() == 1)
 			{
 				provider = matchedProviders.get(0);
-				providerManager2.updateSingleSetting(provider.getId(), DEFAULT_USER_INTERFACE_KEY, DEFAULT_USER_INTERFACE_VALUE);
 				logger.info("Use existing uncached Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 			}
 			else
