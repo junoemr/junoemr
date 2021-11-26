@@ -460,7 +460,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
                         // Define the schema of the delimited resultsTEST, PATIENT(1985-06-15)
                         oDS.responseSchema = {
                             resultsList : "results",
-                            fields : ["formattedName","fomattedDob","demographicNo","status"]
+                            fields : ["formattedName","formattedDob","demographicNo","status"]
                         };
                         // Enable caching
                         oDS.maxCacheEntries = 100;
@@ -479,7 +479,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
                            document.getElementById(str).value = args[2][2];//li.id;
                            args[0].getInputEl().value = args[2][0] + "("+args[2][1]+")";
                            selectedDemos.push(args[0].getInputEl().value);
-                           
+
                         });
 
 
@@ -697,7 +697,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
                         // Define the schema of the delimited resultsTEST, PATIENT(1985-06-15)
                         oDS.responseSchema = {
                             resultsList : "results",
-                            fields : ["formattedName","fomattedDob","demographicNo","status"]
+                            fields : ["formattedName","formattedDob","demographicNo","status"]
                         };
                         // Enable caching
                         oDS.maxCacheEntries = 100;

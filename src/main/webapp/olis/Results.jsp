@@ -167,13 +167,13 @@
 			boolean hasBlockedContent = false;
 			try {
 				if(resp != null && resp.length()>0) {
-					OLISHL7Handler reportHandler = (OLISHL7Handler) Factory.getHandler("OLIS_HL7", resp);
+					OLISHL7Handler reportHandler = (OLISHL7Handler) Factory.getHandler(OLISHL7Handler.OLIS_MESSAGE_TYPE, resp);
 					if(reportHandler != null) {
 						List<OLISError> errors = reportHandler.getReportErrors();
 						if (errors.size() > 0) {
 							for (OLISError error : errors) {
 							%>
-								<div class="error"><%=error.getIndentifer()%>:<%=error.getText().replaceAll("\\n", "<br />")%></div>
+								<div class="error"><%=error.userFriendlyToString().replaceAll("\\n", "<br />")%></div>
 							<%
 							}
 						}
@@ -241,7 +241,7 @@
 								OLISHL7Handler result;
 								String name;
 								for (String resultUuid : resultList) {
-									result = OLISResultsAction.searchResultsMap.get(resultUuid);
+									result = OLISResultsAction.getHandlerByUUID(resultUuid);
 									name = oscar.Misc.getStr(result.getPatientName(), "").trim();
 									if (!name.equals("")) { names.add(name); }
 								}
@@ -257,7 +257,7 @@
 							<option value="">All Labs</option>
 							<%  List<String> labs = new ArrayList<String>();
 								for (String resultUuid : resultList) {
-									result = OLISResultsAction.searchResultsMap.get(resultUuid);
+									result = OLISResultsAction.getHandlerByUUID(resultUuid);
 									name = oscar.Misc.getStr(result.getReportingFacilityName(), "").trim();
 									if (!name.equals("")) { labs.add(name); }
 								}
@@ -338,7 +338,7 @@
 					<%  int lineNum = 0;
 						for (String resultUuid : resultList)
 						{
-							result = OLISResultsAction.searchResultsMap.get(resultUuid);
+							result = OLISResultsAction.getHandlerByUUID(resultUuid);
 
 							// show one row per OBR, so that individual statuses can be displayed. Required feature for OLIS conformance.
 							for(int i=0; i < result.getOBRCount(); i++)

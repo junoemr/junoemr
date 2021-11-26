@@ -96,7 +96,7 @@ public class PrintLabsAction extends Action{
 			{
 				// for printing OLIS lab files that are not persisted
 				resultUuid = StringUtils.trimToNull(request.getParameter("uuid"));
-				handler = OLISResultsAction.searchResultsMap.get(resultUuid);
+				handler = OLISResultsAction.getHandlerByUUID(resultUuid);
 			}
 			else
 			{

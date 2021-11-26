@@ -136,6 +136,7 @@ public class SearchDemographicAutoCompleteAction extends Action {
             hashMap.put("formattedName",StringEscapeUtils.escapeJava(demo.getFormattedName().replaceAll("\"", "\\\"")));
             hashMap.put("demographicNo",String.valueOf(demoId));
             hashMap.put("status",demo.getPatientStatus());
+            hashMap.put("hin",demo.getHin());
              
 
             Provider provider = rx.getProvider(demo.getProviderNo());

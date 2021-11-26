@@ -105,7 +105,7 @@ if (!preview) {
 	hl7 = Factory.getHL7Body(segmentID);
 
 } else {
-	handlerMain = OLISResultsAction.searchResultsMap.get(resultUuid);
+	handlerMain = OLISResultsAction.getHandlerByUUID(resultUuid);
 }
 
 

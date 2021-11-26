@@ -29,17 +29,33 @@ public class OLISError
 {
 	private final OLISHL7Handler olishl7Handler;
 
-	private String segment, sequence, field, indentifer, text;
+	private String segment, sequence, field, identifier, text;
 
-	public OLISError(OLISHL7Handler olishl7Handler, String segment, String sequence, String field, String indentifer, String text)
+	public OLISError(OLISHL7Handler olishl7Handler, String segment, String sequence, String field, String identifier, String text)
 	{
 		super();
 		this.olishl7Handler = olishl7Handler;
 		this.segment = segment;
 		this.sequence = sequence;
 		this.field = field;
-		this.indentifer = indentifer;
+		this.identifier = identifier;
 		this.text = text;
+	}
+
+	public String userFriendlyToString()
+	{
+		String message = getText();
+
+		message = message.replaceAll("@ZRP\\.1\\.1", "Physician CPSID");
+		message = message.replaceAll("@ZRP\\.1\\.13", "Physician Id Type");
+		message = message.replaceAll("@ZRP\\.1\\.2", "Physician First Name");
+		message = message.replaceAll("@ZRP\\.1\\.3", "Physician Last Name");
+		message = message.replaceAll("@ZRP\\.1\\.4", "Physician Middle Name");
+		message = message.replaceAll("@PID\\.3\\.1", "Patient Health Number");
+		message = message.replaceAll("@PID\\.7", "Patient Date of Birth");
+		message = message.replaceAll("@PID\\.8", "Patient Sex");
+
+		return "Error " + identifier + ": " + message;
 	}
 
 	@Override
@@ -49,7 +65,7 @@ public class OLISError
 		int result = 1;
 		result = prime * result + getOuterType().hashCode();
 		result = prime * result + ((field == null) ? 0 : field.hashCode());
-		result = prime * result + ((indentifer == null) ? 0 : indentifer.hashCode());
+		result = prime * result + ((identifier == null) ? 0 : identifier.hashCode());
 		result = prime * result + ((segment == null) ? 0 : segment.hashCode());
 		result = prime * result + ((sequence == null) ? 0 : sequence.hashCode());
 		return result;
@@ -65,7 +81,7 @@ public class OLISError
 		if(obj == null) return false;
 		if(obj instanceof String)
 		{
-			return this.indentifer.equals(obj);
+			return this.identifier.equals(obj);
 		}
 		if(getClass() != obj.getClass())
 		{

@@ -74,7 +74,7 @@ public class PrintOLISLabAttachmentAction extends Action
 			OLISHL7Handler handler;
 			if(StringUtils.isNotBlank(resultUuid))
 			{
-				handler = OLISResultsAction.searchResultsMap.get(resultUuid);
+				handler = OLISResultsAction.getHandlerByUUID(resultUuid);
 			}
 			else
 			{
