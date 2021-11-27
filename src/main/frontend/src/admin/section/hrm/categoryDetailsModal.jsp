@@ -36,15 +36,15 @@
 				            label="Name">
 				</juno-input>
 			</div>
-			<div class="category-subclasses overflow-auto flex-column">
+			<div class="category-subclasses overflow-auto flex-column m-t-16">
                 <table ng-table="$ctrl.tableParams" class="table table-striped table-bordered">
                     <tbody>
-                    <tr ng-repeat="subclass in $ctrl.category.subclasses">
+                    <tr ng-repeat="subclass in $ctrl.category.subClasses">
                         <td data-title="'Facility Number'">
                             {{ subclass.facilityNumber }}
                         </td>
                         <td data-title="'Report Type'">
-                            {{ subclass.className }}
+                            {{ subclass.reportClass }}
                         </td>
                         <td data-title="'Subclass'">
                             {{ subclass.subClassName }}
@@ -56,11 +56,52 @@
                             <juno-button component-style="$ctrl.componentStyle"
                                          button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
                                          button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-                                         click="$ctrl.onDeactivateSubClass(subclass)"
-                                         disabled="!$ctrl.canDeactivate()">
+                                         click="$ctrl.onDeleteSubClass(subclass)"
+                                         disabled="!$ctrl.canDelete()">
                                 X
                             </juno-button>
                         </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <juno-input
+                                    placeholder="Facility Number"
+                                    ng-model = "$ctrl.newSubClass.facilityNumber"
+                            >
+                            </juno-input>
+                        </td>
+                        <td>
+                            <juno-select
+                                    options = "$ctrl.hrmReportClassOptions"
+                                    ng-model = "$ctrl.newSubClass.reportClass"
+                                    placeholder = "Report Type"
+                            >
+                            </juno-select>
+                        </td>
+                        <td>
+                            <juno-input
+                                    placeholder="Subclass"
+                                    ng-model = "$ctrl.newSubClass.subClassName"
+                                    disabled = "!$ctrl.isEligibleForSubClass()"
+                            >
+                            </juno-input>
+                        </td>
+                        <td>
+                            <juno-input
+                                    placeholder="Accompanying Subclass"
+                                    ng-model = "$ctrl.newSubClass.accompanyingSubClassName"
+                                    disabled = "!$ctrl.isEligibleForAccompanyingSubClass()"
+                            >
+                            </juno-input>
+                        </td>
+                        <td>
+                            <juno-button component-style="$ctrl.componentStyle"
+                                         button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+                                         button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+                                         click="$ctrl.onCreateSubClass()"
+                                         disabled="!$ctrl.canCreate() || !$ctrl.isSubClassComplete()">
+                            +
+                        </juno-button></td>
                     </tr>
                     </tbody>
                 </table>
@@ -77,7 +118,8 @@
                                      component-style="$ctrl.resolve.style"
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-						             click="$ctrl.onDelete()">
+                                     disabled="!$ctrl.canDelete()"
+						             click="$ctrl.onDeleteCategory()">
 							Delete
 						</juno-button>
 					</div>
@@ -98,7 +140,7 @@
 						             component-style="$ctrl.resolve.style"
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-						             click="$ctrl.onCreate()"
+						             click="$ctrl.onCreateCategory()"
 						             disabled="!$ctrl.canCreate()">
 							Add Category
 						</juno-button>
@@ -106,7 +148,7 @@
 						             component-style="$ctrl.resolve.style"
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-						             click="$ctrl.onUpdate()"
+						             click="$ctrl.onUpdateCategory()"
 						             disabled="!$ctrl.canUpdate()">
 							Save Category
 						</juno-button>

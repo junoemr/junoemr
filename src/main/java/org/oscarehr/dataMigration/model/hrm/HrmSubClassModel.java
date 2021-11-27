@@ -8,11 +8,15 @@ import java.time.LocalDateTime;
 public class HrmSubClassModel extends AbstractTransientModel
 {
 	private int id;
-	private HrmCategoryModel parentCategory;
+
 	private String facilityNumber;
+
 	private String className;
+
 	private String subClassName;
+
 	private String accompanyingSubClassName;
+
 	private LocalDateTime disabledAt;
 
 	public boolean isDisabled()

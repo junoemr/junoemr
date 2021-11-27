@@ -30,6 +30,7 @@ import {
 import {SecurityPermissions} from "../../../common/security/securityConstants";
 import HrmCategory from "../../../lib/integration/hrm/model/HRMCategory";
 import HrmService from "../../../lib/integration/hrm/service/HrmService";
+import HrmSubClass, {HrmReportClass} from "../../../lib/integration/hrm/model/HrmSubClass";
 
 angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 	{
@@ -51,11 +52,22 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 				const ctrl = this;
 				const hrmService = new HrmService();
 
-				ctrl.LABEL_POSITION = LABEL_POSITION;
+				ctrl.COMPONENT_STYLE = JUNO_STYLE.DEFAULT;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+				ctrl.LABEL_POSITION = LABEL_POSITION;
 
 				ctrl.category = null;
+
+				ctrl.newSubClass = null;
+				ctrl.hrmReportClassOptions = Object.keys(HrmReportClass).map(reportClass =>
+				{
+					return {
+						label: HrmReportClass[reportClass],
+						value: HrmReportClass[reportClass]
+					}
+				})
+
 				ctrl.title = "";
 				ctrl.isCreate = false;
 				ctrl.isLoading = true;
@@ -70,9 +82,11 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 						}
 					});
 
-
 					ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 					ctrl.category = ctrl.resolve.category;
+
+
+					console.log(ctrl.category);
 
 					if(!Juno.Common.Util.exists(ctrl.category))
 					{
@@ -85,7 +99,10 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 						ctrl.title = `Edit an Existing HRM Category (${ctrl.category.name})`;
 					}
 
+					ctrl.newSubClass = new HrmSubClass();
 					ctrl.isLoading = false;
+
+					console.log(ctrl.newSubClass);
 				}
 
 				ctrl.canCreate = () =>
@@ -105,10 +122,7 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 
 				ctrl.canSave = () =>
 				{
-					return !ctrl.isLoading &&
-						ctrl.canEdit() &&
-						Juno.Common.Util.exists(ctrl.category) &&
-						!Juno.Common.Util.isBlank(ctrl.category.name);
+					return !ctrl.isLoading && ctrl.canEdit();
 				}
 
 				ctrl.onCancel = () =>
@@ -122,7 +136,7 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 					Juno.Common.Util.errorAlert($uibModal, "Error", message);
 				}
 
-				ctrl.onUpdate = async () =>
+				ctrl.onUpdateCategory = async () =>
 				{
 					ctrl.isLoading = true;
 					try
@@ -147,7 +161,7 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 					}
 				}
 
-				ctrl.onCreate = async () =>
+				ctrl.onCreateCategory = async () =>
 				{
 					ctrl.isLoading = true;
 					try
@@ -172,7 +186,7 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 					}
 				}
 
-				ctrl.onDelete = async () =>
+				ctrl.onDeleteCategory = async () =>
 				{
 					ctrl.isLoading = true;
 					try
@@ -188,6 +202,37 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 					{
 						ctrl.isLoading = false;
 					}
+				}
+
+				ctrl.isEligibleForSubClass = () =>
+				{
+					return this.newSubClass.reportClass === HrmReportClass.MEDICAL_RECORDS;
+				}
+
+				ctrl.isEligibleForAccompanyingSubClass = () =>
+				{
+					return (this.newSubClass.reportClass === HrmReportClass.CARDIO_RESPIRATORY) ||
+						(this.newSubClass.reportClass === HrmReportClass.DIAGNOSTIC_IMAGING);
+				}
+
+				ctrl.isSubClassComplete = () =>
+				{
+					let subClass = ctrl.newSubClass;
+
+					// Facility number is filled out and either subclass or accompanying subclass depending on the reportType
+					return subClass.facilityNumber &&
+					((subClass.reportClass === HrmReportClass.MEDICAL_RECORDS && subClass.subClassName) ||
+						(subClass.reportClass === HrmReportClass.DIAGNOSTIC_IMAGING || subClass.reportClass === HrmReportClass.CARDIO_RESPIRATORY) && subClass.accompanyingSubClassName)
+				}
+
+				ctrl.onCreateSubClass = async () =>
+				{
+					console.log("create subclass");
+				}
+
+				ctrl.onDeleteSubClass = async () =>
+				{
+					console.log("delete subclass");
 				}
 			}]
 	});

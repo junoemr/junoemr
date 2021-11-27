@@ -1,10 +1,17 @@
 import {HrmSubClassModel} from "../../../../../generated";
 
+export enum HrmReportClass
+{
+  MEDICAL_RECORDS = "Medical Records Report",
+  CARDIO_RESPIRATORY = "Cardio Respiratory Report",
+  DIAGNOSTIC_IMAGING = "Diagnostic Imaging Report",
+}
+
 export default class HrmSubClass
 {
-  private _id: number
+  private _id: number;
   private _facilityNumber: string;
-  private _className: string;
+  private _reportClass: HrmReportClass;
   private _subClassName: string;
   private _accompanyingSubClassName: string;
 
@@ -12,7 +19,7 @@ export default class HrmSubClass
   {
     const hrmSubClass = new HrmSubClass();
     hrmSubClass._facilityNumber = transfer.facilityNumber;
-    hrmSubClass._className = transfer.className;
+    hrmSubClass._reportClass = transfer.className as HrmReportClass;
     hrmSubClass._subClassName = transfer.subClassName;
     hrmSubClass._accompanyingSubClassName = transfer.accompanyingSubClassName;
 
@@ -33,7 +40,7 @@ export default class HrmSubClass
   {
     this._id = null;
     this._facilityNumber = null;
-    this._className = null;
+    this._reportClass = null;
     this._subClassName = null;
     this._accompanyingSubClassName = null;
   }
@@ -43,12 +50,20 @@ export default class HrmSubClass
     return this._id;
   }
 
-  get className(): string {
-    return this._className;
+  get facilityNumber(): string {
+    return this._facilityNumber;
   }
 
-  set className(value: string) {
-    this._className = value;
+  set facilityNumber(value: string) {
+    this._facilityNumber = value;
+  }
+
+  get reportClass(): HrmReportClass {
+    return this._reportClass;
+  }
+
+  set reportClass(value: HrmReportClass) {
+    this._reportClass = value;
   }
 
   get subClassName(): string {

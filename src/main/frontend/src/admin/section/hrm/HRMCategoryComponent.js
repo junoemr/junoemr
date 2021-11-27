@@ -104,7 +104,7 @@ angular.module('Admin.Section').component('hrmCategory',
 					.open({
 						component: 'hrmCategoryDetailsModal',
 						backdrop: 'static',
-						windowClass: "juno-modal",
+						windowClass: "juno-modal lg",
 						resolve: {
 							category: angular.copy(category)
 						}
