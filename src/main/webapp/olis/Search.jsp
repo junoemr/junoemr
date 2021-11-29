@@ -569,12 +569,15 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 </select></td>		
 		</tr>
 		<tr>
-			<th width="20%">Test Request Placer</th><td><select>
-<option></option>
-<option value="5552">Gamma-Dynacare</option>
-<option value="5407">CML</option>
-<option value="5687">LifeLabs</option>
-</select></td>
+			<th width="20%"><label for="testRequestPlacer">Test Request Placer</label></th>
+			<td>
+				<select id="testRequestPlacer" name="testRequestPlacer">
+					<option></option>
+					<option value="5552">Gamma-Dynacare</option>
+					<option value="5407">CML</option>
+					<option value="5687">LifeLabs</option>
+				</select>
+			</td>
 		</tr>
 		<tr>
 			<td colspan="4">

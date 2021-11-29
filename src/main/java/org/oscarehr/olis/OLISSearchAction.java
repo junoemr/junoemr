@@ -28,6 +28,7 @@ import com.indivica.olis.parameters.PV17;
 import com.indivica.olis.parameters.QRD7;
 import com.indivica.olis.parameters.ZBE4;
 import com.indivica.olis.parameters.ZBE6;
+import com.indivica.olis.parameters.ZBR2;
 import com.indivica.olis.parameters.ZBR3;
 import com.indivica.olis.parameters.ZBR4;
 import com.indivica.olis.parameters.ZBR6;
@@ -241,6 +242,12 @@ public class OLISSearchAction extends DispatchAction
 					((Z01Query) query).setExcludeReportingLaboratory(new ZBE4(excludeReportingLaboratory, "ISO"));
 				}
 
+				String testRequestPlacer = request.getParameter("testRequestPlacer");
+				if(StringUtils.isNotBlank(testRequestPlacer))
+				{
+					((Z01Query) query).setTestResultPlacer(new ZBR2(testRequestPlacer, "ISO"));
+				}
+
 
 				// Patient Identifier (PID.3 -- pull data from db and add to query)
 				String demographicNo = request.getParameter("demographic");
@@ -381,16 +388,20 @@ public class OLISSearchAction extends DispatchAction
 
 				String[] testRequestStatusList = request.getParameterValues("testRequestStatus");
 
-				if (testRequestStatusList != null) {
-					for (String testRequestStatus : testRequestStatusList) {
+				if(testRequestStatusList != null)
+				{
+					for(String testRequestStatus : testRequestStatusList)
+					{
 						((Z01Query) query).addToTestRequestStatusList(new OBR25(testRequestStatus));
 					}
 				}
 
 				String[] testResultCodeList = request.getParameterValues("testResultCode");
 
-				if (testResultCodeList != null) {
-					for (String testResultCode : testResultCodeList) {
+				if(testResultCodeList != null)
+				{
+					for(String testResultCode : testResultCodeList)
+					{
 						((Z01Query) query).addToTestResultCodeList(new OBX3(testResultCode, "HL79902"));
 					}
 				}
@@ -398,8 +409,10 @@ public class OLISSearchAction extends DispatchAction
 
 				String[] testRequestCodeList = request.getParameterValues("testRequestCode");
 
-				if (testRequestCodeList != null) {
-					for (String testRequestCode : testRequestCodeList) {
+				if(testRequestCodeList != null)
+				{
+					for(String testRequestCode : testRequestCodeList)
+					{
 						((Z01Query) query).addToTestRequestCodeList(new OBR4(testRequestCode, "HL79901"));
 					}
 				}
@@ -610,7 +623,8 @@ public class OLISSearchAction extends DispatchAction
 
 				String destinationLaboratory = request.getParameter("destinationLaboratory");
 
-				if (destinationLaboratory != null && destinationLaboratory.trim().length() > 0) {
+				if(StringUtils.isNotBlank(destinationLaboratory))
+				{
 					((Z05Query) query).setDestinationLaboratory(new ZBR8(destinationLaboratory, "ISO"));
 				}
 
