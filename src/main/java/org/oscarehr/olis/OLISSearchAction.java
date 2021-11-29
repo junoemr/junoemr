@@ -81,6 +81,7 @@ public class OLISSearchAction extends DispatchAction
 {
 	private final DemographicService demographicService = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
 	private final ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
+	private final UserPropertyDAO userPropertyDAO = SpringUtils.getBean(UserPropertyDAO.class);
 
 	public static HashMap<String, Query> searchQueryMap = new HashMap<String, Query>();
 
@@ -116,7 +117,6 @@ public class OLISSearchAction extends DispatchAction
 			
 		}
 		else if (queryType != null) {
-			UserPropertyDAO userPropertyDAO = (UserPropertyDAO)SpringUtils.getBean("UserPropertyDAO");
 			Query query = null;
 
 			String[] dateFormat = new String[] {
@@ -383,11 +383,14 @@ public class OLISSearchAction extends DispatchAction
 					MiscUtils.getLogger().error("Can't add requested admitting practitioner data to OLIS query", e);
 				}
 
-
-				// TODO-legacy: Add placer group number
+				String orderingFacilityId = request.getParameter("orderingFacility");
+				String placeGroupNumber = request.getParameter("placerGroupNumber");
+				if(StringUtils.isNotBlank(orderingFacilityId) && StringUtils.isNotBlank(placeGroupNumber))
+				{
+					((Z01Query) query).setPlacerGroupNumber(new ORC4(placeGroupNumber, orderingFacilityId, "ISO"));
+				}
 
 				String[] testRequestStatusList = request.getParameterValues("testRequestStatus");
-
 				if(testRequestStatusList != null)
 				{
 					for(String testRequestStatus : testRequestStatusList)
@@ -397,7 +400,6 @@ public class OLISSearchAction extends DispatchAction
 				}
 
 				String[] testResultCodeList = request.getParameterValues("testResultCode");
-
 				if(testResultCodeList != null)
 				{
 					for(String testResultCode : testResultCodeList)
@@ -406,9 +408,7 @@ public class OLISSearchAction extends DispatchAction
 					}
 				}
 
-
 				String[] testRequestCodeList = request.getParameterValues("testRequestCode");
-
 				if(testRequestCodeList != null)
 				{
 					for(String testRequestCode : testRequestCodeList)
@@ -483,11 +483,7 @@ public class OLISSearchAction extends DispatchAction
 
 				String orderingFacilityId = request.getParameter("orderingFacility");
 				String placeGroupNumber = request.getParameter("placerGroupNumber");
-				ORC4 orc4 = new ORC4();
-				orc4.setValue(1, placeGroupNumber);
-				orc4.setValue(3, OLISUtils.PROVINCIAL_LAB_ON + ":" + orderingFacilityId);
-				orc4.setValue(4, "ISO");
-				((Z02Query) query).setPlacerGroupNumber(orc4);
+				((Z02Query) query).setPlacerGroupNumber(new ORC4(placeGroupNumber, orderingFacilityId, "ISO"));
 
 				// Log the consent override
 				logConsentGiven(loggedInInfo.getLoggedInProviderNo(), demographicNo, request);

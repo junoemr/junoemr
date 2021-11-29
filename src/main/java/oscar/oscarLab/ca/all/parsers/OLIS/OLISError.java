@@ -51,13 +51,16 @@ public class OLISError
 		message = message.replaceAll("'@ZRP\\.1\\.2'", "Requesting Physician First Name");
 		message = message.replaceAll("'@ZRP\\.1\\.3'", "Requesting Physician Last Name");
 		message = message.replaceAll("'@ZRP\\.1\\.4'", "Requesting Physician Middle Name");
+
 		message = message.replaceAll("'@PID\\.3\\.1'", "Patient Health Number");
 		message = message.replaceAll("'@PID\\.7'", "Patient Date of Birth");
 		message = message.replaceAll("'@PID\\.8'", "Patient Sex");
+
 		message = message.replaceAll("'@OBR\\.16\\.1'", "Ordering Practitioner CPSID");
 		message = message.replaceAll("'@OBR\\.16\\.13'", "Ordering Practitioner Id Type");
 		message = message.replaceAll("'@OBR\\.28\\.1'", "Copied To Practitioner CPSID");
 		message = message.replaceAll("'@OBR\\.28\\.13'", "Copied To Practitioner Id Type");
+
 		message = message.replaceAll("'@PV1\\.7\\.1'", "Attending Practitioner CPSID");
 		message = message.replaceAll("'@PV1\\.7\\.13'", "Attending Practitioner Id Type");
 		message = message.replaceAll("'@PV1\\.17\\.1'", "Admitting Practitioner CPSID");
@@ -68,6 +71,12 @@ public class OLISError
 		message = message.replaceAll("'@ZBR\\.4\\.6\\.2'", "Reporting Lab");
 		message = message.replaceAll("'@ZBR\\.3\\.6\\.2'", "Specimen Collector");
 		message = message.replaceAll("'@ZBR\\.2\\.6\\.2'", "Test Request Placer");
+
+		message = message.replaceAll("'@ORC\\.4\\.1'", "Placer Group Number");
+		message = message.replaceAll("'@ORC\\.4\\.3'", "Placer Group Ordering Facility");
+
+		message = message.replaceAll("'@OBX\\.3\\.1'", "Test Result Code");
+		message = message.replaceAll("'@OBX\\.4\\.1'", "Test Request Code");
 
 		return "Error " + identifier + ": " + message;
 	}

@@ -580,6 +580,21 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			</td>
 		</tr>
 		<tr>
+			<th width="20%"><span>Placer Group Number</span></th>
+			<td>
+				<input type="text" name="placerGroupNumber" maxlength="25">
+
+				<label>Ordering Facility</label>
+				<select name="orderingFacility">
+					<option value=""></option>
+					<option value="5552">Gamma-Dynacare</option>
+					<option value="5407">CML</option>
+					<option value="5687">LifeLabs</option>
+				</select>
+			</td>
+		</tr>
+		</tr>
+		<tr>
 			<td colspan="4">
 				<table>
 					<tbody><tr>
