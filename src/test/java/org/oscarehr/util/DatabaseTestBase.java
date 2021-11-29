@@ -35,8 +35,6 @@ import java.util.Set;
 
 public class DatabaseTestBase
 {
-	private static Logger logger = MiscUtils.getLogger();
-
 	/**
 	 * Override this method and return the tables that need to be reset before and after running an
 	 * integration test.  Here is a template for the override:
@@ -77,7 +75,6 @@ public class DatabaseTestBase
 		// before any tests run to make sure any pre-test tasks don't make things dirty
 		if(OscarProperties.isTestDatabaseFullResetEnabled())
 		{
-			logger.info("Restoring all test data");
 			// Restore all tables.  Slow but checks for any residual db changes.
 			SchemaUtils.restoreAllTables();
 		}
@@ -95,7 +92,6 @@ public class DatabaseTestBase
 			// Reset the selected database tables
 			if(getTablesToRestore().length > 0)
 			{
-				logger.info("Restoring selected test data");
 				SchemaUtils.restoreTable(getTablesToRestore());
 			}
 
@@ -104,7 +100,6 @@ public class DatabaseTestBase
 			// cleared cover this case.
 			checkDatabase();
 
-			logger.info("Restoring all test data");
 			// Restore all tables.  This is slow but checks for any residual db changes.
 			SchemaUtils.restoreAllTables();
 		}
@@ -112,7 +107,6 @@ public class DatabaseTestBase
 		{
 			if(getTablesToRestore().length > 0)
 			{
-				logger.info("Restoring selected test data");
 				SchemaUtils.restoreTable(getTablesToRestore());
 			}
 		}
@@ -120,7 +114,6 @@ public class DatabaseTestBase
 
 		if(getTablesToClear().length > 0)
 		{
-			logger.info("Clearing selected test data");
 			SchemaUtils.restoreTable(false, getTablesToClear());
 		}
 	}
@@ -129,11 +122,8 @@ public class DatabaseTestBase
 	public void resetAndCheckDatabase()
 		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
-		logger.info("Restoring and checking test data");
 		if(getTablesToRestore().length > 0 || getTablesToClear().length > 0)
 		{
-			logger.info("Restoring all test data");
-
 			// Reset all tables changed or cleared
 			SchemaUtils.restoreTable(getTablesToRestore());
 			SchemaUtils.restoreTable(getTablesToClear());

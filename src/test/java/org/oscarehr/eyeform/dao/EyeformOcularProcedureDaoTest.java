@@ -47,7 +47,7 @@ public class EyeformOcularProcedureDaoTest extends DaoTestFixtures
 	protected String[] getTablesToRestore()
 	{
 		return new String[]{
-			"EyeformOcularProcedure"
+			"EyeformOcularProcedure", "log"
 		};
 	}
 
