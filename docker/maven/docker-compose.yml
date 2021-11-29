@@ -1,10 +1,9 @@
 version: '3.1'
 services:
   juno-test-db:
-    command: mysqld --general-log-file=/var/log/mysql/general-log.log
+    command: mysqld --log-output=NONE --slow-query-log=0 --general-log=0 --innodb-flush-log-at-trx-commit=2 --innodb-log-buffer-size=3M --innodb-buffer-pool-size=180M
     image: mariadb:10.4
-#    volumes:
-#      - ../../.docker/testdb/:/var/lib/mysql:Z
+    tmpfs: /var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: "test"
       MYSQL_USER: oscar

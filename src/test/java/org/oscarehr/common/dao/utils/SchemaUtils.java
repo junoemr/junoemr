@@ -57,6 +57,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
@@ -203,6 +204,21 @@ public class SchemaUtils
 
 					logger.error(errorMessage);
 					errors.add(errorMessage);
+
+					String sql = "SELECT * FROM `" + tableName + "`";
+					ResultSet changedResult = statement.executeQuery(sql);
+					ResultSetMetaData metaData = changedResult.getMetaData();
+
+					logger.error(tableName);
+					logger.error("===============================");
+					while(changedResult.next())
+					{
+						logger.error("-------------------------------");
+						for(int i = 1; i <= metaData.getColumnCount(); i++)
+						{
+							logger.error(metaData.getColumnName(i) + " = " + changedResult.getString(i));
+						}
+					}
 				}
 			}
 		}

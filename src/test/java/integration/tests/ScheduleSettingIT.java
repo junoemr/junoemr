@@ -34,6 +34,7 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -130,6 +131,7 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.switchTo().frame("myFrame");
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("Template Setting")));
 		switchToNewWindow(driver, By.linkText("Template Setting"), oldWindowHandles);
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("General");
 		driver.findElement(By.xpath("//input[@name='summary']")).sendKeys("15 mins duration");

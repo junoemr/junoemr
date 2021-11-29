@@ -49,7 +49,8 @@ public class LabPatientPhysicianInfoDaoTest extends DaoTestFixtures
 	protected String[] getTablesToRestore()
 	{
 		return new String[]{
-			"labPatientPhysicianInfo", "patientLabRouting", "labPatientPhysicianInfo", "providerLabRouting","labReportInformation"
+			"labPatientPhysicianInfo", "patientLabRouting", "labPatientPhysicianInfo",
+			"providerLabRouting", "labReportInformation"
 		};
 	}
 
