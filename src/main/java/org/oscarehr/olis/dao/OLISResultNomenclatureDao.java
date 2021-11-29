@@ -33,7 +33,7 @@ public class OLISResultNomenclatureDao extends AbstractDao<OLISResultNomenclatur
 	
 	@SuppressWarnings("unchecked")
     public List<OLISResultNomenclature> findAll() {
-		String sql = "select x from " + this.modelClass.getName() + " x";
+		String sql = "select x from " + this.modelClass.getName() + " x ORDER BY x.name ASC";
 		Query query = entityManager.createQuery(sql);
 		return query.getResultList();
 	}

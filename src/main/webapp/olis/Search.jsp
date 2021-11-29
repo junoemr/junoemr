@@ -616,7 +616,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 						
 						for (OLISResultNomenclature nomenclature : resultNomenclatureList) {
 						%>
-							<option value="<%=nomenclature.getId() %>"><%=oscar.Misc.getStr(nomenclature.getName(), "").trim()%></option>
+							<option value="<%=nomenclature.getNameId() %>"><%=oscar.Misc.getStr(nomenclature.getName(), "").trim()%></option>
 					    <%
 						}
 						%>
@@ -627,7 +627,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 						
 						for (OLISRequestNomenclature nomenclature : requestNomenclatureList) {
 						%>
-							<option value="<%=nomenclature.getId() %>"><%=oscar.Misc.getStr(nomenclature.getName(),"").trim() %></option>
+							<option value="<%=nomenclature.getNameId() %>"><%=oscar.Misc.getStr(nomenclature.getName(),"").trim() %></option>
 					    <%
 						}
 						%>
@@ -842,7 +842,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 						
 						for (OLISResultNomenclature nomenclature : resultNomenclatureList) {
 						%>
-							<option value="<%=nomenclature.getId() %>"><%=nomenclature.getName().trim() %></option>
+							<option value="<%=nomenclature.getNameId() %>"><%=nomenclature.getName().trim() %></option>
 					    <%
 						}
 						%>
@@ -853,7 +853,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 						
 						for (OLISRequestNomenclature nomenclature : requestNomenclatureList) {
 						%>
-							<option value="<%=nomenclature.getId() %>"><%=nomenclature.getName().trim() %></option>
+							<option value="<%=nomenclature.getNameId() %>"><%=nomenclature.getName().trim() %></option>
 					    <%
 						}
 						%>
