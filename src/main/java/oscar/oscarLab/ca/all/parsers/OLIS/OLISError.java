@@ -63,6 +63,12 @@ public class OLISError
 		message = message.replaceAll("'@PV1\\.17\\.1'", "Admitting Practitioner CPSID");
 		message = message.replaceAll("'@PV1\\.17\\.13'", "Admitting Practitioner Id Type");
 
+		message = message.replaceAll("'@ZBR\\.4\\.6\\.2'", "Reporting Lab");
+		message = message.replaceAll("'@ZBR\\.6\\.6\\.2'", "Performing Lab");
+		message = message.replaceAll("'@ZBR\\.4\\.6\\.2'", "Reporting Lab");
+		message = message.replaceAll("'@ZBR\\.3\\.6\\.2'", "Specimen Collector");
+		message = message.replaceAll("'@ZBR\\.2\\.6\\.2'", "Test Request Placer");
+
 		return "Error " + identifier + ": " + message;
 	}
 

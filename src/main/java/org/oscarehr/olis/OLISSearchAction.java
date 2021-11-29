@@ -200,43 +200,44 @@ public class OLISSearchAction extends DispatchAction
 				fillConsentOverrideSegments(request, query);
 
 				String consentBlockAllIndicator = request.getParameter("consentBlockAllIndicator");
-
-				if (consentBlockAllIndicator != null && consentBlockAllIndicator.trim().length() > 0) {
+				if(StringUtils.isNotBlank(consentBlockAllIndicator))
+				{
 					((Z01Query) query).setPatientConsentBlockAllIndicator(new ZPD3("Y"));
 				}
 
 
 				String specimenCollector = request.getParameter("specimenCollector");
-
-				if (specimenCollector != null && specimenCollector.trim().length() > 0) {
+				if(StringUtils.isNotBlank(specimenCollector))
+				{
 					((Z01Query) query).setSpecimenCollector(new ZBR3(specimenCollector, "ISO"));
 				}
 
 
 				String performingLaboratory = request.getParameter("performingLaboratory");
-
-				if (performingLaboratory != null && performingLaboratory.trim().length() > 0) {
+				if(StringUtils.isNotBlank(performingLaboratory))
+				{
 					((Z01Query) query).setPerformingLaboratory(new ZBR6(performingLaboratory, "ISO"));
 				}
 
 
 				String excludePerformingLaboratory = request.getParameter("excludePerformingLaboratory");
-
-				if (excludePerformingLaboratory != null && excludePerformingLaboratory.trim().length() > 0) {
+				if(StringUtils.isNotBlank(excludePerformingLaboratory))
+				{
 					((Z01Query) query).setExcludePerformingLaboratory(new ZBE6(excludePerformingLaboratory, "ISO"));
 				}
 
 
 				String reportingLaboratory = request.getParameter("reportingLaboratory");
-
-				if (reportingLaboratory != null && reportingLaboratory.trim().length() > 0) {
+				if(StringUtils.isNotBlank(reportingLaboratory))
+				{
 					((Z01Query) query).setReportingLaboratory(new ZBR4(reportingLaboratory, "ISO"));
 				}
 
 
 				String excludeReportingLaboratory = request.getParameter("excludeReportingLaboratory");
 
-				if (excludeReportingLaboratory != null && excludeReportingLaboratory.trim().length() > 0) {
+				if(StringUtils.isNotBlank(excludeReportingLaboratory))
+				{
 					((Z01Query) query).setExcludeReportingLaboratory(new ZBE4(excludeReportingLaboratory, "ISO"));
 				}
 
