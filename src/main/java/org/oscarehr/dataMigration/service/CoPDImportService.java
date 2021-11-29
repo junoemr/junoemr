@@ -404,7 +404,6 @@ public class CoPDImportService
 		if(providerLookupCache.containsKey(cacheKey))
 		{
 			provider = providerLookupCache.get(cacheKey);
-			providerManager2.updateSingleSetting(provider.getId(), UserProperty.COBALT, UserProperty.PROPERTY_ON_NO);
 			logger.info("Use existing cached Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 		}
 		else
@@ -425,7 +424,7 @@ public class CoPDImportService
 				String billCenterCode = properties.getProperty("default_bill_center", "");
 				provider = providerService.addNewProvider(IMPORT_PROVIDER, provider, billCenterCode);
 				providerRoleService.setDefaultRoleForNewProvider(provider.getId());
-				providerManager2.updateSingleSetting(provider.getId(), UserProperty.COBALT, UserProperty.PROPERTY_ON_NO);
+				providerManager2.updateSingleSetting(provider.getId(), UserProperty.COBALT, UserProperty.PROPERTY_ON_YES);
 
 				logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 			}

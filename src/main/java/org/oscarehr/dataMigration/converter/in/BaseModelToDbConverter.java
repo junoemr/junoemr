@@ -124,14 +124,13 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 				String billCenterCode = properties.getProperty("default_bill_center", "");
 				dbProvider = providerService.addNewProvider(IMPORT_PROVIDER, dbProvider, billCenterCode);
 				providerRoleService.setDefaultRoleForNewProvider(dbProvider.getId());
-				providerManager2.updateSingleSetting(dbProvider.getId(), UserProperty.COBALT, UserProperty.PROPERTY_ON_NO);
+				providerManager2.updateSingleSetting(dbProvider.getId(), UserProperty.COBALT, UserProperty.PROPERTY_ON_YES);
 
 				logger.info("Created new Provider record " + dbProvider.getId() + " (" + dbProvider.getLastName() + "," + dbProvider.getFirstName() + ")");
 			}
 			else if(matchedProviders.size() == 1)
 			{
 				dbProvider = matchedProviders.get(0);
-				providerManager2.updateSingleSetting(dbProvider.getId(), UserProperty.COBALT, UserProperty.PROPERTY_ON_NO);
 				logger.info("Use existing uncached Provider record " + dbProvider.getId() + " (" + dbProvider.getLastName() + "," + dbProvider.getFirstName() + ")");
 			}
 			else
