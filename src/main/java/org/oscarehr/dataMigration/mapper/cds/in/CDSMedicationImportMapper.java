@@ -76,7 +76,7 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		String[] dosageMinMax = getDosageMinMax(importStructure.getDosage());
 		if (dosageMinMax != null)
 		{
-			// This will throw an exception if the dosage string is in the forms "X-", "-Y", "-", "" or, if X or Y can't parse to floats
+			// This will throw an exception if the dosage string can't parse to floats
 			// Want this behaviour so that it will fail the patient in these cases, to bring attention to the invalid data
 			medication.setTakeMax(Float.parseFloat(dosageMinMax[0]));
 			medication.setTakeMin(Float.parseFloat(dosageMinMax[1]));
@@ -312,10 +312,12 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 				String max = Util.leadingNum(minmax[1]);
 				if (min.isEmpty() && !max.isEmpty())
 				{
+					logger.warn("Empty minimum dosage found" + minmax.toString());
 					min = max;
 				}
 				if (max.isEmpty() && !min.isEmpty())
 				{
+					logger.warn("Empty maximum dosage found" + minmax.toString());
 					max = min;
 				}
 				minmax[0] = min;
@@ -323,6 +325,7 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 
 				return minmax;
 			}
+			dosage = Util.leadingNum(dosage);
 			return new String[] {dosage, dosage};
 		}
 		return null;

@@ -22,18 +22,19 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
+import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEFAULT_DOCUMENT_DESCRIPTION;
+import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DOC_CLASS_MEDICAL_RECORDS_LEGACY_VALUE;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.oscarehr.dataMigration.exception.InvalidDocumentException;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.document.Document;
 import org.springframework.stereotype.Component;
+import xml.cds.v5_0.ReportClass;
 import xml.cds.v5_0.Reports;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEFAULT_DOCUMENT_DESCRIPTION;
 
 @Component
 public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper<Document>
@@ -126,6 +127,15 @@ public class CDSReportDocumentImportMapper extends AbstractCDSReportImportMapper
 	protected String getDocumentDescription(Reports importStructure)
 	{
 		String clazz = getReportClass(importStructure.getClazz());
+		String subClass = importStructure.getSubClass();
+
+		if(clazz != null &&
+			(clazz.equals(ReportClass.MEDICAL_RECORDS_REPORT.value()) ||
+				clazz.equals(DOC_CLASS_MEDICAL_RECORDS_LEGACY_VALUE) ||
+				clazz.equals(ReportClass.OTHER_LETTER.value())))
+		{
+			return (subClass != null) ? subClass : clazz;
+		}
 		return (clazz != null) ? clazz : DEFAULT_DOCUMENT_DESCRIPTION;
 	}
 }
