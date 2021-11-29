@@ -50,7 +50,7 @@ public class FacilityDaoTest extends DaoTestFixtures
 	protected String[] getTablesToRestore()
 	{
 		return new String[]{
-			"property"//"Facility"
+			"Facility"
 		};
 	}
 
