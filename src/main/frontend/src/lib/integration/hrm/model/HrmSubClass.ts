@@ -19,6 +19,11 @@ export default class HrmSubClass
 
   public static fromTransfer(transfer: HrmSubClassModel): HrmSubClass
   {
+    if (transfer == null)
+    {
+      return null;
+    }
+
     const hrmSubClass = new HrmSubClass();
     hrmSubClass._hrmCategoryId = transfer.hrmCategoryId;
     hrmSubClass._facilityNumber = transfer.facilityNumber;

@@ -24,6 +24,7 @@
 package org.oscarehr.hospitalReportManager.service;
 
 import org.oscarehr.dataMigration.converter.in.hrm.HrmCategoryModelToDbConverter;
+import org.oscarehr.dataMigration.converter.in.hrm.HrmSubClassModelToDbConverter;
 import org.oscarehr.dataMigration.converter.out.hrm.HrmCategoryDbToModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
 import org.oscarehr.hospitalReportManager.dao.HRMCategoryDao;
@@ -35,8 +36,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -50,6 +53,9 @@ public class HRMCategoryService
 
 	@Autowired
 	HrmCategoryModelToDbConverter toDBConverter;
+
+	@Autowired
+	HrmSubClassModelToDbConverter subClassToDBConverter;
 
 	public HrmCategoryModel createCategory(HrmCategoryModel category)
 	{
@@ -114,4 +120,54 @@ public class HRMCategoryService
 
 		return toModelConverter.convert(category);
 	}
+
+	public HrmCategoryModel updateCategory(HrmCategoryModel newModel)
+	{
+		HRMCategory existingEntity = categoryDao.find(newModel.getId());
+		HRMCategory updated = reconcile(existingEntity, newModel);
+		categoryDao.merge(updated);
+
+		return toModelConverter.convert(updated);
+	}
+
+	public HrmCategoryModel getActiveCategory(Integer categoryId)
+	{
+		HRMCategory category = categoryDao.find(categoryId);
+		if (category.isDisabled())
+		{
+			return null;
+		}
+
+		return toModelConverter.convert(category);
+	}
+
+	HRMCategory reconcile(HRMCategory entity, HrmCategoryModel newModel)
+	{
+		Set<Integer> newSubClassIds = new HashSet<>();
+		newModel.getSubClasses().forEach(subClass -> {
+			if (subClass.getId() != null)
+			{
+				newSubClassIds.add(subClass.getId());
+			}
+		});
+
+		// If a subclass exists in the old set, but not in the new set, it was deactivated
+		LocalDateTime now = LocalDateTime.now();
+		entity.getSubClassList().forEach(subClass -> {
+			if (!newSubClassIds.contains(subClass.getId()))
+			{
+				subClass.setDisabledAt(now);
+			}
+		});
+
+		// If a subclass doesn't have an id in the new set, it needs to be created
+		newModel.getSubClasses()
+			.stream()
+			.filter(subClass -> subClass.getId() == null)
+			.forEach(newSubClass -> entity.getSubClassList().add(subClassToDBConverter.convert(newSubClass, entity)));
+
+		return entity;
+	}
+
+
 }

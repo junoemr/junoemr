@@ -36,7 +36,7 @@ public class HRMSubClassImportMapper
 {
 	public List<HrmSubClassModel> convert(Collection<HRMSubClassTransferInbound> transfers, HrmCategoryModel parent)
 	{
-		return transfers.stream().map(transfer -> convert(transfer, parent)).collect(Collectors.toList());;
+		return transfers.stream().map(transfer -> convert(transfer, parent)).collect(Collectors.toList());
 	}
 
 	public HrmSubClassModel convert(HRMSubClassTransferInbound transfer, Integer parentId)

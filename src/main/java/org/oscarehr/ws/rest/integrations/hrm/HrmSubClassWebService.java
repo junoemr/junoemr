@@ -11,10 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -34,7 +32,8 @@ public class HrmSubClassWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/")
-	public RestResponse<HrmSubClassModel> findByAttributes(@QueryParam("sendingFacilityId") String facilityId,
+	public RestResponse<HrmSubClassModel> findActiveByAttributes(
+		@QueryParam("sendingFacilityId") String facilityId,
 		@QueryParam("reportClass") String reportClass,
 		@QueryParam("subClassName") String subClassName,
 		@QueryParam("accompanyingSubClassName") String accompanyingSubClassName)
@@ -43,15 +42,5 @@ public class HrmSubClassWebService extends AbstractServiceImpl
 
 		HrmSubClassModel model = hrmSubClassService.findActiveByAttributes(facilityId, reportClass, subClassName, accompanyingSubClassName);
 		return RestResponse.successResponse(model);
-	}
-
-	@DELETE
-	@Path("/{subClassId}/")
-	public RestResponse<HrmSubClassModel> deactivateSubClass(@PathParam("subClassId") Integer subClassId)
-	{
-		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_DELETE);
-
-		HrmSubClassModel deactivated = hrmSubClassService.deactivateSubClass(subClassId);
-		return RestResponse.successResponse(deactivated);
 	}
 }

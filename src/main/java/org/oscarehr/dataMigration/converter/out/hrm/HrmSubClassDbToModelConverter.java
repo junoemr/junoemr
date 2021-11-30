@@ -13,6 +13,11 @@ public class HrmSubClassDbToModelConverter extends AbstractModelConverter<HRMSub
 {
 	public HrmSubClassModel convert(HRMSubClass entity)
 	{
+		if (entity == null)
+		{
+			return null;
+		}
+
 		HrmSubClassModel model = new HrmSubClassModel();
 		model.setId(entity.getId());
 		model.setHrmCategoryId(entity.getHrmCategory().getId());

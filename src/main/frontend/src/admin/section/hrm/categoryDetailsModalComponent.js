@@ -41,10 +41,12 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 			resolve: "<",
 		},
 		controller: [
+			'$scope',
 			'$uibModal',
 			'securityRolesService',
 			'NgTableParams',
 			function (
+				$scope,
 				$uibModal,
 				securityRolesService,
 				NgTableParams)
@@ -98,18 +100,16 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 
 					ctrl.newSubClass = new HrmSubClass();
 					ctrl.isLoading = false;
-
-					console.log(ctrl.newSubClass);
 				}
 
 				ctrl.canCreate = () =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.HrmCreate);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.HrmCreate) && ctrl.category.name;
 				}
 
 				ctrl.canUpdate = () =>
 				{
-					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.HrmUpdate);
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.HrmUpdate) && ctrl.category.name;
 				}
 
 				ctrl.canDelete = () =>
@@ -163,8 +163,6 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 					ctrl.isLoading = true;
 					try
 					{
-						console.log("in component");
-						console.log(ctrl.category);
 						await hrmService.createCategory(ctrl.category);
 						ctrl.modalInstance.close();
 					}
@@ -239,14 +237,42 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 
 				ctrl.onCreateSubClass = async () =>
 				{
-					// We won't save the actual subclasses until the save button is pressed.
+					const newSubClass = ctrl.newSubClass;
+
+					const alreadyOnThisCategory = ctrl.category.subClasses.filter(existing =>
+					{
+						return existing.facilityNumber === newSubClass.facilityNumber &&
+							existing.reportClass === newSubClass.reportClass &&
+							existing.subClassName === newSubClass.subClassName &&
+							existing.accompanyingSubClassName === existing.accompanyingSubClassName
+					}).length > 0
+					if (alreadyOnThisCategory)
+					{
+						Juno.Common.Util.errorAlert($uibModal, "In Use", "That subclass is already assigned to this category");
+						return;
+					}
+
+					const alreadyOnAnotherCategory = await hrmService.findSubClassByAttributes(
+						newSubClass.facilityNumber,
+						newSubClass.reportClass,
+						newSubClass.subClassName,
+						newSubClass.accompanyingSubClassName);
+					if (alreadyOnAnotherCategory != null)
+					{
+						const hrmCategory = await hrmService.getActiveCategory(alreadyOnAnotherCategory.hrmCategoryId);
+						Juno.Common.Util.errorAlert($uibModal, "In Use", "That subclass is already assigned to " + hrmCategory.name);
+						return;
+					}
+
+					// Subclasses are reconciled by the backend after the save button is pressed.
 					ctrl.category.subClasses.push(ctrl.newSubClass);
 					ctrl.newSubClass = new HrmSubClass();
+					$scope.$apply();
 				}
 
 				ctrl.onDeleteSubClass = async (subClass) =>
 				{
-					// We won't actually delete any subclasses until the save button is pressed.
+					// Subclasses are reconciled by the backend after the save button is pressed.
 					const index = ctrl.category.subClasses.indexOf(subClass);
 					if (index >= 0)
 					{

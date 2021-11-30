@@ -22,11 +22,17 @@
 */
 
 import {API_BASE_PATH} from "../../../constants/ApiConstants";
-import {HrmScheduleApi, HrmCategoriesApi, HrmCategoryApi} from "../../../../../generated";
+import {
+  HrmScheduleApi,
+  HrmCategoriesApi,
+  HrmCategoryApi,
+  HrmSubClassApi
+} from "../../../../../generated";
 import HrmFetchResults from "../model/HrmFetchResults";
 import HrmCategory from "../model/HRMCategory"
 
 import {getAngular$http, getAngular$httpParamSerializer} from "../../../util/AngularUtil";
+import HrmSubClass from "../model/HrmSubClass";
 
 export default class HrmService
 {
@@ -35,6 +41,8 @@ export default class HrmService
     protected _HRMCategoryAPI: any;
 
     protected _HRMCategoriesAPI: any;
+
+    protected _HRMSubClassAPI: any;
 
     // ==========================================================================
     // Public Methods
@@ -52,6 +60,11 @@ export default class HrmService
             API_BASE_PATH);
 
         this._HRMCategoriesAPI = new HrmCategoriesApi(
+            getAngular$http(),
+            getAngular$httpParamSerializer(),
+            API_BASE_PATH);
+
+        this._HRMSubClassAPI = new HrmSubClassApi(
             getAngular$http(),
             getAngular$httpParamSerializer(),
             API_BASE_PATH);
@@ -81,6 +94,12 @@ export default class HrmService
       return HrmCategory.fromTransfer(rawResponse.data.body)
     }
 
+    public async getActiveCategory(id: number): Promise<any>
+    {
+      const rawResponse = await this._HRMCategoryAPI.getActiveCategory(id);
+      return HrmCategory.fromTransfer(rawResponse.data.body);
+    }
+
     public async updateCategory(category: HrmCategory): Promise<any>
     {
       const rawResponse = await this._HRMCategoryAPI.updateCategory(category.id, HrmCategory.toTransfer(category));
@@ -91,5 +110,11 @@ export default class HrmService
     {
       const rawResponse = await this._HRMCategoryAPI.deactivateCategory(category.id);
       return HrmCategory.fromTransfer(rawResponse.data.body);
+    }
+
+    public async findSubClassByAttributes(facilityId, reportClass, subClassName, accompanyingSubClassName): Promise<any>
+    {
+      const rawResponse = await this._HRMSubClassAPI.findActiveByAttributes(facilityId, reportClass, subClassName, accompanyingSubClassName);
+      return HrmSubClass.fromTransfer(rawResponse.data.body);
     }
 }

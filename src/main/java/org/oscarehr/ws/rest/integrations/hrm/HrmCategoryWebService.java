@@ -24,13 +24,9 @@
 package org.oscarehr.ws.rest.integrations.hrm;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.dataMigration.model.hrm.HrmSubClassModel;
 import org.oscarehr.hospitalReportManager.converter.HRMCategoryImportMapper;
 import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
-import org.oscarehr.hospitalReportManager.converter.HRMSubClassImportMapper;
 import org.oscarehr.hospitalReportManager.service.HRMCategoryService;
-import org.oscarehr.hospitalReportManager.service.HRMSubClassService;
-import org.oscarehr.hospitalReportManager.transfer.HRMSubClassTransferInbound;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
@@ -41,12 +37,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.PATCH;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 @Path("/integrations/hrm/category")
@@ -57,16 +53,10 @@ import javax.ws.rs.core.MediaType;
 public class HrmCategoryWebService extends AbstractServiceImpl
 {
 	@Autowired
-	HRMCategoryImportMapper categoryImportMapper;
-
-	@Autowired
-	HRMSubClassImportMapper subClassImportMapper;
+	HRMCategoryImportMapper importMapper;
 
 	@Autowired
 	HRMCategoryService categoryService;
-
-	@Autowired
-	HRMSubClassService subClassService;
 
 	@Autowired
 	SecurityInfoManager securityService;
@@ -77,9 +67,19 @@ public class HrmCategoryWebService extends AbstractServiceImpl
 	{
 		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_CREATE);
 
-		HrmCategoryModel categoryToCreate = categoryImportMapper.convert(transferIn);
+		HrmCategoryModel categoryToCreate = importMapper.convert(transferIn);
 		HrmCategoryModel created = categoryService.createCategory(categoryToCreate);
 		return RestResponse.successResponse(created);
+	}
+
+	@GET
+	@Path("/{categoryId}/")
+	public RestResponse<HrmCategoryModel> getActiveCategory(@PathParam("categoryId") Integer categoryId) throws Exception
+	{
+		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
+
+		HrmCategoryModel found = categoryService.getActiveCategory(categoryId);
+		return RestResponse.successResponse(found);
 	}
 
 	@DELETE
@@ -92,23 +92,16 @@ public class HrmCategoryWebService extends AbstractServiceImpl
 		return RestResponse.successResponse(deactivated);
 	}
 
-	@PATCH
+	@PUT
 	@Path("/{categoryId}/")
-	public RestResponse<HrmCategoryModel> updateCategoryName(@PathParam("categoryId") Integer categoryId, @QueryParam("name") String newName) throws Exception
+	public RestResponse<HrmCategoryModel> updateCategory(@PathParam("categoryId") Integer categoryId, HRMCategoryTransferInbound transferIn) throws Exception
 	{
 		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_UPDATE);
-		HrmCategoryModel updated = categoryService.updateCategoryName(categoryId, newName);
+
+		HrmCategoryModel categoryToUpdate = importMapper.convert(transferIn);
+		categoryToUpdate.setId(categoryId);
+
+		HrmCategoryModel updated = categoryService.updateCategory(categoryToUpdate);
 		return RestResponse.successResponse(updated);
-	}
-
-	@POST
-	@Path("/{categoryId}/subClass/")
-	public RestResponse<HrmSubClassModel> addSubClassToCategory(@PathParam("categoryId") Integer categoryId, HRMSubClassTransferInbound subClass)
-	{
-		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_CREATE);
-		HrmSubClassModel model = subClassImportMapper.convert(subClass, categoryId);
-		HrmSubClassModel created = subClassService.createSubClass(model);
-
-		return RestResponse.successResponse(created);
 	}
 }
