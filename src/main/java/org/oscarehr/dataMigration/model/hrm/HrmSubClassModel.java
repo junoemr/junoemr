@@ -7,7 +7,9 @@ import java.time.LocalDateTime;
 @Data
 public class HrmSubClassModel extends AbstractTransientModel
 {
-	private int id;
+	private Integer id;
+
+	private Integer hrmCategoryId;
 
 	private String facilityNumber;
 

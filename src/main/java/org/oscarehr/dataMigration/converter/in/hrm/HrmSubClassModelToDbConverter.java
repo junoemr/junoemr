@@ -23,27 +23,37 @@
 
 package org.oscarehr.dataMigration.converter.in.hrm;
 
-import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
+import org.oscarehr.dataMigration.model.hrm.HrmSubClassModel;
 import org.oscarehr.hospitalReportManager.model.HRMCategory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.oscarehr.hospitalReportManager.model.HRMSubClass;
 import org.springframework.stereotype.Component;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
-public class HrmCategoryModelToDbConverter extends AbstractModelConverter<HrmCategoryModel, HRMCategory>
+public class HrmSubClassModelToDbConverter
 {
-	@Autowired
-	HrmSubClassModelToDbConverter toEntityConverter;
-
-	@Override
-	public HRMCategory convert(HrmCategoryModel model)
+	public List<HRMSubClass> convert(Collection<HrmSubClassModel> models, HRMCategory parentEntity)
 	{
-		HRMCategory entity = new HRMCategory();
-		entity.setId(model.getId());
-		entity.setCategoryName(model.getName());
-		entity.setDisabledAt((model.getDisabledAt()));
+		if (models == null)
+		{
+			return null;
+		}
 
-		entity.setSubClassList(toEntityConverter.convert(model.getSubClasses(), entity));
+		return models.stream().map(entity -> convert(entity, parentEntity)).collect(Collectors.toList());
+	}
+
+	public HRMSubClass convert(HrmSubClassModel model, HRMCategory parentEntity)
+	{
+		HRMSubClass entity = new HRMSubClass();
+		entity.setHrmCategory(parentEntity);
+		entity.setId(model.getId());
+		entity.setSendingFacilityId(model.getFacilityNumber());
+		entity.setClassName(model.getClassName());
+		entity.setSubClassName(model.getSubClassName());
+		entity.setAccompanyingSubClassName(model.getAccompanyingSubClassName());
+		entity.setDisabledAt(model.getDisabledAt());
 
 		return entity;
 	}

@@ -85,9 +85,6 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 					ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 					ctrl.category = ctrl.resolve.category;
 
-
-					console.log(ctrl.category);
-
 					if(!Juno.Common.Util.exists(ctrl.category))
 					{
 						ctrl.isCreate = true;
@@ -166,6 +163,8 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 					ctrl.isLoading = true;
 					try
 					{
+						console.log("in component");
+						console.log(ctrl.category);
 						await hrmService.createCategory(ctrl.category);
 						ctrl.modalInstance.close();
 					}
@@ -225,14 +224,34 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 						(subClass.reportClass === HrmReportClass.DIAGNOSTIC_IMAGING || subClass.reportClass === HrmReportClass.CARDIO_RESPIRATORY) && subClass.accompanyingSubClassName)
 				}
 
-				ctrl.onCreateSubClass = async () =>
+				ctrl.onReportClassChange = (newValue) =>
 				{
-					console.log("create subclass");
+					// Model won't be updated yet, need to use the param returned by the component
+					if (newValue === HrmReportClass.MEDICAL_RECORDS)
+					{
+						ctrl.newSubClass.accompanyingSubClassName = null;
+					}
+					else
+					{
+						ctrl.newSubClass.subClassName = null;
+					}
 				}
 
-				ctrl.onDeleteSubClass = async () =>
+				ctrl.onCreateSubClass = async () =>
 				{
-					console.log("delete subclass");
+					// We won't save the actual subclasses until the save button is pressed.
+					ctrl.category.subClasses.push(ctrl.newSubClass);
+					ctrl.newSubClass = new HrmSubClass();
+				}
+
+				ctrl.onDeleteSubClass = async (subClass) =>
+				{
+					// We won't actually delete any subclasses until the save button is pressed.
+					const index = ctrl.category.subClasses.indexOf(subClass);
+					if (index >= 0)
+					{
+						ctrl.category.subClasses.splice(index, 1);
+					}
 				}
 			}]
 	});

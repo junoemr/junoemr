@@ -28,6 +28,7 @@ import org.oscarehr.dataMigration.converter.out.hrm.HrmCategoryDbToModelConverte
 import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
 import org.oscarehr.hospitalReportManager.dao.HRMCategoryDao;
 import org.oscarehr.hospitalReportManager.model.HRMCategory;
+import org.oscarehr.hospitalReportManager.model.HRMSubClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -63,30 +64,21 @@ public class HRMCategoryService
 		return toModelConverter.convert(entity);
 	}
 
-	public HrmCategoryModel updateCategory(HrmCategoryModel category)
-	{
-		Optional<HRMCategory> existing = categoryDao.findActiveByName(category.getName());
-		existing.ifPresent(existingCategory ->
-		{
-			// Prevent renames to existing names;
-			if (!existingCategory.getId().equals(category.getId()))
-			{
-				throw new ValidationException("An active category with name " + category.getName() + " already exists");
-			}
-		});
-
-		HRMCategory entity = toDBConverter.convert(category);
-		categoryDao.merge(entity);
-
-		return toModelConverter.convert(entity);
-	}
-
 	public HrmCategoryModel deactivateCategory(Integer categoryId)
 	{
 		HRMCategory entity = categoryDao.find(categoryId);
 		if (!entity.isDisabled())
 		{
 			entity.setDisabledAt(LocalDateTime.now());
+
+			for (HRMSubClass subClassEntity : entity.getSubClassList())
+			{
+				if (!subClassEntity.isDisabled())
+				{
+					subClassEntity.setDisabledAt(LocalDateTime.now());
+				}
+			}
+
 			categoryDao.merge(entity);
 		}
 
@@ -102,5 +94,24 @@ public class HRMCategoryService
 	private boolean isNameInUse(String categoryName)
 	{
 		return categoryDao.findActiveByName(categoryName).isPresent();
+	}
+
+	public HrmCategoryModel updateCategoryName(Integer categoryId, String newName)
+	{
+		Optional<HRMCategory> sameName = categoryDao.findActiveByName(newName);
+		sameName.ifPresent(existingCategory ->
+		{
+			// Prevent renames to existing names;
+			if (!existingCategory.getId().equals(categoryId))
+			{
+				throw new ValidationException("An active category with name " + newName + " already exists");
+			}
+		});
+
+		HRMCategory category = categoryDao.find(categoryId);
+		category.setCategoryName(newName);
+		categoryDao.merge(category);
+
+		return toModelConverter.convert(category);
 	}
 }

@@ -23,24 +23,37 @@
 
 package org.oscarehr.hospitalReportManager.converter;
 
-import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
-import org.oscarehr.hospitalReportManager.transfer.HRMCategoryTransferInbound;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.oscarehr.dataMigration.model.hrm.HrmSubClassModel;
+import org.oscarehr.hospitalReportManager.transfer.HRMSubClassTransferInbound;
 import org.springframework.stereotype.Component;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
-public class HRMCategoryImportMapper extends AbstractModelConverter<HRMCategoryTransferInbound, HrmCategoryModel>
+public class HRMSubClassImportMapper
 {
-	@Autowired
-	HRMSubClassImportMapper subClassMapper;
-
-	@Override
-	public HrmCategoryModel convert(HRMCategoryTransferInbound transfer)
+	public List<HrmSubClassModel> convert(Collection<HRMSubClassTransferInbound> transfers, HrmCategoryModel parent)
 	{
-		HrmCategoryModel model = new HrmCategoryModel();
-		model.setName(transfer.getName());
-		model.setSubClasses(subClassMapper.convert(transfer.getSubClasses(), model));
+		return transfers.stream().map(transfer -> convert(transfer, parent)).collect(Collectors.toList());;
+	}
+
+	public HrmSubClassModel convert(HRMSubClassTransferInbound transfer, Integer parentId)
+	{
+		HrmSubClassModel model = new HrmSubClassModel();
+		model.setHrmCategoryId(parentId);
+		model.setFacilityNumber(transfer.getFacilityNumber());
+		model.setClassName(transfer.getClassName());
+		model.setSubClassName(transfer.getSubClassName());
+		model.setAccompanyingSubClassName(transfer.getAccompanyingSubClassName());
+
 		return model;
+	}
+
+
+	public HrmSubClassModel convert(HRMSubClassTransferInbound transfer, HrmCategoryModel parent)
+	{
+		return convert(transfer, parent.getId());
 	}
 }

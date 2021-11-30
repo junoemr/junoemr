@@ -40,9 +40,9 @@ public class HRMSubClass extends AbstractModel<Integer>
 
 	@Column(name="disabled_at")
 	private LocalDateTime disabledAt;
-	
+
 	@ManyToOne
-	@JoinColumn(name="hrmCategoryId")
+	@JoinColumn(name="hrmCategoryId", nullable=false)
 	private HRMCategory hrmCategory;
 	
 	@Override
@@ -53,6 +53,6 @@ public class HRMSubClass extends AbstractModel<Integer>
 
 	public boolean isDisabled()
 	{
-		return this.disabledAt == null;
+		return this.disabledAt != null;
 	}
 }

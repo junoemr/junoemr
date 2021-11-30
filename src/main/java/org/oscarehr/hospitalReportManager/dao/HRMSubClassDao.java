@@ -10,7 +10,9 @@
 package org.oscarehr.hospitalReportManager.dao;
 
 import java.util.List;
+import java.util.Optional;
 
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 
 import org.oscarehr.common.dao.AbstractDao;
@@ -99,5 +101,35 @@ public class HRMSubClassDao extends AbstractDao<HRMSubClass> {
 			}
 		}
 		return mapping;
+	}
+
+	public Optional<HRMSubClass> findByAttributes(String facilityId, String className, String subClassName, String accompanyingSubClassName)
+	{
+		String sql = "SELECT * FROM HRMSubClass h WHERE " +
+			"h.sendingFacilityId = :facilityId " +
+			"AND h.className = :className " +
+			"AND h.subClassName = :subClassName " +
+			"AND h.accompanyingSubClassName = :accompanyingSubClassName " +
+			"AND disabled_at IS NULL";
+
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("facilityId", facilityId);
+		query.setParameter("className", className);
+		query.setParameter("subClassName", subClassName);
+		query.setParameter("accompanyingSubClassName", accompanyingSubClassName);
+
+		List<HRMSubClass> results = query.getResultList();
+		if (results.size() > 1)
+		{
+			throw new NonUniqueResultException("There can only be one active HRMCategory with a given name");
+		}
+
+		HRMSubClass found = null;
+		if (!results.isEmpty())
+		{
+			found = results.get(0);
+		}
+
+		return Optional.ofNullable(found);
 	}
 }

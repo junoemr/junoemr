@@ -34,7 +34,7 @@ export default class HrmCategory
   {
     this._id = null;
     this._name = null;
-    this._subClasses = null;
+    this._subClasses = [];
   }
 
   public static fromTransferArray(transferList: HrmCategoryModel[]): HrmCategory[]
@@ -64,8 +64,14 @@ export default class HrmCategory
 
   public static toTransfer(category: HrmCategory): HRMCategoryTransferInbound
   {
+    console.log("in transfer");
+    console.log({
+      name: category.name,
+      subClasses: HrmSubClass.toTransferList(category.subClasses),
+    });
     return {
       name: category.name,
+      subClasses: HrmSubClass.toTransferList(category.subClasses),
     }
   }
 

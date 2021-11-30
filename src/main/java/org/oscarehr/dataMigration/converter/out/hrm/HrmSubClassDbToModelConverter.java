@@ -11,11 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class HrmSubClassDbToModelConverter extends AbstractModelConverter<HRMSubClass, HrmSubClassModel>
 {
-	@Override
 	public HrmSubClassModel convert(HRMSubClass entity)
 	{
 		HrmSubClassModel model = new HrmSubClassModel();
 		model.setId(entity.getId());
+		model.setHrmCategoryId(entity.getHrmCategory().getId());
 		model.setFacilityNumber(entity.getSendingFacilityId());
 		model.setClassName(entity.getClassName());
 		model.setSubClassName(entity.getSubClassName());

@@ -23,14 +23,15 @@
 
 package org.oscarehr.hospitalReportManager.transfer;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class HRMSubClassTransferInbound
 {
 	String className;
 	String subClassName;
 	String accompanyingSubClassName;
 	String facilityNumber;
-	String categoryId;
 }

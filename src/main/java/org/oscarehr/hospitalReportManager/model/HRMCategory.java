@@ -12,6 +12,7 @@ package org.oscarehr.hospitalReportManager.model;
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -38,7 +39,7 @@ public class HRMCategory extends AbstractModel<Integer>
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmCategory")
 	private List<HRMDocument> documentList;
 
-	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmCategory")
+	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmCategory", cascade = CascadeType.ALL)
 	private List<HRMSubClass> subClassList;
 
 	@Override

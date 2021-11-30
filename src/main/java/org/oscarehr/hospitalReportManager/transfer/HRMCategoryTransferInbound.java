@@ -23,10 +23,12 @@
 
 package org.oscarehr.hospitalReportManager.transfer;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import java.util.List;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class HRMCategoryTransferInbound
 {
 	String name;

@@ -67,6 +67,7 @@
                             <juno-input
                                     placeholder="Facility Number"
                                     ng-model = "$ctrl.newSubClass.facilityNumber"
+                                    invalid = "!$ctrl.newSubClass.facilityNumber"
                             >
                             </juno-input>
                         </td>
@@ -75,6 +76,8 @@
                                     options = "$ctrl.hrmReportClassOptions"
                                     ng-model = "$ctrl.newSubClass.reportClass"
                                     placeholder = "Report Type"
+                                    invalid = "!$ctrl.newSubClass.reportClass"
+                                    on-change = "$ctrl.onReportClassChange(value)"
                             >
                             </juno-select>
                         </td>
@@ -83,6 +86,7 @@
                                     placeholder="Subclass"
                                     ng-model = "$ctrl.newSubClass.subClassName"
                                     disabled = "!$ctrl.isEligibleForSubClass()"
+                                    invalid ="$ctrl.isEligibleForSubClass() && !$ctrl.newSubClass.subClassName"
                             >
                             </juno-input>
                         </td>
@@ -91,6 +95,7 @@
                                     placeholder="Accompanying Subclass"
                                     ng-model = "$ctrl.newSubClass.accompanyingSubClassName"
                                     disabled = "!$ctrl.isEligibleForAccompanyingSubClass()"
+                                    invalid = "$ctrl.isEligibleForAccompanyingSubClass() && !$ctrl.newSubClass.accompanyingSubClassName"
                             >
                             </juno-input>
                         </td>
@@ -101,7 +106,8 @@
                                          click="$ctrl.onCreateSubClass()"
                                          disabled="!$ctrl.canCreate() || !$ctrl.isSubClassComplete()">
                             +
-                        </juno-button></td>
+                            </juno-button>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
