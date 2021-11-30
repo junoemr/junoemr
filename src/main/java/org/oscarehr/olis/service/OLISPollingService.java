@@ -24,6 +24,7 @@
 package org.oscarehr.olis.service;
 
 import com.indivica.olis.Driver;
+import com.indivica.olis.DriverResponse;
 import com.indivica.olis.parameters.OBR22;
 import com.indivica.olis.parameters.ORC21;
 import com.indivica.olis.parameters.ZRP1;
@@ -39,7 +40,6 @@ import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.UserProperty;
-import org.oscarehr.olis.OLISUtils;
 import org.oscarehr.olis.dao.OLISProviderPreferencesDao;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.exception.OLISAckFailedException;
@@ -204,16 +204,17 @@ public class OLISPollingService
 
 		logger.info("Submit OLIS query for date range: " + ConversionUtils.toDateTimeString(startDateTime) +
 				" to " + ((endDateTime != null) ? ConversionUtils.toDateTimeString(endDateTime) : "present"));
-		String response = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), null, query);
+		DriverResponse driverResponse = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), query);
+		String unsignedResponse = driverResponse.getUnsignedResponse();
 
-		if(!response.startsWith("<Response"))
+		if(!unsignedResponse.startsWith("<Response"))
 		{
-			logger.error("response does not match, aborting " + response);
+			logger.error("response does not match, aborting " + unsignedResponse);
 			return null;
 		}
 
 		String timeStampForNextStartDate = null;
-		GenericFile labTempFile = writeLabFileTempFile(response);
+		GenericFile labTempFile = writeLabFileTempFile(driverResponse.getHl7Response());
 		try
 		{
 			timeStampForNextStartDate = parseAndImportResponse(loggedInInfo, labTempFile);
@@ -269,11 +270,9 @@ public class OLISPollingService
 		return timeStampForNextStartDate;
 	}
 
-	private GenericFile writeLabFileTempFile(String response) throws Exception
+	private GenericFile writeLabFileTempFile(String hl7Response) throws Exception
 	{
-		//Get HL7 Content from xml
-		String responseContent =  OLISUtils.getOLISResponseContent(response);
-		return FileFactory.createTempFile(new ByteArrayInputStream(responseContent.getBytes(StandardCharsets.UTF_8)), "-olis-response.hl7");
+		return FileFactory.createTempFile(new ByteArrayInputStream(hl7Response.getBytes(StandardCharsets.UTF_8)), "-olis-response.hl7");
 	}
 
 	private String parseAndImportResponse(LoggedInInfo loggedInInfo, GenericFile labTempFile) throws Exception

@@ -43,14 +43,12 @@ import org.oscarehr.common.model.OscarMsgType;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.olis.OLISProtocolSocketFactory;
 import org.oscarehr.olis.OLISUtils;
-import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarMessenger.data.MsgProviderData;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
@@ -63,7 +61,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -73,8 +70,9 @@ public class Driver
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
 
-	public static String submitOLISQuery(Provider loggedInProvider, HttpServletRequest request, Query query)
+	public static DriverResponse submitOLISQuery(@NotNull Provider loggedInProvider, Query query)
 	{
+		DriverResponse response;
 		try
 		{
 			OLISMessage message = new OLISMessage(loggedInProvider, query);
@@ -111,20 +109,7 @@ public class Driver
 				logItem.setAction("OLIS");
 				logItem.setContent("query");
 				logItem.setData(olisHL7String);
-
-				if(request != null)
-				{
-					LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-					if(loggedInInfo.getLoggedInProvider() != null)
-					{
-						logItem.setProviderNo(loggedInInfo.getLoggedInProviderNo());
-					}
-				}
-				else
-				{
-					logItem.setProviderNo(ProviderData.SYSTEM_PROVIDER_NO);
-				}
-
+				logItem.setProviderNo(loggedInProvider.getProviderNo());
 				logDao.persist(logItem);
 			}
 			catch(Exception e)
@@ -140,10 +125,14 @@ public class Driver
 
 			if (OscarProperties.getInstance().getProperty("olis_simulate", "no").equals("yes"))
 			{
-				String response = (String) request.getSession().getAttribute("olisResponseContent");
-				request.setAttribute("olisResponseContent", response);
-				request.getSession().setAttribute("olisResponseContent", null);
-				return response;
+				//TODO how to handle this without request object?
+//				String olisResponseContent = (String) request.getSession().getAttribute("olisResponseContent");
+//				request.setAttribute("olisResponseContent", response);
+//				request.getSession().setAttribute("olisResponseContent", null);
+
+//				DriverResponse response = new DriverResponse();
+//				response.setHl7Response(olisResponseContent);
+				response = new DriverResponse();
 			}
 			else
 			{
@@ -152,34 +141,26 @@ public class Driver
 				String signedData = olisResponse.getHIALResponse().getSignedResponse().getSignedData();
 				String unsignedData = Driver.unsignData(signedData);
 
-				if (request != null) {
-					request.setAttribute("msgInXML", msgInXML);
-					request.setAttribute("signedRequest", signedRequest);
-					request.setAttribute("signedData", signedData);
-					request.setAttribute("unsignedResponse", unsignedData);
-				}
-				readResponseFromXML(request, unsignedData);
-
-				return unsignedData;
+				response = readResponseFromXML(loggedInProvider.getProviderNo(), unsignedData);
+				response.setUnsignedRequest(msgInXML);
+				response.setSignedRequest(signedRequest);
+				response.setSignedResponse(signedData);
+				response.setUnsignedResponse(unsignedData);
 			}
 		}
 		catch(Exception e)
 		{
 			logger.error("Can't perform OLIS query due to exception.", e);
-
-			if(request != null)
-			{
-				request.setAttribute("searchException", e);
-
-				LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-				notifyOlisError(loggedInInfo.getLoggedInProvider(), e.getMessage());
-			}
-			return "";
+			response = new DriverResponse();
+			response.setSearchException(e);
+			notifyOlisError(loggedInProvider.getProviderNo(), e.getMessage());
 		}
+		return response;
 	}
 
-	public static void readResponseFromXML(HttpServletRequest request, String olisResponse)
+	public static DriverResponse readResponseFromXML(@NotNull String loggedInProviderNo, String olisResponse)
 	{
+		DriverResponse response = new DriverResponse();
 		try
 		{
 			Response root = OLISUtils.getOLISResponse(olisResponse);
@@ -191,41 +172,31 @@ public class Driver
 				ArrayOfError errors = root.getErrors();
 				List<ca.ssha._2005.hial.Error> errorList = errors.getError();
 
-				for (ca.ssha._2005.hial.Error error : errorList) {
-					String errorString = "";
-					errorString += "ERROR " + error.getNumber() + " (" + error.getSeverity() + ") : " + error.getMessage();
+				for (ca.ssha._2005.hial.Error error : errorList)
+				{
+					String errorString = "ERROR " + error.getNumber() + " (" + error.getSeverity() + ") : " + error.getMessage();
 					logger.debug(errorString);
 
 					ArrayOfString details = error.getDetails();
-                                        if (details != null) {
-                                            List<String> detailList = details.getString();
-                                            for (String detail : detailList) {
-                                                    errorString += "\n" + detail;
-                                            }
-                                        }
-
+					if(details != null)
+					{
+						errorString += String.join("\n", details.getString());
+					}
 					errorStringList.add(errorString);
 				}
-				if (request != null)
-				{
-					request.setAttribute("errors", errorStringList);
-				}
+				response.setErrors(errorStringList);
 			}
 			else if(root.getContent() != null)
 			{
-				if(request != null)
-				{
-					request.setAttribute("olisResponseContent", root.getContent());
-				}
+				response.setHl7Response(root.getContent());
 			}
 		}
 		catch(Exception e)
 		{
 			logger.error("Couldn't read XML from OLIS response.", e);
-
-			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-			notifyOlisError(loggedInInfo.getLoggedInProvider(), "Couldn't read XML from OLIS response." + "\n" + e);
+			notifyOlisError(loggedInProviderNo, "Couldn't read XML from OLIS response." + "\n" + e);
 		}
+		return response;
 	}
 
 	public static String unsignData(String data) {
@@ -390,34 +361,17 @@ public class Driver
 		return result;
 	}
 
-	private static void notifyOlisError(Provider provider, String errorMsg) {
-		HashSet<String> sendToProviderList = new HashSet<String>();
-
-		String providerNoTemp = "999998";
-		sendToProviderList.add(providerNoTemp);
-
-		if (provider != null) {
-			// manual prompts always send to admin
-			sendToProviderList.add(providerNoTemp);
-
-			providerNoTemp = provider.getProviderNo();
-			sendToProviderList.add(providerNoTemp);
-		}
-
-		// no one wants to hear about the problem
-		if (sendToProviderList.size() == 0) return;
-
+	private static void notifyOlisError(@NotNull String loggedInProviderNo, String errorMsg)
+	{
 		String message = "OSCAR attempted to perform a fetch of OLIS data at " + new Date() + " but there was an error during the task.\n\nSee below for the error message:\n" + errorMsg;
 
 		oscar.oscarMessenger.data.MsgMessageData messageData = new oscar.oscarMessenger.data.MsgMessageData();
 
-		ArrayList<MsgProviderData> sendToProviderListData = new ArrayList<MsgProviderData>();
-		for (String providerNo : sendToProviderList) {
-			MsgProviderData mpd = new MsgProviderData();
-			mpd.providerNo = providerNo;
-			mpd.locationId = "145";
-			sendToProviderListData.add(mpd);
-		}
+		ArrayList<MsgProviderData> sendToProviderListData = new ArrayList<>();
+		MsgProviderData mpd = new MsgProviderData();
+		mpd.providerNo = loggedInProviderNo;
+		mpd.locationId = "145";
+		sendToProviderListData.add(mpd);
 
 		String sentToString = messageData.createSentToString(sendToProviderListData);
 		messageData.sendMessage2(message, "OLIS Retrieval Error", "System", sentToString, "-1", sendToProviderListData, null, null, OscarMsgType.GENERAL_TYPE);

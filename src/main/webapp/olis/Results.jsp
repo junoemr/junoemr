@@ -164,19 +164,13 @@
 				<% }
 			}
 			String resp = StringUtils.trimToEmpty((String) request.getAttribute("olisResponseContent"));
+			List<String> resultList = (List<String>) request.getAttribute("resultList");
+
 			boolean hasBlockedContent = false;
 			try {
 				if(resp != null && resp.length()>0) {
 					OLISHL7Handler reportHandler = (OLISHL7Handler) Factory.getHandler(OLISHL7Handler.OLIS_MESSAGE_TYPE, resp);
 					if(reportHandler != null) {
-						List<OLISError> errors = reportHandler.getReportErrors();
-						if (errors.size() > 0) {
-							for (OLISError error : errors) {
-							%>
-								<div class="error"><%=error.userFriendlyToString().replaceAll("\\n", "<br />")%></div>
-							<%
-							}
-						}
 						hasBlockedContent = reportHandler.isReportBlocked();
 					}
 				}
@@ -222,9 +216,7 @@
 			</form>
 			<%
 			}
-			List<String> resultList = (List<String>) request.getAttribute("resultList");
-			
-			
+
 			if (resultList != null) {
 			%>
 			<table>

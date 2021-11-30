@@ -9,6 +9,7 @@
 package org.oscarehr.olis;
 
 import com.indivica.olis.Driver;
+import com.indivica.olis.DriverResponse;
 import com.indivica.olis.parameters.OBR16;
 import com.indivica.olis.parameters.OBR22;
 import com.indivica.olis.parameters.OBR25;
@@ -89,6 +90,7 @@ public class OLISSearchAction extends DispatchAction
 	{
 
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		DriverResponse driverResponse = null;
 		
 		String queryType = request.getParameter("queryType");
 		boolean redo = "true".equals(request.getParameter("redo"));
@@ -96,13 +98,13 @@ public class OLISSearchAction extends DispatchAction
 			String uuid = request.getParameter("uuid");
 			request.setAttribute("searchUuid", uuid);
 			boolean force = "true".equals(request.getParameter("force"));
-			Query q = (Query)searchQueryMap.get(uuid).clone();
+			Query query = (Query)searchQueryMap.get(uuid).clone();
 			if (force)
 			{
-				fillConsentOverrideSegments(request, q);
+				fillConsentOverrideSegments(request, query);
 
 				// Log the consent override
-				logConsentGiven(loggedInInfo.getLoggedInProviderNo(), q.getDemographicNo(), request);
+				logConsentGiven(loggedInInfo.getLoggedInProviderNo(), query.getDemographicNo(), request);
 			}
 
 			// ensure the demographic carries through to results when re-submitting queries
@@ -113,7 +115,7 @@ public class OLISSearchAction extends DispatchAction
 				request.setAttribute("demographic", demo);
 			}
 
-			Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), request, q);
+			driverResponse = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), query);
 			
 		}
 		else if (queryType != null) {
@@ -814,12 +816,20 @@ public class OLISSearchAction extends DispatchAction
 							userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_FIRST_NAME),
 							userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_SECOND_NAME));
 					((Z04Query) query).setRequestingHic(zrp1);
-					Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), request, query);
+					driverResponse = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), query);
 				}
-			} else {
-				Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), request, query);
+			}
+			else {
+				driverResponse = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), query);
 			}
 
+		}
+
+		if(driverResponse != null)
+		{
+			request.setAttribute("olisResponseContent", driverResponse.getHl7Response());
+			request.setAttribute("errors", driverResponse.getErrors());
+			request.setAttribute("searchException", driverResponse.getSearchException());
 		}
 		
 		return mapping.findForward("results");

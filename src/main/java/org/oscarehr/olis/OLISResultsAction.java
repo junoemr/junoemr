@@ -9,6 +9,7 @@
 package org.oscarehr.olis;
 
 import com.indivica.olis.Driver;
+import com.indivica.olis.DriverResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -42,7 +43,8 @@ public class OLISResultsAction extends DispatchAction
 	@Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
-		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.LAB_READ);
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, Permission.LAB_READ);
 
 		try
 		{
@@ -57,7 +59,14 @@ public class OLISResultsAction extends DispatchAction
 				{
 					if(!olisXmlResponse.trim().equalsIgnoreCase(""))
 					{
-						Driver.readResponseFromXML(request, olisXmlResponse);
+						DriverResponse driverResponse = Driver.readResponseFromXML(loggedInProviderNo, olisXmlResponse);
+						request.setAttribute("msgInXML", driverResponse.getUnsignedRequest());
+						request.setAttribute("signedRequest", driverResponse.getSignedRequest());
+						request.setAttribute("signedData", driverResponse.getSignedResponse());
+						request.setAttribute("unsignedResponse", driverResponse.getUnsignedResponse());
+						request.setAttribute("olisResponseContent", driverResponse.getHl7Response());
+						request.setAttribute("errors", driverResponse.getErrors());
+						request.setAttribute("searchException", driverResponse.getSearchException());
 					}
 
 					List<String> resultList = new LinkedList<>();
