@@ -233,6 +233,7 @@ public class SchemaUtils
 
 	public static void restoreTable(boolean includeInitData, String... tableNames) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
 	{
+		logger.info("Restoring tables");
 		long start = System.currentTimeMillis();
 		String schema = ConfigUtils.getProperty("db_schema");
 
@@ -275,6 +276,7 @@ public class SchemaUtils
 	public static void restoreAllTables()
 		throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
 	{
+		logger.info("Restoring all tables");
 		long start = System.currentTimeMillis();
 		String schema=ConfigUtils.getProperty("db_schema");
 

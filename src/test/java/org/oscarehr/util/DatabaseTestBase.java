@@ -34,6 +34,15 @@ import java.util.Set;
 
 public class DatabaseTestBase
 {
+	/** Say whether this specific test class allows a database reset after each test
+	 *
+	 * @return true if it allows db reset, false otherwise
+	 */
+	protected boolean isDatabaseResetEnabled()
+	{
+		return true;
+	}
+
 	/**
 	 * Override this method and return the tables that need to be reset before and after running an
 	 * integration test.  Here is a template for the override:
@@ -83,8 +92,7 @@ public class DatabaseTestBase
 	public void resetDatabase()
 		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
-		if(OscarProperties.isTestDatabaseFullResetEnabled() &&
-			(getTablesToRestore().length > 0 || getTablesToClear().length > 0))
+		if(OscarProperties.isTestDatabaseFullResetEnabled() && !isDatabaseResetEnabled())
 		{
 			// This section is used for debugging
 
@@ -126,7 +134,10 @@ public class DatabaseTestBase
 			// Reset all tables changed or cleared
 			SchemaUtils.restoreTable(getTablesToRestore());
 			SchemaUtils.restoreTable(getTablesToClear());
+		}
 
+		if(isDatabaseResetEnabled())
+		{
 			checkDatabase();
 		}
 	}

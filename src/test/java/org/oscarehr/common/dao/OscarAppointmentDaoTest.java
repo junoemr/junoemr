@@ -36,12 +36,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Appointment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,8 +57,8 @@ public class OscarAppointmentDaoTest extends DaoTestFixtures
 	{
 		return new String[]{
 			"appointment", "demographic", "lst_gender", "admission",
-			"demographic_merged", "program", "health_safety", "provider", "providersite", "site", "program_team", "log", "Facility",
-			"mygroup", "drugs","appointmentArchive"
+			"demographic_merged", "program", "health_safety", "provider", "providersite", "site",
+			"program_team", "log", "Facility", "mygroup", "drugs","appointmentArchive"
 		};
 	}
 

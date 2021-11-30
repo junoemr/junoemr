@@ -29,6 +29,7 @@ import static org.junit.Assert.assertNull;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
@@ -38,11 +39,17 @@ import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class E2ECreatorTest extends DatabaseTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class E2ECreatorTest extends DaoTestFixtures
 {
 	private static Logger logger = MiscUtils.getLogger();
 
+	@Autowired
 	protected DemographicDao demographicDao = null;
 	Demographic demographic = null;
 
@@ -67,8 +74,8 @@ public class E2ECreatorTest extends DatabaseTestBase
 			logger.info("dropAndRecreateDatabase");
 			SchemaUtils.dropAndRecreateDatabase();
 		}
-		DaoTestFixtures.setupBeanFactory();
-		demographicDao = SpringUtils.getBean(DemographicDao.class);
+		//DaoTestFixtures.setupBeanFactory();
+		//demographicDao = SpringUtils.getBean(DemographicDao.class);
 
 		demographic = new Demographic();
 		EntityDataGenerator.generateTestDataForModelClass(demographic);

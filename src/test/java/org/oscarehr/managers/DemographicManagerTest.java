@@ -24,10 +24,12 @@ package org.oscarehr.managers;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -36,9 +38,18 @@ import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.LoggedInInfo;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.beans.factory.annotation.Autowired;
+import oscar.log.LogAction;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(LogAction.class)
+@SuppressStaticInitializationFor("oscar.log.LogAction")
 public class DemographicManagerTest
 {
 	@Autowired
@@ -67,6 +78,19 @@ public class DemographicManagerTest
 
 		Mockito.doNothing().when(securityInfoManager).requireOnePrivilege(provider.getProviderNo(), SecurityInfoManager.CREATE, null, "_demographic");
 		Mockito.doNothing().when(demographicDao).save(demographic);
+
+		//PowerMockito.stub(PowerMockito.method(LogAction.class, "addLogEntrySynchronous", String.class, String.class));
+		PowerMockito.mockStatic(LogAction.class);
+
+		try
+		{
+			PowerMockito.doNothing()
+				.when(LogAction.class, "addLogEntrySynchronous", anyString(), anyString());
+		}
+		catch(Exception e)
+		{
+			fail(e.getMessage());
+		}
 
 		demographic = new Demographic();
 

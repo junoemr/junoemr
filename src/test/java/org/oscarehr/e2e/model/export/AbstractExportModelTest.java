@@ -38,6 +38,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest
 public abstract class AbstractExportModelTest extends DaoTestFixtures
 {
+	@Override
+	protected boolean isDatabaseResetEnabled()
+	{
+		return false;
+	}
+
 	@BeforeClass
 	public static void abstractBeforeClass() throws Exception
 	{

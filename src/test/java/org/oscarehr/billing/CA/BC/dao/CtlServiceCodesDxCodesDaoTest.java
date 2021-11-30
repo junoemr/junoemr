@@ -25,17 +25,21 @@ package org.oscarehr.billing.CA.BC.dao;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.CtlServiceCodesDxCodes;
+import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
-import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.DatabaseTestBase;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlServiceCodesDxCodesDaoTest extends DatabaseTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlServiceCodesDxCodesDaoTest extends DaoTestFixtures
 {
-	public CtlServiceCodesDxCodesDao dao = SpringUtils.getBean(CtlServiceCodesDxCodesDao.class);
+	@Autowired
+	public CtlServiceCodesDxCodesDao ctlServiceCodesDxCodesDao;
 
 	public CtlServiceCodesDxCodesDaoTest()
 	{
@@ -54,7 +58,7 @@ public class CtlServiceCodesDxCodesDaoTest extends DatabaseTestBase
 	{
 		CtlServiceCodesDxCodes entity = new CtlServiceCodesDxCodes();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		ctlServiceCodesDxCodesDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

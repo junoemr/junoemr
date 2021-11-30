@@ -1876,6 +1876,7 @@
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
           <argLine>-Xms1024m -Xmx1024m</argLine>
+          <runOrder>alphabetical</runOrder>
 					<includes>
 						<include>integration/tests/*</include>
 						<include>org/oscarehr/common/dao/**/*</include>
