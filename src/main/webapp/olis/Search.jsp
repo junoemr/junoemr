@@ -9,18 +9,14 @@
 
 --%>
 <%@page contentType="text/html"%>
-<%@page import="java.util.*,
-                org.oscarehr.PMmodule.dao.ProviderDao,
+<%@page import="org.oscarehr.PMmodule.dao.ProviderDao,
                 org.oscarehr.common.model.Provider,
-                org.oscarehr.olis.dao.OLISRequestNomenclatureDao,
-                org.oscarehr.olis.dao.OLISResultNomenclatureDao,
-                org.oscarehr.olis.model.OLISRequestNomenclature,
-                org.oscarehr.olis.model.OLISResultNomenclature,
                 org.oscarehr.util.SpringUtils" %>
 <%@page import="org.oscarehr.common.dao.UserPropertyDAO" %>
 	<%@page import="org.oscarehr.common.model.UserProperty" %>
 	<%@page import="org.oscarehr.util.LoggedInInfo" %>
-	<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
+<%@ page import="java.util.List" %>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 	<%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 
 	<% 
@@ -46,10 +42,7 @@
 	<%
 	    }
 	}
-
 	%>
-	
-
 
 	<html>
 	<head>
@@ -58,9 +51,7 @@
 
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title><bean:message key="olis.olisSearch" /></title>
-	<link rel="stylesheet" type="text/css" href="../../../share/css/OscarStandardLayout.css">
 	<link rel="stylesheet" type="text/css" href="../share/css/OscarStandardLayout.css">
-	<script type="text/javascript" src="../../../share/javascript/Oscar.js"></script>
 	<script type="text/javascript" src="../share/javascript/Oscar.js"></script>
 	
 	<script type="text/javascript" src="../share/yui/js/yahoo-dom-event.js"></script>
@@ -277,13 +268,6 @@
 <%
 ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
 List<Provider> allProvidersList = providerDao.getActiveProviders();
-
-OLISResultNomenclatureDao resultDao = (OLISResultNomenclatureDao) SpringUtils.getBean("OLISResultNomenclatureDao");
-List<OLISResultNomenclature> resultNomenclatureList = resultDao.findAll();
-
-OLISRequestNomenclatureDao requestDao = (OLISRequestNomenclatureDao) SpringUtils.getBean("OLISRequestNomenclatureDao");
-List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
-
 %>
 			
 
@@ -595,49 +579,6 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 		</tr>
 		</tr>
 		<tr>
-			<td colspan="4">
-				<table>
-					<tbody><tr>
-						<th width="20%">Test Request Status (max. 15)</th>
-						<td><select multiple="multiple" id="testRequestStatus" name="testRequestStatus">
-						<option value=""></option>
-						<option value="O"> Order Received </option>
-						<option value="I"> No results </option>
-						<option value="P"> Preliminary </option>
-						<option value="A"> Partial </option>
-						<option value="F"> Final </option>
-						<option value="C"> Correction </option>
-						<option value="X"> Cancelled </option>
-						<option value="E"> Expired  </option>
-						</select></td>
-						<th width="20%">Test Result Code (max. 200)</th>
-						<td><select multiple="multiple" style="width:300px;" name="testResultCode" id="testResultCode">
-						<%
-						
-						for (OLISResultNomenclature nomenclature : resultNomenclatureList) {
-						%>
-							<option value="<%=nomenclature.getNameId() %>"><%=oscar.Misc.getStr(nomenclature.getName(), "").trim()%></option>
-					    <%
-						}
-						%>
-						</select></td>
-						<th width="20%">Test Request Code (max. 100)</th>
-						<td><select multiple="multiple" style="width:300px;" name="testRequestCode" id="testRequestCode">
-						<%
-						
-						for (OLISRequestNomenclature nomenclature : requestNomenclatureList) {
-						%>
-							<option value="<%=nomenclature.getNameId() %>"><%=oscar.Misc.getStr(nomenclature.getName(),"").trim() %></option>
-					    <%
-						}
-						%>
-						</select></td>
-					</tr>
-				</tbody></table>
-			</td>
-		</tr>
-		
-		<tr>
 			<td colspan=2><input type="submit" name="submit" value="Search" /></td>
 		</tr>			
 	</tbody></table>
@@ -831,36 +772,6 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 		
 		<tr>
 			<td colspan="4"><hr></td>
-		</tr>
-		<tr>
-			<td colspan="4">
-				<table>
-					<tbody><tr>
-						<th width="20%">Test Result Code (max. 200)</th>
-						<td><input type="text"><br><select multiple="multiple" style="width:300px;" name="testResultCode" id="testResultCode">
-						<%
-						
-						for (OLISResultNomenclature nomenclature : resultNomenclatureList) {
-						%>
-							<option value="<%=nomenclature.getNameId() %>"><%=nomenclature.getName().trim() %></option>
-					    <%
-						}
-						%>
-						</select></td>
-						<th width="20%">Test Request Code (max. 100)</th>
-						<td><input type="text"><br><select multiple="multiple" style="width:300px;" name="testRequestCode" id="testRequestCode">
-						<%
-						
-						for (OLISRequestNomenclature nomenclature : requestNomenclatureList) {
-						%>
-							<option value="<%=nomenclature.getNameId() %>"><%=nomenclature.getName().trim() %></option>
-					    <%
-						}
-						%>
-						</select></td>
-					</tr>
-				</tbody></table>
-			</td>
 		</tr>
 		<tr>
 			<td colspan=2><input type="submit" name="submit" value="Search" /></td>

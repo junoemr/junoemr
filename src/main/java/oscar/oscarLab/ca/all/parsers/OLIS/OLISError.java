@@ -49,6 +49,7 @@ public class OLISError
 		// patient segments
 		message = message.replaceAll("'@PID\\.7'", "Patient Date of Birth");
 		message = message.replaceAll("'@PID\\.8'", "Patient Sex");
+		message = message.replaceAll("'@PID\\.3\\.1'", "Patient Health Number");
 
 		// physician segments
 		message = message.replaceAll("'@ZRP\\.1\\.1'", "Requesting Physician CPSID");
@@ -56,7 +57,6 @@ public class OLISError
 		message = message.replaceAll("'@ZRP\\.1\\.2'", "Requesting Physician First Name");
 		message = message.replaceAll("'@ZRP\\.1\\.3'", "Requesting Physician Last Name");
 		message = message.replaceAll("'@ZRP\\.1\\.4'", "Requesting Physician Middle Name");
-		message = message.replaceAll("'@PID\\.3\\.1'", "Patient Health Number");
 		message = message.replaceAll("'@PV1\\.7\\.1'", "Attending Practitioner CPSID");
 		message = message.replaceAll("'@PV1\\.7\\.13'", "Attending Practitioner Id Type");
 		message = message.replaceAll("'@PV1\\.17\\.1'", "Admitting Practitioner CPSID");
