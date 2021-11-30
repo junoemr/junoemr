@@ -49,6 +49,7 @@ import oscar.OscarProperties;
 import oscar.oscarMessenger.data.MsgProviderData;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
@@ -70,12 +71,16 @@ public class Driver
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
 
-	public static DriverResponse submitOLISQuery(@NotNull Provider loggedInProvider, Query query)
+	public static DriverResponse submitOLISQuery(@NotNull Provider loggedInProvider, @NotNull Query query)
+	{
+		return submitOLISQuery(loggedInProvider, query, null);
+	}
+	public static DriverResponse submitOLISQuery(@NotNull Provider loggedInProvider, @NotNull Query query, @Null String continuationPointer)
 	{
 		DriverResponse response;
 		try
 		{
-			OLISMessage message = new OLISMessage(loggedInProvider, query);
+			OLISMessage message = new OLISMessage(loggedInProvider, query, continuationPointer);
 
 			System.setProperty("javax.net.ssl.trustStore", OscarProperties.getInstance().getProperty("olis_truststore").trim());
 			System.setProperty("javax.net.ssl.trustStorePassword", OscarProperties.getInstance().getProperty("olis_truststore_password").trim());
@@ -120,8 +125,7 @@ public class Driver
 			logger.info("OLIS Request" +
 					"\nclientTransactionId: " + message.getTransactionId() +
 					"\nrequest URL: " + olisRequestURL +
-					"\nhl7 request query:\n" + olisHL7String
-			);
+					"\nhl7 request query:\n" + olisHL7String.replaceAll("\r", "\n"));
 
 			if (OscarProperties.getInstance().getProperty("olis_simulate", "no").equals("yes"))
 			{
@@ -142,6 +146,7 @@ public class Driver
 				String unsignedData = Driver.unsignData(signedData);
 
 				response = readResponseFromXML(loggedInProvider.getProviderNo(), unsignedData);
+				response.setHl7Request(olisHL7String);
 				response.setUnsignedRequest(msgInXML);
 				response.setSignedRequest(signedRequest);
 				response.setSignedResponse(signedData);

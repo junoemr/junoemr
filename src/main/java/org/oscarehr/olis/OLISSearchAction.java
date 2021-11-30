@@ -74,6 +74,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static com.indivica.olis.parameters.ZPD1.CONSENT_MARKER_SUBSTITUTE;
@@ -84,7 +85,7 @@ public class OLISSearchAction extends DispatchAction
 	private final ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
 	private final UserPropertyDAO userPropertyDAO = SpringUtils.getBean(UserPropertyDAO.class);
 
-	public static HashMap<String, Query> searchQueryMap = new HashMap<String, Query>();
+	public static Map<String, Query> searchQueryMap = new HashMap<>();
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
@@ -94,12 +95,15 @@ public class OLISSearchAction extends DispatchAction
 		
 		String queryType = request.getParameter("queryType");
 		boolean redo = "true".equals(request.getParameter("redo"));
-		if (redo) {
+		if (redo)
+		{
 			String uuid = request.getParameter("uuid");
 			request.setAttribute("searchUuid", uuid);
 			boolean force = "true".equals(request.getParameter("force"));
-			Query query = (Query)searchQueryMap.get(uuid).clone();
-			if (force)
+			String continuationPointer = StringUtils.trimToNull(request.getParameter("continuationPointer"));
+
+			Query query = (Query) searchQueryMap.get(uuid).clone();
+			if(force)
 			{
 				fillConsentOverrideSegments(request, query);
 
@@ -115,8 +119,7 @@ public class OLISSearchAction extends DispatchAction
 				request.setAttribute("demographic", demo);
 			}
 
-			driverResponse = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), query);
-			
+			driverResponse = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), query, continuationPointer);
 		}
 		else if (queryType != null) {
 			Query query = null;
@@ -830,6 +833,8 @@ public class OLISSearchAction extends DispatchAction
 			request.setAttribute("olisResponseContent", driverResponse.getHl7Response());
 			request.setAttribute("errors", driverResponse.getErrors());
 			request.setAttribute("searchException", driverResponse.getSearchException());
+
+			driverResponse.getContinuationPointer().ifPresent(s -> request.setAttribute("continuationPointer", s));
 		}
 		
 		return mapping.findForward("results");

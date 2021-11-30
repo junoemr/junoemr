@@ -35,6 +35,7 @@ public class DriverResponse
 	private String signedRequest;
 	private String signedResponse;
 	private String unsignedResponse;
+	private String hl7Request;
 	private String hl7Response;
 	private List<String> errors;
 	private Exception searchException; // legacy property

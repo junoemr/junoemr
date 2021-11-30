@@ -8,15 +8,16 @@
     and "gnu.org/licenses/gpl-2.0.html".
 
 --%>
-<%@page contentType="text/html;" %>
-<%@page import="java.util.*,
-                oscar.oscarLab.ca.all.parsers.Factory,
-                oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler,
-                oscar.oscarLab.ca.all.parsers.OLIS.OLISError,
-                org.oscarehr.olis.OLISResultsAction" %>
-<%@page import="org.oscarehr.util.MiscUtils" %>
+<%@ page contentType="text/html;" %>
+<%@ page import="java.util.List" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.Factory" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler" %>
+<%@ page import="org.oscarehr.olis.OLISResultsAction" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.oscarehr.dataMigration.model.demographic.Demographic" %>
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
+<%@ page import="java.util.HashSet" %>
+<%@ page import="java.util.ArrayList" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -165,6 +166,7 @@
 			}
 			String resp = StringUtils.trimToEmpty((String) request.getAttribute("olisResponseContent"));
 			List<String> resultList = (List<String>) request.getAttribute("resultList");
+			String continuationPointer = (String) request.getAttribute("continuationPointer");
 
 			boolean hasBlockedContent = false;
 			try {
@@ -368,7 +370,24 @@
 							}
 						}%>
 					</table></td></tr>
-				<% } %>
+				<%
+				}
+				if(StringUtils.isNotBlank(continuationPointer))
+				{
+				%>
+				<tr>
+					<td>
+						<form  action="<%=request.getContextPath()%>/olis/Search.do"
+						       onsubmit="return confirm('Are you sure you want to resubmit this query?')">
+							<input type="hidden" name="redo" value="true" />
+							<input type="hidden" name="continuationPointer" value="<%=continuationPointer%>" />
+							<input type="hidden" name="uuid" value="<%=(String)request.getAttribute("searchUuid")%>" />
+							<input type="hidden" name="demographic" value="<%=(demographic != null) ? demographic.getId() : "" %>" />
+							<input type="submit" value="Retrieve more Results" />
+						</form>
+				</tr>
+				<%
+				}%>
 			</table>
 			<%
 			}
