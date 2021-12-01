@@ -274,7 +274,7 @@ List<Provider> allProvidersList = providerDao.getActiveProviders();
 	<select id="queryType" onchange="displaySearch(this)" style="margin-left:30px;">
 		<option value="Z01">Z01 - Retrieve Laboratory Information for Patient</option>
 		<option value="Z02">Z02 - Retrieve Laboratory Information for Order ID</option>
-		<%-- REMOVED UNTIL IT'S OPERATIONAL, REQUESTED BY ONTARIO MD option value="Z04">Z04 - Retrieve Laboratory Information Updates for Practitioner</option  --%>
+		<option value="Z04">Z04 - Retrieve Laboratory Information Updates for Practitioner</option>
 <%--		REMOVED Below queries as they are not required for OLIS conformance --%>
 <%--		<option value="Z05">Z05 - Retrieve Laboratory Information Updates for Destination Laboratory</option>--%>
 <%--		<option value="Z06">Z06 - Retrieve Laboratory Information Updates for Ordering Facility</option>--%>
@@ -742,13 +742,13 @@ List<Provider> allProvidersList = providerDao.getActiveProviders();
 
 	<form action="<%=request.getContextPath() %>/olis/Search.do" method="POST">
 	<input type="hidden" name="queryType" value="Z04" />
-	<table id="Z04_query" style="display: none;">
+	<table id="Z04_query">
 		<tbody>
 		<tr>
 			<td colspan=2><input type="submit" name="submit" value="Search" /></td>
 		</tr>
 		<tr>
-			<th width="20%">Date &amp; Time Period to Search<br />(yyyy-mm-dd)</th>
+			<th width="20%" class="required">Date &amp; Time Period to Search<br />(yyyy-mm-dd)</th>
 			<td width="30%"><input style="width:150px" type="text" name="startTimePeriod" id="startTimePeriod" value="" > to <input style="width:150px" name="endTimePeriod" type="text" id="endTimePeriod" ></td>
 			<th width="20%"><input class="checkbox" type="checkbox" name="quantityLimitedQuery" id="quantityLimitedQuery"> Quantity Limit?</th>
 			<td width="30%">Quantity<br><input type="text" id="quantityLimit" name="quantityLimit"></td>
@@ -757,17 +757,20 @@ List<Provider> allProvidersList = providerDao.getActiveProviders();
 			<td colspan=4><hr /></td>
 		</tr>
 		<tr>
-			<td width="20%"><span>Requesting HIC</span></td><td><select multiple="multiple" name="requestingHic" id="requestingHic">
-			
-			<option value=""></option>
-			<%
-			for (Provider provider : allProvidersList) {
+			<td width="20%"><span class="required">Requesting HIC</span></td>
+			<td>
+				<select name="requestingHic" id="requestingHic">
+
+				<option value=""></option>
+				<%
+				for (Provider provider : allProvidersList) {
+					%>
+					<option value="<%=provider.getProviderNo() %>">[<%=provider.getProviderNo()%>] <%=provider.getLastName() %>, <%=provider.getFirstName() %></option>
+				<%
+				}
 				%>
-				<option value="<%=provider.getProviderNo() %>">[<%=provider.getProviderNo()%>] <%=provider.getLastName() %>, <%=provider.getFirstName() %></option>
-			<%	
-			}
-			%>
-</select></td>		
+				</select>
+			</td>
 		</tr>
 		
 		<tr>

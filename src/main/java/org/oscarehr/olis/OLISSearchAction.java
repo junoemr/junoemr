@@ -511,34 +511,38 @@ public class OLISSearchAction extends DispatchAction
 				logConsentGiven(loggedInInfo.getLoggedInProviderNo(), demographicNo, request);
 
 
-			} else if (queryType.equalsIgnoreCase("Z04")) {
+			}
+			else if (queryType.equalsIgnoreCase("Z04"))
+			{
 				query = new Z04Query();
 
 				String startTimePeriod = request.getParameter("startTimePeriod");
 				String endTimePeriod = request.getParameter("endTimePeriod");
 
-				try {
-					if (startTimePeriod != null && startTimePeriod.trim().length() > 0) {
+				try
+				{
+					OBR22 obr22 = new OBR22();
+					if(StringUtils.isNotBlank(startTimePeriod))
+					{
 						Date startTime = DateUtils.parseDate(startTimePeriod, dateFormat);
-						if (endTimePeriod != null && endTimePeriod.trim().length() > 0) {
+						if(StringUtils.isNotBlank(endTimePeriod))
+						{
 							Date endTime = changeToEndOfDay(DateUtils.parseDate(endTimePeriod, dateFormat));
 
-							List<Date> dateList = new LinkedList<Date>();
+							List<Date> dateList = new LinkedList<>();
 							dateList.add(startTime);
 							dateList.add(endTime);
-
-							OBR22 obr22 = new OBR22();
 							obr22.setValue(dateList);
-
-							((Z04Query) query).setStartEndTimestamp(obr22);
-						} else {
-							OBR22 obr22 = new OBR22();
-							obr22.setValue(startTime);
-
-							((Z04Query) query).setStartEndTimestamp(obr22);
 						}
+						else
+						{
+							obr22.setValue(startTime);
+						}
+						((Z04Query) query).setStartEndTimestamp(obr22);
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't parse date given for OLIS query", e);
 				}
 
@@ -546,12 +550,16 @@ public class OLISSearchAction extends DispatchAction
 				String quantityLimitedQuery = request.getParameter("quantityLimitedQuery");
 				String quantityLimit = request.getParameter("quantityLimit");
 
-				try {
-					if (quantityLimitedQuery != null && quantityLimitedQuery.trim().length() > 0) {
+				try
+				{
+					if(quantityLimitedQuery != null && quantityLimitedQuery.trim().length() > 0)
+					{
 						// Checked
 						((Z04Query) query).setQuantityLimitedRequest(new QRD7(Integer.parseInt(quantityLimit)));
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't parse the number given for quantity limit in OLIS query", e);
 				}
 
@@ -559,21 +567,25 @@ public class OLISSearchAction extends DispatchAction
 				// Requesting HIC (ZRP.1 -- pull data from db and add to query)
 				String requestingHicProviderNo = request.getParameter("requestingHic");
 
-				try {
-					if (requestingHicProviderNo != null && requestingHicProviderNo.trim().length() > 0) {
+				try
+				{
+					if(StringUtils.isNotBlank(requestingHicProviderNo))
+					{
 						ProviderData provider = providerDao.find(requestingHicProviderNo);
 
 						ZRP1 zrp1 = new ZRP1(provider.getOlisPractitionerNo(),
 								ZRP1.ID_TYPE_CODE_MDL,
 								ZRP1.ASSIGNING_JURISDICTION,
 								ZRP1.ASSIGNING_JURISDICTION_CODING_SYSTEM,
-								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_LAST_NAME),
-								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_FIRST_NAME),
-								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_SECOND_NAME));
+								userPropertyDAO.getStringValue(provider.getId(), UserProperty.OFFICIAL_LAST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(), UserProperty.OFFICIAL_FIRST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(), UserProperty.OFFICIAL_SECOND_NAME));
 
 						((Z04Query) query).setRequestingHic(zrp1);
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't add requested requesting HIC data to OLIS query", e);
 				}
 
@@ -831,24 +843,8 @@ public class OLISSearchAction extends DispatchAction
 			String searchUuid = UUID.randomUUID().toString();
 			searchQueryMap.put(searchUuid, query);
 			request.setAttribute("searchUuid", searchUuid);
-			if(queryType.equals("Z04") && request.getParameterValues("requestingHic") != null && request.getParameterValues("requestingHic").length>1) {
-				for(String providerNo:request.getParameterValues("requestingHic")) {
-					ProviderData provider = providerDao.find(providerNo);
-					ZRP1 zrp1 = new ZRP1(provider.getOlisPractitionerNo(),
-							ZRP1.ID_TYPE_CODE_MDL,
-							ZRP1.ASSIGNING_JURISDICTION,
-							ZRP1.ASSIGNING_JURISDICTION_CODING_SYSTEM,
-							userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_LAST_NAME),
-							userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_FIRST_NAME),
-							userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_SECOND_NAME));
-					((Z04Query) query).setRequestingHic(zrp1);
-					driverResponse = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), query);
-				}
-			}
-			else {
-				driverResponse = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), query);
-			}
 
+			driverResponse = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), query);
 		}
 
 		if(driverResponse != null)
