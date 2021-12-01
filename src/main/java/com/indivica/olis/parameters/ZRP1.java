@@ -14,7 +14,10 @@ package com.indivica.olis.parameters;
  * @author jen
  *
  */
-public class ZRP1 implements Parameter {
+public class ZRP1 implements Parameter
+{
+
+	public static final String ID_TYPE_CODE_MDL = "MDL";
 
 	private String idNumber;
 	private String idTypeCode;

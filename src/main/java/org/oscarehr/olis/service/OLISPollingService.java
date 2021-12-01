@@ -139,8 +139,8 @@ public class OLISPollingService
 			    ZRP1 zrp1 = new ZRP1(
 					    provider.getOlisPractitionerNo(),
 					    olisIdType,
-					    "ON",
-					    "HL70347",
+					    ZRP1.ASSIGNING_JURISDICTION,
+					    ZRP1.ASSIGNING_JURISDICTION_CODING_SYSTEM,
 					    officialLastName,
 					    officialFirstName,
 					    officialSecondName);
