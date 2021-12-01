@@ -40,13 +40,19 @@ export enum SYSTEM_PROPERTIES
     // AQS
     AQS_ORGANIZATION_ID = "aqs_organization_id",
     AQS_ORGANIZATION_SECRET = "aqs_api_secret_key",
+
+    // UI
+    UI_CUSTOM_NAV_ICON = "ui_custom_nav",
+    UI_LOCK_TO_JUNO_UI = "ui_lock",
 }
 
 export enum INSTANCE_TYPE
 {
     BC = "BC",
     ON = "ON",
-    AB = "AB"
+    AB = "AB",
+    SK = "SK",
+    PEI = "PE",
 }
 
 export enum BILLING_TYPE {
