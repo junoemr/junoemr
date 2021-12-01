@@ -92,7 +92,7 @@
 							</juno-security-check>
 						</div>
 
-						<div class="tab-pane h-100vh" id="tracker">
+						<div class="tab-pane" id="tracker">
 							<ui-view></ui-view>
 						</div>
 					</div><!-- tab content -->
