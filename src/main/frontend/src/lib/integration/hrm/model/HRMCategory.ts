@@ -21,7 +21,6 @@
 * Canada
 */
 
-import {HRMCategoryTransferInbound, HrmCategoryModel} from "../../../../../generated";
 import HrmSubClass from "./HrmSubClass";
 
 export default class HrmCategory
@@ -40,6 +39,11 @@ export default class HrmCategory
   get id(): number
   {
     return this._id;
+  }
+
+  set id(value: number)
+  {
+    this._id = value;
   }
 
   get name(): string

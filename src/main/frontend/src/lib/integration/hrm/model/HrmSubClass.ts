@@ -30,6 +30,11 @@ export default class HrmSubClass
     return this._id;
   }
 
+  set id(value: number)
+  {
+    this._id = value;
+  }
+
   get hrmCategoryId(): number
   {
     return this._hrmCategoryId;
