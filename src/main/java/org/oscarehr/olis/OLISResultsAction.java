@@ -98,7 +98,7 @@ public class OLISResultsAction extends DispatchAction
 				errors.addAll(handler.getReportErrors().stream().map(OLISError::userFriendlyToString).collect(Collectors.toList()));
 				if(handler.resultStatusNotFound())
 				{
-					errors.add("Request did not find and data");
+					errors.add("Request did not find any data");
 					continue;
 				}
 
