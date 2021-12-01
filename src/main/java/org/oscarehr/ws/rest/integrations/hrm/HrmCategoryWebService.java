@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.hospitalReportManager.converter.HRMCategoryImportMapper;
 import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
 import org.oscarehr.hospitalReportManager.service.HRMCategoryService;
-import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -58,14 +57,11 @@ public class HrmCategoryWebService extends AbstractServiceImpl
 	@Autowired
 	HRMCategoryService categoryService;
 
-	@Autowired
-	SecurityInfoManager securityService;
-
 	@POST
 	@Path("/")
 	public RestResponse<HrmCategoryModel> createCategory(HRMCategoryTransferInbound transferIn) throws Exception
 	{
-		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_CREATE);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_CREATE);
 
 		HrmCategoryModel categoryToCreate = importMapper.convert(transferIn);
 		HrmCategoryModel created = categoryService.createCategory(categoryToCreate);
@@ -76,7 +72,7 @@ public class HrmCategoryWebService extends AbstractServiceImpl
 	@Path("/{categoryId}/")
 	public RestResponse<HrmCategoryModel> getActiveCategory(@PathParam("categoryId") Integer categoryId) throws Exception
 	{
-		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
 
 		HrmCategoryModel found = categoryService.getActiveCategory(categoryId);
 		return RestResponse.successResponse(found);
@@ -86,7 +82,7 @@ public class HrmCategoryWebService extends AbstractServiceImpl
 	@Path("/{categoryId}/")
 	public RestResponse<HrmCategoryModel> deactivateCategory(@PathParam("categoryId") Integer categoryId) throws Exception
 	{
-		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_DELETE);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_DELETE);
 
 		HrmCategoryModel deactivated = categoryService.deactivateCategory(categoryId);
 		return RestResponse.successResponse(deactivated);
@@ -96,7 +92,7 @@ public class HrmCategoryWebService extends AbstractServiceImpl
 	@Path("/{categoryId}/")
 	public RestResponse<HrmCategoryModel> updateCategory(@PathParam("categoryId") Integer categoryId, HRMCategoryTransferInbound transferIn) throws Exception
 	{
-		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_UPDATE);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_UPDATE);
 
 		HrmCategoryModel categoryToUpdate = importMapper.convert(transferIn);
 		categoryToUpdate.setId(categoryId);

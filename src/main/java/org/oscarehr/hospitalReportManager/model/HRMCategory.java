@@ -22,6 +22,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Entity
@@ -39,7 +40,7 @@ public class HRMCategory extends AbstractModel<Integer>
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmCategory")
 	private List<HRMDocument> documentList;
 
-	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmCategory", cascade = CascadeType.ALL)
+	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmCategory", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<HRMSubClass> subClassList;
 
 	@Override
@@ -51,5 +52,13 @@ public class HRMCategory extends AbstractModel<Integer>
 	public boolean isDisabled()
 	{
 		return this.disabledAt != null;
+	}
+
+	public List<HRMSubClass> getActiveSubClasses()
+	{
+		return this.subClassList
+			.stream()
+			.filter(subClass -> !subClass.isDisabled())
+			.collect(Collectors.toList());
 	}
 }

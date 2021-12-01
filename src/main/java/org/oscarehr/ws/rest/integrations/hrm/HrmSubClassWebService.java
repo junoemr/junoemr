@@ -3,7 +3,6 @@ package org.oscarehr.ws.rest.integrations.hrm;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.dataMigration.model.hrm.HrmSubClassModel;
 import org.oscarehr.hospitalReportManager.service.HRMSubClassService;
-import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -27,9 +26,6 @@ public class HrmSubClassWebService extends AbstractServiceImpl
 	@Autowired
 	HRMSubClassService hrmSubClassService;
 
-	@Autowired
-	SecurityInfoManager securityService;
-
 	@GET
 	@Path("/")
 	public RestResponse<HrmSubClassModel> findActiveByAttributes(
@@ -38,7 +34,7 @@ public class HrmSubClassWebService extends AbstractServiceImpl
 		@QueryParam("subClassName") String subClassName,
 		@QueryParam("accompanyingSubClassName") String accompanyingSubClassName)
 	{
-		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
 
 		HrmSubClassModel model = hrmSubClassService.findActiveByAttributes(facilityId, reportClass, subClassName, accompanyingSubClassName);
 		return RestResponse.successResponse(model);

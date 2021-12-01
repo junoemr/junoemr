@@ -45,7 +45,7 @@ public class HrmCategoryDbToModelConverter extends AbstractModelConverter<HRMCat
 		HrmCategoryModel model = new HrmCategoryModel();
 		model.setId(entity.getId());
 		model.setName(entity.getCategoryName());
-		model.setSubClasses(subClassConverter.convert(entity.getSubClassList()));
+		model.setSubClasses(subClassConverter.convert(entity.getActiveSubClasses()));
 		model.setDisabledAt(entity.getDisabledAt());
 
 		return model;

@@ -87,7 +87,7 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 					ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 					ctrl.category = ctrl.resolve.category;
 
-					if(!Juno.Common.Util.exists(ctrl.category))
+					if(!ctrl.category)
 					{
 						ctrl.isCreate = true;
 						ctrl.title = "Create a New HRM Category";
@@ -215,11 +215,7 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 				ctrl.isSubClassComplete = () =>
 				{
 					let subClass = ctrl.newSubClass;
-
-					// Facility number is filled out and either subclass or accompanying subclass depending on the reportType
-					return subClass.facilityNumber &&
-					((subClass.reportClass === HrmReportClass.MEDICAL_RECORDS && subClass.subClassName) ||
-						(subClass.reportClass === HrmReportClass.DIAGNOSTIC_IMAGING || subClass.reportClass === HrmReportClass.CARDIO_RESPIRATORY) && subClass.accompanyingSubClassName)
+					return subClass.isCompleteMapping()
 				}
 
 				ctrl.onReportClassChange = (newValue) =>
@@ -239,13 +235,10 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 				{
 					const newSubClass = ctrl.newSubClass;
 
-					const alreadyOnThisCategory = ctrl.category.subClasses.filter(existing =>
-					{
-						return existing.facilityNumber === newSubClass.facilityNumber &&
-							existing.reportClass === newSubClass.reportClass &&
-							existing.subClassName === newSubClass.subClassName &&
-							existing.accompanyingSubClassName === existing.accompanyingSubClassName
-					}).length > 0
+					const alreadyOnThisCategory = ctrl.category.subClasses
+						.filter(existing => existing.equals(newSubClass))
+						.length > 0
+
 					if (alreadyOnThisCategory)
 					{
 						Juno.Common.Util.errorAlert($uibModal, "In Use", "That subclass is already assigned to this category");
@@ -257,6 +250,7 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 						newSubClass.reportClass,
 						newSubClass.subClassName,
 						newSubClass.accompanyingSubClassName);
+
 					if (alreadyOnAnotherCategory != null)
 					{
 						const hrmCategory = await hrmService.getActiveCategory(alreadyOnAnotherCategory.hrmCategoryId);

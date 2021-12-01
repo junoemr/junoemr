@@ -42,6 +42,7 @@ public class HRMSubClassImportMapper
 	public HrmSubClassModel convert(HRMSubClassTransferInbound transfer, Integer parentId)
 	{
 		HrmSubClassModel model = new HrmSubClassModel();
+		model.setId(transfer.getId());
 		model.setHrmCategoryId(parentId);
 		model.setFacilityNumber(transfer.getFacilityNumber());
 		model.setClassName(transfer.getClassName());

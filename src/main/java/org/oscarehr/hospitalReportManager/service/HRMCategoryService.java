@@ -27,6 +27,7 @@ import org.oscarehr.dataMigration.converter.in.hrm.HrmCategoryModelToDbConverter
 import org.oscarehr.dataMigration.converter.in.hrm.HrmSubClassModelToDbConverter;
 import org.oscarehr.dataMigration.converter.out.hrm.HrmCategoryDbToModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
+import org.oscarehr.dataMigration.model.hrm.HrmSubClassModel;
 import org.oscarehr.hospitalReportManager.dao.HRMCategoryDao;
 import org.oscarehr.hospitalReportManager.model.HRMCategory;
 import org.oscarehr.hospitalReportManager.model.HRMSubClass;
@@ -36,6 +37,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -143,28 +145,38 @@ public class HRMCategoryService
 
 	HRMCategory reconcile(HRMCategory entity, HrmCategoryModel newModel)
 	{
-		Set<Integer> newSubClassIds = new HashSet<>();
-		newModel.getSubClasses().forEach(subClass -> {
+		// Separate the subclass list on the updated entity into two parts
+		// subClasses with id (previously existing) and those without id (new)
+
+		Set<Integer> activeSubClasses = new HashSet<>();
+		List<HrmSubClassModel> newSubClasses = new ArrayList<>();
+
+		for (HrmSubClassModel subClass : newModel.getSubClasses())
+		{
 			if (subClass.getId() != null)
 			{
-				newSubClassIds.add(subClass.getId());
+				activeSubClasses.add(subClass.getId());
 			}
-		});
-
-		// If a subclass exists in the old set, but not in the new set, it was deactivated
-		LocalDateTime now = LocalDateTime.now();
-		entity.getSubClassList().forEach(subClass -> {
-			if (!newSubClassIds.contains(subClass.getId()))
+			else
 			{
-				subClass.setDisabledAt(now);
+				newSubClasses.add(subClass);
 			}
-		});
+		}
 
-		// If a subclass doesn't have an id in the new set, it needs to be created
-		newModel.getSubClasses()
-			.stream()
-			.filter(subClass -> subClass.getId() == null)
-			.forEach(newSubClass -> entity.getSubClassList().add(subClassToDBConverter.convert(newSubClass, entity)));
+		// Check if any existing subclasses on the entity are missing from the updated set.
+		// If so, those subclasses should be deactivated.
+		LocalDateTime now = LocalDateTime.now();
+		List<HRMSubClass> existingSubClasses = entity.getActiveSubClasses();
+		for (HRMSubClass existingSubClass: existingSubClasses)
+		{
+			if (!activeSubClasses.contains(existingSubClass.getId()))
+			{
+				existingSubClass.setDisabledAt(now);
+			}
+		}
+
+		// Add any new ones to the entity
+		newSubClasses.forEach(newSubClass -> entity.getSubClassList().add(subClassToDBConverter.convert(newSubClass, entity)));
 
 		return entity;
 	}

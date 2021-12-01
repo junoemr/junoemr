@@ -26,7 +26,6 @@ package org.oscarehr.ws.rest.integrations.hrm;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
 import org.oscarehr.hospitalReportManager.service.HRMCategoryService;
-import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -50,14 +49,11 @@ public class HrmCategoriesWebService extends AbstractServiceImpl
 	@Autowired
 	HRMCategoryService categoryService;
 
-	@Autowired
-	SecurityInfoManager securityService;
-
 	@GET
 	@Path("/")
 	public RestResponse<List<HrmCategoryModel>> getActiveCategories() throws Exception
 	{
-		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
 		List<HrmCategoryModel> activeCategories = categoryService.getActiveCategories();
 
 		return RestResponse.successResponse(activeCategories);

@@ -30,6 +30,7 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HRMSubClassTransferInbound
 {
+	Integer id;
 	String className;
 	String subClassName;
 	String accompanyingSubClassName;
