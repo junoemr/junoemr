@@ -77,6 +77,7 @@ public class OscarAppointmentDaoTest extends DaoTestFixtures
 		a.setProviderNo("999998");
 		a.setStatus("t");
 		a.setUpdateDateTime(new Date());
+		a.setLocation("Location");
 		oscarAppointmentDao.persist(a);
 
 		assertNotNull(a.getId());

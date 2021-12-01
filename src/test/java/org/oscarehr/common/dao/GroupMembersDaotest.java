@@ -27,13 +27,18 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.GroupMembers;
 import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class GroupMembersDaotest extends DatabaseTestBase
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class GroupMembersDaotest extends DaoTestFixtures
 {
 
 	protected GroupMembersDao dao = (GroupMembersDao)SpringUtils.getBean("groupMembersDao");

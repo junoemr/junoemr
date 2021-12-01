@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Import;
 import oscar.OscarProperties;
 
@@ -136,6 +137,8 @@ public class SeleniumTestBase extends DatabaseTestBase
 			firefoxOptions.setBinary(ffb);
 			driver = new FirefoxDriver(firefoxOptions);
 		}
+
+		driver.manage().timeouts().implicitlyWait(WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 
 		Navigation.doLogin(
 			AuthUtils.TEST_USER_NAME,
