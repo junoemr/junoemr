@@ -31,14 +31,20 @@ import java.util.Optional;
 @Data
 public class DriverResponse
 {
-	private String unsignedRequest;
-	private String signedRequest;
-	private String signedResponse;
-	private String unsignedResponse;
 	private String hl7Request;
 	private String hl7Response;
 	private List<String> errors;
 	private Exception searchException; // legacy property
+
+	public boolean hasHl7()
+	{
+		return hl7Response != null;
+	}
+
+	public boolean hasErrors()
+	{
+		return errors != null && !errors.isEmpty();
+	}
 
 	public Optional<String> getContinuationPointer()
 	{

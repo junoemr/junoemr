@@ -147,10 +147,6 @@ public class Driver
 
 				response = readResponseFromXML(loggedInProvider.getProviderNo(), unsignedData);
 				response.setHl7Request(olisHL7String);
-				response.setUnsignedRequest(msgInXML);
-				response.setSignedRequest(signedRequest);
-				response.setSignedResponse(signedData);
-				response.setUnsignedResponse(unsignedData);
 			}
 		}
 		catch(Exception e)

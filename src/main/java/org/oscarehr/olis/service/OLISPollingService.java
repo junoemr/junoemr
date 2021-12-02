@@ -51,23 +51,29 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
 import oscar.util.ConversionUtils;
 
 import javax.validation.constraints.NotNull;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler.OLIS_MESSAGE_TYPE;
 import static oscar.oscarLab.ca.all.upload.handlers.OLISHL7Handler.ALL_DUPLICATES_MARKER;
 
 @Service
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class OLISPollingService
 {
 	public static final String OLIS_DATE_FORMAT = "yyyyMMddHHmmssZ";
@@ -125,9 +131,10 @@ public class OLISPollingService
 	    		String officialFirstName = userPropertyDAO.getStringValue(providerId,UserProperty.OFFICIAL_FIRST_NAME);
 				String officialSecondName = userPropertyDAO.getStringValue(providerId,UserProperty.OFFICIAL_SECOND_NAME);
 				String olisIdType = userPropertyDAO.getStringValue(providerId, UserProperty.OFFICIAL_OLIS_IDTYPE);
+				String olisId =  provider.getOlisPractitionerNo();
 				
 				//There is no need to query for users without this configured, it will just end in an error.
-	    		if(StringUtils.isBlank(officialLastName) || StringUtils.isBlank(olisIdType))
+	    		if(StringUtils.isBlank(officialLastName) || StringUtils.isBlank(olisIdType) || StringUtils.isBlank(olisId))
 	    		{
 	    			continue;
 	    		}
@@ -137,7 +144,7 @@ public class OLISPollingService
 				Z04Query providerQuery = new Z04Query();
 				// Setting HIC for Z04 Request
 			    ZRP1 zrp1 = new ZRP1(
-					    provider.getOlisPractitionerNo(),
+					    olisId,
 					    olisIdType,
 					    ZRP1.ASSIGNING_JURISDICTION,
 					    ZRP1.ASSIGNING_JURISDICTION_CODING_SYSTEM,
@@ -150,6 +157,10 @@ public class OLISPollingService
 				Pair<ZonedDateTime, ZonedDateTime> startEnd = findStartEndTimestamps(olisProviderPreferences);
 				String timeStampForNextStartDate = queryAndImportDateRange(loggedInInfo, providerQuery, startEnd.getLeft(), startEnd.getRight());
 				updateProviderStartTime(olisProviderPreferences, timeStampForNextStartDate);
+			}
+			catch(OLISAckFailedException e)
+			{
+				logger.warn("Error polling OLIS for provider " + provider.getProviderNo() + ": " + e.getMessage());
 			}
 			catch(Exception e)
 			{
@@ -199,26 +210,39 @@ public class OLISPollingService
 
 	private String queryAndImportDateRange(LoggedInInfo loggedInInfo, DateRangeQuery query, ZonedDateTime startDateTime, ZonedDateTime endDateTime) throws Exception
 	{
+		List<GenericFile> labTempFiles = new LinkedList<>();
 		OBR22 obr22 = buildRequestStartEndTimestamp(startDateTime, endDateTime);
 		query.setStartEndTimestamp(obr22);
 
 		logger.info("Submit OLIS query for date range: " + ConversionUtils.toDateTimeString(startDateTime) +
 				" to " + ((endDateTime != null) ? ConversionUtils.toDateTimeString(endDateTime) : "present"));
-		DriverResponse driverResponse = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), query);
-		String unsignedResponse = driverResponse.getUnsignedResponse();
-
-		if(!unsignedResponse.startsWith("<Response"))
-		{
-			logger.error("response does not match, aborting " + unsignedResponse);
-			return null;
-		}
 
 		String timeStampForNextStartDate = null;
-		GenericFile labTempFile = writeLabFileTempFile(driverResponse.getHl7Response());
+		Optional<String> continuationPointerOption = Optional.empty();
+		do
+		{
+			DriverResponse driverResponse = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), query, continuationPointerOption.orElse(null));
+			continuationPointerOption = driverResponse.getContinuationPointer();
+
+			if(driverResponse.hasErrors() || !driverResponse.hasHl7())
+			{
+				logger.error("response contains errors, aborting:\n" + String.join("\n", driverResponse.getErrors()));
+				return null;
+			}
+			labTempFiles.add(writeLabFileTempFile(driverResponse.getHl7Response()));
+
+		} while(continuationPointerOption.isPresent());
+
+		Map<GenericFile, String> resultMap = new HashMap<>();
 		try
 		{
-			timeStampForNextStartDate = parseAndImportResponse(loggedInInfo, labTempFile);
-
+			for(GenericFile labTempFile : labTempFiles)
+			{
+				// according to OLIS the last timestamp should always be in the last result,
+				// so using the result from the last file processed should be ok.
+				timeStampForNextStartDate = parseAndImportResponse(loggedInInfo, labTempFile);
+				resultMap.put(labTempFile, timeStampForNextStartDate);
+			}
 			// force recursive call attempt if response has labs but all are duplicates. Otherwise polling will get stuck.
 			if(ALL_DUPLICATES_MARKER.equals(timeStampForNextStartDate))
 			{
@@ -241,13 +265,17 @@ public class OLISPollingService
 		finally
 		{
 			// don't keep unused files - it will fill up the server fast
-			if(timeStampForNextStartDate == null || ALL_DUPLICATES_MARKER.equals(timeStampForNextStartDate))
+			for(GenericFile labTempFile : labTempFiles)
 			{
-				labTempFile.deleteFile();
-			}
-			else
-			{
-				labTempFile.moveToLabs();
+				String timeStampStr = resultMap.get(labTempFile);
+				if(timeStampStr == null || ALL_DUPLICATES_MARKER.equals(timeStampStr))
+				{
+					labTempFile.deleteFile();
+				}
+				else
+				{
+					labTempFile.moveToLabs();
+				}
 			}
 		}
 
@@ -270,7 +298,7 @@ public class OLISPollingService
 		return timeStampForNextStartDate;
 	}
 
-	private GenericFile writeLabFileTempFile(String hl7Response) throws Exception
+	private GenericFile writeLabFileTempFile(String hl7Response) throws IOException, InterruptedException
 	{
 		return FileFactory.createTempFile(new ByteArrayInputStream(hl7Response.getBytes(StandardCharsets.UTF_8)), "-olis-response.hl7");
 	}

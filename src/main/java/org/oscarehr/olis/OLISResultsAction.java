@@ -60,10 +60,6 @@ public class OLISResultsAction extends DispatchAction
 					if(!olisXmlResponse.trim().equalsIgnoreCase(""))
 					{
 						DriverResponse driverResponse = Driver.readResponseFromXML(loggedInProviderNo, olisXmlResponse);
-						request.setAttribute("msgInXML", driverResponse.getUnsignedRequest());
-						request.setAttribute("signedRequest", driverResponse.getSignedRequest());
-						request.setAttribute("signedData", driverResponse.getSignedResponse());
-						request.setAttribute("unsignedResponse", driverResponse.getUnsignedResponse());
 						request.setAttribute("olisResponseContent", driverResponse.getHl7Response());
 						request.setAttribute("errors", driverResponse.getErrors());
 						request.setAttribute("searchException", driverResponse.getSearchException());

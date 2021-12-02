@@ -109,7 +109,8 @@ public class OLISConfigService
 	{
 		String officialLastName  = userPropertyDAO.getStringValue(providerId, UserProperty.OFFICIAL_LAST_NAME);
 		String olisIdType = userPropertyDAO.getStringValue(providerId, UserProperty.OFFICIAL_OLIS_IDTYPE);
+		ProviderData provider = providerDao.find(providerId);
 
-		return !(StringUtils.isBlank(officialLastName) || StringUtils.isBlank(olisIdType));
+		return !(StringUtils.isBlank(officialLastName) || StringUtils.isBlank(olisIdType) || StringUtils.isBlank(provider.getOlisPractitionerNo()));
 	}
 }

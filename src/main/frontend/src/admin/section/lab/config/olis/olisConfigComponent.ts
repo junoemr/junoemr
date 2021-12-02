@@ -44,6 +44,8 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 			ctrl.loadingQueue = new LoadingQueue();
+			ctrl.toastService = new ToastService();
+
 			ctrl.pollingPropName = "olis_polling_enabled";
 			ctrl.labType = "OLIS_HL7"
 			ctrl.frequencySelectOptions = [
@@ -95,7 +97,7 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 				}
 				catch (e)
 				{
-					new ToastService().errorToast("Error loading olis configuration", true);
+					ctrl.toastService.errorToast("Error loading olis configuration", true);
 					console.error(e);
 				}
 			}
@@ -108,10 +110,21 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 			ctrl.manualLabPull = async (): Promise<void> =>
 			{
 				ctrl.loadingQueue.pushLoadingState();
-				await labService.triggerLabPull(ctrl.labType);
-				// refresh provider settings after pulling labs, as dates may change
-				ctrl.providerSettingsList = await labService.getOlisProviderSettings();
-				ctrl.loadingQueue.popLoadingState();
+				try
+				{
+					await labService.triggerLabPull(ctrl.labType);
+					// refresh provider settings after pulling labs, as dates may change
+					ctrl.providerSettingsList = await labService.getOlisProviderSettings();
+				}
+				catch (error)
+				{
+					console.error(error);
+					ctrl.toastService.errorToast("Failed to retrieve results", true);
+				}
+				finally
+				{
+					ctrl.loadingQueue.popLoadingState();
+				}
 			}
 
 			ctrl.labSearch = (): void =>
