@@ -2,10 +2,9 @@
 charset = utf-8
 end_of_line = lf
 indent_size = 2
-indent_style = space
+indent_style = tab
 insert_final_newline = false
 max_line_length = 100
-tab_width = 2
 ij_continuation_indent_size = 4
 ij_formatter_off_tag = @formatter:off
 ij_formatter_on_tag = @formatter:on
@@ -16,7 +15,7 @@ ij_wrap_on_typing = false
 
 [*.css]
 indent_size = 4
-tab_width = 4
+indent_style = tab
 ij_continuation_indent_size = 8
 ij_css_align_closing_brace_with_properties = false
 ij_css_blank_lines_around_nested_selector = 1
@@ -37,25 +36,21 @@ ij_css_use_double_quotes = true
 ij_css_value_alignment = do_not_align
 
 [*.feature]
-tab_width = 4
 ij_continuation_indent_size = 8
 ij_gherkin_keep_indents_on_empty_lines = false
 
 [*.gsp]
 indent_size = 4
-tab_width = 4
 ij_continuation_indent_size = 8
 ij_gsp_keep_indents_on_empty_lines = false
 
 [*.haml]
-tab_width = 4
 ij_continuation_indent_size = 8
 ij_haml_keep_indents_on_empty_lines = false
 
 [*.java]
 indent_size = 4
 indent_style = tab
-tab_width = 4
 ij_java_align_consecutive_assignments = false
 ij_java_align_consecutive_variable_declarations = false
 ij_java_align_group_field_declarations = false
@@ -306,7 +301,6 @@ ij_java_wrap_first_method_in_call_chain = false
 ij_java_wrap_long_lines = false
 
 [*.less]
-tab_width = 4
 ij_continuation_indent_size = 8
 ij_less_align_closing_brace_with_properties = false
 ij_less_blank_lines_around_nested_selector = 1
@@ -346,6 +340,7 @@ ij_sass_use_double_quotes = true
 ij_sass_value_alignment = 0
 
 [*.scss]
+indent_style = tab
 ij_scss_align_closing_brace_with_properties = false
 ij_scss_blank_lines_around_nested_selector = 1
 ij_scss_blank_lines_between_blocks = 1
@@ -365,7 +360,6 @@ ij_scss_use_double_quotes = true
 ij_scss_value_alignment = 0
 
 [*.styl]
-tab_width = 4
 ij_continuation_indent_size = 8
 ij_stylus_align_closing_brace_with_properties = false
 ij_stylus_blank_lines_around_nested_selector = 1
@@ -592,7 +586,6 @@ ij_shell_use_unix_line_separator = true
 indent_size = 4
 indent_style = tab
 max_line_length = 80
-tab_width = 4
 ij_javascript_align_imports = false
 ij_javascript_align_multiline_array_initializer_expression = false
 ij_javascript_align_multiline_binary_operation = false
@@ -853,13 +846,11 @@ ij_coffeescript_var_declaration_wrap = normal
 
 [{*.ft,*.vm,*.vsl}]
 indent_size = 4
-tab_width = 4
 ij_continuation_indent_size = 8
 ij_vtl_keep_indents_on_empty_lines = false
 
 [{*.gant,*.gradle,*.groovy,*.gson,*.gy}]
 indent_size = 4
-tab_width = 4
 ij_continuation_indent_size = 8
 ij_groovy_align_group_field_declarations = false
 ij_groovy_align_multiline_array_initializer_expression = false
@@ -1041,7 +1032,6 @@ ij_groovy_wrap_long_lines = false
 
 [{*.gradle.kts,*.kt,*.kts,*.main.kts,*.space.kts}]
 indent_size = 4
-tab_width = 4
 ij_continuation_indent_size = 8
 ij_kotlin_align_in_columns_case_branch = false
 ij_kotlin_align_multiline_binary_operation = false
@@ -1165,20 +1155,17 @@ ij_html_uniform_ident = false
 
 [{*.jsf,*.jsp,*.jspf,*.tag,*.tagf,*.xjsp}]
 indent_size = 4
-tab_width = 4
 ij_continuation_indent_size = 8
 ij_jsp_jsp_prefer_comma_separated_import_list = false
 ij_jsp_keep_indents_on_empty_lines = false
 
 [{*.jspx,*.tagx}]
 indent_size = 4
-tab_width = 4
 ij_continuation_indent_size = 8
 ij_jspx_keep_indents_on_empty_lines = false
 
 [{*.markdown,*.md}]
 indent_size = 4
-tab_width = 4
 ij_continuation_indent_size = 8
 ij_markdown_force_one_space_after_blockquote_symbol = true
 ij_markdown_force_one_space_after_header_symbol = true

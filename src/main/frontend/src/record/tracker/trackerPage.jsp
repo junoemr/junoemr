@@ -1,4 +1,4 @@
-/*
+<%--
 * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
 * This software is published under the GPL GNU General Public License.
 * This program is free software; you can redistribute it and/or
@@ -19,44 +19,10 @@
 * CloudPractice Inc.
 * Victoria, British Columbia
 * Canada
-*/
+--%>
 
-export enum SYSTEM_PROPERTIES
-{
-    INSTANCE_TYPE = "instance_type",
-    BILLING_TYPE = "billing_type",
-
-    // GENERAL PREFERENCES
-    DEFAULT_PHONE_PREFIX = "phone_prefix",
-    ROSTERING_MODULE = "enable_family_doctor_and_rostering",
-    EXTRA_ADDRESS_FIELD = "enable_additional_address",
-
-    // RX PREFERENCES
-    AUTO_STAMP_RX_SIGNATURES = "rx_preset_signatures",
-
-    // BILLING PREFERENCES
-    SERVICE_LOCATION_CODE = "service_location_code",
-
-    // AQS
-    AQS_ORGANIZATION_ID = "aqs_organization_id",
-    AQS_ORGANIZATION_SECRET = "aqs_api_secret_key",
-
-    // UI
-    UI_CUSTOM_NAV_ICON = "ui_custom_nav",
-    UI_LOCK_TO_JUNO_UI = "ui_lock",
-}
-
-export enum INSTANCE_TYPE
-{
-    BC = "BC",
-    ON = "ON",
-    AB = "AB",
-    SK = "SK",
-    PEI = "PE",
-}
-
-export enum BILLING_TYPE {
-    BC = "BC",
-    ON = "ON",
-    CLINICAID = "CLINICAID"
-}
+<page-wrapper show-header="false">
+    <page-body>
+        <health-tracker user="$ctrl.user"></health-tracker>
+    </page-body>
+</page-wrapper>

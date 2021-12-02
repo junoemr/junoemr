@@ -880,7 +880,7 @@ oscarApp.config([
 		.state('record.tracker',
 		{
 			url: '/tracker',
-			component: 'healthTracker',
+			component: 'healthTrackerPage',
 			resolve:
 			{
 				user: ['providerService', function (providerService)
