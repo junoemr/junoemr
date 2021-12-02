@@ -14,6 +14,7 @@ import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
 import org.oscarehr.olis.service.OLISPollingService;
+import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -99,8 +100,8 @@ public class OLISSchedulerJob
 			olisPrefDao.merge(olisPrefs);
 
 			LoggedInInfo loggedInInfo = new LoggedInInfo();
-			loggedInInfo.setLoggedInProvider(providerDao.getProvider("999998"));
-			loggedInInfo.setLoggedInSecurity(securityDao.getByProviderNo("999998"));
+			loggedInInfo.setLoggedInProvider(providerDao.getProvider(ProviderData.SYSTEM_PROVIDER_NO));
+			loggedInInfo.setLoggedInSecurity(securityDao.getByProviderNo(ProviderData.SYSTEM_PROVIDER_NO));
 
 			olisPollingService.requestResults(loggedInInfo);
 			logger.info("===== OLIS JOB COMPLETE....");

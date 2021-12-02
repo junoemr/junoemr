@@ -79,7 +79,10 @@ public class OLISConfigService
 		OLISSystemPreferences olisSystemPreferences = olisSystemPreferencesDao.getPreferences();
 		olisSystemPreferences.setFilterPatients(input.isFilterPatients());
 		olisSystemPreferences.setPollFrequency(input.getFrequency());
-		olisSystemPreferences.setStartTime(ConversionUtils.toDateTimeString(input.getStartDateTime(), DateTimeFormatter.ofPattern(OLISPollingService.OLIS_DATE_FORMAT)));
+		if(input.getStartDateTime() != null)
+		{
+			olisSystemPreferences.setStartTime(ConversionUtils.toDateTimeString(input.getStartDateTime(), DateTimeFormatter.ofPattern(OLISPollingService.OLIS_DATE_FORMAT)));
+		}
 		olisSystemPreferencesDao.merge(olisSystemPreferences);
 
 		return olisSystemPreferencesToTransferConverter.convert(olisSystemPreferences);

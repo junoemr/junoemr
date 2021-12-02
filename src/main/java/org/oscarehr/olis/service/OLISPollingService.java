@@ -73,7 +73,7 @@ import static oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler.OLIS_MESSAGE_TYP
 import static oscar.oscarLab.ca.all.upload.handlers.OLISHL7Handler.ALL_DUPLICATES_MARKER;
 
 @Service
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
 public class OLISPollingService
 {
 	public static final String OLIS_DATE_FORMAT = "yyyyMMddHHmmssZ";
@@ -176,10 +176,7 @@ public class OLISPollingService
 			OLISProviderPreferences olisProviderPreferences = findOrCreateOLISProviderPrefs(ProviderData.SYSTEM_PROVIDER_NO);
 
 			Z06Query facilityQuery = new Z06Query();
-			ORC21 orc21 = new ORC21();
-			orc21.setValue(6, 2, "^"+facilityId);
-			orc21.setValue(6, 3, "^ISO");
-			facilityQuery.setOrderingFacilityId(orc21);
+			facilityQuery.setOrderingFacilityId(new ORC21(facilityId, ORC21.UNIVERSAL_ID_ISO));
 
 			logger.info("Query OLIS for facility " + facilityId);
 			Pair<ZonedDateTime, ZonedDateTime> startEnd = findStartEndTimestamps(olisProviderPreferences);

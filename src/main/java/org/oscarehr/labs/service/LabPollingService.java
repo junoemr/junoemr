@@ -34,7 +34,7 @@ import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
  * A service dedicated to polling and downloading labs
  */
 @Service
-@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
 public class LabPollingService
 {
 	@Autowired
