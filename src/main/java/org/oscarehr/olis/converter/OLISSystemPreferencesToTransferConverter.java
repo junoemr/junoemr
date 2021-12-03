@@ -44,7 +44,7 @@ public class OLISSystemPreferencesToTransferConverter extends AbstractModelConve
 
 		if(input != null)
 		{
-			transfer.setFrequency(input.getPollFrequency());
+			transfer.setFrequency(input.getPollFrequency().orElse(null));
 			transfer.setFilterPatients(input.isFilterPatients());
 
 			transfer.setStartDateTime(input.getOptionalStartTime()

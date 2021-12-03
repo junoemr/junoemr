@@ -62,10 +62,11 @@ public class OLISSystemPreferences extends AbstractModel<Integer>
 	public void setEndTime(String endTime) {
     	this.endTime = endTime;
     }
-	
-	public Integer getPollFrequency() {
-    	return pollFrequency;
-    }
+
+	public Optional<Integer> getPollFrequency()
+	{
+		return Optional.ofNullable(pollFrequency);
+	}
 
 	public void setPollFrequency(Integer pollFrequency) {
     	this.pollFrequency = pollFrequency;

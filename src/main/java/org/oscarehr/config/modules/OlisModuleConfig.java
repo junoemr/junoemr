@@ -24,19 +24,24 @@
 package org.oscarehr.config.modules;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.config.scheduling.FixedPeriodicAdjustableTrigger;
 import org.oscarehr.olis.OLISSchedulerJob;
-import org.oscarehr.preferences.service.SystemPreferenceService;
+import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
+import org.oscarehr.olis.model.OLISSystemPreferences;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import oscar.OscarProperties;
+
+import java.time.Duration;
 
 @Configuration
 @Conditional(OlisModuleConfig.Condition.class)
-public class OlisModuleConfig
+public class OlisModuleConfig implements SchedulingConfigurer
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
@@ -44,7 +49,10 @@ public class OlisModuleConfig
 	protected OLISSchedulerJob olisSchedulerJob;
 
 	@Autowired
-	protected SystemPreferenceService systemPreferenceService;
+	protected TaskScheduler scheduler;
+
+	@Autowired
+	private OLISSystemPreferencesDao olisSystemPrefDao;
 
 	public OlisModuleConfig()
 	{
@@ -59,13 +67,15 @@ public class OlisModuleConfig
 		}
 	}
 
-	@Scheduled(fixedDelayString = "${omd.olis.poll_interval_sec}000")
-	public void pullOLISReports()
+	@Override
+	public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar)
 	{
-		if(systemPreferenceService.isPreferenceEnabled(UserProperty.OLIS_POLLING_ENABLED, false))
+		scheduledTaskRegistrar.setScheduler(scheduler);
+		scheduledTaskRegistrar.addTriggerTask(olisSchedulerJob, new FixedPeriodicAdjustableTrigger(() ->
 		{
-			logger.info("Initialize OLIS scheduler job");
-			olisSchedulerJob.run();
-		}
+			OLISSystemPreferences olisPrefs = olisSystemPrefDao.getPreferences();
+			Integer frequency = olisPrefs.getPollFrequency().orElse(OLISSystemPreferences.DEFAULT_POLLING_FREQUENCY_MIN);
+			return Duration.ofMinutes(frequency);
+		}));
 	}
 }

@@ -11,9 +11,11 @@ package org.oscarehr.olis;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.SecurityDao;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
 import org.oscarehr.olis.service.OLISPollingService;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.LoggedInInfo;
@@ -32,7 +34,7 @@ import java.util.Date;
  * @author Indivica
  */
 @Service
-public class OLISSchedulerJob
+public class OLISSchedulerJob implements Runnable
 {
 	private static final Logger logger = MiscUtils.getLogger();
 
@@ -48,8 +50,17 @@ public class OLISSchedulerJob
 	@Autowired
 	private SecurityDao securityDao;
 
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
+
+	@Override
 	public void run()
 	{
+		if(!systemPreferenceService.isPreferenceEnabled(UserProperty.OLIS_POLLING_ENABLED, false))
+		{
+			return;
+		}
+
 		try
 		{
 			logger.info("starting OLIS poller job");
@@ -79,11 +90,7 @@ public class OLISSchedulerJob
 
 			if (olisPrefs.getLastRun() != null) {
 				// check to see if we are past last run + frequency interval
-				Integer freqMins = olisPrefs.getPollFrequency();
-				if(freqMins == null)
-				{
-					freqMins = OLISSystemPreferences.DEFAULT_POLLING_FREQUENCY_MIN;
-				}
+				Integer freqMins = olisPrefs.getPollFrequency().orElse(OLISSystemPreferences.DEFAULT_POLLING_FREQUENCY_MIN);
 
 				Calendar cal = Calendar.getInstance();
 				cal.setTime(olisPrefs.getLastRun());
