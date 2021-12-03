@@ -291,6 +291,8 @@ if(!authed) {
 <%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
 <%@ page import="org.oscarehr.demographicRoster.model.DemographicRoster" %>
 <%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
+<%@ page import="static org.oscarehr.common.model.DemographicContact.TYPE_DEMOGRAPHIC" %>
+<%@ page import="static org.oscarehr.common.model.DemographicContact.CATEGORY_PERSONAL" %>
 <html:html locale="true">
 
 <head>
@@ -1671,17 +1673,36 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
 						<bean:message key="demographic.demographiceditdemographic.msgManageContacts"/><!--i18n--></a></b></h3>
 						<ul>
 						<%
-							DemographicContactDao dContactDao = (DemographicContactDao)SpringUtils.getBean("demographicContactDao");
-							List<DemographicContact> dContacts = dContactDao.findByDemographicNo(demographic.getDemographicNo());
+							DemographicContactDao dContactDao = (DemographicContactDao) SpringUtils.getBean("demographicContactDao");
+							List<DemographicContact> dContacts = dContactDao.findByDemographicNoAndCategory(demographic.getDemographicNo(), CATEGORY_PERSONAL);
 							dContacts = ContactAction.fillContactNames(dContacts);
-							for(DemographicContact dContact:dContacts) {
-								String sdm = (dContact.getSdm()!=null && dContact.getSdm().equals("true"))?"<span title=\"SDM\" >/SDM</span>":"";
-								String ec = (dContact.getEc()!=null && dContact.getEc().equals("true"))?"<span title=\"Emergency Contact\" >/EC</span>":"";
-						%>
+							for(DemographicContact dContact : dContacts)
+							{
+								String sdm = (dContact.getSdm() != null && dContact.getSdm().equals("true")) ? "<span title=\"SDM\" >/SDM</span>" : "";
+								String ec = (dContact.getEc() != null && dContact.getEc().equals("true")) ? "<span title=\"Emergency Contact\" >/EC</span>" : "";
 
-								<li><span class="label"><%=dContact.getRole()%>:</span>
-                                                            <span class="info"><%=dContact.getContactName() %><%=sdm%><%=ec%></span>
-                                                        </li>
+								String masterLink = "&nbsp[" + dContact.getTypeLabel() + "]";
+								String encounterLink = "";
+								if(TYPE_DEMOGRAPHIC == dContact.getType())
+								{
+									masterLink = "&nbsp<a target=\"demographic" + dContact.getContactId() +
+											"\" href=\"" + request.getContextPath() +
+											"/demographic/demographiccontrol.jsp?demographic_no=" + dContact.getContactId() +
+											"&displaymode=edit&dboperation=search_detail\">M</a>";
+									encounterLink = "&nbsp<a target=\"encounter" + dContact.getContactId() +
+											"\" href=\"javascript: function myFunction() {return false; }\" " +
+											"onClick=\"popupEChart(710,1024,'" + request.getContextPath() +
+											"/oscarEncounter/IncomingEncounter.do?demographicNo=" + dContact.getContactId() +
+											"&providerNo=" + loggedInInfo.getLoggedInProviderNo() +
+											"&appointmentNo=&curProviderNo=&reason=&appointmentDate=&startTime=&status=" +
+											"&userName=" + URLEncoder.encode(userfirstname + " " + userlastname) +
+											"&curDate=" + curYear + "-" + curMonth + "-" + curDay + "');return false;\">E</a>";
+								}
+						%>
+							<li>
+								<span class="label"><%=dContact.getRole()%>:</span>
+								<span class="info"><%=dContact.getContactName() %><%=sdm%><%=ec%><%=masterLink%><%=encounterLink%></span>
+							</li>
 
 						<%  } %>
 
