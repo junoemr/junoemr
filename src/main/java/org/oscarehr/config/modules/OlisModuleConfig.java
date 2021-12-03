@@ -25,9 +25,9 @@ package org.oscarehr.config.modules;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.config.scheduling.FixedPeriodicAdjustableTrigger;
-import org.oscarehr.olis.OLISSchedulerJob;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
+import org.oscarehr.olis.service.OLISPollingService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
@@ -46,7 +46,7 @@ public class OlisModuleConfig implements SchedulingConfigurer
 	private static final Logger logger = MiscUtils.getLogger();
 
 	@Autowired
-	protected OLISSchedulerJob olisSchedulerJob;
+	protected OLISPollingService olisPollingService;
 
 	@Autowired
 	protected TaskScheduler scheduler;
@@ -71,7 +71,7 @@ public class OlisModuleConfig implements SchedulingConfigurer
 	public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar)
 	{
 		scheduledTaskRegistrar.setScheduler(scheduler);
-		scheduledTaskRegistrar.addTriggerTask(olisSchedulerJob, new FixedPeriodicAdjustableTrigger(() ->
+		scheduledTaskRegistrar.addTriggerTask(olisPollingService, new FixedPeriodicAdjustableTrigger(() ->
 		{
 			OLISSystemPreferences olisPrefs = olisSystemPrefDao.getPreferences();
 			Integer frequency = olisPrefs.getPollFrequency().orElse(OLISSystemPreferences.DEFAULT_POLLING_FREQUENCY_MIN);

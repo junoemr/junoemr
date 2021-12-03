@@ -29,6 +29,7 @@ import org.springframework.scheduling.TriggerContext;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
 import java.util.Date;
 import java.util.Optional;
@@ -68,7 +69,7 @@ public class FixedPeriodicAdjustableTrigger implements Trigger
 
 		// continually increment the next scheduled time based on the period. This ensures that if the task runs beyond the previous period, the next execution is in the future.
 		// this keeps the schedule on a fixed rate (no offset based on execution run time) without stacking tasks.
-		Instant nextExecutionTime = lastScheduledDateTime.map(Date::toInstant).orElse(Instant.now().plus(initialDelay));
+		Instant nextExecutionTime = lastScheduledDateTime.map(Date::toInstant).orElse(Instant.now().truncatedTo(ChronoUnit.MINUTES).plus(initialDelay));
 		while(nextExecutionTime.isBefore(Instant.now()))
 		{
 			nextExecutionTime = nextExecutionTime.plus(period);

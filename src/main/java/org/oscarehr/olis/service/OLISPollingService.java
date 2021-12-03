@@ -35,7 +35,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
+import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
+import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
@@ -45,6 +47,7 @@ import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.exception.OLISAckFailedException;
 import org.oscarehr.olis.model.OLISProviderPreferences;
 import org.oscarehr.olis.model.OLISSystemPreferences;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
@@ -63,6 +66,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -74,7 +78,7 @@ import static oscar.oscarLab.ca.all.upload.handlers.OLISHL7Handler.ALL_DUPLICATE
 
 @Service
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-public class OLISPollingService
+public class OLISPollingService implements Runnable
 {
 	public static final String OLIS_DATE_FORMAT = "yyyyMMddHHmmssZ";
 
@@ -98,9 +102,38 @@ public class OLISPollingService
 	@Autowired
 	private LabHandlerService labHandlerService;
 
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
+
+	@Autowired
+	private ProviderDao legacyProviderDao;
+
+	@Autowired
+	private SecurityDao securityDao;
+
 	public OLISPollingService()
 	{
 		super();
+	}
+
+	@Override
+	public void run()
+	{
+		if(systemPreferenceService.isPreferenceEnabled(UserProperty.OLIS_POLLING_ENABLED, false))
+		{
+			OLISSystemPreferences olisPrefs = olisSystemPreferencesDao.getPreferences();
+
+			logger.info("OLIS POLLING TASK RUNNING....");
+			olisPrefs.setLastRun(new Date());
+			olisSystemPreferencesDao.merge(olisPrefs);
+
+			LoggedInInfo loggedInInfo = new LoggedInInfo();
+			loggedInInfo.setLoggedInProvider(legacyProviderDao.getProvider(ProviderData.SYSTEM_PROVIDER_NO));
+			loggedInInfo.setLoggedInSecurity(securityDao.getByProviderNo(ProviderData.SYSTEM_PROVIDER_NO));
+
+			requestResults(loggedInInfo);
+			logger.info("OLIS POLLING TASK COMPLETE....");
+		}
 	}
 	
 	public void requestResults(LoggedInInfo loggedInInfo)
