@@ -102,17 +102,17 @@ public class CommonLabResultData {
 	}
 
 	//Populate Lab data for consultation request
-	public ArrayList<LabResultData> populateLabResultsData(LoggedInInfo loggedInInfo, String demographicNo, String reqId, boolean attach) {
-		return populateLabResultsData(loggedInInfo, demographicNo, reqId, attach, false);
+	public ArrayList<LabResultData> populateConsultLabResultsData(LoggedInInfo loggedInInfo, String demographicNo, String reqId, boolean attach) {
+		return populateConsultLabResultsData(loggedInInfo, demographicNo, reqId, attach, false);
 	}
 	
 	//Populate Lab data for consultation response
 	public ArrayList<LabResultData> populateLabResultsDataConsultResponse(LoggedInInfo loggedInInfo, String demographicNo, String respId, boolean attach) {
-		return populateLabResultsData(loggedInInfo, demographicNo, respId, attach, true);
+		return populateConsultLabResultsData(loggedInInfo, demographicNo, respId, attach, true);
 	}
 	
 	//Populate Lab data for consultation (private shared method)
-	private ArrayList<LabResultData> populateLabResultsData(LoggedInInfo loggedInInfo, String demographicNo, String consultId, boolean attach, boolean isConsultResponse) {
+	private ArrayList<LabResultData> populateConsultLabResultsData(LoggedInInfo loggedInInfo, String demographicNo, String consultId, boolean attach, boolean isConsultResponse) {
 		ArrayList<LabResultData> labs = new ArrayList<LabResultData>();
 		oscar.oscarMDS.data.MDSResultsData mDSData = new oscar.oscarMDS.data.MDSResultsData();
 
@@ -161,114 +161,8 @@ public class CommonLabResultData {
 		return labs;
 	}
 
-
-    public ArrayList<LabResultData> populateLabResultsData(LoggedInInfo loggedInInfo, String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status, boolean isPaged, Integer page, Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal) {
-
-    		ArrayList<LabResultData> labs = new ArrayList<LabResultData>();
-    		oscar.oscarMDS.data.MDSResultsData mDSData = new oscar.oscarMDS.data.MDSResultsData();
-
-    		OscarProperties op = OscarProperties.getInstance();
-
-    		String cml = op.getProperty("CML_LABS");
-    		String mds = op.getProperty("MDS_LABS");
-    		String pathnet = op.getProperty("PATHNET_LABS");
-    		String hl7text = op.getProperty("HL7TEXT_LABS");
-
-
-    		if(!isPaged && cml != null && cml.trim().equals("yes")){
-    			ArrayList<LabResultData> cmlLabs = mDSData.populateCMLResultsData(providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, status, null);
-    			labs.addAll(cmlLabs);
-    		}
-
-    		if (!isPaged && mds != null && mds.trim().equals("yes")){
-    			ArrayList<LabResultData> mdsLabs = mDSData.populateMDSResultsData2(providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, status, null);
-    			labs.addAll(mdsLabs);
-
-    		}
-    		if (!isPaged && pathnet != null && pathnet.trim().equals("yes")){
-    			PathnetResultsData pathData = new PathnetResultsData();
-    			ArrayList<LabResultData> pathLabs = pathData.populatePathnetResultsData(providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, status,null);
-    			labs.addAll(pathLabs);
-    		}
-
-    		if (hl7text != null && hl7text.trim().equals("yes")){
-    			if (isPaged) {
-    		        ArrayList<LabResultData> hl7Labs = Hl7textResultsData.populateHl7ResultsData(providerNo, demographicNo, patientFirstName, patientLastName,
-    		        												   patientHealthNumber, status, true, page, pageSize, mixLabsAndDocs, isAbnormal);
-    		        labs.addAll(hl7Labs);
-                }
-                else {
-                	ArrayList<LabResultData> hl7Labs = Hl7textResultsData.populateHl7ResultsData(providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, status,null);
-    		        labs.addAll(hl7Labs);
-                }
-
-    		}
-    		return labs;
-    }
-
-    public ArrayList<LabResultData> populateLabResultsData(LoggedInInfo loggedInInfo, String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String ackStatus, String docScanStatus, boolean isPaged, Integer page, Integer pageSize, boolean mixLabsAndDocs, Boolean isAbnormal) {
-    		return populateLabResultsData(loggedInInfo, providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, ackStatus, isPaged, page, pageSize, mixLabsAndDocs, isAbnormal);
-    }
-
 	public ArrayList<LabResultData> populateLabResultsData(LoggedInInfo loggedInInfo, String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status) {
 		return populateLabResultsData(loggedInInfo, providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, status, "I");
-	}
-
-	public ArrayList<LabResultData> populateLabResultsDataInboxIndexPage(LoggedInInfo loggedInInfo, String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status, String scannedDocStatus) {
-		ArrayList<LabResultData> labs = new ArrayList<LabResultData>();
-		oscar.oscarMDS.data.MDSResultsData mDSData = new oscar.oscarMDS.data.MDSResultsData();
-
-		OscarProperties op = OscarProperties.getInstance();
-
-		String cml = op.getProperty("CML_LABS");
-		String mds = op.getProperty("MDS_LABS");
-		String pathnet = op.getProperty("PATHNET_LABS");
-		String hl7text = op.getProperty("HL7TEXT_LABS");
-		String epsilon = op.getProperty("Epsilon_LABS");
-
-		if (scannedDocStatus != null && (scannedDocStatus.equals("N") || scannedDocStatus.equals("I") || scannedDocStatus.equals(""))) {
-
-			if (epsilon != null && epsilon.trim().equals("yes")) {
-				ArrayList<LabResultData> cmlLabs = mDSData.populateEpsilonResultsData(providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, status, null);
-				labs.addAll(cmlLabs);
-			}
-
-			if (cml != null && cml.trim().equals("yes")) {
-				ArrayList<LabResultData> cmlLabs = mDSData.populateCMLResultsData(providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, status, null);
-				labs.addAll(cmlLabs);
-			}
-			if (mds != null && mds.trim().equals("yes")) {
-				ArrayList<LabResultData> mdsLabs = mDSData.populateMDSResultsData2(providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, status, null);
-				labs.addAll(mdsLabs);
-			}
-			if (pathnet != null && pathnet.trim().equals("yes")) {
-				PathnetResultsData pathData = new PathnetResultsData();
-				ArrayList<LabResultData> pathLabs = pathData.populatePathnetResultsData(providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, status,null);
-				labs.addAll(pathLabs);
-			}
-			if (hl7text != null && hl7text.trim().equals("yes")) {
-
-				ArrayList<LabResultData> hl7Labs = Hl7textResultsData.populateHl7ResultsData(providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, status,null);
-				labs.addAll(hl7Labs);
-			}
-		}
-
-		if (scannedDocStatus != null && (scannedDocStatus.equals("O") || scannedDocStatus.equals("I") || scannedDocStatus.equals(""))) {
-
-			DocumentResultsDao documentResultsDao = (DocumentResultsDao) SpringUtils.getBean("documentResultsDao");
-			ArrayList<LabResultData> docs = documentResultsDao.populateDocumentResultsDataOfAllProviders(providerNo, demographicNo, status);
-			labs.addAll(docs);
-		}
-
-		return labs;
-	}
-
-	// get documents that are specific provider to show in that provider's inbox
-	public ArrayList<LabResultData> populateLabResultsData2(LoggedInInfo loggedInInfo, String providerNo, String demographicNo, String patientFirstName, String patientLastName, String patientHealthNumber, String status, String scannedDocStatus) {
-		ArrayList<LabResultData> labs = new ArrayList<LabResultData>();
-		labs = populateLabsData(loggedInInfo, providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, status, scannedDocStatus);
-		labs.addAll(populateDocumentDataSpecificProvider(providerNo, demographicNo, patientFirstName, patientLastName, patientHealthNumber, status, scannedDocStatus));
-		return labs;
 	}
 
 	// return documents specific to this provider only, doesn't include documents that are not linked to any provider

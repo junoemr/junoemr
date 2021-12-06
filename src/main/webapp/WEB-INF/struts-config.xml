@@ -1126,7 +1126,7 @@
 		</action>
 		<action name="FrmFormForm" path="/form/SetupForm" scope="request" type="oscar.form.pageUtil.FrmSetupFormAction" />
 		<action name="FrmFormForm" path="/form/SubmitForm" scope="request" type="oscar.form.pageUtil.FrmFormAction" />
-		<action path="/oscarEncounter/displayLabs" scope="request" type="oscar.oscarEncounter.pageUtil.EctDisplayLabAction2"></action>
+		<action path="/oscarEncounter/displayLabs" scope="request" type="oscar.oscarEncounter.pageUtil.EctDisplayLabAction"></action>
 		<action path="/oscarEncounter/displayForms" scope="request" type="oscar.oscarEncounter.pageUtil.EctDisplayFormAction"></action>
 		<action path="/oscarEncounter/displayEForms" scope="request" type="oscar.oscarEncounter.pageUtil.EctDisplayEFormAction"></action>
 		<action path="/oscarEncounter/displayMessages" scope="request" type="oscar.oscarEncounter.pageUtil.EctDisplayMsgAction"></action>
