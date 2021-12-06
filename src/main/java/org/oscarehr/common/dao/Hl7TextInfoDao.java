@@ -26,6 +26,10 @@
 package org.oscarehr.common.dao;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -35,6 +39,8 @@ import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessageInfo;
 import org.oscarehr.common.model.Hl7TextMessageInfo2;
+import org.oscarehr.common.model.ProviderLabRoutingModel;
+import org.oscarehr.labs.transfer.BasicLabInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
@@ -44,6 +50,7 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
 	public Hl7TextInfoDao() {
 		super(Hl7TextInfo.class);
 	}
+
 	
 	@SuppressWarnings("unchecked")
 	@Deprecated
@@ -64,6 +71,90 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
 
 		return(getSingleResultOrNull(query));
     }
+
+	/**
+	 * Get a list of basic lab info by demographic
+	 * @param demographicId
+	 * @param offset for pagination
+	 * @param limit for pagination
+	 */
+	public List<BasicLabInfo> listBasicInfoByDemographicNo(String demographicId, Integer offset, Integer limit)
+	{
+		String native_sql = "SELECT labId, demographic_no, discipline, " +
+			"obr_date, COALESCE((result_status = 'A'), false) AS abnormal, result_status, type " +
+			"FROM " +
+			"( " +
+				"SELECT textInfo.lab_no AS labId, patientLR.demographic_no, textInfo.discipline, " +
+				"textInfo.obr_date, textInfo.result_status, " +
+				"textMessage.type, " +
+				"ROW_NUMBER() OVER (PARTITION BY COALESCE(accessionNum, textInfo.lab_no) ORDER BY textInfo.lab_no DESC) AS rank " +
+				"FROM hl7TextInfo textInfo " +
+				"LEFT JOIN hl7TextMessage textMessage on textInfo.lab_no = textMessage.lab_id " +
+				"JOIN patientLabRouting patientLR on patientLR.lab_type = :labType and patientLR.lab_no = textInfo.lab_no " +
+			"WHERE patientLR.demographic_no = :demographicId" +
+			") AS ranked_results " +
+			"WHERE ranked_results.rank = 1 " +
+			"ORDER BY ranked_results.obr_date DESC ";
+
+		Query query = entityManager.createNativeQuery(native_sql);
+
+		if(offset != null)
+		{
+			query = query.setFirstResult(offset);
+		}
+		if(limit != null)
+		{
+			query = query.setMaxResults(limit);
+		}
+
+		query.setParameter("labType", ProviderLabRoutingModel.LAB_TYPE_LABS);
+		query.setParameter("demographicId", Integer.parseInt(demographicId));
+
+		@SuppressWarnings("unchecked")
+		List<Object[]> results = query.getResultList();
+
+		List<BasicLabInfo> basicLabInfos = new ArrayList<>();
+		for(Object[] result : results)
+		{
+			BasicLabInfo basicLabInfo = new BasicLabInfo(
+				(int) result[0],
+				Integer.toString((int) result[1]),
+				(String) result[2],
+				LocalDateTime.parse((String) result[3], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				(int) result[4] == 1 ? true : false,
+				(String) result[5],
+				(String) result[6]
+			);
+
+			basicLabInfos.add(basicLabInfo);
+		}
+		return basicLabInfos;
+	}
+
+	/**
+	 * Count number of labs by demographic
+	 * @param demographicId
+	 */
+	public int countByDemographicNo(String demographicId)
+	{
+		String native_sql = "SELECT COUNT(*) " +
+			"FROM " +
+			"( " +
+				"SELECT textInfo.lab_no AS labId, " +
+				"ROW_NUMBER() OVER (PARTITION BY COALESCE(accessionNum, textInfo.lab_no) ORDER BY textInfo.lab_no DESC) AS rank " +
+				"FROM hl7TextInfo textInfo " +
+				"LEFT JOIN patientLabRouting patientLR on patientLR.lab_type = :labType and patientLR.lab_no = textInfo.lab_no " +
+				"WHERE patientLR.demographic_no = :demographicId" +
+			") AS ranked_results " +
+			"WHERE ranked_results.rank = 1 ";
+
+		Query query = entityManager.createNativeQuery(native_sql);
+		query.setParameter("labType", ProviderLabRoutingModel.LAB_TYPE_LABS);
+		query.setParameter("demographicId", Integer.parseInt(demographicId));
+		List<BigInteger> results = query.getResultList();
+
+		return  results.get(0).intValue();
+	}
 
     @SuppressWarnings("unchecked")
     public List<Hl7TextInfo> findByHealthCardNo(String hin) {

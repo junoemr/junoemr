@@ -23,26 +23,19 @@
 
 package org.oscarehr.casemgmt.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionMenuItem;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
+import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.OscarLogDao;
+import org.oscarehr.labs.transfer.BasicLabInfo;
 import org.oscarehr.managers.SecurityInfoManager;
-import org.oscarehr.util.MiscUtils;
+import org.oscarehr.security.model.Permission;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.OscarProperties;
-import oscar.oscarEncounter.pageUtil.EctDisplayLabAction2;
-import oscar.oscarLab.ca.all.web.LabDisplayHelper;
-import oscar.oscarLab.ca.on.CommonLabResultData;
-import oscar.oscarLab.ca.on.LabResultData;
-import oscar.util.ConversionUtils;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 public class EncounterLabResultService extends EncounterSectionService
 {
@@ -166,161 +159,68 @@ public class EncounterLabResultService extends EncounterSectionService
 		return menuItems;
 	}
 
-	public EncounterNotes getNotes(
-			SectionParameters sectionParams, Integer limit,
-			Integer offset
-	)
+	public EncounterNotes getNotes(SectionParameters sectionParams, Integer limit, Integer offset)
 	{
 		List<EncounterSectionNote> out = new ArrayList<>();
 
-		if(!securityInfoManager.hasPrivilege(sectionParams.getLoggedInInfo(), "_lab",
-				"r", null))
+		try
+		{
+			securityInfoManager.requireAllPrivilege(sectionParams.getLoggedInInfo().getLoggedInProviderNo(), Permission.LAB_READ);
+		}
+		catch (SecurityException e)
 		{
 			return EncounterNotes.noNotes();
 		}
 
+		Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
+		List<BasicLabInfo> basicLabInfos = hl7TextInfoDao.listBasicInfoByDemographicNo(
+			sectionParams.getDemographicNo(), offset, limit);
 
-		LinkedHashMap<String,LabResultData> accessionMap = new LinkedHashMap<String,LabResultData>();
-		CommonLabResultData comLab = new CommonLabResultData();
-		ArrayList<LabResultData> labs = comLab.populateLabResultsData(sectionParams.getLoggedInInfo(),
-				"", sectionParams.getDemographicNo(), "", "",
-				"", "U");
-
-		Collections.sort(labs);
-
-		for (int i = 0; i < labs.size(); i++)
-		{
-			LabResultData result = labs.get(i);
-			if (result.accessionNumber == null || result.accessionNumber.equals(""))
-			{
-				accessionMap.put("noAccessionNum" + i + result.labType, result);
-			}
-			else
-			{
-				if (!accessionMap.containsKey(result.accessionNumber + result.labType))
-				{
-					accessionMap.put(result.accessionNumber + result.labType, result);
-				}
-			}
-		}
-
-		labs = new ArrayList<LabResultData>(accessionMap.values());
-
-		for (int j = 0; j < labs.size(); j++)
+		for (BasicLabInfo basicLabInfo : basicLabInfos)
 		{
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
-
-			LabResultData result = labs.get(j);
-
-			// Date
-			Date date = EctDisplayLabAction2.getServiceDate(sectionParams.getLoggedInInfo(), result);
-			LocalDateTime serviceDate = ConversionUtils.toLocalDateTime(date);
-			sectionNote.setUpdateDate(serviceDate);
-
-			// Colour
-			if (result.isAbnormal())
+			sectionNote.setUpdateDate(basicLabInfo.getObservationDateTime());
+			if (basicLabInfo.getAbnormal())
 			{
 				sectionNote.setColour("red");
 			}
 
-			// Title
-			String label = result.getLabel();
-			String labDisplayName;
-			if (label == null || label.equals(""))
+			String segmentID = Integer.toString(basicLabInfo.getLabId());
+			String labLabel = basicLabInfo.getLabel();
+			if (!oscarLogDao.hasRead(sectionParams.getProviderNo(), "lab", segmentID))
 			{
-				labDisplayName = result.getDiscipline();
-			}
-			else
-			{
-				labDisplayName = label;
+				labLabel = "*" + labLabel + "*";
 			}
 
-			// Put stars around a lab if it is not read
-			String labRead = "";
-			if (!oscarLogDao.hasRead(sectionParams.getProviderNo(), "lab", result.segmentID))
-			{
-				labRead = "*";
-			}
+			sectionNote.setText(EncounterSectionService.getTrimmedText(labLabel));
+			sectionNote.setTitle(
+				EncounterSectionService.formatTitleWithLocalDateTime(labLabel,
+					basicLabInfo.getObservationDateTime()));
 
-			if (labDisplayName == null)
-			{
-				labDisplayName = "";
-			}
+			String url = getLabDisplayUrl(basicLabInfo, sectionParams);
 
-			sectionNote.setText(EncounterSectionService.getTrimmedText(labRead + labDisplayName + labRead));
-
-			sectionNote.setTitle(EncounterSectionService.formatTitleWithLocalDateTime(labDisplayName, serviceDate));
-
-			// Link onClick
-			String remoteFacilityIdQueryString = "";
-			if (result.getRemoteFacilityId() != null)
-			{
-				try
-				{
-					remoteFacilityIdQueryString = "&remoteFacilityId=" +
-							encodeUrlParam(result.getRemoteFacilityId().toString());
-
-					String remoteLabKey = LabDisplayHelper.makeLabKey(
-							Integer.parseInt(result.getLabPatientId()), result.getSegmentID(),
-							result.labType, result.getDateTime());
-
-					remoteFacilityIdQueryString = remoteFacilityIdQueryString +
-							"&remoteLabKey=" + encodeUrlParam(remoteLabKey);
-				}
-				catch (Exception e)
-				{
-					MiscUtils.getLogger().error("Error", e);
-				}
-			}
-
-			String url;
-			if ( result.isMDS() )
-			{
-				url = sectionParams.getContextPath() + "/oscarMDS/SegmentDisplay.jsp" +
-						"?demographicId=" + encodeUrlParam(sectionParams.getDemographicNo())+
-						"&providerNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
-						"&segmentID=" + encodeUrlParam(result.segmentID) +
-						"&multiID=" + encodeUrlParam(result.multiLabId) +
-						"&status=" + encodeUrlParam(result.getReportStatus()) +
-						remoteFacilityIdQueryString;
-			}
-			else if (result.isCML())
-			{
-				url = sectionParams.getContextPath() + "/lab/CA/ON/CMLDisplay.jsp" +
-						"?demographicId=" + encodeUrlParam(sectionParams.getDemographicNo())+
-						"&providerNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
-						"&segmentID="+ encodeUrlParam(result.segmentID) +
-						"&multiID=" + encodeUrlParam(result.multiLabId) +
-						remoteFacilityIdQueryString;
-			}
-			else if (result.isHL7TEXT())
-			{
-				url = sectionParams.getContextPath() + "/lab/CA/ALL/labDisplay.jsp" +
-						"?demographicId=" + encodeUrlParam(sectionParams.getDemographicNo())+
-						"&providerNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
-						"&segmentID=" + encodeUrlParam(result.segmentID) +
-						"&multiID=" + encodeUrlParam(result.multiLabId) +
-						remoteFacilityIdQueryString;
-			}
-			else
-			{
-				url = sectionParams.getContextPath() + "/lab/CA/BC/labDisplay.jsp" +
-						"?demographicId=" + encodeUrlParam(sectionParams.getDemographicNo())+
-						"&segmentID=" + encodeUrlParam(result.segmentID) +
-						"&providerNo=" + encodeUrlParam(sectionParams.getProviderNo()) +
-						"&multiID=" + encodeUrlParam(result.multiLabId) +
-						remoteFacilityIdQueryString;
-			}
-
-			String winName = "AllLabs" + sectionParams.getDemographicNo();
-			int hash = winName.hashCode();
-			hash = hash < 0 ? hash * -1 : hash;
-
-			sectionNote.setOnClick("popupPage(700,960,'" + hash + "', '" + url + "');");
-
+			// Force popup window name based on demographic, so the window is reused when viewing multiple labs
+			int windowName = Math.abs(("AllLabs" + sectionParams.getDemographicNo()).hashCode());
+			sectionNote.setOnClick("popupPage(700,960,'" + windowName + "', '" + url + "');");
 			out.add(sectionNote);
 		}
 
-		return EncounterNotes.limitedEncounterNotes(out, offset, limit);
+		EncounterNotes notes = new EncounterNotes();
+		notes.setOffset(offset);
+		notes.setLimit(limit);
+		notes.setNoteCount(hl7TextInfoDao.countByDemographicNo(sectionParams.getDemographicNo()));
+		notes.setEncounterSectionNotes(out);
+		return notes;
+	}
+
+	private String getLabDisplayUrl(BasicLabInfo basicLabInfo, SectionParameters sectionParameters)
+	{
+		String url = sectionParameters.getContextPath() + "/lab/CA/ALL/labDisplay.jsp";
+		url = url + "?demographicId=" + encodeUrlParam(sectionParameters.getDemographicNo())+
+			"&providerNo=" + encodeUrlParam(sectionParameters.getProviderNo()) +
+			"&segmentID=" + encodeUrlParam(Integer.toString(basicLabInfo.getLabId())) +
+			"&status=" + encodeUrlParam(basicLabInfo.getReportStatus());
+
+		return url;
 	}
 }

@@ -53,20 +53,21 @@ public class OscarLogDao extends AbstractDao<OscarLog> {
     }
     
     
-    public boolean hasRead(String providerNo, String content, String contentId){
-    	String sqlCommand="select x from "+modelClass.getSimpleName()+" x where x.action = 'read' and  x.providerNo=?1 and x.content = ?2 and x.contentId = ?3";
+    public boolean hasRead(String providerNo, String content, String contentId)
+	{
+    	String sqlCommand="SELECT COUNT(log) " +
+			"FROM " + modelClass.getSimpleName() + " AS log " +
+			"WHERE log.action = 'read' AND log.providerNo = :providerNo AND log.content = :content and log.contentId = :contentId";
+
     	Query query = entityManager.createQuery(sqlCommand);
-		query.setParameter(1, providerNo);
-		query.setParameter(2, content);
-		query.setParameter(3, contentId);
+		query.setParameter("providerNo", providerNo);
+		query.setParameter("content", content);
+		query.setParameter("contentId", contentId);
 		
 	    @SuppressWarnings("unchecked")
-		List<OscarLog> results=query.getResultList();
-	    if(results.size() == 0){
-	    	return false;
-	    }
-		
-		return true;
+		List<Long> results = query.getResultList();
+
+		return (results.get(0) != 0);
     }
     
     public List<OscarLog> findByActionAndData(String action, String data) {
