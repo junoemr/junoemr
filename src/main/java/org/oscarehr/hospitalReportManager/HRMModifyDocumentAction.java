@@ -13,9 +13,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument.ReportClass;
+import org.oscarehr.dataMigration.model.hrm.HrmObservation;
+import org.oscarehr.dataMigration.model.hrm.HrmSubClassModel;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
+import org.oscarehr.hospitalReportManager.model.HRMObservation;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentCommentDao;
@@ -23,6 +28,9 @@ import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentSubClassDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
+import org.oscarehr.hospitalReportManager.service.HRMCategoryService;
+import org.oscarehr.hospitalReportManager.service.HRMDocumentService;
+import org.oscarehr.hospitalReportManager.service.HRMSubClassService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.security.model.Permission;
@@ -50,7 +58,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 		String method = request.getParameter("method");
 
 		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE);
-		
+
 		if (method != null) {
 			if (method.equalsIgnoreCase("makeIndependent"))
 				return makeIndependent(mapping, form, request, response);
@@ -72,6 +80,10 @@ public class HRMModifyDocumentAction extends DispatchAction {
 				return deleteComment(mapping, form, request, response);
 			else if (method.equalsIgnoreCase("setDescription"))
 				return setDescription(mapping, form, request, response);
+			else if (method.equalsIgnoreCase("recategorize"))
+				return recategorize(mapping, form, request, response);
+			else if (method.equalsIgnoreCase("recategorizeFuture"))
+				return recategorizeFuture(mapping, form, request, response);
 		}
 
 		return mapping.findForward("ajax");
@@ -249,7 +261,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 			String subClassId = request.getParameter("subClassId");
 			hrmDocumentSubClassDao.setAllSubClassesForDocumentAsInactive(Integer.parseInt(hrmDocumentId));
 
-			HRMDocumentSubClass newActiveSubClass = hrmDocumentSubClassDao.find(Integer.parseInt(subClassId));
+			HRMObservation newActiveSubClass = hrmDocumentSubClassDao.find(Integer.parseInt(subClassId));
 			if (newActiveSubClass != null) {
 				newActiveSubClass.setActive(true);
 				hrmDocumentSubClassDao.merge(newActiveSubClass);
@@ -350,6 +362,92 @@ public class HRMModifyDocumentAction extends DispatchAction {
 			MiscUtils.getLogger().error("Couldn't set description for HRM document", e);
 			request.setAttribute("success", false);
 		}
+
+		return mapping.findForward("ajax");
+	}
+
+	public ActionForward recategorize(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.HRM_UPDATE);
+
+		Integer documentId = Integer.parseInt(request.getParameter("documentId"));
+		Integer categoryId = Integer.parseInt(request.getParameter("categoryId"));
+
+		HRMDocumentService hrmDocumentService = SpringUtils.getBean(HRMDocumentService.class);
+		HrmDocument documentModel = hrmDocumentService.getHrmDocument(documentId);
+
+		HRMCategoryService categoryService = SpringUtils.getBean(HRMCategoryService.class);
+		HrmCategoryModel categoryModel = categoryService.getActiveCategory(categoryId);
+
+		if (categoryModel != null)
+		{
+			documentModel.setCategory(categoryModel);
+			hrmDocumentService.updateHrmDocument(documentModel);
+			request.setAttribute("success", true);
+		}
+		else
+		{
+			request.setAttribute("success", false);
+		}
+
+		return mapping.findForward("ajax");
+	}
+
+	/**
+	 * Reclassify future HRM documents which are similar to the specified document
+	 * @param mapping
+	 * @param form
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public ActionForward recategorizeFuture(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.HRM_UPDATE);
+
+		Integer documentId = Integer.parseInt(request.getParameter("documentId"));
+		Integer categoryId = Integer.parseInt(request.getParameter("categoryId"));
+
+		HRMDocumentService hrmDocumentService = SpringUtils.getBean(HRMDocumentService.class);
+		HrmDocument documentModel = hrmDocumentService.getHrmDocument(documentId);
+
+		String facilityId = documentModel.getSendingFacilityId();
+		String reportClass = documentModel.getReportClass().getValue();
+		String subClassName = null;
+		String accompanyingSubClass = null;
+
+		if (documentModel.getReportClass().equals(ReportClass.MEDICAL_RECORDS))
+		{
+			subClassName = documentModel.getReportSubClass();
+		}
+		else if (documentModel.getFirstObservation().isPresent())
+		{
+			HrmObservation firstObservation = documentModel.getFirstObservation().get();
+			accompanyingSubClass = firstObservation.getAccompanyingSubClass();
+		}
+
+		HRMSubClassService subClassService = SpringUtils.getBean(HRMSubClassService.class);
+		HrmSubClassModel existingSubClass = subClassService
+			.findActiveByAttributes(facilityId, reportClass, subClassName, accompanyingSubClass);
+
+		HRMCategoryService categoryService = SpringUtils.getBean(HRMCategoryService.class);
+		if (existingSubClass != null)
+		{
+			subClassService.deactivateSubClass(existingSubClass.getId());
+		}
+
+		HrmSubClassModel subClassToAdd = new HrmSubClassModel();
+		subClassToAdd.setFacilityNumber(facilityId);
+		subClassToAdd.setClassName(reportClass);
+		subClassToAdd.setSubClassName(subClassName);
+		subClassToAdd.setAccompanyingSubClassName(accompanyingSubClass);
+
+		HrmCategoryModel category = categoryService.getActiveCategory(categoryId);
+		category.getSubClasses().add(subClassToAdd);
+		categoryService.updateCategory(category);
+		request.setAttribute("success", true);
 
 		return mapping.findForward("ajax");
 	}

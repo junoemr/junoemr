@@ -10,7 +10,7 @@
 package org.oscarehr.hospitalReportManager.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
+import org.oscarehr.hospitalReportManager.model.HRMObservation;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
@@ -18,14 +18,14 @@ import java.util.List;
 
 @Repository
 @SuppressWarnings("unchecked")
-public class HRMDocumentSubClassDao extends AbstractDao<HRMDocumentSubClass>
+public class HRMDocumentSubClassDao extends AbstractDao<HRMObservation>
 {
 	public HRMDocumentSubClassDao()
 	{
-		super(HRMDocumentSubClass.class);
+		super(HRMObservation.class);
 	}
 
-	public List<HRMDocumentSubClass> getSubClassesByDocumentId(Integer id)
+	public List<HRMObservation> getSubClassesByDocumentId(Integer id)
 	{
 		String sql = "SELECT x FROM " + this.modelClass.getName() + " x WHERE x.hrmDocument.id=:documentId";
 		Query query = entityManager.createQuery(sql);
@@ -33,7 +33,7 @@ public class HRMDocumentSubClassDao extends AbstractDao<HRMDocumentSubClass>
 		return query.getResultList();
 	}
 
-	public List<HRMDocumentSubClass> getActiveSubClassesByDocumentId(Integer id)
+	public List<HRMObservation> getActiveSubClassesByDocumentId(Integer id)
 	{
 		String sql = "SELECT x FROM " + this.modelClass.getName() + " x WHERE x.hrmDocument.id=:documentId and x.active=:active";
 		Query query = entityManager.createQuery(sql);

@@ -31,7 +31,7 @@ import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
+import org.oscarehr.hospitalReportManager.model.HRMObservation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -51,7 +51,7 @@ public class HRMDocumentSubClassDaoTest extends DaoTestFixtures
 
 	@Test
 	public void testCreate() throws Exception {
-		HRMDocumentSubClass entity = new HRMDocumentSubClass();
+		HRMObservation entity = new HRMObservation();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
 		hrmDocumentSubClassDao.persist(entity);
 		assertNotNull(entity.getId());

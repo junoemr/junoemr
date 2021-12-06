@@ -19,7 +19,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.oscarehr.hospitalReportManager.model.HRMCategory;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
+import org.oscarehr.hospitalReportManager.model.HRMObservation;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.oscarehr.hospitalReportManager.model.HRMSubClass;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
@@ -64,15 +64,15 @@ public class HRMUtil {
 			
 			HRMCategory category = null;
 			HRMSubClass thisReportSubClassMapping = null;
-			List<HRMDocumentSubClass> subClassList = hrmDocumentSubClassDao.getSubClassesByDocumentId(hrmDocument.getId());
+			List<HRMObservation> subClassList = hrmDocumentSubClassDao.getSubClassesByDocumentId(hrmDocument.getId());
 			
 			
 			HRMReport report = HRMReportParser.parseReport(hrmDocument.getReportFile(), hrmDocument.getReportFileSchemaVersion());
 			if (report.getFirstReportClass().equalsIgnoreCase("Diagnostic Imaging Report") || report.getFirstReportClass().equalsIgnoreCase("Cardio Respiratory Report")) {
 				// We'll only care about the first one, as long as there is at least one
 				if (subClassList != null && subClassList.size() > 0) {
-					HRMDocumentSubClass firstSubClass = subClassList.get(0);
-					thisReportSubClassMapping = hrmSubClassDao.findApplicableSubClassMapping(report.getFirstReportClass(), firstSubClass.getSubClass(), firstSubClass.getSubClassMnemonic(), report.getSendingFacilityId());
+					HRMObservation firstSubClass = subClassList.get(0);
+					thisReportSubClassMapping = hrmSubClassDao.findApplicableSubClassMapping(report.getFirstReportClass(), firstSubClass.getAccompanyingSubClassName(), firstSubClass.getAccompanyingSubClassMnemonic(), report.getSendingFacilityId());
 				}
 			} else {
 				// Medical records report

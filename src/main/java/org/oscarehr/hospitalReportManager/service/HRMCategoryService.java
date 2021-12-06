@@ -23,10 +23,14 @@
 
 package org.oscarehr.hospitalReportManager.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.dataMigration.converter.in.hrm.HrmCategoryModelToDbConverter;
 import org.oscarehr.dataMigration.converter.in.hrm.HrmSubClassModelToDbConverter;
 import org.oscarehr.dataMigration.converter.out.hrm.HrmCategoryDbToModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument.ReportClass;
+import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.dataMigration.model.hrm.HrmSubClassModel;
 import org.oscarehr.hospitalReportManager.dao.HRMCategoryDao;
 import org.oscarehr.hospitalReportManager.model.HRMCategory;
@@ -49,6 +53,9 @@ public class HRMCategoryService
 {
 	@Autowired
 	HRMCategoryDao categoryDao;
+
+	@Autowired
+	HRMSubClassService subClassService;
 
 	@Autowired
 	HrmCategoryDbToModelConverter toModelConverter;
@@ -181,5 +188,31 @@ public class HRMCategoryService
 		return entity;
 	}
 
+	public Optional<HrmCategoryModel> categorize(HrmDocument report)
+	{
+		String sendingFacilityId = report.getSendingFacilityId();
+		ReportClass reportClass = report.getReportClass();
+		String subClassName = StringUtils.trimToNull(report.getReportSubClass());
 
+		String firstAccompanyingSubClassName = null;
+		List<HrmObservation> observations = report.getObservations();
+		if (observations != null && !observations.isEmpty())
+		{
+			firstAccompanyingSubClassName = observations.get(0).getAccompanyingSubClass();
+		}
+
+		HrmSubClassModel subClass = subClassService.findActiveByAttributes(sendingFacilityId,
+			reportClass.getValue(),
+			subClassName,
+			firstAccompanyingSubClassName);
+
+		if (subClass != null)
+		{
+			HRMCategory entity = categoryDao.find(subClass.getHrmCategoryId());
+
+			return Optional.ofNullable(toModelConverter.convert(entity));
+		}
+
+		return Optional.empty();
+	}
 }

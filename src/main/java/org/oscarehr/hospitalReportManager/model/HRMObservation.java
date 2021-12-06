@@ -20,20 +20,29 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.util.Date;
 
 @Data
 @Entity
-public class HRMDocumentSubClass extends AbstractModel<Integer>
+@Table(name="HRMDocumentSubClass")
+public class HRMObservation extends AbstractModel<Integer>
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
-	private String subClass;
-	private String subClassMnemonic;
-	private String subClassDescription;
-	private Date subClassDateTime;
+
+	@Column(name="subClass")
+	private String accompanyingSubClassName;
+
+	@Column(name="subClassMnemonic")
+	private String accompanyingSubClassMnemonic;
+
+	@Column(name="subClassDescription")
+	private String accompanyingSubClassDescription;
+
+	@Column(name="subClassDateTime")
+	private Date accompanyingSubClassObrDate;
 
 	@Column(name="isActive")
 	private boolean active;

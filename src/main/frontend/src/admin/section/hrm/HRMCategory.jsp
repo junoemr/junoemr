@@ -23,7 +23,7 @@
 
 <div id="hrm-category" class="flex-col align-items-center justify-content-top h-100">
     <div class="flex-row justify-content-between align-items-center w-100">
-    <h4>Manage HRM Categories</h4>
+    <h4>Manage Report Classification</h4>
     <div class="button-wrapper">
         <juno-button ng-if="!$ctrl.newRole"
                      component-style="$ctrl.componentStyle"

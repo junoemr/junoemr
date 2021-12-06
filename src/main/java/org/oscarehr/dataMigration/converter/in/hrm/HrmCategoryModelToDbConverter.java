@@ -38,6 +38,11 @@ public class HrmCategoryModelToDbConverter extends AbstractModelConverter<HrmCat
 	@Override
 	public HRMCategory convert(HrmCategoryModel model)
 	{
+		if (model == null)
+		{
+			return null;
+		}
+
 		HRMCategory entity = new HRMCategory();
 		entity.setId(model.getId());
 		entity.setCategoryName(model.getName());

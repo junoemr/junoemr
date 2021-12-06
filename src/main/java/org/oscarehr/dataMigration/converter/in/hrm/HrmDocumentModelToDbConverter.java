@@ -32,11 +32,12 @@ import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
+import org.oscarehr.hospitalReportManager.model.HRMObservation;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.search.ProviderCriteriaSearch;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -49,6 +50,9 @@ import java.util.List;
 public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDocument, HRMDocument>
 {
 	private Logger logger = MiscUtils.getLogger();
+
+	@Autowired
+	HrmCategoryModelToDbConverter categoryToEntity;
 	
 	@Override
 	public HRMDocument convert(HrmDocument input)
@@ -56,6 +60,7 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		HRMDocument hrmDocument = new HRMDocument();
 		hrmDocument.setDescription(input.getDescription());
 		hrmDocument.setReportType(reportType(input.getReportClass()));
+		hrmDocument.setSubClass(input.getReportSubClass());
 		hrmDocument.setReportStatus(reportStatus(input.getReportStatus()));
 		hrmDocument.setTimeReceived(ConversionUtils.toNullableLegacyDateTime(input.getReceivedDateTime()));
 		hrmDocument.setReportDate(ConversionUtils.toNullableLegacyDateTime(input.getReportDateTime()));
@@ -68,14 +73,17 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		hrmDocument.setReportFile(getReportFileRelativePath(input.getReportFile()));
 		hrmDocument.setReportFileSchemaVersion(input.getReportFileSchemaVersion());
 
-		hrmDocument.setDocumentSubClassList(convertSubClassList(hrmDocument, input.getObservations()));
+		hrmDocument.setObservationList(convertObservationList(hrmDocument, input.getObservations()));
 		hrmDocument.setCommentList(convertCommentList(hrmDocument, input.getComments()));
+
+		hrmDocument.setHrmCategory(categoryToEntity.convert(input.getCategory()));
+
+		hrmDocument.setNumDuplicatesReceived(input.getMatchingData().getNumDuplicatesReceived());
+		hrmDocument.setReportHash(input.getMatchingData().getReportHash());
+		hrmDocument.setReportLessDemographicInfoHash(input.getMatchingData().getReportLessDemographicInfoHash());
+		hrmDocument.setReportLessTransactionInfoHash(input.getMatchingData().getReportLessTransactionInfoHash());
 		
-		hrmDocument.setReportHash(input.getMessageUniqueId());
-		hrmDocument.setNumDuplicatesReceived(0);
-		
-		List<HRMDocumentToProvider> providerLinks = new ArrayList<HRMDocumentToProvider>();
-		
+		List<HRMDocumentToProvider> providerLinks = new ArrayList<>();
 		HRMDocumentToProvider deliverToProviderLink = createDeliverToLink(hrmDocument, input.getDeliverToUserId());
 		if (deliverToProviderLink != null)
 		{
@@ -126,21 +134,22 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		return status;
 	}
 
-	protected List<HRMDocumentSubClass> convertSubClassList(HRMDocument hrmDocument, List<HrmObservation> observations)
+	protected List<HRMObservation> convertObservationList(HRMDocument hrmDocument, List<HrmObservation> observations)
 	{
-		List<HRMDocumentSubClass> hrmDocumentSubClassList = new ArrayList<>(observations.size());
-		for(HrmObservation observation : observations)
+		List<HRMObservation> hrmObservations = new ArrayList<>(observations.size());
+
+		for(HrmObservation observationModel : observations)
 		{
-			HRMDocumentSubClass hrmDocumentSubClass = new HRMDocumentSubClass();
-			hrmDocumentSubClass.setActive(true);
-			hrmDocumentSubClass.setSubClass(observation.getAccompanyingSubClass());
-			hrmDocumentSubClass.setSubClassDescription(observation.getAccompanyingDescription());
-			hrmDocumentSubClass.setSubClassMnemonic(observation.getAccompanyingMnemonic());
-			hrmDocumentSubClass.setSubClassDateTime(ConversionUtils.toNullableLegacyDateTime(observation.getObservationDateTime()));
-			hrmDocumentSubClass.setHrmDocument(hrmDocument);
-			hrmDocumentSubClassList.add(hrmDocumentSubClass);
+			HRMObservation observationEntity = new HRMObservation();
+			observationEntity.setActive(true);
+			observationEntity.setAccompanyingSubClassName(observationModel.getAccompanyingSubClass());
+			observationEntity.setAccompanyingSubClassDescription(observationModel.getAccompanyingDescription());
+			observationEntity.setAccompanyingSubClassMnemonic(observationModel.getAccompanyingMnemonic());
+			observationEntity.setAccompanyingSubClassObrDate(ConversionUtils.toNullableLegacyDateTime(observationModel.getObservationDateTime()));
+			observationEntity.setHrmDocument(hrmDocument);
+			hrmObservations.add(observationEntity);
 		}
-		return hrmDocumentSubClassList;
+		return hrmObservations;
 	}
 
 	protected List<HRMDocumentComment> convertCommentList(HRMDocument hrmDocument, List<HrmComment> comments)
