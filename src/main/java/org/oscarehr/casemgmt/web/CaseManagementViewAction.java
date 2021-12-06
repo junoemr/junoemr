@@ -262,9 +262,6 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		long beginning = start;
 		long current = 0;
 		CaseManagementViewFormBean caseForm = (CaseManagementViewFormBean) form;
-		boolean useNewCaseMgmt = false;
-		String useNewCaseMgmtString = (String) request.getSession().getAttribute("newCaseManagement");
-		if (useNewCaseMgmtString != null) useNewCaseMgmt = Boolean.parseBoolean(useNewCaseMgmtString);
 
 		logger.debug("Starting VIEW");
 		String tab = request.getParameter("tab");
@@ -362,45 +359,6 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		}
 		request.setAttribute("teamName", teamName);
 
-		if (OscarProperties.getInstance().isCaisiLoaded() && !useNewCaseMgmt)
-		{
-
-			logger.debug("Get program providers");
-			List<String> teamMembers = new ArrayList<String>();
-			List<ProgramProvider> programProviders = programMgr.getProgramProviders(programId);
-			current = System.currentTimeMillis();
-			logger.debug("Get program providers " + (current - start));
-			start = current;
-
-			for (ProgramProvider programProvider : programProviders)
-			{
-				logger.debug("Get program provider teams");
-				for (ProgramTeam programTeam : programProvider.getTeams())
-				{
-					String programTeamName = programTeam.getName();
-					if (programTeamName != null && programTeamName.equals(request.getAttribute("teamName")))
-					{
-						teamMembers.add(programProvider.getProvider().getFormattedName());
-					}
-				}
-				current = System.currentTimeMillis();
-				logger.debug("Get program provider teams " + (current - start));
-				start = current;
-
-			}
-			request.setAttribute("teamMembers", teamMembers);
-
-			/* prepare new form list for patient */
-			EncounterFormDao encounterFormDao = (EncounterFormDao) SpringUtils.getBean("encounterFormDao");
-			session.setAttribute("casemgmt_newFormBeans", encounterFormDao.findAll());
-
-			/* prepare messenger list */
-			session.setAttribute("casemgmt_msgBeans", this.caseManagementMgr.getMsgBeans(new Integer(demoNo)));
-
-			// readonly access to define creat a new note button in jsp.
-			session.setAttribute("readonly", new Boolean(this.caseManagementMgr.hasAccessRight("note-read-only", "access", loggedInInfo.getLoggedInProviderNo(), demoNo, (String) session.getAttribute("case_program_id"))));
-
-		}
 		/* Dx */
 		List<Dxresearch> dxList = this.caseManagementMgr.getDxByDemographicNo(demoNo);
 		Map<String, Dxresearch> dxMap = new HashMap<String, Dxresearch>();
@@ -419,14 +377,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		/* ISSUES */
 		if ("Current Issues".equals(tab))
 		{
-			if (useNewCaseMgmt)
-			{
-				viewCurrentIssuesTabForNewCme(request, caseForm, demoNo, programId);
-			}
-			else
-			{
-				viewCurrentIssuesTabForOldCme(request, caseForm, demoNo, programId);
-			}
+			viewCurrentIssuesTabForNewCme(request, caseForm, demoNo, programId);
 		} // end Current Issues Tab
 
 		logger.debug("Get CPP");
@@ -488,21 +439,14 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		else
 		{
 
-			if (useNewCaseMgmt)
+			String fwdName = request.getParameter("ajaxview");
+			if (StringUtils.isEmpty(fwdName) || fwdName.equalsIgnoreCase("null"))
 			{
-				String fwdName = request.getParameter("ajaxview");
-				if (StringUtils.isEmpty(fwdName) || fwdName.equalsIgnoreCase("null"))
-				{
-					return mapping.findForward("page.newcasemgmt.view");
-				}
-				else
-				{
-					return mapping.findForward(fwdName);
-				}
+				return mapping.findForward("page.newcasemgmt.view");
 			}
 			else
 			{
-				return mapping.findForward("page.casemgmt.view");
+				return mapping.findForward(fwdName);
 			}
 		}
 	}
