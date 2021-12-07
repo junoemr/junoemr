@@ -27,13 +27,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import static integration.tests.util.SeleniumTestBase.WEB_DRIVER_EXPLICIT_TIMEOUT;
-import static integration.tests.util.SeleniumTestBase.webDriverWait;
 import static integration.tests.util.seleniumUtil.PageUtil.isExistsBy;
 
 public class SectionAccessUtil
 {
-	public static void accessAdministrationSectionClassicUI(WebDriver driver, String sectionName, String subSectionName)
+	public static void accessAdministrationSectionClassicUI(WebDriver driver, String sectionName, String subSectionName, WebDriverWait webDriverWait)
 	{
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("admin-panel")));
 		driver.findElement(By.id("admin-panel")).click();
@@ -44,7 +42,7 @@ public class SectionAccessUtil
 		driver.switchTo().frame("myFrame");
 	}
 
-	public static void accessAdministrationSectionJUNOUI(WebDriver driver, String sectionName, String subSectionName)
+	public static void accessAdministrationSectionJUNOUI(WebDriver driver, String sectionName, String subSectionName, WebDriverWait webDriverWait)
 			throws InterruptedException
 	{
 		if (isExistsBy(By.xpath("//img[@title=\"Go to Juno UI\"]"), driver))
@@ -65,9 +63,8 @@ public class SectionAccessUtil
 		}
 	}
 
-	public static void accessSectionJUNOUI(WebDriver driver, String sectionName)
+	public static void accessSectionJUNOUI(WebDriver driver, String sectionName, WebDriverWait webDriverWait)
 	{
-		WebDriverWait webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 		if (isExistsBy(By.xpath("//img[@title=\"Go to Juno UI\"]"), driver))
 		{
 			// open JUNO UI page

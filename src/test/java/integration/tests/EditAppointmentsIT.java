@@ -24,8 +24,8 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.seleniumUtil.ActionUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -36,7 +36,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.util.Set;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -122,7 +121,8 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 
 		//Edit from "Edit An Appointment" page
 		Set<String> oldWindowHandles = driver.getWindowHandles();
-		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles);
+		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles,
+			webDriverWait);
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@type='submit']")));
 		driver.findElement(By.xpath("//input[@type='submit']")).click();
 		driver.findElement(By.xpath("//input[@name='keyword']")).clear();
@@ -146,7 +146,8 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		Assert.assertTrue("Patient is NOT updated successfully.", PageUtil.isExistsBy(By.partialLinkText(dad.lastName), driver));
 
 		driver.findElement(By.partialLinkText(dad.lastName)).click();
-		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles);
+		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles,
+			webDriverWait);
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@type='submit']")));
 		String name = driver.findElement(By.xpath("//input[@name='keyword']")).getAttribute("value");
 		String apptDuration = driver.findElement(By.xpath("//input[@name='duration']")).getAttribute("value");
@@ -178,9 +179,8 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
-		accessSectionJUNOUI(driver, "Schedule");
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
-		driver.findElement(By.xpath("//button[@title='Next Day']")).click();
+		accessSectionJUNOUI(driver, "Schedule", webDriverWait);
+		ActionUtil.findWaitClick(driver, webDriverWait, "//button[@title='Next Day']");
 		driver.findElement(By.xpath("//button[@title='Next Day']")).click();
 		Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));
 		providerDropDown.selectByVisibleText("oscardoc, doctor");
@@ -189,7 +189,9 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		driver.findElement(By.xpath("//span[contains(., '" + mom.firstName + "')]")).click();
 		driver.findElement(By.id("input-patient")).findElement(By.tagName("input")).clear();
 		driver.findElement(By.id("input-patient")).findElement(By.tagName("input")).sendKeys(dad.firstName);
-		driver.findElement(By.xpath("//span[contains(., '" + dad.firstName + "')]")).click();
+
+		ActionUtil.findWaitClick(driver, webDriverWait, "//span[contains(., '" + dad.firstName + "')]");
+
 		dropdownSelectByVisibleText(driver, By.id("input-type"), typeUpdated);
 		driver.findElement(By.id("input-duration")).clear();
 		driver.findElement(By.id("input-duration")).sendKeys(apptDurationUpdated);

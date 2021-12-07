@@ -21,7 +21,7 @@ services:
     depends_on: [juno-test-db, juno-selenium-firefox]
     build: .
     #image: maven:3.6.3-openjdk-8
-    command: mvn -Dis_docker_testing_enabled=true -Duser.home=/home/maven -DskipTests clean verify
+    command: mvn -Dis_docker_testing_enabled=true -Duser.home=/home/maven clean verify
     volumes:
       - ../../:/usr/src/mymaven:Z
       - ~/.m2:/home/maven/.m2:Z
@@ -29,7 +29,7 @@ services:
     environment:
       HOME: /home/maven
       MAVEN_CONFIG: /home/maven/.m2
-      MAVEN_OPTS: "-Xmx2048m"
+#      MAVEN_OPTS: "-DXmx2048m"
       TZ: America/Vancouver
     working_dir: /usr/src/mymaven
     user: $DOCKER_USER

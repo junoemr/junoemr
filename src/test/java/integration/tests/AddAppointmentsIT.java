@@ -25,9 +25,6 @@ package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.seleniumUtil.PageUtil;
-import java.util.ArrayList;
-import java.util.Arrays;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -38,7 +35,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -111,7 +107,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
 		PageUtil.switchToWindow(newWindows.get(newWindows.size() - 1), driver);
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@name='status']")));
-		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), status);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), status, webDriverWait);
 		driver.findElement(By.id("addButton")).click();
 		PageUtil.switchToWindow(currWindowHandle, driver);
 	}
@@ -121,9 +117,9 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("searchBtn")));
 		driver.findElement(By.id("searchBtn")).click();
 		driver.findElement(By.xpath(".//td[contains(., '" + demoFName +"')]")).click();
-		dropdownSelectByValue(driver, By.xpath("//select[@name='reasonCode']"), "4");//Follow-Up
+		dropdownSelectByValue(driver, By.xpath("//select[@name='reasonCode']"), "4", webDriverWait);//Follow-Up
 		driver.findElement(By.id("reason")).sendKeys("Appointment Reason.");
-		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), status);//To Do
+		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), status, webDriverWait);//To Do
 		driver.findElement(By.xpath("//input[@name='type']")).sendKeys("Appointment Type");
 		driver.findElement(By.xpath("//textarea[@name='notes']")).sendKeys("Appointment Notes");
 		driver.findElement(By.xpath("//input[@name='resources']")).sendKeys("Appointment Resources");
@@ -231,7 +227,8 @@ public class AddAppointmentsIT extends SeleniumTestBase
 	public void addAppointmentsSearchToolTest() throws InterruptedException {
 		String currWindowHandle = driver.getWindowHandle();
 		//Setup Schedule
-		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Schedule Setting");
+		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Schedule Setting",
+			webDriverWait);
 		String windowHandleScheduleSetting = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
  		setupTemplate(windowHandleScheduleSetting, oldWindowHandles);
@@ -248,8 +245,9 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		PageUtil.switchToLastWindow(driver);
 		driver.manage().window().maximize();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@name='provider_no']")));
-		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), AuthUtils.TEST_PROVIDER_ID);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='dayOfWeek']"), "4"); //Wednesday
+		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), AuthUtils.TEST_PROVIDER_ID,
+			webDriverWait);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='dayOfWeek']"), "4", webDriverWait); //Wednesday
 		driver.findElement(By.xpath("//input[@value='Search']")).click();
 		String secCurrWindowHandle = driver.getWindowHandle();
 
@@ -286,7 +284,8 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		//Setup Groups
-		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Add a Group");
+		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Add a Group",
+			webDriverWait);
 		AddGroupIT addGroupIT = new AddGroupIT();
 		addGroupIT.addGroup(groupName, 2);
 		Assert.assertTrue("Group is Not added successfully.",
@@ -295,7 +294,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("mygroup_no")));
-		dropdownSelectByValue(driver, By.id("mygroup_no"), "_grp_TestGroup");
+		dropdownSelectByValue(driver, By.id("mygroup_no"), "_grp_TestGroup", webDriverWait);
 		String xpathAt9 =
 				"//a[contains(.,'" + drApple.lastName + "')]" +
 						"/ancestor::tr/following-sibling::tr" +

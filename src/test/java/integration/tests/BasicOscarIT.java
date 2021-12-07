@@ -64,8 +64,8 @@ public class BasicOscarIT extends SeleniumTestBase
 				AuthUtils.TEST_PASSWORD,
 				AuthUtils.TEST_PIN,
 				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-				driver
-		);
+				driver,
+			webDriverWait);
 	}
 
 }

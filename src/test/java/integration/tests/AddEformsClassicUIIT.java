@@ -72,9 +72,7 @@ public class AddEformsClassicUIIT extends SeleniumTestBase
 		String subject = "EFormTest";
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		driver.findElement(By.xpath("//div[@id='menuTitleeforms']//descendant::a[contains(., '+')]")).click();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		PageUtil.switchToLastWindow(driver);
 		driver.findElement(By.linkText("letter")).click();
 		PageUtil.switchToLastWindow(driver);
@@ -82,7 +80,6 @@ public class AddEformsClassicUIIT extends SeleniumTestBase
 		driver.findElement((By.xpath("//input[@value='Submit']"))).click();
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		Assert.assertTrue("Eform Letter is NOT added successfully.", PageUtil.isExistsBy(By.partialLinkText(subject), driver));
 	}
 }

@@ -77,7 +77,7 @@ public class EFormIT extends SeleniumTestBase
 		//navigate to eform addition page
 		String oldUrl = driver.getCurrentUrl();
 		driver.get(Navigation.getOscarUrl(Integer.toString(randomTomcatPort)) + EFORM_URL);
-		PageUtil.waitForPageChange(oldUrl, driver);
+		PageUtil.waitForPageChange(oldUrl, webDriverWait);
 		Assert.assertFalse("expecting eform page but found error page!", PageUtil.isErrorPage(driver));
 		logger.info("Navigate to eform add page. OK");
 

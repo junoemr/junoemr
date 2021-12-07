@@ -27,8 +27,6 @@ import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
@@ -39,6 +37,7 @@ import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
+//import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.AuthUtils;
@@ -51,13 +50,8 @@ import org.springframework.boot.web.server.LocalServerPort;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Import;
 import oscar.OscarProperties;
-
-import static org.junit.Assert.fail;
 
 @Import(TestConfig.class)
 public class SeleniumTestBase extends DatabaseTestBase
@@ -72,7 +66,6 @@ public class SeleniumTestBase extends DatabaseTestBase
 	protected JunoProperties junoProperties;
 
 
-	public static final Integer WEB_DRIVER_IMPLICIT_TIMEOUT = 60;
 	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 120;
 	private static final String GECKO_DRIVER="src/test/resources/vendor/geckodriver";
 	private static final String DOCKER_INTEGRATION_PROPERTIES_FILE = "src/test/resources/docker_integration.properties";
@@ -138,17 +131,16 @@ public class SeleniumTestBase extends DatabaseTestBase
 			driver = new FirefoxDriver(firefoxOptions);
 		}
 
-		driver.manage().timeouts().implicitlyWait(WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
+		webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 
 		Navigation.doLogin(
 			AuthUtils.TEST_USER_NAME,
 			AuthUtils.TEST_PASSWORD,
 			AuthUtils.TEST_PIN,
 			Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-			driver
-		);
+			driver,
+			webDriverWait);
 		driver.manage().window().setSize(new Dimension(1920, 1080));
-		webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 	}
 
 	@After

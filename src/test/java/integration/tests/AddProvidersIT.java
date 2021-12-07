@@ -26,14 +26,8 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.data.ProviderTestData;
-import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import junit.framework.Assert;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,14 +35,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.AuthUtils;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 
@@ -105,10 +94,10 @@ Session ID: 7004a14c-aa65-4887-8c95-fcd555918f3b
 		driver.findElement(By.xpath("//input[@name='provider_no']")).sendKeys(drApple.providerNo);
 		driver.findElement(By.xpath("//input[@name='last_name']")).sendKeys(drApple.lastName);
 		driver.findElement(By.xpath("//input[@name='first_name']")).sendKeys(drApple.firstName);
-		dropdownSelectByValue(driver, By.id("provider_type"), drApple.type);
+		dropdownSelectByValue(driver, By.id("provider_type"), drApple.type, webDriverWait);
 		driver.findElement(By.xpath("//input[@name='specialty']")).sendKeys(drApple.specialty);
 		driver.findElement(By.xpath("//input[@name='team']")).sendKeys(drApple.team);
-		dropdownSelectByValue(driver, By.id("sex"), drApple.sex);
+		dropdownSelectByValue(driver, By.id("sex"), drApple.sex, webDriverWait);
 		driver.findElement(By.xpath("//input[@name='dob']")).sendKeys(drApple.dob);
 		driver.findElement(By.xpath("//input[@name='address']")).sendKeys(drApple.address);
 		driver.findElement(By.xpath("//input[@name='phone']")).sendKeys(drApple.homePhone);
@@ -130,10 +119,12 @@ Session ID: 7004a14c-aa65-4887-8c95-fcd555918f3b
 		driver.findElement(By.xpath("//input[@name='xml_p_specialty_code']")).sendKeys(drApple.specialtyCodeNo);
 		driver.findElement(By.xpath("//input[@name='xml_p_billinggroup_no']")).sendKeys(drApple.groupBillingNo);
 		driver.findElement(By.xpath("//input[@name='practitionerNo']")).sendKeys(drApple.cpsidNo);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='billcenter']"), drApple.billCenter);//dropdown empty
+		dropdownSelectByValue(driver, By.xpath("//select[@name='billcenter']"), drApple.billCenter,
+			webDriverWait);//dropdown empty
 		driver.findElement(By.xpath("//input[@name='xml_p_slpusername']")).sendKeys(drApple.selfLearningUsername);
 		driver.findElement(By.xpath("//input[@name='xml_p_slppassword']")).sendKeys(drApple.selfLearningPassword);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), drApple.status);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), drApple.status,
+			webDriverWait);
 		driver.findElement(By.xpath("//input[@name='submitbtn']")).click();
 		Assert.assertNotNull(driver.findElement(By.xpath(".//h1[contains(.,'Successful Addition of a Provider Record.')]")));
 

@@ -22,18 +22,17 @@
  */
 package integration.tests.util.seleniumUtil;
 
-import integration.tests.util.SeleniumTestBase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+//import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 public class PageUtil
@@ -41,32 +40,29 @@ public class PageUtil
 	/**
 	 * wait until the webdriver changes pages
 	 * @param oldUrl
-	 * @param driver
+	 * @param webDriverWait
 	 */
-	public static void waitForPageChange(String oldUrl, WebDriver driver)
+	public static void waitForPageChange(String oldUrl, WebDriverWait webDriverWait)
 	{
-		WebDriverWait wait = new WebDriverWait(driver, 20);
-		wait.until(ExpectedConditions.not(ExpectedConditions.urlMatches(oldUrl)));
+		webDriverWait.until(ExpectedConditions.not(ExpectedConditions.urlMatches(oldUrl)));
 	}
 
 	/**
-	 * check if a given WebElement exists (with no implicit delay)
+	 * check if a given WebElement exists.  Will take a long time to timeout if used to find the
+	 * absence of an element.
 	 * @param search search method used to find element
 	 * @param driver webDriver
 	 * @return true / false depending on if the WebElement exists in the DOM
 	 */
 	public static boolean isExistsBy(By search, WebDriver driver)
 	{
-		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 		try
 		{
 			driver.findElement(search);
-			driver.manage().timeouts().implicitlyWait(SeleniumTestBase.WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 			return true;
 		}
 		catch (NoSuchElementException e)
 		{
-			driver.manage().timeouts().implicitlyWait(SeleniumTestBase.WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 			return false;
 		}
 	}
@@ -138,7 +134,11 @@ public class PageUtil
 		driver.manage().window().maximize();
 	}
 
-	public static void  switchToNewWindow(WebDriver driver, By textlink, Set<String> oldWindowHandles) throws InterruptedException {
+	public static void  switchToNewWindow(WebDriver driver, By textlink,
+		Set<String> oldWindowHandles, WebDriverWait webDriverWait)
+		throws InterruptedException
+	{
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(textlink));
 		driver.findElement(textlink).click();
 		Thread.sleep(2000);
 		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);

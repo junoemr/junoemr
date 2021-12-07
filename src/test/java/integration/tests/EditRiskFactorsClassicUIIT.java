@@ -73,7 +73,6 @@ public class EditRiskFactorsClassicUIIT extends SeleniumTestBase
 		String startDate = "2020-01-01";
 		String resolutionDate = "2021-01-01";
 		PageUtil.switchToLastWindow(driver);
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 
 		//Add Risk Factors Notes
 		driver.findElement(By.xpath("//div[@id='menuTitleriskFactors']//descendant::a[contains(., '+')]")).click();
@@ -85,9 +84,7 @@ public class EditRiskFactorsClassicUIIT extends SeleniumTestBase
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(riskFactorsCPP);
 		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		driver.findElement(By.id("saveImg")).click();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);//wait until note is saved.
 		Assert.assertTrue("Risk Factors Note is NOT Added in CPP successfully",
 				PageUtil.isExistsBy(By.linkText(riskFactorsCPP), driver));
  		Assert.assertTrue("Risk Factors Note is NOT Copied in Encounter note successfully",

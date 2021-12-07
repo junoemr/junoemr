@@ -93,7 +93,7 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 	{
 		driver.findElement(By.xpath("//input[@name='password']")).sendKeys(password);
 		driver.findElement(By.xpath("//input[@name='conPassword']")).sendKeys(password);
-		dropdownSelectByValue(driver, By.id("provider_no"), providerNo);
+		dropdownSelectByValue(driver, By.id("provider_no"), providerNo, webDriverWait);
 
 		//Add today as expiry date
 		driver.findElement(By.xpath("//input[@name='b_ExpireSet']")).click();
@@ -101,16 +101,19 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//div[@class='calendar']//div[contains(., 'Today')]")).click();
 		driver.findElement(By.xpath("//input[@name='pin']")).sendKeys(pin);
 		driver.findElement(By.xpath("//input[@name='conPin']")).sendKeys(pin);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='forcePasswordReset']"), "1");
+		dropdownSelectByValue(driver, By.xpath("//select[@name='forcePasswordReset']"), "1",
+			webDriverWait);
 		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
 	}
 
 	private void removeExpiryDate(String userName, String providerNo)
 	{
-		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.getOscarUrl(randomTomcatPort), driver);
+		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.getOscarUrl(randomTomcatPort), driver,
+			webDriverWait);
 		String currWindowHandle1 = driver.getWindowHandle();
 		PageUtil.switchToWindow(currWindowHandle1, driver);
-		accessAdministrationSectionClassicUI(driver, "User Management", "Search/Edit/Delete Security Records");
+		accessAdministrationSectionClassicUI(driver, "User Management", "Search/Edit/Delete Security Records",
+			webDriverWait);
 		driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(providerNo);
 		driver.findElement(By.xpath("//input[@value='Search']")).click();
 		driver.findElement(By.linkText(userName)).click();
@@ -129,7 +132,8 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 	private void accessLoginApple(String currWindowHandle)
 	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		accessAdministrationSectionClassicUI(driver, "User Management", "Add a Login Record");
+		accessAdministrationSectionClassicUI(driver, "User Management", "Add a Login Record",
+			webDriverWait);
 		driver.findElement(By.xpath("//input[@name='user_name']")).sendKeys(userNameApple);
 	}
 
@@ -140,7 +144,8 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 	{
 		String currWindowHandle = driver.getWindowHandle();
 		//Assign Roles
-		accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
+		accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider",
+			webDriverWait);
 		assignRoles(xpathDropdown, xpathProvider, "admin", "//following-sibling::td/input[@value='Add']");
 		String message = "Role " + role + " is added. (" + drApple.providerNo + ")";
 		Assert.assertTrue("Admin is NOT assigned to the provider successfully.",
@@ -160,18 +165,20 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		//Account expired
 		accessLoginApple(currWindowHandle);
 		addLoginRecord(password, drApple.providerNo, pin);
-		Navigation.doLogin(userNameApple, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver);
+		Navigation.doLogin(userNameApple, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver,
+			webDriverWait);
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath("//p[contains(., 'Your account is expired. Please contact your administrator.')]"), driver));
 
 		//Remove expiry date.
 		removeExpiryDate(userNameApple, drApple.providerNo);
-		Navigation.doLogin(userNameApple, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver);
+		Navigation.doLogin(userNameApple, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver,
+			webDriverWait);
 		Assert.assertTrue(Navigation.isLoggedIn(driver));
 
 		//Reset password
 		Navigation.doLogin(userNameApple, password, pin,
 				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-				driver);
+				driver, webDriverWait);
 		resetPassword(password, passwordUpdated);
 		Assert.assertTrue(Navigation.isLoggedIn(driver));
 	}
@@ -184,7 +191,8 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		String xpathProvider = "(//td[contains(., '" + drBerry.providerNo + "')])";
 		String xpathDropdown = xpathProvider + xpathOption;
 		//Assign Roles
-		accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
+		accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider",
+			webDriverWait);
 		assignRoles(xpathDropdown, xpathProvider, "admin", "//following-sibling::td/input[@value='Add']");
 		String message = "Role " + role + " is added. (" + drBerry.providerNo + ")";
 		Assert.assertTrue("Admin is NOT assigned to the provider successfully.",
@@ -192,7 +200,8 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 
 		Set<String> handles = driver.getWindowHandles();
 		PageUtil.switchToWindow(handles.iterator().next(), driver);
-		accessAdministrationSectionJUNOUI(driver, "User Management", "Add a Login Record");
+		accessAdministrationSectionJUNOUI(driver, "User Management", "Add a Login Record",
+			webDriverWait);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='user_name']")));
 		driver.findElement(By.xpath("//input[@name='user_name']")).sendKeys(userNameBerry);
 
@@ -209,17 +218,19 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 
 		//Account expired.
 		addLoginRecord(password, drBerry.providerNo, pin);
-		Navigation.doLogin(userNameBerry, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver);
+		Navigation.doLogin(userNameBerry, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver,
+			webDriverWait);
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath("//p[contains(., 'Your account is expired. Please contact your administrator.')]"), driver));
 
 		//Remove Expiry date.
 		removeExpiryDate(userNameBerry, drBerry.providerNo);
-		Navigation.doLogin(userNameBerry, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver);
+		Navigation.doLogin(userNameBerry, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver,
+			webDriverWait);
 		Assert.assertTrue(Navigation.isLoggedIn(driver));
 
 		//Reset password
 		Navigation.doLogin(userNameBerry, password, pin, Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-				driver);
+				driver, webDriverWait);
 		resetPassword(password, passwordUpdated);
 		Assert.assertTrue(Navigation.isLoggedIn(driver));
 	}

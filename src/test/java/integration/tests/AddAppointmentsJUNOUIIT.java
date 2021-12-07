@@ -24,9 +24,9 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.seleniumUtil.ActionUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,7 +36,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.util.List;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -107,7 +106,11 @@ public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 	{
 		selectTimeSlot(startTimeExpected);
 		driver.findElement(By.id("input-patient")).findElement(By.tagName("input")).sendKeys(patientFName);
-		driver.findElement(By.xpath("//span[contains(., '" + patientFName + "')]")).click();
+
+		By patientElement = By.xpath("//span[contains(., '" + patientFName + "')]");
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(patientElement));
+		driver.findElement(patientElement).click();
+
 		dropdownSelectByVisibleText(driver, By.id("input-event-appt-status"), apptStatus);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("input-reason-code")));
 		dropdownSelectByVisibleText(driver, By.id("input-reason-code"), "Follow-Up");
@@ -123,29 +126,32 @@ public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 		String xpathProvider = "//td[contains(., '" + providerLName + "')]//following-sibling::" +
 				"td[@class='provider-button-column flex-row justify-content-center']" +
 				"//button[@title='Edit Provider']";
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpathProvider)));
-		driver.findElement(By.xpath(xpathProvider)).click();
+		ActionUtil.findWaitClick(driver, webDriverWait, xpathProvider);
 
 		//Scroll down to "Contact Information"
 		JavascriptExecutor js = (JavascriptExecutor) driver;
-		WebElement Element = driver.findElement(By.xpath("//h6[contains(., 'Site Assignment')]"));
+		By siteAssignmentElement = By.xpath("//h6[contains(., 'Site Assignment')]");
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(siteAssignmentElement));
+		WebElement Element = driver.findElement(siteAssignmentElement);
 		js.executeScript("arguments[0].scrollIntoView();", Element);
+
 		//Add site for Dr. Berry
 		driver.findElement(By.id("name-siteSelection")).sendKeys("Test");
-		driver.findElement(By.xpath("//a[@title='" + siteName +"']")).click();
+		ActionUtil.findWaitClick(driver, webDriverWait, "//a[@title='" + siteName +"']");
 		driver.findElement(By.xpath("//button[@ng-click='$ctrl.addSiteAssignment($ctrl.currentSiteSelection.value)']")).click();
+
 		//Assign role "doctor" to Dr. Berry.
 		driver.findElement(By.id("name-access_roles")).sendKeys("doc");
-		driver.findElement(By.xpath("//a[@title='doctor']")).click();
-		driver.findElement(By.xpath("//button[@ng-click='$ctrl.addUserRole($ctrl.currentRoleSelection.value)']")).click();
-		driver.findElement(By.xpath("//button[@ng-click='$ctrl.submit()']")).click();
-		driver.findElement(By.xpath("//button[@ng-click='$ctrl.close()']")).click();
+		ActionUtil.findWaitClick(driver, webDriverWait, "//a[@title='doctor']");
+		ActionUtil.findWaitClick(driver, webDriverWait, "//button[@ng-click='$ctrl.addUserRole($ctrl.currentRoleSelection.value)']");
+		ActionUtil.findWaitClick(driver, webDriverWait, "//button[@ng-click='$ctrl.submit()']");
+		ActionUtil.findWaitClick(driver, webDriverWait, "//button[@ng-click='$ctrl.close()']");
 	}
 
 	@Test
 	public void addAppointmentsSchedulePageTest() throws InterruptedException {
 		// open JUNO UI page,
-		accessSectionJUNOUI(driver, "Schedule");
+		accessSectionJUNOUI(driver, "Schedule", webDriverWait);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("schedule-select")));
 		dropdownSelectByVisibleText(driver, By.id("schedule-select"), "oscardoc, doctor" );
 
@@ -153,8 +159,11 @@ public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 		String startTimeExpected = "09:00:00";
 		String apptStatusAt9 = "To Do";
 		addAppointmentWithDemo(startTimeExpected, mom.firstName, apptStatusAt9, siteNames[0]);
+
+		By statusElement = By.xpath("//i[@title='" + apptStatusAt9 + "']");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(statusElement));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
-				PageUtil.isExistsBy(By.xpath("//i[@title='" + apptStatusAt9 + "']"), driver));
+				PageUtil.isExistsBy(statusElement, driver));
 
 		//Add an appointment at 10:00-10:15 with NO demographic selected.
 		String startTimeExpectedNoDemo = "10:00:00";
@@ -186,10 +195,10 @@ Driver info: driver.version: unknown
 			throws InterruptedException
 	{
 		// open JUNO UI page, Add site to Dr. Apple and Dr. Berry
-		accessAdministrationSectionJUNOUI(driver, "User Management", "Manage Users");
+		accessAdministrationSectionJUNOUI(driver, "User Management", "Manage Users", webDriverWait);
 		addSiteNAssignRole("Apple", siteNames[0]);
 		// open JUNO UI page,
-		accessSectionJUNOUI(driver, "Schedule");
+		accessSectionJUNOUI(driver, "Schedule", webDriverWait);
 		//Weekly View - next week
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[contains(., 'Week')]")));
 		driver.findElement(By.xpath("//button[contains(., 'Week')]")).click();
@@ -213,14 +222,15 @@ Driver info: driver.version: unknown
 	@Test
 	public void addAppointmentsGroupViewTest() throws InterruptedException {
 		// open JUNO UI page, Add site to Dr. Apple and Dr. Berry
-		accessAdministrationSectionJUNOUI(driver, "User Management", "Manage Users");
+		accessAdministrationSectionJUNOUI(driver, "User Management", "Manage Users", webDriverWait);
 		addSiteNAssignRole("Apple", siteNames[0]);
-		accessSectionJUNOUI(driver, "Manage Users");
+		accessSectionJUNOUI(driver, "Manage Users", webDriverWait);
 		addSiteNAssignRole("Berry", siteNames[0]);
 
 		//Add Group
 		String testGroup = "TestGroup";
-		accessAdministrationSectionJUNOUI(driver, "Schedule Management", "Add a Group");
+		accessAdministrationSectionJUNOUI(driver, "Schedule Management", "Add a Group",
+			webDriverWait);
 		AddGroupIT addGroupIT = new AddGroupIT();
 		addGroupIT.addGroup(testGroup, 2);
 		driver.switchTo().defaultContent();

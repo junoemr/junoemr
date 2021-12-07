@@ -28,18 +28,13 @@ import integration.tests.util.data.SiteTestCollection;
 import integration.tests.util.data.SiteTestData;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
@@ -80,7 +75,7 @@ public class AddSitesIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='site.fax']")).sendKeys(site.fax);
 		driver.findElement(By.xpath("//input[@name='site.address']")).sendKeys(site.address);
 		driver.findElement(By.xpath("//input[@name='site.city']")).sendKeys(site.city);
-		dropdownSelectByValue(driver, By.id("province-select"), site.province);
+		dropdownSelectByValue(driver, By.id("province-select"), site.province, webDriverWait);
 		driver.findElement(By.xpath("//input[@name='site.postal']")).sendKeys(site.postCode);
 		driver.findElement(By.xpath("//input[@name='site.bcFacilityNumber']")).sendKeys(site.bcpFacilityNumber);
 		driver.findElement(By.id("save-button")).click();
@@ -105,7 +100,7 @@ public class AddSitesIT extends SeleniumTestBase
 	public void addSitesJUNOUITest()
 	{
 		SiteTestData siteJuno = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[1]);
-		accessSectionJUNOUI(driver, "Admin");
+		accessSectionJUNOUI(driver, "Admin", webDriverWait);
 		addNewSites(siteJuno);
 		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(siteJuno.siteName), driver));
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));

@@ -25,7 +25,9 @@ package integration.tests.util.seleniumUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class ActionUtil
 {
@@ -34,8 +36,9 @@ public class ActionUtil
 		Select dropdownList = new Select(driver.findElement(dropdown));
 		dropdownList.selectByVisibleText(visibleText);
 	}
-	public static void dropdownSelectByValue(WebDriver driver, By dropdown, String dropdownSelection)
+	public static void dropdownSelectByValue(WebDriver driver, By dropdown, String dropdownSelection, WebDriverWait webDriverWait)
 	{
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("option[value='" + dropdownSelection + "']")));
 		Select dropdownList = new Select(driver.findElement(dropdown));
 		dropdownList.selectByValue(dropdownSelection);
 	}
@@ -53,4 +56,10 @@ public class ActionUtil
 		text.sendKeys(textNew);
 	}
 
+	public static void findWaitClick(WebDriver driver, WebDriverWait webDriverWait, String xpath)
+	{
+		By elementToClick = By.xpath(xpath);
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(elementToClick));
+		driver.findElement(elementToClick).click();
+	}
 }

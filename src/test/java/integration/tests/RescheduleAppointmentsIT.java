@@ -25,7 +25,6 @@ package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -37,7 +36,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -91,7 +89,8 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
 
         //Edit from "Edit An Appointment" page
         Set<String> oldWindowHandles = driver.getWindowHandles();
-        PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles);
+        PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles,
+			webDriverWait);
         //Cut & Paste from 9:00 to 9:45
         driver.findElement(By.xpath("//input[@value='Cut']")).click();
         PageUtil.switchToWindow(currWindowHandle, driver);
@@ -108,7 +107,8 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
                 PageUtil.isExistsBy(By.xpath(apptXpath), driver));
 
         //Copy & paste from 9:45 to 10:45
-        PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles);
+        PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles,
+			webDriverWait);
         driver.findElement(By.xpath("//input[@value='Copy']")).click();
         PageUtil.switchToWindow(currWindowHandle, driver);
         Thread.sleep(2000);
@@ -136,7 +136,7 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
         Assert.assertTrue("Appointments is NOT added successfully.",
                 PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
-        accessSectionJUNOUI(driver, "Schedule");
+        accessSectionJUNOUI(driver, "Schedule", webDriverWait);
         webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
         driver.findElement(By.xpath("//button[@title='Next Day']")).click();
         driver.findElement(By.xpath("//button[@title='Next Day']")).click();

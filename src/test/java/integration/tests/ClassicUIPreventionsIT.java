@@ -24,13 +24,8 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -38,12 +33,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -201,7 +194,8 @@ public class ClassicUIPreventionsIT extends SeleniumTestBase
 				"child::a[contains(@onclick, 'AddPreventionData.jsp?prevention=Smoking')]"), driver));
 
 		PageUtil.switchToNewWindow(driver,
-				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), oldWindowHandles);
+				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), oldWindowHandles,
+			webDriverWait);
 		String currentComment = driver.findElement(By.xpath("//textarea[@name='comments']")).getAttribute("value");
 		Assert.assertEquals("Exam-style prevention comments not updated successfully", originalComments, currentComment);
 	}

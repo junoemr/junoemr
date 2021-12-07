@@ -102,7 +102,6 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("Allergies")));
 		String eChartWindowHandle = driver.getWindowHandle();
 		driver.findElement(By.linkText("Allergies")).click();
-		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 		String allergiesWindowHandle = driver.getWindowHandle();
 		Map<String, String> pageHandleMap = new HashMap<String, String>();
 		pageHandleMap.put(eChartPage, eChartWindowHandle);
@@ -125,7 +124,6 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		driver.findElement(By.id("searchString")).sendKeys(allergyNameCustom);
 		driver.findElement(By.xpath("//button[@value='Custom Allergy']")).click();
 		driver.switchTo().alert().accept();
-		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 		addAllergyDetails(reaction, startDate, ageOfOnset, lifeStage, severity, onset);
 
 		HashMap<String, Boolean> assertionTestData = new HashMap<String, Boolean>();
@@ -135,7 +133,6 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 			{
 				PageUtil.switchToWindow(pageHandleMap.get(pageType), driver);
 				driver.navigate().refresh();
-				driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 			}
 			for (int i = 0; i < allergyNames.size(); i++)
 			{
@@ -176,7 +173,6 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 			"/parent::tr/descendant::a[contains(., 'Inactivate')]";
 		driver.findElement(By.xpath(inactivateButtonEggWhite)).click();
 		driver.switchTo().alert().accept();
-		driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
 
 		//** Verify on Allergies page. **
 		Assert.assertFalse("Allergies Page: " + allergyNameCustom + " is NOT inactivated successfully.",
@@ -185,7 +181,6 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		//** Verify on Allergies section on eChart page. **
 		PageUtil.switchToWindow(eChartWindowHandle, driver);
 		driver.navigate().refresh();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		Assert.assertFalse("eChart Page: " + allergyNameCustom + " is NOT inactivated successfully.",
 			PageUtil.isExistsBy(By.linkText(allergyNameCustom.toUpperCase()), driver));
 	}

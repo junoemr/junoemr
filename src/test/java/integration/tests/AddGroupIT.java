@@ -26,14 +26,12 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -97,7 +95,8 @@ public class AddGroupIT extends SeleniumTestBase
 	@Test
 	public void addGroupsClassicUITest() throws InterruptedException {
 		//Add a New Group with two providers: Dr. Apple and Dr. Berry
-		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Add a Group");
+		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Add a Group",
+			webDriverWait);
 		addGroup(groupName, 2);
 		Assert.assertTrue("Group is Not added successfully.",
 				PageUtil.isExistsBy(By.name(valueOfDrApple), driver) &&
@@ -125,7 +124,8 @@ public class AddGroupIT extends SeleniumTestBase
 
 	@Test
 	public void addGroupsJUNOUITest() throws InterruptedException {
-		accessAdministrationSectionJUNOUI(driver, "Schedule Management", "Add a Group");
+		accessAdministrationSectionJUNOUI(driver, "Schedule Management", "Add a Group",
+			webDriverWait);
 
 		//Add a New Group with two providers: Dr. Apple and Dr. Berry
 		addGroup(groupName, 2);

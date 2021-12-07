@@ -25,7 +25,6 @@ package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -35,7 +34,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -71,7 +69,7 @@ public class AssignRolesIT extends SeleniumTestBase
 
     public static void assignRoles(String xpathDropdown, String xpathProviderNo, String role, String xpathAction)
     {
-        dropdownSelectByValue(driver, By.xpath(xpathDropdown), role);
+        dropdownSelectByValue(driver, By.xpath(xpathDropdown), role, webDriverWait);
         String xpath = xpathProviderNo + xpathAction;
         driver.findElement(By.xpath(xpath)).click();
     }
@@ -88,7 +86,8 @@ public class AssignRolesIT extends SeleniumTestBase
     public void assignRolesClassicUITest()
             throws InterruptedException
     {
-        accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
+        accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider",
+			webDriverWait);
         webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='keyword']")));
         driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(drApple.lastName);
         driver.findElement(By.xpath("//input[@name='search']")).click();
@@ -110,8 +109,9 @@ public class AssignRolesIT extends SeleniumTestBase
         Assert.assertEquals("Nurse is NOT updated to the provider successfully.", "nurse", roleUpdated);
 
         //Set primary role
-        dropdownSelectByValue(driver, By.id("primaryRoleProvider"), drApple.providerNo);
-        dropdownSelectByValue(driver, By.id("primaryRoleRole"), "admin");
+        dropdownSelectByValue(driver, By.id("primaryRoleProvider"), drApple.providerNo,
+			webDriverWait);
+        dropdownSelectByValue(driver, By.id("primaryRoleRole"), "admin", webDriverWait);
         driver.findElement(By.xpath("//input[@value='Set Primary Role']")).click();
         driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(drApple.lastName);
         driver.findElement(By.xpath("//input[@name='search']")).click();

@@ -27,7 +27,6 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -36,7 +35,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.util.Set;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -81,7 +79,6 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 
 	public static String apptStatusHoverOver()
 	{
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.className("apptStatus")));
 		WebElement statusButton = driver.findElement(By.className("apptStatus"));
 		Actions builder = new Actions(driver);
 		builder.clickAndHold().moveToElement(statusButton);
@@ -117,8 +114,9 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 
 		//Edit from "Edit An Appointment" page
 		Set<String> oldWindowHandles = driver.getWindowHandles();
-		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), "b");//Customized 2
+		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles,
+			webDriverWait);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), "b", webDriverWait);//Customized 2
 		driver.findElement(By.id("updateButton")).click();
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
@@ -131,7 +129,9 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 			throws InterruptedException
 	{
 		// Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
-		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
+		String viewNextDaySelector = "//img[@alt='View Next DAY']";
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(viewNextDaySelector)));
+		driver.findElement(By.xpath(viewNextDaySelector)).click();
 		String currWindowHandle = driver.getWindowHandle();
 		AddAppointmentsIT addAppointmentsTests = new AddAppointmentsIT();
 		addAppointmentsTests.addAppointmentsSchedulePage("10:00", currWindowHandle, mom.firstName);
@@ -139,10 +139,16 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
-		accessSectionJUNOUI(driver, "Schedule");
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
-		driver.findElement(By.xpath("//button[@title='Next Day']")).click();
-		driver.findElement(By.xpath("//button[@title='Next Day']")).click();
+		accessSectionJUNOUI(driver, "Schedule", webDriverWait);
+
+		String nextDaySelector = "//button[@title='Next Day']";
+
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(nextDaySelector)));
+		driver.findElement(By.xpath(nextDaySelector)).click();
+
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(nextDaySelector)));
+		driver.findElement(By.xpath(nextDaySelector)).click();
+
 		Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));
 		providerDropDown.selectByVisibleText("oscardoc, doctor");
 		WebElement statusButton = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-starbill rotate']"));
@@ -158,7 +164,7 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 
 		//Edit from "Modify Appointment" page
 		driver.findElement(By.xpath("//span[contains(., '" + momFullNameJUNO + "')]")).click();
-		dropdownSelectByValue(driver, By.id("input-event-appt-status"), "C");//Cancelled
+		dropdownSelectByValue(driver, By.id("input-event-appt-status"), "C", webDriverWait);//Cancelled
 		driver.findElement(By.xpath("//button[contains(., 'Modify')]")).click();
 		String statusCancelled = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-cancel rotate']"))
 				.getAttribute("title");

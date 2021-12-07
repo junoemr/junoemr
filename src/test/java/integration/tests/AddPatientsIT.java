@@ -26,11 +26,8 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.PatientTestCollection;
 import integration.tests.util.data.PatientTestData;
-import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,13 +35,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.AuthUtils;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.sql.SQLException;
 
 import static integration.tests.util.data.PatientTestCollection.patientLNames;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByIndex;
@@ -94,12 +87,13 @@ public class AddPatientsIT extends SeleniumTestBase
 		driver.findElement(By.xpath(".//a[contains(@href,'demographiccontrol')]")).click();
 		driver.findElement(By.id("last_name")).sendKeys(mom.lastName);
 		driver.findElement(By.id("first_name")).sendKeys(mom.firstName);
-		dropdownSelectByValue(driver, By.id("official_lang"), mom.language);
-		dropdownSelectByValue(driver, By.id("title"), mom.title);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='spoken_lang']"), mom.spoken);
+		dropdownSelectByValue(driver, By.id("official_lang"), mom.language, webDriverWait);
+		dropdownSelectByValue(driver, By.id("title"), mom.title, webDriverWait);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='spoken_lang']"), mom.spoken,
+			webDriverWait);
 		driver.findElement(By.id("address")).sendKeys(mom.address);
 		driver.findElement(By.id("city")).sendKeys(mom.city);
-		dropdownSelectByValue(driver, By.id("province"), mom.province);
+		dropdownSelectByValue(driver, By.id("province"), mom.province, webDriverWait);
 		driver.findElement(By.id("postal")).sendKeys(mom.postal);
 		driver.findElement(By.id("phone")).sendKeys(mom.homePhone);
 		driver.findElement(By.id("hPhoneExt")).sendKeys(mom.homePhoneExt);
@@ -107,14 +101,16 @@ public class AddPatientsIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='wPhoneExt']")).sendKeys(mom.workPhoneExt);
 		driver.findElement(By.xpath("//input[@name='demo_cell']")).sendKeys(mom.cellPhone);
 		driver.findElement(By.xpath("//textarea[@name='phoneComment']")).sendKeys(mom.phoneComment);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='newsletter']"), mom.newsletter);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='aboriginal']"), mom.aboriginal);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='newsletter']"), mom.newsletter,
+			webDriverWait);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='aboriginal']"), mom.aboriginal,
+			webDriverWait);
 		driver.findElement(By.id("email")).sendKeys(mom.email);
 		driver.findElement(By.xpath("//input[@name='myOscarUserName']")).sendKeys(mom.phrUserName);
 		driver.findElement(By.id("year_of_birth")).sendKeys(mom.dobYear);
 		driver.findElement(By.id("month_of_birth")).sendKeys(mom.dobMonth);
 		driver.findElement(By.id("date_of_birth")).sendKeys(mom.dobDate);
-		dropdownSelectByValue(driver, By.id("sex"), mom.sex);
+		dropdownSelectByValue(driver, By.id("sex"), mom.sex, webDriverWait);
 		driver.findElement(By.id("hin")).sendKeys(mom.hin);
 		driver.findElement(By.id("eff_date_year")).sendKeys(mom.effYear);
 		driver.findElement(By.id("eff_date_month")).sendKeys(mom.effMonth);
@@ -123,7 +119,7 @@ public class AddPatientsIT extends SeleniumTestBase
 		driver.findElement(By.id("hc_renew_date_year")).sendKeys(mom.hcRenewYear);
 		driver.findElement(By.id("hc_renew_date_month")).sendKeys(mom.hcRenewMonth);
 		driver.findElement(By.id("hc_renew_date_date")).sendKeys(mom.hcRenewDate);
-		dropdownSelectByValue(driver, By.id("countryOfOrigin"), mom.countryOfOrigin);
+		dropdownSelectByValue(driver, By.id("countryOfOrigin"), mom.countryOfOrigin, webDriverWait);
 		driver.findElement(By.xpath("//input[@name='sin']")).sendKeys(mom.sin);
 		driver.findElement(By.xpath("//input[@name='cytolNum']")).sendKeys(mom.cytology);
 		driver.findElement(By.id("nameOfMother")).sendKeys(mom.motherName);
@@ -134,11 +130,11 @@ public class AddPatientsIT extends SeleniumTestBase
 		dropdownSelectByIndex(driver, By.xpath("//select[@name='cust2']"), 0);
 		driver.findElement(By.xpath("//input[@name='referral_doctor_name']")).sendKeys(mom.referralDoctor);
 		driver.findElement(By.xpath("//input[@name='referral_doctor_no']")).sendKeys(mom.referralDoctorNo);
-		dropdownSelectByValue(driver, By.id("roster_status"), mom.rosterStatus);
+		dropdownSelectByValue(driver, By.id("roster_status"), mom.rosterStatus, webDriverWait);
 		driver.findElement(By.xpath("//input[@name='roster_date_year']")).sendKeys(mom.rosteredYear);
 		driver.findElement(By.xpath("//input[@name='roster_date_month']")).sendKeys(mom.rosteredMonth);
 		driver.findElement(By.xpath("//input[@name='roster_date_date']")).sendKeys(mom.rosteredDate);
-		dropdownSelectByValue(driver, By.id("patient_status"), mom.patientStatus);
+		dropdownSelectByValue(driver, By.id("patient_status"), mom.patientStatus, webDriverWait);
 		driver.findElement(By.id("chart_no")).sendKeys(mom.chartNo);
 		dropdownSelectByIndex(driver, By.id("name_list_id"), 0);
 		driver.findElement(By.id("waiting_list_note")).sendKeys("Waiting List Note");
@@ -169,11 +165,14 @@ public class AddPatientsIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='last_name']")).sendKeys(dad.lastName);
 		driver.findElement(By.xpath("//input[@name='first_name']")).sendKeys(dad.firstName);
 		driver.findElement(By.xpath("//input[@name='year_of_birth']")).sendKeys(dad.dobYear);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='month_of_birth']"), dad.dobMonth);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='date_of_birth']"), dad.dobDate);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='sex']"), dad.sex);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='month_of_birth']"), dad.dobMonth,
+			webDriverWait);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='date_of_birth']"), dad.dobDate,
+			webDriverWait);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='sex']"), dad.sex, webDriverWait);
 		driver.findElement(By.xpath("//input[@name='hin']")).sendKeys(dad.hin);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='patient_status']"), dad.patientStatus);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='patient_status']"), dad.patientStatus,
+			webDriverWait);
 		dropdownSelectByIndex(driver, By.xpath("//select[@name='staff']"), 0);
 		driver.findElement(By.xpath("//input[@name='submit']")).click();
 
@@ -217,14 +216,15 @@ Session ID: 0d4f748a-5686-499b-bfe9-a6b482d75e62
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("input-lastName")));
 		driver.findElement(By.id("input-lastName")).sendKeys(son.lastName);
 		driver.findElement(By.id("input-firstName")).sendKeys(son.firstName);
-		dropdownSelectByValue(driver, By.id("input-gender"), "string:" + son.sex);
+		dropdownSelectByValue(driver, By.id("input-gender"), "string:" + son.sex, webDriverWait);
 		driver.findElement(By.id("input-dob")).sendKeys(son.dobYear + "-" + son.dobMonth + "-" + son.dobDate);
 		driver.findElement(By.id("input-address")).click();
 		driver.findElement(By.id("input-hin")).sendKeys(son.hin);
-		dropdownSelectByValue(driver, By.id("input-hcType"), "string:" + son.hcType);
+		dropdownSelectByValue(driver, By.id("input-hcType"), "string:" + son.hcType, webDriverWait);
 		driver.findElement(By.id("input-address")).sendKeys(son.address);
 		driver.findElement(By.id("input-city")).sendKeys(son.city);
-		dropdownSelectByValue(driver, By.id("input-province"), "string:" + son.province);
+		dropdownSelectByValue(driver, By.id("input-province"), "string:" + son.province,
+			webDriverWait);
 		driver.findElement(By.id("input-postal-code")).sendKeys(son.postal);
 		driver.findElement(By.id("input-email")).sendKeys(son.email);
 		driver.findElement(By.id("input-phone")).sendKeys(son.homePhone);

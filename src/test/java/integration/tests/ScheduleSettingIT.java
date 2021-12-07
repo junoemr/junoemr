@@ -132,7 +132,7 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.switchTo().frame("myFrame");
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("Template Setting")));
-		switchToNewWindow(driver, By.linkText("Template Setting"), oldWindowHandles);
+		switchToNewWindow(driver, By.linkText("Template Setting"), oldWindowHandles, webDriverWait);
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("General");
 		driver.findElement(By.xpath("//input[@name='summary']")).sendKeys("15 mins duration");
 		//15 mins duration 9-12
@@ -149,7 +149,8 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.switchTo().frame("myFrame");
-		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), providerNo);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), providerNo,
+			webDriverWait);
 		LocalDate currentDate = LocalDate.now();
 		String month = Integer.toString(currentDate.getMonthValue());
 		String year = Integer.toString(currentDate.getYear());
@@ -177,12 +178,14 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 	{
 		String holidayName = "Happy Monday";
 		// open Schedule Template Setting page
-		accessAdministrationSectionClassicUI(driver, "Schedule Management","Schedule Setting");
+		accessAdministrationSectionClassicUI(driver, "Schedule Management","Schedule Setting",
+			webDriverWait);
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 
 		//Holiday Setting - Add the Next Month, the Second Row, Monday as a holiday!
-		switchToNewWindow(driver, By.xpath(".//a[contains(.,'Holiday Setting')]"), oldWindowHandles);
+		switchToNewWindow(driver, By.xpath(".//a[contains(.,'Holiday Setting')]"), oldWindowHandles,
+			webDriverWait);
 		driver.findElement(By.xpath(".//a[contains(.,'next month')]")).click();
 		driver.findElement(By.xpath("//table/tbody/tr/td[2]/table[3]/tbody/tr[3]/td[2]/input")).click();
 		driver.findElement(By.xpath(".//input[@name='holiday_name']")).sendKeys(holidayName);
@@ -194,8 +197,9 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 		// Delete "A|Academic"
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.switchTo().frame("myFrame");
-		switchToNewWindow(driver, By.xpath(".//a[contains(., 'Template Code Setting')]"), oldWindowHandles);
-		dropdownSelectByValue(driver, By.xpath(".//select[@name='code']"), "A");
+		switchToNewWindow(driver, By.xpath(".//a[contains(., 'Template Code Setting')]"), oldWindowHandles,
+			webDriverWait);
+		dropdownSelectByValue(driver, By.xpath(".//select[@name='code']"), "A", webDriverWait);
 		driver.findElement(By.xpath("//input[@value='Edit']")).click();
 		driver.findElement(By.xpath("//input[@value='Delete']")).click();
 		Assert.assertFalse("Template is NOT deleted successfully.",
@@ -214,7 +218,7 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 				isTemplateInDropdownOpions(By.xpath("//select[@name='code']"), "5"));
 
 		//Edit "a|Administrative Work" to be " b|Break 30 mins"
-		dropdownSelectByValue(driver, By.xpath("//select[@name='code']"), "a");
+		dropdownSelectByValue(driver, By.xpath("//select[@name='code']"), "a", webDriverWait);
 		driver.findElement(By.xpath("//input[@value='Edit']")).click();
 		textEdit(driver, By.xpath("//input[@name='code']"), "b");
 		textEdit(driver, By.xpath("//input[@name='description']"), "Break 30 mins");
@@ -232,7 +236,8 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 				isTemplateInDropdownOpions(By.xpath("//select[@name='name']"), templateTitleGeneral));
 
 		//Edit Template
-		dropdownSelectByValue(driver, By.xpath("//select[@name='name']"), templateTitleGeneral);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='name']"), templateTitleGeneral,
+			webDriverWait);
 		driver.findElement(By.xpath("//input[@value='Edit']")).click();
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("General-Updated");
 		//30 mins break 12-12:30 -> 1 break and a 30 mins appointment
@@ -242,7 +247,8 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 				isTemplateInDropdownOpions(By.xpath("//select[@name='name']"), templateTitleGeneralUpdate));
 
 		//Delete Template
-		dropdownSelectByValue(driver, By.xpath("//select[@name='name']"), templateTitleGeneralUpdate);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='name']"), templateTitleGeneralUpdate,
+			webDriverWait);
 		driver.findElement(By.xpath("//input[@value='Edit']")).click();
 		driver.findElement(By.xpath("//input[@value='Delete']")).click();
 		Assert.assertFalse("Template for public is NOT deleted successfully.",
@@ -253,9 +259,11 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.switchTo().frame("myFrame");
 		dropdownSelectByValue(driver, By.xpath("//select[@name='providerid']"),
-				ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]).providerNo);
-		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Setting')]"), oldWindowHandles);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='step1']"), "5");
+				ProviderTestCollection.providerMap.get(ProviderTestCollection.providerLNames[0]).providerNo,
+			webDriverWait);
+		switchToNewWindow(driver, By.xpath("//a[contains(., 'Template Setting')]"), oldWindowHandles,
+			webDriverWait);
+		dropdownSelectByValue(driver, By.xpath("//select[@name='step1']"), "5", webDriverWait);
 		driver.findElement(By.xpath("//input[@value='Go']")).click();
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("Tue/Thur Schedule");
 		driver.findElement(By.xpath("//input[@name='summary']")).sendKeys("Tue/Thur Combination");
