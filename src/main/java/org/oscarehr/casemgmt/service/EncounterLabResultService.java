@@ -112,42 +112,29 @@ public class EncounterLabResultService extends EncounterSectionService
 
 		String winName = "AllLabs" + sectionParams.getDemographicNo();
 
-		if (OscarProperties.getInstance().getBooleanProperty("HL7TEXT_LABS", "yes"))
+		String url = sectionParams.getContextPath() + "/lab/CumulativeLabValues3.jsp" +
+				"?demographic_no=" + encodeUrlParam(sectionParams.getDemographicNo());
+
+		addMenuItem(
+			menuItems, null,
+			"oscarEncounter.LeftNavBar.LabMenuItem1",
+			"popupPage(700,1000, '" + winName + "','" + url + "')"
+		);
+
+		if (OscarProperties.getInstance().getProperty("labs.hide_old_grid_display",
+				"false").equals("false"))
 		{
-			String url = sectionParams.getContextPath() + "/lab/CumulativeLabValues3.jsp" +
-					"?demographic_no=" + encodeUrlParam(sectionParams.getDemographicNo());
-
-			addMenuItem(
-				menuItems, null,
-				"oscarEncounter.LeftNavBar.LabMenuItem1",
-				"popupPage(700,1000, '" + winName + "','" + url + "')"
-			);
-
-			if (OscarProperties.getInstance().getProperty("labs.hide_old_grid_display",
-					"false").equals("false"))
-			{
-				String gridUrl = sectionParams.getContextPath() + "/lab/CumulativeLabValues2.jsp" +
-						"?demographic_no=" + sectionParams.getDemographicNo();
-
-				addMenuItem(
-						menuItems, null,
-						"oscarEncounter.LeftNavBar.LabMenuItem1old",
-						"popupPage(700,1000, '" + winName + "','" + gridUrl + "')"
-				);
-			}
-		} else
-		{
-			String url = sectionParams.getContextPath() + "/lab/CumulativeLabValues2.jsp" +
+			String gridUrl = sectionParams.getContextPath() + "/lab/CumulativeLabValues2.jsp" +
 					"?demographic_no=" + sectionParams.getDemographicNo();
 
 			addMenuItem(
 					menuItems, null,
-					"oscarEncounter.LeftNavBar.LabMenuItem1",
-					"popupPage(700,1000, '" + winName + "','" + url + "')"
+					"oscarEncounter.LeftNavBar.LabMenuItem1old",
+					"popupPage(700,1000, '" + winName + "','" + gridUrl + "')"
 			);
 		}
 
-		String url = sectionParams.getContextPath() + "/lab/CumulativeLabValues.jsp" +
+		url = sectionParams.getContextPath() + "/lab/CumulativeLabValues.jsp" +
 				"?demographic_no=" + sectionParams.getDemographicNo();
 
 		addMenuItem(

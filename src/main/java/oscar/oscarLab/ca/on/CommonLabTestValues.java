@@ -95,29 +95,7 @@ public class CommonLabTestValues {
 	 */
 	@Deprecated
 	public static ArrayList<Hashtable<String, Serializable>> findUniqueLabsForPatient(String demographic) {
-		OscarProperties op = OscarProperties.getInstance();
-		String cml = op.getProperty("CML_LABS");
-		String mds = op.getProperty("MDS_LABS");
-		String pathnet = op.getProperty("PATHNET_LABS");
-		String hl7text = op.getProperty("HL7TEXT_LABS");
-		ArrayList<Hashtable<String, Serializable>> labs = new ArrayList<Hashtable<String, Serializable>>();
-		if (cml != null && cml.trim().equals("yes")) {
-			ArrayList<Hashtable<String, Serializable>> cmlLabs = findUniqueLabsForPatientCML(demographic);
-			labs.addAll(cmlLabs);
-		}
-		if (mds != null && mds.trim().equals("yes")) {
-			ArrayList<Hashtable<String, Serializable>> mdsLabs = findUniqueLabsForPatientMDS(demographic);
-			labs.addAll(mdsLabs);
-		}
-		if (pathnet != null && pathnet.trim().equals("yes")) {
-			ArrayList<Hashtable<String, Serializable>> pathLabs = findUniqueLabsForPatientExcelleris(demographic);
-			labs.addAll(pathLabs);
-		}
-		if (hl7text != null && hl7text.trim().equals("yes")) {
-			ArrayList<Hashtable<String, Serializable>> hl7Labs = findUniqueLabsForPatientHL7Text(demographic);
-			labs.addAll(hl7Labs);
-		}
-		return labs;
+		return findUniqueLabsForPatientHL7Text(demographic);
 	}
 
 	/**
