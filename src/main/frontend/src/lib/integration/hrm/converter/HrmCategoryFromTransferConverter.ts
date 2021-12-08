@@ -21,45 +21,26 @@
 * Canada
 */
 
-import {
-	HrmCategoryModel,
-	HRMCategoryTransferInbound
-} from "../../../../../generated";
+import { HrmCategoryModel } from "../../../../../generated";
 import HrmCategory from "../model/HRMCategory";
-import HrmSubClassConverter from "./HrmSubClassConverter";
+import HrmSubClassFromTransferConverter from "./HrmSubClassFromTransferConverter";
+import AbstractConverter from "../../../conversion/AbstractConverter";
 
-export default class HrmCategoryConverter
+export default class HrmCategoryFromTransferConverter extends AbstractConverter<HrmCategoryModel, HrmCategory>
 {
-	public static fromTransfer(transfer: HrmCategoryModel): HrmCategory
-	{
-		if (!transfer)
-		{
-			return null;
-		}
+  subClassConverter: HrmSubClassFromTransferConverter = new HrmSubClassFromTransferConverter();
 
-		const category = new HrmCategory();
-		category.id = transfer.id;
-		category.name = transfer.name;
-		category.subClasses = HrmSubClassConverter.fromTransfers(transfer.subClasses);
+  convert(transfer: HrmCategoryModel, args: any): HrmCategory {
+    if (!transfer)
+    {
+      return null;
+    }
 
-		return category;
-	}
+    const category = new HrmCategory();
+    category.id = transfer.id;
+    category.name = transfer.name;
+    category.subClasses = this.subClassConverter.convertList(transfer.subClasses);
 
-	public static fromTransfers(transferList: HrmCategoryModel[]): HrmCategory[]
-	{
-		if (!transferList)
-		{
-			return null;
-		}
-
-		return transferList.map(HrmCategoryConverter.fromTransfer);
-	}
-
-	public static toTransfer(category: HrmCategory): HRMCategoryTransferInbound
-	{
-		return {
-			name: category.name,
-			subClasses: HrmSubClassConverter.toTransfers(category.subClasses)
-		}
-	}
+    return category;
+  }
 }

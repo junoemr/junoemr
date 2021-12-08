@@ -21,6 +21,8 @@
  * Canada
  */
 
+import {JUNO_STYLE} from "../../../common/components/junoComponentConstants";
+
 angular.module('Admin.Section').component('hrmIndex',
 	{
 		templateUrl: 'src/admin/section/hrm/HRMIndex.jsp',
@@ -29,14 +31,28 @@ angular.module('Admin.Section').component('hrmIndex',
 		{
 			let ctrl = this;
 
-			ctrl.changeTab = function (state)
-			{
-				$state.go(state);
-			};
+			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.GREY;
 
-			ctrl.isTabActive = function(tabState)
+			ctrl.tabList = [
+				{
+					label: "Status",
+					value: "admin.hrm.admin"
+				},
+				{
+					label: "Settings",
+					value: 'admin.hrm.settings',
+				},
+				{
+					label: "Classification",
+					value: 'admin.hrm.category'
+				},
+			];
+
+			ctrl.currentTab = ctrl.tabList[0];
+
+			ctrl.onTabChange = (activeTab) =>
 			{
-				return tabState === $state.current.name;
-			}
+				$state.go(activeTab);
+			};
 		}]
 	});

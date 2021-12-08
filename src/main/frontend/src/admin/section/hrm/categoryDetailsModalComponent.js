@@ -203,13 +203,13 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 
 				ctrl.isEligibleForSubClass = () =>
 				{
-					return this.newSubClass.reportClass === HrmReportClass.MEDICAL_RECORDS;
+					return this.newSubClass.reportClass === HrmReportClass.MedicalRecords;
 				}
 
 				ctrl.isEligibleForAccompanyingSubClass = () =>
 				{
-					return (this.newSubClass.reportClass === HrmReportClass.CARDIO_RESPIRATORY) ||
-						(this.newSubClass.reportClass === HrmReportClass.DIAGNOSTIC_IMAGING);
+					return (this.newSubClass.reportClass === HrmReportClass.CardioRespiratory) ||
+						(this.newSubClass.reportClass === HrmReportClass.DiagnosticImaging);
 				}
 
 				ctrl.isSubClassComplete = () =>
@@ -221,7 +221,7 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 				ctrl.onReportClassChange = (newValue) =>
 				{
 					// Model won't be updated yet, need to use the param returned by the component
-					if (newValue === HrmReportClass.MEDICAL_RECORDS)
+					if (newValue === HrmReportClass.MedicalRecords)
 					{
 						ctrl.newSubClass.accompanyingSubClassName = null;
 					}

@@ -1,4 +1,4 @@
-<%--
+/*
 * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
 * This software is published under the GPL GNU General Public License.
 * This program is free software; you can redistribute it and/or
@@ -16,20 +16,30 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 *
 * This software was written for
-	* CloudPractice Inc.
+* CloudPractice Inc.
 * Victoria, British Columbia
 * Canada
---%>
+*/
 
-<div id="hrm-index">
-    <div class="d-flex">
-        <juno-tab tabs="$ctrl.tabList"
-                  ng-model="$ctrl.currentTab"
-                  change="$ctrl.onTabChange(activeTab)"
-                  component-style="$ctrl.componentStyle">
-        </juno-tab>
-    </div>
-    <div class="m-t-16">
-        <ui-view></ui-view>
-    </div>
-</div>
+import { HRMCategoryTransferInbound } from "../../../../../generated";
+import HrmCategory from "../model/HRMCategory";
+import AbstractConverter from "../../../conversion/AbstractConverter";
+import HrmSubClassToTransferConverter from "./HrmSubClassToTransferConverter";
+
+export default class HrmCategoryToTransferConverter extends AbstractConverter<HrmCategory, HRMCategoryTransferInbound>
+{
+  private readonly subClassConverter: HrmSubClassToTransferConverter = new HrmSubClassToTransferConverter();
+
+  convert(category: HrmCategory, args: any): HRMCategoryTransferInbound
+  {
+    if (!category)
+    {
+      return null;
+    }
+
+    return {
+      name: category.name,
+      subClasses: this.subClassConverter.convertList(category.subClasses),
+    }
+  }
+}

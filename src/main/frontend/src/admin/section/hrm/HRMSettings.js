@@ -57,6 +57,8 @@ angular.module('Admin.Section').component('hrmSettings',
 				ctrl.port = propertyValues["omd.hrm.port"];
 				ctrl.remotePath = "/" + propertyValues["omd.hrm.remote_path"];
 				ctrl.interval = (parseInt(propertyValues["omd.hrm.poll_interval_sec"]))/60;
+
+				$scope.$apply();
 			};
 		}]
 	});

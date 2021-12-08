@@ -40,13 +40,21 @@ angular.module('Admin.Section').component('hrmAdmin',
 			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-			ctrl.$onInit = async () => {
+			ctrl.$onInit = async () =>
+			{
 				ctrl.COMPONENT_STYLE = ctrl.COMPONENT_STYLE || JUNO_STYLE.DEFAULT;
-				
-				ctrl.latestResults = await hrmService.getLastResults();
+				try
+				{
+					ctrl.latestResults = await hrmService.getLastResults();
+				}
+				finally
+				{
+					$scope.$apply();
+				}
 			};
 			
-			ctrl.fetchHRMDocs = async () => {
+			ctrl.fetchHRMDocs = async () =>
+			{
 				try
 				{
 					ctrl.working = true;

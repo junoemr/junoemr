@@ -2013,10 +2013,10 @@
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueueWebService
-                org.oscarehr.ws.rest.integrations.hrm.HrmCategoryWebService
-                org.oscarehr.ws.rest.integrations.hrm.HrmCategoriesWebService
+								org.oscarehr.ws.rest.integrations.hrm.HrmCategoryWebService
+								org.oscarehr.ws.rest.integrations.hrm.HrmCategoriesWebService
 								org.oscarehr.ws.rest.integrations.hrm.HrmScheduleWebService
-                org.oscarehr.ws.rest.integrations.hrm.HrmSubClassWebService
+								org.oscarehr.ws.rest.integrations.hrm.HrmSubClassWebService
 								org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService
 								org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService
 								org.oscarehr.ws.rest.MeasurementsWebService

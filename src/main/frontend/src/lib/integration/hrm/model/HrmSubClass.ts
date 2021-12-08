@@ -1,8 +1,8 @@
 export enum HrmReportClass
 {
-  MEDICAL_RECORDS = "Medical Records Report",
-  CARDIO_RESPIRATORY = "Cardio Respiratory Report",
-  DIAGNOSTIC_IMAGING = "Diagnostic Imaging Report",
+  MedicalRecords = "Medical Records Report",
+  CardioRespiratory = "Cardio Respiratory Report",
+  DiagnosticImaging = "Diagnostic Imaging Report",
 }
 
 export default class HrmSubClass
@@ -86,13 +86,14 @@ export default class HrmSubClass
   }
 
   // Facility number is filled out and either subclass or accompanying subclass depending on the reportClass
-  public isCompleteMapping(): boolean {
+  public isCompleteMapping(): boolean
+  {
     if (!this.reportClass || !this.facilityNumber)
     {
       return false;
     }
 
-    if (this.reportClass === HrmReportClass.MEDICAL_RECORDS)
+    if (this.reportClass === HrmReportClass.MedicalRecords)
     {
       return !!this.subClassName;
     }
@@ -116,7 +117,7 @@ export default class HrmSubClass
       return false;
     }
 
-    if (this.reportClass === HrmReportClass.MEDICAL_RECORDS)
+    if (this.reportClass === HrmReportClass.MedicalRecords)
     {
       return this.subClassName === other.subClassName;
     }
