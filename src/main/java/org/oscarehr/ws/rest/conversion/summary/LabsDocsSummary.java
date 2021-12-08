@@ -34,10 +34,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.common.dao.OscarLogDao;
+import org.oscarehr.labs.transfer.BasicLabInfo;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.oscarehr.ws.rest.to.model.SummaryItemTo1;
 import org.oscarehr.ws.rest.to.model.SummaryTo1;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import oscar.dms.EDoc;
@@ -45,11 +50,15 @@ import oscar.dms.EDocUtil;
 import oscar.dms.EDocUtil.EDocSort;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
+import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
 @Component
 public class LabsDocsSummary implements Summary
 {
+	@Autowired
+	private OscarLogDao oscarLogDao;
+
 	public static final int DISPLAY_SIZE = 20;
 
 	private static Logger logger = MiscUtils.getLogger();
@@ -66,96 +75,43 @@ public class LabsDocsSummary implements Summary
 		summary.setDisplaySize(String.valueOf(DISPLAY_SIZE));
 		
 		List<SummaryItemTo1> list = summary.getSummaryItem();
-		int count = 0;
-		
-		// Labs
-		
-		 //_newCasemgmt.documents
-		 //_newCasemgmt.labResult
-		
-		CommonLabResultData comLab = new CommonLabResultData();
-        ArrayList<LabResultData> labs = comLab.populateLabResultsData(loggedInInfo, "",""+demographicNo, "", "","","U");
 
-        // sort so that only the newest version of the lab is selected
-        Collections.sort(labs);
+		Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
+		List<BasicLabInfo> basicLabInfos = hl7TextInfoDao.listBasicInfoByDemographicNo(
+			demographicNo.toString(), 0, null);
 
-		LinkedHashMap<String,LabResultData> accessionMap = new LinkedHashMap<String,LabResultData>();
-		for (int i = 0; i < labs.size(); i++)
+		for (BasicLabInfo basicLabInfo : basicLabInfos)
 		{
-			LabResultData result = labs.get(i);
-			if (result.accessionNumber == null || result.accessionNumber.equals(""))
+
+			int segmentID = basicLabInfo.getLabId();
+			String label = basicLabInfo.getLabel();
+			if (!oscarLogDao.hasRead(loggedInInfo.getLoggedInProvider().getProviderNo(), "lab", Integer.toString(segmentID)))
 			{
-				accessionMap.put("noAccessionNum" + i + result.labType, result);
-			} else
-			{
-				if (!accessionMap.containsKey(result.accessionNumber + result.labType))
-				{
-					accessionMap.put(result.accessionNumber + result.labType, result);
-				}
+				label = "*" + label + "*";
 			}
+			SummaryItemTo1 summaryItem = new SummaryItemTo1(segmentID, label, "action", "lab");
+			summaryItem.setDate(
+				ConversionUtils.toLegacyDate(basicLabInfo.getObservationDateTime().toLocalDate()));
+
+			String url = "../lab/CA/ALL/labDisplay.jsp?providerNo=" +
+				loggedInInfo.getLoggedInProvider().getProviderNo() + "&segmentID=" + segmentID;
+			summaryItem.setAction(url);
+
+			if (basicLabInfo.getAbnormal())
+			{
+				summaryItem.setAbnormalFlag(true);
+			}
+			list.add(summaryItem);
 		}
-		labs = new ArrayList<LabResultData>(accessionMap.values());
-		
-        //now we add individual module items
-        String url = null;
-        for( int idx = 0; idx < labs.size(); ++idx ) {
-            LabResultData result =  labs.get(idx);
-            Date date = result.getDateObj();
-            String label = result.getLabel();
-            String labDisplayName;
-            
-            if ( result.isMDS() ){ 
-            	if (label == null || label.equals("")) labDisplayName = result.getDiscipline();
-            	else labDisplayName = label;                
-                url = "../oscarMDS/SegmentDisplay.jsp?providerNo="+loggedInInfo.getLoggedInProvider().getProviderNo()+"&segmentID="+result.segmentID+"&status="+result.getReportStatus();
-            }else if (result.isCML()){ 
-            	if (label == null || label.equals("")) labDisplayName = result.getDiscipline();
-            	else labDisplayName = label; 
-                url = "../lab/CA/ON/CMLDisplay.jsp?providerNo="+loggedInInfo.getLoggedInProvider().getProviderNo()+"&segmentID="+result.segmentID;                 
-            }else if (result.isHL7TEXT()){
-            	if (label == null || label.equals("")) labDisplayName = result.getDiscipline();
-            	else labDisplayName = label; 
-                url = "../lab/CA/ALL/labDisplay.jsp?providerNo="+loggedInInfo.getLoggedInProvider().getProviderNo()+"&segmentID="+result.segmentID;
-            }else {
-            	if (label == null || label.equals("")) labDisplayName = result.getDiscipline();
-            	else labDisplayName = label;
-                url = "../lab/CA/BC/labDisplay.jsp?segmentID="+result.segmentID+"&providerNo="+loggedInInfo.getLoggedInProvider().getProviderNo();
-            }
-            
-            SummaryItemTo1 summaryItem = new SummaryItemTo1(Integer.parseInt(result.segmentID), labDisplayName,"action","lab");//+result.labType);
-            summaryItem.setDate(date);
-            summaryItem.setAction(url);
-            if(result.isAbnormal()){
-            	summaryItem.setAbnormalFlag(true);
-            }
-            list.add(summaryItem);
-            count++;
-        } 
-        
+
         //Docs
         ArrayList<EDoc> docList = EDocUtil.listDocs(loggedInInfo, "demographic", ""+demographicNo, null, EDocUtil.PRIVATE, EDocSort.OBSERVATIONDATE, "active");
 		String dbFormat = "yyyy-MM-dd";
 
-		String key;
 		String title;
-	
-		
-
-		// --- add remote documents ---
-		
-		if (loggedInInfo.getCurrentFacility().isIntegratorEnabled()) {
-			try {
-				ArrayList<EDoc> remoteDocuments = EDocUtil.getRemoteDocuments(loggedInInfo, demographicNo);
-				docList.addAll(remoteDocuments);
-			} catch (Exception e) {
-				logger.error("error getting remote documents", e);
-			}
-		}
-
 
 		for (int i = 0; i < docList.size(); i++) {
 			EDoc curDoc = docList.get(i);
-			String dispFilename = org.apache.commons.lang.StringUtils.trimToEmpty(curDoc.getFileName());
 			String dispStatus = String.valueOf(curDoc.getStatus());
 
 			if (dispStatus.equals("A")) dispStatus = "active";
@@ -179,9 +135,7 @@ public class LabsDocsSummary implements Summary
 				MiscUtils.getLogger().debug("EctDisplayDocsAction: Error creating date " + ex.getMessage());
 			}
 
-			
-	
-			
+			String url;
 			if( curDoc.getRemoteFacilityId()==null && curDoc.isPDF() ) {
 				url = "../dms/showDocument.jsp?segmentID=" + dispDocNo +
 						"&providerNo=" + loggedInInfo.getLoggedInProviderNo() +
@@ -196,15 +150,8 @@ public class LabsDocsSummary implements Summary
 			if(summaryItem.getDisplayName().trim().equals("")){
 				summaryItem.setDisplayName("N/A");
 			}
-			//item.setLinkTitle(title + serviceDateStr);
-			//item.setTitle(title);
-			//key = StringUtils.maxLenString(curDoc.getDescription(), MAX_LEN_KEY, CROP_LEN_KEY, ELLIPSES) + "(" + serviceDateStr + ")";
-			///key = StringEscapeUtils.escapeJavaScript(key);
 
 			 list.add(summaryItem);
-             count++;
-
-
 		}
 
 		

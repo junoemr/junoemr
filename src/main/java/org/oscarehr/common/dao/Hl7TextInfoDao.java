@@ -80,11 +80,11 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
 	 */
 	public List<BasicLabInfo> listBasicInfoByDemographicNo(String demographicId, Integer offset, Integer limit)
 	{
-		String native_sql = "SELECT labId, demographic_no, discipline, " +
+		String native_sql = "SELECT labId, demographic_no, label, discipline, " +
 			"obr_date, COALESCE((result_status = 'A'), false) AS abnormal, result_status, type " +
 			"FROM " +
 			"( " +
-				"SELECT textInfo.lab_no AS labId, patientLR.demographic_no, textInfo.discipline, " +
+				"SELECT textInfo.lab_no AS labId, patientLR.demographic_no, textInfo.label, textInfo.discipline, " +
 				"textInfo.obr_date, textInfo.result_status, " +
 				"textMessage.type, " +
 				"ROW_NUMBER() OVER (PARTITION BY COALESCE(accessionNum, textInfo.lab_no) ORDER BY textInfo.lab_no DESC) AS rank " +
@@ -120,10 +120,11 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
 				(int) result[0],
 				Integer.toString((int) result[1]),
 				(String) result[2],
-				LocalDateTime.parse((String) result[3], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
-				(int) result[4] == 1 ? true : false,
-				(String) result[5],
-				(String) result[6]
+				(String) result[3],
+				LocalDateTime.parse((String) result[4], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+				(int) result[5] == 1 ? true : false,
+				(String) result[6],
+				(String) result[7]
 			);
 
 			basicLabInfos.add(basicLabInfo);
