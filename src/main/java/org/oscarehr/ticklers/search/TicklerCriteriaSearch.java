@@ -122,13 +122,19 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 
 	private void setOrderByCriteria(Criteria criteria)
 	{
+		String alias = criteria.getAlias();
+
 		switch(sortMode)
 		{
 			case DemographicName:
-				criteria.addOrder(getOrder("demographicNo"));
+				criteria.createAlias(alias + ".demographic", "demo", Criteria.LEFT_JOIN);
+				criteria.addOrder(getOrder("demo.LastName"));	// mapping found in the .hbm file
+				criteria.addOrder(getOrder("demo.FirstName"));	// mapping found in the .hbm file
 				break;
 			case Creator:
-				criteria.addOrder(getOrder("creator"));
+				criteria.createAlias(alias + ".provider", "prov", Criteria.LEFT_JOIN);
+				criteria.addOrder(getOrder("prov.LastName"));	// mapping found in the .hbm file
+				criteria.addOrder(getOrder("prov.FirstName"));	// mapping found in the .hbm file
 				break;
 			case ServiceDate:
 				criteria.addOrder(getOrder("serviceDate"));
@@ -137,7 +143,9 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 				criteria.addOrder(getOrder("priority"));
 				break;
 			case TaskAssignedTo:
-				criteria.addOrder(getOrder("taskAssignedTo"));
+				criteria.createAlias(alias + ".assignee", "prov", Criteria.LEFT_JOIN);
+				criteria.addOrder(getOrder("prov.LastName"));	// mapping found in the .hbm file
+				criteria.addOrder(getOrder("prov.FirstName"));	// mapping found in the .hbm file
 				break;
 			case Status:
 				criteria.addOrder(getOrder("status"));
