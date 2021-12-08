@@ -180,7 +180,7 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 				PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
 		accessSectionJUNOUI(driver, "Schedule", webDriverWait);
-		ActionUtil.findWaitClick(driver, webDriverWait, "//button[@title='Next Day']");
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
 		driver.findElement(By.xpath("//button[@title='Next Day']")).click();
 		Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));
 		providerDropDown.selectByVisibleText("oscardoc, doctor");
@@ -190,7 +190,7 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		driver.findElement(By.id("input-patient")).findElement(By.tagName("input")).clear();
 		driver.findElement(By.id("input-patient")).findElement(By.tagName("input")).sendKeys(dad.firstName);
 
-		ActionUtil.findWaitClick(driver, webDriverWait, "//span[contains(., '" + dad.firstName + "')]");
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//span[contains(., '" + dad.firstName + "')]");
 
 		dropdownSelectByVisibleText(driver, By.id("input-type"), typeUpdated);
 		driver.findElement(By.id("input-duration")).clear();

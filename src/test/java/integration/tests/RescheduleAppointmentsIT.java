@@ -24,6 +24,7 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.seleniumUtil.ActionUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,7 +45,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.AddPatientsIT.mom;
 import static integration.tests.AddPatientsIT.momFullNameJUNO;
-import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
 @RunWith(SpringRunner.class)
@@ -144,12 +144,12 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
         providerDropDown.selectByVisibleText("oscardoc, doctor");
 
         //Reschedule the appointment from 10:00am to 10:45am
-        driver.findElement(By.xpath("//span[contains(., '" + momFullNameJUNO + "')]")).click();
-        textEdit(driver, By.id("input-startTime"), "10:45 AM");
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//span[contains(., '" + momFullNameJUNO + "')]");
+        ActionUtil.findWaitEditById(driver, webDriverWait, "input-startTime", "10:45 AM");
         driver.findElement(By.xpath("//button[contains(., 'Modify')]")).click();
 
         String timeFrameExpected = "10:45:00";
-        driver.findElement(By.xpath("//span[contains(., '" + momFullNameJUNO + "')]")).click();
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//span[contains(., '" + momFullNameJUNO + "')]");
         String startTimeAfterReschedule = driver.findElement(By.id("input-startTime")).getAttribute("value");
         driver.findElement(By.xpath("//button[@title='Cancel']")).click();
         Assert.assertEquals("Appointment is NOT rescheduled from 10:00 to 10:45",

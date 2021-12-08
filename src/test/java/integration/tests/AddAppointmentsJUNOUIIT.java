@@ -126,7 +126,7 @@ public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 		String xpathProvider = "//td[contains(., '" + providerLName + "')]//following-sibling::" +
 				"td[@class='provider-button-column flex-row justify-content-center']" +
 				"//button[@title='Edit Provider']";
-		ActionUtil.findWaitClick(driver, webDriverWait, xpathProvider);
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, xpathProvider);
 
 		//Scroll down to "Contact Information"
 		JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -137,15 +137,15 @@ public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 
 		//Add site for Dr. Berry
 		driver.findElement(By.id("name-siteSelection")).sendKeys("Test");
-		ActionUtil.findWaitClick(driver, webDriverWait, "//a[@title='" + siteName +"']");
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//a[@title='" + siteName +"']");
 		driver.findElement(By.xpath("//button[@ng-click='$ctrl.addSiteAssignment($ctrl.currentSiteSelection.value)']")).click();
 
 		//Assign role "doctor" to Dr. Berry.
 		driver.findElement(By.id("name-access_roles")).sendKeys("doc");
-		ActionUtil.findWaitClick(driver, webDriverWait, "//a[@title='doctor']");
-		ActionUtil.findWaitClick(driver, webDriverWait, "//button[@ng-click='$ctrl.addUserRole($ctrl.currentRoleSelection.value)']");
-		ActionUtil.findWaitClick(driver, webDriverWait, "//button[@ng-click='$ctrl.submit()']");
-		ActionUtil.findWaitClick(driver, webDriverWait, "//button[@ng-click='$ctrl.close()']");
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//a[@title='doctor']");
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@ng-click='$ctrl.addUserRole($ctrl.currentRoleSelection.value)']");
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@ng-click='$ctrl.submit()']");
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@ng-click='$ctrl.close()']");
 	}
 
 	@Test

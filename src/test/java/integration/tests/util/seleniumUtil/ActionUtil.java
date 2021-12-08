@@ -56,9 +56,26 @@ public class ActionUtil
 		text.sendKeys(textNew);
 	}
 
-	public static void findWaitClick(WebDriver driver, WebDriverWait webDriverWait, String xpath)
+	public static void findWaitEditById(WebDriver driver, WebDriverWait webDriverWait, String id, String textNew)
+	{
+		By elementToEdit = By.id(id);
+		findWaitEdit(driver, webDriverWait, elementToEdit, textNew);
+	}
+
+	public static void findWaitEdit(WebDriver driver, WebDriverWait webDriverWait, By elementToEdit, String textNew)
+	{
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(elementToEdit));
+		textEdit(driver, elementToEdit, textNew);
+	}
+
+	public static void findWaitClickByXpath(WebDriver driver, WebDriverWait webDriverWait, String xpath)
 	{
 		By elementToClick = By.xpath(xpath);
+		findWaitClick(driver, webDriverWait, elementToClick);
+	}
+
+	public static void findWaitClick(WebDriver driver, WebDriverWait webDriverWait, By elementToClick)
+	{
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(elementToClick));
 		driver.findElement(elementToClick).click();
 	}
