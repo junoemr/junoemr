@@ -26,9 +26,6 @@
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import MhaConfigService from "../lib/integration/myhealthaccess/service/MhaConfigService";
 import MhaPatientService from "../lib/integration/myhealthaccess/service/MhaPatientService";
-import MessagingServiceFactory from "../lib/messaging/factory/MessagingServiceFactory";
-import {MessagingServiceType} from "../lib/messaging/model/MessagingServiceType";
-import {MessageGroup} from "../lib/messaging/model/MessageGroup";
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../common/components/junoComponentConstants";
 import {MhaCallPanelEvents} from "./components/mhaCallPanel/mhaCallPanelEvents";
@@ -128,8 +125,6 @@ angular.module('Record').controller('Record.RecordController', [
 				controller.demographic = await demographicService.getDemographic(controller.demographicNo);
 				controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
 				controller.loadPreferredPhone(controller.demographic);
-
-				controller.fillMenu();
 			}
 
 			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterNoteCreate))
@@ -280,136 +275,6 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.isNaN = function(num)
 		{
 			return isNaN(num);
-		};
-
-		controller.fillMenu = function fillMenu()
-		{
-			uxService.menu($stateParams.demographicNo).then(
-				function success(results)
-				{
-					controller.recordtabs2 = results;
-					controller.addMessengerToMenu(controller.recordtabs2);
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-		};
-
-		/**
-		 * load messenger nav item & add it to the menu.
-		 * Cannot be done on the backend because checking MHA status in a blocking manner (on the backend)
-		 * will slow page load.
-		 * @param navItems - the nav item array
-		 */
-		controller.addMessengerToMenu = async (navItems) =>
-		{
-			const mhaConfigService = new MhaConfigService();
-			const mhaPatientService = new MhaPatientService();
-
-			const navItem = {
-				id: navItems[navItems.length - 1].id + 1,
-				label: "Messenger",
-				state: ["record.messaging.view", "record.messaging.view.message"],
-				dropdown: true,
-				dropdownItems: [],
-			};
-
-			// TODO Robert's security check here
-			// add patient messenger item only if the patient is verified.
-			if (await mhaConfigService.mhaEnabled())
-			{
-				const mhaProfiles = await mhaPatientService.profilesForDemographic($stateParams.demographicNo);
-				const verified = mhaProfiles.reduce((verified, profile) => verified || profile.isVerified, false);
-
-				if (verified)
-				{
-					const verifiedProfile = mhaProfiles.find((profile) => profile.isVerified);
-					const messagingService = MessagingServiceFactory.build(MessagingServiceType.MHA_CLINIC);
-
-					navItem.dropdownItems.push({
-						id: PATIENT_MESSENGER_NAV_ID,
-						label: "Patient Messenger",
-						popup: false,
-						openNewWindow: false,
-						custom_state: {
-							state: "record.messaging.view",
-							params: {
-								backend: MessagingServiceType.MHA_CLINIC,
-								source: (await messagingService.getDefaultMessageSource()).id,
-								group: MessageGroup.Received,
-								messageableId: verifiedProfile.id,
-								recordPageEmbedded: true,
-							}
-						},
-					})
-				}
-			}
-
-			// TODO Robert's security check here
-			navItem.dropdownItems.push({
-				id: 1,
-				label: "Internal Messenger",
-				url: `../oscarMessenger/DisplayDemographicMessages.do?orderby=date&boxType=3&demographic_no=${$stateParams.demographicNo}`
-			});
-
-			navItems.push(navItem);
-			$scope.$apply();
-		}
-
-		controller.changeTab = function changeTab(temp)
-		{
-			controller.currenttab2 = controller.recordtabs2[temp.id];
-
-			if (Juno.Common.Util.isDefinedAndNotNull(temp.state))
-			{
-				if(Juno.Common.Util.isDefinedAndNotNull(temp.demoId)){
-					$state.go(temp.state[0],
-						{
-							demographicNo: temp.demoId
-						});
-				}
-				else
-				{
-					$state.go(temp.state[0]);
-				}
-			}
-			else
-			{
-				switch (temp.id)
-				{
-					case PATIENT_MESSENGER_NAV_ID:
-						$state.go(temp.custom_state.state, temp.custom_state.params);
-						break;
-					default:
-						if (angular.isDefined(temp.url))
-						{
-							var win;
-							if (temp.label === "Rx")
-							{
-								win = temp.label + controller.demographicNo;
-							}
-							else
-							{
-								var rnd = Math.round(Math.random() * 1000);
-								win = "win" + rnd;
-							}
-							window.open(temp.url, win, "scrollbars=yes, location=no, width=1000, height=600");
-						}
-						break;
-				}
-			}
-		};
-
-		controller.isActive = function isActive(tab)
-		{
-			if(Juno.Common.Util.isDefinedAndNotNull($state.current.name) &&
-				Juno.Common.Util.isDefinedAndNotNull(tab.state))
-			{
-				return (tab.state.includes($state.current.name));
-			}
-
-			return false;
 		};
 
 		// Check if there have been potential changes to a note, display a warning if needed

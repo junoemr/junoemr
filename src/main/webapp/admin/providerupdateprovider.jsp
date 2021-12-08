@@ -96,6 +96,35 @@ function setfocus() {
   document.updatearecord.last_name.select();
 }
 
+function isBlank(str)
+{
+	return (!str || /^\s*$/.test(str));
+}
+
+function onsub()
+{
+	var errors = [];
+	if (isBlank(document.updatearecord.last_name.value))
+	{
+		errors.push("Last Name is required");
+	}
+	if (isBlank(document.updatearecord.first_name.value))
+	{
+		errors.push("First Name is required");
+	}
+	if (isBlank(document.updatearecord.provider_type.value))
+	{
+		errors.push("Provider Type is required");
+	}
+
+	if(errors.length > 0)
+	{
+		alert(errors.join("\n"));
+		return false;
+	}
+	return true;
+}
+
 jQuery(document).ready( function() {
 
         Juno.Admin.Provider.Profile.initSiteSelectHandler();
@@ -155,7 +184,7 @@ jQuery(document).ready( function() {
 	</tr>
 </table>
 
-<form method="post" action="providerupdate.jsp" name="updatearecord">
+<form method="post" action="providerupdate.jsp" name="updatearecord" onsubmit="return onsub()">
 
 <%
 
@@ -630,16 +659,15 @@ jQuery(document).ready( function() {
 			value="<%= provider.getSignedConfidentiality()==null ? "" : provider.getSignedConfidentiality() %>">
         </td>
 	</tr>
-	
-	
+
 	<tr>
 		<td colspan="2">
-		<div align="center"><input type="submit"
-			name="subbutton"
-			value="<bean:message key="admin.providerupdateprovider.btnSubmit"/>"
-		>
-			<input type="hidden" name="current_user" value="<%=curProvider_no%>">
-		</div>
+			<div align="center">
+				<input type="submit"
+				       name="subbutton"
+				       value="<bean:message key="admin.providerupdateprovider.btnSubmit"/>">
+				<input type="hidden" name="current_user" value="<%=curProvider_no%>">
+			</div>
 		</td>
 	</tr>
 

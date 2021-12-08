@@ -16,6 +16,8 @@
 		align-items: center;
 
 		juno-button {
+			--button-height: 24px;
+
 			.juno-button {
 				margin: 0 2px 0 0;
 				width: 20px;
@@ -62,6 +64,21 @@
 			a {
 				text-decoration: underline;
 			}
+		}
+
+		> .leading-icon {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+
+			font-size: 14px;
+			width: 16px;
+			height: 16px;
+
+			color: var(--color-neutral-white);
+			background-color: var(--color-primary-base);
+
+			border-radius: 100%;
 		}
 	}
 

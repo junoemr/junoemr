@@ -12,13 +12,15 @@ package org.oscarehr.hospitalReportManager.reportImpl;
 import org.apache.commons.codec.binary.Base64;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.hospitalReportManager.HRMReport;
-import org.oscarehr.hospitalReportManager.xsd.DateFullOrPartial;
-import org.oscarehr.hospitalReportManager.xsd.Demographics;
-import org.oscarehr.hospitalReportManager.xsd.OmdCds;
-import org.oscarehr.hospitalReportManager.xsd.PersonNameStandard;
-import org.oscarehr.hospitalReportManager.xsd.PersonNameStandard.LegalName.OtherName;
-import org.oscarehr.hospitalReportManager.xsd.ReportFormat;
-import org.oscarehr.hospitalReportManager.xsd.ReportsReceived;
+
+import xml.hrm.v4_1.OmdCds;
+import xml.hrm.v4_1.DateFullOrPartial;
+import xml.hrm.v4_1.Demographics;
+import xml.hrm.v4_1.PersonNameStandard;
+import xml.hrm.v4_1.PersonNameStandard.LegalName.OtherName;
+import xml.hrm.v4_1.ReportFormat;
+import xml.hrm.v4_1.ReportsReceived;
+
 import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
 
@@ -325,7 +327,7 @@ public class HRMReport_4_1 implements HRMReport
 
 		return physicianName;
 	}
-
+	
 	public String getSendingFacilityId()
 	{
 		if(hrmReport.getPatientRecord().getReportsReceived() == null || hrmReport.getPatientRecord().getReportsReceived().isEmpty())

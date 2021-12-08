@@ -9,6 +9,8 @@ import {ScheduleApi} from "../../generated/api/ScheduleApi";
 import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import {MhaAppointmentApi, MhaDemographicApi, MhaIntegrationApi, SitesApi} from "../../generated";
 import {SecurityPermissions} from "../common/security/securityConstants";
+import {VirtualAppointmentType, virtualAppointmentTypeOptions} from "../lib/appointment/model/VirtualAppointmentType";
+import ToastService from "../lib/alerts/service/ToastService";
 
 angular.module('Schedule').component('eventComponent', {
 	templateUrl: "src/schedule/event.jsp",
@@ -31,6 +33,7 @@ angular.module('Schedule').component('eventComponent', {
 		'securityService',
 		'securityRolesService',
 		'scheduleService',
+		'focusService',
 
 		function (
 			$scope,
@@ -46,10 +49,15 @@ angular.module('Schedule').component('eventComponent', {
 			securityService,
 			securityRolesService,
 			scheduleService,
+			focusService,
 		)
 		{
 
 			let controller = this;
+
+			//=========================================================================
+			// Services
+			//=========================================================================/
 
 			$scope.scheduleApi = new ScheduleApi($http, $httpParamSerializer,
 				'../ws/rs');
@@ -67,6 +75,9 @@ angular.module('Schedule').component('eventComponent', {
 					'../ws/rs');
 
 			let sitesApi = new SitesApi($http, $httpParamSerializer, '../ws/rs');
+
+			controller.toastService = new ToastService();
+
 			//=========================================================================
 			// Access Control
 			//=========================================================================/
@@ -88,6 +99,7 @@ angular.module('Schedule').component('eventComponent', {
 			controller.reasonCodeList = [];
 
 			$scope.eventUuid = null;
+			$scope.virtualAppointmentOptions = virtualAppointmentTypeOptions();
 
 			$scope.eventData = {
 				startDate: null,
@@ -103,7 +115,8 @@ angular.module('Schedule').component('eventComponent', {
 				virtual: false,
 				bookingSource: null,
 				isSelfBooked: false,
-				creatorSecurityId: null
+				creatorSecurityId: null,
+				virtualAppointmentType: null,
 			};
 
 			controller.repeatBooking =
@@ -363,6 +376,7 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.eventData.creatorSecurityId = data.eventData.creatorSecurityId;
 					$scope.eventData.isSelfBooked = data.eventData.tagSelfBooked;
 					$scope.eventData.confirmed = data.eventData.confirmed;
+					$scope.eventData.virtualAppointmentType = data.eventData.virtualAppointmentType;
 
 					controller.checkEventConflicts(); // uses the eventData
 					controller.isAlreadyDoubleBook = controller.isDoubleBookPrevented;
@@ -449,7 +463,7 @@ angular.module('Schedule').component('eventComponent', {
 													{// assign to schedule site that we are booking in to.
 														if(result.data.body)
 														{
-															let site = controller.siteOptions.find(el => el.uuid === result.data.body.siteId);
+															let site = result.data.body ? controller.siteOptions.find(el => el.uuid === result.data.body.siteId) : null;
 															if (site)
 															{
 																$scope.eventData.site = site.value;
@@ -484,6 +498,19 @@ angular.module('Schedule').component('eventComponent', {
 						}
 				);
 			};
+
+			controller.$postLink = () =>
+			{
+				// wrapped in a timeout because ref does not properly initialize at this phase when inside a transclude for some reason
+				$timeout(function ()
+				{
+					// autofocus demographic search if there is no patient
+					if (controller.patientSearchRef && !$scope.isPatientSelected())
+					{
+						focusService.element(controller.patientSearchRef.find(":input:first"));
+					}
+				}, 0);
+			}
 
 			//=========================================================================
 			// Private methods
@@ -931,7 +958,8 @@ angular.module('Schedule').component('eventComponent', {
 						creatorSecurityId: $scope.eventData.creatorSecurityId,
 						tagSelfBooked: $scope.eventData.isSelfBooked,
 						sendNotification: sendNotification,
-						confirmed: $scope.eventData.confirmed
+						confirmed: $scope.eventData.confirmed,
+						virtualAppointmentType: $scope.eventData.virtualAppointmentType,
 					},
 					repeatOnDates,
 
@@ -1071,6 +1099,14 @@ angular.module('Schedule').component('eventComponent', {
 							controller.updateRepeatBookingDates();
 						}
 					});
+				$scope.$watch("eventData.virtualAppointmentType", (virtualAppointmentType) =>
+				{
+					$scope.eventData.virtual = virtualAppointmentType && virtualAppointmentType !== VirtualAppointmentType.None;
+				});
+				$scope.$watch("telehealthMode", () =>
+				{
+					controller.updateTelehealthAppointmentOptions();
+				});
 			};
 
 			//=========================================================================
@@ -1190,19 +1226,8 @@ angular.module('Schedule').component('eventComponent', {
 					$scope.working = false;
 				}, function (result)
 				{
-					console.log($scope.displayMessages.field_errors()['location']);
-					if (!$scope.displayMessages.has_standard_errors())
-					{
-						console.log(result);
-						if (result.error.message)
-						{
-							$scope.displayMessages.add_standard_error(result.error.message);
-						}
-						else
-						{
-							$scope.displayMessages.add_generic_fatal_error();
-						}
-					}
+					let message = result.error.message ? result.error.message : "Unknown Error";
+					controller.toastService.errorToast("Failed to save changes: " + message);
 					$scope.working = false;
 				});
 			};
@@ -1334,9 +1359,10 @@ angular.module('Schedule').component('eventComponent', {
 					controller.parentScope.refetchEvents();
 					controller.modalInstance.close();
 					$scope.working = false;
-				}, function ()
+				}, function (result)
 				{
-					$scope.displayMessages.add_generic_fatal_error();
+					let message = result.error.message ? result.error.message : "Unknown Error";
+					controller.toastService.errorToast("Failed to save changes: " + message, true);
 					$scope.working = false;
 				});
 			};
@@ -1608,8 +1634,31 @@ angular.module('Schedule').component('eventComponent', {
 				{
 					console.error(err);
 				}
-
 			};
+
+			/**
+			 * update the list of available telehealth appointment types.
+			 */
+			controller.updateTelehealthAppointmentOptions = () =>
+			{
+				// virtual appointment type cannot be modified in editMode.
+				if (controller.editMode)
+				{
+					return;
+				}
+
+				switch ($scope.telehealthMode)
+				{
+					case $scope.TELEHEALTH_MODES.TELEHEALTH:
+						$scope.virtualAppointmentOptions = virtualAppointmentTypeOptions();
+						break;
+					case $scope.TELEHEALTH_MODES.ONE_TIME_TELEHEALTH:
+						$scope.virtualAppointmentOptions = virtualAppointmentTypeOptions().filter((option) => option.value !== VirtualAppointmentType.Chat);
+						break;
+					default:
+						break;
+				}
+			}
 
 			//=========================================================================
 			//  Key Bindings

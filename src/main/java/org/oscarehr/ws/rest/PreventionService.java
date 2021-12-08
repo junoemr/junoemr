@@ -61,7 +61,7 @@ public class PreventionService extends AbstractServiceImpl
 	public RestSearchResponse<PreventionTypeTransfer> searchPreventionTypes(@QueryParam("keyword") String searchParam)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.PREVENTION_READ);
-		return RestSearchResponse.successResponseOnePage(preventionManager.searchPreventionTypes(searchParam));
+		return RestSearchResponse.successResponseOnePage(preventionManager.searchPreventionTypes(searchParam, new PreventionTypeTransfer.SearchComparator()));
 	}
 
 	@GET

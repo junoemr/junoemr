@@ -59,8 +59,24 @@ export default class SystemPreferenceService
 	}
 
 	/**
+	 * Get the value of all system properties specified
+	 * @param propertyNames - an array of property names to fetch
+	 * @return object consisting of {propertyName: propertyValue}
+	 */
+	public async getProperties(...propertyNames: string[]): Promise<any>
+	{
+		let propertyValues = await Promise.all(propertyNames.map(propertyName => this.getProperty(propertyName)));
+
+		return propertyValues.reduce((propertyMap, propertyValue, index) => {
+			propertyMap[propertyNames[index]] = propertyValue;
+			return propertyMap;
+		}, {});
+	}
+
+
+	/**
 	 * Get the value of system property setting, from the server. Returning default if the server does not have a value
-	 * for that property.
+	 * for that property.  A property is defined in the instance's .properties file.
 	 * @param propertyName - the name of the property to fetch
 	 * @param defaultValue - a default value to use if the property is not set on the server.
 	 * @return the value from the server or the default value provided
@@ -70,4 +86,29 @@ export default class SystemPreferenceService
 		return (await this.systemPreferenceApi.getPropertyValue(propertyName, defaultValue)).data.body;
 	}
 
+  /**
+   * Get the value of system preference setting from the server.  Unlike a property, a preference is stored in the database.
+   * If the server does not have the value defined, return the default value instead.
+   *
+   * @param preferenceName - the name of the preference to fetch
+   * @param defaultValue - a default value to use if the preference is not set on the server.
+   * @return the value from the server or the default value provided
+   */
+	public async getPreferenceWithDefault(preferenceName: string, defaultValue: any): Promise<any>
+  {
+    return (await this.systemPreferenceApi.getPreferenceValue(preferenceName, defaultValue)).data.body;
+  }
+
+  /**
+   * Determine if a system perference (stored in the database) is enabled.
+   * An enabled value is any case-insensitive match on any of {"true", "on", "yes"}
+   *
+   * @param preferenceName - the name of the preference to fetch
+   * @param defaultValue - a default value to use if the preference is not set on the server.
+   * @return boolean true if enabled, false otherwise
+   */
+  public async isPreferenceEnabled(preferenceName: string): Promise<any>
+  {
+    return (await this.systemPreferenceApi.getPreferenceEnabled(preferenceName, false)).data.body
+  }
 }

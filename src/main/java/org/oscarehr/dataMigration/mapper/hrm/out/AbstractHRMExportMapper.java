@@ -70,7 +70,9 @@ public abstract class AbstractHRMExportMapper<I, E> extends AbstractExportMapper
 		DateFullOrPartial dateFullOrPartial = null;
 		if(localDateTime != null)
 		{
-			dateFullOrPartial = toNullableDateFullOrPartial(localDateTime.toLocalDate());
+			dateFullOrPartial = objectFactory.createDateFullOrPartial();
+			XMLGregorianCalendar calendar = ConversionUtils.toNullableXmlGregorianCalendar(localDateTime);
+			dateFullOrPartial.setDateTime(calendar);
 		}
 		return dateFullOrPartial;
 	}

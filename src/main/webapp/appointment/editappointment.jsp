@@ -1478,7 +1478,8 @@
 
 				jQuery("#send-telehealth-link-btn").click(() =>
 				{
-					if (mhaAppointment)
+                    var apptIsVirtual = <%=appt.getIsVirtual()%>
+					if (mhaAppointment && apptIsVirtual)
 					{
 						myhealthaccess.sendTelehealthAppointmentNotification("<%=request.getContextPath()%>",
 								jQuery(document.forms.EDITAPPT.location).val(), mhaAppointment).then(() =>

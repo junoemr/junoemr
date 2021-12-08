@@ -531,10 +531,11 @@ public class DemographicManager {
 		demographic.setPhone2(oscar.util.StringUtils.filterControlCharacters(demographic.getPhone2()));
 
 		addRosterHistoryEntry(demographic, previousDemographic);
-		newDemographicDao.merge(demographic);
 
 		// update MyHealthAccess connection status.
 		demographicService.queueMHAPatientUpdates(demographic, previousDemographic, loggedInInfo);
+
+		newDemographicDao.merge(demographic);
 
 		if (demographic.getDemographicExtSet() != null)
 		{

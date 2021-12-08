@@ -1,6 +1,10 @@
 <div class="appointment-card" ng-class="$ctrl.getComponentClasses()">
 	<div ng-if="$ctrl.ngModel" class="content juno-text">
-		
+
+		<div class="leading-icon m-r-8">
+			<i class="icon" ng-class="$ctrl.getLeadingIcon()" title="{{$ctrl.getLeadingIconTooltip()}}"></i>
+		</div>
+
 		<div class="name-reason" title="{{$ctrl.ngModel.reason}}">
 			<a ng-href="#!/record/{{$ctrl.ngModel.demographicNo}}/details"
 			   title="Master File">{{$ctrl.ngModel.demographicName}}</a>

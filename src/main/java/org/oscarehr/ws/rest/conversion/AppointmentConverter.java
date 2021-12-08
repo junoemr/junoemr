@@ -43,6 +43,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.TimeZone;
 
 public class AppointmentConverter extends AbstractConverter<Appointment, AppointmentTo1> {
@@ -121,6 +122,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		appointment.setUrgency(t.getUrgency());
 		appointment.setIsVirtual(t.isVirtual());
 		appointment.setType(t.getType());
+		appointment.setVirtualAppointmentType(Optional.ofNullable(t.getVirtualAppointmentType()).orElse(Appointment.VirtualAppointmentType.NONE));
 
 		if(t.isDoNotBook())
 		{
@@ -239,6 +241,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		appointment.setUrgency(urgency);
 		appointment.setCreatorSecurityId(t.getCreatorSecurityId());
 		appointment.setBookingSource(t.getBookingSource());
+		appointment.setVirtualAppointmentType(t.getVirtualAppointmentType());
 
 		return appointment;
     }
@@ -296,6 +299,7 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 		calendarAppointment.setAppointmentName(appointmentName);
 		calendarAppointment.setConfirmed(appointment.isConfirmed());
 		calendarAppointment.setCritical(isCritical);
+		calendarAppointment.setVirtualAppointmentType(appointment.getVirtualAppointmentType());
 		if (appointment.getBookingSource() != null)
 		{
 			calendarAppointment.setBookingSource(appointment.getBookingSource().toString());

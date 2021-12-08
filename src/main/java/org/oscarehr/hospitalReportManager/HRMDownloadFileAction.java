@@ -28,8 +28,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DownloadAction;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
+import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
@@ -84,7 +84,7 @@ public class HRMDownloadFileAction extends DownloadAction
 			throw new Exception("HRMDocument not found - " + ids.get(0));
 		}
 
-		HRMReport report = HRMReportParser.parseReport(hd.getReportFile(), hd.getReportFileSchemaVersion());
+		HRMReport report = HRMReportParser.parseRelativeLocation(hd.getReportFile(), hd.getReportFileSchemaVersion());
 
 		if(report == null)
 		{
@@ -95,9 +95,10 @@ public class HRMDownloadFileAction extends DownloadAction
 		{
 			throw new Exception("no binary document found");
 		}
-    	
-    	byte[] binaryContent = report.getBinaryContent();
-
+  
+		// This is somehow already decoding the base64 content... don't ask me how.
+    	byte[] binaryContent = report.getBase64BinaryContent();
+		
     	String fileExtension = report.getFileExtension().toLowerCase();
 	    fileExtension = fileExtension.replaceAll("\\.", "");
 

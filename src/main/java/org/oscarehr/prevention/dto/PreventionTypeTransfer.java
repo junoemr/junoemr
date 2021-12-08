@@ -23,6 +23,9 @@
 package org.oscarehr.prevention.dto;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Comparator;
 
 @Data
 public class PreventionTypeTransfer
@@ -32,4 +35,45 @@ public class PreventionTypeTransfer
 	private String code;
 	private String atc;
 	private String healthCanadaType;
+
+	public static class SearchComparator implements Comparator<PreventionTypeTransfer>
+	{
+		@Override
+		public int compare(PreventionTypeTransfer o1, PreventionTypeTransfer o2)
+		{
+			if(o1 == null && o2 == null)
+			{
+				return 0;
+			}
+			// nulls first
+			else if(o1 == null)
+			{
+				return -1;
+			}
+			else if(o2 == null)
+			{
+				return 1;
+			}
+
+			Comparator<Integer> intComparator = Comparator.comparing(Integer::intValue);
+
+			// shortest names first
+			int result = intComparator.compare(StringUtils.trimToEmpty(o1.getName()).length(), StringUtils.trimToEmpty(o2.getName()).length());
+			if(result == 0)
+			{
+				// alphabetical
+				Comparator<String> stringComparator = Comparator.nullsFirst(Comparator.comparing(String::toString));
+				result = stringComparator.compare(o1.getName(), o2.getName());
+			}
+
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj)
+		{
+			return false;
+		}
+	}
+
 }

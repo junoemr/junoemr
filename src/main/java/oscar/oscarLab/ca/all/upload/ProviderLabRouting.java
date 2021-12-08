@@ -36,6 +36,7 @@ package oscar.oscarLab.ca.all.upload;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -83,32 +84,43 @@ public class ProviderLabRouting {
 
 		routeMagic(labId, provider_no, labType);
 	}
-
-	public void routeMagic(int labId, String provider_no, String labType) {
+	
+	/**
+	 * Updated signature of route magic, this one includes an obrDate to avoid having to create another
+	 * trigger to populate the field for the entry.
+	 *
+	 * @param labId identifier for the lab, document, hrm report, whatever else is in the inbox
+	 * @param provider_no provider number to route to.  O is the general inbox.
+	 * @param labType lab type constant
+	 * @param obrDate date of the lab, document, hrm report, etc
+	 */
+	public void routeMagic(int labId, String provider_no, String labType, Date obrDate)
+	{
 		ForwardingRules fr = new ForwardingRules();
 		OscarProperties props = OscarProperties.getInstance();
 		String autoFileLabs = props.getProperty("AUTO_FILE_LABS");
-
+		
 		ProviderLabRoutingDao dao = SpringUtils.getBean(ProviderLabRoutingDao.class);
 		List<ProviderLabRoutingModel> routings = dao.findByLabNoAndLabTypeAndProviderNo(labId, labType, provider_no);
-
+		
 		if (routings.isEmpty()) {
 			String status = fr.getStatus(provider_no);
 			ArrayList<ArrayList<String>> forwardProviders = fr.getProviders(provider_no);
-
+			
 			ProviderLabRoutingModel p = new ProviderLabRoutingModel();
 			p.setProviderNo(provider_no);
 			p.setLabNo(labId);
 			p.setStatus(status);
 			p.setLabType(labType);
+			p.setObrDate(obrDate);
 			providerLabRoutingDao.persist(p);
-
+			
 			//forward lab to specified providers
 			for (int j = 0; j < forwardProviders.size(); j++) {
 				logger.info("FORWARDING PROVIDER: " + ((forwardProviders.get(j)).get(0)));
 				routeMagic(labId, ((forwardProviders.get(j)).get(0)), labType);
 			}
-
+			
 			// If the lab has already been sent to this provider check to make sure that
 			// it is set as a new lab for at least one provider if AUTO_FILE_LABS=yes is not
 			// set in the oscar.properties file
@@ -122,7 +134,15 @@ public class ProviderLabRouting {
 				}
 			}
 		}
-
+		
+	}
+	
+	/**
+	 * Legacy signature of route magic
+	 */
+	public void routeMagic(int labId, String provider_no, String labType)
+	{
+		routeMagic(labId, provider_no, labType, null);
 	}
 
 	public void route(String labId, String provider_no, String labType) throws SQLException {

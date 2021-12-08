@@ -23,6 +23,12 @@
 
 package org.oscarehr.casemgmt.service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote.SortChronologicDescTextAsc;
@@ -34,17 +40,12 @@ import org.oscarehr.hospitalReportManager.service.HRMService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+@Service
 public class EncounterHRMService extends EncounterSectionService
 {
 	public static final String SECTION_ID = "hrm";
@@ -99,14 +100,15 @@ public class EncounterHRMService extends EncounterSectionService
 	public EncounterNotes getNotes(SectionParameters sectionParams, Integer limit, Integer offset)
 	{
 		Integer demographicNo = Integer.parseInt(sectionParams.getDemographicNo());
-		if(!securityInfoManager.hasPrivileges(
-				sectionParams.getLoggedInInfo().getLoggedInProviderNo(), demographicNo, Permission.HRM_READ)
-				|| !OscarProperties.getInstance().hasHRMDocuments())
+		if(!OscarProperties.getInstance().isModuleEnabled(OscarProperties.Module.MODULE_HRM) || !securityInfoManager.hasPrivileges(
+				sectionParams.getLoggedInInfo().getLoggedInProviderNo(), demographicNo, Permission.HRM_READ))
 		{
 			return EncounterNotes.noNotes();
 		}
 
-		Map<String, HRMDemographicDocument> demographicDocuments = hrmService.getHrmDocumentsForDemographic(demographicNo);
+		Map<String, HRMDemographicDocument> demographicDocuments = hrmService.getHrmDocumentsForDemographic(
+			Integer.parseInt(sectionParams.getDemographicNo())
+		);
 
 		List<EncounterSectionNote> out = new ArrayList<>();
 		for (Entry<String, HRMDemographicDocument> entry: demographicDocuments.entrySet())
@@ -116,7 +118,7 @@ public class EncounterHRMService extends EncounterSectionService
 			HRMDocument hrmDocument = entry.getValue().getHrmDocument();
 			List<Integer> duplicateIdList = entry.getValue().getDuplicateIds();
 
-			String reportStatus = hrmDocument.getReportStatus();
+			HRMDocument.STATUS reportStatus = hrmDocument.getReportStatus();
 			String dispFilename = hrmDocument.getReportType();
 			String dispDocNo = hrmDocument.getId().toString();
 			String description = hrmDocument.getDescription();
@@ -126,19 +128,24 @@ public class EncounterHRMService extends EncounterSectionService
 			{
 				text = dispFilename;
 			}
-
-			if(reportStatus != null && reportStatus.equalsIgnoreCase("C"))
+			
+			if (reportStatus == null)
+			{
+				text = "(Unknown) " + text;
+			}
+			else if(reportStatus.equals(HRMDocument.STATUS.CANCELLED))
 			{
 				text = "(Cancelled) " + text;
 			}
 
 			String trimmedText = EncounterSectionService.getTrimmedText(text);
 
-			LocalDateTime date = ConversionUtils.toNullableLocalDate(
-				hrmDocument.getTimeReceived()).atStartOfDay();
-
-			sectionNote.setUpdateDate(date);
-
+			LocalDate date = ConversionUtils.toNullableLocalDate(hrmDocument.getTimeReceived());
+			if (date != null)
+			{
+				sectionNote.setUpdateDate(date.atStartOfDay());
+			}
+			
 			StringBuilder duplicateLabIdQueryString = new StringBuilder();
 			if (duplicateIdList!=null)
 			{
@@ -167,8 +174,8 @@ public class EncounterHRMService extends EncounterSectionService
 			}
 
 			sectionNote.setText(labRead + trimmedText + labRead);
-			sectionNote.setTitle(formatTitleWithLocalDateTime(trimmedText, date));
-
+			sectionNote.setTitle(formatTitleWithLocalDateTime(trimmedText, date != null ? date.atStartOfDay() : null));
+			
 			out.add(sectionNote);
 		}
 
