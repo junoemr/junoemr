@@ -23,15 +23,20 @@
 
 package integration.tests;
 
+import static integration.tests.EditFamilyHistoryClassicUIIT.addNotes;
+import static integration.tests.EditFamilyHistoryClassicUIIT.archiveNotes;
 import static integration.tests.EditFamilyHistoryClassicUIIT.editCPPNoteTest;
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
+import integration.tests.util.seleniumUtil.PageUtil;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openqa.selenium.By;
 import org.oscarehr.JunoApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -55,14 +60,48 @@ public class EditOtherMedsClassicUIIT extends SeleniumTestBase
 	{
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
+		String eChartWindowHandle = driver.getWindowHandle();
+		PageUtil.switchToWindow(eChartWindowHandle, driver);
+	}
+
+	String cppType = "Other Meds";
+	String cppTypeID = "menuTitleoMeds";
+	String noteCPP = cppType + " in CPP";
+	String noteEncounter = cppType + " in Encounter";
+	String editedNoteCPP = "Edited " + noteCPP;
+	String archivedNote = "Archived " + cppType;
+
+	@Test
+	public void addOtherMedsTest()
+	{
+		//Add Notes
+		addNotes(cppTypeID, noteCPP, noteEncounter);
+		Assert.assertTrue(cppType + " Note is NOT Added in CPP successfully",
+			PageUtil.isExistsBy(By.linkText(noteCPP), driver));
+		Assert.assertTrue(cppType + " Note is NOT Copied in Encounter note successfully",
+			PageUtil.isExistsBy(By.xpath("//div[contains(., '" + noteEncounter + "')]"), driver));
 	}
 
 	@Test
 	public void editOtherMedsTest()
 	{
-		String otherMeds = "Other Meds";
-		String otherMedsId = "menuTitleoMeds";
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
-		editCPPNoteTest(otherMeds, otherMedsId);
+		//Add Notes
+		addNotes(cppTypeID, noteCPP, noteEncounter);
+
+		//Edit Note
+		editCPPNoteTest(cppType);
+		Assert.assertTrue(cppType + " Note is NOT Edited in CPP successfully",
+			PageUtil.isExistsBy(By.linkText(editedNoteCPP), driver));
 	}
+
+	@Test
+	public void archiveOtherMedsTest()
+	{
+		//Archive Note
+		archiveNotes(cppType, cppTypeID);
+		Assert.assertTrue(cppType + " Note is NOT Archived successfully",
+			PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedNote + "')]"), driver));
+	}
+
 }

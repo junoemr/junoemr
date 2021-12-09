@@ -29,7 +29,6 @@ import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,30 +57,56 @@ public class EditFamilyHistoryClassicUIIT extends SeleniumTestBase
 	{
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
+		String eChartWindowHandle = driver.getWindowHandle();
+		PageUtil.switchToWindow(eChartWindowHandle, driver);
+	}
+
+	String cppType = "Family History";
+	String cppTypeID = "menuTitlefamHistory";
+	String noteCPP = cppType + " in CPP";
+	String noteEncounter = cppType + " in Encounter";
+	String editedNoteCPP = "Edited " + noteCPP;
+	String archivedNote = "Archived " + cppType;
+
+	@Test
+	public void addFamilyHistoryTest()
+	{
+		//Add Notes
+		addNotes(cppTypeID, noteCPP, noteEncounter);
+		Assert.assertTrue(cppType + " Note is NOT Added in CPP successfully",
+			PageUtil.isExistsBy(By.linkText(noteCPP), driver));
+		Assert.assertTrue(cppType + " Note is NOT Copied in Encounter note successfully",
+			PageUtil.isExistsBy(By.xpath("//div[contains(., '" + noteEncounter + "')]"), driver));
 	}
 
 	@Test
 	public void editFamilyHistoryTest()
 	{
-		String familyHistory = "Family History";
-		String familyHistoryId = "menuTitlefamHistory";
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
-		editCPPNoteTest(familyHistory, familyHistoryId);
+		//Add Notes
+		addNotes(cppTypeID, noteCPP, noteEncounter);
+
+		//Edit Note
+		editCPPNoteTest(cppType);
+		Assert.assertTrue(cppType + " Note is NOT Edited in CPP successfully",
+			PageUtil.isExistsBy(By.linkText(editedNoteCPP), driver));
 	}
 
-	public static void editCPPNoteTest(String cppType, String cppTypeID)
+	@Test
+	public void archiveFamilyHistoryTest()
 	{
-		String noteCPP = cppType + " in CPP";
-		String noteEncounter = cppType + " in Encounter";
-		String editedNoteCPP = "Edited " + noteCPP;
-		String archivedNote = "Archived " + cppType;
+		//Archive Note
+		archiveNotes(cppType, cppTypeID);
+		Assert.assertTrue(cppType + " Note is NOT Archived successfully",
+			PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedNote + "')]"), driver));
+	}
+
+	public static  void addNotes(String cppTypeID, String noteCPP, String noteEncounter)
+	{
 		String startDate = "2020-01-01";
 		String resolutionDate = "2021-01-01";
-		String eChartWindowHandle = driver.getWindowHandle();
-		PageUtil.switchToWindow(eChartWindowHandle, driver);
-		driver.navigate().refresh();
 
-		//Add Notes
+		driver.navigate().refresh();
 		driver.findElement(
 			By.xpath("//div[@id='" + cppTypeID + "']//descendant::a[contains(., '+')]")).click();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
@@ -92,30 +117,28 @@ public class EditFamilyHistoryClassicUIIT extends SeleniumTestBase
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(noteCPP);
 		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 		driver.findElement(By.id("saveImg")).click();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);//wait until note is saved.
-		Assert.assertTrue(cppType + " Note is NOT Added in CPP successfully",
-			PageUtil.isExistsBy(By.linkText(noteCPP), driver));
-		Assert.assertTrue(cppType + " Note is NOT Copied in Encounter note successfully",
-			PageUtil.isExistsBy(By.xpath("//div[contains(., '" + noteEncounter + "')]"), driver));
+	}
 
-		//Edit Note
+	public static void editCPPNoteTest(String cppType)
+	{
+		String noteCPP = cppType + " in CPP";
+		String editedNoteCPP = "Edited " + noteCPP;
+		driver.navigate().refresh();
 		driver.findElement(By.linkText(noteCPP)).click();
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(editedNoteCPP);
 		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
-		Assert.assertTrue(cppType + " Note is NOT Edited in CPP successfully",
-			PageUtil.isExistsBy(By.linkText(editedNoteCPP), driver));
+	}
 
-		//Archive Note
+	public static void archiveNotes(String cppType, String cppTypeID)
+	{
+		String archivedNote = "Archived " + cppType;
 		driver.findElement(By.xpath("//div[@id='" + cppTypeID + "']//descendant::a[contains(., '+')]")).click();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(archivedNote);
 		driver.findElement(By.xpath("//input[@title='Archive']")).click();
 		driver.findElement(By.linkText(cppType)).click();
 		PageUtil.switchToLastWindow(driver);
-		Assert.assertTrue(cppType + " Note is NOT Archived successfully",
-			PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedNote + "')]"), driver));
 	}
 }
