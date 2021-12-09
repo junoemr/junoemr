@@ -33,133 +33,124 @@
 		<div class="overflow-auto height-100 flex-column p-16">
 			<div class="role-details">
 				<juno-input ng-model="$ctrl.category.name"
-				            label="Name">
+							label="Name">
 				</juno-input>
 			</div>
 			<div class="category-subclasses overflow-auto flex-column m-t-16">
-                <table ng-table="$ctrl.tableParams" class="table table-striped table-bordered">
-                    <tbody>
-                    <tr ng-repeat="subclass in $ctrl.category.subClasses">
-                        <td data-title="'Facility Number'">
-                            {{ subclass.facilityNumber }}
-                        </td>
-                        <td data-title="'Report Type'">
-                            {{ subclass.reportClass }}
-                        </td>
-                        <td data-title="'Subclass'">
-                            {{ subclass.subClassName }}
-                        </td>
-                        <td data-title="'Accompanying Subclass'">
-                            {{ subclass.accompanyingSubClassName }}
-                        </td>
-                        <td>
-                            <juno-button component-style="$ctrl.componentStyle"
-                                         button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
-                                         button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-                                         click="$ctrl.onDeleteSubClass(subclass)"
-                                         disabled="!$ctrl.canDelete()">
-                                X
-                            </juno-button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <juno-input
-                                    placeholder="Facility Number"
-                                    ng-model = "$ctrl.newSubClass.facilityNumber"
-                                    invalid = "!$ctrl.newSubClass.facilityNumber"
-                            >
-                            </juno-input>
-                        </td>
-                        <td>
-                            <juno-select
-                                    options = "$ctrl.hrmReportClassOptions"
-                                    ng-model = "$ctrl.newSubClass.reportClass"
-                                    placeholder = "Report Type"
-                                    invalid = "!$ctrl.newSubClass.reportClass"
-                                    on-change = "$ctrl.onReportClassChange(value)"
-                            >
-                            </juno-select>
-                        </td>
-                        <td>
-                            <juno-input
-                                    placeholder="Subclass"
-                                    ng-model = "$ctrl.newSubClass.subClassName"
-                                    disabled = "!$ctrl.isEligibleForSubClass()"
-                                    invalid ="$ctrl.isEligibleForSubClass() && !$ctrl.newSubClass.subClassName"
-                            >
-                            </juno-input>
-                        </td>
-                        <td>
-                            <juno-input
-                                    placeholder="Accompanying Subclass"
-                                    ng-model = "$ctrl.newSubClass.accompanyingSubClassName"
-                                    disabled = "!$ctrl.isEligibleForAccompanyingSubClass()"
-                                    invalid = "$ctrl.isEligibleForAccompanyingSubClass() && !$ctrl.newSubClass.accompanyingSubClassName"
-                            >
-                            </juno-input>
-                        </td>
-                        <td>
-                            <juno-button component-style="$ctrl.componentStyle"
-                                         button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-                                         button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-                                         click="$ctrl.onCreateSubClass()"
-                                         disabled="!$ctrl.canCreate() || !$ctrl.isSubClassComplete()">
-                            +
-                            </juno-button>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+				<table ng-table="$ctrl.tableParams" class="table table-striped table-bordered">
+					<tbody>
+					<tr ng-repeat="subclass in $ctrl.category.subClasses">
+						<td data-title="'Facility Number'">
+							{{ subclass.facilityNumber }}
+						</td>
+						<td data-title="'Report Type'">
+							{{ subclass.reportClass }}
+						</td>
+						<td data-title="'Subclass'">
+							{{ subclass.subClassName }}
+						</td>
+						<td data-title="'Accompanying Subclass'">
+							{{ subclass.accompanyingSubClassName }}
+						</td>
+						<td>
+							<juno-button component-style="$ctrl.componentStyle"
+										 button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
+										 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+										 click="$ctrl.onDeleteSubClass(subclass)"
+										 disabled="!$ctrl.canDelete()">
+								X
+							</juno-button>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<juno-input
+									placeholder="Facility Number"
+									ng-model = "$ctrl.newSubClass.facilityNumber"
+									invalid = "!$ctrl.newSubClass.facilityNumber"
+							>
+							</juno-input>
+						</td>
+						<td>
+							<juno-select
+									options = "$ctrl.hrmReportClassOptions"
+									ng-model = "$ctrl.newSubClass.reportClass"
+									placeholder = "Report Type"
+									invalid = "!$ctrl.newSubClass.reportClass"
+									on-change = "$ctrl.onReportClassChange(value)"
+							>
+							</juno-select>
+						</td>
+						<td>
+							<juno-input
+									placeholder="Subclass"
+									ng-model = "$ctrl.newSubClass.subClassName"
+									disabled = "!$ctrl.isEligibleForSubClass()"
+									invalid ="$ctrl.isEligibleForSubClass() && !$ctrl.newSubClass.subClassName"
+							>
+							</juno-input>
+						</td>
+						<td>
+							<juno-input
+									placeholder="Accompanying Subclass"
+									ng-model = "$ctrl.newSubClass.accompanyingSubClassName"
+									disabled = "!$ctrl.isEligibleForAccompanyingSubClass()"
+									invalid = "$ctrl.isEligibleForAccompanyingSubClass() && !$ctrl.newSubClass.accompanyingSubClassName"
+							>
+							</juno-input>
+						</td>
+						<td>
+							<juno-button component-style="$ctrl.componentStyle"
+										 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+										 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+										 click="$ctrl.onCreateSubClass()"
+										 disabled="!$ctrl.canCreate() || !$ctrl.isSubClassComplete()">
+								+
+							</juno-button>
+						</td>
+					</tr>
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</modal-body>
-
-    <modal-footer>
-		<div class="row footer-wrapper">
-			<div class="col-md-6">
-				<div class="button-group-wrapper pull-left">
-					<div class="button-wrapper">
-						<juno-button ng-if="!$ctrl.isCreate"
-                                     component-style="$ctrl.resolve.style"
-						             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
-						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-                                     disabled="!$ctrl.canDelete()"
-						             click="$ctrl.onDeleteCategory()">
-							Delete
-						</juno-button>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-6">
-				<div class="button-group-wrapper">
-					<div class="button-wrapper">
-						<juno-button component-style="$ctrl.resolve.style"
-						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-						             click="$ctrl.onCancel()">
-							Cancel
-						</juno-button>
-					</div>
-					<div class="button-wrapper">
-						<juno-button ng-if="$ctrl.isCreate"
-						             component-style="$ctrl.resolve.style"
-						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-						             click="$ctrl.onCreateCategory()"
-						             disabled="!$ctrl.canCreate()">
-							Add Category
-						</juno-button>
-						<juno-button ng-if="!$ctrl.isCreate"
-						             component-style="$ctrl.resolve.style"
-						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-						             click="$ctrl.onUpdateCategory()"
-						             disabled="!$ctrl.canUpdate()">
-							Save Category
-						</juno-button>
-					</div>
-				</div>
+	<modal-footer>
+		<div class="d-flex justify-content-between align-items-center h-100">
+			<juno-button class="w-128 m-l-16 flex-grow-0"
+						 ng-if="!$ctrl.isCreate"
+						 component-style="$ctrl.resolve.style"
+						 button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
+						 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+						 disabled="!$ctrl.canDelete()"
+						 click="$ctrl.onDeleteCategory()">
+				Delete
+			</juno-button>
+			<div class="button-group d-flex m-r-16">
+				<juno-button class="w-128 m-r-8 flex-grow-0"
+							 component-style="$ctrl.resolve.style"
+							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+							 click="$ctrl.onCancel()">
+					Cancel
+				</juno-button>
+				<juno-button ng-if="$ctrl.isCreate"
+							 class="w-128 flex-grow-0"
+							 component-style="$ctrl.resolve.style"
+							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+							 click="$ctrl.onCreateCategory()"
+							 disabled="!$ctrl.canCreate()">
+					Add Category
+				</juno-button>
+				<juno-button ng-if="!$ctrl.isCreate"
+							 class="w-128 flex-grow-0"
+							 component-style="$ctrl.resolve.style"
+							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+							 click="$ctrl.onUpdateCategory()"
+							 disabled="!$ctrl.canUpdate()">
+					Save Category
+				</juno-button>
 			</div>
 		</div>
 	</modal-footer>
