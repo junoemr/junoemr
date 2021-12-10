@@ -24,8 +24,8 @@
 <div id="hrm-category" class="flex-col align-items-center justify-content-top h-100">
     <div class="flex-row justify-content-between align-items-center w-100">
     <h4>Manage Report Classification</h4>
-    <div class="button-wrapper">
-        <juno-button ng-if="!$ctrl.newRole"
+        <juno-button class="flex-grow-0 w-128"
+                     ng-if="!$ctrl.newRole"
                      component-style="$ctrl.componentStyle"
                      button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
                      button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
@@ -33,12 +33,12 @@
                      disabled="!$ctrl.canCreate()">
             New Category
         </juno-button>
-        </div>
     </div>
     <table ng-table="$ctrl.tableParams" class="table table-striped table-bordered">
         <tbody>
         <tr ng-repeat="category in $ctrl.categories">
-            <td data-title="'Name'">
+            <td data-title="'Name'"
+                class="width-60">
                 {{ category.name }}
             </td>
             <td data-title="'Subclasses'">
