@@ -27,7 +27,7 @@ import AbstractConverter from "../../../conversion/AbstractConverter";
 
 export default class HrmSubClassFromTransferConverter extends AbstractConverter<HrmSubClassModel, HrmSubClass>
 {
-  convert(transfer: HrmSubClassModel, args: any): HrmSubClass
+  convert(transfer: HrmSubClassModel): HrmSubClass
   {
     if (transfer == null)
     {

@@ -71,31 +71,31 @@ export default class HrmService
 
     public async createCategory(category: HrmCategory): Promise<HrmCategory>
     {
-      const rawResponse = await this._hrmCategoryApi.createCategory(this._hrmCategoryToTransfer.convert(category, undefined));
-      return this._hrmCategoryFromTransfer.convert(rawResponse.data.body, undefined);
+      const rawResponse = await this._hrmCategoryApi.createCategory(this._hrmCategoryToTransfer.convert(category));
+      return this._hrmCategoryFromTransfer.convert(rawResponse.data.body);
     }
 
     public async getActiveCategory(id: number): Promise<HrmCategory>
     {
       const rawResponse = await this._hrmCategoryApi.getActiveCategory(id);
-      return this._hrmCategoryFromTransfer.convert(rawResponse.data.body, undefined);
+      return this._hrmCategoryFromTransfer.convert(rawResponse.data.body);
     }
 
     public async updateCategory(category: HrmCategory): Promise<HrmCategory>
     {
-      const rawResponse = await this._hrmCategoryApi.updateCategory(category.id, this._hrmCategoryToTransfer.convert(category, undefined));
-      return this._hrmCategoryFromTransfer.convert(rawResponse.data.body, undefined);
+      const rawResponse = await this._hrmCategoryApi.updateCategory(category.id, this._hrmCategoryToTransfer.convert(category));
+      return this._hrmCategoryFromTransfer.convert(rawResponse.data.body);
     }
 
     public async deactivateCategory(category: HrmCategory): Promise<HrmCategory>
     {
       const rawResponse = await this._hrmCategoryApi.deactivateCategory(category.id);
-      return this._hrmCategoryFromTransfer.convert(rawResponse.data.body, undefined);
+      return this._hrmCategoryFromTransfer.convert(rawResponse.data.body);
     }
 
     public async findSubClassByAttributes(facilityId, reportClass, subClassName, accompanyingSubClassName): Promise<any>
     {
       const rawResponse = await this._hrmSubClassApi.findActiveByAttributes(facilityId, reportClass, subClassName, accompanyingSubClassName);
-      return this._hrmSubClassFromTransfer.convert(rawResponse.data.body, undefined);
+      return this._hrmSubClassFromTransfer.convert(rawResponse.data.body);
     }
 }

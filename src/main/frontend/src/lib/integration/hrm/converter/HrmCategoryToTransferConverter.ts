@@ -30,7 +30,7 @@ export default class HrmCategoryToTransferConverter extends AbstractConverter<Hr
 {
   private readonly subClassConverter: HrmSubClassToTransferConverter = new HrmSubClassToTransferConverter();
 
-  convert(category: HrmCategory, args: any): HRMCategoryTransferInbound
+  convert(category: HrmCategory): HRMCategoryTransferInbound
   {
     if (!category)
     {

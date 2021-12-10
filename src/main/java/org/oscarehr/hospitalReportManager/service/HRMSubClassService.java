@@ -40,13 +40,13 @@ import java.util.List;
 public class HRMSubClassService
 {
 	@Autowired
-	HRMSubClassDao subClassDao;
+	private HRMSubClassDao subClassDao;
 
 	@Autowired
-	HRMCategoryDao categoryDao;
+	private HRMCategoryDao categoryDao;
 
 	@Autowired
-	HrmSubClassDbToModelConverter entityToModel;
+	private HrmSubClassDbToModelConverter entityToModel;
 
 	public HrmSubClassModel findActiveByAttributes(String facilityId, String reportClass, String subClassName, String accompanyingSubClassName)
 	{
