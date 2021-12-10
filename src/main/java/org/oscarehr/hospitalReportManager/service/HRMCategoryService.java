@@ -150,7 +150,7 @@ public class HRMCategoryService
 		return toModelConverter.convert(category);
 	}
 
-	HRMCategory reconcile(HRMCategory entity, HrmCategoryModel newModel)
+	public HRMCategory reconcile(HRMCategory entity, HrmCategoryModel newModel)
 	{
 		// Separate the subclass list on the updated entity into two parts
 		// subClasses with id (previously existing) and those without id (new)
@@ -158,15 +158,18 @@ public class HRMCategoryService
 		Set<Integer> activeSubClasses = new HashSet<>();
 		List<HrmSubClassModel> newSubClasses = new ArrayList<>();
 
-		for (HrmSubClassModel subClass : newModel.getSubClasses())
+		if (newModel.getSubClasses() != null)
 		{
-			if (subClass.getId() != null)
+			for (HrmSubClassModel subClass : newModel.getSubClasses())
 			{
-				activeSubClasses.add(subClass.getId());
-			}
-			else
-			{
-				newSubClasses.add(subClass);
+				if (subClass.getId() != null)
+				{
+					activeSubClasses.add(subClass.getId());
+				}
+				else
+				{
+					newSubClasses.add(subClass);
+				}
 			}
 		}
 
