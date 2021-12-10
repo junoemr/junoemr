@@ -119,11 +119,24 @@ public final class Misc {
 		return retval;
 	}
 
-	public static String areaCode(String num) {
+	/**
+	 * Retrieves the area code from a phone number
+	 * @param num Phone number to pull area code from
+	 * @return String - area code of provider number
+	 */
+	public static String areaCode(String num)
+	{
 		String retval = num;
-		try {
+		try
+		{
 			retval = cleanNumber(num).substring(0, 3);
-		} catch (Exception e) {
+		}
+		catch (StringIndexOutOfBoundsException e)
+		{
+			// Do not care about this exception. It's expected if num less than 3 characters long
+		}
+		catch (Exception e)
+		{
 			MiscUtils.getLogger().error("Error", e);
 		}
 		return retval;
