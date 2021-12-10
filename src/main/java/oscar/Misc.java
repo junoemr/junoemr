@@ -109,11 +109,22 @@ public final class Misc {
 //		return sb.toString();
 	}
 
+	/**
+	 * Retrieves a cleaned phone number from a full phone number
+	 * @param num Full phone number to pull the phone number from
+	 * @return String - cleaned phone number
+	 */
 	public static String phoneNumber(String num) {
 		String retval = num;
-		try {
+		try
+		{
 			retval = cleanNumber(num).substring(3);
-		} catch (Exception e) {
+		}
+		catch (IndexOutOfBoundsException e) {
+			// Do not care about this exception. It's expected if num less than 3 characters long
+		}
+		catch (Exception e)
+		{
 			MiscUtils.getLogger().error("Error", e);
 		}
 		return retval;
