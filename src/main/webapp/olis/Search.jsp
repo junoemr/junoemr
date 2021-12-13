@@ -742,7 +742,7 @@ List<Provider> allProvidersList = providerDao.getActiveProviders();
 
 	<form action="<%=request.getContextPath() %>/olis/Search.do" method="POST">
 	<input type="hidden" name="queryType" value="Z04" />
-	<table id="Z04_query">
+	<table id="Z04_query" style="display: none;">
 		<tbody>
 		<tr>
 			<td colspan=2><input type="submit" name="submit" value="Search" /></td>

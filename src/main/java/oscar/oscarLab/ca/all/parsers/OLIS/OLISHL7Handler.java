@@ -2262,7 +2262,12 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	@Override
 	public String getAccessionNum()
 	{
-		return getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getORC().getOrc4_PlacerGroupNumber().getEi1_EntityIdentifier().getValue());
+		if(getOBRCount() > 0)
+		{
+			// remember that calling 'get' on non-existent groups (ie ORDER_OBSERVATION) will create them (and throw off the reps count)
+			return getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getORC().getOrc4_PlacerGroupNumber().getEi1_EntityIdentifier().getValue());
+		}
+		return null;
 	}
 
 	public String getAccessionNumSourceOrganization() {
