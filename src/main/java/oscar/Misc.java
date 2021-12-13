@@ -35,9 +35,11 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.util.MiscUtils;
 
-public final class Misc {
+public final class Misc 
+{
 
-	private Misc() {
+	private Misc() 
+	{
 		// prevent instantiation
 	}
 
@@ -90,7 +92,8 @@ public final class Misc {
 	 */
 	public static String charEscape(String S, char a) 
 	{
-		if (S == null) {
+		if (S == null) 
+		{
 			return S;
 		}
 		int N = S.length();
@@ -120,20 +123,13 @@ public final class Misc {
 	 * @param num Full phone number to pull the phone number from
 	 * @return String - cleaned phone number
 	 */
-	public static String phoneNumber(String num) {
-		String retval = num;
-		try
-		{
-			retval = cleanNumber(num).substring(3);
+	public static String phoneNumber(String num) 
+	{
+		String retval = cleanNumber(num);
+		if (retval.length() < 3) {
+			return retval;
 		}
-		catch (IndexOutOfBoundsException e) {
-			// Do not care about this exception. It's expected if num less than 3 characters long
-		}
-		catch (Exception e)
-		{
-			MiscUtils.getLogger().error("Error", e);
-		}
-		return retval;
+		return retval.substring(3);
 	}
 
 	/**
@@ -143,20 +139,11 @@ public final class Misc {
 	 */
 	public static String areaCode(String num)
 	{
-		String retval = num;
-		try
-		{
-			retval = cleanNumber(num).substring(0, 3);
+		String retval = cleanNumber(num);
+		if (retval.length() < 3) {
+			return retval;
 		}
-		catch (StringIndexOutOfBoundsException e)
-		{
-			// Do not care about this exception. It's expected if num less than 3 characters long
-		}
-		catch (Exception e)
-		{
-			MiscUtils.getLogger().error("Error", e);
-		}
-		return retval;
+		return retval.substring(0, 3);
 	}
 
 	/**
