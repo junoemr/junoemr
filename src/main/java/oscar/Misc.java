@@ -42,13 +42,7 @@ public final class Misc
 	{
 		// prevent instantiation
 	}
-
-	/**
-	 * 
-	 * @param names
-	 * @param values
-	 * @return
-	 */
+	
 	public static Hashtable hashDefs(String[] names, String[] values) 
 	{
 		Hashtable H = new Hashtable();
@@ -57,12 +51,7 @@ public final class Misc
 			H.put(names[i], values[i]);
 		return H;
 	}
-
-	/**
-	 * 
-	 * @param sAppRootPath
-	 * @return
-	 */
+	
 	public static String getApplicationName(String sAppRootPath) 
 	{
 		int idx = sAppRootPath.lastIndexOf('/');
@@ -88,7 +77,7 @@ public final class Misc
 	 * Escapes the provided character a in string A
 	 * @param S string to escape characters in
 	 * @param a Character to escape in S
-	 * @return
+	 * @return String - escaped string
 	 */
 	public static String charEscape(String S, char a) 
 	{
@@ -126,7 +115,8 @@ public final class Misc
 	public static String phoneNumber(String num) 
 	{
 		String retval = cleanNumber(num);
-		if (retval.length() < 3) {
+		if (retval.length() < 3) 
+		{
 			return retval;
 		}
 		return retval.substring(3);
@@ -140,7 +130,8 @@ public final class Misc
 	public static String areaCode(String num)
 	{
 		String retval = cleanNumber(num);
-		if (retval.length() < 3) {
+		if (retval.length() < 3) 
+		{
 			return retval;
 		}
 		return retval.substring(0, 3);
@@ -223,8 +214,8 @@ public final class Misc
 
 	/**
 	 * Capitalizes words in a string
-	 * @param S
-	 * @return
+	 * @param S String to capitalize
+	 * @return String - Capitalized S
 	 */
 	public static String toUpperLowerCase(String S) 
 	{
@@ -255,14 +246,7 @@ public final class Misc
 		}
 		return sb.toString();
 	}
-
-	/**
-	 * 
-	 * @param s
-	 * @param dflt
-	 * @param nLimit
-	 * @return
-	 */
+	
 	public static String getShortStr(java.lang.String s, java.lang.String dflt, int nLimit)
 	{
 		if (s == null)
@@ -276,13 +260,7 @@ public final class Misc
 		}
 		return s;
 	}
-
-	/**
-	 * 
-	 * @param A
-	 * @param S
-	 * @return
-	 */
+	
 	public static String stringArrayJoin(String[] A, String S)
 	{
 		if (A == null || A.length == 0)
@@ -332,12 +310,7 @@ public final class Misc
 		}
 		return vectorToStringArray(V);
 	}
-
-	/**
-	 * 
-	 * @param S
-	 * @return
-	 */
+	
 	public static String[] stringSplit(String S)
 	{ // delim==S[0]
 		if (S == null || S.length() == 0)
@@ -353,12 +326,7 @@ public final class Misc
 		}
 		return vectorToStringArray(V);
 	}
-
-	/**
-	 * 
-	 * @param S
-	 * @return
-	 */
+	
 	public static Hashtable splitDelimHash(String S)
 	{
 		// delim=S[0]
@@ -381,14 +349,7 @@ public final class Misc
 		}
 		return H;
 	}
-
-	/**
-	 * 
-	 * @param S
-	 * @param d
-	 * @param defs
-	 * @return
-	 */
+	
 	public static String stringDelimSubst(String S, String d, Dict defs)
 	{
 		// S contains keys, beginning and ending with copies of delim;
@@ -400,14 +361,7 @@ public final class Misc
 		}
 		return stringArrayJoin(A, "");
 	}
-
-	/**
-	 * 
-	 * @param S
-	 * @param d
-	 * @param defs
-	 * @return
-	 */
+	
 	public static String stringDelimSubst(String S, String d, Hashtable defs)
 	{
 		// S contains keys, beginning and ending with copies of delim;
@@ -419,12 +373,7 @@ public final class Misc
 		}
 		return stringArrayJoin(A, "");
 	}
-
-	/**
-	 * 
-	 * @param Level
-	 * @return
-	 */
+	
 	public static String indent(int Level)
 	{
 		String S = "";
@@ -436,10 +385,10 @@ public final class Misc
 	}
 
 	/**
-	 * Converts a string to an integer, or a default value if string can't be parsed to int
+	 * Converts a string to an int, or a default value if string can't be parsed to int
 	 * @param S String to convert
 	 * @param dval Default value
-	 * @return
+	 * @return int - S converted to int or dval
 	 */
 	public static int getInt(String S, int dval)
 	{
@@ -462,7 +411,7 @@ public final class Misc
 	 * Returns S if not null, otherwise dval
 	 * @param S String
 	 * @param dval Default value
-	 * @return
+	 * @return String - S or dval
 	 */
 	public static String getStr(String S, String dval)
 	{
@@ -472,12 +421,7 @@ public final class Misc
 		}
 		return S;
 	}
-
-	/**
-	 * 
-	 * @param S
-	 * @return
-	 */
+	
 	public static String evalQuotedChars(String S)
 	{
 		String R = "";
@@ -518,12 +462,7 @@ public final class Misc
 		}
 		return R;
 	}
-
-	/**
-	 * 
-	 * @param H
-	 * @return
-	 */
+	
 	public static String hashAttribString(Hashtable H)
 	{
 		// returns the attribute string joe="schmoe" john="smith" &c.
@@ -538,12 +477,7 @@ public final class Misc
 		}
 		return S;
 	}
-
-	/**
-	 * 
-	 * @param S
-	 * @return
-	 */
+	
 	public static Hashtable attribStringHash(String S)
 	{
 		// interprets the attribute string joe="schmoe" john="smith" &c.
@@ -611,8 +545,8 @@ public final class Misc
 	/**
 	 * Adds a decimal place the a string of numbers to add 2 significant digits
 	 * Will move decimal left two places if already has a decimal
-	 * @param input
-	 * @return
+	 * @param input String to insert decimal point into
+	 * @return String - Modified input
 	 */
 	public static String insertDecimalPoint(String input)
 	{
@@ -630,10 +564,10 @@ public final class Misc
 
 	/**
 	 * Returns the default value if check and checkAgainst are equal, otherwise return check
-	 * @param check
-	 * @param checkAgainst
-	 * @param defaultValue
-	 * @return
+	 * @param check value to check
+	 * @param checkAgainst value to check against
+	 * @param defaultValue default value
+	 * @return String - result
 	 */
 	public static String check(String check, String checkAgainst, String defaultValue)
 	{
@@ -642,9 +576,9 @@ public final class Misc
 
 	/**
 	 * Returns default value if check is null, otherwise returns check
-	 * @param check
-	 * @param defaultValue
-	 * @return
+	 * @param check value to check
+	 * @param defaultValue value to check against
+	 * @return String - Result
 	 */
 	public static String check(String check, String defaultValue)
 	{
@@ -653,8 +587,8 @@ public final class Misc
 
 	/**
 	 * Converts a Vector to a string array
-	 * @param V
-	 * @return
+	 * @param V Vector to convert
+	 * @return String[] - result
 	 */
 	public static String[] vectorToStringArray(Vector V)
 	{
@@ -685,12 +619,7 @@ public final class Misc
 		}
 		return col;
 	}
-
-	/**
-	 * 
-	 * @param str
-	 * @return
-	 */
+	
 	public static String removeNewLine(String str)
 	{
 		StringBuilder stringBuffer = new java.lang.StringBuilder();
@@ -737,7 +666,7 @@ public final class Misc
 	/**
 	 * Builds a string filled with 0
 	 * @param x Number of 0's to fill in the string
-	 * @return
+	 * @return String - result
 	 */
 	public static String zero(int x) {
 		String returnZeroValue = new String();
@@ -746,13 +675,7 @@ public final class Misc
 		}
 		return returnZeroValue;
 	}
-
-	/**
-	 * 
-	 * @param y
-	 * @param x
-	 * @return
-	 */
+	
 	public static String forwardZero(String y, int x)
 	{
 		String returnZeroValue = new String();
@@ -763,13 +686,7 @@ public final class Misc
 		}
 		return cutFrontString(returnZeroValue + y, x);
 	}
-
-	/**
-	 * 
-	 * @param y
-	 * @param i
-	 * @return
-	 */
+	
 	public static String backwardZero(String y, int i)
 	{
 		String returnValue = new String();
@@ -780,24 +697,12 @@ public final class Misc
 		}
 		return cutBackString(y + returnValue, i);
 	}
-
-	/**
-	 * 
-	 * @param str
-	 * @param len
-	 * @return
-	 */
+	
 	public static String cutFrontString(String str, int len)
 	{
 		return str.substring(str.length() - len, str.length());
 	}
-
-	/**
-	 * 
-	 * @param str
-	 * @param len
-	 * @return
-	 */
+	
 	public static String cutBackString(String str, int len)
 	{
 		if (str != null && str.length() < len)
@@ -806,13 +711,7 @@ public final class Misc
 		}
 		return str.substring(0, len);
 	}
-
-	/**
-	 * 
-	 * @param y
-	 * @param x
-	 * @return
-	 */
+	
 	public static String forwardSpace(String y, int x)
 	{
 		String returnZeroValue = new String();
@@ -823,13 +722,7 @@ public final class Misc
 		}
 		return cutFrontString(returnZeroValue + y, x);
 	}
-
-	/**
-	 * 
-	 * @param y
-	 * @param x
-	 * @return
-	 */
+	
 	public static String moneyFormatPaddedZeroNoDecimal(String y, int x)
 	{
 		String returnZeroValue = "";
@@ -843,12 +736,7 @@ public final class Misc
 		}
 		return cutFrontString(returnZeroValue, x);
 	}
-
-	/**
-	 * 
-	 * @param str
-	 * @return
-	 */
+	
 	public static String moneyFormat(String str)
 	{
 		String moneyStr = "0.00";
@@ -861,26 +749,12 @@ public final class Misc
 		}
 		return moneyStr;
 	}
-
-	/**
-	 * 
-	 * @param rs
-	 * @param columnName
-	 * @return
-	 * @throws SQLException
-	 */
+	
 	public static String getString(ResultSet rs, String columnName) throws SQLException
 	{
 		return (StringUtils.trimToEmpty(rs.getString(columnName)));
 	}
-
-	/**
-	 * 
-	 * @param rs
-	 * @param columnIndex
-	 * @return
-	 * @throws SQLException
-	 */
+	
 	public static String getString(ResultSet rs, int columnIndex) throws SQLException
 	{
 		return (StringUtils.trimToEmpty(rs.getString(columnIndex)));
@@ -899,14 +773,7 @@ public final class Misc
 		}
 		return (String) s;
 	}
-
-	/**
-	 * 
-	 * @param str
-	 * @param pattern
-	 * @param replaceTo
-	 * @return
-	 */
+	
 	public static String replace(String str, String pattern, String replaceTo)
 	{
 		String[] buff = str.split(pattern);
@@ -924,12 +791,7 @@ public final class Misc
 		}
 		return sb.toString();
 	}
-
-	/**
-	 * 
-	 * @param s
-	 * @return
-	 */
+	
 	public static String getStringJs(Object s)
 	{
 		if (s == null)
@@ -939,12 +801,7 @@ public final class Misc
 		String s1 = replace((String) s, "'", "\\'");
 		return replace(s1, "\"", "&#34;");
 	}
-
-	/**
-	 * 
-	 * @param sPin
-	 * @return
-	 */
+	
 	public static String encryptPIN(String sPin)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -967,12 +824,7 @@ public final class Misc
 		}
 		return sb.toString();
 	}
-
-	/**
-	 * 
-	 * @param digits
-	 * @return
-	 */
+	
 	public static String getRandomNumber(int digits)
 	{
 		int max = (int) Math.pow(10, digits) - 1;
