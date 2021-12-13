@@ -356,7 +356,8 @@ public class ManageDocumentAction extends DispatchAction {
 		File returnFile = null;
 		try
 		{
-			if(document.hasEncodingError())
+			String pdfMimeType = GenericFile.ALLOWED_CONTENT_TYPES.APPLICATION_PDF.getContentType();
+			if(document.hasEncodingError() || !pdfMimeType.equals(document.getContenttype()))
 			{
 				returnFile = generatePdfPreviewUnavailableImage();
 			}
