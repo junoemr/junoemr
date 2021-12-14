@@ -1,4 +1,5 @@
 <div class="encounter-note-list-base flex-column">
+	<juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.EncounterNoteRead">
 	<div class="note-list-header">
 		<filter-panel ng-if="$ctrl.enableFilterHeader"
 		              label="Filter Encounter Notes"
@@ -77,4 +78,5 @@
 			<div style="clear:both;"></div>
 		</div>
 	</div>
+	</juno-security-check>
 </div>

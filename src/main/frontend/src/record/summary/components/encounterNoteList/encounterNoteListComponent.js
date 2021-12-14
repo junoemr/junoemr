@@ -23,8 +23,10 @@
 
  */
 
+import {SecurityPermissions} from "../../../../common/security/securityConstants";
+
 angular.module('Record.Summary').component('encounterNoteList', {
-	templateUrl: "src/record/summary/encounterNoteListTemplate.jsp",
+	templateUrl: "src/record/summary/components/encounterNoteList/encounterNoteListTemplate.jsp",
 	bindings: {
 		userId: '<', // current user provider number
 		selectedNoteHash: '=',
@@ -43,6 +45,8 @@ angular.module('Record.Summary').component('encounterNoteList', {
 		          providerService)
 	{
 		const ctrl = this;
+
+		ctrl.SecurityPermissions = SecurityPermissions;
 
 		ctrl.$onInit = function()
 		{

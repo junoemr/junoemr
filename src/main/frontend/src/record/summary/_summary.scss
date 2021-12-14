@@ -1,5 +1,10 @@
 .summary-section {
 
+	.summary-grid {
+		grid-template-columns: .2fr .6fr .2fr;
+		gap: 24px;
+	}
+
 	#summary-section-left{
 		margin-bottom: $margin-md;
 	}
@@ -12,6 +17,7 @@
 	}
 
 	.summary-tabs {
+		position: relative;
 		@include juno-tab-md($page-tabs-height-alt);
 		@include juno-tab-color-scheme-white(4px);
 	}
