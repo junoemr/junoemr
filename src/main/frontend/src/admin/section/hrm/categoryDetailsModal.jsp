@@ -114,44 +114,46 @@
 			</div>
 		</div>
 	</modal-body>
-	<modal-footer>
-		<div class="d-flex justify-content-between align-items-center h-100">
-			<juno-button class="w-128 m-l-16 flex-grow-0"
-						 ng-if="!$ctrl.isCreate"
-						 component-style="$ctrl.resolve.style"
-						 button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
-						 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-						 disabled="!$ctrl.canDelete()"
-						 click="$ctrl.onDeleteCategory()">
-				Delete
-			</juno-button>
-			<div class="button-group d-flex m-r-16">
-				<juno-button class="w-128 m-r-8 flex-grow-0"
-							 component-style="$ctrl.resolve.style"
-							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-							 click="$ctrl.onCancel()">
-					Cancel
-				</juno-button>
-				<juno-button ng-if="$ctrl.isCreate"
-							 class="w-128 flex-grow-0"
-							 component-style="$ctrl.resolve.style"
-							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-							 click="$ctrl.onCreateCategory()"
-							 disabled="!$ctrl.canCreate()">
-					Add Category
-				</juno-button>
-				<juno-button ng-if="!$ctrl.isCreate"
-							 class="w-128 flex-grow-0"
-							 component-style="$ctrl.resolve.style"
-							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-							 click="$ctrl.onUpdateCategory()"
-							 disabled="!$ctrl.canUpdate()">
-					Save Category
-				</juno-button>
-			</div>
-		</div>
-	</modal-footer>
+    <modal-footer>
+        <div class="d-flex align-items-center h-100">
+            <div class="d-flex m-l-16 align-items-center width-50 justify-content-start">
+                <juno-button class="w-128 flex-grow-0"
+                             ng-if="!$ctrl.isCreate"
+                             component-style="$ctrl.resolve.style"
+                             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
+                             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+                             disabled="!$ctrl.canDelete()"
+                             click="$ctrl.onDeleteCategory()">
+                    Delete
+                </juno-button>
+            </div>
+            <div class="d-flex m-r-16 width-50 align-items-center justify-content-end">
+                <juno-button class="w-128 m-r-8 flex-grow-0"
+                             component-style="$ctrl.resolve.style"
+                             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+                             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
+                             click="$ctrl.onCancel()">
+                    Cancel
+                </juno-button>
+                <juno-button ng-if="$ctrl.isCreate"
+                             class="w-128 flex-grow-0"
+                             component-style="$ctrl.resolve.style"
+                             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+                             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+                             click="$ctrl.onCreateCategory()"
+                             disabled="!$ctrl.canCreate()">
+                    Add Category
+                </juno-button>
+                <juno-button ng-if="!$ctrl.isCreate"
+                             class="w-128 flex-grow-0"
+                             component-style="$ctrl.resolve.style"
+                             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+                             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+                             click="$ctrl.onUpdateCategory()"
+                             disabled="!$ctrl.canUpdate()">
+                    Save Category
+                </juno-button>
+            </div>
+        </div>
+    </modal-footer>
 </juno-modal>

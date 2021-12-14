@@ -1,112 +1,182 @@
 package org.oscarehr.integration.hrm;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.oscarehr.dataMigration.converter.in.hrm.HrmSubClassModelToDbConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
 import org.oscarehr.dataMigration.model.hrm.HrmSubClassModel;
 import org.oscarehr.hospitalReportManager.model.HRMCategory;
 import org.oscarehr.hospitalReportManager.model.HRMSubClass;
 import org.oscarehr.hospitalReportManager.service.HRMCategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-import java.time.LocalDateTime;
+import xml.hrm.v4_3.ReportClass;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-@RunWith(SpringRunner.class)
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.Mockito.when;
+
 @SpringBootTest
 public class HRMCategoryServiceTest
 {
-	HRMCategoryService categoryService = new HRMCategoryService();
+	@Autowired
+	@InjectMocks
+	HRMCategoryService categoryService;
+
+	@Mock
+	HrmSubClassModelToDbConverter subClassConverter;
+
+	@Before
+	public void before() throws Exception
+	{
+		MockitoAnnotations.initMocks(this);
+		when(subClassConverter.convert(anyCollection(), any(HRMCategory.class))).thenCallRealMethod();
+		when(subClassConverter.convert(any(HrmSubClassModel.class), any(HRMCategory.class))).thenCallRealMethod();
+	}
 
 	@Test
-	public void test_reconcile_baseCaseNoChangesEmpty()
+	public void reconcile_baseCaseNoChangesEmpty()
 	{
-		HRMCategory entity = generateEntity();
-		HrmCategoryModel incomingTransfer = generateModel();
+		HRMCategory entity = generateCategoryEntity();
+		HrmCategoryModel incomingTransfer = generateCategoryModel();
 		HRMCategory reconciled = categoryService.reconcile(entity, incomingTransfer);
 
-		Assert.assertTrue("Subclasses are empty", reconciled.getActiveSubClasses().isEmpty());
+		Assert.assertTrue("Category has no subclasses", reconciled.getActiveSubClasses().isEmpty());
 	}
 
 	@Test
-	public void test_reconcile_baseCaseNoChangesNotEmpty()
+	public void reconcile_noChangesNotEmpty()
 	{
-		HRMCategory entity = generateEntity();
-		entity.setSubClassList(generateEntitySubClassList(entity));
+		HRMCategory entity = generateCategoryEntity();
+		bindSubClasses(entity, generateDISubClassEntity(entity));
 
-		HrmCategoryModel incomingTransfer = generateModel();
-		incomingTransfer.setSubClasses(generateModelSubClassList(incomingTransfer));
+		HrmCategoryModel incomingTransfer = generateCategoryModel();
+		HrmSubClassModel noChanges = generateDISubClassModel(incomingTransfer);
+		bindSubClasses(incomingTransfer, noChanges);
 
 		HRMCategory reconciled = categoryService.reconcile(entity, incomingTransfer);
 
-		Assert.assertEquals("Subclasses has size 1", 1, reconciled.getActiveSubClasses().size());
+		HRMSubClass reconciledSubClass = reconciled.getActiveSubClasses().get(0);
 
-		HRMSubClass onlySubClass = reconciled.getActiveSubClasses().get(0);
-
-		Assert.assertEquals("Facility number name is the same", "Dennys", onlySubClass.getSendingFacilityId());
-		Assert.assertEquals("Class name is the same", "Diagnostic Imaging", onlySubClass.getClassName());
-		Assert.assertEquals("Subclass name is the same", "Breakfast", onlySubClass.getSubClassName());
-		Assert.assertEquals("Accompanying subclass name is the same", "Pancakes", onlySubClass.getAccompanyingSubClassName());
-		Assert.assertNull("Subclass is not disabled", onlySubClass.getDisabledAt());
+		Assert.assertEquals("Category has one subclass", 1, reconciled.getActiveSubClasses().size());
+		Assert.assertTrue("First subclass is mapped correctly", isMappedCorrectly(reconciledSubClass, noChanges));
 	}
 
 	@Test
-	public void test_nameChange()
+	public void reconcile_addSubClass()
 	{
-		String newName = "foo";
+		HRMCategory entity = generateCategoryEntity();
+		bindSubClasses(entity, generateDISubClassEntity(entity));
 
-		HRMCategory entity = generateEntity();
-		HrmCategoryModel incomingTransfer = generateModel();
-		incomingTransfer.setName(newName);
+		HrmCategoryModel twoSubClasses = generateCategoryModel();
+		HrmSubClassModel firstSubClass = generateDISubClassModel(twoSubClasses);
+		HrmSubClassModel secondSubClass = generateMRRSubClassModel(twoSubClasses);
+		secondSubClass.setId(null);
 
-		HRMCategory reconciled = categoryService.reconcile(entity, incomingTransfer);
-		Assert.assertEquals("Entity's name has been updated", reconciled.getCategoryName(), newName);
+		bindSubClasses(twoSubClasses, firstSubClass, secondSubClass);
+
+		HRMCategory reconciled = categoryService.reconcile(entity, twoSubClasses);
+
+		HRMSubClass firstReconciled = reconciled.getSubClassList().get(0);
+		HRMSubClass secondReconciled = reconciled.getSubClassList().get(1);
+
+		Assert.assertEquals("Two active subclasses", 2, reconciled.getActiveSubClasses().size());
+		Assert.assertTrue("First subclass is mapped correctly", isMappedCorrectly(firstReconciled, firstSubClass));
+		Assert.assertTrue("Second subclass is mapped correctly", isMappedCorrectly(secondReconciled, secondSubClass));
 	}
 
 	@Test
-	public void test_deactivate()
+	public void reconcile_deleteSubClasses()
 	{
-		HRMCategory entity = generateEntity();
-		HrmCategoryModel incomingTransfer = generateModel();
-		incomingTransfer.setDisabledAt(LocalDateTime.now());
+		HRMCategory entity = generateCategoryEntity();
+		bindSubClasses(entity, generateDISubClassEntity(entity), generateMRRSubClassEntity(entity));
 
-		HRMCategory reconciled = categoryService.reconcile(entity, incomingTransfer);
-		Assert.assertNotNull("Entity has been disabled", reconciled.getDisabledAt());
+		HrmCategoryModel deleteOne = generateCategoryModel();
+		// First subclass (DI) is deleted
+		HrmSubClassModel remainingSubClass = generateMRRSubClassModel(deleteOne);
+		bindSubClasses(deleteOne, remainingSubClass);
+
+		HRMCategory reconciled = categoryService.reconcile(entity, deleteOne);
+
+		HRMSubClass firstReconciled = reconciled.getSubClassList().get(0);
+		HRMSubClass secondReconciled = reconciled.getSubClassList().get(1);
+
+		Assert.assertEquals("One active subclass", 1, reconciled.getActiveSubClasses().size());
+		Assert.assertNotNull("The first subclass is disabled", firstReconciled.getDisabledAt());
+		Assert.assertNull("The second subclass is active", secondReconciled.getDisabledAt());
+		Assert.assertTrue("Second subclass is mapped correctly", isMappedCorrectly(secondReconciled, remainingSubClass));
 	}
 
 	@Test
-	public void test_reconcile_addSubClass()
+	public void reconcile_addDeleteSubClass()
 	{
+		HRMCategory entity = generateCategoryEntity();
+		bindSubClasses(entity, generateDISubClassEntity(entity), generateMRRSubClassEntity(entity));
 
+		HrmCategoryModel deleteOneAddOne = generateCategoryModel();
+
+		// First subclass (DI) is deleted
+
+		HrmSubClassModel unchanged = generateMRRSubClassModel(deleteOneAddOne);
+
+		HrmSubClassModel added = new HrmSubClassModel();
+		added.setHrmCategoryId(deleteOneAddOne.getId());
+		added.setFacilityNumber("TimHortons");
+		added.setClassName(ReportClass.CARDIO_RESPIRATORY_REPORT.value());
+		added.setAccompanyingSubClassName("DoubleDouble");
+		added.setDisabledAt(null);
+
+		bindSubClasses(deleteOneAddOne, unchanged, added);
+
+		HRMCategory reconciled = categoryService.reconcile(entity, deleteOneAddOne);
+		HRMSubClass firstReconciled = reconciled.getSubClassList().get(0);
+		HRMSubClass secondReconciled = reconciled.getSubClassList().get(1);
+		HRMSubClass thirdReconciled = reconciled.getSubClassList().get(2);
+
+		Assert.assertEquals("Two active subclasses", 2, reconciled.getActiveSubClasses().size());
+		Assert.assertNotNull("The first subclass is disabled", firstReconciled.getDisabledAt());
+		Assert.assertNull("The second subclass is active", secondReconciled.getDisabledAt());
+		Assert.assertNull("The third subclass is active", thirdReconciled.getDisabledAt());
+		Assert.assertTrue("Second subclass is mapped correctly", isMappedCorrectly(secondReconciled, unchanged));
+		Assert.assertTrue("Third subclass is mapped correctly", isMappedCorrectly(thirdReconciled, added));
 	}
 
-	@Test
-	public void test_reconcile_deleteSubClass()
-	{
+	//
+	//  Convenience methods below
+	//
 
+	private void bindSubClasses(HRMCategory parent, HRMSubClass... subClasses)
+	{
+		List<HRMSubClass> subClassList = new ArrayList<>(Arrays.asList(subClasses));
+		parent.setSubClassList(subClassList);
 	}
 
-	@Test
-	public void test_reconcile_addDeleteSubClasses()
+	private void bindSubClasses(HrmCategoryModel parent, HrmSubClassModel... subClasses)
 	{
-
+		List<HrmSubClassModel> subClassList = new ArrayList<>(Arrays.asList(subClasses));
+		parent.setSubClasses(subClassList);
 	}
 
-	private HrmCategoryModel generateModel()
+	private HrmCategoryModel generateCategoryModel()
 	{
 		HrmCategoryModel model = new HrmCategoryModel();
 		model.setId(1);
-		model.setName("test");
+		model.setName("Breakfast");
 		model.setSubClasses(new ArrayList<>());
 		model.setDisabledAt(null);
 
 		return model;
 	}
 
-	private HRMCategory generateEntity()
+	private HRMCategory generateCategoryEntity()
 	{
 		HRMCategory entity = new HRMCategory();
 		entity.setId(1);
@@ -117,31 +187,74 @@ public class HRMCategoryServiceTest
 		return entity;
 	}
 
-	private List<HRMSubClass> generateEntitySubClassList(HRMCategory parent)
+	private HRMSubClass generateDISubClassEntity(HRMCategory parent)
 	{
 		HRMSubClass subclass = new HRMSubClass();
 		subclass.setId(1);
 		subclass.setHrmCategory(parent);
 		subclass.setSendingFacilityId("Dennys");
 		subclass.setClassName("Diagnostic Imaging");
-		subclass.setSubClassName("Breakfast");
 		subclass.setAccompanyingSubClassName("Pancakes");
 		subclass.setDisabledAt(null);
 
-		return Collections.singletonList(subclass);
+		return subclass;
 	}
 
-	private List<HrmSubClassModel> generateModelSubClassList(HrmCategoryModel parent)
+	private HRMSubClass generateMRRSubClassEntity(HRMCategory parent)
+	{
+		HRMSubClass subclass = new HRMSubClass();
+		subclass.setId(2);
+		subclass.setHrmCategory(parent);
+		subclass.setSendingFacilityId("McDonalds");
+		subclass.setClassName("Medical Records Report");
+		subclass.setAccompanyingSubClassName("Hashbrowns");
+		subclass.setDisabledAt(null);
+
+		return subclass;
+	}
+
+	private HrmSubClassModel generateDISubClassModel(HrmCategoryModel parent)
 	{
 		HrmSubClassModel subclass = new HrmSubClassModel();
 		subclass.setId(1);
 		subclass.setHrmCategoryId(parent.getId());
 		subclass.setFacilityNumber("Dennys");
 		subclass.setClassName("Diagnostic Imaging");
-		subclass.setSubClassName("Breakfast");
 		subclass.setAccompanyingSubClassName("Pancakes");
 		subclass.setDisabledAt(null);
 
-		return Collections.singletonList(subclass);
+		return subclass;
+	}
+
+	private HrmSubClassModel generateMRRSubClassModel(HrmCategoryModel parent)
+	{
+		HrmSubClassModel subclass = new HrmSubClassModel();
+		subclass.setId(2);
+		subclass.setHrmCategoryId(parent.getId());
+		subclass.setFacilityNumber("McDonalds");
+		subclass.setClassName("Medical Records Report");
+		subclass.setAccompanyingSubClassName("Hashbrowns");
+		subclass.setDisabledAt(null);
+
+		return subclass;
+	}
+
+	private boolean isMappedCorrectly(HRMSubClass entity, HrmSubClassModel model)
+	{
+		// Intentional .equals here, we want this to fail if id is ever null
+		boolean parentMatch = entity.getHrmCategory().getId().equals(model.getHrmCategoryId());
+
+		boolean facilityNumberMatch = Objects.equals(entity.getSendingFacilityId(), model.getFacilityNumber());
+		boolean nameMatch = Objects.equals(entity.getClassName(), model.getClassName());
+		boolean subClassNameMatch = Objects.equals(entity.getSubClassName(), model.getSubClassName());
+		boolean accompanyingSubClassNameMatch = Objects.equals(entity.getAccompanyingSubClassName(), model.getAccompanyingSubClassName());
+		boolean disabledAtMatch = Objects.equals(entity.getDisabledAt(), model.getDisabledAt());
+
+		return parentMatch &&
+			facilityNumberMatch &&
+			nameMatch &&
+			subClassNameMatch &&
+			accompanyingSubClassNameMatch &&
+			disabledAtMatch;
 	}
 }

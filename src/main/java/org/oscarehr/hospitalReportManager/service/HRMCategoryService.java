@@ -52,19 +52,19 @@ import java.util.Set;
 public class HRMCategoryService
 {
 	@Autowired
-	HRMCategoryDao categoryDao;
+	private HRMCategoryDao categoryDao;
 
 	@Autowired
-	HRMSubClassService subClassService;
+	private HRMSubClassService subClassService;
 
 	@Autowired
-	HrmCategoryDbToModelConverter toModelConverter;
+	private HrmCategoryDbToModelConverter toModelConverter;
 
 	@Autowired
-	HrmCategoryModelToDbConverter toDBConverter;
+	private HrmCategoryModelToDbConverter toDBConverter;
 
 	@Autowired
-	HrmSubClassModelToDbConverter subClassToDBConverter;
+	private HrmSubClassModelToDbConverter subClassToDBConverter;
 
 	public HrmCategoryModel createCategory(HrmCategoryModel category)
 	{
@@ -111,29 +111,26 @@ public class HRMCategoryService
 		return categoryDao.findActiveByName(categoryName).isPresent();
 	}
 
-	public HrmCategoryModel updateCategoryName(Integer categoryId, String newName)
+	public HrmCategoryModel updateCategory(HrmCategoryModel updatedModel)
 	{
-		Optional<HRMCategory> sameName = categoryDao.findActiveByName(newName);
-		sameName.ifPresent(existingCategory ->
+		HRMCategory existingEntity = categoryDao.find(updatedModel.getId());
+
+		if (!existingEntity.getCategoryName().equals(updatedModel.getName()))
 		{
-			// Prevent renames to existing names;
-			if (!existingCategory.getId().equals(categoryId))
+			Optional<HRMCategory> sameName = categoryDao.findActiveByName(updatedModel.getName());
+			sameName.ifPresent(existingCategory ->
 			{
-				throw new ValidationException("An active category with name " + newName + " already exists");
-			}
-		});
+				// Prevent renames to existing names;
+				if (!existingCategory.getId().equals(existingEntity.getId()))
+				{
+					throw new ValidationException("An active category with name " + updatedModel.getName() + " already exists");
+				}
+			});
 
-		HRMCategory category = categoryDao.find(categoryId);
-		category.setCategoryName(newName);
-		categoryDao.merge(category);
+			existingEntity.setCategoryName(updatedModel.getName());
+		}
 
-		return toModelConverter.convert(category);
-	}
-
-	public HrmCategoryModel updateCategory(HrmCategoryModel newModel)
-	{
-		HRMCategory existingEntity = categoryDao.find(newModel.getId());
-		HRMCategory updated = reconcile(existingEntity, newModel);
+		HRMCategory updated = reconcile(existingEntity, updatedModel);
 		categoryDao.merge(updated);
 
 		return toModelConverter.convert(updated);
