@@ -58,6 +58,7 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 	public HRMDocument convert(HrmDocument input)
 	{
 		HRMDocument hrmDocument = new HRMDocument();
+		hrmDocument.setId(input.getId());
 		hrmDocument.setDescription(input.getDescription());
 		hrmDocument.setReportType(reportType(input.getReportClass()));
 		hrmDocument.setSubClass(input.getReportSubClass());
