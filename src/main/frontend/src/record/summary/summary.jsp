@@ -44,7 +44,7 @@
 							</summary-module>
 						</div>
 		            </div>
-					<div class="flex-column flex-grow-1"
+					<div class="flex-column flex-grow-1 height-100"
 						 ng-click="summaryCtrl.checkAction($event)"
 						 ng-keypress="summaryCtrl.checkAction($event)">
 						<div class="flex-row justify-content-center summary-tabs"
@@ -77,7 +77,7 @@
 
 							</div>
 						</div>
-						<div class="w-100 note-list">
+						<div class="w-100 height-100 note-list">
 							<div class="tab-content">
 								<div class="tab-pane active" id="all">
 									<encounter-note-list
