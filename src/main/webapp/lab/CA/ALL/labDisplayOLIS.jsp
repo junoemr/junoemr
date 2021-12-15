@@ -1726,49 +1726,51 @@ public String strikeOutInvalidContent(String content, String status) {
 
                                 boolean obrFlag = false;
                                 int obxCount = handler.getOBXCount(obr);
-                                String collectorsComment = handler.getCollectorsComment(obr); // TODO-legacy: get collector attribution
-                                if (collectorsComment != null && !collectorsComment.equals("")) {
+                                String collectorsComment = handler.getCollectorsComment(obr);
+                                if (StringUtils.isNotBlank(collectorsComment))
+								{
                                 	 %>
                                      <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
                                          <td valign="top" align="left" colspan="7"><div style="margin-left:15px; width:700px">
-                                         <strong>Comments:</strong> <%=handler.formatString(collectorsComment)%>
+                                         <strong>Collector's Comments:</strong> <%=handler.formatString(collectorsComment)%>
                                          <span style="margin-left:15px;font-size:8px; color:#333333;"><%=handler.getCollectorsCommentSourceOrganization(obr)%></span>
                                          </div></td>
                                      </tr>
                                      <%
                                 }
 
-                                if (handler.getObservationHeader(obr, 0).equals(headers.get(obr))) {
+                                if (handler.getObservationHeader(obr, 0).equals(headers.get(obr)))
+								{
                                 	int cc = handler.getOBRCommentCount(obr);
-                                	for (int comment = 0; comment < cc; comment++){
-                                    // the obrName should only be set if it has not been
-                                    // set already which will only have occured if the
-                                    // obx name is "" or if it is the same as the obr name
-                                    String obxNN = handler.getOBXName(obr,0);
-                                    if(!obrFlag && obxNN.equals("")){%>
-                                        <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" >
-                                            <td valign="top" align="left"><%=handler.getOBRName(comment)%></td>
-                                            <td valign="top" align="left"><%=handler.getObrSpecimenSource(comment) %></td>
-                                            <td colspan="5">&nbsp;</td>
-                                        </tr>
-                                        <%obrFlag = true;
-                                    }
+	                                for(int n = 0; n < cc; n++)
+	                                {
+	                                    // the obrName should only be set if it has not been set already,
+		                                // which will only have occurred if the obx name is ""
+		                                // or if it is the same as the obr name
+	                                    String obxNN = handler.getOBXName(obr,0);
+	                                    if(!obrFlag && StringUtils.isBlank(obxNN))
+										{%>
+	                                        <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
+	                                            <td valign="top" align="left"><%=handler.getOBRName(obr)%></td>
+	                                            <td colspan="6">&nbsp;</td>
+	                                        </tr>
+	                                        <%obrFlag = true;
+	                                    }
 
-                                    String obrComment = handler.getOBRComment(obr, comment);
-                                    String sourceOrg = handler.getOBRSourceOrganization(obr, comment);
-                                    %>
+	                                    String obrComment = handler.getOBRComment(obr, n);
+	                                    String sourceOrg = handler.getOBRSourceOrganization(obr, n);
+	                                    %>
                                 <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
                                     <td valign="top" align="left" colspan="7">
-                                    <div  style="margin-left:15px;width: 700px;">
-                                    	<%=obrComment%>
+                                    <div style="margin-left:15px;width: 700px;">
+	                                    <span><%=obrComment%></span>
                                     	<span style="margin-left:15px;font-size:8px; color:#333333;"><%=sourceOrg%></span>
                                    	</div>
                                     </td>
                                 </tr>
-                                <%
-
-                                }//end for k=0
-                            	}//end if handler.getObservation..
+                                    <%
+	                                }//end for n=0
+                            	}//end if handler.getObservation
 
                                 for (int k=0; k < obxCount; k++){
                                 	obx = handler.getMappedOBX(obr, k);
