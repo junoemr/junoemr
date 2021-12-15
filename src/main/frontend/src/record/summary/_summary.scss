@@ -1,4 +1,5 @@
 .summary-section {
+	@include juno-page-padding-default;
 
 	.summary-grid {
 		grid-template-columns: .24fr .52fr .24fr;

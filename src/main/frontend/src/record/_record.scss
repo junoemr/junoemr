@@ -18,17 +18,15 @@
 		position: relative;
 
 		.primary-content-window {
-			@include juno-page-padding-default;
-
 			position: absolute;
 			inset: 0;
 
 			overflow-y: auto;
 
-      @media print {
-        overflow: unset;
-        height: auto;
-      }
+			@media print {
+				overflow: unset;
+				height: auto;
+			}
 		}
 	}
 

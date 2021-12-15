@@ -23,10 +23,10 @@
     Ontario, Canada
 
 --%>
-<page-wrapper show-header="false" class="summary-section">
+<page-wrapper show-header="false">
 	<page-body>
 		<juno-security-check show-placeholder="true" permissions="summaryCtrl.SecurityPermissions.EchartRead">
-			<div class="flex-column flex-grow-1">
+			<div class="flex-column flex-grow-1 summary-section">
 				<div class="grid-flow-row summary-grid">
 					<div class="flex-column flex-grow-1" id="summary-section-left">
 						<div class="module-list" ng-repeat="mod in summaryCtrl.page.columnOne.modules">
