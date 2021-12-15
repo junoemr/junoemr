@@ -23,9 +23,6 @@
 
 package integration.tests;
 
-import static integration.tests.EditFamilyHistoryClassicUIIT.addNotes;
-import static integration.tests.EditFamilyHistoryClassicUIIT.archiveNotes;
-import static integration.tests.EditFamilyHistoryClassicUIIT.editCPPNoteTest;
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
 import integration.tests.config.TestConfig;
@@ -37,13 +34,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class EditRiskFactorsClassicUIIT extends SeleniumTestBase
+public class EditFamilyHistoryClassicUIIT extends SeleniumTestBase
 {
 	@Override
 	protected String[] getTablesToRestore()
@@ -64,15 +62,15 @@ public class EditRiskFactorsClassicUIIT extends SeleniumTestBase
 		PageUtil.switchToWindow(eChartWindowHandle, driver);
 	}
 
-	String cppType = "Risk Factors";
-	String cppTypeID = "menuTitleriskFactors";
+	String cppType = "Family History";
+	String cppTypeID = "menuTitlefamHistory";
 	String noteCPP = cppType + " in CPP";
 	String noteEncounter = cppType + " in Encounter";
 	String editedNoteCPP = "Edited " + noteCPP;
 	String archivedNote = "Archived " + cppType;
 
 	@Test
-	public void addRiskFactorsTest()
+	public void addFamilyHistoryTest()
 	{
 		//Add Notes
 		addNotes(cppTypeID, noteCPP, noteEncounter);
@@ -83,7 +81,7 @@ public class EditRiskFactorsClassicUIIT extends SeleniumTestBase
 	}
 
 	@Test
-	public void editRiskFactorsTest()
+	public void editFamilyHistoryTest()
 	{
 		//Add Notes
 		addNotes(cppTypeID, noteCPP, noteEncounter);
@@ -95,11 +93,52 @@ public class EditRiskFactorsClassicUIIT extends SeleniumTestBase
 	}
 
 	@Test
-	public void archiveRiskFactorsTest()
+	public void archiveFamilyHistoryTest()
 	{
 		//Archive Note
 		archiveNotes(cppType, cppTypeID);
 		Assert.assertTrue(cppType + " Note is NOT Archived successfully",
 			PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedNote + "')]"), driver));
+	}
+
+	public static  void addNotes(String cppTypeID, String noteCPP, String noteEncounter)
+	{
+		String startDate = "2020-01-01";
+		String resolutionDate = "2021-01-01";
+
+		driver.navigate().refresh();
+		driver.findElement(
+			By.xpath("//div[@id='" + cppTypeID + "']//descendant::a[contains(., '+')]")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
+		driver.findElement(By.id("noteEditTxt")).sendKeys(noteEncounter);
+		driver.findElement(By.id("startdate")).sendKeys(startDate);
+		driver.findElement(By.id("resolutiondate")).sendKeys(resolutionDate);
+		driver.findElement(By.xpath("//input[@title='Copy to Current Note']")).click();
+		driver.findElement(By.id("noteEditTxt")).clear();
+		driver.findElement(By.id("noteEditTxt")).sendKeys(noteCPP);
+		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
+		driver.findElement(By.id("saveImg")).click();
+	}
+
+	public static void editCPPNoteTest(String cppType)
+	{
+		String noteCPP = cppType + " in CPP";
+		String editedNoteCPP = "Edited " + noteCPP;
+		driver.navigate().refresh();
+		driver.findElement(By.linkText(noteCPP)).click();
+		driver.findElement(By.id("noteEditTxt")).clear();
+		driver.findElement(By.id("noteEditTxt")).sendKeys(editedNoteCPP);
+		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
+	}
+
+	public static void archiveNotes(String cppType, String cppTypeID)
+	{
+		String archivedNote = "Archived " + cppType;
+		driver.findElement(By.xpath("//div[@id='" + cppTypeID + "']//descendant::a[contains(., '+')]")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
+		driver.findElement(By.id("noteEditTxt")).sendKeys(archivedNote);
+		driver.findElement(By.xpath("//input[@title='Archive']")).click();
+		driver.findElement(By.linkText(cppType)).click();
+		PageUtil.switchToLastWindow(driver);
 	}
 }
