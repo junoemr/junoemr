@@ -5,6 +5,7 @@ import {
 } from "../../../../common/components/junoComponentConstants";
 
 import {DemographicApi} from "../../../../../generated";
+import ToastService from "../../../../lib/alerts/service/ToastService";
 
 angular.module('Record.Details').component('demographicContactsModal', {
     templateUrl: 'src/record/details/components/demographicContactsModal/demographicContactsModal.jsp',
@@ -18,22 +19,19 @@ angular.module('Record.Details').component('demographicContactsModal', {
         "$scope",
         "$http",
         "$httpParamSerializer",
-        "$uibModal",
         "$state",
-        "uxService",
         function (
             $scope,
             $http,
             $httpParamSerializer,
-            $uibModal,
             $state,
-            uxService,
         )
         {
             const ctrl = this;
-            const demographicApi = new DemographicApi($http, $httpParamSerializer, "../ws/rs");
-            const EDIT_TITLE = "Edit contact";
-            const NO_EDIT_TITLE = "Editing is currently only available for internal contacts";
+            ctrl.demographicApi = new DemographicApi($http, $httpParamSerializer, "../ws/rs");
+            ctrl.EDIT_TITLE = "Edit contact";
+            ctrl.NO_EDIT_TITLE = "Editing is currently only available for internal contacts";
+            ctrl.toastService = new ToastService();
 
             ctrl.types = {
                 PROVIDER: 0,
@@ -73,33 +71,43 @@ angular.module('Record.Details').component('demographicContactsModal', {
                 switch(ctrl.contact.type)
                 {
                     case ctrl.types.INTERNAL:
-                        ctrl.title = EDIT_TITLE;
+                        ctrl.title = ctrl.EDIT_TITLE;
                         ctrl.contactType = ctrl.typesText.INTERNAL_TEXT;
                         break;
                     case ctrl.types.EXTERNAL:
-                        ctrl.title = EDIT_TITLE;
+                        ctrl.title = ctrl.EDIT_TITLE;
                         ctrl.contactType = ctrl.typesText.EXTERNAL_TEXT;
                         break;
                     case ctrl.types.PROVIDER:
-                        ctrl.title = NO_EDIT_TITLE;
+                        ctrl.title = ctrl.NO_EDIT_TITLE;
                         ctrl.contactType = ctrl.typesText.PROVIDER_TEXT;
                         break;
                     case ctrl.types.PROFESSIONAL_SPECIALIST:
-                        ctrl.title = NO_EDIT_TITLE;
+                        ctrl.title = ctrl.NO_EDIT_TITLE;
                         ctrl.contactType = ctrl.typesText.PROFESSIONAL_SPECIALIST_TEXT;
                 }
             };
 
-            ctrl.onCancel = (data) =>
+            ctrl.onCancel = () =>
             {
-                ctrl.modalInstance.close(data);
+                ctrl.closeModal();
             };
+
+            ctrl.closeModal = (updatedContact = null) =>
+            {
+                ctrl.modalInstance.close(updatedContact);
+            };
+
 
             ctrl.edit = () =>
             {
                 if (ctrl.contact.type === ctrl.types.INTERNAL)
                 {
-                    ctrl.getTabs(ctrl.contact.contactId);
+                    $state.go("record.details",
+                        {
+                            demographicNo: ctrl.contact.contactId,
+                        });
+                    ctrl.closeModal();
                 }
                 else
                 {
@@ -119,18 +127,20 @@ angular.module('Record.Details').component('demographicContactsModal', {
                 ctrl.valid.email = true;
 
                 if (!ctrl.validate())
-			{
-				Juno.Common.Util.errorAlert($uibModal, 'Error', 'Some fields are invalid, Please correct the highlighted fields');
-				return;
-			}
+                {
+                    ctrl.toastService.notificationToast('Some fields are invalid, Please correct the highlighted fields');
+                    return;
+                }
 
                 ctrl.saving = true;
-                demographicApi.updateExternalContact(ctrl.demographic, ctrl.contact.contactId, ctrl.contact).then(
-                    (data) => {
-                        ctrl.onCancel(data);
+                ctrl.demographicApi.updateExternalContact(ctrl.demographic, ctrl.contact.contactId, ctrl.contact).then(
+                    (response) =>
+                    {
+                        ctrl.closeModal(response.data.body);
                     },
-                    () => {
-                        Juno.Common.Util.errorAlert($uibModal, 'Error', 'Could not update contacts');
+                    () =>
+                    {
+                        ctrl.toastService.errorToast('Could not update contacts', true);
                     });
             };
 
@@ -139,40 +149,6 @@ angular.module('Record.Details').component('demographicContactsModal', {
 			    ctrl.saving = false;
 			    ctrl.dataChanged = false;
 		    };
-
-            ctrl.getTabs = function getTabs(contactId)
-            {
-                uxService.menu(contactId).then(
-                    function success(results)
-                    {
-                        ctrl.tab = results[0];
-                        ctrl.tab.demoId = contactId;
-                        ctrl.changeTab(ctrl.tab);
-                    },
-                    function error()
-                    {
-                        Juno.Common.Util.errorAlert($uibModal, "Error", "Unable to open tab.");
-                    });
-            };
-
-            ctrl.changeTab = function changeTab(tab)
-            {
-                if (tab.state)
-                {
-                    if (tab.demoId)
-                    {
-                        $state.go(tab.state[0],
-                            {
-                                demographicNo: tab.demoId
-                            });
-                        ctrl.modalInstance.close();
-                    }
-                    else
-                    {
-                        $state.go(tab.state[0]);
-                    }
-                }
-            };
 
             ctrl.validate = function validate()
             {
