@@ -26,17 +26,17 @@ import {
 	JUNO_BUTTON_COLOR_PATTERN,
 	JUNO_STYLE,
 	LABEL_POSITION,
-} from "../../../common/components/junoComponentConstants";
-import {SecurityPermissions} from "../../../common/security/securityConstants";
-import HrmCategory from "../../../lib/integration/hrm/model/HRMCategory";
-import HrmService from "../../../lib/integration/hrm/service/HrmService";
-import HrmSubClass, {HrmReportClass} from "../../../lib/integration/hrm/model/HrmSubClass";
-import {HrmExceptions} from "../../../lib/integration/hrm/exception/HrmExceptions";
+} from "../../../../common/components/junoComponentConstants";
+import {SecurityPermissions} from "../../../../common/security/securityConstants";
+import HrmCategory from "../../../../lib/integration/hrm/model/HRMCategory";
+import HrmService from "../../../../lib/integration/hrm/service/HrmService";
+import HrmSubClass, {HrmReportClass} from "../../../../lib/integration/hrm/model/HrmSubClass";
+import {HrmExceptions} from "../../../../lib/integration/hrm/exception/HrmExceptions";
 
 angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 	{
 
-		templateUrl: 'src/admin/section/hrm/categoryDetailsModal.jsp',
+		templateUrl: 'src/admin/section/hrm/categoryDetailsModal/categoryDetailsModal.jsp',
 		bindings: {
 			modalInstance: "<",
 			resolve: "<",

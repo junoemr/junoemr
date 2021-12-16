@@ -21,11 +21,11 @@
  * Canada
  */
 
-import {JUNO_STYLE} from "../../../common/components/junoComponentConstants";
+import {JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
 
 angular.module('Admin.Section').component('hrmIndex',
 	{
-		templateUrl: 'src/admin/section/hrm/HRMIndex.jsp',
+		templateUrl: 'src/admin/section/hrm/index/HRMIndex.jsp',
 		bindings: {},
 		controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state)
 		{

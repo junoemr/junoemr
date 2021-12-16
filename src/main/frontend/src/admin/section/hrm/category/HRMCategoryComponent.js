@@ -21,13 +21,13 @@
  * Canada
  */
 
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE} from "../../../common/components/junoComponentConstants";
-import {SecurityPermissions} from "../../../common/security/securityConstants";
-import HrmService from "../../../lib/integration/hrm/service/HrmService";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE} from "../../../../common/components/junoComponentConstants";
+import {SecurityPermissions} from "../../../../common/security/securityConstants";
+import HrmService from "../../../../lib/integration/hrm/service/HrmService";
 
 angular.module('Admin.Section').component('hrmCategory',
 	{
-		templateUrl: 'src/admin/section/hrm/HRMCategory.jsp',
+		templateUrl: 'src/admin/section/hrm/category/HRMCategory.jsp',
 		bindings: {},
 		controller: [
 			'$scope',

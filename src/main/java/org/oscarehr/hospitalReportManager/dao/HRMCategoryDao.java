@@ -26,7 +26,6 @@ package org.oscarehr.hospitalReportManager.dao;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 
 import org.oscarehr.common.dao.AbstractDao;
@@ -55,18 +54,6 @@ public class HRMCategoryDao extends AbstractDao<HRMCategory> {
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("name", categoryName);
 
-		List<HRMCategory> results = query.getResultList();
-		if (results.size() > 1)
-		{
-			throw new NonUniqueResultException("There can only be one active HRMCategory with a given name");
-		}
-
-		HRMCategory found = null;
-		if (!results.isEmpty())
-		{
-			found = results.get(0);
-		}
-
-		return Optional.ofNullable(found);
+		return Optional.ofNullable(getSingleResultOrNull(query));
 	}
 }
