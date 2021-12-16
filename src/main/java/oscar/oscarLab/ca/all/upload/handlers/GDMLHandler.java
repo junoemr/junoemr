@@ -35,22 +35,17 @@ package oscar.oscarLab.ca.all.upload.handlers;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
-import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.OscarAuditLogger;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.upload.MessageUploader;
 import oscar.oscarLab.ca.all.upload.RouteReportResults;
 import oscar.oscarLab.ca.all.util.Utilities;
 
-import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class GDMLHandler implements MessageHandler
 {
-
     Logger logger = Logger.getLogger(GDMLHandler.class);
     Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
 
@@ -68,11 +63,6 @@ public class GDMLHandler implements MessageHandler
             {
 
                 String msg = messages.get(i);
-                if (isDuplicate(loggedInInfo, msg))
-                {
-                    throw new FileAlreadyExistsException(fileName);
-                }
-
                 routeResults = new RouteReportResults();
                 MessageUploader.routeReport(loggedInInfo, serviceName, "GDML", msg, fileId, routeResults);
 
@@ -94,37 +84,5 @@ public class GDMLHandler implements MessageHandler
         }
         return ("success");
 
-    }
-
-    private boolean isDuplicate(LoggedInInfo loggedInInfo, String msg)
-    {
-        //OLIS requirements - need to see if this is a duplicate
-        oscar.oscarLab.ca.all.parsers.MessageHandler h = Factory.getHandler("GDML", msg);
-        //if final
-        if (h.getOrderStatus().equals("F"))
-        {
-            String fullAcc = h.getAccessionNum();
-            String acc = h.getAccessionNum();
-            if (acc.indexOf("-") != -1)
-            {
-                acc = acc.substring(acc.indexOf("-") + 1);
-            }
-            //do we have this?
-            List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(acc);
-            for (Hl7TextInfo dupResult : dupResults)
-            {
-                if (dupResult.equals(fullAcc))
-                {
-                    OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate lab skipped - accession " + fullAcc + "\n" + msg);
-                    return true;
-                }
-                if (dupResult.getAccessionNumber().length() > 4 && dupResult.getAccessionNumber().substring(4).equals(acc))
-                {
-                    OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate lab skipped - accession " + fullAcc + "\n" + msg);
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

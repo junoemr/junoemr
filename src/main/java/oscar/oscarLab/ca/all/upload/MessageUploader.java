@@ -43,6 +43,7 @@ import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
+import org.oscarehr.common.hl7.Hl7Const;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Hl7TextInfo;
@@ -212,7 +213,7 @@ public final class MessageUploader {
 
 			if (messageHandler.isAbnormal())
 			{
-				resultStatus = "A";
+				resultStatus = Hl7Const.ABNORMAL_FLAG_YES;
 			}
 
 			ArrayList<String> disciplineArray = messageHandler.getHeaders();

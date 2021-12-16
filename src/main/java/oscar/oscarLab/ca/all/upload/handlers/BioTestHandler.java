@@ -27,9 +27,7 @@ package oscar.oscarLab.ca.all.upload.handlers;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
-import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.OscarAuditLogger;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.upload.MessageUploader;
@@ -37,7 +35,6 @@ import oscar.oscarLab.ca.all.upload.RouteReportResults;
 import oscar.oscarLab.ca.all.util.Utilities;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class BioTestHandler implements MessageHandler
 {
@@ -58,11 +55,6 @@ public class BioTestHandler implements MessageHandler
             {
 
                 String msg = messages.get(i);
-                if (isDuplicate(loggedInInfo, msg))
-                {
-                    return ("success");
-                }
-
                 routeResults = new RouteReportResults();
                 MessageUploader.routeReport(loggedInInfo, serviceName, "BIOTEST", msg, fileId, routeResults);
 
@@ -85,41 +77,5 @@ public class BioTestHandler implements MessageHandler
         }
         return ("success");
 
-    }
-
-    private boolean isDuplicate(LoggedInInfo loggedInInfo, String msg)
-    {
-        //OLIS requirements - need to see if this is a duplicate
-        oscar.oscarLab.ca.all.parsers.MessageHandler h = Factory.getHandler("BIOTEST", msg);
-        //if final
-        if (h.getOrderStatus().equals("F"))
-        {
-            String fullAcc = h.getAccessionNum();
-            String acc = h.getAccessionNum();
-            if (acc.indexOf("-") != -1)
-            {
-                acc = acc.substring(acc.indexOf("-") + 1);
-            }
-            //do we have this?
-            List<Hl7TextInfo> dupResults = hl7TextInfoDao.searchByAccessionNumber(acc);
-            for (Hl7TextInfo dupResult : dupResults)
-            {
-                if (dupResult.equals(fullAcc))
-                {
-                    //if(h.getHealthNum().equals(dupResult.getHealthNumber())) {
-                    OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate lab skipped - accession " + fullAcc + "\n" + msg);
-                    return true;
-                    //}
-                }
-                if (dupResult.getAccessionNumber().length() > 4 && dupResult.getAccessionNumber().substring(4).equals(acc))
-                {
-                    //if(h.getHealthNum().equals(dupResult.getHealthNumber())) {
-                    OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate lab skipped - accession " + fullAcc + "\n" + msg);
-                    return true;
-                    //}
-                }
-            }
-        }
-        return false;
     }
 }
