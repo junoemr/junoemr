@@ -27,25 +27,22 @@ import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
-import java.sql.SQLException;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
 
 /*
 -------------------------------------------------------------------------------
@@ -134,10 +131,9 @@ public class EditCPPNotesClassicIT extends SeleniumTestBase
 		String startDate = "2020-01-01";
 		String resolutionDate = "2021-01-01";
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(2000);
 
 		//Add Social History Notes
-		driver.findElement(By.xpath("//div[@id='divR1I1']//descendant::a[contains(., '+')]")).click();
+		findWaitClickByXpath(driver, webDriverWait, "//div[@id='divR1I1']//descendant::a[contains(., '+')]");
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(socialHistoryInEncounter);
 		driver.findElement(By.id("startdate")).sendKeys(startDate);
@@ -146,9 +142,8 @@ public class EditCPPNotesClassicIT extends SeleniumTestBase
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(socialHistoryInCPP);
 		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
-		Thread.sleep(1000);
-		driver.findElement(By.id("saveImg")).click();
-		Thread.sleep(1000);//wait until note is saved.
+		findWaitClickById(driver, webDriverWait, "saveImg");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(socialHistoryInCPP)));
 		Assert.assertTrue("Social History Note is NOT Added in CPP successfully",
 				PageUtil.isExistsBy(By.linkText(socialHistoryInCPP), driver));
  		Assert.assertTrue("Social History Note is NOT Copied in Encounter note successfully",
@@ -169,6 +164,7 @@ public class EditCPPNotesClassicIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@title='Archive']")).click();
 		driver.findElement(By.linkText("Social History")).click();
 		PageUtil.switchToLastWindow(driver);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + archivedSocialHistory + "')]")));
 		Assert.assertTrue("Social History Note is NOT Archived successfully",
 				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedSocialHistory + "')]"), driver));
 	}
@@ -187,18 +183,17 @@ public class EditCPPNotesClassicIT extends SeleniumTestBase
 		String treatment = "Heat";
 
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(2000);
 
 		//Add Medical History Notes
-		driver.findElement(By.xpath("//div[@id='divR1I2']//descendant::a[contains(., '+')]")).click();
+		findWaitClickByXpath(driver, webDriverWait, "//div[@id='divR1I2']//descendant::a[contains(., '+')]");
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(medicalHistoryInEncounter);
 		driver.findElement(By.id("startdate")).sendKeys(startDate);
 		driver.findElement(By.id("resolutiondate")).sendKeys(resolutionDate);
 		driver.findElement(By.id("proceduredate")).sendKeys(precedureDate);
 		driver.findElement(By.id("treatment")).sendKeys(treatment);
-		dropdownSelectByVisibleText(driver, By.id("lifestage"), "Newborn: Birth to 28 days");
-		dropdownSelectByVisibleText(driver, By.id("hidecpp"), "No");
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("lifestage"), "Newborn: Birth to 28 days");
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("hidecpp"), "No");
 		driver.findElement(By.xpath("//input[@title='Copy to Current Note']")).click();
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(medicalHistoryInCPP);
@@ -254,8 +249,8 @@ public class EditCPPNotesClassicIT extends SeleniumTestBase
 		driver.findElement(By.id("resolutiondate")).sendKeys(resolutionDate);
 		driver.findElement(By.id("problemdescription")).sendKeys(problemDesc);
 		driver.findElement(By.id("problemstatus")).sendKeys(problemStatus);
-		dropdownSelectByVisibleText(driver, By.id("lifestage"), "Newborn: Birth to 28 days");
-		dropdownSelectByVisibleText(driver, By.id("hidecpp"), "No");
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("lifestage"), "Newborn: Birth to 28 days");
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("hidecpp"), "No");
 		driver.findElement(By.xpath("//input[@title='Copy to Current Note']")).click();
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(ongoingConcernsInCPP);

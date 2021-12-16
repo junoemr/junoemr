@@ -31,12 +31,15 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class ActionUtil
 {
-	public static void dropdownSelectByVisibleText(WebDriver driver, By dropdown, String visibleText)
+	public static void dropdownSelectByVisibleText(WebDriver driver,
+		WebDriverWait webDriverWait, By dropdown, String visibleText)
 	{
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(dropdown));
 		Select dropdownList = new Select(driver.findElement(dropdown));
 		dropdownList.selectByVisibleText(visibleText);
 	}
-	public static void dropdownSelectByValue(WebDriver driver, By dropdown, String dropdownSelection, WebDriverWait webDriverWait)
+	public static void dropdownSelectByValue(WebDriver driver, WebDriverWait webDriverWait,
+		By dropdown, String dropdownSelection)
 	{
 		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("option[value='" + dropdownSelection + "']")));
 		Select dropdownList = new Select(driver.findElement(dropdown));
@@ -74,9 +77,45 @@ public class ActionUtil
 		findWaitClick(driver, webDriverWait, elementToClick);
 	}
 
+	public static void findWaitClickById(WebDriver driver, WebDriverWait webDriverWait, String id)
+	{
+		By elementToClick = By.id(id);
+		findWaitClick(driver, webDriverWait, elementToClick);
+	}
+
+	public static void findWaitClickByLinkText(WebDriver driver, WebDriverWait webDriverWait, String linkText)
+	{
+		By elementToClick = By.linkText(linkText);
+		findWaitClick(driver, webDriverWait, elementToClick);
+	}
+
+	public static void findWaitClickByPartialLinkText(WebDriver driver, WebDriverWait webDriverWait, String linkText)
+	{
+		By elementToClick = By.partialLinkText(linkText);
+		findWaitClick(driver, webDriverWait, elementToClick);
+	}
+
 	public static void findWaitClick(WebDriver driver, WebDriverWait webDriverWait, By elementToClick)
 	{
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(elementToClick));
 		driver.findElement(elementToClick).click();
+	}
+
+	public static void findWaitSendKeysByXpath(WebDriver driver, WebDriverWait webDriverWait, String xpath, String keysToSend)
+	{
+		By element = By.xpath(xpath);
+		findWaitSendKeys(driver, webDriverWait, element, keysToSend);
+	}
+
+	public static void findWaitSendKeysById(WebDriver driver, WebDriverWait webDriverWait, String id, String keysToSend)
+	{
+		By element = By.id(id);
+		findWaitSendKeys(driver, webDriverWait, element, keysToSend);
+	}
+
+	public static void findWaitSendKeys(WebDriver driver, WebDriverWait webDriverWait, By element, String keysToSend)
+	{
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(element));
+		driver.findElement(element).sendKeys(keysToSend);
 	}
 }

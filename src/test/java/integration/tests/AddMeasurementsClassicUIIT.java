@@ -37,6 +37,11 @@ import org.oscarehr.JunoApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByLinkText;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysById;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
 import static integration.tests.util.seleniumUtil.PageUtil.accessEncounterPage;
 import static integration.tests.util.seleniumUtil.PageUtil.isErrorPage;
 
@@ -68,34 +73,31 @@ public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
-		Thread.sleep(1000);
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("measurements")));
 		if (PageUtil.isExistsBy((By.id("imgmeasurements5")), driver))
 		{
 			driver.findElement(By.id("imgmeasurements5")).click();
 		}
 		driver.findElement(By.linkText(flowsheetName)).click();
-		Thread.sleep(2000);
+		findWaitClickByLinkText(driver, webDriverWait, flowsheetName);
 		PageUtil.switchToLastWindow(driver);
-		driver.findElement(By.xpath("//span[contains(., '" + flowsheetSelected + "')]")).click();
-		Thread.sleep(5000);
+		findWaitClickByXpath(driver, webDriverWait, "//span[contains(., '" + flowsheetSelected + "')]");
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(2000);
-		driver.findElement(By.id("value(inputValue-0)")).sendKeys(measurementSelected);
-		driver.findElement(By.xpath("//input[@value='Save']")).click();
+		findWaitSendKeysById(driver, webDriverWait, "value(inputValue-0)", measurementSelected);
+		findWaitClickByXpath(driver, webDriverWait, "//input[@value='Save']");
 	}
 
 	@Test
 	public void addMeasurementsStandardFlowsheetClassicUITest()
 			throws InterruptedException
 	{
-		driver.findElement(By.id("search")).click();
+		findWaitClickById(driver, webDriverWait, "search");
 		PageUtil.switchToLastWindow(driver);
-		driver.findElement(By.xpath("//input[@title='Search active patients']")).click();
-		driver.findElement(By.xpath("//a[@title='Encounter']")).click();
+		findWaitClickByXpath(driver, webDriverWait, "//input[@title='Search active patients']");
+		findWaitClickByXpath(driver, webDriverWait, "//a[@title='Encounter']");
 		PageUtil.switchToLastWindow(driver);
+
 		// ** Add flowsheets to Disease Registry. **
-		Thread.sleep(5000);
 		String currWindowHandle = driver.getWindowHandle();
 		AddDiseaseRegistryClassicUIIT addDiseaseRegistry = new AddDiseaseRegistryClassicUIIT();
 		addDiseaseRegistry.addDiseaseRegistry();
@@ -160,8 +162,8 @@ public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 		//** Verify from Measurements **
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
-		Thread.sleep(1000);
-		driver.findElement(By.id("imgmeasurements5")).click();
+		findWaitClickById(driver, webDriverWait, "imgmeasurements5");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(., '"+ diabetesSelected + "')]")));
 		Assert.assertTrue("Measurement " + diabetesSelected + " from " + flowsheetNameDiabetes + " is NOT added successfully",
 				PageUtil.isExistsBy(By.xpath("//span[contains(., '"+ diabetesSelected + "')]"), driver));
 		Assert.assertTrue("Measurement " + aSTHMASelected + " from " + flowsheetNameASTHMA + " is NOT added successfully",

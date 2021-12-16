@@ -23,27 +23,31 @@
 package integration.tests.util.seleniumUtil;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByLinkText;
 import static integration.tests.util.seleniumUtil.PageUtil.isExistsBy;
+import static org.junit.Assert.fail;
 
 public class SectionAccessUtil
 {
-	public static void accessAdministrationSectionClassicUI(WebDriver driver, String sectionName, String subSectionName, WebDriverWait webDriverWait)
+	public static void accessAdministrationSectionClassicUI(WebDriver driver,
+		WebDriverWait webDriverWait, String sectionName, String subSectionName)
 	{
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("admin-panel")));
 		driver.findElement(By.id("admin-panel")).click();
 		PageUtil.switchToLastWindow(driver);
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText(sectionName)));
-		driver.findElement(By.linkText(sectionName)).click();
-		driver.findElement(By.linkText(subSectionName)).click();
-		driver.switchTo().frame("myFrame");
+		findWaitClickByLinkText(driver, webDriverWait, sectionName);
+		findWaitClickByLinkText(driver, webDriverWait, subSectionName);
+		driver.switchTo().defaultContent();
+		webDriverWait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("myFrame"));
 	}
 
-	public static void accessAdministrationSectionJUNOUI(WebDriver driver, String sectionName, String subSectionName, WebDriverWait webDriverWait)
-			throws InterruptedException
+	public static void accessAdministrationSectionJUNOUI(WebDriver driver,
+		WebDriverWait webDriverWait, String sectionName, String subSectionName)
 	{
 		if (isExistsBy(By.xpath("//img[@title=\"Go to Juno UI\"]"), driver))
 		{
@@ -52,23 +56,39 @@ public class SectionAccessUtil
 		}
 		// open administration panel
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("main-nav-collapse")));
-		driver.findElement(By.linkText("Admin")).click();
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText(sectionName)));
-		driver.findElement(By.linkText(sectionName)).click();
-		driver.findElement(By.linkText(subSectionName)).click();
-		Thread.sleep(2000);
+		findWaitClickByLinkText(driver, webDriverWait, "Admin");
+		findWaitClickByLinkText(driver, webDriverWait, sectionName);
+		findWaitClickByLinkText(driver, webDriverWait, subSectionName);
+
+		try
+		{
+			// This should ideally be removed.  Perhaps have a way to identify if a section has an
+			// iframe in it, and require that information when calling this method so it doesn't
+			// have to guess.
+			Thread.sleep(2000);
+		}
+		catch (InterruptedException e)
+		{
+			fail("Interrupted");
+		}
+
 		if (isExistsBy(By.tagName("iframe"), driver))
 		{
 			driver.switchTo().frame("content-frame");
 		}
 	}
 
-	public static void accessSectionJUNOUI(WebDriver driver, String sectionName, WebDriverWait webDriverWait)
+	public static void accessSectionJUNOUI(WebDriver driver, WebDriverWait webDriverWait,
+		String sectionName)
 	{
-		if (isExistsBy(By.xpath("//img[@title=\"Go to Juno UI\"]"), driver))
+		webDriverWait.until(
+			webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
+
+		String link = "//img[@title=\"Go to Juno UI\"]";
+		if (isExistsBy(By.xpath(link), driver))
 		{
 			// open JUNO UI page
-			driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
+			driver.findElement(By.xpath(link)).click();
 		}
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText(sectionName)));
 		driver.findElement(By.linkText(sectionName)).click();

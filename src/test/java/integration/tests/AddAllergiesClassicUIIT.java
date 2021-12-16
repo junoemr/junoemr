@@ -31,14 +31,10 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.ActionUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
-import java.sql.SQLException;
-import java.sql.Time;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -47,7 +43,6 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -99,9 +94,11 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		List<String> errorMessages = Arrays.asList(errorMessageSearch, errorMessageQuickButton, errorMessageCustomized);
 
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
+
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("Allergies")));
 		String eChartWindowHandle = driver.getWindowHandle();
-		driver.findElement(By.linkText("Allergies")).click();
+		ActionUtil.findWaitClickByLinkText(driver, webDriverWait, "Allergies");
+
 		String allergiesWindowHandle = driver.getWindowHandle();
 		Map<String, String> pageHandleMap = new HashMap<String, String>();
 		pageHandleMap.put(eChartPage, eChartWindowHandle);
@@ -109,20 +106,19 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		PageUtil.switchToLastWindow(driver);
 
 		//** Add allergies from quick button. **
-		driver.findElement(By.xpath("//button[contains(., '" + allergyNameQuickButton + "')]")).click();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//textarea[@name='reactionDescription']")));
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[contains(., '" + allergyNameQuickButton + "')]");
 		addAllergyDetails(reaction, startDate, ageOfOnset, lifeStage, severity, onset);
 
 		// ** Add allergies from search. **
-		driver.findElement(By.id("typeSelectAll")).click();
-		driver.findElement(By.id("searchString")).sendKeys(allergyNameSearch);
-		driver.findElement(By.id("searchStringButton")).click();
-		driver.findElement(By.linkText(allergySearchDescription)).click();
+		ActionUtil.findWaitClickById(driver, webDriverWait, "typeSelectAll");
+		ActionUtil.findWaitSendKeysById(driver, webDriverWait, "searchString", allergyNameSearch);
+		ActionUtil.findWaitClickById(driver, webDriverWait, "searchStringButton");
+		ActionUtil.findWaitClickByLinkText(driver, webDriverWait, allergySearchDescription);
 		addAllergyDetails(reaction, startDate, ageOfOnset, lifeStage, severity, onset);
 
 		//** Add customised allergy. **
-		driver.findElement(By.id("searchString")).sendKeys(allergyNameCustom);
-		driver.findElement(By.xpath("//button[@value='Custom Allergy']")).click();
+		ActionUtil.findWaitSendKeysById(driver, webDriverWait, "searchString", allergyNameCustom);
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@value='Custom Allergy']");
 		driver.switchTo().alert().accept();
 		addAllergyDetails(reaction, startDate, ageOfOnset, lifeStage, severity, onset);
 
@@ -134,9 +130,12 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 				PageUtil.switchToWindow(pageHandleMap.get(pageType), driver);
 				driver.navigate().refresh();
 			}
+
+			webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.partialLinkText(allergyNames.get(0).toUpperCase())));
 			for (int i = 0; i < allergyNames.size(); i++)
 			{
-				assertionTestData.put(createErrorMessageString(pageType, allergyNames.get(i), errorMessages.get(i)),
+				assertionTestData.put(
+					createErrorMessageString(pageType, allergyNames.get(i), errorMessages.get(i)),
 					PageUtil.isExistsBy(By.partialLinkText(allergyNames.get(i).toUpperCase()), driver));
 			}
 		}
@@ -153,11 +152,12 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 
 		String modifyButtonEggWhiteXpath = "//table[@class='allergy_table']/descendant::td[contains(., '" + allergyNameQuickButton.toUpperCase() + "')]" +
 			"/parent::tr/descendant::a[contains(., 'Modify')]";
-		driver.findElement(By.xpath(modifyButtonEggWhiteXpath)).click();
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, modifyButtonEggWhiteXpath);
 		addAllergyDetails(reaction_modified, startDate_modified, ageOfOnset_modified, lifeStage_modified, severity_modified, onset_modified);
 
 		//** Verify the updated content from Allergies page **
 		String allergyInfoXpath = "//table[@class='allergy_table']/descendant::td[contains(., '" + allergyNameQuickButton.toUpperCase() + "')]/parent::tr";
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(allergyInfoXpath)));
 		String allergyInfo = driver.findElement(By.xpath(allergyInfoXpath)).getText();
 		Boolean reactionStatus = allergyInfo.contains(reaction_modified);
 		Boolean startDateStatus = allergyInfo.contains(startDate_modified);
@@ -175,24 +175,29 @@ public class AddAllergiesClassicUIIT extends SeleniumTestBase
 		driver.switchTo().alert().accept();
 
 		//** Verify on Allergies page. **
+		String customNameXpath = "//td[contains(., '" + allergyNameCustom.toUpperCase() + "')]";
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(customNameXpath)));
 		Assert.assertFalse("Allergies Page: " + allergyNameCustom + " is NOT inactivated successfully.",
-			PageUtil.isExistsBy(By.xpath("//td[contains(., '" + allergyNameCustom.toUpperCase() + "')]"), driver));
+			PageUtil.isExistsBy(By.xpath(customNameXpath), driver));
 
 		//** Verify on Allergies section on eChart page. **
 		PageUtil.switchToWindow(eChartWindowHandle, driver);
 		driver.navigate().refresh();
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.linkText(allergyNameCustom.toUpperCase())));
 		Assert.assertFalse("eChart Page: " + allergyNameCustom + " is NOT inactivated successfully.",
 			PageUtil.isExistsBy(By.linkText(allergyNameCustom.toUpperCase()), driver));
 	}
 
 	protected void addAllergyDetails(String reaction, String startDate, String ageOfOnset, String lifeStage, String severity, String onset)
 	{
-		textEdit(driver, By.xpath("//textarea[@name='reactionDescription']"), reaction);
+		String reactionXpath = "//textarea[@name='reactionDescription']";
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(reactionXpath)));
+		textEdit(driver, By.xpath(reactionXpath), reaction);
 		textEdit(driver, By.id("startDate"), startDate);
 		textEdit(driver, By.id("ageOfOnset"), ageOfOnset);
-		ActionUtil.dropdownSelectByVisibleText(driver, By.id("lifeStage"), lifeStage);
-		ActionUtil.dropdownSelectByVisibleText(driver, By.name("severityOfReaction"), severity);
-		ActionUtil.dropdownSelectByVisibleText(driver, By.name("onSetOfReaction"), onset);
+		ActionUtil.dropdownSelectByVisibleText(driver, webDriverWait, By.id("lifeStage"), lifeStage);
+		ActionUtil.dropdownSelectByVisibleText(driver, webDriverWait, By.name("severityOfReaction"), severity);
+		ActionUtil.dropdownSelectByVisibleText(driver, webDriverWait, By.name("onSetOfReaction"), onset);
 		driver.findElement(By.xpath("//input[@type='submit']")).click();
 	}
 

@@ -49,7 +49,6 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectio
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-
 public class EditAppointmentsIT extends SeleniumTestBase
 {
 	String apptDurationUpdated = "30";
@@ -84,6 +83,7 @@ public class EditAppointmentsIT extends SeleniumTestBase
 
 	public String getDropdownValue(By dropdownBy)
 	{
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(dropdownBy));
 		Select dropdown = new Select(driver.findElement(dropdownBy));
 		WebElement option = dropdown.getFirstSelectedOption();
 		return option.getText();
@@ -130,7 +130,7 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		driver.findElement(By.xpath(".//td[contains(., '" + dad.firstName + "')]")).click();
 		driver.findElement(By.xpath("//input[@name='duration']")).clear();
 		driver.findElement(By.xpath("//input[@name='duration']")).sendKeys(apptDurationUpdated);
-		dropdownSelectByVisibleText(driver, By.xpath("//select[@name='reasonCode']"), reasonCodeUpdated);
+		dropdownSelectByVisibleText(driver, webDriverWait, By.xpath("//select[@name='reasonCode']"), reasonCodeUpdated);
 		driver.findElement(By.id("reason")).clear();
 		driver.findElement(By.id("reason")).sendKeys(reasonUpdated);
 		driver.findElement(By.xpath("//input[@name='type']")).clear();
@@ -179,24 +179,26 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
-		accessSectionJUNOUI(driver, "Schedule", webDriverWait);
+		accessSectionJUNOUI(driver, webDriverWait, "Schedule");
 		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
-		driver.findElement(By.xpath("//button[@title='Next Day']")).click();
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("schedule-select")));
 		Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));
 		providerDropDown.selectByVisibleText("oscardoc, doctor");
 
 		//Edit from "Modify Appointment" page
 		driver.findElement(By.xpath("//span[contains(., '" + mom.firstName + "')]")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("input")));
 		driver.findElement(By.id("input-patient")).findElement(By.tagName("input")).clear();
 		driver.findElement(By.id("input-patient")).findElement(By.tagName("input")).sendKeys(dad.firstName);
 
 		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//span[contains(., '" + dad.firstName + "')]");
 
-		dropdownSelectByVisibleText(driver, By.id("input-type"), typeUpdated);
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("input-type"), typeUpdated);
 		driver.findElement(By.id("input-duration")).clear();
 		driver.findElement(By.id("input-duration")).sendKeys(apptDurationUpdated);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("input-reason-code")));
-		dropdownSelectByVisibleText(driver, By.id("input-reason-code"), reasonCodeUpdated);
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("input-reason-code"), reasonCodeUpdated);
 		driver.findElement(By.id("input-notes")).clear();
 		driver.findElement(By.id("input-notes")).sendKeys(notesUpdated);
 		driver.findElement(By.id("input-event_reason")).clear();
@@ -204,6 +206,7 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		//driver.findElement(By.xpath("//label[@class='form-control checkmark']")).click();
 		driver.findElement(By.xpath("//label[contains(., 'Critical')]")).click();
 		driver.findElement(By.xpath("//button[contains(., 'Modify')]")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(dad.lastName)));
 		Assert.assertTrue("Patient is NOT updated successfully.",
 				PageUtil.isExistsBy(By.partialLinkText(dad.lastName), driver));
 

@@ -32,6 +32,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 
 import java.sql.SQLException;
@@ -39,6 +40,9 @@ import java.time.LocalDate;
 import java.util.Set;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
 
 /*
 -------------------------------------------------------------------------------
@@ -110,6 +114,7 @@ public class ClassicUIPreventionsIT extends SeleniumTestBase
 		String originalNeverReason = "well this is sure clear";
 
 		// fill in various empty fields on page
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='name']")));
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys(originalName);
 		driver.findElement(By.xpath("//input[@name='location']")).sendKeys(originalLocation);
 		driver.findElement(By.xpath("//input[@name='route']")).sendKeys(originalRoute);
@@ -133,6 +138,7 @@ public class ClassicUIPreventionsIT extends SeleniumTestBase
 
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]")));
 		Assert.assertTrue("Can't find anything resembling an added prevention on page",
 				PageUtil.isExistsBy(By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), driver));
 
@@ -146,10 +152,11 @@ public class ClassicUIPreventionsIT extends SeleniumTestBase
 
 		// Attempt to view prevention and verify information is correct
 		driver.findElement(By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]")).click();
-		Thread.sleep(2000);
+		findWaitClickByXpath(driver, webDriverWait, "//div[contains(@onclick, 'AddPreventionData.jsp?id=')]");
 		PageUtil.switchToLastWindow(driver);
 
 		// Pull out current assigned values and make sure they match
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='name']")));
 		String currentName = driver.findElement(By.xpath("//input[@name='name']")).getAttribute("value");
 		String currentLocation = driver.findElement(By.xpath("//input[@name='location']")).getAttribute("value");
 		String currentRoute = driver.findElement(By.xpath("//input[@name='route']")).getAttribute("value");
@@ -179,19 +186,23 @@ public class ClassicUIPreventionsIT extends SeleniumTestBase
 		String originalComments = "I'm a smoking check!";
 
 		// you should be able to do nothing here and hit save, but for testing purposes we'll fill in comments
-		driver.findElement(By.xpath("//textarea[@name='comments']")).sendKeys(originalComments);
+		findWaitSendKeysByXpath(driver, webDriverWait, "//textarea[@name='comments']", originalComments);
 		driver.findElement(By.xpath("//input[@type='submit']")).click();
 
 		// window closes, find following URL and verify entry shows
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + PREVENTION_URL);
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 
+		String xpath = "//div[contains(@onclick, 'AddPreventionData.jsp?id=')]" +
+			"//preceding::div[@class='headPrevention _nifty']//" +
+			"child::p//" +
+			"child::a[contains(@onclick, 'AddPreventionData.jsp?prevention=Smoking')]";
+
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
+
 		// Click on prevention to edit it
 		Assert.assertTrue("Can't find anything resembling an added exam prevention on page", PageUtil.isExistsBy(
-				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]" +
-				"//preceding::div[@class='headPrevention _nifty']//" +
-				"child::p//" +
-				"child::a[contains(@onclick, 'AddPreventionData.jsp?prevention=Smoking')]"), driver));
+				By.xpath(xpath), driver));
 
 		PageUtil.switchToNewWindow(driver,
 				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), oldWindowHandles,

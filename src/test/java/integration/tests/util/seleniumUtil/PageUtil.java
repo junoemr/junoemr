@@ -28,12 +28,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-//import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
 
 public class PageUtil
 {
@@ -136,11 +137,10 @@ public class PageUtil
 
 	public static void  switchToNewWindow(WebDriver driver, By textlink,
 		Set<String> oldWindowHandles, WebDriverWait webDriverWait)
-		throws InterruptedException
 	{
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(textlink));
-		driver.findElement(textlink).click();
-		Thread.sleep(2000);
+		int expectedNumberOfWindows = driver.getWindowHandles().size() + 1;
+		findWaitClick(driver, webDriverWait, textlink);
+		webDriverWait.until(ExpectedConditions.numberOfWindowsToBe(expectedNumberOfWindows));
 		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
 		PageUtil.switchToWindow(newWindows.get(0), driver);
 		driver.manage().window().maximize();
@@ -154,5 +154,4 @@ public class PageUtil
 		driver.findElement(By.linkText("E")).click();
 		PageUtil.switchToLastWindow(driver);
 	}
-
 }

@@ -24,6 +24,7 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.seleniumUtil.ActionUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,6 +56,9 @@ import static integration.tests.ScheduleSettingIT.setupSchedule;
 import static integration.tests.ScheduleSettingIT.setupTemplate;
 import static integration.tests.ScheduleSettingIT.templateTitleGeneral;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 
 @RunWith(SpringRunner.class)
@@ -83,43 +87,42 @@ public class AddAppointmentsIT extends SeleniumTestBase
 
 	public void appointmentDateDisplay(By appointmentDateBy, String appointmentDate)
 	{
-		boolean isAppointmentDateDisplayed = false;
-		isAppointmentDateDisplayed = PageUtil.isExistsBy(appointmentDateBy, driver);
+		boolean isAppointmentDateDisplayed = PageUtil.isExistsBy(appointmentDateBy, driver);
 		if (!isAppointmentDateDisplayed)//If the next Wednesday is not in current week.
 		{
-			driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
-			driver.findElement(By.partialLinkText(appointmentDate)).click();
+			ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//img[@alt='View Next DAY']");
+			ActionUtil.findWaitClickByPartialLinkText(driver, webDriverWait, appointmentDate);
 		}
 	}
 
-	public void addAppointmentWithDemo(By timeFrame, String currWindowHandle, String status, String demoFName) throws InterruptedException
+	public void addAppointmentWithDemo(By timeFrame, String currWindowHandle, String status, String demoFName)
 	{
-		driver.findElement(timeFrame).click();
+		findWaitClick(driver, webDriverWait, timeFrame);
 		PageUtil.switchToLastWindow(driver);
 		addAppointmentPageWithDemo(currWindowHandle, status, demoFName);
 	}
 
 	public void	addAppointmentWithNODemo(By timeFrame, Set<String> oldWindowHandles, String currWindowHandle, String status)
-			throws InterruptedException
 	{
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(timeFrame));
 		driver.findElement(timeFrame).click();
 		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
 		PageUtil.switchToWindow(newWindows.get(newWindows.size() - 1), driver);
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@name='status']")));
-		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), status, webDriverWait);
-		driver.findElement(By.id("addButton")).click();
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='status']"), status);
+		findWaitClickByXpath(driver, webDriverWait, "addButton");
 		PageUtil.switchToWindow(currWindowHandle, driver);
 	}
 
-	public void addAppointmentPageWithDemo(String secCurrWindowHandle, String status, String demoFName) throws InterruptedException
+	public void addAppointmentPageWithDemo(String secCurrWindowHandle, String status, String demoFName)
 	{
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("searchBtn")));
-		driver.findElement(By.id("searchBtn")).click();
-		driver.findElement(By.xpath(".//td[contains(., '" + demoFName +"')]")).click();
-		dropdownSelectByValue(driver, By.xpath("//select[@name='reasonCode']"), "4", webDriverWait);//Follow-Up
+		findWaitClickById(driver, webDriverWait, "searchBtn");
+		findWaitClickByXpath(driver, webDriverWait, ".//td[contains(., '" + demoFName +"')]");
+
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='reasonCode']"), "4");//Follow-Up
 		driver.findElement(By.id("reason")).sendKeys("Appointment Reason.");
-		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), status, webDriverWait);//To Do
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='status']"), status);//To Do
 		driver.findElement(By.xpath("//input[@name='type']")).sendKeys("Appointment Type");
 		driver.findElement(By.xpath("//textarea[@name='notes']")).sendKeys("Appointment Notes");
 		driver.findElement(By.xpath("//input[@name='resources']")).sendKeys("Appointment Resources");
@@ -128,19 +131,20 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		PageUtil.switchToWindow(secCurrWindowHandle, driver);
 	}
 
-	public void addAppointmentsSchedulePage(String time, String currWindowHandle, String demofName) throws InterruptedException
+	public void addAppointmentsSchedulePage(String time, String currWindowHandle, String demofName)
 	{
-		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
+		findWaitClickByXpath(driver, webDriverWait, "//img[@alt='View Next DAY']");
 		addAppointmentWithDemo(By.linkText(time), currWindowHandle, "t", demofName);//To Do
 	}
 
 	@Test
-	public void addAppointmentsSchedulePageTest() throws InterruptedException {
-		Thread.sleep(10000);
+	public void addAppointmentsSchedulePageTest()
+	{
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 		addAppointmentsSchedulePage("09:00", currWindowHandle, mom.firstName);
+
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(mom.lastName)));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
@@ -154,7 +158,8 @@ public class AddAppointmentsIT extends SeleniumTestBase
 
 	@Test
 	@Ignore
-	public void addAppointmentsSchedulePageWeeklyViewTest() throws InterruptedException {
+	public void addAppointmentsSchedulePageWeeklyViewTest()
+	{
 		//Weekly View - next week
 		driver.findElement(By.xpath("//input[@name='weekview']")).click();
 		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
@@ -224,11 +229,12 @@ public class AddAppointmentsIT extends SeleniumTestBase
 	}
 
 	@Test
-	public void addAppointmentsSearchToolTest() throws InterruptedException {
+	public void addAppointmentsSearchToolTest()
+	{
 		String currWindowHandle = driver.getWindowHandle();
 		//Setup Schedule
-		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Schedule Setting",
-			webDriverWait);
+		accessAdministrationSectionClassicUI(driver, webDriverWait, "Schedule Management", "Schedule Setting"
+		);
 		String windowHandleScheduleSetting = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
  		setupTemplate(windowHandleScheduleSetting, oldWindowHandles);
@@ -245,15 +251,15 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		PageUtil.switchToLastWindow(driver);
 		driver.manage().window().maximize();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@name='provider_no']")));
-		dropdownSelectByValue(driver, By.xpath("//select[@name='provider_no']"), AuthUtils.TEST_PROVIDER_ID,
-			webDriverWait);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='dayOfWeek']"), "4", webDriverWait); //Wednesday
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='provider_no']"), AuthUtils.TEST_PROVIDER_ID
+		);
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='dayOfWeek']"), "4"); //Wednesday
 		driver.findElement(By.xpath("//input[@value='Search']")).click();
 		String secCurrWindowHandle = driver.getWindowHandle();
 
 		// Add an appointment at the first available spot on Wednesday with demographic selected.
 		String xpathFirst = "/html/body/center/table/tbody/tr[2]/td[1]";
-		driver.findElement(By.xpath(xpathFirst)).click();
+		findWaitClickByXpath(driver, webDriverWait, xpathFirst);
 		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
 		PageUtil.switchToWindow(newWindows.get(2), driver);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("input[name='appointment_date']")));
@@ -266,7 +272,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		String xpathNext = "/html/body/center/table/tbody/tr[2]/td[1]";
 		addAppointmentWithNODemo(By.xpath(xpathNext),oldWindowHandles, secCurrWindowHandle, "H");//Here
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		driver.findElement(By.xpath("//input[@name='weekview']")).click();
+		findWaitClickByXpath(driver, webDriverWait, "//input[@name='weekview']");
 		appointmentDateDisplay(By.partialLinkText(appointmentDate), appointmentDate);
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.xpath("//img[@title='Picked']"), driver));
@@ -284,8 +290,8 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		//Setup Groups
-		accessAdministrationSectionClassicUI(driver, "Schedule Management", "Add a Group",
-			webDriverWait);
+		accessAdministrationSectionClassicUI(driver, webDriverWait, "Schedule Management", "Add a Group"
+		);
 		AddGroupIT addGroupIT = new AddGroupIT();
 		addGroupIT.addGroup(groupName, 2);
 		Assert.assertTrue("Group is Not added successfully.",
@@ -294,7 +300,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("mygroup_no")));
-		dropdownSelectByValue(driver, By.id("mygroup_no"), "_grp_TestGroup", webDriverWait);
+		dropdownSelectByValue(driver, webDriverWait, By.id("mygroup_no"), "_grp_TestGroup");
 		String xpathAt9 =
 				"//a[contains(.,'" + drApple.lastName + "')]" +
 						"/ancestor::tr/following-sibling::tr" +

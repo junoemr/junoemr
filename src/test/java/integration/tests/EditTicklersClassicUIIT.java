@@ -28,10 +28,6 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -39,7 +35,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -101,8 +96,8 @@ java.lang.AssertionError: Tickler note is Not added Successfully.
 		driver.findElement(By.id("menuTitletickler")).click();
 		Thread.sleep(2000);
 		PageUtil.switchToLastWindow(driver);
-		dropdownSelectByVisibleText(driver, By.xpath("//select[@name='priority']"), priority);
-		dropdownSelectByVisibleText(driver, By.id("site"), clinic);
+		dropdownSelectByVisibleText(driver, webDriverWait, By.xpath("//select[@name='priority']"), priority);
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("site"), clinic);
 		driver.findElement(By.xpath("//textarea[@name='textarea']")).sendKeys(reminderMessage);
 		driver.findElement(By.xpath("//input[@value='Submit & Write to Encounter']")).click();
 		PageUtil.switchToWindow(currWindowHandle, driver);
@@ -128,10 +123,10 @@ java.lang.AssertionError: Tickler note is Not added Successfully.
 		PageUtil.switchToLastWindow(driver);
 		driver.findElement(By.linkText("Edit")).click();
 		PageUtil.switchToLastWindow(driver);
-		dropdownSelectByVisibleText(driver, By.xpath("//select[@name='status']"), "Complete");
-		dropdownSelectByVisibleText(driver, By.xpath("//select[@name='assignedToProviders']"),
+		dropdownSelectByVisibleText(driver, webDriverWait, By.xpath("//select[@name='status']"), "Complete");
+		dropdownSelectByVisibleText(driver, webDriverWait, By.xpath("//select[@name='assignedToProviders']"),
 				drBerry.lastName + " ," + drBerry.firstName);
-		dropdownSelectByVisibleText(driver, By.xpath("//select[@name='suggestedText']"), suggestedText);
+		dropdownSelectByVisibleText(driver, webDriverWait, By.xpath("//select[@name='suggestedText']"), suggestedText);
 		driver.findElement(By.xpath("//input[@name='pasteMessage']")).click();
 		driver.findElement(By.xpath("//input[@name='updateTicklerAndSaveEncounter']")).click();
 		PageUtil.switchToWindow(currWindowHandle, driver);
@@ -147,7 +142,7 @@ java.lang.AssertionError: Tickler note is Not added Successfully.
 		//*** Verify the update on Tickler Management page. ***
 		driver.findElement(By.linkText("Tickler")).click();
 		PageUtil.switchToLastWindow(driver);
-		dropdownSelectByVisibleText(driver, By.id("ticklerview"), "Completed");
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("ticklerview"), "Completed");
 		driver.findElement(By.xpath("//input[@value='Create Report']")).click();
 		Assert.assertTrue("Provider is Not updated Successfully.",
 				PageUtil.isExistsBy(By.xpath("//td[contains(., '" + drBerry.lastName + "')]"), driver));
@@ -159,7 +154,7 @@ java.lang.AssertionError: Tickler note is Not added Successfully.
 		//*** Delete the Tickler Note. ***
 		driver.findElement(By.xpath("//input[@name='checkbox']")).click();
 		driver.findElement(By.xpath("//input[@value='Delete']")).click();
-		dropdownSelectByVisibleText(driver, By.id("ticklerview"), "Deleted");
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("ticklerview"), "Deleted");
 		driver.findElement(By.xpath("//input[@value='Create Report']")).click();
 
 		//*** Verify the update on Tickler Management page. ***

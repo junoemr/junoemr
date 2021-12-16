@@ -41,6 +41,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.AddProvidersIT.drApple;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeys;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 
 @RunWith(SpringRunner.class)
@@ -69,25 +73,26 @@ public class AssignRolesIT extends SeleniumTestBase
 
     public static void assignRoles(String xpathDropdown, String xpathProviderNo, String role, String xpathAction)
     {
-        dropdownSelectByValue(driver, By.xpath(xpathDropdown), role, webDriverWait);
+        dropdownSelectByValue(driver, webDriverWait, By.xpath(xpathDropdown), role);
         String xpath = xpathProviderNo + xpathAction;
-        driver.findElement(By.xpath(xpath)).click();
+		findWaitClickByXpath(driver, webDriverWait, xpath);
     }
 
     public static String optionSelected(String xpath)
     {
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
         Select dropdownPrimary = new Select(driver.findElement(By.xpath(xpath)));
         String primaryRoleSelected = dropdownPrimary.getFirstSelectedOption().getText();
-        return primaryRoleSelected ;
+        return primaryRoleSelected;
     }
 
-    @Test
 	@Ignore
+    @Test
     public void assignRolesClassicUITest()
             throws InterruptedException
     {
-        accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider",
-			webDriverWait);
+        accessAdministrationSectionClassicUI(driver, webDriverWait, "User Management", "Assign Role to Provider"
+		);
         webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='keyword']")));
         driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(drApple.lastName);
         driver.findElement(By.xpath("//input[@name='search']")).click();
@@ -109,12 +114,13 @@ public class AssignRolesIT extends SeleniumTestBase
         Assert.assertEquals("Nurse is NOT updated to the provider successfully.", "nurse", roleUpdated);
 
         //Set primary role
-        dropdownSelectByValue(driver, By.id("primaryRoleProvider"), drApple.providerNo,
-			webDriverWait);
-        dropdownSelectByValue(driver, By.id("primaryRoleRole"), "admin", webDriverWait);
+        dropdownSelectByValue(driver, webDriverWait, By.id("primaryRoleProvider"), drApple.providerNo
+		);
+        dropdownSelectByValue(driver, webDriverWait, By.id("primaryRoleRole"), "admin");
         driver.findElement(By.xpath("//input[@value='Set Primary Role']")).click();
-        driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(drApple.lastName);
-        driver.findElement(By.xpath("//input[@name='search']")).click();
+		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='keyword']", drApple.lastName);
+		findWaitClickByXpath(driver, webDriverWait, "//input[@name='search']");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//td[contains(., 'Yes')]")));
         Assert.assertTrue(PageUtil.isExistsBy(By.xpath("//td[contains(., 'Yes')]"), driver));
 
         String path = "//td[contains(., 'Yes')]/preceding-sibling::td//select[@name='roleNew']";
@@ -125,6 +131,7 @@ public class AssignRolesIT extends SeleniumTestBase
         String xpathDelete = "(//td[contains(., '" + drApple.providerNo + "')])[2]//following-sibling::td/input[@value='Delete']";
         driver.findElement(By.xpath(xpathDelete)).click();
         String messageDelete = "Role nurse is deleted. (" + drApple.providerNo + ")";
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//font[contains(., '" + messageDelete + "')]")));
         Assert.assertTrue("Role nurse is NOT deleted successfully.",
                 PageUtil.isExistsBy(By.xpath("//font[contains(., '" + messageDelete + "')]"), driver));
     }

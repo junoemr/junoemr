@@ -25,6 +25,7 @@ package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
+import integration.tests.util.seleniumUtil.ActionUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -57,7 +58,7 @@ public class EditEncounterNotesIT extends SeleniumTestBase
 		return new String[]{
 			"admission", "casemgmt_note", "demographic", "eChart", "eform_data", "eform_instance",
 			"eform_values", "log", "log_ws_rest", "measurementType",
-			"provider_recent_demographic_access","validations", "property"
+			"provider_recent_demographic_access","validations", "property", "casemgmt_tmpsave"
 		};
 	}
 
@@ -75,38 +76,52 @@ public class EditEncounterNotesIT extends SeleniumTestBase
 
 		String newNote = "Testing Note ";
 		String editedNote = " Edited Testing Note";
+		String caseNoteXpath = "//textarea[@name='caseNote_note']";
+
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		js.executeScript("window.scrollBy(0, document.body.scrollHeight)");
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//textarea[@name='caseNote_note']")));
-		driver.findElement(By.xpath("//textarea[@name='caseNote_note']")).sendKeys(newNote);
-		driver.findElement(By.id("saveImg")).click();
-		driver.findElement(By.id("newNoteImg")).click();
-		driver.findElement(By.linkText("Edit")).click();
-		driver.findElement(By.xpath("//textarea[@name='caseNote_note']")).sendKeys(editedNote);
-		driver.findElement(By.id("saveImg")).click();
-		String text = driver.findElement(By.xpath("//textarea[@name='caseNote_note']")).getText();
+		ActionUtil.findWaitSendKeysByXpath(driver, webDriverWait, caseNoteXpath, newNote);
+
+		ActionUtil.findWaitClickById(driver, webDriverWait, "saveImg");
+		ActionUtil.findWaitClickById(driver, webDriverWait, "newNoteImg");
+		ActionUtil.findWaitClickByLinkText(driver, webDriverWait, "Edit");
+		ActionUtil.findWaitSendKeysByXpath(driver, webDriverWait, caseNoteXpath, editedNote);
+		ActionUtil.findWaitClickById(driver, webDriverWait, "saveImg");
+
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(caseNoteXpath)));
+		String text = driver.findElement(By.xpath(caseNoteXpath)).getText();
+
 		Assert.assertTrue("Edited Note is NOT saved", Pattern.compile(editedNote).matcher(text).find());
 	}
 
 	// XXX: This test was ignored because if failed after switching Juno to run with jdk17.  It's
 	//      probably not worth fixing until juno has been fixed to officially run with that jdk.
-	@Test
 	@Ignore
+	@Test
 	public void editEncounterNotesJUNOUITest()
 	{
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + SUMMARY_URL);
 
 		String newNote = "Testing Note JUNO";
 		String editedNote = "Edited Testing Note JUNO";
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditor1")));
-		driver.findElement(By.id("noteEditor1")).sendKeys(newNote);
+
+		ActionUtil.findWaitSendKeysById(driver, webDriverWait, "noteEditor1", newNote);
+
 		driver.findElement(By.id("theSave")).click();
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@ng-click='$ctrl.editButtonClick()']")));
-		driver.findElement(By.xpath("//button[@ng-click='$ctrl.editButtonClick()']")).click();
-		driver.findElement(By.id("noteEditor1")).clear();
-		driver.findElement(By.id("noteEditor1")).sendKeys(editedNote);
-		driver.findElement(By.id("theSave")).click();
-		String text = driver.findElement(By.xpath("//p[@class='ng-binding']")).getText();
+
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@ng-click='$ctrl.editButtonClick()']");
+
+		String noteId = "noteEditor1";
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id(noteId)));
+		driver.findElement(By.id(noteId)).clear();
+		driver.findElement(By.id(noteId)).sendKeys(editedNote);
+
+		ActionUtil.findWaitClickById(driver, webDriverWait, "theSave");
+
+		String noteXpath = "//p[@class='ng-binding']";
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(noteXpath)));
+		String text = driver.findElement(By.xpath(noteXpath)).getText();
+
 		Assert.assertTrue("Edited Note is NOT saved in JUNO UI", Pattern.compile(editedNote).matcher(text).find());
 	}
 }

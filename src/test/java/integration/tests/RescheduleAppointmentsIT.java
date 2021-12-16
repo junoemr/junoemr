@@ -136,7 +136,7 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
         Assert.assertTrue("Appointments is NOT added successfully.",
                 PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
-        accessSectionJUNOUI(driver, "Schedule", webDriverWait);
+        accessSectionJUNOUI(driver, webDriverWait, "Schedule");
         webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
         driver.findElement(By.xpath("//button[@title='Next Day']")).click();
         driver.findElement(By.xpath("//button[@title='Next Day']")).click();

@@ -31,6 +31,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.By.ByLinkText;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 
 import java.sql.SQLException;
@@ -39,6 +41,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysById;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -72,14 +77,15 @@ public class AddEformsClassicUIIT extends SeleniumTestBase
 		String subject = "EFormTest";
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
-		driver.findElement(By.xpath("//div[@id='menuTitleeforms']//descendant::a[contains(., '+')]")).click();
+		findWaitClickByXpath(driver, webDriverWait, "//div[@id='menuTitleeforms']//descendant::a[contains(., '+')]");
 		PageUtil.switchToLastWindow(driver);
-		driver.findElement(By.linkText("letter")).click();
+		findWaitClick(driver, webDriverWait, By.linkText("letter"));
 		PageUtil.switchToLastWindow(driver);
-		driver.findElement(By.id("subject")).sendKeys(subject);
-		driver.findElement((By.xpath("//input[@value='Submit']"))).click();
+		findWaitSendKeysById(driver, webDriverWait, "subject", subject);
+		findWaitClickByXpath(driver, webDriverWait, "//input[@value='Submit']");
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(subject)));
 		Assert.assertTrue("Eform Letter is NOT added successfully.", PageUtil.isExistsBy(By.partialLinkText(subject), driver));
 	}
 }
