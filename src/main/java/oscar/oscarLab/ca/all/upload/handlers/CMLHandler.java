@@ -34,10 +34,8 @@
 package oscar.oscarLab.ca.all.upload.handlers;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.upload.MessageUploader;
 import oscar.oscarLab.ca.all.upload.RouteReportResults;
@@ -48,7 +46,6 @@ import java.util.ArrayList;
 public class CMLHandler implements MessageHandler
 {
     Logger logger = Logger.getLogger(CMLHandler.class);
-    Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
 
     public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, String ipAddr)
     {
