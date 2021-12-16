@@ -71,8 +71,15 @@ export default class HrmService
 
     public async createCategory(category: HrmCategory): Promise<HrmCategory>
     {
-      const rawResponse = await this._hrmCategoryApi.createCategory(this._hrmCategoryToTransfer.convert(category));
-      return this._hrmCategoryFromTransfer.convert(rawResponse.data.body);
+      try
+      {
+        const rawResponse = await this._hrmCategoryApi.createCategory(this._hrmCategoryToTransfer.convert(category));
+        return this._hrmCategoryFromTransfer.convert(rawResponse.data.body);
+      }
+      catch (err)
+      {
+        throw (err.data.error);
+      }
     }
 
     public async getActiveCategory(id: number): Promise<HrmCategory>
@@ -83,8 +90,15 @@ export default class HrmService
 
     public async updateCategory(category: HrmCategory): Promise<HrmCategory>
     {
-      const rawResponse = await this._hrmCategoryApi.updateCategory(category.id, this._hrmCategoryToTransfer.convert(category));
-      return this._hrmCategoryFromTransfer.convert(rawResponse.data.body);
+      try
+      {
+        const rawResponse = await this._hrmCategoryApi.updateCategory(category.id, this._hrmCategoryToTransfer.convert(category));
+        return this._hrmCategoryFromTransfer.convert(rawResponse.data.body);
+      }
+      catch (err)
+      {
+        throw (err.data.error);
+      }
     }
 
     public async deactivateCategory(category: HrmCategory): Promise<HrmCategory>

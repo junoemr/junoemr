@@ -31,6 +31,7 @@ import {SecurityPermissions} from "../../../common/security/securityConstants";
 import HrmCategory from "../../../lib/integration/hrm/model/HRMCategory";
 import HrmService from "../../../lib/integration/hrm/service/HrmService";
 import HrmSubClass, {HrmReportClass} from "../../../lib/integration/hrm/model/HrmSubClass";
+import {HrmExceptions} from "../../../lib/integration/hrm/exception/HrmExceptions";
 
 angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 	{
@@ -143,7 +144,7 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 					}
 					catch (err)
 					{
-						if (err.status === 400)
+						if (err.message === HrmExceptions.CategoryNameInUse)
 						{
 							ctrl.errorFunction(err, "A category with that name already exists");
 						}
@@ -168,7 +169,7 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 					}
 					catch (err)
 					{
-						if (err.status === 400)
+						if (err.message === HrmExceptions.CategoryNameInUse)
 						{
 							ctrl.errorFunction(err, "A category with that name already exists");
 						}

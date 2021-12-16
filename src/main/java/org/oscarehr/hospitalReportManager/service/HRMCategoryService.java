@@ -33,13 +33,13 @@ import org.oscarehr.dataMigration.model.hrm.HrmDocument.ReportClass;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.dataMigration.model.hrm.HrmSubClassModel;
 import org.oscarehr.hospitalReportManager.dao.HRMCategoryDao;
+import org.oscarehr.hospitalReportManager.exception.HrmCategoryNameInUseException;
 import org.oscarehr.hospitalReportManager.model.HRMCategory;
 import org.oscarehr.hospitalReportManager.model.HRMSubClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -70,7 +70,7 @@ public class HRMCategoryService
 	{
 		if (isNameInUse(category.getName()))
 		{
-			throw new ValidationException("An active category with name " + category.getName() + " already exists");
+			throw new HrmCategoryNameInUseException("An active category with name " + category.getName() + " already exists");
 		}
 
 		HRMCategory entity = toDBConverter.convert(category);
@@ -123,7 +123,7 @@ public class HRMCategoryService
 				// Prevent renames to existing names;
 				if (!existingCategory.getId().equals(existingEntity.getId()))
 				{
-					throw new ValidationException("An active category with name " + updatedModel.getName() + " already exists");
+					throw new HrmCategoryNameInUseException("An active category with name " + updatedModel.getName() + " already exists");
 				}
 			});
 
