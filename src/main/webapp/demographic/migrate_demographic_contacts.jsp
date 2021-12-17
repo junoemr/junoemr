@@ -105,7 +105,8 @@
 			dc.setSdm(r.getSubDecisionMaker().equals("1")?"true":"false");
 			dc.setType(DemographicContact.TYPE_DEMOGRAPHIC);
 
-			if(demographicContactDao.find(dc.getDemographicNo(), Integer.parseInt(dc.getContactId())).size()==0) {
+			if(!demographicContactDao.findOptional(dc.getDemographicNo(), dc.getContactId(), DemographicContact.TYPE_DEMOGRAPHIC).isPresent())
+			{
 				demographicContactDao.persist(dc);
 			}
 		}

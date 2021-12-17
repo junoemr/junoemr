@@ -223,15 +223,15 @@ public class DemographicContactDaoTest extends DaoTestFixtures
 		demographicContactDao.persist(contact5);
 		demographicContactDao.persist(contact6);
 		
-		List<DemographicContact> result = demographicContactDao.find(demographicNo, 101);
-		List<DemographicContact> expectedResult = new ArrayList<DemographicContact>(Arrays.asList(
+		List<DemographicContact> results = demographicContactDao.findByDemographicNoAndCategory(demographicNo, category);
+		List<DemographicContact> expectedResult = new ArrayList<>(Arrays.asList(
 				contact1,
 				contact3,
 				contact6
 				));
 		
-		assertEquals(expectedResult.size(), result.size());
-		assertTrue(result.containsAll(expectedResult));
+		assertEquals(expectedResult.size(), results.size());
+		assertTrue(results.containsAll(expectedResult));
 	}
 
 	public void testCreate() throws Exception {

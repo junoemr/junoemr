@@ -416,7 +416,7 @@ public class DemographicManager {
 		contact.setLastName(StringUtils.trimToNull(demographicContactFewTo1.getLastName()));
 		contact.setMiddleName(StringUtils.trimToNull(demographicContactFewTo1.getMiddleName()));
 		contact.setAddress(StringUtils.trimToNull(demographicContactFewTo1.getAddress()));
-		contact.setCity(StringUtils.trimToNull(demographicContactFewTo1.getCity()));;
+		contact.setCity(StringUtils.trimToNull(demographicContactFewTo1.getCity()));
 		contact.setPostal(StringUtils.trimToNull(demographicContactFewTo1.getPostal()));
 		contact.setProvince(StringUtils.trimToNull(demographicContactFewTo1.getProvince()));
 		contact.setResidencePhone(StringUtils.trimToNull(demographicContactFewTo1.getHomePhone()));
@@ -439,21 +439,12 @@ public class DemographicManager {
 
 	public DemographicContact updateExternalDemographicContact(DemographicContactFewTo1 demographicContactFewTo1, String contactId, Integer demographicId)
 	{
-		DemographicContact demographicContact = demographicContactDao.find(demographicId, contactId, demographicContactFewTo1.getCategory());
+		DemographicContact demographicContact = demographicContactDao.find(demographicId, contactId, demographicContactFewTo1.getType());
 
 		demographicContact.setRole(demographicContactFewTo1.getRole());
 		demographicContact.setConsentToContact(demographicContactFewTo1.isConsentToContact());
 
 		return (DemographicContact) demographicContactDao.merge(demographicContact);
-	}
-
-
-
-	public List<Demographic> getDemographicsByProvider(LoggedInInfo loggedInInfo, Provider provider) {
-		checkPrivilege(loggedInInfo, Permission.DEMOGRAPHIC_READ);
-		List<Demographic> result = demographicDao.getDemographicByProvider(provider.getProviderNo(), true);
-
-		return result;
 	}
 
 	public void createDemographic(LoggedInInfo loggedInInfo, Demographic demographic)

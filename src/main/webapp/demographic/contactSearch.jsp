@@ -28,8 +28,8 @@
 <%@ page import="org.oscarehr.common.model.Contact"%>
 <%@ page import="org.apache.commons.text.StringEscapeUtils"%>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.Properties" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="org.oscarehr.common.model.DemographicContact" %>
 
 <%@ include file="/taglibs.jsp"%>
 
@@ -40,7 +40,6 @@
   if(request.getParameter("limit2")!=null) strLimit2 = request.getParameter("limit2");
 
   int nItems = 0;
-  Properties prop = null;
   String form = request.getParameter("form")==null?"":request.getParameter("form") ;
   String elementName = request.getParameter("elementName")==null?"":request.getParameter("elementName") ;
   String elementId = request.getParameter("elementId")==null?"":request.getParameter("elementId") ;
@@ -63,7 +62,7 @@
 	  }
 	  if (request.getParameter("demoNo") != null)
 	  {
-		  List<String> existingContacts =  ContactAction.getDemographicContactIds(request.getParameter("demoNo"));
+		  List<String> existingContacts =  ContactAction.getDemographicContactIds(request.getParameter("demoNo"), DemographicContact.TYPE_CONTACT);
 		  pageContext.setAttribute("existingContacts", existingContacts);
 	  }
 	   
