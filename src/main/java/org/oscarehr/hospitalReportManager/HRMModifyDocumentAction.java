@@ -52,6 +52,10 @@ public class HRMModifyDocumentAction extends DispatchAction {
 	private HRMDocumentCommentDao hrmDocumentCommentDao = (HRMDocumentCommentDao) SpringUtils.getBean("HRMDocumentCommentDao");
 	private ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
 
+	private static HRMCategoryService categoryService = SpringUtils.getBean(HRMCategoryService.class);
+	private static HRMDocumentService hrmDocumentService = SpringUtils.getBean(HRMDocumentService.class);
+	private static HRMSubClassService subClassService = SpringUtils.getBean(HRMSubClassService.class);
+
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	 
 	public ActionForward undefined(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
@@ -374,10 +378,8 @@ public class HRMModifyDocumentAction extends DispatchAction {
 		Integer documentId = Integer.parseInt(request.getParameter("documentId"));
 		Integer categoryId = Integer.parseInt(request.getParameter("categoryId"));
 
-		HRMDocumentService hrmDocumentService = SpringUtils.getBean(HRMDocumentService.class);
 		HrmDocument documentModel = hrmDocumentService.getHrmDocument(documentId);
 
-		HRMCategoryService categoryService = SpringUtils.getBean(HRMCategoryService.class);
 		HrmCategoryModel categoryModel = categoryService.getActiveCategory(categoryId);
 
 		if (categoryModel != null)
@@ -428,11 +430,9 @@ public class HRMModifyDocumentAction extends DispatchAction {
 			accompanyingSubClass = firstObservation.getAccompanyingSubClass();
 		}
 
-		HRMSubClassService subClassService = SpringUtils.getBean(HRMSubClassService.class);
 		HrmSubClassModel existingSubClass = subClassService
 			.findActiveByAttributes(facilityId, reportClass, subClassName, accompanyingSubClass);
 
-		HRMCategoryService categoryService = SpringUtils.getBean(HRMCategoryService.class);
 		if (existingSubClass != null)
 		{
 			subClassService.deactivateSubClass(existingSubClass.getId());

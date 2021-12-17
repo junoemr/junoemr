@@ -24,5 +24,6 @@
 export enum HrmExceptions
 {
   HrmException = "HRM_EXCEPTION",
-  CategoryNameInUse = "CATEGORY_NAME_IN_USE"
+  CategoryNameInUse = "CATEGORY_NAME_IN_USE",
+  DocumentException = "DOCUMENT_EXCEPTION"
 }

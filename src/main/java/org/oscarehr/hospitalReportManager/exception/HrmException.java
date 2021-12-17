@@ -29,7 +29,8 @@ public class HrmException extends RuntimeException
 	public enum HrmErrorResponse
 	{
 		HRM_EXCEPTION,
-		CATEGORY_NAME_IN_USE
+		CATEGORY_NAME_IN_USE,
+		DOCUMENT_EXCEPTION
 	}
 
 	public HrmException(String message)

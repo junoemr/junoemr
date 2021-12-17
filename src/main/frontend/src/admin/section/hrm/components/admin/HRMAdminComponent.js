@@ -21,15 +21,15 @@
  * Canada
  */
 
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";;
-import SystemPreferenceService from "../../../../lib/system/service/SystemPreferenceService";
-import HrmService from "../../../../lib/integration/hrm/service/HrmService";
-import {HRMStatus} from "../../../../lib/integration/hrm/model/HrmFetchResults";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../../common/components/junoComponentConstants";;
+import SystemPreferenceService from "../../../../../lib/system/service/SystemPreferenceService";
+import HrmService from "../../../../../lib/integration/hrm/service/HrmService";
+import {HRMStatus} from "../../../../../lib/integration/hrm/model/HrmFetchResults";
 import moment from "moment";
 
 angular.module('Admin.Section').component('hrmAdmin',
 	{
-		templateUrl: 'src/admin/section/hrm/admin/HRMAdmin.jsp',
+		templateUrl: 'src/admin/section/hrm/components/admin/HRMAdmin.jsp',
 		bindings: {},
 		controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$uibModal', function ($scope, $http, $httpParamSerializer, $state, $uibModal)
 		{

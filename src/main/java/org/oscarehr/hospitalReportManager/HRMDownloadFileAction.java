@@ -28,6 +28,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DownloadAction;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.hospitalReportManager.exception.HrmDocumentException;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -63,25 +64,25 @@ public class HRMDownloadFileAction extends DownloadAction
 
 	    if(StringUtils.isNullOrEmpty(id))
 	    {
-		    throw new Exception("document id passsed");
+		    throw new HrmDocumentException("document id is null");
 	    }
 
     	HRMDocument hd = hrmDocumentDao.find(Integer.parseInt(id));
 		if(hd == null)
 		{
-			throw new Exception("HRMDocument not found - " + id);
+			throw new HrmDocumentException("document not found - " + id);
 		}
 
 		HRMReport report = HRMReportParser.parseRelativeLocation(hd.getReportFile(), hd.getReportFileSchemaVersion());
 
 		if(report == null)
 		{
-			throw new Exception("Failed to parse HRMDocument with id " + hd.getId());
+			throw new HrmDocumentException("failed to parse hrm document with id " + hd.getId());
 		}
 
 		if(!report.isBinary())
 		{
-			throw new Exception("no binary document found");
+			throw new HrmDocumentException("document is not binary");
 		}
   
 		// This is somehow already decoding the base64 content... don't ask me how.

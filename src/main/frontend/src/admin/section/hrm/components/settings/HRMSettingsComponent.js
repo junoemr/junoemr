@@ -21,12 +21,12 @@
  * Canada
  */
 
-import {JUNO_STYLE, } from "../../../../common/components/junoComponentConstants";;
-import SystemPreferenceService from "../../../../lib/system/service/SystemPreferenceService";
+import {JUNO_STYLE, } from "../../../../../common/components/junoComponentConstants";;
+import SystemPreferenceService from "../../../../../lib/system/service/SystemPreferenceService";
 
 angular.module('Admin.Section').component('hrmSettings',
 	{
-		templateUrl: 'src/admin/section/hrm/settings/HRMSettings.jsp',
+		templateUrl: 'src/admin/section/hrm/components/settings/HRMSettings.jsp',
 		bindings: {},
 		controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$uibModal', function ($scope, $http, $httpParamSerializer, $state, $uibModal)
 		{
