@@ -10,10 +10,8 @@
 --%>
 <%@ page contentType="text/html;" %>
 <%@ page import="java.util.List" %>
-<%@ page import="oscar.oscarLab.ca.all.parsers.Factory" %>
 <%@ page import="oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler" %>
 <%@ page import="org.oscarehr.olis.OLISResultsAction" %>
-<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.oscarehr.dataMigration.model.demographic.Demographic" %>
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
 <%@ page import="java.util.HashSet" %>
@@ -167,18 +165,8 @@
 			String resp = StringUtils.trimToEmpty((String) request.getAttribute("olisResponseContent"));
 			List<String> resultList = (List<String>) request.getAttribute("resultList");
 			String continuationPointer = (String) request.getAttribute("continuationPointer");
+			boolean hasBlockedContent = (boolean) request.getAttribute("blockedContent");
 
-			boolean hasBlockedContent = false;
-			try {
-				if(resp != null && resp.length()>0) {
-					OLISHL7Handler reportHandler = (OLISHL7Handler) Factory.getHandler(OLISHL7Handler.OLIS_MESSAGE_TYPE, resp);
-					if(reportHandler != null) {
-						hasBlockedContent = reportHandler.isReportBlocked();
-					}
-				}
-			} catch (Exception e) {
-				MiscUtils.getLogger().error("error",e);
-			}
 			if (hasBlockedContent) { 
 			%>
 			<form  action="<%=request.getContextPath()%>/olis/Search.do"

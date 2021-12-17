@@ -249,6 +249,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	public OLISHL7Handler() throws HL7Exception
 	{
 		super();
+		init(null);
 	}
 
 	public OLISHL7Handler(String hl7message) throws HL7Exception

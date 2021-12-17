@@ -80,6 +80,7 @@ public class OLISResultsAction extends DispatchAction
 			List<String> resultList = new LinkedList<>();
 			List<String> errors = new LinkedList<>();
 
+			boolean blockedContent = false;
 			for(String message : messages)
 			{
 				String resultUuid = UUID.randomUUID().toString();
@@ -104,12 +105,15 @@ public class OLISResultsAction extends DispatchAction
 					continue;
 				}
 
+				blockedContent = blockedContent || handler.isReportBlocked();
+
 				searchResultsMap.put(resultUuid, handler);
 				resultList.add(resultUuid);
 			}
 
 			request.setAttribute("errors", errors);
 			request.setAttribute("resultList", resultList);
+			request.setAttribute("blockedContent", blockedContent);
 		}
 		catch(Exception e)
 		{

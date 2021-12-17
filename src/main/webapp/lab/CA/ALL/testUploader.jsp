@@ -1,4 +1,4 @@
-<%--
+<%@ page import="oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler" %><%--
 
     Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
@@ -143,6 +143,7 @@ $(function() {
 					<option value="ORU_R01">ORU_R01</option>
 					<option value="BIOTEST">BioTest</option>
 					<option value="TRUENORTH">TRUENORTH</option>
+					<option value="<%=OLISHL7Handler.OLIS_MESSAGE_TYPE%>">OLIS</option>
 					<option value="OTHER">Other</option>
 				</select>
 			<br />
