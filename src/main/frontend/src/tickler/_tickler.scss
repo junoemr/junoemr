@@ -3,6 +3,8 @@
 }
 
 #tickler-list-page {
+	@include juno-page-padding-default;
+
 	#search-form {
 		.search-filters>div {
 			margin-bottom: $margin-sm;

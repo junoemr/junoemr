@@ -1,8 +1,8 @@
-import PartialDateConverter from "../../lib/common/partialDate/converter/partialDateConverter";
-import PartialDateModelSerializer from "../../lib/common/partialDate/converter/partialDateModelSerializer";
+import PartialDateConverter from "../../../../lib/common/partialDate/converter/partialDateConverter";
+import PartialDateModelSerializer from "../../../../lib/common/partialDate/converter/partialDateModelSerializer";
 
 angular.module('Record.Summary').component('groupNotesComponent', {
-	templateUrl: 'src/record/summary/groupNotes.jsp',
+	templateUrl: 'src/record/summary/components/groupNotes/groupNotes.jsp',
 	bindings: {
 		modalInstance: "<",
 		resolve: "<",

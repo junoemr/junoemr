@@ -23,8 +23,12 @@
 
  */
 
+import {SecurityPermissions} from "../../../../common/security/securityConstants";
+import LoadingQueue from "../../../../lib/util/LoadingQueue";
+import ToastService from "../../../../lib/alerts/service/ToastService";
+
 angular.module('Record.Summary').component('encounterNoteList', {
-	templateUrl: "src/record/summary/encounterNoteListTemplate.jsp",
+	templateUrl: "src/record/summary/components/encounterNoteList/encounterNoteListTemplate.jsp",
 	bindings: {
 		userId: '<', // current user provider number
 		selectedNoteHash: '=',
@@ -35,17 +39,24 @@ angular.module('Record.Summary').component('encounterNoteList', {
 	controller: [
 		'$scope',
 		'$stateParams',
+		'$timeout',
 		'noteService',
 		'providerService',
 		function ($scope,
 		          $stateParams,
+		          $timeout,
 		          noteService,
 		          providerService)
 	{
 		const ctrl = this;
 
-		ctrl.$onInit = function()
+		ctrl.SecurityPermissions = SecurityPermissions;
+		ctrl.loadingQueue = new LoadingQueue();
+		ctrl.notesPerRequest = 20;
+
+		ctrl.$onInit = async function()
 		{
+			ctrl.loadingQueue.pushLoadingState();
 			// initialize internal variables
 			ctrl.filter = {
 				onlyNotes: false,
@@ -59,7 +70,6 @@ angular.module('Record.Summary').component('encounterNoteList', {
 
 
 			ctrl.index = 0;
-			ctrl.busy = false;
 			ctrl.moreNotes = true;
 
 			// set default binding values
@@ -69,13 +79,7 @@ angular.module('Record.Summary').component('encounterNoteList', {
 			ctrl.onEditNote = ctrl.onEditNote || null;
 			ctrl.registerFunctions = ctrl.registerFunctions || null;
 
-			ctrl.providerSettings = {};
-			providerService.getSettings().then(
-				function success(results)
-				{
-					ctrl.providerSettings = results;
-				}
-			);
+			ctrl.providerSettings = await providerService.getSettings();
 
 			// call this method with functions that the parent is allowed to call.
 			if (angular.isFunction(ctrl.registerFunctions))
@@ -84,6 +88,7 @@ angular.module('Record.Summary').component('encounterNoteList', {
 					refresh: ctrl.refresh
 				});
 			}
+			ctrl.loadingQueue.popLoadingState();
 		};
 
 		ctrl.bubbleUpEditCppCallback = function bubbleUpEditCppCallback(note, successCallback, dismissCallback)
@@ -207,43 +212,41 @@ angular.module('Record.Summary').component('encounterNoteList', {
 		//Note display functions
 		ctrl.addMoreItems = function addMoreItems()
 		{
-			if (ctrl.busy) return;
-
-			ctrl.busy = true;
-
-			noteService.getNotesFrom($stateParams.demographicNo, ctrl.index, 20, {}).then(
-				function success(results)
-				{
-					if (angular.isDefined(results.notelist))
-					{
-						if (results.notelist instanceof Array)
-						{
-							for (var i = 0; i < results.notelist.length; i++)
-							{
-								ctrl.noteList.push(results.notelist[i]);
-							}
-						}
-						else
-						{
-							ctrl.noteList.push(results.notelist);
-						}
-						ctrl.index = ctrl.noteList.length;
-					}
-					if(angular.isDefined(results.moreNotes))
-					{
-						ctrl.moreNotes = results.moreNotes;
-					}
-					ctrl.busy = false;
-				},
-				function error(errors)
-				{
-					console.error(errors);
-					ctrl.error = errors;
-					ctrl.busy = false;
-				}
-			);
-
+			ctrl.loadingQueue.pushLoadingState();
+			ctrl.addMoreItemsAsync().catch((error) =>
+			{
+				console.error(error);
+				new ToastService().errorToast("Error loading additional notes", true);
+			}).finally(() =>
+			{
+				ctrl.loadingQueue.popLoadingState();
+			});
 		};
+
+		ctrl.addMoreItemsAsync = async () =>
+		{
+			let results = await noteService.getNotesFrom($stateParams.demographicNo, ctrl.index, ctrl.notesPerRequest, {});
+
+			if (angular.isDefined(results.notelist))
+			{
+				if (results.notelist instanceof Array)
+				{
+					for (let i = 0; i < results.notelist.length; i++)
+					{
+						ctrl.noteList.push(results.notelist[i]);
+					}
+				}
+				else
+				{
+					ctrl.noteList.push(results.notelist);
+				}
+				ctrl.index = ctrl.noteList.length;
+			}
+			if(angular.isDefined(results.moreNotes))
+			{
+				ctrl.moreNotes = results.moreNotes;
+			}
+		}
 
 		ctrl.refresh = function refresh()
 		{

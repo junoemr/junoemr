@@ -24,7 +24,7 @@
  */
 
 angular.module('Record.Summary').component('summaryModule', {
-	templateUrl: "src/record/summary/summaryModuleTemplate.jsp",
+	templateUrl: "src/record/summary/components/summaryModule/summaryModuleTemplate.jsp",
 	bindings: {
 		module: '<',
 		itemDisplayCount: '<', // how many list items to display before requiring expansion
