@@ -28,6 +28,7 @@ import oscar.oscarLab.ca.all.util.Utilities;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -77,7 +78,7 @@ public class OLISResultsAction extends DispatchAction
 			FileUtils.writeStringToFile(tempFile, olisResultString);
 
 			List<String> messages = Utilities.separateMessages(System.getProperty("java.io.tmpdir") + "/olis_" + uuid + ".response");
-			List<String> resultList = new LinkedList<>();
+			List<String> resultList = new ArrayList<>(messages.size());
 			List<String> errors = new LinkedList<>();
 
 			boolean blockedContent = false;

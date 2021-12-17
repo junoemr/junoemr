@@ -1739,15 +1739,16 @@ public String strikeOutInvalidContent(String content, String status) {
                                      <%
                                 }
 
-                                if (handler.getObservationHeader(obr, 0).equals(headers.get(obr)))
+								// does this check even do anything?
+                                if (handler.getOBRName(obr).equals(headers.get(obr)))
 								{
-                                	int cc = handler.getOBRCommentCount(obr);
-	                                for(int n = 0; n < cc; n++)
+                                	int obrCommentCount = handler.getOBRCommentCount(obr);
+	                                for(int n = 0; n < obrCommentCount; n++)
 	                                {
 	                                    // the obrName should only be set if it has not been set already,
 		                                // which will only have occurred if the obx name is ""
 		                                // or if it is the same as the obr name
-	                                    String obxNN = handler.getOBXName(obr,0);
+		                                String obxNN = (obxCount > 0) ? handler.getOBXName(obr, 0) : "";
 	                                    if(!obrFlag && StringUtils.isBlank(obxNN))
 										{%>
 	                                        <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
@@ -2083,14 +2084,6 @@ public String strikeOutInvalidContent(String content, String status) {
                                         <%}
                                     }
                                 }
-                            //}
-
-                            String obsHeader = handler.getObservationHeader(obr, 0);
-                            String headr = (String) headers.get(i);
-
-                            //for ( j=0; j< OBRCount; j++){
-
-                            //} //end for j=0; j<obrCount;
                             %>
                         </table>
                         <% // end for headers

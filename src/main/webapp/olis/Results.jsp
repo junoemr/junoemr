@@ -16,6 +16,7 @@
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
 <%@ page import="java.util.HashSet" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.stream.Collectors" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -167,6 +168,9 @@
 			String continuationPointer = (String) request.getAttribute("continuationPointer");
 			boolean hasBlockedContent = (boolean) request.getAttribute("blockedContent");
 
+			// ordering must be preserved for matching uuid to handler below
+			List<OLISHL7Handler> resultHandlers = resultList.stream().map(OLISResultsAction::getHandlerByUUID).collect(Collectors.toList());
+
 			if (hasBlockedContent) { 
 			%>
 			<form  action="<%=request.getContextPath()%>/olis/Search.do"
@@ -220,10 +224,9 @@
 						<select name="patientFilter" onChange="filterResults(this)">
 							<option value="">All Patients</option>
 							<%  List<String> names = new ArrayList<String>();
-								OLISHL7Handler result;
 								String name;
-								for (String resultUuid : resultList) {
-									result = OLISResultsAction.getHandlerByUUID(resultUuid);
+								for (OLISHL7Handler result : resultHandlers)
+								{
 									name = oscar.Misc.getStr(result.getPatientName(), "").trim();
 									if (!name.equals("")) { names.add(name); }
 								}
@@ -238,8 +241,8 @@
 						<select name="labFilter" onChange="filterResults(this)">
 							<option value="">All Labs</option>
 							<%  List<String> labs = new ArrayList<String>();
-								for (String resultUuid : resultList) {
-									result = OLISResultsAction.getHandlerByUUID(resultUuid);
+								for (OLISHL7Handler result : resultHandlers)
+								{
 									name = oscar.Misc.getStr(result.getReportingFacilityName(), "").trim();
 									if (!name.equals("")) { labs.add(name); }
 								}
@@ -318,9 +321,10 @@
 					</tr>
 					
 					<%  int lineNum = 0;
-						for (String resultUuid : resultList)
+						for(int handlerIndex=0; handlerIndex< resultHandlers.size(); handlerIndex++)
 						{
-							result = OLISResultsAction.getHandlerByUUID(resultUuid);
+							String resultUuid = resultList.get(handlerIndex);
+							OLISHL7Handler result = resultHandlers.get(handlerIndex);
 
 							// show one row per OBR, so that individual statuses can be displayed. Required feature for OLIS conformance.
 							for(int i=0; i < result.getOBRCount(); i++)
