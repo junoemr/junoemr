@@ -23,12 +23,17 @@
 
 package org.oscarehr.dataMigration.mapper.hrm.in;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.cxf.helpers.FileUtils;
 import org.oscarehr.common.io.FileFactory;
+import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 
+import org.oscarehr.dataMigration.model.hrm.HrmDocumentMatchingData;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 
+import org.oscarehr.hospitalReportManager.service.HRMCategoryService;
 import org.oscarehr.integration.clinicaid.dto.v2.MasterNumber;
 import org.oscarehr.integration.clinicaid.service.v2.ClinicAidService;
 import org.oscarehr.util.MiscUtils;
@@ -41,6 +46,7 @@ import xml.hrm.v4_3.ReportsReceived;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Component
 public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3, HrmDocument>
@@ -50,7 +56,10 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 	
 	@Autowired
 	private ClinicAidService clinicAidService;
-	
+
+	@Autowired
+	private HRMCategoryService categoryService;
+
 	private static final String SCHEMA_VERSION = "4.3";
 	
 	@Override
@@ -85,8 +94,6 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 		model.setReceivedDateTime(LocalDateTime.now());
 		model.setCreatedBy(stubProviderFromPersonName(report.getAuthorPhysician()));
 		model.setReportStatus(fromNullableString(report.getResultStatus()));
-		model.setDescription(model.getReportClass().getValue());
-		
 		model.setReportSubClass(report.getSubClass());
 		model.setReportFileSchemaVersion(SCHEMA_VERSION);
 		
@@ -109,12 +116,47 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 				MiscUtils.getLogger().error("Could not establish connection to clinicaid api", e);
 			}
 		}
-		
+
 		model.setObservations(importStructure.getObservations());
-		
+
+		Optional<HrmCategoryModel> category = categoryService.categorize(model);
+
+		if (category.isPresent())
+		{
+			model.setCategory(category.get());
+			model.setDescription(category.get().getName());
+		}
+		else
+		{
+			model.setDescription(model.getReportClass().getValue());
+		}
+
+
 		model.setDocument(documentMapper.importToJuno(importStructure));
 		model.setReportFile(FileFactory.getExistingFile(importStructure.getFileLocation()));
-		
+
+		model.setMatchingData(createMatchingData(FileUtils.getStringFromFile(model.getReportFile().getFileObject())));
+
 		return model;
+	}
+
+	protected HrmDocumentMatchingData createMatchingData(String fileContents)
+	{
+		String noMessageIdFileData = fileContents.replaceAll("<MessageUniqueID>.*?</MessageUniqueID>", "<MessageUniqueID></MessageUniqueID>");
+		String noTransactionInfoFileData = fileContents.replaceAll("<TransactionInformation>.*?</TransactionInformation>", "<TransactionInformation></TransactionInformation>");
+		String noDemographicInfoFileData = fileContents.replaceAll("<Demographics>.*?</Demographics>", "<Demographics></Demographics").replaceAll("<MessageUniqueID>.*?</MessageUniqueID>", "<MessageUniqueID></MessageUniqueID>");
+
+		String noMessageIdHash = DigestUtils.md5Hex(noMessageIdFileData);
+		String noTransactionInfoHash = DigestUtils.md5Hex(noTransactionInfoFileData);
+		String noDemographicInfoHash = DigestUtils.md5Hex(noDemographicInfoFileData);
+
+		HrmDocumentMatchingData matchingData = new HrmDocumentMatchingData();
+
+		matchingData.setReportHash(noMessageIdHash);
+		matchingData.setReportLessTransactionInfoHash(noTransactionInfoHash);
+		matchingData.setReportLessDemographicInfoHash(noDemographicInfoHash);
+		matchingData.setNumDuplicatesReceived(0);
+
+		return matchingData;
 	}
 }

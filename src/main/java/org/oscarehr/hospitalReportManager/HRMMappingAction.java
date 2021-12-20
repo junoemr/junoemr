@@ -44,8 +44,6 @@ public class HRMMappingAction extends DispatchAction {
 			
 			String className = request.getParameter("class"); 
 			String subClass = request.getParameter("subclass");
-			String mnemonic = request.getParameter("mnemonic");
-			String description = request.getParameter("description");
 			String sendingFacilityId = request.getParameter("sendingFacilityId");
 			String categoryId = request.getParameter("category");
 
@@ -54,9 +52,7 @@ public class HRMMappingAction extends DispatchAction {
 			hrmSubClass.setClassName(className);
 			hrmSubClass.setSubClassName(subClass);
 			hrmSubClass.setSendingFacilityId(sendingFacilityId);
-			hrmSubClass.setSubClassMnemonic(mnemonic);
-			hrmSubClass.setSubClassDescription(description);
-			hrmSubClass.setHrmCategory(hrmCategoryDao.findById(Integer.parseInt(categoryId)).get(0));
+			//hrmSubClass.setHrmCategory(hrmCategoryDao.findById(Integer.parseInt(categoryId)).get(0));
 			
 			hrmSubClassDao.merge(hrmSubClass);
 			request.setAttribute("success", true);

@@ -116,7 +116,7 @@ public class HRMReportProcessor
 			HrmDocument model = reportMapper.importToJuno((HRMReport_4_3) hrmReport);
 			
 			HRMDocument hrmDocument = hrmDocumentModelToDbConverter.convert(model);
-			HRMReportParser.fillDocumentHashData(hrmDocument, hrmFile);
+			//HRMReportParser.fillDocumentHashData(hrmDocument, hrmFile);
 			
 			if (!hrmService.isDuplicateReport(hrmDocument))
 			{

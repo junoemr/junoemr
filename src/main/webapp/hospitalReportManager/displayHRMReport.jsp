@@ -44,6 +44,59 @@
         response.sendRedirect("../securityError.jsp?type=HRM_READ," + demoQueryComponent);
         return;
     }
+
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    HrmDocument hrmDocument = (HrmDocument) request.getAttribute("hrmDocument");
+    HRMReport hrmReport = (HRMReport) request.getAttribute("hrmReport");
+    Integer hrmReportId = (Integer) request.getAttribute("hrmReportId");
+
+    List<HRMDocumentToProvider> providerLinkList = (List<HRMDocumentToProvider>) request.getAttribute("providerLinkList");
+
+    ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
+    DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+
+    // These are all elements which will be flagged with an attention class if they are missing
+    String lastName = hrmReport.getLegalLastName();
+    String firstName = hrmReport.getLegalFirstName();
+    String HCN = hrmReport.getHCN();
+    String HCNVersion = hrmReport.getHCNVersion();
+
+    String HCNProvince = hrmReport.getHCNProvinceCode();
+    if (ConversionUtils.hasContent(HCNProvince))
+    {
+        HCNProvince.replaceAll("\\w{2}-", "");
+    }
+
+    String gender = hrmReport.getGender();
+    String dateOfBirth = hrmReport.getDateOfBirthAsString();
+
+    String address1 = hrmReport.getAddressLine1();
+    String address2 = hrmReport.getAddressLine2();
+    String city = hrmReport.getAddressCity();
+
+    String postalCode = hrmReport.getPostalCode();
+    String province = hrmReport.getCountrySubDivisionCode().replaceAll("\\w{2}-", "");
+
+    String deliverToLastName = hrmReport.getDeliverToUserIdLastName();
+    String deliverToFirstName = hrmReport.getDeliverToUserIdFirstName();
+    String deliverToId = hrmReport.getDeliverToUserId();
+
+    String sendingFacilityId = hrmReport.getSendingFacilityId();
+    String reportNumber = hrmReport.getSendingFacilityReportNo();
+
+    Date reportTime = findReportTime(hrmReport);
+
+    // I think author is an optional field
+    String author = "";
+    List<String> authorNameParts = hrmReport.getFirstReportAuthorPhysician();
+    if (authorNameParts != null && !authorNameParts.isEmpty())
+    {
+        authorNameParts.remove(0);
+    }
+    author = StringUtils.trimToNull(String.join(" ", authorNameParts));
+
+    String facilityName = (String) request.getAttribute("facilityName");
 %>
 
 <%@page import="java.util.LinkedList, java.util.List, org.oscarehr.util.SpringUtils, org.oscarehr.PMmodule.dao.ProviderDao, java.util.Date" %>
@@ -60,10 +113,10 @@
 <%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocument" %>
 <%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
 <%@ page import="org.oscarehr.security.model.Permission" %>
-<%@ page import="org.apache.http.client.utils.URLEncodedUtils" %>
-<%@ page import="org.apache.http.NameValuePair" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="org.oscarehr.dataMigration.model.hrm.HrmDocument" %>
+<%@ page import="org.oscarehr.hospitalReportManager.service.HRMCategoryService" %>
+<%@ page import="org.oscarehr.dataMigration.model.hrm.HrmCategoryModel" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%!
@@ -124,20 +177,6 @@
         return dateFormat.format(fieldContent);
     }
 %>
-<%
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-    HRMDocument hrmDocument = (HRMDocument) request.getAttribute("hrmDocument");
-    HRMReport hrmReport = (HRMReport) request.getAttribute("hrmReport");
-    Integer hrmReportId = (Integer) request.getAttribute("hrmReportId");
-
-    List<HRMDocumentToProvider> providerLinkList = (List<HRMDocumentToProvider>) request.getAttribute("providerLinkList");
-
-    ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
-    DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
-%>
-
-
 <html>
 <head>
     <title>HRM Report</title>
@@ -212,10 +251,44 @@
 			});
 		}
 
+		reclassifyReport = function(documentId)
+        {
+            var categoryId = $("#category-select").val();
+            $.ajax({
+                url: "<%=request.getContextPath() %>/hospitalReportManager/Modify.do",
+                dataType: "json",
+                type: "POST",
+                data: {
+                    documentId: documentId,
+                    categoryId: categoryId,
+                    method: "recategorize",
+                },
+                success: function (data) {},
+                error: function(err){console.log(err)}
+            });
+        }
+
+        reclassifyFutureReports = function(documentId)
+        {
+            var categoryId = $("#category-select").val();
+            $.ajax({
+                dataType: "json",
+                url: "<%=request.getContextPath() %>/hospitalReportManager/Modify.do",
+                type: "POST",
+                data: {
+                    documentId: documentId,
+                    categoryId: categoryId,
+                    method: "recategorizeFuture"
+                },
+                success: function (data) {},
+                error: function (err) {console.log(err)}
+            })
+        }
+
 		jQuery(document).ready(function() {
 			initProviderAutoComplete();
-			var demographicSearch = $("#demographic-search");
 
+			var demographicSearch = $("#demographic-search");
 			if (demographicSearch.length)
 			{
 				initDemographicAutoComplete();
@@ -301,6 +374,23 @@
             white-space: pre;
             margin-right: 24px;
             overflow-x: scroll;
+        }
+
+        .description-container .label {
+            width: 30%;
+            display: inline-block;
+        }
+
+        .description-container .input {
+            width: 30%;
+        }
+
+        .description-container .action-button {
+            width: 15%;
+        }
+
+        .description-container select {
+            width: 30%;
         }
 
         @media print {
@@ -501,56 +591,13 @@
 %>
 <div id="hrmReportContent">
     <div id="hrmHeader"><b>HRM Patient Record</b><br/>
-        <%
-            // These are all elements which will be flagged with an attention class if they are missing
-            String lastName = hrmReport.getLegalLastName();
-            String firstName = hrmReport.getLegalFirstName();
-            String HCN = hrmReport.getHCN();
-            String HCNVersion = hrmReport.getHCNVersion();
-
-            String HCNProvince = hrmReport.getHCNProvinceCode();
-            if (ConversionUtils.hasContent(HCNProvince))
-            {
-            	HCNProvince.replaceAll("\\w{2}-", "");
-            }
-
-            String gender = hrmReport.getGender();
-            String dateOfBirth = hrmReport.getDateOfBirthAsString();
-
-            String address1 = hrmReport.getAddressLine1();
-            String address2 = hrmReport.getAddressLine2();
-            String city = hrmReport.getAddressCity();
-
-            String postalCode = hrmReport.getPostalCode();
-            String province = hrmReport.getCountrySubDivisionCode().replaceAll("\\w{2}-", "");
-
-            String deliverToLastName = hrmReport.getDeliverToUserIdLastName();
-            String deliverToFirstName = hrmReport.getDeliverToUserIdFirstName();
-            String deliverToId = hrmReport.getDeliverToUserId();
-
-            String sendingFacilityId = hrmReport.getSendingFacilityId();
-            String reportNumber = hrmReport.getSendingFacilityReportNo();
-
-            Date reportTime = findReportTime(hrmReport);
-
-            // I think author is an optional field
-            String author = "";
-            List<String> authorNameParts = hrmReport.getFirstReportAuthorPhysician();
-            if (authorNameParts != null && !authorNameParts.isEmpty())
-            {
-                authorNameParts.remove(0);
-            }
-            author = StringUtils.trimToNull(String.join(" ", authorNameParts));
-
-            String facilityName = (String) request.getAttribute("facilityName");
-        %>
         <b>Name: </b><span class="<%=getFieldClass(lastName)%>"><%=getFieldDisplayValue(lastName)%></span>, <span class="<%=getFieldClass(firstName)%>"><%=getFieldDisplayValue(firstName)%></span> <span class="<%=getFieldClass(gender)%>">(<%=getFieldDisplayValue(gender)%>)</span><br/>
         <b>DOB: </b><span class="<%=getFieldClass(dateOfBirth)%>"><%=getFieldDisplayValue(dateOfBirth)%></span><br>
         <b>HCN: </b><span class="<%=getFieldClass(HCN)%>"><%=getFieldDisplayValue(HCN)%></span> <span class="<%=getFieldClass(HCNVersion)%>"><%=getFieldDisplayValue(HCNVersion)%></span><br/>
     </div>
     <br />
     <div id="hrmNotice">
-        This report was received from the Hospital Report Manager (HRM) at <%= hrmDocument.getTimeReceived() %>.
+        This report was received from the Hospital Report Manager (HRM) at <%= ConversionUtils.toDateString(hrmDocument.getReceivedDateTime()) %>.
         <% if (request.getAttribute("hrmDuplicateNum") != null && ((Integer) request.getAttribute("hrmDuplicateNum")) > 0) { %><br /><i>OSCAR has received <%=request.getAttribute("hrmDuplicateNum") %> duplicates of this report.</i><% } %>
         <%
             List<HRMDocument> allDocumentsWithRelationship = (List<HRMDocument>) request.getAttribute("allDocumentsWithRelationship");
@@ -575,24 +622,21 @@
     <div class="hrm-container">
         <%-- Document content --%>
         <div class="hrm-content">
-            <% if(hrmReport.isBinary()) { %>
-            <%
-                String reportFileData = hrmReport.getFileData();
-                String noMessageIdFileData = reportFileData.replaceAll("<MessageUniqueID>.*?</MessageUniqueID>", "<MessageUniqueID></MessageUniqueID>");
-                String noMessageIdHash = org.apache.commons.codec.digest.DigestUtils.md5Hex(noMessageIdFileData);
-            %>
-            <%
+            <% if(hrmReport.isBinary()) {
+
+                Integer documentId = hrmDocument.getId();
                 List<String> imageFormats = Arrays.asList(".gif", ".jpg", ".jpeg", ".png", ".jpeg");    // *.tiff is not supported on modern browsers
+
                 if (hrmReport.getFileExtension() != null && imageFormats.contains(hrmReport.getFileExtension())) {
             %>
-            <img src="<%=request.getContextPath() %>/hospitalReportManager/HRMDownloadFile.do?hash=<%=noMessageIdHash%>"/><br/>
+            <img src="<%=request.getContextPath() %>/hospitalReportManager/HRMDownloadFile.do?id=<%=documentId%>"/><br/>
             <% } else { %>
             <div style="display: inline-block; margin:auto; color:red; white-space: pre-line">
                 This report contains an attachment which cannot be viewed in your browser.
                 Please use the link to view/download the content contained within.
             </div>
             <% } %>
-            <a href="<%=request.getContextPath() %>/hospitalReportManager/HRMDownloadFile.do?hash=<%=noMessageIdHash%>"><%=(hrmReport.getLegalLastName() + "_" + hrmReport.getLegalFirstName() + "_" +  hrmReport.getFirstReportClass() + hrmReport.getFileExtension()).replaceAll("\\s", "_") %></a>
+            <a href="<%=request.getContextPath() %>/hospitalReportManager/HRMDownloadFile.do?id=<%=documentId%>"><%=(hrmReport.getLegalLastName() + "_" + hrmReport.getLegalFirstName() + "_" +  hrmReport.getFirstReportClass() + hrmReport.getFileExtension()).replaceAll("\\s", "_") %></a>
             <% } else { %>
             <div class="<%=getFieldClass(hrmReport.getFirstReportTextContent())%>"><%=ConversionUtils.hasContent(hrmReport.getFirstReportTextContent()) ? hrmReport.getFirstReportTextContent() : "NO CONTENT"%></div>
             <% } %>
@@ -626,11 +670,7 @@
                     <td><span class="<%=getFieldClass(facilityName)%>"><%=getFieldDisplayValue(facilityName)%></span> <span class="<%=getFieldClass(sendingFacilityId)%>">(<%=getFieldDisplayValue(sendingFacilityId)%>)</span></td>
                 </tr>
                 <tr>
-                    <td>Report No:</td>
-                    <td><span class="<%=getFieldClass(reportNumber)%>"><%=getFieldDisplayValue(reportNumber)%></span></td>
-                </tr>
-                <tr>
-                    <td>Status</td>
+                    <td>Status:</td>
                     <% if (hrmDocument.getReportStatus() == null) { %>
                     <td class="attention">Unsigned/Unknown</td>
                     <% } else if (hrmDocument.getReportStatus().equals(HRMDocument.STATUS.CANCELLED)) { %>
@@ -638,6 +678,10 @@
                     <% } else { %>
                     <td>Signed by author</td>
                     <% } %>
+                </tr>
+                <tr>
+                    <td>Category:</td>
+                    <td><%= hrmDocument.getCategory() != null ? hrmDocument.getCategory().getName() : "Unmatched to category" %></td>
                 </tr>
             </table>
             <hr>
@@ -747,15 +791,6 @@
                 <% } %>
                 <% } %>
             </table>
-            <% if (hrmDocument.getUnmatchedProviders() != null && !hrmDocument.getUnmatchedProviders().isEmpty()) { %>
-            <table>
-                <tr><th>Embedded Unmatched Recipients</th></tr>
-                <% String[] unmatchedProviders = hrmDocument.getUnmatchedProviders().substring(1).split("\\|");
-                    for (String unmatchedProvider : unmatchedProviders) { %>
-                <tr><td><%=unmatchedProvider%></td></tr>
-                <% } %>
-            </table>
-            <% } %>
             <table>
                 <tr><th>Search Providers by Name</th></tr>
                 <tr>
@@ -793,8 +828,7 @@
                             <td class="<%=getFieldClass(observationDate)%>"><%=getFieldDisplayValue(observationDate)%></td>
                         </tr>
                     <% } %>
-                <% } else { %>
-                <%
+                <% } else {
                     if (hrmReport.getFirstReportSubClass() != null) {
                         String[] subClassFromReport = hrmReport.getFirstReportSubClass().split("\\^");
                         String subClassDisplay = "";
@@ -811,8 +845,12 @@
                         <td>Subclass:</td>
                         <td><%=subClassDisplay%></td>
                     </tr>
+                    <% } %>
                 <% } %>
-            <% } %>
+                <tr>
+                    <td>Report No:</td>
+                    <td><span class="<%=getFieldClass(reportNumber)%>"><%=getFieldDisplayValue(reportNumber)%></span></td>
+                </tr>
             </table>
             <table>
                 <tr>
@@ -842,13 +880,31 @@
     </div>
 
     <div class="description-container hrm-action-container hide-on-print">
-        <b>Change report description:</b><br>
-        <input type="text" id="descriptionField_<%=hrmReportId %>_hrm" size="100" value="<%=StringEscapeUtils.escapeHtml(hrmDocument.getDescription())%>"/><br />
-
-        <div class="boxButton">
-            <input type="button" onClick="setDescription('<%=hrmReportId %>')" value="Set Description" /><span id="descriptionstatus<%=hrmReportId %>"></span><br /><br />
+        <div style="width: 75%">
+            <b class="label">Change Report Description:</b>
+            <input class="input" type="text" id="descriptionField_<%=hrmReportId %>_hrm" value="<%=StringEscapeUtils.escapeHtml(hrmDocument.getDescription())%>"/>
+            <input class="action-button" type="button" onClick="setDescription('<%=hrmReportId %>')" value="Save"/><span id="descriptionstatus<%=hrmReportId %>"></span>
         </div>
+        <div style="width: 75%">
+            <b class="label">Change Report Classification:</b>
+            <select class="input" id="category-select">
+                <%
+                    HRMCategoryService categoryService = SpringUtils.getBean(HRMCategoryService.class);
+                    List<HrmCategoryModel> categories = categoryService.getActiveCategories();
 
+                    if (hrmDocument.getCategory() != null)
+                    {
+                        categories.remove(hrmDocument.getCategory());
+                    }
+
+                %>
+                <% for (HrmCategoryModel category : categories) { %>
+                <option value="<%=category.getId()%>"><%=category.getName()%></option>
+                <% } %>
+            </select>
+            <input class="action-button" type="button" onClick="reclassifyReport('<%=hrmReportId%>')" value="This Report"/>
+            <input class="action-button" type="button" onClick="reclassifyFutureReports('<%=hrmReportId%>')" value="Future Reports"/>
+        </div>
     </div>
 
     <div class="comment-container hrm-action-container hide-on-print">
