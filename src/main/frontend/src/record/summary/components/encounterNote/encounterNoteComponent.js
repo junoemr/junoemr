@@ -23,10 +23,10 @@
 
  */
 
-import {SecurityPermissions} from "../../common/security/securityConstants";
+import {SecurityPermissions} from "../../../../common/security/securityConstants";
 
 angular.module('Record.Summary').component('encounterNote', {
-	templateUrl: "src/record/summary/encounterNoteTemplate.jsp",
+	templateUrl: "src/record/summary/components/encounterNote/encounterNoteTemplate.jsp",
 	bindings: {
 		note: '<?',
 		onEditCpp: '&?',
