@@ -42,13 +42,14 @@ import java.util.regex.Pattern;
 public class PDFFile extends GenericFile
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final Pattern[] allowedWarningsGS = new Pattern[2];
+	private static final Pattern[] allowedWarningsGS = new Pattern[3];
 	private static final Pattern[] disallowedOutputGS = new Pattern[1];
 
 	static
 	{
 		allowedWarningsGS[0] = Pattern.compile(".*Missing glyph .* in the font .*", Pattern.CASE_INSENSITIVE);
 		allowedWarningsGS[1] = Pattern.compile(".*Failed to interpret TT instructions in font.*", Pattern.CASE_INSENSITIVE);
+		allowedWarningsGS[2] = Pattern.compile(".*jbig2dec WARNING text region refers to no symbol dictionaries \\(segment 0x02\\).*", Pattern.CASE_INSENSITIVE);
 
 		disallowedOutputGS[0] = Pattern.compile(".*Error reading a content stream\\. The page may be incomplete.*", Pattern.CASE_INSENSITIVE);
 	}
@@ -120,7 +121,7 @@ public class PDFFile extends GenericFile
 		String contentType;
 		if(isValid)
 		{
-			contentType = GenericFile.getContentType(javaFile);
+			contentType = super.getContentType();
 		}
 		else
 		{

@@ -254,4 +254,21 @@ public class DemographicContact extends AbstractModel<Integer> {
 	public void setDetails(Contact details) {
 	    this.details = details;
     }
+
+	public String getTypeLabel()
+	{
+		switch(type)
+		{
+			case TYPE_PROVIDER:
+				return TYPE_PROVIDER_TEXT;
+			case TYPE_DEMOGRAPHIC:
+				return TYPE_DEMOGRAPHIC_TEXT;
+			case TYPE_CONTACT:
+				return TYPE_CONTACT_TEXT;
+			case TYPE_PROFESSIONALSPECIALIST:
+				return TYPE_PROFESSIONAL_SPECIALIST_TEXT;
+			default:
+				return "Unknown";
+		}
+	}
 }

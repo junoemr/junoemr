@@ -16,5 +16,9 @@
 
 	&.juno-tab-swim-lane {
 		overflow: hidden;
+
+		.juno-button {
+			--button-height: 24px;
+		}
 	}
 }
