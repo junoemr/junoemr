@@ -49,9 +49,11 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModa
 				{
 					ctrl.model = angular.copy(ctrl.resolve.model); // use a copy so we don't modify the real model
 					ctrl.model.sortDataByObservationDate(true);
-					ctrl.labels = ctrl.formatLabels(ctrl.model.data);
-					ctrl.data = [ctrl.formatData(ctrl.model.data)];
-					ctrl.options = ctrl.formatOptions(ctrl.model.data);
+					const dataPoints = ctrl.model.data.filter((value: CareTrackerItemDataModel) => value.observationDateTime && value.observationDateTime.isValid())
+
+					ctrl.labels = ctrl.formatLabels(dataPoints);
+					ctrl.data = [ctrl.formatData(dataPoints)];
+					ctrl.options = ctrl.formatOptions(dataPoints);
 					ctrl.isLoading = false;
 				}
 
