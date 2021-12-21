@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographic.service;
+package org.oscarehr.contact.service;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.oscarehr.contact.dao.ContactDao;

@@ -29,10 +29,11 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class DemographicContactFewTo1 implements Serializable {
-
+public class DemographicContactFewTo1 implements Serializable
+{
 	private static final long serialVersionUID = 1L;
-	
+
+	private Integer id;
 	private String role;
 	private boolean consentToContact;
 	private String sdm;

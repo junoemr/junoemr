@@ -56,7 +56,7 @@ import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
-import org.oscarehr.demographic.service.DemographicContactService;
+import org.oscarehr.contact.service.DemographicContactService;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;

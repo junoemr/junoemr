@@ -25,11 +25,14 @@
 
 package org.oscarehr.contact.transfer;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
 
-public class DemographicContactTo1 implements Serializable {
-
+@Data
+public class DemographicContactTo1 implements Serializable
+{
 	//link to the provider table
 	public static final int TYPE_PROVIDER = 0;
 	//link to the demographic table
@@ -64,147 +67,4 @@ public class DemographicContactTo1 implements Serializable {
 	private Boolean active = true;
 	
 	private String contactName;
-
-	public Integer getId() {
-		return this.id;
-	}
-
-	public Date getCreated() {
-		return created;
-	}
-
-	public void setCreated(Date created) {
-		this.created = created;
-	}
-
-	public boolean isDeleted() {
-		return deleted;
-	}
-
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
-
-	public int getDemographicNo() {
-		return demographicNo;
-	}
-
-	public void setDemographicNo(int demographicNo) {
-		this.demographicNo = demographicNo;
-	}
-
-	public String getContactId() {
-		return contactId;
-	}
-
-	public void setContactId(String contactId) {
-		this.contactId = contactId;
-	}
-
-
-	public Date getUpdateDate() {
-		return updateDate;
-	}
-
-	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
-	}
-
-
-	public String getRole() {
-		return role;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
-	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
-
-	public String getCategory() {
-    	return category;
-    }
-
-	public void setCategory(String category) {
-    	this.category = category;
-    }
-
-	public void setId(Integer id) {
-    	this.id = id;
-    }
-
-
-	public String getContactName() {
-    	return contactName;
-    }
-
-	public void setContactName(String contactName) {
-    	this.contactName = contactName;
-    }
-
-	public String getSdm() {
-    	return sdm;
-    }
-
-	public void setSdm(String sdm) {
-    	this.sdm = sdm;
-    }
-
-	public String getEc() {
-    	return ec;
-    }
-
-	public void setEc(String ec) {
-    	this.ec = ec;
-    }
-
-	public String getNote() {
-    	return note;
-    }
-
-	public void setNote(String note) {
-    	this.note = note;
-    }
-
-
-
-	public int getFacilityId() {
-    	return facilityId;
-    }
-
-	public void setFacilityId(int facilityId) {
-    	this.facilityId = facilityId;
-    }
-
-	public String getCreator() {
-    	return creator;
-    }
-
-	public void setCreator(String creator) {
-    	this.creator = creator;
-    }
-
-	public boolean isConsentToContact() {
-		return consentToContact;
-	}
-
-	public void setConsentToContact(boolean consentToContact) {
-		this.consentToContact = consentToContact;
-	}
-
-	public boolean isActive() {
-		return active;
-	}
-
-	public void setActive(boolean active) {
-		this.active = active;
-	}
-
-	
 }

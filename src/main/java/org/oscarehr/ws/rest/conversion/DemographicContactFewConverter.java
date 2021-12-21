@@ -52,6 +52,7 @@ public class DemographicContactFewConverter {
 		demographicContactFewTo1.setSdm(demographicContact.getSdm());
 		demographicContactFewTo1.setCategory(demographicContact.getCategory());
 		demographicContactFewTo1.setType(demographicContact.getType());
+		demographicContactFewTo1.setId(demographicContact.getId());
 		demographicContactFewTo1.setContactId(demographicContact.getContactId());
 		
 		if (demographicContact.getType() == DemographicContact.TYPE_DEMOGRAPHIC) {
