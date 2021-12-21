@@ -288,18 +288,7 @@ oscarApp.config([
 		.state('ticklers',
 		{
 			url: '/ticklers',
-			templateUrl: 'src/tickler/ticklerList.jsp',
-			controller: 'Tickler.TicklerListController as ticklerListCtrl',
-			resolve:
-			{
-				providers: ['providerService', function(providerService)
-				{
-					return providerService.searchProviders(
-					{
-						active: true
-					});
-				}],
-			}
+			component: "ticklerListController",
 		})
 		.state('search',
 		{
@@ -848,18 +837,7 @@ oscarApp.config([
 		.state('record.tickler',
 		{
 			url: '/tickler',
-			templateUrl: 'src/tickler/ticklerList.jsp',
-			controller: 'Tickler.TicklerListController as ticklerListCtrl',
-			resolve:
-			{
-				providers: ['providerService', function(providerService)
-				{
-					return providerService.searchProviders(
-					{
-						active: true
-					});
-				}]
-			},
+			component: "ticklerListController",
 			meta:
 			{
 				auth: {

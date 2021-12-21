@@ -26,16 +26,15 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
 <div class="tickler-page-header"
-     ng-if="!ticklerListCtrl.inDemographicView()">
-	<!-- TODO-legacy -->
+     ng-if="!$ctrl.inDemographicView()">
 </div>
-<juno-security-check show-placeholder="true" permissions="ticklerListCtrl.SecurityPermissions.TicklerRead">
+<juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.TicklerRead">
 	<div class="col-xs-12" id="tickler-list-page">
 		<form name="searchForm" id="search-form" class="no-print">
 			<div class="row search-filters">
 				<div class="col-lg-2 col-sm-4 col-xs-6">
 					<label>Service Start Date</label>
-					<input ng-model="ticklerListCtrl.search.serviceStartDate" type="text"
+					<input ng-model="$ctrl.search.serviceStartDate" type="text"
 						id="serviceStartDate"
 						name="serviceStartDate"
 						class="form-control"
@@ -48,7 +47,7 @@
 				</div>
 				<div class="col-lg-2 col-sm-4 col-xs-6">
 					<label>Service End Date</label>
-					<input ng-model="ticklerListCtrl.search.serviceEndDate" type="text"
+					<input ng-model="$ctrl.search.serviceEndDate" type="text"
 						id="serviceEndDate"
 						name="serviceEndDate"
 						class="form-control"
@@ -61,7 +60,7 @@
 				</div>
 				<div class="col-lg-2 col-sm-3 col-xs-6">
 					<label>Status</label>
-					<select ng-model="ticklerListCtrl.search.status" name="status" id="status" class="form-control" >
+					<select ng-model="$ctrl.search.status" name="status" id="status" class="form-control" >
 						<option value=""><bean:message key="tickler.list.status" bundle="ui"/></option>
 						<option value="A"><bean:message key="tickler.list.status.active" bundle="ui"/></option>
 						<option value="C"><bean:message key="tickler.list.status.completed" bundle="ui"/></option>
@@ -70,11 +69,11 @@
 				</div>
 				<div class="col-lg-2 col-sm-3 col-xs-6">
 					<label>Priority</label>
-					<select ng-model="ticklerListCtrl.search.priority"
+					<select ng-model="$ctrl.search.priority"
 							name="priority"
 							id="priority"
 							class="form-control"
-							ng-init="ticklerListCtrl.search.priority=''">
+							ng-init="$ctrl.search.priority=''">
 						<option value=""><bean:message key="tickler.list.priority" bundle="ui"/></option>
 						<option value="Normal"><bean:message key="tickler.list.priority.normal" bundle="ui"/></option>
 						<option value="High"><bean:message key="tickler.list.priority.high" bundle="ui"/></option>
@@ -84,34 +83,34 @@
 
 				<div class="col-lg-2 col-sm-3 col-xs-6">
 					<label>Assignee</label>
-					<select ng-model="ticklerListCtrl.search.taskAssignedTo" name="taskAssignedTo"
+					<select ng-model="$ctrl.search.taskAssignedTo" name="taskAssignedTo"
 							id="taskAssignedTo"
 							class="form-control"
-							ng-model="ticklerListCtrl.search.taskAssignedTo"
-							data-ng-options="a.providerNo as a.name for a in ticklerListCtrl.providers"
-							ng-init="ticklerListCtrl.search.taskAssignedTo=''">
+							ng-model="$ctrl.search.taskAssignedTo"
+							data-ng-options="a.providerNo as a.name for a in $ctrl.providers"
+							ng-init="$ctrl.search.taskAssignedTo=''">
 							<option value=""><bean:message key="tickler.list.assignee" bundle="ui"/></option>
 					</select>
 				</div>
 				<div class="col-lg-2 col-sm-3 col-xs-6">
 					<label>Creator</label>
-					<select ng-model="ticklerListCtrl.search.creator"
+					<select ng-model="$ctrl.search.creator"
 							name="creator"
 							id="creator"
 							class="form-control"
-							ng-model="ticklerListCtrl.search.creator"
-							data-ng-options="a.providerNo as a.name for a in ticklerListCtrl.providers" ng-init="ticklerListCtrl.search.creator=''">
+							ng-model="$ctrl.search.creator"
+							data-ng-options="a.providerNo as a.name for a in $ctrl.providers" ng-init="$ctrl.search.creator=''">
 						<option value=""><bean:message key="tickler.list.creator" bundle="ui"/></option>
 					</select>
 				</div>
 				<div class="col-lg-2 col-sm-3 col-xs-6">
 					<label>MRP</label>
-					<select ng-model="ticklerListCtrl.search.mrp" name="mrp"
+					<select ng-model="$ctrl.search.mrp" name="mrp"
 							id="mrp"
 							class="form-control"
-							ng-model="ticklerListCtrl.search.mrp"
-							data-ng-options="a.providerNo as a.name for a in ticklerListCtrl.providers"
-							ng-init="ticklerListCtrl.search.mrp=''">
+							ng-model="$ctrl.search.mrp"
+							data-ng-options="a.providerNo as a.name for a in $ctrl.providers"
+							ng-init="$ctrl.search.mrp=''">
 						<option value=""><bean:message key="tickler.list.allMRP" bundle="ui"/></option>
 					</select>
 				</div>
@@ -119,23 +118,23 @@
 
 			<div class="row search-buttons">
 				<div class="col-xs-12">
-					<button class="btn btn-primary" type="button" ng-click="ticklerListCtrl.doSearch()" ><bean:message key="global.search" bundle="ui"/></button>
-					<button class="btn btn-default" type="button" ng-click="ticklerListCtrl.clear()" ><bean:message key="global.clear" bundle="ui"/></button>
+					<button class="btn btn-primary" type="button" ng-click="$ctrl.doSearch()" ><bean:message key="global.search" bundle="ui"/></button>
+					<button class="btn btn-default" type="button" ng-click="$ctrl.clear()" ><bean:message key="global.clear" bundle="ui"/></button>
 
-					<button class="btn btn-default" type="button" ng-click="ticklerListCtrl.printArea()"><span class="glyphicon glyphicon-print"></span> Print List</button>
+					<button class="btn btn-default" type="button" ng-click="$ctrl.printArea()"><span class="glyphicon glyphicon-print"></span> Print List</button>
 				</div>
 			</div>
 		</form>
 
-		<table ng-table="ticklerListCtrl.tableParams" show-filter="false" class="table table-striped table-bordered tickler-table">
+		<table ng-table="$ctrl.tableParams" show-filter="false" class="table table-striped table-bordered tickler-table">
 			<tbody>
 				<tr ng-repeat="tickler in $data">
 					<td>
 						<input type="checkbox" ng-model="tickler.checked" class="no-print">
 					</td>
 					<td>
-						<button ng-click="ticklerListCtrl.editTickler(tickler)"
-						        ng-disabled="!ticklerListCtrl.canEdit()"
+						<button ng-click="$ctrl.editTickler(tickler)"
+						        ng-disabled="!$ctrl.canEdit()"
 						        class="btn btn-xs btn-primary no-print">
 							<bean:message key="global.edit" bundle="ui"/>
 						</button>
@@ -169,14 +168,14 @@
 					</td>
 					<td data-title="'<bean:message key="tickler.list.header.comments" bundle="ui"/>'">
 						<span ng-if="tickler.ticklerComments != null">
-							<a ng-show="ticklerListCtrl.canEdit()">
-								<span class="glyphicon glyphicon-comment" ng-click="ticklerListCtrl.showComments(tickler)"></span>
+							<a ng-show="$ctrl.canEdit()">
+								<span class="glyphicon glyphicon-comment" ng-click="$ctrl.showComments(tickler)"></span>
 							</a>
 						</span>
 					</td>
 					<td data-title="'<bean:message key="tickler.list.header.note" bundle="ui"/>'">
-						<a ng-show="ticklerListCtrl.canEdit()"
-						   ng-click="ticklerListCtrl.editNote2(tickler)"
+						<a ng-show="$ctrl.canEdit()"
+						   ng-click="$ctrl.editNote2(tickler)"
 						   class="hand-hover no-print">
 							<span class="glyphicon glyphicon-edit" ></span>
 						</a>
@@ -187,24 +186,24 @@
 			<tfoot class="no-print">
 				<tr>
 					<td colspan="12" class="white">
-						<a ng-click="ticklerListCtrl.checkAll($data)"><bean:message key="tickler.list.checkAll" bundle="ui"/></a> -
-						<a ng-click="ticklerListCtrl.checkNone($data)"><bean:message key="tickler.list.checkNone" bundle="ui"/></a> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+						<a ng-click="$ctrl.checkAll($data)"><bean:message key="tickler.list.checkAll" bundle="ui"/></a> -
+						<a ng-click="$ctrl.checkNone($data)"><bean:message key="tickler.list.checkNone" bundle="ui"/></a> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 						<button class="btn btn-danger"
 						        type="button"
-						        ng-disabled="!ticklerListCtrl.canDelete()"
-						        ng-click="ticklerListCtrl.deleteTicklers()">
+						        ng-disabled="!$ctrl.canDelete()"
+						        ng-click="$ctrl.deleteTicklers()">
 							<bean:message key="tickler.list.delete" bundle="ui"/>
 						</button>
 						<button class="btn btn-warning"
 						        type="button"
-						        ng-disabled="!ticklerListCtrl.canEdit()"
-						        ng-click="ticklerListCtrl.completeTicklers()">
+						        ng-disabled="!$ctrl.canEdit()"
+						        ng-click="$ctrl.completeTicklers()">
 							<bean:message key="tickler.list.complete" bundle="ui"/>
 						</button>
 						<button class="btn btn-success"
 						        name="button" type="button"
-						        ng-disabled="!ticklerListCtrl.canCreate()"
-						        ng-click="ticklerListCtrl.addTickler()">
+						        ng-disabled="!$ctrl.canCreate()"
+						        ng-click="$ctrl.addTickler()">
 							<bean:message key="tickler.list.add" bundle="ui"/>
 						</button>
 					</td>
