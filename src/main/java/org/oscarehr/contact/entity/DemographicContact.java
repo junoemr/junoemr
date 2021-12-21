@@ -23,9 +23,10 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.contact.entity;
 
 import com.google.common.collect.Sets;
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -41,7 +42,8 @@ import java.util.Date;
 import java.util.HashSet;
 
 @Entity
-public class DemographicContact extends AbstractModel<Integer> {
+public class DemographicContact extends AbstractModel<Integer>
+{
 
 	//link to the provider table
 	public static final int TYPE_PROVIDER = 0;

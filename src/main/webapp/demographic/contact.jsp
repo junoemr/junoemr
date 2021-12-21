@@ -27,7 +27,7 @@
 <%@ include file="/taglibs.jsp"%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao"%>
-<%@page import="org.oscarehr.common.model.DemographicContact"%>
+<%@page import="org.oscarehr.contact.entity.DemographicContact"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
 <%
 	String id = request.getParameter("id");

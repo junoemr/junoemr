@@ -39,8 +39,8 @@
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.Calendar" %>
 <%@ page import="oscar.oscarReport.data.RptSearchData" %>
-<%@ page import="org.oscarehr.common.model.DemographicContact" %>
-<%@ page import="org.oscarehr.common.model.Contact" %>
+<%@ page import="org.oscarehr.contact.entity.DemographicContact" %>
+<%@ page import="org.oscarehr.contact.entity.Contact" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>

@@ -25,11 +25,11 @@
 --%>
 
 <%@ page import="org.oscarehr.common.web.ContactAction"%>
-<%@ page import="org.oscarehr.common.model.Contact"%>
+<%@ page import="org.oscarehr.contact.entity.Contact"%>
 <%@ page import="org.apache.commons.text.StringEscapeUtils"%>
 <%@ page import="java.util.List" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ page import="org.oscarehr.common.model.DemographicContact" %>
+<%@ page import="org.oscarehr.contact.entity.DemographicContact" %>
 
 <%@ include file="/taglibs.jsp"%>
 

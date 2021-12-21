@@ -23,9 +23,10 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.contact.dao;
 
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
@@ -33,7 +34,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class DemographicContactDao extends AbstractDao<DemographicContact>{
+public class DemographicContactDao extends AbstractDao<DemographicContact>
+{
 
 	public DemographicContactDao() {
 		super(DemographicContact.class);

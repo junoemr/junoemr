@@ -48,9 +48,9 @@
 <%@page import="java.text.DateFormatSymbols"%>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@page import="org.oscarehr.common.model.Demographic" %>
-<%@page import="org.oscarehr.common.model.DemographicContact" %>
+<%@page import="org.oscarehr.contact.entity.DemographicContact" %>
 <%@page import="org.oscarehr.common.model.Relationships" %>
-<%@page import="org.oscarehr.common.dao.DemographicContactDao" %>
+<%@page import="org.oscarehr.contact.dao.DemographicContactDao" %>
 <%@page import="org.oscarehr.common.dao.RelationshipsDao" %>
 <%@ include file="/taglibs.jsp"%>
 <%@include file="/layouts/caisi_html_top.jspf"%>

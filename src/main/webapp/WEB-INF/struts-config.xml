@@ -542,7 +542,7 @@
 		</form-bean>
 
 		<form-bean name="contactForm" type="org.apache.struts.validator.DynaValidatorForm">
-			<form-property name="contact" type="org.oscarehr.common.model.Contact" />
+			<form-property name="contact" type="org.oscarehr.contact.entity.Contact" />
 			<form-property name="pcontact" type="org.oscarehr.common.model.ProfessionalContact" />
 		</form-bean>
 

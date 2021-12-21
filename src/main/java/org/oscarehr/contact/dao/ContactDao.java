@@ -23,10 +23,11 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.contact.dao;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.oscarehr.common.model.Contact;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.contact.entity.Contact;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
@@ -35,7 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class ContactDao extends AbstractDao<Contact> {
+public class ContactDao extends AbstractDao<Contact>
+{
 
 	public ContactDao() {
 		super(Contact.class);

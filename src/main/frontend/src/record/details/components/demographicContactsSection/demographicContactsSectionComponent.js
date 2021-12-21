@@ -107,7 +107,7 @@ angular.module('Record.Details').component('demographicContactsSection', {
                     {
                         ctrl.demoContacts.forEach((contact, index) =>
                         {
-                            if (contact.contactId === updatedContact.contactId)
+                            if (contact.id === updatedContact.id)
                             {
                                 ctrl.demoContacts[index] = updatedContact;
                             }

@@ -23,7 +23,7 @@
  */
 
 
-package org.oscarehr.ws.rest.to.model;
+package org.oscarehr.contact.transfer;
 
 import lombok.Data;
 import java.io.Serializable;
