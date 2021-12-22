@@ -42,6 +42,7 @@
 <%@ page
 	import="org.caisi.model.*, org.oscarehr.common.model.*, org.oscarehr.PMmodule.model.*,org.springframework.context.*,org.springframework.web.context.support.*"%>
 <%@ page import="java.util.Date"%>
+<%@ page import="org.oscarehr.ticklers.entity.Tickler" %>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%

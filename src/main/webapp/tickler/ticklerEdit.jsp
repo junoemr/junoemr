@@ -24,12 +24,12 @@
 
 --%>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
-<%@page import="org.oscarehr.common.dao.TicklerTextSuggestDao" %>
+<%@page import="org.oscarehr.ticklers.dao.TicklerTextSuggestDao" %>
 <%@page import="org.oscarehr.common.model.Demographic" %>
 <%@page import="org.oscarehr.common.model.Provider" %>
-<%@page import="org.oscarehr.common.model.Tickler" %>
-<%@page import="org.oscarehr.common.model.TicklerComment" %>
-<%@page import="org.oscarehr.common.model.TicklerTextSuggest" %>
+<%@page import="org.oscarehr.ticklers.entity.Tickler" %>
+<%@page import="org.oscarehr.ticklers.entity.TicklerComment" %>
+<%@page import="org.oscarehr.ticklers.entity.TicklerTextSuggest" %>
 <%@page import="org.oscarehr.managers.TicklerManager" %>
 <%@page import="org.oscarehr.util.LocaleUtils" %>
 <%@page import="org.oscarehr.util.LoggedInInfo" %>

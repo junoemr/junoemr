@@ -21,57 +21,18 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.model;
+package org.oscarehr.ticklers.dao;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.ticklers.entity.TicklerComment;
+import org.springframework.stereotype.Repository;
 
-@Entity
-@Table(name="tickler_category")
-public class TicklerCategory extends AbstractModel<Integer>  {
+@Repository
+public class TicklerCommentDao extends AbstractDao<TicklerComment>
+{
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	public TicklerCommentDao() {
+		super(TicklerComment.class);
+	}
 	
-	private String category;
-	private String description;
-	private boolean active;
-	
-	@Override
-	public Integer getId() {
-		return id;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public boolean isActive() {
-		return active;
-	}
-
-	public void setActive(boolean active) {
-		this.active = active;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
 }

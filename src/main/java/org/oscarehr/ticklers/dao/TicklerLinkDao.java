@@ -23,17 +23,19 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.ticklers.dao;
 
 import java.util.List;
 
 import javax.persistence.Query;
 
-import org.oscarehr.common.model.TicklerLink;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.ticklers.entity.TicklerLink;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class TicklerLinkDao extends AbstractDao<TicklerLink>{
+public class TicklerLinkDao extends AbstractDao<TicklerLink>
+{
 
 	public TicklerLinkDao() {
 		super(TicklerLink.class);

@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.ticklers.dao;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,16 +31,18 @@ import java.util.Set;
 
 import javax.persistence.Query;
 
+import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.common.model.CustomFilter;
 import org.oscarehr.common.model.CustomFilter.SORTCOLUMN;
 import org.oscarehr.common.model.CustomFilter.SORTDIR;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class TicklerDao extends AbstractDao<Tickler>{
+public class TicklerDao extends AbstractDao<Tickler>
+{
 
 	public TicklerDao() {
 		super(Tickler.class);

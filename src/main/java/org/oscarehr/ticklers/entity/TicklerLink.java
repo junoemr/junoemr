@@ -23,10 +23,11 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.ticklers.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -45,7 +46,8 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="tickler_link")
-public class TicklerLink extends AbstractModel<Integer>{
+public class TicklerLink extends AbstractModel<Integer>
+{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

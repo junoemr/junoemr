@@ -41,7 +41,7 @@
 
 <%@ include file="/ticklerPlus/header.jsp"%>
 
-<%@ page import="org.oscarehr.common.model.Tickler" %>
+<%@ page import="org.oscarehr.ticklers.entity.Tickler" %>
 
 <%@ page import="java.util.Calendar"%>
 <%

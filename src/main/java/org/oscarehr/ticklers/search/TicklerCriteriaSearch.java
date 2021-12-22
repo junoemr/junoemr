@@ -24,7 +24,7 @@ package org.oscarehr.ticklers.search;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 
 import java.util.Date;
@@ -98,7 +98,11 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 
 		if (getMrp() != null)
 		{
-			criteria.add(Restrictions.eq("mrp", getMrp()));
+			String alias = criteria.getAlias();
+
+			// join demographic and only return the result if the assigned mrp matches
+			criteria.createAlias(alias + ".demographic", "demo", Criteria.INNER_JOIN);
+			criteria.add(Restrictions.eq("demo.providerNo", getMrp()));
 		}
 
 		// date searching

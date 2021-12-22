@@ -72,7 +72,7 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Facility;
 import org.oscarehr.common.model.JointAdmission;
 import org.oscarehr.common.model.RoomDemographic;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.managers.BedDemographicManager;
 import org.oscarehr.managers.BedManager;
 import org.oscarehr.managers.RoomDemographicManager;

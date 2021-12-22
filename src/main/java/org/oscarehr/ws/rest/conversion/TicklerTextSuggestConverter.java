@@ -23,7 +23,7 @@
  */
 package org.oscarehr.ws.rest.conversion;
 
-import org.oscarehr.common.model.TicklerTextSuggest;
+import org.oscarehr.ticklers.entity.TicklerTextSuggest;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.TicklerTextSuggestTo1;
 import org.springframework.beans.BeanUtils;

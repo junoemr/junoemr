@@ -22,7 +22,9 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.common.model;
+package org.oscarehr.ticklers.entity;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -37,7 +39,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="tickler_text_suggest")
-public class TicklerTextSuggest extends AbstractModel<Integer>{
+public class TicklerTextSuggest extends AbstractModel<Integer>
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

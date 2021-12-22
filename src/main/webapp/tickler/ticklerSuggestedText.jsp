@@ -24,7 +24,7 @@
 
 --%>
 
-<%@page import="org.oscarehr.common.model.TicklerTextSuggest, org.oscarehr.common.dao.TicklerTextSuggestDao"%>
+<%@page import="org.oscarehr.ticklers.entity.TicklerTextSuggest, org.oscarehr.ticklers.dao.TicklerTextSuggestDao"%>
 <%@page import="org.springframework.web.context.WebApplicationContext, org.springframework.web.context.support.WebApplicationContextUtils"%>
 <!DOCTYPE html>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>

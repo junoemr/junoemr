@@ -46,7 +46,6 @@ angular.module('Tickler').component('ticklerListController', {
 			const ticklerAPI = $resource('../ws/rs/tickler/ticklers');
 			controller.toastService = new ToastService();
 
-			controller.lastResponse = ""; // Can be removed?
 			controller.user = null;
 			controller.providers = [];
 			controller.SecurityPermissions = SecurityPermissions;

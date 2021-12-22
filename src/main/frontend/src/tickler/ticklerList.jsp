@@ -73,7 +73,7 @@
 							name="priority"
 							id="priority"
 							class="form-control"
-							ng-init="$ctrl.search.priority=''">
+							ng-init="$ctrl.search.priority=null">
 						<option value=""><bean:message key="tickler.list.priority" bundle="ui"/></option>
 						<option value="Normal"><bean:message key="tickler.list.priority.normal" bundle="ui"/></option>
 						<option value="High"><bean:message key="tickler.list.priority.high" bundle="ui"/></option>
@@ -88,7 +88,7 @@
 							class="form-control"
 							ng-model="$ctrl.search.taskAssignedTo"
 							data-ng-options="a.providerNo as a.name for a in $ctrl.providers"
-							ng-init="$ctrl.search.taskAssignedTo=''">
+							ng-init="$ctrl.search.taskAssignedTo=null">
 							<option value=""><bean:message key="tickler.list.assignee" bundle="ui"/></option>
 					</select>
 				</div>
@@ -99,7 +99,8 @@
 							id="creator"
 							class="form-control"
 							ng-model="$ctrl.search.creator"
-							data-ng-options="a.providerNo as a.name for a in $ctrl.providers" ng-init="$ctrl.search.creator=''">
+							data-ng-options="a.providerNo as a.name for a in $ctrl.providers"
+							ng-init="$ctrl.search.creator=null">
 						<option value=""><bean:message key="tickler.list.creator" bundle="ui"/></option>
 					</select>
 				</div>
@@ -110,7 +111,7 @@
 							class="form-control"
 							ng-model="$ctrl.search.mrp"
 							data-ng-options="a.providerNo as a.name for a in $ctrl.providers"
-							ng-init="$ctrl.search.mrp=''">
+							ng-init="$ctrl.search.mrp=null">
 						<option value=""><bean:message key="tickler.list.allMRP" bundle="ui"/></option>
 					</select>
 				</div>
