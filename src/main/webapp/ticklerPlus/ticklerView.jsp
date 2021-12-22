@@ -50,7 +50,7 @@
 <br/>
 <%@page import="org.oscarehr.util.SpringUtils"%>
 <%@page import="org.oscarehr.PMmodule.dao.ProgramDao"%>
-<%@page import="org.oscarehr.common.model.Demographic"%>
+<%@page import="org.oscarehr.demographic.model.Demographic"%>
 <%@page import="org.oscarehr.common.model.Provider"%>
 <script>
 	function reassign_tickler() {
@@ -86,10 +86,12 @@
 	String priorityStyle = "";
 	
 	Tickler temp = (Tickler)request.getAttribute("tickler");
-	if(temp != null) {
+	if(temp != null)
+	{
 		Demographic demographic = temp.getDemographic();
-		if(demographic != null) {
-	demographic_name = demographic.getLastName() + "," + demographic.getFirstName();
+		if(demographic != null)
+		{
+			demographic_name = demographic.getFormattedName();
 		}
 		
 		if (temp.getProgramId()!=null) {

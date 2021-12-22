@@ -44,6 +44,7 @@
 <%@ page import="org.oscarehr.ticklers.entity.Tickler" %>
 
 <%@ page import="java.util.Calendar"%>
+<%@ page import="org.oscarehr.demographic.model.Demographic" %>
 <%
 	Calendar now = Calendar.getInstance();
 int curYear = now.get(Calendar.YEAR);
@@ -376,10 +377,10 @@ int curMonth = now.get(Calendar.MONTH) + 1;
 				String late_status = "b";
 				Tickler temp = (Tickler) pageContext.getAttribute("tickler");
 				if (temp != null) {
-					org.oscarehr.common.model.Demographic demographic = temp.getDemographic();
-					if (demographic != null) {
-						demographic_name = demographic.getLastName() + ","
-								+ demographic.getFirstName();
+					Demographic demographic = temp.getDemographic();
+					if (demographic != null)
+					{
+						demographic_name = demographic.getFormattedName();
 					}
 					org.oscarehr.common.model.Provider provider = temp.getProvider();
 					if (provider != null) {

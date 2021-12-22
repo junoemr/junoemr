@@ -39,10 +39,12 @@
 %>
 
 <%@ include file="/taglibs.jsp"%>
-<%@ page
-	import="org.caisi.model.*, org.oscarehr.common.model.*, org.oscarehr.PMmodule.model.*,org.springframework.context.*,org.springframework.web.context.support.*"%>
 <%@ page import="java.util.Date"%>
 <%@ page import="org.oscarehr.ticklers.entity.Tickler" %>
+<%@ page import="org.oscarehr.demographic.model.Demographic" %>
+<%@ page import="org.oscarehr.common.model.Provider" %>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
+<%@ page import="org.springframework.context.ApplicationContext" %>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
