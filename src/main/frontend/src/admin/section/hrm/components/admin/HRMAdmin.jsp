@@ -29,35 +29,34 @@
             <panel-body>
                 <div class="flex-col">
                     <div class="flex-col align-items-start">
-                        <div class="summary-step flex-row align-items-center">
-                            <div class="status" ng-class="$ctrl.getSummaryClass($ctrl.latestResults.getLoginSummary())">Connection</div>
+                        <div class="summary-step m-t-8 m-b-8 flex-row align-items-center">
+                            <div class="status p-4 m-r-24" ng-class="$ctrl.getSummaryClass($ctrl.latestResults.getLoginSummary())">Connection</div>
                             <div class="status-text">{{ $ctrl.getSummaryText($ctrl.latestResults.getLoginSummary()) }}</div>
                         </div>
-                        <div class="summary-step flex-row align-items-center">
-                            <div class="status" ng-class="$ctrl.getSummaryClass($ctrl.latestResults.getDownloadSummary())">Downloading</div>
+                        <div class="summary-step m-t-8 m-b-8 flex-row align-items-center">
+                            <div class="status p-4 m-r-24" ng-class="$ctrl.getSummaryClass($ctrl.latestResults.getDownloadSummary())">Downloading</div>
                             <div class="status-text">{{ $ctrl.getSummaryText($ctrl.latestResults.getDownloadSummary()) }}</div>
                         </div>
-                        <div class="summary-step flex-row align-items-center">
-                            <div class="status" ng-class="$ctrl.getSummaryClass($ctrl.latestResults.getProcessingSummary())">Processing</div>
+                        <div class="summary-step m-t-8 m-b-8 flex-row align-items-center">
+                            <div class="status p-4 m-r-24" ng-class="$ctrl.getSummaryClass($ctrl.latestResults.getProcessingSummary())">Processing</div>
                             <div class="status-text">{{ $ctrl.getSummaryText($ctrl.latestResults.getProcessingSummary()) }}</div>
                         </div>
                     </div>
-                    <div class="summary-footer flex-col align-items-end">
-                        <p>Last checked for reports {{ $ctrl.lastCheckedAsMinutesAgo() }} minutes ago</p>
-                        <p>{{ $ctrl.latestResults.reportsDownloadedCount }} reports downloaded, {{ $ctrl.latestResults.reportsProcessedCount }} reports processed</p>
+                    <div class="summary-footer m-t-4 p-0 flex-col align-items-end">
+                        <p>{{ $ctrl.lastCheckedMessage() }}</p>
+                        <p ng-show="$ctrl.latestResults">{{ $ctrl.latestResults.reportsDownloadedCount }} reports downloaded, {{ $ctrl.latestResults.reportsProcessedCount }} reports processed</p>
                     </div>
                 </div>
             </panel-body>
         </panel>
     <div class="d-flex flex-col justify-content-center align-items-center m-t-24">
-        <div ng-if="!$ctrl.working" class="fetch-container">
-            <juno-button class="download-button"
-                         button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-                         button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-                         click="$ctrl.fetchHRMDocs()">
-                Check For Reports
-            </juno-button>
-        </div>
+		<juno-button ng-if="!$ctrl.working"
+					 class="download-button flex-grow-0 w-256"
+					 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+					 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+					 click="$ctrl.fetchHRMDocs()">
+			Check For Reports
+		</juno-button>
         <div ng-if="$ctrl.working">
             <juno-loading-indicator indicator-type="dot-pulse"></juno-loading-indicator>
         </div>

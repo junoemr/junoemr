@@ -21,8 +21,7 @@
  * Canada
  */
 
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../../common/components/junoComponentConstants";;
-import SystemPreferenceService from "../../../../../lib/system/service/SystemPreferenceService";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE} from "../../../../../common/components/junoComponentConstants";;
 import HrmService from "../../../../../lib/integration/hrm/service/HrmService";
 import {HRMStatus} from "../../../../../lib/integration/hrm/model/HrmFetchResults";
 import moment from "moment";
@@ -31,7 +30,7 @@ angular.module('Admin.Section').component('hrmAdmin',
 	{
 		templateUrl: 'src/admin/section/hrm/components/admin/HRMAdmin.jsp',
 		bindings: {},
-		controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$uibModal', function ($scope, $http, $httpParamSerializer, $state, $uibModal)
+		controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$uibModal', function ($scope)
 		{
 			let ctrl = this;
 			let hrmService = new HrmService();
@@ -99,16 +98,18 @@ angular.module('Admin.Section').component('hrmAdmin',
 					return "error";
 				}
 			}
-			
-			ctrl.lastCheckedAsMinutesAgo = () =>
+
+			ctrl.lastCheckedMessage = () =>
 			{
 				if (!ctrl.latestResults)
 				{
-					return "-";
+					return "Results have not been downloaded today";
 				}
-				
-				const duration = moment.duration(moment().diff(ctrl.latestResults.endTime));
-				return Math.floor(duration.asMinutes());
+				else
+				{
+					const duration = moment.duration(moment().diff(ctrl.latestResults.endTime));
+					return `Last checked ${Math.floor(duration.asMinutes())} minutes ago`;
+				}
 			}
 		}]
 	});

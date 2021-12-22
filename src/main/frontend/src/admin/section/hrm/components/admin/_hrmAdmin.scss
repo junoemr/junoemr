@@ -7,24 +7,17 @@
 
     .summary-step {
       height: 32px;
-      margin: 8px 0;
-
-      &.ok {
-        background: $semantic-success-base;
-      }
 
       .status {
         @include juno-font-button(16px, bold, normal);
 
         width: 192px;
         text-align: center;
-        color: $color-neutral-white;
+        color: var(--color-neutral-white);
         border-radius: 4px;
-        padding: 4px;
-        margin-right: 24px;
 
         &.ok {
-          background: var(--color-lime-base)
+          background: var(--color-lime-darker);
         }
 
         &.warn {
@@ -44,8 +37,6 @@
     .summary-footer {
       p {
         @include juno-font-body-smallest;
-        margin: 4px 0 0 0;
-        padding: 0;
       }
 
     }
