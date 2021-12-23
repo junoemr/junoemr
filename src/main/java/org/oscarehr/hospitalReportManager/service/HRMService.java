@@ -27,7 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 import lombok.Synchronized;
@@ -35,16 +34,15 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
+import org.oscarehr.dataMigration.converter.out.hrm.HrmDocumentDbToModelConverter;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.dataMigration.converter.in.hrm.HrmDocumentModelToDbConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
-import org.oscarehr.dataMigration.parser.hrm.HRMFileParser;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.oscarehr.hospitalReportManager.dto.HRMDemographicDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
-import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
@@ -75,7 +73,10 @@ public class HRMService
 	private HRMReportProcessor reportProcessor;
 	
 	@Autowired
-	private HrmDocumentModelToDbConverter hrmDocumentModelToDbConverter;
+	private HrmDocumentModelToDbConverter modelToEntity;
+
+	@Autowired
+	private HrmDocumentDbToModelConverter entityToModel;
 
 	@Autowired
 	private HRMDocumentDao hrmDocumentDao;
@@ -160,7 +161,7 @@ public class HRMService
 	 */
 	public HRMDocument uploadNewHRMDocument(HrmDocument hrmDocumentModel, Demographic demographic) throws IOException
 	{
-		HRMDocument hrmDocument = hrmDocumentModelToDbConverter.convert(hrmDocumentModel);
+		HRMDocument hrmDocument = modelToEntity.convert(hrmDocumentModel);
 		HRMReportParser.fillDocumentHashData(hrmDocument, hrmDocumentModel.getReportFile());
 
 		// The intent here was to move the document into documents folder as close to the end of the import
@@ -185,13 +186,10 @@ public class HRMService
 			uploadNewHRMDocument(documentModel, demographic);
 		}
 	}
-	
+
 	public boolean isDuplicateReport(HRMDocument model)
 	{
-		// report hash matches = duplicate report for same recipient
-		// no transaction info hash matches = duplicate report, but different recipient TODO handle somewhere?
-		
-		List<Integer> duplicateIds = hrmDocumentDao.findByHash(model.getReportHash());
+		List<Integer> duplicateIds = hrmDocumentDao.findByMessageUniqueId(model.getMessageUniqueId());
 		return duplicateIds != null && duplicateIds.size() > 0;
 	}
 	
@@ -290,40 +288,17 @@ public class HRMService
 
 	public Map<String, HRMDemographicDocument> getHrmDocumentsForDemographic(Integer demographicNo)
 	{
-		List<Integer> doNotShowList = new LinkedList<>();
-		HashMap<String, HRMDocument> labReports = new HashMap<>();
-
 		Map<String, HRMDemographicDocument> out = new HashMap<>();
 
 		List<HRMDocument> allHrmDocsForDemo = hrmDocumentDao.findByDemographicId(demographicNo);
 
 		for (HRMDocument doc : allHrmDocsForDemo)
 		{
-			String facilityId = doc.getSendingFacilityId();
-			String facilityReportId = doc.getSendingFacilityReportId();
-			String deliverToUserId = doc.getDeliverToUserId();
-			
 			// filter duplicate reports
 			String duplicateKey;
-			if (!HRMFileParser.SCHEMA_VERSION.equals(doc.getReportFileSchemaVersion())) // legacy xml lookup
-			{
-				HRMReport hrmReport = HRMReportParser.parseReport(doc.getReportFile(), doc.getReportFileSchemaVersion());
-				if (hrmReport != null)
-				{
-					facilityId = hrmReport.getSendingFacilityId();
-					facilityReportId = hrmReport.getSendingFacilityReportNo();
-					deliverToUserId = hrmReport.getDeliverToUserId();
-				}
-			}
-			
-			// The commented code below is legacy behaviour kept in for reference (for now).
-			// Previously if a message matched on the set { facility, reportId, deliverToUser }, some overly complicated
-			// logic was applied to determine duplication/versioning.
-			
-			// Now, a duplicate is simply an exact match on the contents of the message, minus the transactional segment
+
+			// A duplicate is simply an exact match on the contents of the message, minus the transactional segment
 			// and there is no versioning system.
-			
-			
 			if (ConversionUtils.hasContent(doc.getReportLessTransactionInfoHash()))
 			{
 				duplicateKey = doc.getReportLessTransactionInfoHash();
@@ -333,115 +308,21 @@ public class HRMService
 				// if we are missing too much data (cds imports can cause this), we don't want to filter the reports, just choose a unique key
 				duplicateKey = String.valueOf(doc.getId());
 			}
-			
-			/*
-			// if we are missing too much data (cds imports can cause this), we don't want to filter the reports, just choose a unique key
-			if (facilityId == null && facilityReportId == null)
-			{
-				duplicateKey = String.valueOf(doc.getId());
-			}
-			else
-			{
-				// the key = SendingFacility+':'+ReportNumber+':'+DeliverToUserID as per HRM spec can be used to signify duplicate report
-				duplicateKey = facilityId + ':' + facilityReportId + ':' + deliverToUserId;
-			}*/
-			
+
 			if (!out.containsKey(duplicateKey))
 			{
 				HRMDemographicDocument demographicDocument = new HRMDemographicDocument();
 				demographicDocument.setHrmDocument(doc);
 				out.put(duplicateKey, demographicDocument);
-				
-				labReports.put(duplicateKey, doc);
 			}
 		}
-/*
-
-			List<HRMDocument> relationshipDocs = hrmDocumentDao.findAllDocumentsWithRelationship(doc.getId());
-
-			HRMDocument oldestDocForTree = doc;
-			for(HRMDocument relationshipDoc : relationshipDocs)
-			{
-				if(relationshipDoc.getId().intValue() != doc.getId().intValue())
-				{
-					if(relationshipDoc.getReportDate().compareTo(oldestDocForTree.getReportDate()) >= 0
-						|| relationshipDoc.getReportStatus().equals(HRMDocument.STATUS.CANCELLED))
-					{
-						doNotShowList.add(oldestDocForTree.getId());
-						oldestDocForTree = relationshipDoc;
-					}
-				}
-			}
-
-			boolean addToList = true;
-			for(HRMDemographicDocument demographicDocument: out.values())
-			{
-				HRMDocument displayDoc = demographicDocument.getHrmDocument();
-				if(displayDoc.getId().intValue() == oldestDocForTree.getId().intValue())
-				{
-					addToList = false;
-					break;
-				}
-			}
-
-			for(Integer doNotShowId : doNotShowList)
-			{
-				if(doNotShowId.intValue() == oldestDocForTree.getId().intValue())
-				{
-					addToList = false;
-					break;
-				}
-			}
-
-			if (addToList)
-			{
-				// if no duplicate
-				if (!out.containsKey(duplicateKey))
-				{
-					HRMDemographicDocument demographicDocument = new HRMDemographicDocument();
-					demographicDocument.setHrmDocument(oldestDocForTree);
-
-					out.put(duplicateKey, demographicDocument);
-					labReports.put(duplicateKey, doc);
-				}
-				else // there exists an entry like this one
-				{
-					Integer duplicateIdToAdd;
-
-					HRMDocument previousHrmReport = labReports.get(duplicateKey);
-					HRMDemographicDocument demographicDocument = out.get(duplicateKey);
-
-					// if the current entry is newer than the previous one then replace it, other wise just keep the previous entry
-					if (HRMResultsData.isNewer(doc, previousHrmReport))
-					{
-						HRMDocument previousHRMDocument = demographicDocument.getHrmDocument();
-						duplicateIdToAdd = previousHRMDocument.getId();
-
-						demographicDocument.setHrmDocument(oldestDocForTree);
-						labReports.put(duplicateKey, doc);
-					}
-					else
-					{
-						duplicateIdToAdd = doc.getId();
-					}
-
-					if (demographicDocument.getDuplicateIds() == null)
-					{
-						demographicDocument.setDuplicateIds(new ArrayList<>());
-					}
-
-					demographicDocument.getDuplicateIds().add(duplicateIdToAdd);
-				}
-			}
-		}
-*/
 
 		return out;
 	}
 	
 	public void handleDuplicate(HRMDocument hrmDocument)
 	{
-		List<Integer> matchingDocuments = hrmDocumentDao.findByHash(hrmDocument.getReportHash());
+		List<Integer> matchingDocuments = hrmDocumentDao.findByMessageUniqueId(hrmDocument.getMessageUniqueId());
 		
 		if (matchingDocuments != null && !matchingDocuments.isEmpty())
 		{
@@ -452,7 +333,7 @@ public class HRMService
 		
 		if (matchingDocuments != null && matchingDocuments.size() > 1)
 		{
-			logger.warn(String.format("Multiple HRM documents have the same report hash %s", hrmDocument.getReportHash()));
+			logger.warn(String.format("Multiple HRM documents have the same unique Id %s", hrmDocument.getMessageUniqueId()));
 		}
 	}
 }

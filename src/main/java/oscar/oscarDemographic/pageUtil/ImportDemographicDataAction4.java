@@ -93,7 +93,7 @@ import org.oscarehr.hospitalReportManager.dao.HRMDocumentSubClassDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
+import org.oscarehr.hospitalReportManager.model.HRMObservation;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.dao.ProviderDataDao;
@@ -1944,11 +1944,11 @@ import java.util.zip.ZipInputStream;
 
                         ReportsReceived.OBRContent[] obr = repR[i].getOBRContentArray();
                         for (int j=0; j<obr.length; j++) {
-                            HRMDocumentSubClass hrmDocSc = new HRMDocumentSubClass();
-                            if (obr[j].getAccompanyingSubClass()!=null) hrmDocSc.setSubClass(obr[j].getAccompanyingSubClass());
-                            if (obr[j].getAccompanyingDescription()!=null) hrmDocSc.setSubClassDescription(obr[j].getAccompanyingDescription());
-                            if (obr[j].getAccompanyingMnemonic()!=null) hrmDocSc.setSubClassMnemonic(obr[j].getAccompanyingMnemonic());
-                            if (obr[j].getObservationDateTime()!=null) hrmDocSc.setSubClassDateTime(dateTimeFPtoDate(obr[j].getObservationDateTime(), timeShiftInDays));
+                            HRMObservation hrmDocSc = new HRMObservation();
+                            if (obr[j].getAccompanyingSubClass()!=null) hrmDocSc.setAccompanyingSubClassName(obr[j].getAccompanyingSubClass());
+                            if (obr[j].getAccompanyingDescription()!=null) hrmDocSc.setAccompanyingSubClassDescription(obr[j].getAccompanyingDescription());
+                            if (obr[j].getAccompanyingMnemonic()!=null) hrmDocSc.setAccompanyingSubClassMnemonic(obr[j].getAccompanyingMnemonic());
+                            if (obr[j].getObservationDateTime()!=null) hrmDocSc.setAccompanyingSubClassObrDate(dateTimeFPtoDate(obr[j].getObservationDateTime(), timeShiftInDays));
                             hrmDocSc.setHrmDocument(hrmDoc);
                             hrmDocSc.setActive(true);
                             hrmDocSubClassDao.persist(hrmDocSc);

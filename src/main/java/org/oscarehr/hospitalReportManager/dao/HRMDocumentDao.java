@@ -63,6 +63,14 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 		List<Integer> matches = query.getResultList();
 		return matches;
 	}
+
+	public List<Integer> findByMessageUniqueId(String uniqueId) {
+		String sql = "select distinct x.id from " + this.modelClass.getName() + " x where x.messageUniqueId = :uniqueId";
+		Query query = entityManager.createQuery(sql);
+		query.setParameter("uniqueId", uniqueId);
+		List<Integer> matches = query.getResultList();
+		return matches;
+	}
 	
 	public List<HRMDocument> findByNoTransactionInfoHash(String hash) {
 		String sql = "select x from " + this.modelClass.getName() + " x where x.reportLessTransactionInfoHash=?1";

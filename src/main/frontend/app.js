@@ -170,14 +170,29 @@ oscarApp.config([
 		})
 		.state('admin.hrm',
 		{
-			url: '/hrmAdmin',
+			url: '/hrm',
+			component: 'hrmIndex'
+		})
+		.state('admin.hrm.admin',
+		{
+			url: '/admin',
 			component: 'hrmAdmin',
 		})
-        .state('admin.iMDHealth',
-        {
-            url: '/imdHealth',
-            component: 'imdHealthAdmin',
-        })
+		.state('admin.hrm.settings',
+		{
+			url: '/settings',
+			component: 'hrmSettings',
+		})
+		.state('admin.hrm.category',
+		{
+			url: '/category',
+			component: 'hrmCategory',
+		})
+        	.state('admin.iMDHealth',
+        	{
+            		url: '/imdHealth',
+            		component: 'imdHealthAdmin',
+        	})
 		.state('admin.iceFall',
 		{
 			url: '/iceFall',
