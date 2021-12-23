@@ -36,7 +36,7 @@ import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.HRMReport;
-import org.oscarehr.hospitalReportManager.model.HRMFetchResults;
+import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
 import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +78,7 @@ public class HRMReportProcessor
 	 * @param doDecrypt decrypt file prior to parsing and routing
 	 * @param results storage object, contains result of the processing operation.
 	 */
-	public void processHRMFiles(List<GenericFile> unprocessedFiles, boolean doDecrypt, HRMFetchResults results)
+	public void processHRMFiles(List<GenericFile> unprocessedFiles, boolean doDecrypt, HrmFetchResultsModel results)
 	{
 		LocalDate today = LocalDate.now();
 		

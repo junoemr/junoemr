@@ -69,7 +69,7 @@
     }
 
     String gender = hrmReport.getGender();
-    String dateOfBirth = hrmReport.getDateOfBirthAsString();
+    String dateOfBirth = hrmReport.getDateOfBirth().map(ConversionUtils::toDateString).orElse("");
 
     String address1 = hrmReport.getAddressLine1();
     String address2 = hrmReport.getAddressLine2();
@@ -78,23 +78,17 @@
     String postalCode = hrmReport.getPostalCode();
     String province = hrmReport.getCountrySubDivisionCode().replaceAll("\\w{2}-", "");
 
-    String deliverToLastName = hrmReport.getDeliverToUserIdLastName();
-    String deliverToFirstName = hrmReport.getDeliverToUserIdFirstName();
+    String deliverToLastName = hrmReport.getDeliverToUserLastName();
+    String deliverToFirstName = hrmReport.getDeliverToUserFirstName();
     String deliverToId = hrmReport.getDeliverToUserId();
 
     String sendingFacilityId = hrmReport.getSendingFacilityId();
     String reportNumber = hrmReport.getSendingFacilityReportNo();
 
-    Date reportTime = findReportTime(hrmReport);
+    LocalDateTime reportTime = findReportTime(hrmReport);
 
     // I think author is an optional field
-    String author = "";
-    List<String> authorNameParts = hrmReport.getFirstReportAuthorPhysician();
-    if (authorNameParts != null && !authorNameParts.isEmpty())
-    {
-        authorNameParts.remove(0);
-    }
-    author = StringUtils.trimToNull(String.join(" ", authorNameParts));
+    String author = hrmReport.getAuthorPhysician();
 
     String facilityName = (String) request.getAttribute("facilityName");
 %>
@@ -117,6 +111,7 @@
 <%@ page import="org.oscarehr.dataMigration.model.hrm.HrmDocument" %>
 <%@ page import="org.oscarehr.hospitalReportManager.service.HRMCategoryService" %>
 <%@ page import="org.oscarehr.dataMigration.model.hrm.HrmCategoryModel" %>
+<%@ page import="java.time.LocalDateTime" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%!
@@ -140,23 +135,23 @@
         return fieldContent;
     }
 
-    Date findReportTime(HRMReport report)
+    LocalDateTime findReportTime(HRMReport report)
     {
-    	Date reportTime = null;
+    	LocalDateTime reportTime = null;
 
-    	if (report.getFirstReportEventTime() != null)
+    	if (report.getEventTime().isPresent())
         {
-        	reportTime = report.getFirstReportEventTime().getTime();
+        	reportTime = report.getEventTime().get();
         }
-    	else if (report.getFirstAccompanyingSubClassDateTime() != null)
+    	else if (report.getFirstAccompanyingSubClassDateTime().isPresent())
         {
-        	reportTime = report.getFirstAccompanyingSubClassDateTime().getTime();
+        	reportTime = report.getFirstAccompanyingSubClassDateTime().get();
         }
 
     	return reportTime;
     }
 
-    String getFieldDisplayClass(Date fieldContent)
+    String getFieldDisplayClass(LocalDateTime fieldContent)
     {
     	if (fieldContent == null)
         {
@@ -166,15 +161,14 @@
     	return "";
     }
 
-    String getFieldDisplayValue(Date fieldContent)
+    String getFieldDisplayValue(LocalDateTime fieldContent)
     {
         if (fieldContent == null)
         {
             return "UNKNOWN";
         }
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return dateFormat.format(fieldContent);
+        return ConversionUtils.toDateTimeString(fieldContent);
     }
 %>
 <html>
@@ -465,9 +459,18 @@
 				url: "<%=request.getContextPath() %>/hospitalReportManager/Modify.do",
 				data: "method=assignProvider&reportId=" + reportId + "&providerNo=" + providerNo,
 				success: function(data) {
-					if (data != null)
-						$("provstatus" + reportId).innerHTML = data;
-				}
+					if (data.success)
+					{
+						alert("Successfully assigned provider");
+					}
+					else
+					{
+						alert("Could not assign provider to report");
+					}
+				},
+				error: function(err) {
+					alert("Could not assign provider to report");
+				},
 			});
 		}
 
@@ -477,8 +480,7 @@
 				url: "<%=request.getContextPath() %>/hospitalReportManager/Modify.do",
 				data: "method=removeProvider&providerMappingId=" + mappingId,
 				success: function(data) {
-					if (data != null)
-						$("provstatus" + reportId).innerHTML = data;
+					alert("Provider removed from report");
 				}
 			});
 		}
@@ -636,9 +638,9 @@
                 Please use the link to view/download the content contained within.
             </div>
             <% } %>
-            <a href="<%=request.getContextPath() %>/hospitalReportManager/HRMDownloadFile.do?id=<%=documentId%>"><%=(hrmReport.getLegalLastName() + "_" + hrmReport.getLegalFirstName() + "_" +  hrmReport.getFirstReportClass() + hrmReport.getFileExtension()).replaceAll("\\s", "_") %></a>
+            <a href="<%=request.getContextPath() %>/hospitalReportManager/HRMDownloadFile.do?id=<%=documentId%>"><%=(hrmReport.getLegalLastName() + "_" + hrmReport.getLegalFirstName() + "_" +  hrmReport.getClassName() + hrmReport.getFileExtension()).replaceAll("\\s", "_") %></a>
             <% } else { %>
-            <div class="<%=getFieldClass(hrmReport.getFirstReportTextContent())%>"><%=ConversionUtils.hasContent(hrmReport.getFirstReportTextContent()) ? hrmReport.getFirstReportTextContent() : "NO CONTENT"%></div>
+            <div class="<%=getFieldClass(hrmReport.getTextContent())%>"><%=ConversionUtils.hasContent(hrmReport.getTextContent()) ? hrmReport.getTextContent() : "NO CONTENT"%></div>
             <% } %>
             <%
                 String confidentialityStatement = (String) request.getAttribute("confidentialityStatement");
@@ -671,12 +673,12 @@
                 </tr>
                 <tr>
                     <td>Status:</td>
-                    <% if (hrmDocument.getReportStatus() == null) { %>
-                    <td class="attention">Unsigned/Unknown</td>
+                    <% if (hrmDocument.getReportStatus().equals(HRMDocument.STATUS.SIGNED)) { %>
+                    <td class="attention">Signed by author</td>
                     <% } else if (hrmDocument.getReportStatus().equals(HRMDocument.STATUS.CANCELLED)) { %>
                     <td class="attention">Cancelled</td>
                     <% } else { %>
-                    <td>Signed by author</td>
+                    <td>Unsigned / Unknown</td>
                     <% } %>
                 </tr>
                 <tr>
@@ -807,9 +809,10 @@
                 <tr><th colspan="2">Embedded Report Information</th></tr>
                 <tr>
                     <td>Report Class:</td>
-                    <td><%=hrmReport.getFirstReportClass()%></td>
+                    <td><%=hrmReport.getClassName()%></td>
                 </tr>
-                <% if (hrmReport.getFirstReportClass().equalsIgnoreCase("Diagnostic Imaging Report") || hrmReport.getFirstReportClass().equalsIgnoreCase("Cardio Respiratory Report")) { %>
+                <% if (hrmReport.getClassName().equals(HrmDocument.ReportClass.DIAGNOSTIC_IMAGING.getValue()) ||
+							   hrmReport.getClassName().equals(HrmDocument.ReportClass.CARDIO_RESPIRATORY.getValue())) { %>
                     <%
                         List<HrmObservation> hrmObservations = hrmReport.getObservations();
                     %>
@@ -829,8 +832,8 @@
                         </tr>
                     <% } %>
                 <% } else {
-                    if (hrmReport.getFirstReportSubClass() != null) {
-                        String[] subClassFromReport = hrmReport.getFirstReportSubClass().split("\\^");
+                    if (!hrmReport.getSubClassName().isEmpty()) {
+                        String[] subClassFromReport = hrmReport.getSubClassName().split("\\^");
                         String subClassDisplay = "";
                         if (subClassFromReport.length == 1)
                         {

@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.hospitalReportManager.model.HRMFetchResults;
+import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
@@ -75,7 +75,7 @@ public class HRMSftpService
 	 * @return List of downloaded HRM files
 	 */
 	@Synchronized
-	protected List<GenericFile> pullHRMFromSource(HRMFetchResults results)
+	protected List<GenericFile> pullHRMFromSource(HrmFetchResultsModel results)
 	{
 		JSch jsch = new JSch();
 		Session session = null;

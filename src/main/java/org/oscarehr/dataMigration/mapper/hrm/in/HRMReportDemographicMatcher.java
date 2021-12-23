@@ -49,8 +49,8 @@ public class HRMReportDemographicMatcher extends AbstractHRMImportMapper<HRMRepo
 		searchParams.setHin(importStructure.getHCN());
 		searchParams.setSex(importStructure.getGender());
 		searchParams.setLastName(importStructure.getLegalLastName());
-		importStructure.getDateOfBirthAsLocalDate()
-			.ifPresent(searchParams::setDateOfBirth);
+
+		importStructure.getDateOfBirth().ifPresent(searchParams::setDateOfBirth);
 		
 		// Additional parameters
 		searchParams.setHealthCardProvince(extractSubRegionCode(importStructure.getHCNProvinceCode()));

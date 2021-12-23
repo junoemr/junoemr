@@ -46,7 +46,7 @@ import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
-import org.oscarehr.hospitalReportManager.model.HRMFetchResults;
+import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,14 +90,14 @@ public class HRMService
 	private Logger logger = MiscUtils.getLogger();
 	
 	// Access only via synchronized methods
-	private HRMFetchResults lastFetchResults = null;
+	private HrmFetchResultsModel lastFetchResults = null;
 	
 	/**
 	 * Get the results of the last fetch operation
 	 * @return
 	 */
 	@Synchronized
-	public HRMFetchResults getLastFetchResults()
+	public HrmFetchResultsModel getLastFetchResults()
 	{
 		return this.lastFetchResults;
 	}
@@ -108,9 +108,9 @@ public class HRMService
 	 * @return object containing results of the operation
 	 */
 	@Synchronized
-	public HRMFetchResults consumeRemoteHRMDocuments()
+	public HrmFetchResultsModel consumeRemoteHRMDocuments()
 	{
-		HRMFetchResults results = new HRMFetchResults();
+		HrmFetchResultsModel results = new HrmFetchResultsModel();
 		List<GenericFile> downloadedFiles = sftpService.pullHRMFromSource(results);
 		reportProcessor.processHRMFiles(downloadedFiles, true, results);
 		
@@ -125,9 +125,9 @@ public class HRMService
 	 * @return object containing results of the operation
 	 */
 	@Synchronized
-	HRMFetchResults consumeLocalHRMDocuments(Path localHRMPath)
+	HrmFetchResultsModel consumeLocalHRMDocuments(Path localHRMPath)
 	{
-		HRMFetchResults results = new HRMFetchResults();
+		HrmFetchResultsModel results = new HrmFetchResultsModel();
 		results.setLoginSuccess(true);
 		results.setReportsDownloaded(0);
 		results.setDownloadSuccess(true);

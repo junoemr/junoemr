@@ -24,7 +24,7 @@
 package org.oscarehr.hospitalReportManager.service;
 
 import lombok.Synchronized;
-import org.oscarehr.hospitalReportManager.model.HRMFetchResults;
+import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.PeriodicTrigger;
@@ -63,9 +63,9 @@ public class HRMScheduleService
 	 * If a local override is present, will read from that location instead of using sftp connection.
 	 */
 	@Synchronized
-	public HRMFetchResults scheduleFetchNow() throws InterruptedException, ExecutionException, TimeoutException
+	public HrmFetchResultsModel scheduleFetchNow() throws InterruptedException, ExecutionException, TimeoutException
 	{
-		HRMFetchResults results;
+		HrmFetchResultsModel results;
 		
 		if (OscarProperties.getInstance().getProperty("omd.hrm.local_download_override") == null)
 		{

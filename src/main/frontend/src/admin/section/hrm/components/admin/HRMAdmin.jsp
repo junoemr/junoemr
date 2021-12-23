@@ -44,7 +44,7 @@
                     </div>
                     <div class="summary-footer m-t-4 p-0 flex-col align-items-end">
                         <p>{{ $ctrl.lastCheckedMessage() }}</p>
-                        <p ng-show="$ctrl.latestResults">{{ $ctrl.latestResults.reportsDownloadedCount }} reports downloaded, {{ $ctrl.latestResults.reportsProcessedCount }} reports processed</p>
+                        <p ng-show="$ctrl.latestResults">{{ $ctrl.latestResults.reportsDownloaded }} reports downloaded, {{ $ctrl.latestResults.reportsProcessed }} reports processed</p>
                     </div>
                 </div>
             </panel-body>

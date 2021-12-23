@@ -30,10 +30,10 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 /**
- * Holds aggregate statistics pertaining to the HRM Fetch task
+ * Holds telemetry gathered for a HRMFetch task.
  */
 @Data
-public class HRMFetchResults
+public class HrmFetchResultsModel
 {
 	private int reportsDownloaded = 0;
 	private int reportsProcessed = 0;

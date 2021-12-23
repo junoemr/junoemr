@@ -31,7 +31,7 @@ angular.module('Admin.Section').component('hrmSettings',
 		controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$uibModal', function ($scope, $http, $httpParamSerializer, $state, $uibModal)
 		{
 			let ctrl = this;
-			let systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
+			const systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
 
 			ctrl.user = "";
 			ctrl.address = "";
