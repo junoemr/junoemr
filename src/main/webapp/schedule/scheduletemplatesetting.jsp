@@ -79,41 +79,17 @@ function setfocus()
 
 function selectprovider(s)
 {
-	self.location.href = "scheduletemplateapplying.jsp?provider_no=" + s.options[s.selectedIndex].value + "&provider_name=" + urlencode(s.options[s.selectedIndex].text);
-}
-
-function urlencode(str)
-{
-	var ns = (navigator.appName == "Netscape") ? 1 : 0;
-	if (ns)
-	{
-		return escape(str);
-	}
-	var ms = "%25#23 20+2B?3F<3C>3E{7B}7D[5B]5D|7C^5E~7E`60";
-	var msi = 0;
-	var i, c, rs, ts;
-	while (msi < ms.length)
-	{
-		c = ms.charAt(msi);
-		rs = ms.substring(++msi, msi + 2);
-		msi += 2;
-		i = 0;
-		while (true)
-		{
-			i = str.indexOf(c, i);
-			if (i == -1) break;
-			ts = str.substring(0, i);
-			str = ts + "%" + rs + str.substring(++i, str.length);
-		}
-	}
-	return str;
+	console.info(encodeURIComponent(s.options[s.selectedIndex].text));
+	self.location.href = "scheduletemplateapplying.jsp?provider_no=" + s.options[s.selectedIndex].value +
+		"&provider_name=" + encodeURIComponent(s.options[s.selectedIndex].text);
 }
 
 function go()
 {
-	var s = document.schedule.providerid.value;
-	var u = 'scheduleedittemplate.jsp?providerid=' + s + '&providername=' + urlencode(document.schedule.providerid.options[document.schedule.providerid.selectedIndex].text);
-	popupPage(390, 700, u);
+	var providerId = document.schedule.providerid.value;
+	var url = 'scheduleedittemplate.jsp?providerid=' + providerId +
+		'&providername=' + encodeURIComponent(document.schedule.providerid.options[document.schedule.providerid.selectedIndex].text);
+	popupPage(390, 700, url);
 }
 </script>
 </head>
