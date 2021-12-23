@@ -22,6 +22,10 @@
  */
 package org.oscarehr.schedule.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.oscarehr.common.model.Appointment;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -67,6 +71,9 @@ public class AppointmentDetails
 	private boolean isVirtual;
 	private boolean isConfirmed;
 	private Integer creatorSecurityId;
+	@Getter
+	@Setter
+	private Appointment.VirtualAppointmentType virtualAppointmentType;
 
 	public AppointmentDetails(
 		Integer appointmentNo,
@@ -107,7 +114,8 @@ public class AppointmentDetails
 		String ticklerMessages,
 		boolean isVirtual,
 		boolean isConfirmed,
-		Integer creatorSecurityId
+		Integer creatorSecurityId,
+		Appointment.VirtualAppointmentType virtualAppointmentType
 	)
 	{
 		this.appointmentNo = appointmentNo;
@@ -149,6 +157,7 @@ public class AppointmentDetails
 		this.ticklerMessages = ticklerMessages;
 		this.isVirtual = isVirtual;
 		this.isConfirmed = isConfirmed;
+		this.virtualAppointmentType = virtualAppointmentType;
 	}
 
 	public Integer getAppointmentNo()

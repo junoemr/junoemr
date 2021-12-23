@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -35,6 +36,8 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.AppointmentStatus;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,12 +46,14 @@ import java.util.NoSuchElementException;
 
 import static org.mockito.Mockito.when;
 
-public class AppointmentStatusServiceTest
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class AppointmentStatusServiceTest extends DaoTestFixtures
 {
 	/**
 	 * Used when the unit test is highly coupled to the DAO
 	 */
-	protected AppointmentStatusService appointmentStatusService = SpringUtils.getBean(AppointmentStatusService.class);
+	protected AppointmentStatusService appointmentStatusService;
 	
 	/**
 	 * Used when the unit test doesn't require explicit modification of the DAO
@@ -59,18 +64,12 @@ public class AppointmentStatusServiceTest
 	
 	@Mock
 	AppointmentStatusDao mockDao;
-	
-	@BeforeClass
-	public static void init() throws Exception
-	{
-		DaoTestFixtures.setupBeanFactory();
-	}
 
 	@Before
 	public void before() throws Exception
 	{
-		SchemaUtils.restoreTable("appointment_status");
 		MockitoAnnotations.initMocks(this);
+		SchemaUtils.restoreTable("appointment_status");
 	}
 	
 	/**

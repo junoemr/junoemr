@@ -25,7 +25,6 @@ package org.oscarehr.provider.service;
 
 import org.oscarehr.provider.dao.RecentDemographicAccessDao;
 import org.oscarehr.provider.model.RecentDemographicAccess;
-import org.oscarehr.provider.model.RecentDemographicAccessPK;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,18 +57,8 @@ public class RecentDemographicAccessService
 	 */
 	public synchronized void updateAccessRecord(Integer providerNo, Integer demographicNo)
 	{
-		RecentDemographicAccessPK primaryKey = new RecentDemographicAccessPK(providerNo, demographicNo);
-		RecentDemographicAccess record = recentDemographicAccessDao.find(primaryKey);
-		if(record == null)
-		{
-			record = new RecentDemographicAccess(providerNo, demographicNo);
-			record.setAccessDateTimeToNow();
-			recentDemographicAccessDao.persist(record);
-		}
-		else
-		{
-			record.setAccessDateTimeToNow();
-			recentDemographicAccessDao.merge(record);
-		}
+		RecentDemographicAccess record = new RecentDemographicAccess(providerNo, demographicNo);
+		record.setAccessDateTimeToNow();
+		recentDemographicAccessDao.upsert(record);
 	}
 }

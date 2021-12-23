@@ -70,8 +70,8 @@ public class PhoneNumber {
      * <p>
      * You are getting this "catch-all" property because of the following reason: 
      * The field name "Extension" is used by two different parts of a schema. See: 
-     * line 546 of file:/mnt/robert.junoemr.com/oscarhost/source/oscar_emr/src/main/resources/org/oscarehr/common/xml/hrm/v4_3/report_manager_dt.xsd
-     * line 541 of file:/mnt/robert.junoemr.com/oscarhost/source/oscar_emr/src/main/resources/org/oscarehr/common/xml/hrm/v4_3/report_manager_dt.xsd
+     * line 546 of file:/home/chris.semiao/source/juno_spring_boot/src/main/resources/org/oscarehr/common/xml/hrm/v4_3/report_manager_dt.xsd
+     * line 541 of file:/home/chris.semiao/source/juno_spring_boot/src/main/resources/org/oscarehr/common/xml/hrm/v4_3/report_manager_dt.xsd
      * <p>
      * To get rid of this property, apply a property customization to one 
      * of both of the following declarations to change their names: 

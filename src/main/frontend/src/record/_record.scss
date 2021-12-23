@@ -13,44 +13,19 @@
 			font-size: 20px;
 		}
 	}
-	#record-nav {
-
-		$border-bottom-size: 4px;
-		@include juno-tab-md(calc(#{$page-tabs-height} - #{$border-bottom-size}));
-		@include juno-tab-color-scheme-white($border-bottom-size);
-		@include juno-font-tab;
-
-		@include juno-breakpoints(1600px, $screen-nav-md, $screen-nav-sm);
-	}
 
 	.page-fill-wrapper {
 		position: relative;
 
 		.primary-content-window {
-			@include juno-page-padding-default;
-
 			position: absolute;
 			inset: 0;
 
 			overflow-y: auto;
 
-      @media print {
-        overflow: unset;
-        height: auto;
-      }
-		}
-	}
-
-	.sub-nav {
-		.dropdown-menu {
-			background-color: #fff;
-			li {
-				a {
-					color: #636363;
-				}
-				a:hover {
-					background-color: #ebebeb;
-				}
+			@media print {
+				overflow: unset;
+				height: auto;
 			}
 		}
 	}

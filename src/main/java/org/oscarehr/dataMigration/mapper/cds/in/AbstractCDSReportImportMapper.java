@@ -20,6 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
+
 package org.oscarehr.dataMigration.mapper.cds.in;
 
 import org.oscarehr.common.io.FileFactory;
@@ -39,6 +40,7 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -76,8 +78,8 @@ public abstract class AbstractCDSReportImportMapper<E> extends AbstractCDSImport
 				else
 				{
 					String fileExtension = importStructure.getFileExtensionAndVersion();
-					byte[] base64Media = getReportContent(importStructure).getMedia();
-					tempFile = FileFactory.createTempFile(new ByteArrayInputStream(base64Media), "." + fileExtension.toLowerCase());
+					byte[] media = getReportContent(importStructure).getMedia();
+					tempFile = FileFactory.createTempFile(new ByteArrayInputStream(media), "." + fileExtension.toLowerCase());
 				}
 			}
 			else //text report
@@ -112,7 +114,7 @@ public abstract class AbstractCDSReportImportMapper<E> extends AbstractCDSImport
 		return provider;
 	}
 
-	protected Reviewer getReviewer(List<Reports.ReportReviewed> reviewers)
+	protected Reviewer getFirstReviewer(List<Reports.ReportReviewed> reviewers)
 	{
 		Reviewer reviewer = null;
 		if(reviewers != null && !reviewers.isEmpty())
@@ -123,6 +125,21 @@ public abstract class AbstractCDSReportImportMapper<E> extends AbstractCDSImport
 			reviewer.setOhipNumber(reviewed.getReviewingOHIPPhysicianId());
 		}
 		return reviewer;
+	}
+
+	protected List<Reviewer> getReviewers(List<Reports.ReportReviewed> reviews)
+	{
+		List<Reviewer> reviewers = new ArrayList<>();
+		for (Reports.ReportReviewed review : reviews)
+		{
+			Reviewer reviewer = Reviewer.fromProvider(toProvider(review.getName()));
+			reviewer.setReviewDateTime(PartialDateTime.from(toNullablePartialDate(review.getDateTimeReportReviewed())));
+			reviewer.setOhipNumber(review.getReviewingOHIPPhysicianId());
+
+			reviewers.add(reviewer);
+		}
+
+		return reviewers;
 	}
 
 	private ReportContent getReportContent(Reports importStructure) throws InvalidDocumentException

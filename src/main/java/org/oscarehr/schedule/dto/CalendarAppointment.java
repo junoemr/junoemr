@@ -25,6 +25,7 @@ package org.oscarehr.schedule.dto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.oscarehr.common.model.Appointment;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -72,6 +73,7 @@ public class CalendarAppointment implements Serializable
 	private boolean isConfirmed;
 	private Integer creatorSecurityId;
 	private String bookingSource;
+	private Appointment.VirtualAppointmentType virtualAppointmentType;
 
 	public CalendarAppointment()
 	{}
@@ -85,7 +87,7 @@ public class CalendarAppointment implements Serializable
 	                           String notes, String tagNames, String site, String type,
 	                           String resources, String urgency, boolean doNotBook, boolean tagSelfBooked,
 	                           boolean tagSelfCancelled, boolean virtual, String tagSystemCodes, boolean isConfirmed,
-	                           Integer creatorSecurityId,  String bookingSource, boolean critical)
+	                           Integer creatorSecurityId,  String bookingSource, boolean critical, Appointment.VirtualAppointmentType virtualAppointmentType)
 	{
 		this.appointmentNo = appointmentNo;
 		this.billingRegion = billingRegion;
@@ -121,6 +123,7 @@ public class CalendarAppointment implements Serializable
 		this.creatorSecurityId = creatorSecurityId;
 		this.bookingSource = bookingSource;
 		this.critical = critical;
+		this.virtualAppointmentType = virtualAppointmentType;
 	}
 
 	@Override
@@ -160,12 +163,14 @@ public class CalendarAppointment implements Serializable
 				Objects.equals(tagSystemCodes, that.tagSystemCodes) &&
 				Objects.equals(isConfirmed, that.isConfirmed) &&
 				Objects.equals(bookingSource, that.bookingSource) &&
-				Objects.equals(creatorSecurityId, that.creatorSecurityId);
+				Objects.equals(creatorSecurityId, that.creatorSecurityId) &&
+				Objects.equals(virtualAppointmentType, that.virtualAppointmentType);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(appointmentNo, billingRegion, billingForm, billingRdohip, userProviderNo, userFirstName, userLastName, demographicDob, demographicName, demographicPhone, demographicNo, providerNo, startTime, endTime, eventStatusCode, eventStatusModifier, numInvoices, reason, notes, tagNames, site, type, resources, urgency, tagSelfBooked, tagSelfCancelled, tagSystemCodes, bookingSource, creatorSecurityId, critical);
+		return Objects.hash(appointmentNo, billingRegion, billingForm, billingRdohip, userProviderNo, userFirstName, userLastName, demographicDob, demographicName, demographicPhone, demographicNo, providerNo, startTime, endTime, eventStatusCode,
+				eventStatusModifier, numInvoices, reason, notes, tagNames, site, type, resources, urgency, tagSelfBooked, tagSelfCancelled, tagSystemCodes, bookingSource, creatorSecurityId, critical, virtualAppointmentType);
 	}
 }

@@ -24,6 +24,29 @@
 package org.oscarehr.ws.rest;
 
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.StreamingOutput;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
@@ -56,29 +79,9 @@ import org.oscarehr.ws.rest.to.model.SummaryTo1;
 import org.oscarehr.ws.rest.transfer.DashboardTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.oscarProvider.data.ProviderMyOscarIdData;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import oscar.OscarProperties;
+import oscar.oscarProvider.data.ProviderMyOscarIdData;
 
 
 
@@ -255,6 +258,7 @@ public class RecordUxService extends AbstractServiceImpl {
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		String loggedInProviderId = getLoggedInProviderId();
+		OscarProperties properties = OscarProperties.getInstance();
 
 		logger.debug("getting summary:"+summaryName+" for demo "+demographicNo+"  loggedInInfo "+loggedInInfo);
 		List<SummaryTo1> summaryList = null;
@@ -347,15 +351,20 @@ public class RecordUxService extends AbstractServiceImpl {
 			}
 
 			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.FORM_READ, Permission.EFORM_READ)
-					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ASSESSMENTS_POS))
+				&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.ASSESSMENTS_POS))
 			{
 				summaryList.add(new SummaryTo1("Forms", count++, SummaryTo1.FORMS_CODE));
+			}
+			
+			if(properties.isModuleEnabled(OscarProperties.Module.MODULE_HRM)
+					&& securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.HRM_READ))
+			{
+				summaryList.add(new SummaryTo1("HRM Documents", count++, SummaryTo1.HRM_DOCUMENTS));
 			}
 		}
 		return summaryList;
 	}
 	
-
 	private static final Map<String, String> MY_MAP = createMap();
 
     private static Map<String, String> createMap() {
@@ -376,7 +385,8 @@ public class RecordUxService extends AbstractServiceImpl {
 		result.put("incoming","labsDocsSummary");
 		result.put("dssupport","decisionSupportSummary");
 		result.put("allergies","allergiesSummary");
-		result.put("riskfactors","issueNoteSummary"); 
+		result.put("riskfactors","issueNoteSummary");
+		result.put("hrmdocuments", "HRMDocumentSummary");
 		
         return Collections.unmodifiableMap(result);
     }

@@ -391,6 +391,8 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueueWebService"/>
 			<!-- AQS -->
+
+            		<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService"/>
             <bean autowire="byName" class="org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService"/>
             <bean autowire="byName" class="org.oscarehr.ws.rest.LabWebService"/>

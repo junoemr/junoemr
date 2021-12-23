@@ -61,7 +61,7 @@ import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.Y_INDICATOR_TRU
 @Component
 public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper<I, E>
 {
-	private static final Logger logger = Logger.getLogger(AbstractCDSImportMapper.class);
+	protected static final Logger logger = Logger.getLogger(AbstractCDSImportMapper.class);
 
 	public AbstractCDSImportMapper()
 	{

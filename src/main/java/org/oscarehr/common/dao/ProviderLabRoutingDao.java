@@ -148,9 +148,10 @@ public class ProviderLabRoutingDao extends AbstractDao<ProviderLabRoutingModel> 
 			" proLR.timestamp " +
 			"FROM providerLabRouting proLR " +
 			"LEFT JOIN document doc ON proLR.lab_type = 'DOC' AND proLR.lab_no = doc.document_no AND doc.status <> 'D' " +
+			"LEFT JOIN HRMDocument hrm ON proLR.lab_type = 'HRM' AND proLR.lab_no = hrm.id " +
 			"LEFT JOIN hl7TextInfo lab ON proLR.lab_type = 'HL7' AND proLR.lab_no = lab.lab_no " +
 			"LEFT JOIN hl7TextInfo lab2 ON lab.accessionNum = lab2.accessionNum AND (lab2.obr_date > lab.obr_date OR (lab2.obr_date = lab.obr_date AND lab2.lab_no > lab.lab_no)) " +
-			"WHERE (doc.document_no IS NOT NULL OR lab.lab_no IS NOT NULL) " +
+			"WHERE (doc.document_no IS NOT NULL OR lab.lab_no IS NOT NULL OR hrm.id IS NOT NULL) " +
 			"AND proLR.provider_no = :provider_no " +
 			"AND proLR.status = :status " +
 			"AND lab2.lab_no IS NULL " +

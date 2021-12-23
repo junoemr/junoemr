@@ -240,8 +240,10 @@
 	<bean id="integrationPushUpdateSchedulingTask" class="org.oscarehr.integration.schedulingTasks.IntegrationPushUpdateSchedulingTask" autowire="byName"/>
 
 	<!-- CLINICAID -->
-	<bean id="clinicaidAPIService" class="org.oscarehr.integration.clinicaid.service.ClinicaidAPIService" autowire="byName"/>
-	<bean id="clinicaidSessionManager" class="org.oscarehr.integration.clinicaid.service.ClinicaidSessionManager" autowire="byName"/>
+    <bean id="clinicaidAPIService" class="org.oscarehr.integration.clinicaid.service.ClinicaidAPIService" autowire="byName"/>
+    <bean id="clinicAidService" class="org.oscarehr.integration.clinicaid.service.v2.ClinicAidService" autowire="byName"/>
+    <bean id="clinicAidCommunicationService" class="org.oscarehr.integration.clinicaid.service.v2.ClinicAidCommunicationService" autowire="byName"/>
+    <bean id="clinicaidSessionManager" class="org.oscarehr.integration.clinicaid.service.ClinicaidSessionManager" autowire="byName"/>
 
     <!-- TELEHEALTH -->
     <bean id="myHealthAccessService" class="org.oscarehr.telehealth.service.MyHealthAccessService" autowire="byName"/>

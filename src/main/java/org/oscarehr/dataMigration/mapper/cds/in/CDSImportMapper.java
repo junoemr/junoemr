@@ -225,6 +225,9 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, org.oscareh
 
 	private boolean isHrmDocument(Reports report)
 	{
-		return (report.getHRMResultStatus() != null && !report.getOBRContent().isEmpty());
+		// Any of these fields are specific to HRM Reports
+		return (report.getHRMResultStatus() != null ||
+			report.getSendingFacilityId() != null ||
+			report.getSendingFacilityReport() != null);
 	}
 }
