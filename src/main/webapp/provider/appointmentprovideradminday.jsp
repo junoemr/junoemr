@@ -53,7 +53,7 @@
 <%@ page import="org.oscarehr.schedule.model.ScheduleTemplate" %>
 <%@ page import="org.oscarehr.common.dao.OscarAppointmentDao" %>
 <%@ page import="org.oscarehr.common.model.Appointment" %>
-<%@ page import="org.oscarehr.common.model.Tickler" %>
+<%@ page import="org.oscarehr.ticklers.entity.Tickler" %>
 <%@ page import="org.oscarehr.managers.TicklerManager" %>
 <%@page import="org.oscarehr.managers.ProgramManager2"%>
 <%@page import="org.oscarehr.PMmodule.model.ProgramProvider"%>

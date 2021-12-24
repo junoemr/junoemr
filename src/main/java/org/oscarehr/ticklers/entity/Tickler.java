@@ -21,13 +21,16 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.model;
+package org.oscarehr.ticklers.entity;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.oscarehr.PMmodule.model.Program;
+import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.LocaleUtils;
 
 import javax.persistence.CascadeType;
@@ -58,7 +61,8 @@ import java.util.Set;
 
 @Entity
 @Table(name="tickler")
-public class Tickler extends AbstractModel<Integer> {
+public class Tickler extends AbstractModel<Integer>
+{
 
 	//These fields can be phased out in favor for the enums
 	public static final String ACTIVE  = "A";
@@ -409,7 +413,7 @@ public class Tickler extends AbstractModel<Integer> {
          public static final Comparator<Tickler> DemographicNameAscComparator = new Comparator<Tickler>() {
         @Override
 	public int compare(Tickler t1, Tickler t2) {          
-            int compareVal = (Demographic.FormattedNameComparator.compare(t1.getDemographic(),t2.getDemographic()));
+            int compareVal = (Tickler.FormattedNameComparator.compare(t1.getDemographic(),t2.getDemographic()));
             
             //if there are more than one ticklers for a given demographic name, order them in ascending order by service date
             if (compareVal == 0) {
@@ -423,7 +427,7 @@ public class Tickler extends AbstractModel<Integer> {
     public static final Comparator<Tickler> DemographicNameDescComparator = new Comparator<Tickler>() {
         @Override
 	public int compare(Tickler t1, Tickler t2) {          
-            int compareVal = (Demographic.FormattedNameComparator.compare(t2.getDemographic(),t1.getDemographic()));
+            int compareVal = (Tickler.FormattedNameComparator.compare(t2.getDemographic(),t1.getDemographic()));
             if (compareVal == 0) {
                 compareVal = t2.getServiceDate().compareTo(t1.getServiceDate());
             }
@@ -582,6 +586,15 @@ public class Tickler extends AbstractModel<Integer> {
             return compareVal;
 	}
     };
+
+	public static final Comparator<Demographic> FormattedNameComparator = new Comparator<Demographic>()
+	{
+		@Override
+		public int compare(Demographic dm1, Demographic dm2)
+		{
+			return dm1.getFormattedName().compareToIgnoreCase(dm2.getFormattedName());
+		}
+	};
 
 	public Integer getCategoryId() {
 		return categoryId;

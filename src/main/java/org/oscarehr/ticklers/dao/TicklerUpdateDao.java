@@ -21,13 +21,15 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.ticklers.dao;
 
-import org.oscarehr.common.model.TicklerUpdate;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.ticklers.entity.TicklerUpdate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class TicklerUpdateDao extends AbstractDao<TicklerUpdate>{
+public class TicklerUpdateDao extends AbstractDao<TicklerUpdate>
+{
 
 	public TicklerUpdateDao() {
 		super(TicklerUpdate.class);

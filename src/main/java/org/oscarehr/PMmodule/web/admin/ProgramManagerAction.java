@@ -87,7 +87,7 @@ import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.BedCheckTime;
 import org.oscarehr.common.model.Facility;
 import org.oscarehr.common.model.FunctionalCentre;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.managers.BedCheckTimeManager;
 import org.oscarehr.managers.TicklerManager;
 import org.oscarehr.match.IMatchManager;

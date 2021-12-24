@@ -20,7 +20,7 @@ import org.oscarehr.common.dao.CaseloadDao;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.MsgDemoMapDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
-import org.oscarehr.common.dao.TicklerDao;
+import org.oscarehr.ticklers.dao.TicklerDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.MessageList;

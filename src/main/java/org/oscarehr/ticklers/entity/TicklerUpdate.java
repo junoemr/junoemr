@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.model;
+package org.oscarehr.ticklers.entity;
 
 import java.util.Date;
 
@@ -41,10 +41,13 @@ import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.common.model.Provider;
 
 @Entity
 @Table(name="tickler_update")
-public class TicklerUpdate extends AbstractModel<Integer> {
+public class TicklerUpdate extends AbstractModel<Integer>
+{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

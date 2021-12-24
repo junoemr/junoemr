@@ -21,7 +21,7 @@
  * Canada
  */
 
-package org.oscarehr.ticklers.model;
+package org.oscarehr.ticklers.entity;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

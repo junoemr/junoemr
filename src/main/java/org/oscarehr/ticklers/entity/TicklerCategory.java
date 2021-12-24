@@ -21,27 +21,60 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.ticklers.entity;
 
-import java.util.List;
+import org.oscarehr.common.model.AbstractModel;
 
-import javax.persistence.Query;
-import org.oscarehr.common.model.TicklerCategory;
-import org.springframework.stereotype.Repository;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-@Repository
-public class TicklerCategoryDao extends AbstractDao<TicklerCategory> {
+@Entity
+@Table(name="tickler_category")
+public class TicklerCategory extends AbstractModel<Integer>
+{
 
-	protected TicklerCategoryDao() {
-		super(TicklerCategory.class);
-	}
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 	
-	@SuppressWarnings("unchecked")
-	public List<TicklerCategory> getActiveCategories() {
-		String sql = "SELECT x FROM TicklerCategory x WHERE x.active = true ORDER BY x.category";
-		Query query = entityManager.createQuery(sql);		
-		List<TicklerCategory> results = query.getResultList();
-		return results;
+	private String category;
+	private String description;
+	private boolean active;
+	
+	@Override
+	public Integer getId() {
+		return id;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 }

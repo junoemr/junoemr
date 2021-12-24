@@ -83,7 +83,7 @@ import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Site;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.common.service.PdfRecordPrinter;
 import org.oscarehr.common.web.ContactAction;
 import org.oscarehr.eyeform.MeasurementFormatter;

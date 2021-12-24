@@ -21,16 +21,30 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
+package org.oscarehr.ticklers.dao;
 
-import org.oscarehr.common.model.TicklerComment;
+import java.util.List;
+
+import javax.persistence.Query;
+
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.ticklers.entity.TicklerCategory;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class TicklerCommentDao extends AbstractDao<TicklerComment>{
+public class TicklerCategoryDao extends AbstractDao<TicklerCategory>
+{
 
-	public TicklerCommentDao() {
-		super(TicklerComment.class);
+	protected TicklerCategoryDao() {
+		super(TicklerCategory.class);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public List<TicklerCategory> getActiveCategories() {
+		String sql = "SELECT x FROM TicklerCategory x WHERE x.active = true ORDER BY x.category";
+		Query query = entityManager.createQuery(sql);		
+		List<TicklerCategory> results = query.getResultList();
+		return results;
+	}
+
 }

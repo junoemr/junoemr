@@ -29,7 +29,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.ticklers.dao.CDMTicklerDao;
 import org.oscarehr.ticklers.dao.TicklersDao;
-import org.oscarehr.ticklers.model.CDMTicklerInfo;
+import org.oscarehr.ticklers.entity.CDMTicklerInfo;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
