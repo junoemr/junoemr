@@ -8,15 +8,7 @@
  */
 package org.oscarehr.olis;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -28,13 +20,20 @@ import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarLab.FileUploadCheck;
 import oscar.oscarLab.ca.all.upload.HandlerClassFactory;
 import oscar.oscarLab.ca.all.upload.handlers.OLISHL7Handler;
 import oscar.oscarLab.ca.on.CommonLabResultData;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 
 public class OLISAddToInboxAction extends DispatchAction {
 
@@ -47,8 +46,8 @@ public class OLISAddToInboxAction extends DispatchAction {
 		String providerNo=loggedInInfo.getLoggedInProviderNo();
 		
 		String uuidToAdd = request.getParameter("uuid");
-		String pFile = request.getParameter("file");
-		String pAck = request.getParameter("ack");
+		String pFile = StringUtils.trimToNull(request.getParameter("file"));
+		String pAck = StringUtils.trimToNull(request.getParameter("ack"));
 		boolean doFile = false, doAck = false;
 		if (pFile != null && pFile.equals("true")) {
 			doFile = true;
@@ -82,7 +81,7 @@ public class OLISAddToInboxAction extends DispatchAction {
 					if (doAck) {
 						String demographicID = getDemographicIdFromLab("HL7", msgUploadHandler.getLastSegmentId());
 						LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACK, LogConst.CON_HL7_LAB, "" + msgUploadHandler.getLastSegmentId(), request.getRemoteAddr(), demographicID);
-						CommonLabResultData.updateReportStatus(msgUploadHandler.getLastSegmentId(), providerNo, ProviderInboxItem.ACK, "comment", "HL7");
+						CommonLabResultData.updateReportStatus(msgUploadHandler.getLastSegmentId(), providerNo, ProviderInboxItem.ACK, "auto-acknowledged from olis search", "HL7");
 
 					}
 				} else {

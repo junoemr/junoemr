@@ -32,40 +32,32 @@
 <script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/sortable.js"></script>
 
 <script type="text/javascript">
-	function addToInbox(uuid) {
+	function addToInbox(uuid, params="")
+	{
 		jQuery(uuid).attr("disabled", "disabled");
 		jQuery.ajax({
-			url: "<%=request.getContextPath() %>/olis/AddToInbox.do",
+			url: "<%=request.getContextPath() %>/olis/AddToInbox.do" + params,
 			data: "uuid=" + uuid,
 			success: function(data) {
 				jQuery("#" + uuid + "_result").html(data);
 			}
 		});
 	}
-	function preview(uuid) {
+	function save(uuid)
+	{
+		return addToInbox(uuid);
+	}
+	function saveAndFile(uuid)
+	{
+		return addToInbox(uuid, "?file=true");
+	}
+	function saveAndAck(uuid)
+	{
+		return addToInbox(uuid, "?ack=true");
+	}
+	function preview(uuid)
+	{
 		reportWindow('<%=request.getContextPath()%>/lab/CA/ALL/labDisplayOLIS.jsp?segmentID=0&preview=true&uuid=' + uuid);
-	}
-
-	function save(uuid) {
-		jQuery(uuid).attr("disabled", "disabled");
-		jQuery.ajax({
-			url: "<%=request.getContextPath() %>/olis/AddToInbox.do",
-			data: "uuid=" + uuid + "&file=true",
-			success: function(data) {
-				jQuery("#" + uuid + "_result").html(data);
-			}
-		});
-	}
-
-	function ack(uuid) {
-		jQuery(uuid).attr("disabled", "disabled");
-		jQuery.ajax({
-			url: "<%=request.getContextPath() %>/olis/AddToInbox.do?ack=true",
-			data: "uuid=" + uuid + "&ack=true",
-			success: function(data) {
-				jQuery("#" + uuid + "_result").html(data);
-			}
-		});
 	}
 
 	var patientFilter = "";
@@ -336,13 +328,13 @@
 							    reportingLaboratory="<%=result.getReportingFacilityName()%>">
 								<td>
 									<div id="<%=resultUuid %>_result"></div>
-									<input type="button" onClick="addToInbox('<%=resultUuid %>'); return false;" id="<%=resultUuid %>" value="Add to Inbox" />
+									<input type="button" onClick="save('<%=resultUuid %>'); return false;" id="<%=resultUuid %>" value="Add to Inbox" />
 								</td>
 								<td>
-									<input type="button" onClick="save('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_save" value="Save/File" />
+									<input type="button" onClick="saveAndFile('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_save" value="Save/File" />
 								</td>
 								<td>
-									<input type="button" onClick="ack('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_ack" value="Acknowledge" />
+									<input type="button" onClick="saveAndAck('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_ack" value="Acknowledge" />
 								</td>
 								<td>
 									<input type="button" onClick="preview('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_preview" value="Preview" />
