@@ -27,9 +27,10 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import com.google.common.collect.Sets;
-import java.util.HashSet;
 import org.apache.commons.lang.StringUtils;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
+
+import java.util.HashSet;
 
 /**
  * Handler for:
@@ -42,14 +43,14 @@ public class AHSRuralDIHandler extends AHSHandler
 	public static final String AHS_RURAL_DI_LAB_TYPE = "AHS-RDI";
 
 	protected static final String AHS_RDI_SENDING_APPLICATION = "RAD";
-	protected static final HashSet<String> AHS_RDI_SENDING_FACILITIES = Sets.newHashSet(
-		"AHR-AWLA", // .arad
-		"CHR-CLRH", // .crad
-		"DTHR-DRDH", // .drad
-		"ECHR-ESMH", // .erad
-		"PHR-LMHA", // .lrad
-		"NLHR-NNLA", // .nrad
-		"PCHR-PQEA" // .prad
+	protected static final HashSet<String> AHS_RDI_SENDING_FACILITY_PREFIXES = Sets.newHashSet(
+		"AHR-", // .arad
+		"CHR-", // .crad
+		"DTHR-", // .drad
+		"ECHR-", // .erad
+		"PHR-", // .lrad
+		"NLHR-", // .nrad
+		"PCHR-" // .prad
 	);
 
 	public static boolean handlerTypeMatch(Message message)
@@ -61,10 +62,10 @@ public class AHSRuralDIHandler extends AHSHandler
 			MSH messageHeaderSegment = msh.getMSH();
 
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
-			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
+			String sendingFacility = StringUtils.trimToEmpty(messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue());
 
 			return AHS_RDI_SENDING_APPLICATION.equalsIgnoreCase(sendingApplication) &&
-				AHS_RDI_SENDING_FACILITIES.contains(sendingFacility.toUpperCase());
+					AHS_RDI_SENDING_FACILITY_PREFIXES.stream().anyMatch(sendingFacility::startsWith);
 		}
 		return false;
 	}
