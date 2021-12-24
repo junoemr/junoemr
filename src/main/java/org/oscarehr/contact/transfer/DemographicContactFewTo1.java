@@ -21,25 +21,42 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.dao;
 
-import java.util.List;
 
-import javax.persistence.Query;
-import org.oscarehr.common.model.ContactSpecialty;
-import org.springframework.stereotype.Repository;
+package org.oscarehr.contact.transfer;
 
-@Repository
-public class ContactSpecialtyDao extends AbstractDao<ContactSpecialty> {
+import lombok.Data;
+import java.io.Serializable;
 
-	protected ContactSpecialtyDao() {
-	    super(ContactSpecialty.class);
-    }
+@Data
+public class DemographicContactFewTo1 implements Serializable
+{
+	private static final long serialVersionUID = 1L;
 
-	public List<ContactSpecialty> findAll() {
-		Query findAll = entityManager.createNamedQuery("ContactSpecialty.findAll");
-		List<ContactSpecialty> contactSpecialtyList = findAll.getResultList();		
-		return contactSpecialtyList;
-	}
+	private Integer id;
+	private String role;
+	private boolean consentToContact;
+	private String sdm;
+	private String ec;
+	private String category;
+	private String contactId;
+	private int type;
+	private String lastName;
+	private String firstName;
+	private String middleName;
+	private String address;
+	private String address2;
+	private String city;
+	private String postal;
+	private String province;
 
+	private String homePhone;
+	private String cellPhone;
+	private String workPhone;
+	private String hPhoneExt;
+	private String wPhoneExt;
+	private String cPhoneExt;
+	private String fax;
+	private String email;
+	private String note;
 }

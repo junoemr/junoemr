@@ -23,29 +23,54 @@
  */
 
 
-package org.oscarehr.ws.rest.to.model;
+package org.oscarehr.contact.entity;
 
-import java.io.Serializable;
+import com.google.common.collect.Sets;
+import org.oscarehr.common.model.AbstractModel;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreRemove;
+import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import java.util.Date;
+import java.util.HashSet;
 
-public class DemographicContactTo1 implements Serializable {
+@Entity
+public class DemographicContact extends AbstractModel<Integer>
+{
 
 	//link to the provider table
 	public static final int TYPE_PROVIDER = 0;
+	public static final String TYPE_PROVIDER_TEXT = "Provider";
 	//link to the demographic table
 	public static final int TYPE_DEMOGRAPHIC = 1;
+	public static final String TYPE_DEMOGRAPHIC_TEXT = "Demographic";
 	//link to the contact table
 	public static final int TYPE_CONTACT = 2;
+	public static final String TYPE_CONTACT_TEXT = "Contact";
 	//link to the professional specialists table
 	public static final int TYPE_PROFESSIONALSPECIALIST = 3;
+	public static final String TYPE_PROFESSIONAL_SPECIALIST_TEXT = "Professional Specialist";
 
 	public static final String CATEGORY_PERSONAL = "personal";
 	public static final String CATEGORY_PROFESSIONAL = "professional";
 
+	public static final HashSet<String> ALL_CATEGORIES = Sets.newHashSet(CATEGORY_PERSONAL, CATEGORY_PROFESSIONAL);
+
 
 	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date created;
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date updateDate;
 	private boolean deleted;
 	private int demographicNo;
@@ -63,8 +88,12 @@ public class DemographicContactTo1 implements Serializable {
 	private Boolean consentToContact = true;
 	private Boolean active = true;
 	
+	@Transient
 	private String contactName;
+	@Transient
+	private Contact details;
 
+	@Override
 	public Integer getId() {
 		return this.id;
 	}
@@ -119,6 +148,16 @@ public class DemographicContactTo1 implements Serializable {
 		this.role = role;
 	}
 
+	public Boolean getConsentToContact()
+	{
+		return consentToContact;
+	}
+
+	public void setConsentToContact(Boolean consentToContact)
+	{
+		this.consentToContact = consentToContact;
+	}
+
 	public int getType() {
 		return type;
 	}
@@ -134,11 +173,6 @@ public class DemographicContactTo1 implements Serializable {
 	public void setCategory(String category) {
     	this.category = category;
     }
-
-	public void setId(Integer id) {
-    	this.id = id;
-    }
-
 
 	public String getContactName() {
     	return contactName;
@@ -172,8 +206,6 @@ public class DemographicContactTo1 implements Serializable {
     	this.note = note;
     }
 
-
-
 	public int getFacilityId() {
     	return facilityId;
     }
@@ -189,6 +221,17 @@ public class DemographicContactTo1 implements Serializable {
 	public void setCreator(String creator) {
     	this.creator = creator;
     }
+
+	@PreRemove
+	protected void jpa_preventDelete() {
+		throw (new UnsupportedOperationException("Remove is not allowed for this type of item."));
+	}
+
+	@PrePersist
+	@PreUpdate
+	protected void jpa_updateTimestamp() {
+		this.setUpdateDate(new Date());
+	}
 
 	public boolean isConsentToContact() {
 		return consentToContact;
@@ -206,5 +249,28 @@ public class DemographicContactTo1 implements Serializable {
 		this.active = active;
 	}
 
-	
+	public Contact getDetails() {
+	    return details;
+    }
+
+	public void setDetails(Contact details) {
+	    this.details = details;
+    }
+
+	public String getTypeLabel()
+	{
+		switch(type)
+		{
+			case TYPE_PROVIDER:
+				return TYPE_PROVIDER_TEXT;
+			case TYPE_DEMOGRAPHIC:
+				return TYPE_DEMOGRAPHIC_TEXT;
+			case TYPE_CONTACT:
+				return TYPE_CONTACT_TEXT;
+			case TYPE_PROFESSIONALSPECIALIST:
+				return TYPE_PROFESSIONAL_SPECIALIST_TEXT;
+			default:
+				return "Unknown";
+		}
+	}
 }

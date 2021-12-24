@@ -23,17 +23,19 @@
  */
 
 
-package org.oscarehr.common.dao;
+package org.oscarehr.contact.dao;
 
-import org.hibernate.NonUniqueResultException;
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public class DemographicContactDao extends AbstractDao<DemographicContact>{
+public class DemographicContactDao extends AbstractDao<DemographicContact>
+{
 
 	public DemographicContactDao() {
 		super(DemographicContact.class);
@@ -84,26 +86,23 @@ public class DemographicContactDao extends AbstractDao<DemographicContact>{
 		return dContacts;
 	}
 
-	public List<DemographicContact> find(int demographicNo, int contactId) {
-		String sql = "select x from " + this.modelClass.getName() + " x where x.demographicNo=?1 and x.contactId = ?2 and x.deleted=false";
+	public DemographicContact find(int demographicNo, String contactId, int type)
+	{
+		String sql = "select x from " + this.modelClass.getName() + " x where " +
+				"x.demographicNo=:demographicId AND " +
+				"x.contactId = :contactId AND " +
+				"x.type=:type AND " +
+				"x.deleted=false";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, demographicNo);
-		query.setParameter(2, new Integer(contactId).toString());
-		@SuppressWarnings("unchecked")
-		List<DemographicContact> dContacts = query.getResultList();
-		return dContacts;
+		query.setParameter("demographicId", demographicNo);
+		query.setParameter("contactId", contactId);
+		query.setParameter("type", type);
+		return getSingleResultOrNull(query);
 	}
 
-	public DemographicContact find(int demographicNo, String contactId, String category) throws NonUniqueResultException
+	public Optional<DemographicContact> findOptional(int demographicNo, String contactId, int type)
 	{
-		Query query = entityManager.createQuery("SELECT x FROM DemographicContact x WHERE x.demographicNo = :demographicNo AND x.contactId = :contactId AND x.category = :category AND x.deleted = false");
-		query.setParameter("demographicNo", demographicNo);
-		query.setParameter("contactId", contactId);
-		query.setParameter("category", category);
-
-		@SuppressWarnings("unchecked")
-		DemographicContact dContact = (DemographicContact) query.getSingleResult();
-		return dContact;
+		return Optional.ofNullable(find(demographicNo, contactId, type));
 	}
 
 	public List<DemographicContact> findAllByContactIdAndCategoryAndType(int contactId, String category, int type) {

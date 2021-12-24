@@ -21,7 +21,9 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.common.model;
+package org.oscarehr.contact.entity;
+
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -34,7 +36,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name="ContactSpecialty")
 @NamedQueries({@NamedQuery(name = "ContactSpecialty.findAll", query = "SELECT c FROM ContactSpecialty c ORDER BY c.specialty")})
-public class ContactSpecialty extends AbstractModel<Integer> {
+public class ContactSpecialty extends AbstractModel<Integer>
+{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

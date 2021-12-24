@@ -23,9 +23,10 @@
  */
 
 
-package org.oscarehr.common.model;
+package org.oscarehr.contact.entity;
 
 import lombok.Data;
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.Entity;
@@ -45,7 +46,8 @@ import java.util.Date;
 @Entity
 @Inheritance(strategy=InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name="type")
-public class Contact extends AbstractModel<Integer> {
+public class Contact extends AbstractModel<Integer>
+{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

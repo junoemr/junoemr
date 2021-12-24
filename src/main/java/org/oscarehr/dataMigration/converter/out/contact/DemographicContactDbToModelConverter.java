@@ -23,8 +23,8 @@
 package org.oscarehr.dataMigration.converter.out.contact;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.oscarehr.common.dao.ContactDao;
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.contact.dao.ContactDao;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
 import org.oscarehr.dataMigration.converter.out.DemographicDbToModelConverter;
@@ -33,10 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
-import static org.oscarehr.common.model.DemographicContact.TYPE_CONTACT;
-import static org.oscarehr.common.model.DemographicContact.TYPE_DEMOGRAPHIC;
-import static org.oscarehr.common.model.DemographicContact.TYPE_PROFESSIONALSPECIALIST;
-import static org.oscarehr.common.model.DemographicContact.TYPE_PROVIDER;
+import static org.oscarehr.contact.entity.DemographicContact.TYPE_CONTACT;
+import static org.oscarehr.contact.entity.DemographicContact.TYPE_DEMOGRAPHIC;
+import static org.oscarehr.contact.entity.DemographicContact.TYPE_PROFESSIONALSPECIALIST;
+import static org.oscarehr.contact.entity.DemographicContact.TYPE_PROVIDER;
 import static org.oscarehr.dataMigration.model.contact.DemographicContact.CATEGORY;
 
 @Component

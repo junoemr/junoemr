@@ -25,10 +25,13 @@
 
 package org.oscarehr.common.model;
 
+import org.oscarehr.contact.entity.Contact;
+
 import javax.persistence.Entity;
 
 @Entity
-public class ProfessionalContact extends Contact {
+public class ProfessionalContact extends Contact
+{
 	
 	private String specialty;	
 	private String cpso;

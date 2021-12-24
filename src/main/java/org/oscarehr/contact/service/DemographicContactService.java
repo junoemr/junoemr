@@ -20,12 +20,12 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographic.service;
+package org.oscarehr.contact.service;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.oscarehr.common.dao.ContactDao;
-import org.oscarehr.common.dao.DemographicContactDao;
-import org.oscarehr.common.model.Contact;
+import org.oscarehr.contact.dao.ContactDao;
+import org.oscarehr.contact.dao.DemographicContactDao;
+import org.oscarehr.contact.entity.Contact;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.dataMigration.converter.in.contact.DemographicContactModelToDbConverter;
 import org.oscarehr.dataMigration.converter.in.contact.ExternalContactModelToDbConverter;
@@ -41,10 +41,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.oscarehr.common.model.DemographicContact.TYPE_CONTACT;
-import static org.oscarehr.common.model.DemographicContact.TYPE_DEMOGRAPHIC;
-import static org.oscarehr.common.model.DemographicContact.TYPE_PROFESSIONALSPECIALIST;
-import static org.oscarehr.common.model.DemographicContact.TYPE_PROVIDER;
+import static org.oscarehr.contact.entity.DemographicContact.TYPE_CONTACT;
+import static org.oscarehr.contact.entity.DemographicContact.TYPE_DEMOGRAPHIC;
+import static org.oscarehr.contact.entity.DemographicContact.TYPE_PROFESSIONALSPECIALIST;
+import static org.oscarehr.contact.entity.DemographicContact.TYPE_PROVIDER;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -62,9 +62,9 @@ public class DemographicContactService
 	@Autowired
 	private ContactDao contactDao;
 
-	public org.oscarehr.common.model.DemographicContact addNewContact(DemographicContact demographicContactModel, Demographic demographic)
+	public org.oscarehr.contact.entity.DemographicContact addNewContact(DemographicContact demographicContactModel, Demographic demographic)
 	{
-		org.oscarehr.common.model.DemographicContact dbContact = demographicContactModelToDbConverter.convert(demographicContactModel);
+		org.oscarehr.contact.entity.DemographicContact dbContact = demographicContactModelToDbConverter.convert(demographicContactModel);
 		dbContact.setDemographicNo(demographic.getId());
 
 		// check if contact needs to be saved first
