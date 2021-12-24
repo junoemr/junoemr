@@ -39,7 +39,7 @@ public class MeasurementsDataBeanToCareTrackerItemDataConverter extends Abstract
 		careTrackerItemData.setId(input.getId());
 		careTrackerItemData.setValue(input.getDataField());
 		careTrackerItemData.setComment(StringUtils.trimToNull(input.getComments()));
-		careTrackerItemData.setObservationDateTime(ConversionUtils.toLocalDateTime(input.getDateObservedAsDate()));
+		careTrackerItemData.setObservationDateTime(ConversionUtils.toNullableLocalDateTime(input.getDateObservedAsDate()));
 		careTrackerItemData.setCreatedDateTime(ConversionUtils.toLocalDateTime(input.getDateEnteredAsDate()));
 		careTrackerItemData.setUpdatedDateTime(ConversionUtils.toLocalDateTime(input.getDateEnteredAsDate()));
 

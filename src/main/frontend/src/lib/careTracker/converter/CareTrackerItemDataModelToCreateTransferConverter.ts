@@ -36,10 +36,16 @@ export default class CareTrackerItemDataModelToCreateTransferConverter extends A
 			return null;
 		}
 
+		let obsDate = null;
+		if(dataModel.observationDateTime && dataModel.observationDateTime.isValid())
+		{
+			obsDate = Juno.Common.Util.formatMomentDateTimeNoTimezone(dataModel.observationDateTime)
+		}
+
 		return {
 			value: dataModel.value,
 			comment: dataModel.comment,
-			observationDateTime: Juno.Common.Util.formatMomentDateTimeNoTimezone(dataModel.observationDateTime),
+			observationDateTime: obsDate,
 		} as CareTrackerItemDataCreateTransfer;
 	}
 }
