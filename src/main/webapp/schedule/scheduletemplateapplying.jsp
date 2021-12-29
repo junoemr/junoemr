@@ -136,7 +136,7 @@
 		String threeYearsBack = (Integer.parseInt(today.substring(0, today.indexOf('-'))) - 3) + today.substring(today.indexOf('-'));
 
 		String providerName = request.getParameter("provider_name");
-		String providerNameEncoded = URLEncoder.encode(providerName, StandardCharsets.UTF_8);
+		String providerNameEncoded = URLEncoder.encode(providerName, String.valueOf(StandardCharsets.UTF_8));
 
 		if("1".equals(request.getParameter("delete")))
 		{
