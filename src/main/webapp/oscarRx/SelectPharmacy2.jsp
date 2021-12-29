@@ -610,9 +610,9 @@ $(function() {
 								<security:oscarSec roleName="<%=roleName$%>" objectName="_rx"
 												   rights="w"
 												   reverse="<%=false%>">
-									<input class="col" type="button" value="Save"
+									<input class="col" type="button" value="Create New"
 										   onclick="return savePharmacy();"/>
-									<input class="col" type="button" value="Update"
+									<input class="col" type="button" value="Update Pharmacy"
 										   onclick="return updatePharmacy();"/>
 								</security:oscarSec>
 							</div>
