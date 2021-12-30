@@ -122,6 +122,16 @@ public class PageUtil
 		targetLocator.window(windowHandle);
 	}
 
+	public static void clickWaitSwitchToLast(WebDriver driver, WebDriverWait webDriverWait, By clickTarget)
+	{
+		int handleCount = driver.getWindowHandles().size();
+		Set<String> allHandles = driver.getWindowHandles();
+
+		findWaitClick(driver, webDriverWait, clickTarget);
+		webDriverWait.until(ExpectedConditions.numberOfWindowsToBe(handleCount + 1));
+		switchToLastWindow(driver);
+	}
+
 	public static void switchToLastWindow(WebDriver driver)
 	{
 		Set<String> allHandles = driver.getWindowHandles();

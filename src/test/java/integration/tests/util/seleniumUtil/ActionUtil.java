@@ -23,6 +23,7 @@
 package integration.tests.util.seleniumUtil;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -67,6 +68,7 @@ public class ActionUtil
 
 	public static void findWaitEdit(WebDriver driver, WebDriverWait webDriverWait, By elementToEdit, String textNew)
 	{
+		webDriverWait.until(waitDriver -> ((JavascriptExecutor)waitDriver).executeScript("return document.readyState").equals("complete"));
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(elementToEdit));
 		textEdit(driver, elementToEdit, textNew);
 	}
@@ -97,6 +99,7 @@ public class ActionUtil
 
 	public static void findWaitClick(WebDriver driver, WebDriverWait webDriverWait, By elementToClick)
 	{
+		webDriverWait.until(waitDriver -> ((JavascriptExecutor)waitDriver).executeScript("return document.readyState").equals("complete"));
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(elementToClick));
 		driver.findElement(elementToClick).click();
 	}
@@ -115,6 +118,7 @@ public class ActionUtil
 
 	public static void findWaitSendKeys(WebDriver driver, WebDriverWait webDriverWait, By element, String keysToSend)
 	{
+		webDriverWait.until(waitDriver -> ((JavascriptExecutor)waitDriver).executeScript("return document.readyState").equals("complete"));
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(element));
 		driver.findElement(element).sendKeys(keysToSend);
 	}

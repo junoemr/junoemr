@@ -27,7 +27,6 @@ import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,18 +34,16 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
-import java.sql.SQLException;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.data.PatientTestCollection.patientLNames;
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByLinkText;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
+import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -74,8 +71,7 @@ public class SendMessagesClassicUIIT extends SeleniumTestBase
 	public void sendMessagesBetweenClinicUsersTest()
 	{
 		String subject = "Message between users";
-		findWaitClickById(driver, webDriverWait, "oscar_new_msg");
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.id("oscar_new_msg"));
 
 		//** Send Message **
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Compose Message")));
@@ -110,16 +106,14 @@ public class SendMessagesClassicUIIT extends SeleniumTestBase
 		String subjectPatientAttached = "Message with Patient Attached";
 		String patientLName = patientLNames[1];
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("oscar_new_msg")));
-		driver.findElement(By.id("oscar_new_msg")).click();
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.id("oscar_new_msg"));
 		String currWindowHandle = driver.getWindowHandle();
 
 		//** Send Message **
 		findWaitClickByLinkText(driver, webDriverWait, "Compose Message");
 		composeMessage(subjectPatientAttached);
 		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='keyword']", patientLName);
-		findWaitClickByXpath(driver, webDriverWait, "//input[@name='searchDemo']");
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.xpath("//input[@name='searchDemo']"));
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("2")));
 		driver.findElement(By.linkText("2")).click();
 		PageUtil.switchToWindow(currWindowHandle, driver);
@@ -164,8 +158,7 @@ public class SendMessagesClassicUIIT extends SeleniumTestBase
 		String patientLName = patientLNames[0];
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
-		findWaitClickByXpath(driver, webDriverWait, "//div[@id='menuTitlemsgs']//descendant::a[contains(., '+')]");
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.xpath("//div[@id='menuTitlemsgs']//descendant::a[contains(., '+')]"));
 
 		//** Send Message **
 		composeMessage(subjectEchart);

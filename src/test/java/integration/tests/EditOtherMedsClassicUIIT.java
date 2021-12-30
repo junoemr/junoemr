@@ -41,6 +41,7 @@ import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByLinkText;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -110,8 +111,7 @@ public class EditOtherMedsClassicUIIT extends SeleniumTestBase
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(archivedOtherMeds);
 		driver.findElement(By.xpath("//input[@title='Archive']")).click();
-		findWaitClickByLinkText(driver, webDriverWait, "Other Meds");
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.linkText("Other Meds"));
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + archivedOtherMeds + "')]")));
 		Assert.assertTrue("Other Meds Note is NOT Archived successfully",
 				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedOtherMeds + "')]"), driver));

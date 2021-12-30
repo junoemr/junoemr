@@ -38,6 +38,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
 @RunWith(SpringRunner.class)
@@ -82,8 +83,7 @@ public class AddSitesIT extends SeleniumTestBase
 
 		// open administration panel
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("admin-panel")));
-		driver.findElement(By.id("admin-panel")).click();
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.id("admin-panel"));
 		addNewSites(site, "myFrame");
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(site.siteName)));
 		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(site.siteName), driver));

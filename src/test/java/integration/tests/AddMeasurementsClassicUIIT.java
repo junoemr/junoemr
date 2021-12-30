@@ -38,12 +38,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByLinkText;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysById;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
-import static integration.tests.util.seleniumUtil.PageUtil.accessEncounterPage;
-import static integration.tests.util.seleniumUtil.PageUtil.isErrorPage;
+import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -57,7 +54,7 @@ public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 			"admission", "caisi_role",  "casemgmt_note", "demographic", "documentDescriptionTemplate", "dxresearch",
 			"eChart", "Facility", "issue", "log", "LookupList", "LookupListItem", "measurementType", "measurements",
 			"OscarJob", "OscarJobType", "provider", "ProviderPreference",  "quickListUser", "roster_status",
-			"secUserRole", "tickler_text_suggest", "validations", "log_ws_rest", "property"
+			"secUserRole", "tickler_text_suggest", "validations", "log_ws_rest", "property", "casemgmt_tmpsave"
 		};
 	}
 
@@ -78,11 +75,8 @@ public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 		{
 			driver.findElement(By.id("imgmeasurements5")).click();
 		}
-		driver.findElement(By.linkText(flowsheetName)).click();
-		findWaitClickByLinkText(driver, webDriverWait, flowsheetName);
-		PageUtil.switchToLastWindow(driver);
-		findWaitClickByXpath(driver, webDriverWait, "//span[contains(., '" + flowsheetSelected + "')]");
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.linkText(flowsheetName));
+		clickWaitSwitchToLast(driver, webDriverWait, By.xpath("//span[contains(., '" + flowsheetSelected + "')]"));
 		findWaitSendKeysById(driver, webDriverWait, "value(inputValue-0)", measurementSelected);
 		findWaitClickByXpath(driver, webDriverWait, "//input[@value='Save']");
 	}
@@ -91,11 +85,9 @@ public class AddMeasurementsClassicUIIT extends SeleniumTestBase
 	public void addMeasurementsStandardFlowsheetClassicUITest()
 			throws InterruptedException
 	{
-		findWaitClickById(driver, webDriverWait, "search");
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.id("search"));
 		findWaitClickByXpath(driver, webDriverWait, "//input[@title='Search active patients']");
-		findWaitClickByXpath(driver, webDriverWait, "//a[@title='Encounter']");
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.xpath("//a[@title='Encounter']"));
 
 		// ** Add flowsheets to Disease Registry. **
 		String currWindowHandle = driver.getWindowHandle();

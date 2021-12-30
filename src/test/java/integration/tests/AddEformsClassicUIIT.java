@@ -44,6 +44,7 @@ import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysById;
+import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -77,10 +78,8 @@ public class AddEformsClassicUIIT extends SeleniumTestBase
 		String subject = "EFormTest";
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
-		findWaitClickByXpath(driver, webDriverWait, "//div[@id='menuTitleeforms']//descendant::a[contains(., '+')]");
-		PageUtil.switchToLastWindow(driver);
-		findWaitClick(driver, webDriverWait, By.linkText("letter"));
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.xpath("//div[@id='menuTitleeforms']//descendant::a[contains(., '+')]"));
+		clickWaitSwitchToLast(driver, webDriverWait, By.linkText("letter"));
 		findWaitSendKeysById(driver, webDriverWait, "subject", subject);
 		findWaitClickByXpath(driver, webDriverWait, "//input[@value='Submit']");
 		PageUtil.switchToWindow(currWindowHandle, driver);

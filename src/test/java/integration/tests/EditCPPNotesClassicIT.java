@@ -41,8 +41,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 
 /*
 -------------------------------------------------------------------------------
@@ -162,8 +164,7 @@ public class EditCPPNotesClassicIT extends SeleniumTestBase
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(archivedSocialHistory);
 		driver.findElement(By.xpath("//input[@title='Archive']")).click();
-		driver.findElement(By.linkText("Social History")).click();
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.linkText("Social History"));
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + archivedSocialHistory + "')]")));
 		Assert.assertTrue("Social History Note is NOT Archived successfully",
 				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedSocialHistory + "')]"), driver));
@@ -218,8 +219,7 @@ public class EditCPPNotesClassicIT extends SeleniumTestBase
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(archivedMedicalHistory);
 		driver.findElement(By.xpath("//input[@title='Archive']")).click();
-		driver.findElement(By.linkText("Medical History")).click();
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.linkText("Medical History"));
 		Assert.assertTrue("Medical History Note is NOT Archived successfully",
 				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedMedicalHistory + "')]"), driver));
 	}
@@ -239,10 +239,9 @@ public class EditCPPNotesClassicIT extends SeleniumTestBase
 		String problemStatus = "Active";
 
 		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(2000);
 
 		//Add Ongoing Concerns Notes
-		driver.findElement(By.xpath("//div[@id='divR2I1']//descendant::a[contains(., '+')]")).click();
+		findWaitClick(driver, webDriverWait, By.xpath("//div[@id='divR2I1']//descendant::a[contains(., '+')]"));
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(ongoingConcernsInEncounter);
 		driver.findElement(By.id("startdate")).sendKeys(startDate);
@@ -254,12 +253,14 @@ public class EditCPPNotesClassicIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@title='Copy to Current Note']")).click();
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(ongoingConcernsInCPP);
-		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
-		Thread.sleep(1000);
-		driver.findElement(By.id("saveImg")).click();
-		Thread.sleep(1000);
+		findWaitClick(driver, webDriverWait, By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']"));
+		findWaitClick(driver, webDriverWait, By.id("saveImg"));
+
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(ongoingConcernsInCPP)));
 		Assert.assertTrue("Ongoing Concerns Note is NOT Added in CPP successfully",
 				PageUtil.isExistsBy(By.linkText(ongoingConcernsInCPP), driver));
+
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + ongoingConcernsInEncounter + "')]")));
 		Assert.assertTrue("Ongoing Concerns Note is NOT Copied in Encounter note successfully",
 				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + ongoingConcernsInEncounter + "')]"), driver));
 
@@ -276,8 +277,7 @@ public class EditCPPNotesClassicIT extends SeleniumTestBase
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(archivedOngoingConcerns);
 		driver.findElement(By.xpath("//input[@title='Archive']")).click();
-		driver.findElement(By.linkText("Ongoing Concerns")).click();
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.linkText("Ongoing Concerns"));
 		Assert.assertTrue("Ongoing Concerns Note is NOT Archived successfully",
 				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedOngoingConcerns + "')]"), driver));
 	}
@@ -326,8 +326,7 @@ public class EditCPPNotesClassicIT extends SeleniumTestBase
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(archivedReminder);
 		driver.findElement(By.xpath("//input[@title='Archive']")).click();
-		driver.findElement(By.linkText("Reminders")).click();
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.linkText("Reminders"));
 		Assert.assertTrue("Reminders Note is NOT Archived successfully",
 				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedReminder + "')]"), driver));
 	}

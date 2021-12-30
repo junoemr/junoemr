@@ -59,6 +59,7 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 
 @RunWith(SpringRunner.class)
@@ -97,8 +98,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 
 	public void addAppointmentWithDemo(By timeFrame, String currWindowHandle, String status, String demoFName)
 	{
-		findWaitClick(driver, webDriverWait, timeFrame);
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, timeFrame);
 		addAppointmentPageWithDemo(currWindowHandle, status, demoFName);
 	}
 
@@ -247,8 +247,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 
 		//Search available schedule for Wednesdays
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		driver.findElement(By.xpath("//input[@name='searchview']")).click();
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.xpath("//input[@name='searchview']"));
 		driver.manage().window().maximize();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@name='provider_no']")));
 		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='provider_no']"), AuthUtils.TEST_PROVIDER_ID

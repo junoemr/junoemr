@@ -94,7 +94,6 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
         //Cut & Paste from 9:00 to 9:45
         driver.findElement(By.xpath("//input[@value='Cut']")).click();
         PageUtil.switchToWindow(currWindowHandle, driver);
-        Thread.sleep(2000);
         driver.findElement(By.linkText("09:45")).click();
         PageUtil.switchToLastWindow(driver);
         driver.findElement(By.id("pasteButton")).click();

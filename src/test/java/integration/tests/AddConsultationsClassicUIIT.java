@@ -42,6 +42,7 @@ import static integration.tests.util.junoUtil.Navigation.Consultation_URL;
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -70,8 +71,7 @@ public class AddConsultationsClassicUIIT extends SeleniumTestBase
 		String serviceName = "Cardiology";
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String eChartWindowHandle = driver.getWindowHandle();
-		findWaitClickByXpath(driver, webDriverWait, "//div[@id='menuTitleconsultation']//descendant::a[contains(., '+')]");
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.xpath("//div[@id='menuTitleconsultation']//descendant::a[contains(., '+')]"));
 		dropdownSelectByVisibleText(driver, webDriverWait, By.id("service"), serviceName);
 		findWaitClickByXpath(driver, webDriverWait, "//input[@name='submitSaveOnly']");
 
