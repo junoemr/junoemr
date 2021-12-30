@@ -110,7 +110,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		PageUtil.switchToWindow(newWindows.get(newWindows.size() - 1), driver);
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@name='status']")));
 		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='status']"), status);
-		findWaitClickByXpath(driver, webDriverWait, "addButton");
+		findWaitClickById(driver, webDriverWait, "addButton");
 		PageUtil.switchToWindow(currWindowHandle, driver);
 	}
 
@@ -150,7 +150,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 				PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
 		//Add an appointment at 10:00-10:15 with NO demographic selected.
-		addAppointmentWithNODemo(By.linkText("10:00"),oldWindowHandles, currWindowHandle, "t");//To Do
+		addAppointmentWithNODemo(By.linkText("10:00"), oldWindowHandles, currWindowHandle, "t");//To Do
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("."), driver));

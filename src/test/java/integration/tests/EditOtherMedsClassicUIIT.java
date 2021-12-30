@@ -38,6 +38,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByLinkText;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -73,7 +76,7 @@ public class EditOtherMedsClassicUIIT extends SeleniumTestBase
 		PageUtil.switchToLastWindow(driver);
 
 		//Add Other Meds Notes
-		driver.findElement(By.xpath("//div[@id='menuTitleoMeds']//descendant::a[contains(., '+')]")).click();
+		findWaitClickByXpath(driver, webDriverWait, "//div[@id='menuTitleoMeds']//descendant::a[contains(., '+')]");
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(otherMedsEncounter);
 		driver.findElement(By.id("startdate")).sendKeys(startDate);
@@ -81,28 +84,35 @@ public class EditOtherMedsClassicUIIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@title='Copy to Current Note']")).click();
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(otherMedsCPP);
-		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
-		driver.findElement(By.id("saveImg")).click();
+		findWaitClickByXpath(driver, webDriverWait, "//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']");
+		findWaitClickById(driver, webDriverWait, "saveImg");
+
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(otherMedsCPP)));
 		Assert.assertTrue("Other Meds Note is NOT Added in CPP successfully",
 				PageUtil.isExistsBy(By.linkText(otherMedsCPP), driver));
+
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + otherMedsEncounter + "')]")));
  		Assert.assertTrue("Other Meds Note is NOT Copied in Encounter note successfully",
 				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + otherMedsEncounter + "')]"), driver));
 
 		//Edit Other Meds Note
-		driver.findElement(By.linkText(otherMedsCPP)).click();
+		findWaitClickByLinkText(driver, webDriverWait, otherMedsCPP);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(editedOtherMedsCPP);
 		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(editedOtherMedsCPP)));
 		Assert.assertTrue("Other Meds Note is NOT Edited in CPP successfully",
 				PageUtil.isExistsBy(By.linkText(editedOtherMedsCPP), driver));
 
 		//Archive Other Meds Note
-		driver.findElement(By.xpath("//div[@id='menuTitleoMeds']//descendant::a[contains(., '+')]")).click();
+		findWaitClickByXpath(driver, webDriverWait, "//div[@id='menuTitleoMeds']//descendant::a[contains(., '+')]");
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(archivedOtherMeds);
 		driver.findElement(By.xpath("//input[@title='Archive']")).click();
-		driver.findElement(By.linkText("Other Meds")).click();
+		findWaitClickByLinkText(driver, webDriverWait, "Other Meds");
 		PageUtil.switchToLastWindow(driver);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + archivedOtherMeds + "')]")));
 		Assert.assertTrue("Other Meds Note is NOT Archived successfully",
 				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedOtherMeds + "')]"), driver));
 	}
