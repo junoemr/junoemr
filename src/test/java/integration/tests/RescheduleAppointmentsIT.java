@@ -46,6 +46,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.AddPatientsIT.mom;
 import static integration.tests.AddPatientsIT.momFullNameJUNO;
+import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
 @RunWith(SpringRunner.class)
@@ -140,10 +141,7 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
         webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
         driver.findElement(By.xpath("//button[@title='Next Day']")).click();
         driver.findElement(By.xpath("//button[@title='Next Day']")).click();
-		webDriverWait.until(waitDriver -> ((JavascriptExecutor)waitDriver).executeScript("return document.readyState").equals("complete"));
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("schedule-select")));
-		Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));
-        providerDropDown.selectByVisibleText("oscardoc, doctor");
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("schedule-select"), "oscardoc, doctor");
 
         //Reschedule the appointment from 10:00am to 10:45am
 		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//span[contains(., '" + momFullNameJUNO + "')]");

@@ -44,6 +44,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static integration.tests.AddPatientsIT.mom;
 import static integration.tests.AddPatientsIT.momFullNameJUNO;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
+import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
 @RunWith(SpringRunner.class)
@@ -151,10 +152,7 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(nextDaySelector)));
 		driver.findElement(By.xpath(nextDaySelector)).click();
 
-		webDriverWait.until(waitDriver -> ((JavascriptExecutor)waitDriver).executeScript("return document.readyState").equals("complete"));
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("schedule-select")));
-		Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));
-		providerDropDown.selectByVisibleText("oscardoc, doctor");
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("schedule-select"), "oscardoc, doctor");
 
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//i[@class='icon icon-status onclick-event-status icon-starbill rotate']")));
 		WebElement statusButton = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-starbill rotate']"));

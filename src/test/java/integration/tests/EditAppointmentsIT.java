@@ -33,9 +33,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.JunoApplication;
 
 import java.util.Set;
@@ -184,10 +186,7 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		accessSectionJUNOUI(driver, webDriverWait, "Schedule");
 		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
 		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
-		webDriverWait.until(waitDriver -> ((JavascriptExecutor)waitDriver).executeScript("return document.readyState").equals("complete"));
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("schedule-select")));
-		Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));
-		providerDropDown.selectByVisibleText("oscardoc, doctor");
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("schedule-select"), "oscardoc, doctor");
 
 		//Edit from "Modify Appointment" page
 		findWaitClick(driver, webDriverWait, By.xpath("//span[contains(., '" + mom.firstName + "')]"));
