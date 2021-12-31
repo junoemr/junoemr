@@ -25,9 +25,8 @@
 
 package oscar.oscarDemographic.pageUtil;
 
-import java.io.File;
+import oscar.OscarProperties;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,23 +44,25 @@ import org.apache.struts.action.ActionMapping;
  * @author jay
  */
 public class ImportLogDownloadAction extends Action {
-   
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws FileNotFoundException, IOException {
 
-	String importLog = request.getParameter("importlog");
-	File importLogFile = new File(importLog);
-	InputStream in = new FileInputStream(importLog);
-	OutputStream out = response.getOutputStream();
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws IOException
+	{
+		OscarProperties oscarProperties = OscarProperties.getInstance();
+		String importDirectory = oscarProperties.getPathProperty(OscarProperties.KEY_TEMP_DIR);
+		String logFileName = oscar.util.StringUtils.sanitizeFilename(request.getParameter(ImportDemographicDataAction4.IMPORT_FILE_PARAM));
 
-	response.setContentType("application/octet-stream");
-	response.setHeader("Content-Disposition", "attachment; filename=\""+importLogFile.getName()+"\"" );
+		InputStream in = new FileInputStream(importDirectory + logFileName);
+		OutputStream out = response.getOutputStream();
 
-	byte[] buf = new byte[1024];
-	int len;
-	while ((len=in.read(buf)) > 0) out.write(buf,0,len);
-	in.close();
-	out.close();
+		response.setContentType("application/octet-stream");
+		response.setHeader("Content-Disposition", "attachment; filename=\"" + logFileName + "\"" );
 
-	return null;
-    }
+		byte[] buf = new byte[1024];
+		int len;
+		while ((len=in.read(buf)) > 0) out.write(buf,0,len);
+		in.close();
+		out.close();
+
+		return null;
+	}
 }

@@ -38,6 +38,8 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.upload.FormFile;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.oscarehr.util.MiscUtils;
 
 public class StringUtils {
@@ -485,4 +487,19 @@ public class StringUtils {
 
         return true;
     }
+
+	/**
+	 * Filters HTML tags from text
+	 * This is primarily intended to prevent XSS in Juno.
+	 * @param input - string to test
+	 * @return - filtered string
+	 */
+	public static String filterUnsafeString(String input)
+	{
+		if(input == null)
+		{
+			return null;
+		}
+		return Jsoup.clean(input, Whitelist.none());
+	}
 }
