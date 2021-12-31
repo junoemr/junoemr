@@ -35,6 +35,7 @@ public class ActionUtil
 	public static void dropdownSelectByVisibleText(WebDriver driver,
 		WebDriverWait webDriverWait, By dropdown, String visibleText)
 	{
+		webDriverWait.until(waitDriver -> ((JavascriptExecutor)waitDriver).executeScript("return document.readyState").equals("complete"));
 		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(dropdown));
 		Select dropdownList = new Select(driver.findElement(dropdown));
 		dropdownList.selectByVisibleText(visibleText);
@@ -42,6 +43,7 @@ public class ActionUtil
 	public static void dropdownSelectByValue(WebDriver driver, WebDriverWait webDriverWait,
 		By dropdown, String dropdownSelection)
 	{
+		webDriverWait.until(waitDriver -> ((JavascriptExecutor)waitDriver).executeScript("return document.readyState").equals("complete"));
 		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("option[value='" + dropdownSelection + "']")));
 		Select dropdownList = new Select(driver.findElement(dropdown));
 		dropdownList.selectByValue(dropdownSelection);

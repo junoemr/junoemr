@@ -45,6 +45,7 @@ import static integration.tests.AddPatientsIT.dad;
 import static integration.tests.AddPatientsIT.dadFullName;
 import static integration.tests.AddPatientsIT.mom;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
 @RunWith(SpringRunner.class)
@@ -187,7 +188,7 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		providerDropDown.selectByVisibleText("oscardoc, doctor");
 
 		//Edit from "Modify Appointment" page
-		driver.findElement(By.xpath("//span[contains(., '" + mom.firstName + "')]")).click();
+		findWaitClick(driver, webDriverWait, By.xpath("//span[contains(., '" + mom.firstName + "')]"));
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("input")));
 		driver.findElement(By.id("input-patient")).findElement(By.tagName("input")).clear();
 		driver.findElement(By.id("input-patient")).findElement(By.tagName("input")).sendKeys(dad.firstName);

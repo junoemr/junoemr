@@ -132,6 +132,7 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 		String viewNextDaySelector = "//img[@alt='View Next DAY']";
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(viewNextDaySelector)));
 		driver.findElement(By.xpath(viewNextDaySelector)).click();
+
 		String currWindowHandle = driver.getWindowHandle();
 		AddAppointmentsIT addAppointmentsTests = new AddAppointmentsIT();
 		addAppointmentsTests.addAppointmentsSchedulePage("10:00", currWindowHandle, mom.firstName);
@@ -149,15 +150,18 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(nextDaySelector)));
 		driver.findElement(By.xpath(nextDaySelector)).click();
 
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("schedule-select")));
 		Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));
 		providerDropDown.selectByVisibleText("oscardoc, doctor");
+
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//i[@class='icon icon-status onclick-event-status icon-starbill rotate']")));
 		WebElement statusButton = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-starbill rotate']"));
 		String statusTD = statusButton.getAttribute("title");
 		Assert.assertEquals("Status is NOT To Do", statusExpectedTD, statusTD);
 
 		//Edit by clicking the status button from Schedule page
 		statusButton.click();
-		Thread.sleep(3000);//wait for clicking to change the status.
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//i[@class='icon icon-status onclick-event-status icon-todo rotate']")));
 		String statusDP = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-todo rotate']"))
 				.getAttribute("title");
 		Assert.assertEquals("JUNO UI: Status is NOT updated to Daysheet Printed Successfully", statusExpectedDP, statusDP);

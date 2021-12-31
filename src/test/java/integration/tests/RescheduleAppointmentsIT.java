@@ -32,6 +32,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -139,7 +140,9 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
         webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
         driver.findElement(By.xpath("//button[@title='Next Day']")).click();
         driver.findElement(By.xpath("//button[@title='Next Day']")).click();
-        Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));
+		webDriverWait.until(waitDriver -> ((JavascriptExecutor)waitDriver).executeScript("return document.readyState").equals("complete"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("schedule-select")));
+		Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));
         providerDropDown.selectByVisibleText("oscardoc, doctor");
 
         //Reschedule the appointment from 10:00am to 10:45am

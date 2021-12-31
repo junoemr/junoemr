@@ -24,6 +24,7 @@
 package integration.tests;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
@@ -85,8 +86,12 @@ public class EditRiskFactorsClassicUIIT extends SeleniumTestBase
 		driver.findElement(By.id("noteEditTxt")).sendKeys(riskFactorsCPP);
 		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
 		driver.findElement(By.id("saveImg")).click();
+
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(riskFactorsCPP)));
 		Assert.assertTrue("Risk Factors Note is NOT Added in CPP successfully",
 				PageUtil.isExistsBy(By.linkText(riskFactorsCPP), driver));
+
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + riskFactorsEncounter + "')]")));
  		Assert.assertTrue("Risk Factors Note is NOT Copied in Encounter note successfully",
 				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + riskFactorsEncounter + "')]"), driver));
 
@@ -95,6 +100,7 @@ public class EditRiskFactorsClassicUIIT extends SeleniumTestBase
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(editedriskFactorsCPP);
 		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(editedriskFactorsCPP)));
 		Assert.assertTrue("Risk Factors Note is NOT Edited in CPP successfully",
 				PageUtil.isExistsBy(By.linkText(editedriskFactorsCPP), driver));
 
@@ -103,8 +109,8 @@ public class EditRiskFactorsClassicUIIT extends SeleniumTestBase
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
 		driver.findElement(By.id("noteEditTxt")).sendKeys(archivedriskFactors);
 		driver.findElement(By.xpath("//input[@title='Archive']")).click();
-		driver.findElement(By.linkText("Risk Factors")).click();
-		PageUtil.switchToLastWindow(driver);
+		clickWaitSwitchToLast(driver, webDriverWait, By.linkText("Risk Factors"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + archivedriskFactors + "')]")));
 		Assert.assertTrue("Risk Factors Note is NOT Archived successfully",
 				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedriskFactors + "')]"), driver));
 	}

@@ -136,6 +136,8 @@ public class ScheduleSettingIT extends SeleniumTestBase {
 		webDriverWait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("myFrame"));
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.linkText("Template Setting")));
 		switchToNewWindow(driver, By.linkText("Template Setting"), oldWindowHandles, webDriverWait);
+		webDriverWait.until(waitDriver -> ((JavascriptExecutor)waitDriver).executeScript("return document.readyState").equals("complete"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='name']")));
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys("General");
 		driver.findElement(By.xpath("//input[@name='summary']")).sendKeys("15 mins duration");
 		//15 mins duration 9-12
