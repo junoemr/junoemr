@@ -501,7 +501,7 @@ public class StringUtils {
 	 * @param input - string to test
 	 * @return - filtered string
 	 */
-	public static String filterUnsafeString(String input)
+	public static String filterHTMLFromString(String input)
 	{
 		if(input == null)
 		{
