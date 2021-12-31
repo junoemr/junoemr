@@ -32,12 +32,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
-//import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.AuthUtils;
@@ -50,6 +50,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Import;
 import oscar.OscarProperties;
 
@@ -67,6 +68,8 @@ public class SeleniumTestBase extends DatabaseTestBase
 
 
 	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 120;
+	public static final Integer WEB_DRIVER_PAGE_LOAD_TIMEOUT = 120;
+	public static final Integer WEB_DRIVER_SCRIPT_TIMEOUT = 120;
 	private static final String GECKO_DRIVER="src/test/resources/vendor/geckodriver";
 	private static final String DOCKER_INTEGRATION_PROPERTIES_FILE = "src/test/resources/docker_integration.properties";
 	private static final String DEFAULT_INTEGRATION_PROPERTIES_FILE = "src/test/resources/integration.properties";
@@ -130,6 +133,9 @@ public class SeleniumTestBase extends DatabaseTestBase
 			firefoxOptions.setBinary(ffb);
 			driver = new FirefoxDriver(firefoxOptions);
 		}
+
+		driver.manage().timeouts().setScriptTimeout(WEB_DRIVER_SCRIPT_TIMEOUT, TimeUnit.SECONDS);
+		driver.manage().timeouts().pageLoadTimeout(WEB_DRIVER_PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
 
 		webDriverWait = new WebDriverWait(driver, WEB_DRIVER_EXPLICIT_TIMEOUT);
 
