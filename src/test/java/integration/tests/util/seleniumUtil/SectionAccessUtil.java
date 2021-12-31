@@ -49,6 +49,18 @@ public class SectionAccessUtil
 	public static void accessAdministrationSectionJUNOUI(WebDriver driver,
 		WebDriverWait webDriverWait, String sectionName, String subSectionName)
 	{
+		webDriverWait.until(waitDriver -> ((JavascriptExecutor)waitDriver).executeScript("return document.readyState").equals("complete"));
+		try
+		{
+			// This should ideally be removed.  Detecting if an element exists doesn't work if the
+			// page takes time to load
+			Thread.sleep(2000);
+		}
+		catch (InterruptedException e)
+		{
+			fail("Interrupted");
+		}
+
 		if (isExistsBy(By.xpath("//img[@title=\"Go to Juno UI\"]"), driver))
 		{
 			// open JUNO UI page
