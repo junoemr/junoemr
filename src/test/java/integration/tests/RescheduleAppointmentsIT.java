@@ -39,6 +39,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -128,7 +130,12 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
     public void rescheduleAppointmentTestsJUNOUI()
             throws InterruptedException
     {
-        // Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEEE MMM d");
+		LocalDate dateToday = LocalDate.now();
+		String dateTodayString = dtf.format(dateToday);
+		String dateTomorrowString = dtf.format(dateToday.plusDays(1));
+
+		// Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
         driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
         String currWindowHandle = driver.getWindowHandle();
         AddAppointmentsIT addAppointmentsTests = new AddAppointmentsIT();
@@ -138,9 +145,13 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
                 PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
         accessSectionJUNOUI(driver, webDriverWait, "Schedule");
-        webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
-        driver.findElement(By.xpath("//button[@title='Next Day']")).click();
-        driver.findElement(By.xpath("//button[@title='Next Day']")).click();
+
+		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-today span"), "(0) " + dateTodayString));
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
+
+		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-future span"), "(0) " + dateTomorrowString));
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
+
 		dropdownSelectByVisibleText(driver, webDriverWait, By.id("schedule-select"), "oscardoc, doctor");
 
         //Reschedule the appointment from 10:00am to 10:45am

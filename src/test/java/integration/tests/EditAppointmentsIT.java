@@ -40,6 +40,8 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.JunoApplication;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -173,7 +175,13 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 	}
 
 	@Test
-	public void changeAppointmentStatusTestsJUNOUI() throws InterruptedException {
+	public void changeAppointmentStatusTestsJUNOUI() throws InterruptedException
+	{
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEEE MMM d");
+		LocalDate dateToday = LocalDate.now();
+		String dateTodayString = dtf.format(dateToday);
+		String dateTomorrowString = dtf.format(dateToday.plusDays(1));
+
 		// Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
 		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
 		String currWindowHandle = driver.getWindowHandle();
@@ -184,8 +192,13 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 				PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
 		accessSectionJUNOUI(driver, webDriverWait, "Schedule");
+
+		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-today span"), "(0) " + dateTodayString));
 		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
+
+		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-future span"), "(0) " + dateTomorrowString));
 		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
+
 		dropdownSelectByVisibleText(driver, webDriverWait, By.id("schedule-select"), "oscardoc, doctor");
 
 		//Edit from "Modify Appointment" page

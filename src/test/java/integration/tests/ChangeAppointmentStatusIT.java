@@ -37,6 +37,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -130,6 +132,11 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 	public void changeAppointmentStatusTestsJUNOUI()
 			throws InterruptedException
 	{
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEEE MMM d");
+		LocalDate dateToday = LocalDate.now();
+		String dateTodayString = dtf.format(dateToday);
+		String dateTomorrowString = dtf.format(dateToday.plusDays(1));
+
 		// Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
 		String viewNextDaySelector = "//img[@alt='View Next DAY']";
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(viewNextDaySelector)));
@@ -146,9 +153,11 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 
 		String nextDaySelector = "//button[@title='Next Day']";
 
+		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-today span"), "(0) " + dateTodayString));
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(nextDaySelector)));
 		driver.findElement(By.xpath(nextDaySelector)).click();
 
+		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-future span"), "(0) " + dateTomorrowString));
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(nextDaySelector)));
 		driver.findElement(By.xpath(nextDaySelector)).click();
 
