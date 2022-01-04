@@ -45,7 +45,8 @@ public class OscarProperties extends Properties {
 	// Put property names here
 	private static final String KEY_INSTANCE_TYPE = "instance_type";
 	private static final String KEY_BILLING_TYPE = "billing_type";
-	
+	public static final String KEY_TEMP_DIR = "TMP_DIR";
+
 	private static final String BILLING_TYPE_ONTARIO = "ON";
 	private static final String BILLING_TYPE_BC = "BC";
 	private static final String BILLING_TYPE_CLINICAID = "CLINICAID";
@@ -215,6 +216,21 @@ public class OscarProperties extends Properties {
 		}
 		
 		return getProperty(key, "").trim().equalsIgnoreCase(val);
+	}
+
+	/**
+	 * Gets a folder path property and ensures it contains a trailing slash
+	 * @param key
+	 * @return string
+	 */
+	public String getPathProperty(String key)
+	{
+		String folderPath = getProperty(key, "").trim();
+		if(folderPath.length() != 0 && !folderPath.endsWith("/"))
+		{
+			folderPath = folderPath + "/";
+		}
+		return folderPath;
 	}
 
 	public Integer getIntegerProperty(String key, Integer defaultValue) {

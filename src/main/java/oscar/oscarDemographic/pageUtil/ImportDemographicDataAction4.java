@@ -171,6 +171,7 @@ import java.util.zip.ZipInputStream;
     private static final String REPORTBINARY = "Binary";
     private static final String REPORTTEXT = "Text";
     private static final String RISKFACTOR = "Risk";
+	public static final String IMPORT_FILE_PARAM = "importlog";
 
 
     boolean matchProviderNames = true;
@@ -296,7 +297,10 @@ import java.util.zip.ZipInputStream;
 
         //channel warnings and importlog to browser
         request.setAttribute("warnings",warnings);
-        if (importLog!=null) request.setAttribute("importlog",importLog.getPath());
+        if (importLog != null)
+        {
+            request.setAttribute(IMPORT_FILE_PARAM, importLog.getName());
+        }
 
         logger.info("IMPORT PROCESS COMPLETE");
         return mapping.findForward("success");
