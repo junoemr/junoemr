@@ -291,8 +291,8 @@ if(!authed) {
 <%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
 <%@ page import="org.oscarehr.demographicRoster.model.DemographicRoster" %>
 <%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
-<%@ page import="static org.oscarehr.common.model.DemographicContact.TYPE_DEMOGRAPHIC" %>
-<%@ page import="static org.oscarehr.common.model.DemographicContact.CATEGORY_PERSONAL" %>
+<%@ page import="static org.oscarehr.contact.entity.DemographicContact.TYPE_DEMOGRAPHIC" %>
+<%@ page import="static org.oscarehr.contact.entity.DemographicContact.CATEGORY_PERSONAL" %>
 <html:html locale="true">
 
 <head>
