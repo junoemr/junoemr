@@ -24,6 +24,7 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.junoUtil.AppointmentUtil;
 import integration.tests.util.seleniumUtil.ActionUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
@@ -146,11 +147,15 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
 
         accessSectionJUNOUI(driver, webDriverWait, "Schedule");
 
+		AppointmentUtil.skipTwoDaysJUNOUI(driver, webDriverWait);
+
+		/*
 		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-today span"), "(0) " + dateTodayString));
 		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
 
 		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-future span"), "(0) " + dateTomorrowString));
 		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
+		 */
 
 		dropdownSelectByVisibleText(driver, webDriverWait, By.id("schedule-select"), "oscardoc, doctor");
 

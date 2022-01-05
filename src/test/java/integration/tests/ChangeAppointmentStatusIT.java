@@ -24,6 +24,7 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.junoUtil.AppointmentUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,11 +38,14 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
+import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties.Web;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import oscar.util.ConversionUtils;
 
 import static integration.tests.AddPatientsIT.mom;
 import static integration.tests.AddPatientsIT.momFullNameJUNO;
@@ -132,11 +136,6 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 	public void changeAppointmentStatusTestsJUNOUI()
 			throws InterruptedException
 	{
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEEE MMM d");
-		LocalDate dateToday = LocalDate.now();
-		String dateTodayString = dtf.format(dateToday);
-		String dateTomorrowString = dtf.format(dateToday.plusDays(1));
-
 		// Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
 		String viewNextDaySelector = "//img[@alt='View Next DAY']";
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(viewNextDaySelector)));
@@ -151,15 +150,25 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 
 		accessSectionJUNOUI(driver, webDriverWait, "Schedule");
 
+		AppointmentUtil.skipTwoDaysJUNOUI(driver, webDriverWait);
+		/*
 		String nextDaySelector = "//button[@title='Next Day']";
 
-		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-today span"), "(0) " + dateTodayString));
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(nextDaySelector)));
+
+		String todayDateString = driver.findElement(By.cssSelector("#ca-calendar th.fc-today")).getAttribute("data-date");
+		LocalDate dateToday = ConversionUtils.toLocalDate(todayDateString);
+		String oneDayLaterString = dtf.format(dateToday.plusDays(1));
+		String twoDaysLaterString = dtf.format(dateToday.plusDays(2));
+
+		driver.findElement(By.xpath(nextDaySelector)).click();
+
+		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-future span"), "(0) " + oneDayLaterString));
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(nextDaySelector)));
 		driver.findElement(By.xpath(nextDaySelector)).click();
 
-		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-future span"), "(0) " + dateTomorrowString));
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(nextDaySelector)));
-		driver.findElement(By.xpath(nextDaySelector)).click();
+		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-future span"), "(0) " + twoDaysLaterString));
+		 */
 
 		dropdownSelectByVisibleText(driver, webDriverWait, By.id("schedule-select"), "oscardoc, doctor");
 
