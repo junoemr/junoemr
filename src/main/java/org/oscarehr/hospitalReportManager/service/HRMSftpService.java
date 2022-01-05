@@ -33,7 +33,7 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
 
 import com.jcraft.jsch.ChannelSftp;
@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 public class HRMSftpService
 {
 	// CONNECTION SETTINGS

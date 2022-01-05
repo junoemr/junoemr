@@ -33,7 +33,7 @@ angular.module('Admin.Section').component('hrmAdmin',
 		controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$uibModal', function ($scope)
 		{
 			let ctrl = this;
-			let hrmService = new HrmService();
+			const hrmService = new HrmService();
 			
 			ctrl.COMPONENT_STYLE = JUNO_STYLE.DEFAULT;
 			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
