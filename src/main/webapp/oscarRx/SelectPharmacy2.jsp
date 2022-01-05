@@ -91,6 +91,14 @@ oscar.oscarRx.pageUtil.RxSessionBean bean = (oscar.oscarRx.pageUtil.RxSessionBea
 		color:#FFFFFF;
 }
 
+.row {
+	margin: 0 -2px;
+}
+
+.col {
+	margin: 0 2px;
+}
+
 </style>
 
 <script type="text/javascript">
@@ -244,48 +252,68 @@ $(function() {
 	  return false;
   }
   
-  function savePharmacy() {
-	  
-	  if( !confirm("You are about to edit/add a pharmacy to the database.  Is this what you want?\nSelect set Preferred Pharmacy to add pharmacy to the patient.")) {
+  function savePharmacy()
+  {
+	  if( !confirm("You are about to add a pharmacy to the database. Is this what you want?\nSelect set Preferred Pharmacy to add pharmacy to the patient.") )
+	  {
+		  return false;
+	  }
+	  if( !isFaxNumberCorrect() )
+	  {
 		  return false;
 	  }
 	  
-	  if( !isFaxNumberCorrect() ) {
-		  return false;
-	  }
-	  
-	  
-	  if( $("#pharmacyId").val() != null && $("#pharmacyId").val() != "" ) {
-	  	  
-		  var data = $("#pharmacyForm").serialize();
-		  $.post("<%=request.getContextPath() + "/oscarRx/managePharmacy.do?method=save"%>",
-			  data, function( data ) {
-		      	if( data.id ) {
-		      		
-		      		if( $('#preferedPharmacy option').length > 0 ) {
-		      			var select = $('#preferedPharmacy>option:selected');
-		      			var json = JSON.parse($(select).val());
-		      			if( data.id = json.id ) {	      			
-		      				$(select).val(JSON.stringify(data));
-		      			}
-		      		}
-		      	    alert("Record saved!");
-		      	    resetForm();
-		      	    
-		      	}
-		      	else {
-		      	    alert("There was a problem saving your record");
-		      	}
-		  },
-		  "json"	  
-		  );
-	  }
-	  else {
-		  addPharmacy();
-	  }
-	  
+	  addPharmacy();
 	  return false;
   }
+  
+	function updatePharmacy()
+	{
+		if( !confirm("You are about to update a pharmacy in the database. Is this what you want?") )
+		{
+			return false;
+		}
+		if( !isFaxNumberCorrect() )
+		{
+			return false;
+		}
+	
+		if( $("#pharmacyId").val() != null && $("#pharmacyId").val() != "" )
+		{
+			var data = $("#pharmacyForm").serialize();
+			$.post("<%=request.getContextPath() + "/oscarRx/managePharmacy.do?method=save"%>",
+					data, function( data )
+					{
+						if( data.id )
+						{
+	
+							if( $('#preferedPharmacy option').length > 0 )
+							{
+								var select = $('#preferedPharmacy>option:selected');
+								var json = JSON.parse($(select).val());
+								if( data.id = json.id )
+								{
+									$(select).val(JSON.stringify(data));
+								}
+							}
+							alert("Record saved!");
+							resetForm();
+	
+						}
+						else
+						{
+							alert("There was a problem saving your record");
+						}
+					},
+					"json"
+			);
+		}
+		else
+		{
+			alert("You can not update this pharmacy because it is not an existing record. Please save this pharmacy instead.");
+		}
+		return false;
+	}
   
   function setPreferredPharmacy() {
 	  
@@ -576,11 +604,18 @@ $(function() {
 						</select>	
 							</td>
 						<td style="text-align:right;padding-right:250px;" colspan="2">
-						<input type="button" value="Reset" onclick="return resetForm();"/>&nbsp;
-						<security:oscarSec roleName="<%=roleName$%>" objectName="_rx" rights="w" reverse="<%=false%>">
-						<input type="button" value="Save" onclick="return savePharmacy();"/>&nbsp;&nbsp;
-<!-- 							<input type="button" value="<bean:message key="SelectPharmacy.deleteLink" />" onclick="return deletePharmacy($('#preferedPharmacy>option:selected').val())"/> -->
-						</security:oscarSec>
+							<div class="row">
+								<input class="col" type="button" value="Reset"
+									   onclick="return resetForm();"/>
+								<security:oscarSec roleName="<%=roleName$%>" objectName="_rx"
+												   rights="w"
+												   reverse="<%=false%>">
+									<input class="col" type="button" value="Create New"
+										   onclick="return savePharmacy();"/>
+									<input class="col" type="button" value="Update Pharmacy"
+										   onclick="return updatePharmacy();"/>
+								</security:oscarSec>
+							</div>
 						</td>
 					</tr>
 					
