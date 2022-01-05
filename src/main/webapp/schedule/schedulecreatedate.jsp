@@ -87,7 +87,7 @@
 	}
 
 	String providerName = request.getParameter("provider_name");
-	String providerNameEncoded = URLEncoder.encode(providerName, StandardCharsets.UTF_8);
+	String providerNameEncoded = URLEncoder.encode(providerName, String.valueOf(StandardCharsets.UTF_8));
 
 	//to prepare calendar display
 	GregorianCalendar now = new GregorianCalendar();
