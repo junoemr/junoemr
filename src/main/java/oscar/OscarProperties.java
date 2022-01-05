@@ -203,14 +203,7 @@ public class OscarProperties extends Properties {
 		}
 		return folderPath;
 	}
-
-	public Integer getIntegerProperty(String key, Integer defaultValue) {
-		key = key==null ? null : key.trim();
-
-		String propertyValue = getProperty(key, defaultValue.toString());
-
-		return Integer.parseInt(propertyValue);
-	}
+	
 	/**
 	 * Will check the properties to see if that property is set and if it's set to "true", "yes" or "on".
 	 * If it is method returns true if not method returns false.
