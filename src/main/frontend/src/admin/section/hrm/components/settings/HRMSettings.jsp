@@ -22,34 +22,57 @@
 --%>
 
 <div id="hrm-settings" class="flex-col align-items-center justify-content-top h-100">
-    <div class="details-container flex-col align-items-start">
-        <div class="width-100 section">
-            <div class="flex-col justify-content-center header">
-                <h5>Connection</h5>
-            </div>
-            <div>
-                <p>Juno EMR is using the following connection settings:</p>
-                <div class="flex-col width-100 align-items-start">
-                    <div><span class="row-title">Address:</span> {{ $ctrl.address }}</div>
-                    <div><span class="row-title">User Name:</span> {{ $ctrl.user }}</div>
-                    <div><span class="row-title">Remote Path:</span> {{ $ctrl.remotePath }}</div>
-                    <div><span class="row-title">Port:</span>{{ $ctrl.port }}</div>
-                </div>
-            </div>
-        </div>
-        <div class="width-100 section">
-            <div class="flex-col justify-content-center header">
-                <h5>Downloading</h5>
-            </div>
-            <p>Juno EMR is automatically checking for new HRM reports every {{ $ctrl.interval }} minutes.</p>
-        </div>
-        <div class="width-100 section">
-            <div class="flex-col justify-content-center header">
-                <h5>Processing</h5>
-            </div>
-            <p>Juno EMR is decrypting your HRM reports.</p>
-            <p>Demographics and providers will be automatically linked to each message.
-                You can always change these assignments at any time using the HRM report viewer.</p>
-        </div>
-    </div>
+	<panel class="w-100">
+		<panel-header class="flex-row justify-content-between align-items-center">
+			<h6 class="d-inline-block">Settings</h6>
+			<div class="flex-row">
+				<juno-button ng-if="!$ctrl.isReadOnly"
+							 class="flex-grow-0 w-256 m-r-8"
+							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+							 click="$ctrl.onSave()">
+					Save
+				</juno-button>
+				<juno-button ng-if="$ctrl.isReadOnly"
+							 class="flex-grow-0 w-256"
+							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+							 click="$ctrl.onEdit()">
+					Edit Settings
+				</juno-button>
+				<juno-button ng-if="!$ctrl.isReadOnly"
+							 class="flex-grow-0 w-256"
+							 button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
+							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+							 click="$ctrl.onCancel()">
+					Cancel
+				</juno-button>
+			</div>
+		</panel-header>
+		<panel-body class="flex-col">
+			<div class="flex-col">
+				<juno-input label="Mailbox Address"
+							label-position="$ctrl.LABEL_POSITION"
+							disabled="$ctrl.readOnly"
+				>
+				</juno-input>
+				<juno-input label="User Name"
+							label-position="$ctrl.LABEL_POSITION"
+							disabled="$ctrl.readOnly"
+				>
+				</juno-input>
+				<juno-input label="Remote Path"
+							label-position="$ctrl.LABEL_POSITION"
+							disabled="$ctrl.readOnly"
+				>
+				</juno-input>
+				<juno-input label="Port"
+							label-position="$ctrl.LABEL_POSITION"
+							disabled="$ctrl.readOnly"
+							placeholder="22"
+				>
+				</juno-input>
+			</div>
+		</panel-body>
+	</panel>
 </div>

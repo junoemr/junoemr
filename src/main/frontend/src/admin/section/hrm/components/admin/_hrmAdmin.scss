@@ -1,76 +1,55 @@
 #hrm-admin {
-  .tab-container {
-    display: flex;
-  }
+	.stats-panel {
+		.summary-step {
+			height: 32px;
 
-  .summary-container {
+			.status {
+				@include juno-font-button(16px, bold, normal);
+				background-color: var(--color-neutral-lightest);
+				border: solid 2px;
+				border-radius: 4px;
 
-    .summary-step {
-      height: 32px;
+				width: 256px;
+				text-align: center;
 
-      .status {
-        @include juno-font-button(16px, bold, normal);
+				&.ok {
+					border-color: var(--color-lime-darker);
+					color: var(--color-lime-darker);
+				}
 
-        width: 192px;
-        text-align: center;
-        color: var(--color-neutral-white);
-        border-radius: 4px;
+				&.warn {
+					border-color: var(--color-orange-dark);
+					color: var(--color-orange-dark);
+				}
 
-        &.ok {
-          background: var(--color-lime-darker);
-        }
+				&.error {
+					border-color: var(--color-red-dark);
+					color: var(--color-red-dark);
+				}
+			}
 
-        &.warn {
-          background: var(--color-yellow-base);
-        }
+			.status-text {
+				white-space: pre-line;
+			}
+		}
 
-        &.error {
-          background: var(--color-red-base);
-        }
-      }
+		.xs-text {
+			@include juno-font-body-smallest;
+		}
+	}
 
-      .status-text {
-        white-space: pre-line;
-      }
-    }
+	.polling-panel {
+		.loading-container {
+			overflow: hidden;
+			height: 30px;
+			width: 256px;
+		}
 
-    .summary-footer {
-      p {
-        @include juno-font-body-smallest;
-      }
-
-    }
-  }
-
-  .fetch-container {
-    width: 256px;
-  }
-
-  .details-container
-  {
-    .header {
-      font-weight: bold;
-      margin-bottom: 12px;
-    }
-
-    .section {
-      margin-top: 24px;
-
-      .row-title {
-        width: 128px;
-        display: inline-block;
-        font-weight: bold;
-        margin-left: 32px;
-      }
-
-      h5 {
-        margin: 0;
-      }
-
-      p {
-        @include juno-font-body-small;
-        white-space: pre-line;
-      }
-    }
-  }
+		juno-input {
+			flex-grow: 0;
+			display: inline-block;
+			width: 512px;
+			margin-top: 8px;
+		}
+	}
 }

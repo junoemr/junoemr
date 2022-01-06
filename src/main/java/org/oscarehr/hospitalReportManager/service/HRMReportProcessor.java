@@ -142,7 +142,7 @@ public class HRMReportProcessor
 			else
 			{
 				logger.info(String.format("Duplicate report hash (%s) for file: %s", hrmDocument.getReportHash(), hrmDocument.getReportFile()));
-				hrmService.handleDuplicate(hrmDocument);
+				hrmService.handleDuplicateDocument(hrmDocument);
 			}
 			
 			return true;

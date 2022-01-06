@@ -196,7 +196,7 @@ public class HRMService
 	/**
 	 * Persist HRMDocument and any associated provider and demographic linkages through cascade.
 	 *
-	 * @param hrmDocument hrmDocument to persist
+	 * @param hrmDocument duplicate to persist
 	 * @param demographic <optional>Demographic to associate with the HRM document</optional>
 	 * @return HRMDocument entity
 	 */
@@ -320,20 +320,19 @@ public class HRMService
 		return out;
 	}
 	
-	public void handleDuplicate(HRMDocument hrmDocument)
+	public void handleDuplicateDocument(HRMDocument duplicate)
 	{
-		List<Integer> matchingDocuments = hrmDocumentDao.findByMessageUniqueId(hrmDocument.getMessageUniqueId());
-		
+		List<Integer> matchingDocuments = hrmDocumentDao.findByMessageUniqueId(duplicate.getMessageUniqueId());
 		if (matchingDocuments != null && !matchingDocuments.isEmpty())
 		{
-			HRMDocument originalDocument = hrmDocumentDao.find(matchingDocuments.get(0));
-			originalDocument.setNumDuplicatesReceived(originalDocument.getNumDuplicatesReceived() + 1);
-			hrmDocumentDao.merge(originalDocument);
-		}
-		
-		if (matchingDocuments != null && matchingDocuments.size() > 1)
-		{
-			logger.warn(String.format("Multiple HRM documents have the same unique Id %s", hrmDocument.getMessageUniqueId()));
+			if (matchingDocuments.size() > 1)
+			{
+				logger.warn(String.format("Multiple HRM documents have the same unique id %s", duplicate.getMessageUniqueId()));
+			}
+
+			HRMDocument original = hrmDocumentDao.find(matchingDocuments.get(0));
+			original.setNumDuplicatesReceived(original.getNumDuplicatesReceived() + 1);
+			hrmDocumentDao.merge(original);
 		}
 	}
 }

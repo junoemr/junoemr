@@ -100,15 +100,28 @@ export default class SystemPreferenceService
   }
 
   /**
-   * Determine if a system perference (stored in the database) is enabled.
+   * Determine if a system preference (stored in the database) is enabled.
    * An enabled value is any case-insensitive match on any of {"true", "on", "yes"}
    *
    * @param preferenceName - the name of the preference to fetch
-   * @param defaultValue - a default value to use if the preference is not set on the server.
+   * @param defaultValue - an optional default value to use if the preference is not set on the server.
    * @return boolean true if enabled, false otherwise
    */
-  public async isPreferenceEnabled(preferenceName: string): Promise<any>
+  public async isPreferenceEnabled(preferenceName: string, defaultValue?: boolean): Promise<any>
   {
-    return (await this.systemPreferenceApi.getPreferenceEnabled(preferenceName, false)).data.body
+    return (await this.systemPreferenceApi.getPreferenceEnabled(preferenceName, false)).data.body;
   }
+
+/**
+ * Set the value of a preference (stored in the database), creating a new preference if one does
+ * not already exist as specified by the preference name.
+ *
+ * @param preferenceName - the name of the preference to set
+ * @param value - value to set preference to
+ * @return number preference id
+ */
+  public async setPreference(preferenceName: string, value: any): Promise<number>
+	{
+		return (await this.systemPreferenceApi.putPreferenceValue(preferenceName, value)).data.body;
+	}
 }
