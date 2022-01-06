@@ -23,6 +23,11 @@
 
 package integration.tests;
 
+import static integration.tests.EditFamilyHistoryClassicUIIT.addNotes;
+import static integration.tests.EditFamilyHistoryClassicUIIT.archiveNotes;
+import static integration.tests.EditFamilyHistoryClassicUIIT.editCPPNoteTest;
+import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
@@ -37,16 +42,11 @@ import org.oscarehr.JunoApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByLinkText;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
-import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
-
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EditOtherMedsClassicUIIT extends SeleniumTestBase
 {
+
 	@Override
 	protected String[] getTablesToRestore()
 	{
@@ -62,58 +62,51 @@ public class EditOtherMedsClassicUIIT extends SeleniumTestBase
 	{
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
+		String eChartWindowHandle = driver.getWindowHandle();
+		PageUtil.switchToWindow(eChartWindowHandle, driver);
+	}
+
+	String cppType = "Other Meds";
+	String cppTypeID = "menuTitleoMeds";
+	String noteCPP = cppType + " in CPP";
+	String noteEncounter = cppType + " in Encounter";
+	String editedNoteCPP = "Edited " + noteCPP;
+	String archivedNote = "Archived " + cppType;
+
+	@Test
+	public void addOtherMedsTest()
+	{
+		//Add Notes
+		addNotes(cppTypeID, noteCPP, noteEncounter);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + noteEncounter + "')]")));
+		Assert.assertTrue(cppType + " Note is NOT Added in CPP successfully",
+			PageUtil.isExistsBy(By.linkText(noteCPP), driver));
+		Assert.assertTrue(cppType + " Note is NOT Copied in Encounter note successfully",
+			PageUtil.isExistsBy(By.xpath("//div[contains(., '" + noteEncounter + "')]"), driver));
 	}
 
 	@Test
 	public void editOtherMedsTest()
 	{
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
-		String otherMedsCPP = "Other Meds in CPP";
-		String otherMedsEncounter = "Other Meds in Encounter";
-		String editedOtherMedsCPP = "Edited Other Meds in CPP";
-		String archivedOtherMeds = "Archived Other Meds";
-		String startDate = "2020-01-01";
-		String resolutionDate = "2021-01-01";
-		PageUtil.switchToLastWindow(driver);
+		//Add Notes
+		addNotes(cppTypeID, noteCPP, noteEncounter);
 
-		//Add Other Meds Notes
-		findWaitClickByXpath(driver, webDriverWait, "//div[@id='menuTitleoMeds']//descendant::a[contains(., '+')]");
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
-		driver.findElement(By.id("noteEditTxt")).sendKeys(otherMedsEncounter);
-		driver.findElement(By.id("startdate")).sendKeys(startDate);
-		driver.findElement(By.id("resolutiondate")).sendKeys(resolutionDate);
-		driver.findElement(By.xpath("//input[@title='Copy to Current Note']")).click();
-		driver.findElement(By.id("noteEditTxt")).clear();
-		driver.findElement(By.id("noteEditTxt")).sendKeys(otherMedsCPP);
-		findWaitClickByXpath(driver, webDriverWait, "//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']");
-		findWaitClickById(driver, webDriverWait, "saveImg");
-
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(otherMedsCPP)));
-		Assert.assertTrue("Other Meds Note is NOT Added in CPP successfully",
-				PageUtil.isExistsBy(By.linkText(otherMedsCPP), driver));
-
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + otherMedsEncounter + "')]")));
- 		Assert.assertTrue("Other Meds Note is NOT Copied in Encounter note successfully",
-				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + otherMedsEncounter + "')]"), driver));
-
-		//Edit Other Meds Note
-		findWaitClickByLinkText(driver, webDriverWait, otherMedsCPP);
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
-		driver.findElement(By.id("noteEditTxt")).clear();
-		driver.findElement(By.id("noteEditTxt")).sendKeys(editedOtherMedsCPP);
-		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(editedOtherMedsCPP)));
-		Assert.assertTrue("Other Meds Note is NOT Edited in CPP successfully",
-				PageUtil.isExistsBy(By.linkText(editedOtherMedsCPP), driver));
-
-		//Archive Other Meds Note
-		findWaitClickByXpath(driver, webDriverWait, "//div[@id='menuTitleoMeds']//descendant::a[contains(., '+')]");
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("noteEditTxt")));
-		driver.findElement(By.id("noteEditTxt")).sendKeys(archivedOtherMeds);
-		driver.findElement(By.xpath("//input[@title='Archive']")).click();
-		clickWaitSwitchToLast(driver, webDriverWait, By.linkText("Other Meds"));
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + archivedOtherMeds + "')]")));
-		Assert.assertTrue("Other Meds Note is NOT Archived successfully",
-				PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedOtherMeds + "')]"), driver));
+		//Edit Note
+		editCPPNoteTest(cppType);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(editedNoteCPP)));
+		Assert.assertTrue(cppType + " Note is NOT Edited in CPP successfully",
+			PageUtil.isExistsBy(By.linkText(editedNoteCPP), driver));
 	}
+
+	@Test
+	public void archiveOtherMedsTest()
+	{
+		//Archive Note
+		archiveNotes(cppType, cppTypeID);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + archivedNote+ "')]")));
+		Assert.assertTrue(cppType + " Note is NOT Archived successfully",
+			PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedNote + "')]"), driver));
+	}
+
 }

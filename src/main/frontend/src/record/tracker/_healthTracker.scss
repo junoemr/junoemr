@@ -1,3 +1,8 @@
+
+.health-tracker-page {
+	@include juno-page-padding-default;
+}
+
 .health-tracker-component {
 	position: relative;
 

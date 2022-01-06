@@ -29,10 +29,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.util.MessageResources;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.dao.ContactDao;
-import org.oscarehr.common.dao.DemographicContactDao;
+import org.oscarehr.contact.dao.ContactDao;
+import org.oscarehr.contact.dao.DemographicContactDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.common.model.ProfessionalContact;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;

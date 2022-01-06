@@ -29,8 +29,8 @@ import org.oscarehr.dataMigration.model.provider.Provider;
 
 import java.time.LocalDateTime;
 
-import static org.oscarehr.common.model.DemographicContact.CATEGORY_PERSONAL;
-import static org.oscarehr.common.model.DemographicContact.CATEGORY_PROFESSIONAL;
+import static org.oscarehr.contact.entity.DemographicContact.CATEGORY_PERSONAL;
+import static org.oscarehr.contact.entity.DemographicContact.CATEGORY_PROFESSIONAL;
 
 
 @Data

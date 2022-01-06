@@ -32,7 +32,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.managers.TicklerManager;
 import org.oscarehr.util.LoggedInInfo;

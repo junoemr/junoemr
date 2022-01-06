@@ -25,14 +25,14 @@ package org.oscarehr.ws.rest.demographic;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.jcs.access.exception.InvalidArgumentException;
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
-import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
+import org.oscarehr.contact.transfer.DemographicContactFewTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

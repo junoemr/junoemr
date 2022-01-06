@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.managers.TicklerManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;

@@ -30,7 +30,7 @@ import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
+import org.oscarehr.contact.transfer.DemographicContactFewTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;

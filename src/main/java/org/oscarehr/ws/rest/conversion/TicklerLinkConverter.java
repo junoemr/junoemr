@@ -23,7 +23,7 @@
  */
 package org.oscarehr.ws.rest.conversion;
 
-import org.oscarehr.common.model.TicklerLink;
+import org.oscarehr.ticklers.entity.TicklerLink;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.TicklerLinkTo1;
 import org.springframework.beans.BeanUtils;

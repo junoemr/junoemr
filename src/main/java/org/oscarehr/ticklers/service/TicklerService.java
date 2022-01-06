@@ -24,14 +24,13 @@
 
 package org.oscarehr.ticklers.service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.PaginationQuery;
-import org.oscarehr.common.dao.TicklerCategoryDao;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.dao.TicklerCategoryDao;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.ticklers.dao.TicklersDao;
 import org.oscarehr.ticklers.search.TicklerCriteriaSearch;
 import org.oscarehr.ticklers.web.TicklerQuery;
@@ -168,14 +167,7 @@ public class TicklerService extends AbstractServiceImpl
 		criteriaSearch.setLimit(perPage);
 		criteriaSearch.setOffset(offset);
 
-		int total = TicklerDao.criteriaSearchCount(criteriaSearch);
-
-		List<Tickler> resultList = new ArrayList<>();
-		if (total > 0)
-		{
-			resultList = TicklerDao.criteriaSearch(criteriaSearch);
-		}
-		return resultList;
+		return TicklerDao.criteriaSearch(criteriaSearch);
 	}
 
 	public int getTicklerCount(TicklerCriteriaSearch criteriaSearch)

@@ -31,7 +31,7 @@ import org.oscarehr.billing.CA.service.EligibilityCheckService;
 import org.oscarehr.billing.CA.transfer.EligibilityCheckTransfer;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.ws.external.soap.v1.converter.DemographicModelToSoapTransferConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;

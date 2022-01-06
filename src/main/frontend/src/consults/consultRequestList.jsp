@@ -50,7 +50,7 @@
 	<!-- TODO-legacy -->
 </div>
 <juno-security-check show-placeholder="true" permissions="consultRequestListCtrl.SecurityPermissions.ConsultationRead">
-	<div class="col-lg-12">
+	<div class="col-lg-12 consult-page">
 		<form name="searchForm" id="search-form">
 
 			<div class="row search-filters consultation-search-filter">

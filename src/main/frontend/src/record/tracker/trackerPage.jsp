@@ -23,6 +23,8 @@
 
 <page-wrapper show-header="false">
     <page-body>
-        <health-tracker user="$ctrl.user"></health-tracker>
+        <div class="health-tracker-page">
+            <health-tracker user="$ctrl.user"></health-tracker>
+        </div>
     </page-body>
 </page-wrapper>
