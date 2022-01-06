@@ -45,6 +45,8 @@ import java.util.Set;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.junoUtil.Navigation.EFORM_URL;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.PageUtil.switchToNewWindow;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
@@ -81,27 +83,24 @@ public class EFormIT extends SeleniumTestBase
 		Assert.assertFalse("expecting eform page but found error page!", PageUtil.isErrorPage(driver));
 		logger.info("Navigate to eform add page. OK");
 
-		//open eform
-		WebElement eformButton = driver.findElement(By.xpath("//a[contains(., 'travel_from_v4')]"));
-		Assert.assertNotNull(eformButton);
-
 		String currWindowHandle = driver.getWindowHandle();
 		Set<String> oldWindowHandles = driver.getWindowHandles();
-		eformButton.click();
-		Thread.sleep(2000);
+		switchToNewWindow(driver, By.xpath("//a[contains(., 'travel_from_v4')]"), oldWindowHandles, webDriverWait);
 		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
 		Assert.assertEquals("more than one window opened when opening eform", 1, newWindows.size());
 
-		PageUtil.switchToWindow(newWindows.get(0), driver);
-		Thread.sleep(2000);
 		Assert.assertFalse("got error page on eform page", PageUtil.isErrorPage(driver));
 		logger.info("Open eform travel_form_v4. OK");
 
-		driver.findElement(By.xpath("//input[@id='SubmitButton']")).click();
+		findWaitClickByXpath(driver, webDriverWait, "//input[@id='SubmitButton']");
+
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		logger.info("Submit eform travel_form_v4. OK");
+
+		oldUrl = driver.getCurrentUrl();
 		driver.get(Navigation.getOscarUrl(Integer.toString(randomTomcatPort)) + ECHART_URL);
-		Thread.sleep(2000);
+		PageUtil.waitForPageChange(oldUrl, webDriverWait);
+
 		Assert.assertNotNull(driver.findElement(By.xpath("//a[contains(., 'travel_from_v4:')]")));
 		logger.info("Eform added to Echart? OK");
 	}
