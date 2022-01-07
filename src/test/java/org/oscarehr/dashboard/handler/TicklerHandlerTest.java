@@ -30,7 +30,7 @@ import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.managers.TicklerManager;
 import org.oscarehr.util.LoggedInInfo;
 

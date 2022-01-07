@@ -24,7 +24,7 @@
 package org.oscarehr.ws.rest.transfer.tickler;
 
 import lombok.Data;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 
 import java.util.Date;
 import java.util.List;

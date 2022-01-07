@@ -24,12 +24,12 @@
 package org.oscarehr.ws.rest.conversion;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.oscarehr.common.model.Contact;
+import org.oscarehr.contact.entity.Contact;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
+import org.oscarehr.contact.transfer.DemographicContactFewTo1;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -52,6 +52,7 @@ public class DemographicContactFewConverter {
 		demographicContactFewTo1.setSdm(demographicContact.getSdm());
 		demographicContactFewTo1.setCategory(demographicContact.getCategory());
 		demographicContactFewTo1.setType(demographicContact.getType());
+		demographicContactFewTo1.setId(demographicContact.getId());
 		demographicContactFewTo1.setContactId(demographicContact.getContactId());
 		
 		if (demographicContact.getType() == DemographicContact.TYPE_DEMOGRAPHIC) {

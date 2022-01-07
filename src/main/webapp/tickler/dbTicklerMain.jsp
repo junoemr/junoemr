@@ -28,7 +28,7 @@
 
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
-<%@ page import="org.oscarehr.common.model.Tickler" %>
+<%@ page import="org.oscarehr.ticklers.entity.Tickler" %>
 <%@ page import="org.oscarehr.managers.TicklerManager" %>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%

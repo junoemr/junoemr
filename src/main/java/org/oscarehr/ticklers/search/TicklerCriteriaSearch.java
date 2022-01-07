@@ -24,7 +24,7 @@ package org.oscarehr.ticklers.search;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 
 import java.util.Date;
@@ -98,7 +98,11 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 
 		if (getMrp() != null)
 		{
-			criteria.add(Restrictions.eq("mrp", getMrp()));
+			String alias = criteria.getAlias();
+
+			// join demographic and only return the result if the assigned mrp matches
+			criteria.createAlias(alias + ".demographic", "demo", Criteria.INNER_JOIN);
+			criteria.add(Restrictions.eq("demo.providerNo", getMrp()));
 		}
 
 		// date searching
@@ -122,13 +126,19 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 
 	private void setOrderByCriteria(Criteria criteria)
 	{
+		String alias = criteria.getAlias();
+
 		switch(sortMode)
 		{
 			case DemographicName:
-				criteria.addOrder(getOrder("demographicNo"));
+				criteria.createAlias(alias + ".demographic", "demo", Criteria.LEFT_JOIN);
+				criteria.addOrder(getOrder("demo.LastName"));	// mapping found in the .hbm file
+				criteria.addOrder(getOrder("demo.FirstName"));	// mapping found in the .hbm file
 				break;
 			case Creator:
-				criteria.addOrder(getOrder("creator"));
+				criteria.createAlias(alias + ".provider", "prov", Criteria.LEFT_JOIN);
+				criteria.addOrder(getOrder("prov.LastName"));	// mapping found in the .hbm file
+				criteria.addOrder(getOrder("prov.FirstName"));	// mapping found in the .hbm file
 				break;
 			case ServiceDate:
 				criteria.addOrder(getOrder("serviceDate"));
@@ -137,7 +147,9 @@ public class TicklerCriteriaSearch extends AbstractCriteriaSearch
 				criteria.addOrder(getOrder("priority"));
 				break;
 			case TaskAssignedTo:
-				criteria.addOrder(getOrder("taskAssignedTo"));
+				criteria.createAlias(alias + ".assignee", "prov", Criteria.LEFT_JOIN);
+				criteria.addOrder(getOrder("prov.LastName"));	// mapping found in the .hbm file
+				criteria.addOrder(getOrder("prov.FirstName"));	// mapping found in the .hbm file
 				break;
 			case Status:
 				criteria.addOrder(getOrder("status"));

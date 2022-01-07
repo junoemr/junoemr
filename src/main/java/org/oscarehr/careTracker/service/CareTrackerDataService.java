@@ -319,7 +319,7 @@ public class CareTrackerDataService
 					providerId,
 					careTrackerItem.getTypeCode(),
 					value,
-					ConversionUtils.toLegacyDateTime(itemData.getObservationDateTime()),
+					ConversionUtils.toNullableLegacyDateTime(itemData.getObservationDateTime()),
 					itemData.getComment());
 
 			return measurementToCareTrackerItemDataConverter.convert(measurement);
@@ -337,6 +337,11 @@ public class CareTrackerDataService
 			CareTrackerItem careTrackerItem,
 			CareTrackerItemDataCreateTransfer itemData)
 	{
+		if(itemData.getObservationDateTime() == null)
+		{
+			throw new ValidationException("Preventions must have an observation date");
+		}
+
 		// set up the comment extension
 		List<PreventionExt> extList = new ArrayList<>();
 		String commentText = StringUtils.trimToNull(itemData.getComment());

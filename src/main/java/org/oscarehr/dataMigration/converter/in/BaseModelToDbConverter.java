@@ -26,7 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.provider.search.ProviderCriteriaSearch;
@@ -54,6 +56,9 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 
 	@Autowired
 	private ProviderService providerService;
+
+	@Autowired
+	private ProviderManager2 providerManager2;
 
 	@Autowired
 	private ProviderRoleService providerRoleService;
@@ -119,6 +124,7 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 				String billCenterCode = properties.getProperty("default_bill_center", "");
 				dbProvider = providerService.addNewProvider(IMPORT_PROVIDER, dbProvider, billCenterCode);
 				providerRoleService.setDefaultRoleForNewProvider(dbProvider.getId());
+				providerManager2.updateSingleSetting(dbProvider.getId(), UserProperty.COBALT, UserProperty.PROPERTY_ON_YES);
 
 				logger.info("Created new Provider record " + dbProvider.getId() + " (" + dbProvider.getLastName() + "," + dbProvider.getFirstName() + ")");
 			}

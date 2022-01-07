@@ -26,6 +26,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.util.MiscUtils;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
@@ -40,7 +41,7 @@ public class AHSMeditechHandler extends AHSHandler
 	public static final String AHS_MEDITECH_LAB_TYPE = "AHS-PDOC";
 
 	protected static final String AHS_PDOC_SENDING_APPLICATION = "PDOC";
-	protected static final String AHS_PDOC_SENDING_FACILITY = "PHR-LMHA";
+	protected static final String AHS_PDOC_SENDING_FACILITY_PREFIX = "PHR-";
 
 	public static boolean handlerTypeMatch(Message message)
 	{
@@ -51,10 +52,10 @@ public class AHSMeditechHandler extends AHSHandler
 			MSH messageHeaderSegment = msh.getMSH();
 
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
-			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
+			String sendingFacility = StringUtils.trimToEmpty(messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue());
 
 			return AHS_PDOC_SENDING_APPLICATION.equalsIgnoreCase(sendingApplication) &&
-				AHS_PDOC_SENDING_FACILITY.equalsIgnoreCase(sendingFacility);
+					sendingFacility.startsWith(AHS_PDOC_SENDING_FACILITY_PREFIX);
 		}
 		return false;
 	}

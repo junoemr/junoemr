@@ -3,6 +3,10 @@
 	@extend %juno-page-header;
 }
 
+.consult-page {
+	@include juno-page-padding-default;
+}
+
 #consult-request-section,
 #consult-response-section {
 	.consult-request-form {

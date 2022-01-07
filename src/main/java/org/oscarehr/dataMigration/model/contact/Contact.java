@@ -25,10 +25,10 @@ package org.oscarehr.dataMigration.model.contact;
 import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 
-import static org.oscarehr.common.model.DemographicContact.TYPE_CONTACT;
-import static org.oscarehr.common.model.DemographicContact.TYPE_DEMOGRAPHIC;
-import static org.oscarehr.common.model.DemographicContact.TYPE_PROFESSIONALSPECIALIST;
-import static org.oscarehr.common.model.DemographicContact.TYPE_PROVIDER;
+import static org.oscarehr.contact.entity.DemographicContact.TYPE_CONTACT;
+import static org.oscarehr.contact.entity.DemographicContact.TYPE_DEMOGRAPHIC;
+import static org.oscarehr.contact.entity.DemographicContact.TYPE_PROFESSIONALSPECIALIST;
+import static org.oscarehr.contact.entity.DemographicContact.TYPE_PROVIDER;
 
 public interface Contact
 {

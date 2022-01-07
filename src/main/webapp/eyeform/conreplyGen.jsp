@@ -50,7 +50,7 @@ if(!authed) {
 <%@page import="org.oscarehr.eyeform.model.*"%>
 <%@page import="org.oscarehr.eyeform.web.EyeformAction"%>
 <%@page import="java.util.List"%>
-<%@page import="org.oscarehr.common.model.DemographicContact"%>
+<%@page import="org.oscarehr.contact.entity.DemographicContact"%>
 <%@ page import="org.oscarehr.allergy.model.Allergy" %>
 
 <html:html>

@@ -23,17 +23,6 @@
  */
 package org.caisi.tickler.web;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import org.oscarehr.common.model.Tickler;
-import org.oscarehr.common.printing.FontSettings;
-import org.oscarehr.common.printing.PdfWriterFactory;
-
-import oscar.OscarProperties;
-
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
@@ -48,6 +37,16 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfPageEventHelper;
 import com.lowagie.text.pdf.PdfWriter;
+import org.oscarehr.common.printing.FontSettings;
+import org.oscarehr.common.printing.PdfWriterFactory;
+import org.oscarehr.ticklers.entity.Tickler;
+import oscar.OscarProperties;
+import oscar.util.ConversionUtils;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class TicklerPrinter {
 
@@ -154,7 +153,8 @@ public class TicklerPrinter {
 		document.resetHeader();
 		document.resetFooter();
 
-		String headerTitle = "Tickler re: " + tickler.getDemographic().getFormattedName() + " DOB:" + tickler.getDemographic().getFormattedDob();
+		String headerTitle = "Tickler re: " + tickler.getDemographic().getFormattedName() +
+				" DOB:" + ConversionUtils.toDateString(tickler.getDemographic().getDateOfBirth());
 
 		if (newPage) {
 			document.newPage();

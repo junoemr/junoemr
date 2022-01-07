@@ -26,10 +26,10 @@ package org.oscarehr.admin.web;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.DemographicContactDao;
+import org.oscarehr.contact.dao.DemographicContactDao;
 import org.oscarehr.common.dao.ProfessionalContactDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.common.model.ProfessionalContact;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.util.MiscUtils;

@@ -63,7 +63,7 @@ import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.managers.TicklerManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;

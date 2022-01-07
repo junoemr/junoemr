@@ -29,9 +29,8 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.CustomFilter;
-import org.oscarehr.common.model.Tickler;
-import org.oscarehr.common.model.TicklerTextSuggest;
-import org.oscarehr.common.search.AbstractCriteriaSearch;
+import org.oscarehr.ticklers.entity.Tickler;
+import org.oscarehr.ticklers.entity.TicklerTextSuggest;
 import org.oscarehr.encounterNote.service.TicklerNoteService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -64,8 +63,8 @@ import java.util.List;
 
 @Path("/tickler")
 @Component("ticklerWebService")
-public class TicklerWebService extends AbstractServiceImpl {
-	
+public class TicklerWebService extends AbstractServiceImpl
+{
 	@Autowired
 	private TicklerManager ticklerManager; 
 
@@ -186,7 +185,7 @@ public class TicklerWebService extends AbstractServiceImpl {
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.TICKLER_READ);
 
-		AbstractCriteriaSearch.SORTDIR sortDir = AbstractCriteriaSearch.SORTDIR.valueOf(sortDirection);
+		TicklerCriteriaSearch.SORTDIR sortDir = TicklerCriteriaSearch.SORTDIR.valueOf(sortDirection);
 		TicklerCriteriaSearch.SORT_MODE sortMode = TicklerCriteriaSearch.SORT_MODE.valueOf(sortColumn);
 
 		TicklerCriteriaSearch ticklerCriteriaSearch = new TicklerCriteriaSearch();

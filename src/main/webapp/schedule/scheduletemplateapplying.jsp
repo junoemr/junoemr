@@ -47,10 +47,11 @@
 <%@ page import="oscar.SxmlMisc" %>
 <%@page import="oscar.util.ConversionUtils"%>
 <%@page import="oscar.util.UtilDateUtilities"%>
-<%@page import="java.net.URLEncoder"%>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.StringTokenizer" %>
+<%@ page import="java.nio.charset.StandardCharsets" %>
+<%@ page import="java.net.URLEncoder" %>
 <%
 	Schedule scheduleService = SpringUtils.getBean(Schedule.class);
 	ScheduleTemplateService scheduleTemplateService = SpringUtils.getBean(ScheduleTemplateService.class);
@@ -134,6 +135,9 @@
 		String today = UtilDateUtilities.DateToString(new java.util.Date(), "yyyy-MM-dd");
 		String threeYearsBack = (Integer.parseInt(today.substring(0, today.indexOf('-'))) - 3) + today.substring(today.indexOf('-'));
 
+		String providerName = request.getParameter("provider_name");
+		String providerNameEncoded = URLEncoder.encode(providerName, String.valueOf(StandardCharsets.UTF_8));
+
 		if("1".equals(request.getParameter("delete")))
 		{
 			String providerNo = request.getParameter("provider_no");
@@ -142,7 +146,7 @@
 
 			scheduleService.deleteSchedule(providerNo, startDate, deletePriority);
 
-			response.sendRedirect("scheduletemplateapplying.jsp?provider_no=" + providerNo + "&provider_name=" + URLEncoder.encode(request.getParameter("provider_name")));
+			response.sendRedirect("scheduletemplateapplying.jsp?provider_no=" + providerNo + "&provider_name=" + providerNameEncoded);
 		}
 		else
 		{
@@ -189,14 +193,14 @@ function displayTemplate(s)
 
 function selectrschedule(s) {
     var ref = "<rewrite:reWrite jspPage="scheduletemplateapplying.jsp"/>";
-    ref += "?provider_no=<%=request.getParameter("provider_no")%>&provider_name=<%=request.getParameter("provider_name")%>";
+    ref += "?provider_no=<%=request.getParameter("provider_no")%>&provider_name=<%=providerNameEncoded%>";
     ref += "&sdate=" +s.options[s.selectedIndex].value;
     self.location.href = ref;
 }
 function onBtnDelete(s) {
   if( confirm("<bean:message key="schedule.scheduletemplateapplying.msgDeleteConfirmation"/>") ) {
     var ref = "<rewrite:reWrite jspPage="scheduletemplateapplying.jsp"/>";
-    ref += "?provider_no=<%=request.getParameter("provider_no")%>&provider_name=<%=request.getParameter("provider_name")%>";
+    ref += "?provider_no=<%=request.getParameter("provider_no")%>&provider_name=<%=providerNameEncoded%>";
     ref += "&sdate=" +s.options[s.selectedIndex].value;
     ref += "&delete=1&deldate=all";
     self.location.href = ref;
@@ -561,9 +565,9 @@ function disableSubmitButton()
 		%>
 		<table width="99%" border="0" cellspacing="0" cellpadding="0">
 			<tr>
-				<td bgcolor="#CCFFCC"><b><%=request.getParameter("provider_name")%></b>
+				<td bgcolor="#CCFFCC"><b><%=providerName%></b>
 				<input type="hidden" name="provider_name"
-					value="<%=request.getParameter("provider_name")%>"></td>
+					value="<%=providerName%>"></td>
 				<td bgcolor="#CCFFCC" nowrap align="right"><select
 					name="select" onChange="selectrschedule(this)">
 					<%

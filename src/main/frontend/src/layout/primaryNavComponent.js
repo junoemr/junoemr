@@ -1,10 +1,12 @@
 import {SecurityPermissions} from "../common/security/securityConstants";
+import {SYSTEM_PROPERTIES} from "../common/services/systemPreferenceServiceConstants";
 import {BILLING_REGION} from "../billing/billingConstants";
 import {MessagingServiceType} from "../lib/messaging/model/MessagingServiceType";
 import MessagingServiceFactory from "../lib/messaging/factory/MessagingServiceFactory";
 import {MessageGroup} from "../lib/messaging/model/MessageGroup";
 import MhaConfigService from "../lib/integration/myhealthaccess/service/MhaConfigService";
 import {MessageCountMode} from "../lib/provider/settings/model/MessageCountMode";
+import SystemPreferenceService from "../lib/system/service/SystemPreferenceService";
 
 angular.module('Layout').component("primaryNavigation", {
 	bindings: {},
@@ -50,6 +52,7 @@ angular.module('Layout').component("primaryNavigation", {
 		          ticklerService)
 	{
 		var ctrl = this;
+		const systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
 
 		ctrl.me = null;
 
@@ -66,6 +69,8 @@ angular.module('Layout').component("primaryNavigation", {
 
 		ctrl.init = function init()
 		{
+			ctrl.uiLock = false
+			ctrl.customNavIcon = null; 	// initalized as null to prevent icon flicker if it needs to be changed from default
 			ctrl.activeConsultationTotal = 0;
 			ctrl.ticklerTotal = 0;
 			ctrl.unAckLabDocTotal = 0;
@@ -80,6 +85,18 @@ angular.module('Layout').component("primaryNavigation", {
 			// measured in months
 			ctrl.consultationLookbackPeriod = 1;
 			ctrl.SecurityPermissions = SecurityPermissions;
+
+			systemPreferenceService.isPreferenceEnabled(SYSTEM_PROPERTIES.UI_CUSTOM_NAV_ICON)
+			.then(pref =>
+			{
+				ctrl.customNavIcon = pref;
+			})
+
+			systemPreferenceService.isPreferenceEnabled(SYSTEM_PROPERTIES.UI_LOCK_TO_JUNO_UI)
+			.then(pref =>
+			{
+				ctrl.uiLock = pref;
+			})
 
 			personaService.getDashboardMenu().then(
 				function success(results)
@@ -174,6 +191,24 @@ angular.module('Layout').component("primaryNavigation", {
 			ctrl.mhaEnabled = await ctrl.mhaConfigService.mhaEnabled();
 
 			$scope.$apply();
+		}
+
+		ctrl.navTitle = () =>
+		{
+			if (!ctrl.uiLock)
+			{
+				return "Go to OSCAR Classic UI";
+			}
+
+			return "";
+		}
+
+		ctrl.onClickNavIcon = () =>
+		{
+			if (!ctrl.uiLock)
+			{
+				window.location = "../provider/providercontrol.jsp";
+			}
 		}
 
 		//=========================================================================
@@ -584,11 +619,6 @@ angular.module('Layout').component("primaryNavigation", {
 					window.location = item.url;
 				}
 			}
-		};
-
-		ctrl.loadClassicUi = function()
-		{
-			window.location = "../provider/providercontrol.jsp";
 		};
 
 		ctrl.openMhaInbox = async () =>

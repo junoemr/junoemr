@@ -30,7 +30,7 @@ import org.hibernate.FetchMode;
 import org.hibernate.Session;
 import org.oscarehr.common.PaginationQuery;
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 import org.oscarehr.ticklers.web.TicklerQuery;
 import org.oscarehr.util.MiscUtils;
