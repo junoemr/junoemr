@@ -151,25 +151,6 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 		accessSectionJUNOUI(driver, webDriverWait, "Schedule");
 
 		AppointmentUtil.skipTwoDaysJUNOUI(driver, webDriverWait);
-		/*
-		String nextDaySelector = "//button[@title='Next Day']";
-
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(nextDaySelector)));
-
-		String todayDateString = driver.findElement(By.cssSelector("#ca-calendar th.fc-today")).getAttribute("data-date");
-		LocalDate dateToday = ConversionUtils.toLocalDate(todayDateString);
-		String oneDayLaterString = dtf.format(dateToday.plusDays(1));
-		String twoDaysLaterString = dtf.format(dateToday.plusDays(2));
-
-		driver.findElement(By.xpath(nextDaySelector)).click();
-
-		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-future span"), "(0) " + oneDayLaterString));
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(nextDaySelector)));
-		driver.findElement(By.xpath(nextDaySelector)).click();
-
-		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-future span"), "(0) " + twoDaysLaterString));
-		 */
-
 		dropdownSelectByVisibleText(driver, webDriverWait, By.id("schedule-select"), "oscardoc, doctor");
 
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//i[@class='icon icon-status onclick-event-status icon-starbill rotate']")));

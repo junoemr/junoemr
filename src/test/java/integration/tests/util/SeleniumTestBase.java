@@ -67,9 +67,9 @@ public class SeleniumTestBase extends DatabaseTestBase
 	protected JunoProperties junoProperties;
 
 
-	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 120;
-	public static final Integer WEB_DRIVER_PAGE_LOAD_TIMEOUT = 120;
-	public static final Integer WEB_DRIVER_SCRIPT_TIMEOUT = 120;
+	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 60;
+	public static final Integer WEB_DRIVER_PAGE_LOAD_TIMEOUT = 60;
+	public static final Integer WEB_DRIVER_SCRIPT_TIMEOUT = 60;
 	private static final String GECKO_DRIVER="src/test/resources/vendor/geckodriver";
 	private static final String DOCKER_INTEGRATION_PROPERTIES_FILE = "src/test/resources/docker_integration.properties";
 	private static final String DEFAULT_INTEGRATION_PROPERTIES_FILE = "src/test/resources/integration.properties";

@@ -31,6 +31,8 @@ import oscar.util.ConversionUtils;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+
 public class AppointmentUtil
 {
 	private static final String COLUMN_HEADER_DATE_FORMAT = "EEEE MMM d";
@@ -46,11 +48,11 @@ public class AppointmentUtil
 		String oneDayLaterString = dtf.format(dateToday.plusDays(1));
 		String twoDaysLaterString = dtf.format(dateToday.plusDays(2));
 
-		driver.findElement(By.xpath(nextDaySelector)).click();
+		findWaitClickByXpath(driver, webDriverWait, nextDaySelector);
 
 		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-future span"), "(0) " + oneDayLaterString));
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(nextDaySelector)));
-		driver.findElement(By.xpath(nextDaySelector)).click();
+		findWaitClickByXpath(driver, webDriverWait, nextDaySelector);
 
 		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-future span"), "(0) " + twoDaysLaterString));
 	}

@@ -9,6 +9,7 @@ services:
       MYSQL_USER: oscar
       MYSQL_PASSWORD: oscar
       MYSQL_DATABASE: oscar_test
+      TZ: America/Vancouver
     ulimits:
       nofile:
         soft: 65536
@@ -16,6 +17,8 @@ services:
 
   juno-selenium-firefox:
     image: selenium/standalone-firefox:latest
+    environment:
+      TZ: America/Vancouver
 
   juno-maven:
     depends_on: [juno-test-db, juno-selenium-firefox]
