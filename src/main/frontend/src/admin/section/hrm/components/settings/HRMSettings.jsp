@@ -37,38 +37,47 @@
 							 class="flex-grow-0 w-256"
 							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-							 click="$ctrl.onEdit()">
+							 click="$ctrl.onEdit()"
+							 disabled="!$ctrl.canEdit()">
 					Edit Settings
 				</juno-button>
 				<juno-button ng-if="!$ctrl.isReadOnly"
 							 class="flex-grow-0 w-256"
 							 button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
 							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-							 click="$ctrl.onCancel()">
+							 click="$ctrl.onCancel()"
+							 disabled="$ctrl.isReadOnly">
 					Cancel
 				</juno-button>
 			</div>
 		</panel-header>
-		<panel-body class="flex-col">
+		<panel-body>
 			<div class="flex-col">
-				<juno-input label="Mailbox Address"
-							label-position="$ctrl.LABEL_POSITION"
-							disabled="$ctrl.readOnly"
-				>
-				</juno-input>
 				<juno-input label="User Name"
 							label-position="$ctrl.LABEL_POSITION"
-							disabled="$ctrl.readOnly"
+							ng-model="$ctrl.userSettings.userName"
+							disabled="$ctrl.isReadOnly"
 				>
 				</juno-input>
-				<juno-input label="Remote Path"
+				<juno-input class="m-t-16"
+							label="Mailbox Address"
 							label-position="$ctrl.LABEL_POSITION"
-							disabled="$ctrl.readOnly"
+							ng-model="$ctrl.userSettings.mailBoxAddress"
+							disabled="$ctrl.isReadOnly"
 				>
 				</juno-input>
-				<juno-input label="Port"
+				<juno-input class="m-t-16"
+							label="Remote Path"
 							label-position="$ctrl.LABEL_POSITION"
-							disabled="$ctrl.readOnly"
+							ng-model="$ctrl.userSettings.remotePath"
+							disabled="$ctrl.isReadOnly"
+				>
+				</juno-input>
+				<juno-input class="m-t-16"
+							label="Port"
+							label-position="$ctrl.LABEL_POSITION"
+							ng-model="$ctrl.userSettings.port"
+							disabled="$ctrl.isReadOnly"
 							placeholder="22"
 				>
 				</juno-input>

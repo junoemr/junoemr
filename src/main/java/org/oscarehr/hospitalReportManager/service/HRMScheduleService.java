@@ -44,7 +44,9 @@ public class HRMScheduleService
 	
 	@Autowired
 	HRMService hrmService;
-	
+
+	public static final int HRM_MINIMUM_POLL_TIME_SEC = 1200;
+
 	/**
 	 * Schedule remote fetch every intervalSeconds.  Location will not be overridden by local override.
 	 * @param intervalSeconds

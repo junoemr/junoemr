@@ -23,8 +23,8 @@
 				}
 
 				&.error {
-					border-color: var(--color-red-dark);
-					color: var(--color-red-dark);
+					border-color: var(--color-red-base);
+					color: var(--color-red-base);
 				}
 			}
 
@@ -49,7 +49,6 @@
 			flex-grow: 0;
 			display: inline-block;
 			width: 512px;
-			margin-top: 8px;
 		}
 	}
 }

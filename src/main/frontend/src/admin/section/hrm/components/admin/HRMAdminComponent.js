@@ -25,131 +25,111 @@ import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION
 import HrmService from "../../../../../lib/integration/hrm/service/HrmService";
 import {HRMStatus} from "../../../../../lib/integration/hrm/model/HrmFetchResults";
 import moment from "moment";
-import SystemPreferenceService
-	from "../../../../../lib/system/service/SystemPreferenceService";
+import SystemPreferenceService from "../../../../../lib/system/service/SystemPreferenceService";
+import {SecurityPermissions} from "../../../../../common/security/securityConstants";
 
 angular.module('Admin.Section').component('hrmAdmin',
 	{
 		templateUrl: 'src/admin/section/hrm/components/admin/HRMAdmin.jsp',
 		bindings: {},
-		controller: ['$scope', '$http', '$httpParamSerializer', function ($scope, $http, $httpParamSerializer)
-		{
-			let ctrl = this;
-			const hrmService = new HrmService();
-			const systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
-
-			ctrl.COMPONENT_STYLE = JUNO_STYLE.DEFAULT;
-			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
-			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
-			ctrl.LABEL_POSITION = LABEL_POSITION.TOP;
-
-			ctrl.pollingEnabled = true;
-			ctrl.pollingInterval = 0;
-
-			ctrl.pollingEnabledPreferenceName = "omd.hrm.polling_enabled";
-			ctrl.pollingIntervalPropertyKey = "omd.hrm.poll_interval_sec";
-
-			ctrl.$onInit = async () =>
+		controller: ['$scope', '$http', '$httpParamSerializer', 'securityRolesService',
+			function ($scope, $http, $httpParamSerializer, securityRolesService)
 			{
-				ctrl.COMPONENT_STYLE = ctrl.COMPONENT_STYLE || JUNO_STYLE.DEFAULT;
+				let ctrl = this;
+				const hrmService = new HrmService();
+				const systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
 
-				hrmService.getLastResults()
-				.then(value =>
-				{
-					ctrl.latestResults = value;
-				});
+				ctrl.COMPONENT_STYLE = JUNO_STYLE.DEFAULT;
+				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+				ctrl.LABEL_POSITION = LABEL_POSITION.TOP;
 
-				systemPreferenceService.getProperty(ctrl.pollingIntervalPropertyKey)
-				.then(value =>
-				{
-					ctrl.interval = Math.floor((value)/60);
-				});
+				ctrl.pollingEnabled = true;
+				ctrl.pollingInterval = 0;
 
-				systemPreferenceService.isPreferenceEnabled(ctrl.pollingEnabledPreferenceName, false)
-				.then(value =>
-				{
-					ctrl.pollingEnabled = value;
-				});
-			};
+				ctrl.pollingEnabledPreferenceName = "omd.hrm.polling_enabled";
+				ctrl.pollingIntervalPropertyKey = "omd.hrm.poll_interval_sec";
 
-			ctrl.fetchHRMDocs = async () =>
-			{
-				try
+				ctrl.$onInit = async () =>
 				{
-					ctrl.working = true;
-					ctrl.latestResults = await hrmService.fetchNewHRMDocuments();
-				}
-				finally
-				{
-					ctrl.working = false;
-					$scope.$apply();
-				}
-			}
+					ctrl.COMPONENT_STYLE = ctrl.COMPONENT_STYLE || JUNO_STYLE.DEFAULT;
 
-			ctrl.getSummaryText = (hrmStatus) =>
-			{
-				if (hrmStatus === HRMStatus.SUCCESS)
-				{
-					return "OK: No problems detected";
-				}
-				else if (hrmStatus === HRMStatus.HAS_ERRORS)
-				{
-					return "WARNING: One or more documents had problems. Consult the security log or contact support for assistance";
-				}
-				else
-				{
-					return "ERROR: Consult the security log or contact support for assistance";
-				}
-			}
+					hrmService.getLastResults()
+					.then(value =>
+					{
+						ctrl.latestResults = value;
+					});
 
-			ctrl.getSummaryClass = (hrmStatus) =>
-			{
+					systemPreferenceService.getProperty(ctrl.pollingIntervalPropertyKey)
+					.then(value =>
+					{
+						ctrl.pollingInterval = Math.floor((value)/60);
+					});
+				};
 
-				if (hrmStatus === HRMStatus.SUCCESS)
+				ctrl.fetchHRMDocs = async () =>
 				{
-					return "ok";
+					try
+					{
+						ctrl.working = true;
+						ctrl.latestResults = await hrmService.fetchNewHRMDocuments();
+					}
+					finally
+					{
+						ctrl.working = false;
+						$scope.$apply();
+					}
 				}
-				else if (hrmStatus === HRMStatus.HAS_ERRORS)
-				{
-					return "warn";
-				}
-				else
-				{
-					return "error";
-				}
-			}
 
-			ctrl.lastCheckedMessage = () =>
-			{
-				if (!ctrl.latestResults)
+				ctrl.getSummaryText = (hrmStatus) =>
 				{
-					return "Results have not been downloaded today";
+					if (hrmStatus === HRMStatus.SUCCESS)
+					{
+						return "OK: No problems detected";
+					}
+					else if (hrmStatus === HRMStatus.HAS_ERRORS)
+					{
+						return "WARNING: One or more documents had problems. Consult the security log or contact support for assistance";
+					}
+					else
+					{
+						return "ERROR: Consult the security log or contact support for assistance";
+					}
 				}
-				else
-				{
-					const duration = moment.duration(moment().diff(ctrl.latestResults.endTime));
-					return `Last checked ${Math.floor(duration.asMinutes())} minutes ago`;
-				}
-			}
 
-			ctrl.onPollingToggle = async (enabled) =>
-			{
-				try
+				ctrl.getSummaryClass = (hrmStatus) =>
 				{
-					ctrl.working = true;
-					await systemPreferenceService.setPreference(ctrl.pollingEnabledPreferenceName, enabled);
+
+					if (hrmStatus === HRMStatus.SUCCESS)
+					{
+						return "ok";
+					}
+					else if (hrmStatus === HRMStatus.HAS_ERRORS)
+					{
+						return "warn";
+					}
+					else
+					{
+						return "error";
+					}
 				}
-				catch (err)
+
+				ctrl.lastCheckedMessage = () =>
 				{
-					console.err(err);
-					// Revert the state change if there's an exception and the value can't be set on the backend
-					ctrl.pollingEnabled = !ctrl.pollingEnabled;
+					if (!ctrl.latestResults)
+					{
+						return "Results have not been downloaded today";
+					}
+					else
+					{
+						const duration = moment.duration(moment().diff(ctrl.latestResults.endTime));
+						return `Last checked ${Math.floor(duration.asMinutes())} minutes ago`;
+					}
 				}
-				finally
+
+				ctrl.canRead = () =>
 				{
-					ctrl.working = false;
-					$scope.$apply();
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.HrmRead);
 				}
-			}
-		}]
+			}]
 	});

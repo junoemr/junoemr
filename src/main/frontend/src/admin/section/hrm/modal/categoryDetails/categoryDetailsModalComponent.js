@@ -41,16 +41,8 @@ angular.module('Admin.Section').component('hrmCategoryDetailsModal',
 			modalInstance: "<",
 			resolve: "<",
 		},
-		controller: [
-			'$scope',
-			'$uibModal',
-			'securityRolesService',
-			'NgTableParams',
-			function (
-				$scope,
-				$uibModal,
-				securityRolesService,
-				NgTableParams)
+		controller: ['$scope', '$uibModal', 'securityRolesService', 'NgTableParams',
+			function ($scope, $uibModal, securityRolesService, NgTableParams)
 			{
 				const ctrl = this;
 				const hrmService = new HrmService();

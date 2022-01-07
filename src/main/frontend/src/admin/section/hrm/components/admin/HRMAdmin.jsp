@@ -24,7 +24,7 @@
 	<panel class="stats-panel w-100"
 		   component-style="$ctrl.COMPONENT_STYLE">
 		<panel-header>
-			<h6>Status</h6>
+			<h6>System Status</h6>
 		</panel-header>
 		<panel-body>
 			<div class="flex-row flex-grow-1 justify-content-space-between">
@@ -51,12 +51,13 @@
 	</panel>
 	<panel class="polling-panel w-100">
 		<panel-header class="flex-row justify-content-between align-items-center">
-			<h6 class="d-inline-block">Polling</h6>
+			<h6 class="d-inline-block">HRM Report Polling</h6>
 			<div class="d-flex">
 				<juno-button ng-if="!$ctrl.working"
 							 class="flex-grow-0 w-256"
 							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
+							 disabled="!$ctrl.canRead()"
 							 click="$ctrl.fetchHRMDocs()">
 					Check For Reports Now
 				</juno-button>
@@ -66,16 +67,8 @@
 			</div>
 		</panel-header>
 		<panel-body class="flex-col">
-			<juno-toggle label="Enable Automatic Polling"
-						 label-position="$ctrl.LABEL_POSITION"
-						 round="true"
-						 ng-model="$ctrl.pollingEnabled",
-						 change="$ctrl.onPollingToggle(checked)"
-						 disabled="$ctrl.working"
-			>
-			</juno-toggle>
 			<div class="flex-row align-items-center">
-				<juno-input label="Polling Frequency (minutes)"
+				<juno-input label="Automatic Polling Frequency (minutes)"
 							label-position="$ctrl.LABEL_POSITION"
 							ng-model="$ctrl.pollingInterval"
 							disabled="true"

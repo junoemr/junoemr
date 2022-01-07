@@ -67,10 +67,12 @@ export default class SystemPreferenceService
 	{
 		let propertyValues = await Promise.all(propertyNames.map(propertyName => this.getProperty(propertyName)));
 
-		return propertyValues.reduce((propertyMap, propertyValue, index) => {
-			propertyMap[propertyNames[index]] = propertyValue;
-			return propertyMap;
-		}, {});
+		return propertyValues.reduce(
+				(propertyMap, propertyValue, index) =>
+				{
+					propertyMap[propertyNames[index]] = propertyValue;
+					return propertyMap;
+				}, {});
 	}
 
 
@@ -86,15 +88,27 @@ export default class SystemPreferenceService
 		return (await this.systemPreferenceApi.getPropertyValue(propertyName, defaultValue)).data.body;
 	}
 
+	public async getPreferences(...preferenceNames: string[]): Promise<any>
+	{
+		let preferenceValues = await Promise.all(preferenceNames.map(preferenceName => this.getPreference(preferenceName)));
+
+		return preferenceValues.reduce(
+				(preferenceMap, preferenceValue, index) =>
+				{
+					preferenceMap[preferenceNames[index]] = preferenceValue;
+					return preferenceMap;
+				}, {});
+	}
+
   /**
    * Get the value of system preference setting from the server.  Unlike a property, a preference is stored in the database.
    * If the server does not have the value defined, return the default value instead.
    *
    * @param preferenceName - the name of the preference to fetch
-   * @param defaultValue - a default value to use if the preference is not set on the server.
+   * @param defaultValue - optional default value to use if the preference is not set on the server.
    * @return the value from the server or the default value provided
    */
-	public async getPreferenceWithDefault(preferenceName: string, defaultValue: any): Promise<any>
+	public async getPreference(preferenceName: string, defaultValue?: any): Promise<any>
   {
     return (await this.systemPreferenceApi.getPreferenceValue(preferenceName, defaultValue)).data.body;
   }
