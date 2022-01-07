@@ -269,12 +269,14 @@
 			<artifactId>javax.el</artifactId>
 			<version>3.0.1-b08</version>
 		</dependency>
+		<!--
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>2.28.2</version>
+			<version>4.2.0</version>
 			<scope>test</scope>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-module-junit4</artifactId>
@@ -1847,6 +1849,7 @@
 						<exclude>org/oscarehr/integration/born/AR2005BornConnectorTest.java</exclude>
 						<exclude>org/oscarehr/integration/born/AR2005Form2XMLTest.java</exclude>
 					</excludes>
+					<trimStackTrace>false</trimStackTrace>
 				</configuration>
 			</plugin>
 			<plugin>
