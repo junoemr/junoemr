@@ -32,9 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
@@ -69,7 +67,6 @@ import org.oscarehr.util.XmlUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import oscar.OscarProperties;
 import oscar.oscarDB.ArchiveDeletedRecords;
 import oscar.oscarDB.DBPreparedHandler;
 import oscar.oscarLab.ca.all.Hl7textResultsData;

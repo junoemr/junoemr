@@ -33,7 +33,6 @@ import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.billing.CA.BC.model.Hl7Obx;
 import org.oscarehr.billing.CA.BC.model.Hl7Orc;
@@ -50,8 +49,6 @@ import org.oscarehr.common.model.MdsZMN;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
-import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.util.LabGridDisplay;

@@ -30,9 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.OscarLogDao;
@@ -44,12 +42,9 @@ import org.oscarehr.ws.rest.to.model.SummaryItemTo1;
 import org.oscarehr.ws.rest.to.model.SummaryTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;
 import oscar.dms.EDocUtil.EDocSort;
-import oscar.oscarLab.ca.on.CommonLabResultData;
-import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
 

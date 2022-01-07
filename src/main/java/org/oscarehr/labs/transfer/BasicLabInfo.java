@@ -3,8 +3,6 @@ package org.oscarehr.labs.transfer;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Data;
-import org.oscarehr.util.SpringUtils;
-import oscar.oscarLab.ca.on.LabResultData;
 
 @Data
 public class BasicLabInfo implements Serializable

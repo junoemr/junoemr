@@ -26,6 +26,19 @@ package oscar.oscarEncounter.pageUtil;
 
 import com.quatro.dao.security.SecroleDao;
 import com.quatro.model.security.Secrole;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -61,21 +74,6 @@ import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.util.DateUtils;
 import oscar.util.UtilDateUtilities;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
 
 public class EctIncomingEncounterAction extends Action {
 
