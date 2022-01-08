@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
 public class HRMSftpService
 {
 	@Autowired
-	private static SystemPreferenceService systemPreferences;
+	private SystemPreferenceService systemPreferences;
 
 	// LOCAL CONFIG
 	private static final String OMD_SFTP_SSH_KEY = OscarProperties.getInstance().getProperty("omd.hrm.private_key_file");
@@ -78,7 +78,7 @@ public class HRMSftpService
 	{
 		final String OMD_HRM_USER = systemPreferences.getPreferenceValue("omd.hrm.user", null);
 		final String OMD_HRM_IP = systemPreferences.getPreferenceValue("omd.hrm.address", null);
-		final Integer OMD_HRM_PORT = NumberUtils.toInt(systemPreferences.getPreferenceValue("omd.hrm.address", null), 0);
+		final Integer OMD_HRM_PORT = NumberUtils.toInt(systemPreferences.getPreferenceValue("omd.hrm.port", null), 0);
 		final String REMOTE_PATH = systemPreferences.getPreferenceValue("omd.hrm.remote_path", null);
 
 		JSch jsch = new JSch();

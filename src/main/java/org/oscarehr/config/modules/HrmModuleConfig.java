@@ -39,7 +39,7 @@ import javax.annotation.PostConstruct;
 public class HrmModuleConfig
 {
 	@Autowired
-	private static HRMScheduleService hrmScheduleService;
+	private HRMScheduleService hrmScheduleService;
 
 	private static final Logger logger = MiscUtils.getLogger();
 	

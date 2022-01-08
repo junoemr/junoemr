@@ -104,7 +104,7 @@ public class GenericFile
 	public static final String BILLING_REMITTANCE_FAILED_DIR = new File(BILLING_BASE_DIR, props.getProperty("BILLING_REMITTANCE_FAILED_DIR")).getPath();
 
 	public static final String RESOURCE_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("RESOURCE_BASE_DIR")).getPath();
-	public static final String HRM_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("omd.hrm.base_directory")).getPath();
+	public static final String HRM_BASE_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("omd.hrm.base_directory")).getPath();
 
 	public static final String LOG_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("LOG_BASE_DIR")).getPath();
 	public static final String LOG_IMPORT_DIR = new File(LOG_BASE_DIR, props.getProperty("LOG_IMPORT_DIR")).getPath();

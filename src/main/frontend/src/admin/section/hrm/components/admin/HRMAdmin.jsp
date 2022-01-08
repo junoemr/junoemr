@@ -51,7 +51,7 @@
 	</panel>
 	<panel class="polling-panel w-100">
 		<panel-header class="flex-row justify-content-between align-items-center">
-			<h6 class="d-inline-block">HRM Report Polling</h6>
+			<h6 class="d-inline-block">Report Polling</h6>
 			<div class="d-flex">
 				<juno-button ng-if="!$ctrl.working"
 							 class="flex-grow-0 w-256"

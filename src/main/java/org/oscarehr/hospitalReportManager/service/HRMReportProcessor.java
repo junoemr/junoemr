@@ -51,7 +51,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class HRMReportProcessor
@@ -82,7 +81,7 @@ public class HRMReportProcessor
 	{
 		LocalDate today = LocalDate.now();
 		
-		AtomicInteger processedFiles = new AtomicInteger(0);
+		int processedFiles = 0;
 		
 		if (unprocessedFiles != null && !unprocessedFiles.isEmpty())
 		{
@@ -98,13 +97,13 @@ public class HRMReportProcessor
 				boolean success = processHRMFile_43(workingFile);
 				if (success)
 				{
-					processedFiles.getAndIncrement();
+					processedFiles++;
 				}
 			}
 		}
 		
-		results.setProcessingSuccess(unprocessedFiles != null && processedFiles.get() == unprocessedFiles.size());
-		results.setReportsProcessed(processedFiles.get());
+		results.setProcessingSuccess(unprocessedFiles != null && processedFiles == unprocessedFiles.size());
+		results.setReportsProcessed(processedFiles);
 		results.setEndTime(LocalDateTime.now());
 	}
 	

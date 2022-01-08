@@ -78,7 +78,6 @@
 							label-position="$ctrl.LABEL_POSITION"
 							ng-model="$ctrl.userSettings.port"
 							disabled="$ctrl.isReadOnly"
-							placeholder="22"
 				>
 				</juno-input>
 			</div>
