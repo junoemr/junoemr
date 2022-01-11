@@ -196,11 +196,7 @@ if (message != null){
 					<option value="CML">CML</option>
 					<option value="EPSILON">EPSILON/MHL</option>
 
-					<option value="PATHL7"
-					<oscar:oscarPropertiesCheck property="PATHNET_LABS" value="yes">
-					selected
-					</oscar:oscarPropertiesCheck> 
-					>EXCELLERIS</option>
+					<option value="PATHL7">EXCELLERIS</option>
 
 					<option value="GDML">GDML</option>
 					<option value="HHSEMR">HHSEMR</option>
