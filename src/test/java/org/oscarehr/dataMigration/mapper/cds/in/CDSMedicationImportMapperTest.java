@@ -22,6 +22,16 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -29,27 +39,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oscarehr.dataMigration.logger.cds.CDSImportLogger;
+import org.oscarehr.dataMigration.model.medication.FrequencyCode;
+import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
 import org.oscarehr.dataMigration.service.context.PatientImportContextService;
+import org.springframework.beans.factory.annotation.Autowired;
 import xml.cds.v5_0.DateFullOrPartial;
 import xml.cds.v5_0.DateTimeFullOrPartial;
 import xml.cds.v5_0.MedicationsAndTreatments;
 import xml.cds.v5_0.ObjectFactory;
 import xml.cds.v5_0.PersonNameSimple;
-import org.oscarehr.dataMigration.model.medication.FrequencyCode;
-import org.oscarehr.dataMigration.model.provider.Provider;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import java.time.LocalDate;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
 
 public class CDSMedicationImportMapperTest
 {

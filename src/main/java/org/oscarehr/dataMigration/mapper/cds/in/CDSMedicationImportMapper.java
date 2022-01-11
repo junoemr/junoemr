@@ -22,6 +22,9 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.dataMigration.exception.InvalidFrequencyCodeException;
@@ -37,10 +40,6 @@ import org.springframework.stereotype.Component;
 import oscar.oscarDemographic.pageUtil.Util;
 import xml.cds.v5_0.DrugMeasure;
 import xml.cds.v5_0.MedicationsAndTreatments;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class CDSMedicationImportMapper extends AbstractCDSImportMapper<MedicationsAndTreatments, Medication>
@@ -301,28 +300,34 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 	 * @param dosage
 	 * @return String Array containing the split dosage, or null
 	 */
-	protected String[] getDosageMinMax(String dosage)
+	protected  String[] getDosageMinMax(String dosage)
 	{
 		if (dosage != null)
 		{
 			if (dosage.matches(".*-.*"))
 			{
+				String max = "";
 				String[] minmax = dosage.split("-");
-				String min = Util.leadingNum(minmax[0]);
-				String max = Util.leadingNum(minmax[1]);
-				if (min.isEmpty() && !max.isEmpty())
+				if (minmax.length > 0)
 				{
-					logger.warn("Empty minimum dosage found" + minmax.toString());
-					min = max;
+					String min = Util.leadingNum(minmax[0]);
+					if (minmax.length > 1)
+					{
+						max = Util.leadingNum(minmax[1]);
+					}
+					if (min.isEmpty() && !max.isEmpty())
+					{
+						logger.warn("Empty minimum dosage found" + minmax.toString());
+					}
+					if (max.isEmpty() && (!min.isEmpty() || min != null))
+					{
+						logger.warn("Empty maximum dosage found" + minmax.toString());
+						minmax[0] = min;
+						return minmax;
+					}
+					minmax[0] = min;
+					minmax[1] = max;
 				}
-				if (max.isEmpty() && !min.isEmpty())
-				{
-					logger.warn("Empty maximum dosage found" + minmax.toString());
-					max = min;
-				}
-				minmax[0] = min;
-				minmax[1] = max;
-
 				return minmax;
 			}
 			dosage = Util.leadingNum(dosage);
@@ -330,4 +335,16 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		}
 		return null;
 	}
+
+	/*    protected String leadingNum(String s) {
+    	if (s==null) return "";
+        s = s.trim();
+        for (int i=0; i<s.length(); i++) {
+            if (!".0123456789".contains(s.substring(i,i+1))) {
+                s = s.substring(0, i);
+                break;
+            }
+        }
+        return s;
+    }*/
 }
