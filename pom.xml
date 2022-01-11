@@ -1865,7 +1865,6 @@
 						</goals>
 						<configuration>
 							<skipTests>false</skipTests>
-							<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m</argLine>
 							<test>SetupDatabase</test>
 							<systemPropertyVariables>
 								<oscar.skip.dbinit>${oscar.dbinit.skip}</oscar.skip.dbinit>
@@ -1917,7 +1916,6 @@
 						<exclude>**/SetupDatabase.java</exclude>
 					</excludes>
 					<skipTests>false</skipTests>
-					<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m</argLine>
 					<systemPropertyVariables>
 						<oscar.skip.dbinit>true</oscar.skip.dbinit>
 					</systemPropertyVariables>
