@@ -38,7 +38,6 @@ import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.LoggedInInfo;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -79,7 +78,6 @@ public class DemographicManagerTest
 		Mockito.doNothing().when(securityInfoManager).requireOnePrivilege(provider.getProviderNo(), SecurityInfoManager.CREATE, null, "_demographic");
 		Mockito.doNothing().when(demographicDao).save(demographic);
 
-		//PowerMockito.stub(PowerMockito.method(LogAction.class, "addLogEntrySynchronous", String.class, String.class));
 		PowerMockito.mockStatic(LogAction.class);
 
 		try
