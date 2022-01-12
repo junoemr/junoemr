@@ -130,7 +130,7 @@ public class ConsultationAttachmentService
 	public List<LabResultData> getAttachedLabs(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
 	{
 		CommonLabResultData labData = new CommonLabResultData();
-		return labData.populateLabResultsData(loggedInInfo, demographicNo, consultId, CommonLabResultData.ATTACHED);
+		return labData.populateConsultLabResultsData(loggedInInfo, demographicNo, consultId, CommonLabResultData.ATTACHED);
 	}
 
 	public List<LabResultData> getUnattachedLabs(LoggedInInfo loggedInInfo, Integer demographicNo, Integer consultId)
@@ -144,7 +144,7 @@ public class ConsultationAttachmentService
 	public List<LabResultData> getUnattachedLabs(LoggedInInfo loggedInInfo, String demographicNo, String consultId)
 	{
 		CommonLabResultData labData = new CommonLabResultData();
-		List<LabResultData> unfilteredLabs = labData.populateLabResultsData(loggedInInfo, demographicNo, consultId, CommonLabResultData.UNATTACHED);
+		List<LabResultData> unfilteredLabs = labData.populateConsultLabResultsData(loggedInInfo, demographicNo, consultId, CommonLabResultData.UNATTACHED);
 		return filterLabVersions(unfilteredLabs);
 	}
 	public List<LabResultData> getAllLabs(LoggedInInfo loggedInInfo, String demographicNo, String consultId)

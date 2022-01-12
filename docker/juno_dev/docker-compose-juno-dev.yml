@@ -1,10 +1,12 @@
 version: '3.1'
 services:
   db:
-    command: mysqld --general-log-file=/var/log/mysql/general-log.log
+    command: mysqld --general-log=1 --general-log-file=/var/log/mysql/general-log.log --log-error=/var/log/error.log
     image: mariadb:10.4
     volumes:
       - ../../.docker/db/:/var/lib/mysql:Z
+      - ../../.docker/db_logs/:/var/log/mysql:Z
+      - ./mariadb.conf.d/:/etc/mysql/conf.d/:Z
     environment:
       MYSQL_ROOT_PASSWORD: "${JUNO_DB_PASSWORD}"
     networks:
