@@ -52,7 +52,6 @@
 	String elementName=request.getParameter("elementName");
 	String elementId=request.getParameter("elementId");
 	formName=(formName!=null)?formName:"ticklerForm";
-	List<String> existingContacts =  ContactAction.getDemographicContactIds(request.getParameter("demoNo"));
 	elementName=(elementName!=null)?elementName:"filter.demographic_webName";
 	elementId=(elementId!=null)?elementId:"filter.demographic_no";
 %>
@@ -114,7 +113,6 @@
 	<INPUT TYPE="hidden" NAME="formName" VALUE="<%=formName %>" />
 	<INPUT TYPE="hidden" NAME="elementName" VALUE="<%=elementName %>" />
 	<INPUT TYPE="hidden" NAME="elementId" VALUE="<%=elementId %>" />
-	<INPUT TYPE="hidden" NAME="existingContacts" VALUE="<%=existingContacts%>" />
 
 	</form>
 </table>

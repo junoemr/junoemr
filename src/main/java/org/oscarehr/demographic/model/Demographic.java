@@ -26,6 +26,7 @@ import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
+import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
@@ -920,6 +921,17 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	public boolean isNewBorn()
 	{
 		return Demographic.isNewBorn(getDateOfBirth(), getVer());
+	}
+
+	/**
+	 * pulled from old demographic entity for backwards compatability use. should be on the model or front end
+	 * avoid use if possible
+	 */
+	@Deprecated
+	public int getAgeInYears()
+	{
+		LocalDate dob = getDateOfBirth();
+		return Utility.calcAge(String.valueOf(dob.getYear()), String.valueOf(dob.getMonthValue()), String.valueOf(dob.getDayOfMonth()));
 	}
 
 	/**

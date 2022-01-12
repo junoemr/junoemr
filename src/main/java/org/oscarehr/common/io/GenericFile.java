@@ -47,6 +47,7 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -123,7 +124,7 @@ public class GenericFile
 	// validation info
 	protected boolean hasBeenValidated;
 	protected boolean isValid;
-	protected boolean 	restrictContentType = true;
+	protected boolean restrictContentType = true;
 	protected String reasonInvalid;
 	protected String invalidContentType;
 
@@ -350,7 +351,7 @@ public class GenericFile
 
 	public String getContentType() throws IOException
 	{
-		return GenericFile.getContentType(javaFile);
+		return Optional.ofNullable(GenericFile.getContentType(javaFile)).orElse(getInvalidContentType());
 	}
 
 	public int getPageCount() throws IOException

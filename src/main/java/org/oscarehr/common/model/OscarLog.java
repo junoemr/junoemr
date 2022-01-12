@@ -143,7 +143,7 @@ public class OscarLog extends AbstractModel<Long> implements Serializable {
 	}
 
 	public void setData(String data) {
-		this.data = StringUtils.trimToNull(data);
+		this.data = StringUtils.trimToNull(oscar.util.StringUtils.filterHTMLFromString(data));
 	}
 
 	public Date getCreated() {

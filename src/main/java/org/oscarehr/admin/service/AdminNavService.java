@@ -650,7 +650,7 @@ public class AdminNavService
 
 		if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM))
 		{
-			integrationItems.add(new AdminNavItemTo1("Health Report Manager (HRM)", "hrmAdmin"));
+			integrationItems.add(new AdminNavItemTo1("Health Report Manager (HRM)", "hrm/admin"));
 		}
 
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.phrconfig"), "frame?frameUrl=" + contextPath + "/admin/MyoscarConfiguration.jsp"));

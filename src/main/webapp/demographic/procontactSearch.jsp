@@ -46,7 +46,7 @@
 <%@ page import="java.util.*,java.sql.*, java.net.*"%>
 <%@ page import="org.oscarehr.common.web.ContactAction"%>
 <%@ page import="org.oscarehr.common.model.ProfessionalContact"%>
-<%@ page import="org.oscarehr.common.model.Contact"%>
+<%@ page import="org.oscarehr.contact.entity.Contact"%>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
 <%@ page import="org.apache.commons.lang.WordUtils"%>
 

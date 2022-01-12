@@ -121,7 +121,7 @@ public class PDFFile extends GenericFile
 		String contentType;
 		if(isValid)
 		{
-			contentType = GenericFile.getContentType(javaFile);
+			contentType = super.getContentType();
 		}
 		else
 		{

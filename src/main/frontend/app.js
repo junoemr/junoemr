@@ -170,14 +170,29 @@ oscarApp.config([
 		})
 		.state('admin.hrm',
 		{
-			url: '/hrmAdmin',
+			url: '/hrm',
+			component: 'hrmIndex'
+		})
+		.state('admin.hrm.admin',
+		{
+			url: '/admin',
 			component: 'hrmAdmin',
 		})
-        .state('admin.iMDHealth',
-        {
-            url: '/imdHealth',
-            component: 'imdHealthAdmin',
-        })
+		.state('admin.hrm.settings',
+		{
+			url: '/settings',
+			component: 'hrmSettings',
+		})
+		.state('admin.hrm.category',
+		{
+			url: '/category',
+			component: 'hrmCategory',
+		})
+        	.state('admin.iMDHealth',
+        	{
+            		url: '/imdHealth',
+            		component: 'imdHealthAdmin',
+        	})
 		.state('admin.iceFall',
 		{
 			url: '/iceFall',
@@ -298,18 +313,7 @@ oscarApp.config([
 		.state('ticklers',
 		{
 			url: '/ticklers',
-			templateUrl: 'src/tickler/ticklerList.jsp',
-			controller: 'Tickler.TicklerListController as ticklerListCtrl',
-			resolve:
-			{
-				providers: ['providerService', function(providerService)
-				{
-					return providerService.searchProviders(
-					{
-						active: true
-					});
-				}],
-			}
+			component: "ticklerListController",
 		})
 		.state('search',
 		{
@@ -858,18 +862,7 @@ oscarApp.config([
 		.state('record.tickler',
 		{
 			url: '/tickler',
-			templateUrl: 'src/tickler/ticklerList.jsp',
-			controller: 'Tickler.TicklerListController as ticklerListCtrl',
-			resolve:
-			{
-				providers: ['providerService', function(providerService)
-				{
-					return providerService.searchProviders(
-					{
-						active: true
-					});
-				}]
-			},
+			component: "ticklerListController",
 			meta:
 			{
 				auth: {

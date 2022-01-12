@@ -24,6 +24,7 @@
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../../common/components/junoComponentConstants";
 import {SecurityPermissions} from "../../../../../common/security/securityConstants";
+import {Moment} from "moment/moment";
 
 angular.module('Record.Tracker.CareTracker').component('careTrackerItemData',
 	{
@@ -50,9 +51,9 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItemData',
 					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 				}
 
-				ctrl.getDateForDisplay = (dateTime) =>
+				ctrl.getDateForDisplay = (dateTime: Moment) =>
 				{
-					return Juno.Common.Util.formatDate(dateTime);
+					return (dateTime && dateTime.isValid()) ? Juno.Common.Util.formatDate(dateTime) : "Invalid Date";
 				}
 			}]
 	});

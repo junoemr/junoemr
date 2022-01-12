@@ -34,10 +34,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.oscarehr.common.dao.ContactDao;
-import org.oscarehr.common.dao.DemographicContactDao;
-import org.oscarehr.common.model.Contact;
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.contact.dao.ContactDao;
+import org.oscarehr.contact.dao.DemographicContactDao;
+import org.oscarehr.contact.entity.Contact;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;

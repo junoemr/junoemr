@@ -337,8 +337,9 @@
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.ValidationExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.MhaBaseExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.integrations.aqs.exceptionMapping.AqsCommunicationExceptionMapper"/>
-            <bean class="org.oscarehr.ws.rest.exceptionMapping.ScheduleExceptionMapper"/>
-            <bean class="org.oscarehr.ws.rest.exceptionMapping.IntegrationExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.ScheduleExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.IntegrationExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.HrmExceptionMapper"/>
 
 			<!-- Juno filters. -->
 			<bean class="org.oscarehr.ws.rest.filter.LoggingFilterInternal"/>
@@ -391,13 +392,14 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueueWebService"/>
 			<!-- AQS -->
-
-            		<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmCategoriesWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmCategoryWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmSubClassWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmScheduleWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService"/>
-            <bean autowire="byName" class="org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService"/>
-            <bean autowire="byName" class="org.oscarehr.ws.rest.lab.LabWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.lab.LabWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.lab.olis.OlisLabWebService"/>
-
 			<bean autowire="byName" class="org.oscarehr.ws.rest.MeasurementsWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.MessagingService"/>
 			<!-- MHA -->

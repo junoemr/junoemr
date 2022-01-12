@@ -242,7 +242,7 @@
 			<form-property name="installDate" type="java.lang.String" />
 		</form-bean>
 		<form-bean name="ticklerForm" type="org.apache.struts.validator.DynaValidatorForm">
-			<form-property name="tickler" type="org.oscarehr.common.model.Tickler"/>
+			<form-property name="tickler" type="org.oscarehr.ticklers.entity.Tickler"/>
 			<form-property name="filter" type="org.oscarehr.common.model.CustomFilter"/>
 		</form-bean>
 		<form-bean name="TicklerSettingsForm" type="org.oscarehr.ticklers.web.TicklerSettingsForm" />
@@ -541,7 +541,7 @@
 		</form-bean>
 
 		<form-bean name="contactForm" type="org.apache.struts.validator.DynaValidatorForm">
-			<form-property name="contact" type="org.oscarehr.common.model.Contact" />
+			<form-property name="contact" type="org.oscarehr.contact.entity.Contact" />
 			<form-property name="pcontact" type="org.oscarehr.common.model.ProfessionalContact" />
 		</form-bean>
 
@@ -2656,9 +2656,6 @@
 		<action path="/hospitalReportManager/Display" type="org.oscarehr.hospitalReportManager.HRMDisplayReportAction" parameter="method" scope="request" validate="false">
 			<forward name="display" path="/hospitalReportManager/displayHRMReport.jsp" />
 		</action>
-		<action input="/hospitalReportManager/hrmKeyUploader.jsp" name="hrmKeyUploadForm" path="/hospitalReportManager/hrmKeyUploader" scope="request" type="org.oscarehr.hospitalReportManager.HRMUploadKeyAction">
-			<forward name="success" path="/hospitalReportManager/hrmPreferences.jsp" />
-		</action>
 		<action input="/hospitalReportManager/hospitalReportManager.jsp" name="hrmLabUploadForm" path="/hospitalReportManager/UploadLab" scope="request" type="org.oscarehr.hospitalReportManager.HRMUploadLabAction">
 			<forward name="success" path="/hospitalReportManager/hospitalReportManager.jsp" />
 		</action>
@@ -2668,15 +2665,7 @@
 		<action path="/hospitalReportManager/Statement" type="org.oscarehr.hospitalReportManager.HRMStatementModifyAction" scope="request" validate="false">
 			<forward name="success" path="/hospitalReportManager/hospitalReportManager.jsp" />
 		</action>
-		<action path="/hospitalReportManager/Mapping" type="org.oscarehr.hospitalReportManager.HRMMappingAction" scope="request" validate="false">
-			<forward name="success" path="/hospitalReportManager/hrmShowMapping.jsp" />
-		</action>
-		<action path="/hospitalReportManager/HRMPreferences" type="org.oscarehr.hospitalReportManager.HRMPreferencesAction" scope="request" validate="false">
-			<forward name="success" path="/hospitalReportManager/hrmPreferences.jsp" />
-		</action>
 		<action path="/hospitalReportManager/HRMDownloadFile" type="org.oscarehr.hospitalReportManager.HRMDownloadFileAction" />
-		
-
 
 		<action path="/caseload/CaseloadContent" scope="request" type="org.oscarehr.caseload.CaseloadContentAction" parameter="method" />
 
