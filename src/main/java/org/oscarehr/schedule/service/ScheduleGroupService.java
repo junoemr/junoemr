@@ -23,7 +23,9 @@
 package org.oscarehr.schedule.service;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.common.dao.MyGroupAccessRestrictionDao;
 import org.oscarehr.common.dao.MyGroupDao;
+import org.oscarehr.common.model.MyGroupAccessRestriction;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.common.model.MyGroup;
 import org.oscarehr.provider.model.ProviderData;
@@ -35,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -48,14 +51,35 @@ public class ScheduleGroupService
 	@Autowired
 	MyGroupDao myGroupDao;
 
+	@Autowired
+	MyGroupAccessRestrictionDao myGroupAccessRestrictionDao;
+
 	/**
 	 * Creates a list of schedule groups.  The list is made of groups from the mygroup table and then
 	 * each provider is appended as there is an implicit schedule for each provider.
+	 * No access control restrictions are applied
 	 * @return The list of valid schedule groups.
 	 */
 	public List<ScheduleGroup> getScheduleGroups()
 	{
+		return getScheduleGroups(null);
+	}
+
+	/**
+	 * Creates a list of schedule groups.  The list is made of groups from the mygroup table and then
+	 * each provider is appended as there is an implicit schedule for each provider. Will
+	 * @param accessControlProviderNo providerNo to apply access control restrictions for
+	 * @return The list of valid schedule groups.
+	 */
+	public List<ScheduleGroup> getScheduleGroups(String accessControlProviderNo)
+	{
 		List<ScheduleGroup> groups = getMyGroupScheduleGroups();
+
+		List<String> myGroupAccessRestrictionIds = myGroupAccessRestrictionDao
+			.findByProviderNo(accessControlProviderNo)
+			.stream()
+			.map(MyGroupAccessRestriction::getMyGroupNo)
+			.collect(Collectors.toList());
 
 		// Get a list of providers
 		List<ProviderData> providers = providerDataDao.findAll(false);
@@ -80,7 +104,10 @@ public class ScheduleGroupService
 			groups.add(new ScheduleGroup(provider.getId(), ScheduleGroup.IdentifierType.PROVIDER, providerName, providerIds));
 		}
 
-		return groups;
+		// Filter out any schedules this provider is restricted from seeing
+		return groups.stream().filter(group -> !myGroupAccessRestrictionIds
+			.contains(group.getIdentifier()))
+			.collect(Collectors.toList());
 	}
 
 	private List<ScheduleGroup> getMyGroupScheduleGroups()
