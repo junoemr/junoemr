@@ -16,6 +16,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.olis.transfer.OLISSearchResultTransfer;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -66,7 +67,7 @@ public class OLISResultsAction extends DispatchAction
 						request.setAttribute("searchException", driverResponse.getSearchException());
 					}
 
-					List<String> resultList = new LinkedList<>();
+					List<OLISSearchResultTransfer> resultList = new LinkedList<>();
 					request.setAttribute("resultList", resultList);
 					return mapping.findForward("results");
 				}
@@ -78,7 +79,7 @@ public class OLISResultsAction extends DispatchAction
 			FileUtils.writeStringToFile(tempFile, olisResultString);
 
 			List<String> messages = Utilities.separateMessages(System.getProperty("java.io.tmpdir") + "/olis_" + uuid + ".response");
-			List<String> resultList = new ArrayList<>(messages.size());
+			List<OLISSearchResultTransfer> resultList = new ArrayList<>(messages.size());
 			List<String> errors = new LinkedList<>();
 
 			boolean blockedContent = false;
@@ -109,7 +110,11 @@ public class OLISResultsAction extends DispatchAction
 				blockedContent = blockedContent || handler.isReportBlocked();
 
 				searchResultsMap.put(resultUuid, handler);
-				resultList.add(resultUuid);
+
+				OLISSearchResultTransfer transfer = new OLISSearchResultTransfer();
+				transfer.setUuid(resultUuid);
+				transfer.setDuplicate(OLISUtils.isDuplicate(LoggedInInfo.getLoggedInInfoFromRequest(request), handler, message));
+				resultList.add(transfer);
 			}
 
 			request.setAttribute("errors", errors);

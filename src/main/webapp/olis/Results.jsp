@@ -17,6 +17,7 @@
 <%@ page import="java.util.HashSet" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.stream.Collectors" %>
+<%@ page import="org.oscarehr.olis.transfer.OLISSearchResultTransfer" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -32,6 +33,9 @@
 <script type="text/javascript" src="<%=request.getContextPath()%>/share/javascript/sortable.js"></script>
 
 <script type="text/javascript">
+
+	let showDuplicates = false;
+
 	function addToInbox(uuid, params="")
 	{
 		jQuery(uuid).attr("disabled", "disabled");
@@ -58,6 +62,10 @@
 	function preview(uuid)
 	{
 		reportWindow('<%=request.getContextPath()%>/lab/CA/ALL/labDisplayOLIS.jsp?segmentID=0&preview=true&uuid=' + uuid);
+	}
+	function toggleShowDuplicates()
+	{
+		jQuery(".duplicate").toggle();
 	}
 
 	var patientFilter = "";
@@ -115,6 +123,10 @@
 	display: flex;
 	flex-direction: column;
 }
+.duplicate {
+	color: darkgreen;
+	display: none;
+}
 
 </style>
 	
@@ -156,12 +168,15 @@
 				<% }
 			}
 			String resp = StringUtils.trimToEmpty((String) request.getAttribute("olisResponseContent"));
-			List<String> resultList = (List<String>) request.getAttribute("resultList");
+			List<OLISSearchResultTransfer> resultList = (List<OLISSearchResultTransfer>) request.getAttribute("resultList");
 			String continuationPointer = (String) request.getAttribute("continuationPointer");
 			boolean hasBlockedContent = (boolean) request.getAttribute("blockedContent");
 
 			// ordering must be preserved for matching uuid to handler below
-			List<OLISHL7Handler> resultHandlers = resultList.stream().map(OLISResultsAction::getHandlerByUUID).collect(Collectors.toList());
+			List<OLISHL7Handler> resultHandlers = resultList.stream()
+					.map(OLISSearchResultTransfer::getUuid)
+					.map(OLISResultsAction::getHandlerByUUID)
+					.collect(Collectors.toList());
 
 			if (hasBlockedContent) { 
 			%>
@@ -207,7 +222,7 @@
 			%>
 			<table>
 				<tr>
-					<td colspan=8>Showing <%=resultList.size() %> result(s)</td>
+					<td colspan=8>Found <%=resultList.size() %> result(s)</td>
 				</tr>
 				<% if (resultList.size() > 0) { %>
 					<tr>
@@ -294,6 +309,13 @@
 						</th>
 					</tr>
 				<% } %>
+					<tr>
+						<td colspan="10">
+							<input type="button" onClick="toggleShowDuplicates()"
+								   value="Show/Hide duplicates"
+								   title="Show or hide results already within the system"/>
+						</td>
+					</tr>
 					<tr><td colspan="10">
 					<table class="sortable" id="resultsTable">
 					<tr>
@@ -315,15 +337,17 @@
 					<%  int lineNum = 0;
 						for(int handlerIndex=0; handlerIndex< resultHandlers.size(); handlerIndex++)
 						{
-							String resultUuid = resultList.get(handlerIndex);
+							OLISSearchResultTransfer transfer = resultList.get(handlerIndex);
+							String resultUuid = transfer.getUuid();
 							OLISHL7Handler result = resultHandlers.get(handlerIndex);
 
 							// show one row per OBR, so that individual statuses can be displayed. Required feature for OLIS conformance.
 							for(int i=0; i < result.getOBRCount(); i++)
 							{
 								int obrRep = result.getMappedOBR(i); // aka use sort keys
+								String cssClass = (++lineNum % 2 == 1 ? "oddLine" : "evenLine") + (transfer.isDuplicate() ? " duplicate" : "");
 							%>
-							<tr class="<%=++lineNum % 2 == 1 ? "oddLine" : "evenLine"%>"
+							<tr class="<%=cssClass%>"
 							    patientName="<%=result.getPatientName()%>"
 							    reportingLaboratory="<%=result.getReportingFacilityName()%>">
 								<td>

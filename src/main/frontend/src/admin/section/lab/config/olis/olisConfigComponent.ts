@@ -50,18 +50,6 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 			ctrl.labType = "OLIS_HL7"
 			ctrl.frequencySelectOptions = [
 				{
-					label: "5 Minutes",
-					value: 5,
-				},
-				{
-					label: "10 Minutes",
-					value: 10,
-				},
-				{
-					label: "15 Minutes",
-					value: 15,
-				},
-				{
 					label: "30 Minutes",
 					value: 30,
 				},
