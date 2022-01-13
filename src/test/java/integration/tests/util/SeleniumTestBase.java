@@ -25,19 +25,35 @@ package integration.tests.util;
 import integration.tests.config.TestConfig;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
+import lombok.CustomLog;
+import net.jodah.failsafe.RetryPolicy;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.CommandExecutor;
+import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.TracedCommandExecutor;
+import org.openqa.selenium.remote.http.AddSeleniumUserAgent;
+import org.openqa.selenium.remote.http.ClientConfig;
+import org.openqa.selenium.remote.http.Filter;
+import org.openqa.selenium.remote.http.HttpClient;
+import org.openqa.selenium.remote.http.HttpResponse;
+import org.openqa.selenium.remote.http.RetryRequest;
+import org.openqa.selenium.remote.tracing.TracedHttpClient;
+import org.openqa.selenium.remote.tracing.opentelemetry.OpenTelemetryTracer;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.AuthUtils;
@@ -50,6 +66,9 @@ import org.springframework.boot.web.server.LocalServerPort;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Import;
 import oscar.OscarProperties;
@@ -113,11 +132,45 @@ public class SeleniumTestBase extends DatabaseTestBase
 
 		if(OscarProperties.isDockerTestingEnabled())
 		{
+			RetryRequest retryRequest = new RetryRequest();
+
+			// The contents of the try block are brought to you by a workaround hack found in
+			// https://github.com/SeleniumHQ/selenium/issues/9528#issuecomment-998105828
 			try
 			{
-				driver = new RemoteWebDriver(new URL(DOCKER_SELENIUM_TEST_URL), firefoxOptions);
+				Field readTimeoutPolicyField = retryRequest.getClass().getDeclaredField("readTimeoutPolicy");
+				readTimeoutPolicyField.setAccessible(true);
+
+				RetryPolicy<HttpResponse> readTimeoutPolicy =
+					new RetryPolicy<HttpResponse>()
+						.handle(TimeoutException.class)
+						.withBackoff(1, 4, ChronoUnit.SECONDS)
+						.withMaxRetries(3)
+						.withMaxDuration(Duration.ofSeconds(300))
+						.onRetry(e -> logger.info(String.format(
+							"Read timeout #%s. Retrying.",
+							e.getAttemptCount())));
+
+				FieldUtils.removeFinalModifier(readTimeoutPolicyField);
+				readTimeoutPolicyField.set(retryRequest, readTimeoutPolicy);
+
+				Filter filter = new AddSeleniumUserAgent().andThen(retryRequest);
+				ClientConfig config = ClientConfig
+					.defaultConfig()
+					.baseUrl(new URL(DOCKER_SELENIUM_TEST_URL))
+					.readTimeout(Duration.ofSeconds(90))
+					.withFilter(filter);
+				OpenTelemetryTracer tracer = OpenTelemetryTracer.getInstance();
+				HttpClient.Factory httpClientFactory = HttpClient.Factory.createDefault();
+				TracedHttpClient.Factory tracedHttpClientFactory = new TracedHttpClient.Factory(
+					tracer,
+					httpClientFactory);
+				CommandExecutor executor = new HttpCommandExecutor(Collections.emptyMap(), config, tracedHttpClientFactory);
+				TracedCommandExecutor tracedCommandExecutor = new TracedCommandExecutor(executor, tracer);
+
+				driver = new RemoteWebDriver(tracedCommandExecutor, firefoxOptions);
 			}
-			catch (MalformedURLException e)
+			catch (Exception e)
 			{
 				logger.error("Error starting remote web driver", e);
 			}
