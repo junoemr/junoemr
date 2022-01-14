@@ -28,8 +28,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.ED;
 import org.marc.everest.datatypes.II;
 import org.marc.everest.datatypes.NullFlavor;
@@ -46,8 +48,13 @@ import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.export.AbstractExportModelTest;
 import org.oscarehr.e2e.util.EverestUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class AlertsModelTest extends AbstractExportModelTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class AlertsModelTest extends AbstractExportModelTest
+{
 	public static CaseManagementNoteDAO dao;
 	public static CaseManagementNote alert;
 	public static AlertsModel alertsModel;
@@ -55,8 +62,9 @@ public class AlertsModelTest extends AbstractExportModelTest {
 	public static CaseManagementNote nullAlert;
 	public static AlertsModel nullAlertsModel;
 
-	@BeforeClass
-	public static void beforeClass() {
+	@Before
+	public void before()
+	{
 		dao = SpringUtils.getBean(CaseManagementNoteDAO.class);
 		alert = dao.getNotesByDemographic(Constants.Runtime.VALID_DEMOGRAPHIC.toString()).get(5);
 		alertsModel = new AlertsModel(alert);

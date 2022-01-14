@@ -45,10 +45,12 @@ public class LabReportInformationDaoTest extends DaoTestFixtures
 	public LabReportInformationDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("labReportInformation","labPatientPhysicianInfo");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"labReportInformation","labPatientPhysicianInfo"
+		};
 	}
 
 	@Test

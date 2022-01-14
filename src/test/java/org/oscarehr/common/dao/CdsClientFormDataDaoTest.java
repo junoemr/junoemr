@@ -51,9 +51,12 @@ public class CdsClientFormDataDaoTest extends DaoTestFixtures
 
 	Logger logger = MiscUtils.getLogger();
 	
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("CdsClientFormData");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"CdsClientFormData"
+		};
 	}
 
 	@Test

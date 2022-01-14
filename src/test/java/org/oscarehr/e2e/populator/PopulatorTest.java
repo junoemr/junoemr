@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.II;
@@ -42,15 +42,23 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class PopulatorTest extends DaoTestFixtures {
-	@BeforeClass
-	public static void beforeClass() throws Exception {
-		SchemaUtils.restoreTable(Constants.Runtime.TABLES);
+public class PopulatorTest extends DaoTestFixtures
+{
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return Constants.Runtime.TABLES;
+	}
+
+	@Before
+	public void beforeClass() throws Exception
+	{
 		assertEquals(0, SchemaUtils.loadFileIntoMySQL(Constants.Runtime.E2E_SETUP));
 	}
 
 	@Test
-	public void emptyEmrExportPopulatorTest() {
+	public void emptyEmrExportPopulatorTest()
+	{
 		PatientExport patientExport = new PatientExport(Constants.Runtime.EMPTY_DEMOGRAPHIC);
 		CE<String> code = Constants.EMRConversionDocument.CODE;
 		II templateId = new II(Constants.EMRConversionDocument.TEMPLATE_ID);
@@ -64,7 +72,8 @@ public class PopulatorTest extends DaoTestFixtures {
 	}
 
 	@Test
-	public void invalidEmrExportPopulatorTest() {
+	public void invalidEmrExportPopulatorTest()
+	{
 		PatientExport patientExport = new PatientExport(Constants.Runtime.INVALID_VALUE);
 		CE<String> code = Constants.EMRConversionDocument.CODE;
 		II templateId = new II(Constants.EMRConversionDocument.TEMPLATE_ID);

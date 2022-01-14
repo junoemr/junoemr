@@ -54,10 +54,12 @@ public class OcanConnexOptionDaoTest extends DaoTestFixtures
 	@Autowired
 	protected OcanConnexOptionDao ocanConnexOptionDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("OcanConnexOption");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"OcanConnexOption"
+		};
 	}
 
 	@Test

@@ -46,9 +46,12 @@ public class ServiceSpecialistsDaoTest extends DaoTestFixtures
 	public ServiceSpecialistsDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("serviceSpecialists", "professionalSpecialists");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"serviceSpecialists", "professionalSpecialists"
+		};
 	}
 
 	@Test

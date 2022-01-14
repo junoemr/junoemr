@@ -42,9 +42,12 @@ public class BedDaoTest extends DaoTestFixtures
 	@Autowired
 	protected BedDao bedDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("bed");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"bed"
+		};
 	}
 
 	@Test

@@ -47,10 +47,16 @@ public class WaitlistDaoTest extends DaoTestFixtures
 	@Autowired
 	public WaitlistDao dao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("criteria","demographic","vacancy_client_match","eform_data","eform_values","vacancy_client_match","demographic","vacancy_template","vacancy","client_referral","program","criteria_selection_option");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"criteria","demographic","vacancy_client_match","eform_data","eform_values",
+			"vacancy_client_match","demographic","vacancy_template","vacancy","client_referral",
+			"program","criteria_selection_option"
+		};
 	}
+
 	@Test
 	public void testGetClientMatches() {
 		assertNotNull(dao.getClientMatches(1));

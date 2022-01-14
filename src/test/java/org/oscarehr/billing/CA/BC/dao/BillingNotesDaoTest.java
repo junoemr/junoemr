@@ -40,11 +40,14 @@ public class BillingNotesDaoTest extends DaoTestFixtures
 	@Autowired
 	public BillingNoteDao dao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billingnote");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billingnote"
+		};
 	}
-	
+
 	@Test
 	public void testFindNotes() {
 		dao.findNotes(999, 999);

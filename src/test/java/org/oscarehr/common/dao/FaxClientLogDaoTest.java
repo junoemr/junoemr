@@ -42,9 +42,12 @@ public class FaxClientLogDaoTest extends DaoTestFixtures
 	@Autowired
 	protected FaxClientLogDao faxClientLogDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("FaxClientLog");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"FaxClientLog"
+		};
 	}
 
 	@Test

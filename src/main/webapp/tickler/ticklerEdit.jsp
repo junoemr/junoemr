@@ -24,12 +24,12 @@
 
 --%>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
-<%@page import="org.oscarehr.common.dao.TicklerTextSuggestDao" %>
-<%@page import="org.oscarehr.common.model.Demographic" %>
+<%@page import="org.oscarehr.ticklers.dao.TicklerTextSuggestDao" %>
+<%@page import="org.oscarehr.demographic.model.Demographic" %>
 <%@page import="org.oscarehr.common.model.Provider" %>
-<%@page import="org.oscarehr.common.model.Tickler" %>
-<%@page import="org.oscarehr.common.model.TicklerComment" %>
-<%@page import="org.oscarehr.common.model.TicklerTextSuggest" %>
+<%@page import="org.oscarehr.ticklers.entity.Tickler" %>
+<%@page import="org.oscarehr.ticklers.entity.TicklerComment" %>
+<%@page import="org.oscarehr.ticklers.entity.TicklerTextSuggest" %>
 <%@page import="org.oscarehr.managers.TicklerManager" %>
 <%@page import="org.oscarehr.util.LocaleUtils" %>
 <%@page import="org.oscarehr.util.LoggedInInfo" %>
@@ -39,6 +39,7 @@
 <%@ page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 
 <%
 	TicklerManager ticklerManager = SpringUtils.getBean(TicklerManager.class);
@@ -237,7 +238,7 @@
 				<th style="background-color: #EEEEFF"><bean:message
 						key="tickler.ticklerEdit.demographicName"/></th>
 				<td><a href=#
-					   onClick="popupPage(600,800,'../demographic/demographiccontrol.jsp?demographic_no=<%=d.getDemographicNo()%>&displaymode=edit&dboperation=search_detail')"><%=d.getLastName()%>
+					   onClick="popupPage(600,800,'../demographic/demographiccontrol.jsp?demographic_no=<%=d.getId()%>&displaymode=edit&dboperation=search_detail')"><%=d.getLastName()%>
 					,<%=d.getFirstName()%>
 				</a></td>
 				<th style="background-color: #EEEEFF"><bean:message
@@ -258,7 +259,7 @@
 			<tr>
 				<th style="background-color: #EEEEFF"><bean:message
 						key="tickler.ticklerEdit.age"/></th>
-				<td><%=d.getAge()%>(<%=d.getFormattedDob()%>)</td>
+				<td><%=d.getAgeInYears()%>(<%=ConversionUtils.toDateString(d.getDateOfBirth())%>)</td>
 				<th style="background-color: #EEEEFF"><bean:message
 						key="tickler.ticklerEdit.email"/></th>
 				<td><%=d.getEmail()%>

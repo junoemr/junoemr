@@ -24,20 +24,25 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.junoUtil.AppointmentUtil;
+import integration.tests.util.seleniumUtil.ActionUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -46,11 +51,11 @@ import static integration.tests.AddPatientsIT.dad;
 import static integration.tests.AddPatientsIT.dadFullName;
 import static integration.tests.AddPatientsIT.mom;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-
 public class EditAppointmentsIT extends SeleniumTestBase
 {
 	String apptDurationUpdated = "30";
@@ -70,7 +75,7 @@ public class EditAppointmentsIT extends SeleniumTestBase
 			"measurementType", "mygroup", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
 			"provider_billing", "providerArchive", "providerbillcenter", "ProviderPreference", "providersite",
 			"rschedule", "secUserRole", "scheduledate", "scheduletemplate", "scheduletemplatecode", "site",
-			"tickler_text_suggest"
+			"tickler_text_suggest", "provider_recent_demographic_access"
 		};
 	}
 
@@ -85,6 +90,7 @@ public class EditAppointmentsIT extends SeleniumTestBase
 
 	public String getDropdownValue(By dropdownBy)
 	{
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(dropdownBy));
 		Select dropdown = new Select(driver.findElement(dropdownBy));
 		WebElement option = dropdown.getFirstSelectedOption();
 		return option.getText();
@@ -122,7 +128,8 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 
 		//Edit from "Edit An Appointment" page
 		Set<String> oldWindowHandles = driver.getWindowHandles();
-		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles);
+		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles,
+			webDriverWait);
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@type='submit']")));
 		driver.findElement(By.xpath("//input[@type='submit']")).click();
 		driver.findElement(By.xpath("//input[@name='keyword']")).clear();
@@ -130,7 +137,7 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		driver.findElement(By.xpath(".//td[contains(., '" + dad.firstName + "')]")).click();
 		driver.findElement(By.xpath("//input[@name='duration']")).clear();
 		driver.findElement(By.xpath("//input[@name='duration']")).sendKeys(apptDurationUpdated);
-		dropdownSelectByVisibleText(driver, By.xpath("//select[@name='reasonCode']"), reasonCodeUpdated);
+		dropdownSelectByVisibleText(driver, webDriverWait, By.xpath("//select[@name='reasonCode']"), reasonCodeUpdated);
 		driver.findElement(By.id("reason")).clear();
 		driver.findElement(By.id("reason")).sendKeys(reasonUpdated);
 		driver.findElement(By.xpath("//input[@name='type']")).clear();
@@ -146,7 +153,8 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		Assert.assertTrue("Patient is NOT updated successfully.", PageUtil.isExistsBy(By.partialLinkText(dad.lastName), driver));
 
 		driver.findElement(By.partialLinkText(dad.lastName)).click();
-		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles);
+		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles,
+			webDriverWait);
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@type='submit']")));
 		String name = driver.findElement(By.xpath("//input[@name='keyword']")).getAttribute("value");
 		String apptDuration = driver.findElement(By.xpath("//input[@name='duration']")).getAttribute("value");
@@ -168,7 +176,13 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 	}
 
 	@Test
-	public void changeAppointmentStatusTestsJUNOUI() throws InterruptedException {
+	public void changeAppointmentStatusTestsJUNOUI() throws InterruptedException
+	{
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEEE MMM d");
+		LocalDate dateToday = LocalDate.now();
+		String dateTodayString = dtf.format(dateToday);
+		String dateTomorrowString = dtf.format(dateToday.plusDays(1));
+
 		// Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
 		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
 		String currWindowHandle = driver.getWindowHandle();
@@ -178,29 +192,41 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
-		accessSectionJUNOUI(driver, "Schedule");
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
-		driver.findElement(By.xpath("//button[@title='Next Day']")).click();
-		driver.findElement(By.xpath("//button[@title='Next Day']")).click();
-		Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));
-		providerDropDown.selectByVisibleText("oscardoc, doctor");
+		accessSectionJUNOUI(driver, webDriverWait, "Schedule");
+
+		AppointmentUtil.skipTwoDaysJUNOUI(driver, webDriverWait);
+
+		/*
+		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-today span"), "(0) " + dateTodayString));
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
+
+		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-future span"), "(0) " + dateTomorrowString));
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
+		 */
+
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("schedule-select"), "oscardoc, doctor");
 
 		//Edit from "Modify Appointment" page
-		driver.findElement(By.xpath("//span[contains(., '" + mom.firstName + "')]")).click();
+		findWaitClick(driver, webDriverWait, By.xpath("//span[contains(., '" + mom.firstName + "')]"));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName("input")));
 		driver.findElement(By.id("input-patient")).findElement(By.tagName("input")).clear();
 		driver.findElement(By.id("input-patient")).findElement(By.tagName("input")).sendKeys(dad.firstName);
-		driver.findElement(By.xpath("//span[contains(., '" + dad.firstName + "')]")).click();
-		dropdownSelectByVisibleText(driver, By.id("input-type"), typeUpdated);
+
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//span[contains(., '" + dad.firstName + "')]");
+
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("input-type"), typeUpdated);
 		driver.findElement(By.id("input-duration")).clear();
 		driver.findElement(By.id("input-duration")).sendKeys(apptDurationUpdated);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("input-reason-code")));
-		dropdownSelectByVisibleText(driver, By.id("input-reason-code"), reasonCodeUpdated);
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("input-reason-code"), reasonCodeUpdated);
 		driver.findElement(By.id("input-notes")).clear();
 		driver.findElement(By.id("input-notes")).sendKeys(notesUpdated);
 		driver.findElement(By.id("input-event_reason")).clear();
 		driver.findElement(By.id("input-event_reason")).sendKeys(reasonUpdated);
-		driver.findElement(By.xpath("//label[@class='form-control checkmark']")).click();
+		//driver.findElement(By.xpath("//label[@class='form-control checkmark']")).click();
+		driver.findElement(By.xpath("//label[contains(., 'Critical')]")).click();
 		driver.findElement(By.xpath("//button[contains(., 'Modify')]")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(dad.lastName)));
 		Assert.assertTrue("Patient is NOT updated successfully.",
 				PageUtil.isExistsBy(By.partialLinkText(dad.lastName), driver));
 
@@ -210,7 +236,7 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		String reasonCode = getDropdownValue(By.id("input-reason-code"));
 		String notes = driver.findElement(By.id("input-notes")).getAttribute("value");
 		String reason = driver.findElement(By.id("input-event_reason")).getAttribute("value");
-		boolean critialStatus = driver.findElement(By.xpath("//label[@class='form-control checkmark']")).isSelected();
+		boolean critialStatus = driver.findElement(By.xpath("//label[contains(., 'Critical')]")).isSelected();
 
 		Assert.assertEquals("Type is NOT updated successfully.", typeUpdated, type);
 		Assert.assertEquals("Duration is NOT updated successfully.", apptDurationUpdated, apptDuration);

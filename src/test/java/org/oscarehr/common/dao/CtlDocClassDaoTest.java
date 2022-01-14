@@ -53,9 +53,12 @@ public class CtlDocClassDaoTest extends DaoTestFixtures
 
 	Logger logger = MiscUtils.getLogger();
 
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("ctl_doc_class");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"ctl_doc_class"
+		};
 	}
 
 	@Test

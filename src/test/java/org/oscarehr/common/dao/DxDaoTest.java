@@ -53,9 +53,12 @@ public class DxDaoTest extends DaoTestFixtures
 	
 	Logger logger = MiscUtils.getLogger();
 
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("dx_associations");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"dx_associations"
+		};
 	}
 
 	@Test

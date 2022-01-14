@@ -43,7 +43,7 @@ if(!authed) {
 <%@ include file="/taglibs.jsp"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao"%>
-<%@page import="org.oscarehr.common.model.DemographicContact"%>
+<%@page import="org.oscarehr.contact.entity.DemographicContact"%>
 <%
 	String id = request.getParameter("id");
 %>

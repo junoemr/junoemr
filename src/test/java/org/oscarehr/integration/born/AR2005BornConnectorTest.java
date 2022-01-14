@@ -61,9 +61,16 @@ import org.springframework.test.context.junit4.SpringRunner;
 //@SpringBootTest
 public class AR2005BornConnectorTest extends DaoTestFixtures
 {
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"formONAR"
+		};
+	}
+
 	//@Before
 	public void before() throws Exception {
-		SchemaUtils.restoreTable(new String[]{"formONAR"});
 		assertEquals(SchemaUtils.loadFileIntoMySQL(System.getProperty("basedir") + "/src/test/resources/initFormONAR.sql"),0);
 	}
 

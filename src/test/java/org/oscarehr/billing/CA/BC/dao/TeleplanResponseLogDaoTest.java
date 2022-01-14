@@ -46,9 +46,12 @@ public class TeleplanResponseLogDaoTest extends DaoTestFixtures
 	public TeleplanResponseLogDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("teleplan_response_log");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"teleplan_response_log"
+		};
 	}
 
 	@Test

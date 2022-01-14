@@ -24,7 +24,7 @@ package org.oscarehr.ws.external.rest.v1.transfer.tickler;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.springframework.beans.BeanUtils;
 import oscar.util.ConversionUtils;
 

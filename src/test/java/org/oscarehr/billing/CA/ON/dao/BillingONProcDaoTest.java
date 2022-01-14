@@ -46,9 +46,12 @@ public class BillingONProcDaoTest extends DaoTestFixtures
 	public BillingONProcDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billing_on_proc");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billing_on_proc"
+		};
 	}
 
 	@Test

@@ -26,14 +26,8 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.data.ProviderTestData;
-import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import junit.framework.Assert;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,16 +35,15 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.AuthUtils;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -65,7 +58,7 @@ public class AddProvidersIT extends SeleniumTestBase
 	{
 		return new String[]{
 			"admission", "log", "program_provider", "provider", "provider_billing",
-			"providerbillcenter", "secUserRole"
+			"providerbillcenter", "secUserRole", "property"
 		};
 	}
 
@@ -92,23 +85,24 @@ Session ID: 7004a14c-aa65-4887-8c95-fcd555918f3b
 			throws Exception
 	{
 		// open administration panel
-		driver.findElement(By.id("admin-panel")).click();
+		findWaitClickById(driver, webDriverWait, "admin-panel");
 		PageUtil.switchToLastWindow(driver);
 
 		// Add a provider record page
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(".//h5[contains(.,'Add a Provider Record')]")));
 		driver.findElement(By.xpath(".//h5[contains(.,'Add a Provider Record')]")).click();
-		Thread.sleep(2000);
-		driver.switchTo().frame("myFrame");
-		driver.findElement(By.xpath("//input[@value='Suggest']")).click();
+
+		webDriverWait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("myFrame"));
+
+		findWaitClickByXpath(driver, webDriverWait, "//input[@value='Suggest']");
 		driver.findElement(By.xpath("//input[@name='provider_no']")).clear();
 		driver.findElement(By.xpath("//input[@name='provider_no']")).sendKeys(drApple.providerNo);
 		driver.findElement(By.xpath("//input[@name='last_name']")).sendKeys(drApple.lastName);
 		driver.findElement(By.xpath("//input[@name='first_name']")).sendKeys(drApple.firstName);
-		dropdownSelectByValue(driver, By.id("provider_type"), drApple.type);
+		dropdownSelectByValue(driver, webDriverWait, By.id("provider_type"), drApple.type);
 		driver.findElement(By.xpath("//input[@name='specialty']")).sendKeys(drApple.specialty);
 		driver.findElement(By.xpath("//input[@name='team']")).sendKeys(drApple.team);
-		dropdownSelectByValue(driver, By.id("sex"), drApple.sex);
+		dropdownSelectByValue(driver, webDriverWait, By.id("sex"), drApple.sex);
 		driver.findElement(By.xpath("//input[@name='dob']")).sendKeys(drApple.dob);
 		driver.findElement(By.xpath("//input[@name='address']")).sendKeys(drApple.address);
 		driver.findElement(By.xpath("//input[@name='phone']")).sendKeys(drApple.homePhone);
@@ -130,21 +124,25 @@ Session ID: 7004a14c-aa65-4887-8c95-fcd555918f3b
 		driver.findElement(By.xpath("//input[@name='xml_p_specialty_code']")).sendKeys(drApple.specialtyCodeNo);
 		driver.findElement(By.xpath("//input[@name='xml_p_billinggroup_no']")).sendKeys(drApple.groupBillingNo);
 		driver.findElement(By.xpath("//input[@name='practitionerNo']")).sendKeys(drApple.cpsidNo);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='billcenter']"), drApple.billCenter);//dropdown empty
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='billcenter']"), drApple.billCenter
+		);//dropdown empty
 		driver.findElement(By.xpath("//input[@name='xml_p_slpusername']")).sendKeys(drApple.selfLearningUsername);
 		driver.findElement(By.xpath("//input[@name='xml_p_slppassword']")).sendKeys(drApple.selfLearningPassword);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), drApple.status);
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='status']"), drApple.status
+		);
 		driver.findElement(By.xpath("//input[@name='submitbtn']")).click();
+
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//h1[contains(.,'Successful Addition of a Provider Record.')]")));
 		Assert.assertNotNull(driver.findElement(By.xpath(".//h1[contains(.,'Successful Addition of a Provider Record.')]")));
 
 		driver.switchTo().defaultContent();
-		driver.findElement(By.xpath(".//a[contains(.,'User Management')]")).click();
-		driver.findElement(By.xpath(".//a[contains(.,'Search/Edit/Delete Provider Records')]")).click();
-		Thread.sleep(1000);
-		driver.switchTo().frame("myFrame");
-		driver.findElement(By.xpath("//input[@value='search_providerno']")).click();
-		driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(drApple.providerNo);
-		driver.findElement(By.xpath("//input[@name='button']")).click();
+		findWaitClickByXpath(driver, webDriverWait, ".//a[contains(.,'User Management')]");
+		findWaitClickByXpath(driver, webDriverWait, ".//a[contains(.,'Search/Edit/Delete Provider Records')]");
+		webDriverWait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt("myFrame"));
+		findWaitClickByXpath(driver, webDriverWait, "//input[@value='search_providerno']");
+		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='keyword']", drApple.providerNo);
+		findWaitClickByXpath(driver, webDriverWait, "//input[@name='button']");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("html/body/center/center/table/tbody/tr[2]/td[3]")));
 		WebElement providerAdded = driver.findElement(By.xpath("html/body/center/center/table/tbody/tr[2]/td[3]"));
 		String providerAddedLName = providerAdded.getText();
 		Assert.assertEquals(drApple.lastName, providerAddedLName);

@@ -50,10 +50,12 @@ public class MeasurementTypeDaoTest extends DaoTestFixtures
 	@Autowired
 	protected MeasurementTypeDao measurementTypeDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "measurementType");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"measurementType"
+		};
 	}
 
 	@Test

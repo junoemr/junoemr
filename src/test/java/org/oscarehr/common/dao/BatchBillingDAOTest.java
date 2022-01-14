@@ -60,9 +60,12 @@ public class BatchBillingDAOTest extends DaoTestFixtures
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 	Timestamp currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("batch_billing");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"batch_billing"
+		};
 	}
 	
 	@Test 

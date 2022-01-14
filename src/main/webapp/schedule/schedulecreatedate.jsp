@@ -70,18 +70,24 @@
 <%@ page import="oscar.MyDateFormat" %>
 <%@ page import="oscar.SxmlMisc" %>
 <%@ page import="oscar.appt.ApptUtil" %>
-<%@ page import="java.net.URLDecoder" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@page import="java.util.Calendar" %>
 <%@page import="java.util.GregorianCalendar" %>
 <%@page import="java.util.List" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="java.nio.charset.StandardCharsets" %>
+<%@ page import="org.apache.commons.lang3.StringUtils" %>
 <%
 	Schedule scheduleService = SpringUtils.getBean(Schedule.class);
 
-	String provider_name = URLDecoder.decode(request.getParameter("provider_name"));
 	String provider_no = request.getParameter("provider_no");
-	if(provider_no == null || provider_no == "") response.sendRedirect("../logout.jsp");
+	if(StringUtils.isBlank(provider_no))
+	{
+		response.sendRedirect("../logout.jsp");
+	}
+
+	String providerName = request.getParameter("provider_name");
+	String providerNameEncoded = URLEncoder.encode(providerName, String.valueOf(StandardCharsets.UTF_8));
 
 	//to prepare calendar display
 	GregorianCalendar now = new GregorianCalendar();
@@ -222,7 +228,7 @@
 
 		</td>
 		<td><br>
-		<b><%=provider_name%></b> &nbsp; &nbsp; <font size="-1"><bean:message
+		<b><%=providerName%></b> &nbsp; &nbsp; <font size="-1"><bean:message
 			key="schedule.schedulecreatedate.msgEffective" />&nbsp;<b>(<%=scheduleRscheduleBean.sdate +" - "+scheduleRscheduleBean.edate%>)</b></font>
 		<center>
 			<%
@@ -244,14 +250,14 @@
 				%>
 			<tr>
 				<td BGCOLOR="#CCFFCC" width="50%" align="center"><a
-					href="schedulecreatedate.jsp?provider_no=<%=provider_no%>&provider_name=<%=URLEncoder.encode(provider_name)%>&year=<%=year%>&month=<%=month%>&day=<%=day%>&delta=-1&bFirstDisp=0">
+					href="schedulecreatedate.jsp?provider_no=<%=provider_no%>&provider_name=<%=providerNameEncoded%>&year=<%=year%>&month=<%=month%>&day=<%=day%>&delta=-1&bFirstDisp=0">
 				&nbsp;&nbsp;<img src="../images/previous.gif" WIDTH="10" HEIGHT="9"
 					BORDER="0"
 					ALT='<bean:message key="schedule.schedulecreatedate.btnLastMonthTip"/>'
 					vspace="2"> <bean:message
 					key="schedule.schedulecreatedate.btnLastMonth" />&nbsp;&nbsp; </a> <b><span
 					CLASS=title><%=year%>-<%=month%></span></b> <a
-					href="schedulecreatedate.jsp?provider_no=<%=provider_no%>&provider_name=<%=URLEncoder.encode(provider_name)%>&year=<%=year%>&month=<%=month%>&day=<%=day%>&delta=1&bFirstDisp=0">
+					href="schedulecreatedate.jsp?provider_no=<%=provider_no%>&provider_name=<%=providerNameEncoded%>&year=<%=year%>&month=<%=month%>&day=<%=day%>&delta=1&bFirstDisp=0">
 				&nbsp;&nbsp;<bean:message
 					key="schedule.schedulecreatedate.btnNextMonth" /><img
 					src="../images/next.gif" WIDTH="10" HEIGHT="9" BORDER="0"
@@ -325,7 +331,7 @@
 
 			%>
 			<td bgcolor='<%=bgcolor.toString()%>'><a href="#"
-				onclick="popupPage(260,720,'scheduledatepopup.jsp?provider_no=<%=provider_no%>&provider_name=<%=provider_name%>&year=<%=year%>&month=<%=month%>&day=<%=dateGrid[i][j]%>&bFistDisp=1')">
+				onclick="popupPage(260,720,'scheduledatepopup.jsp?provider_no=<%=provider_no%>&provider_name=<%=providerNameEncoded%>&year=<%=year%>&month=<%=month%>&day=<%=dateGrid[i][j]%>&bFistDisp=1')">
 			<font color="red"><%= dateGrid[i][j] %></font> <font size="-3"
 				color="blue"><%=strHolidayName.toString()%></font> <br>
 			<font size="-2">&nbsp;<%=strHour.toString()%> <br>

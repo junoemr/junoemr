@@ -50,10 +50,12 @@ public class OcanStaffFormDataDaoTest extends DaoTestFixtures
 	@Autowired
 	protected OcanStaffFormDataDao ocanStaffFormDataDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("OcanStaffFormData");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"OcanStaffFormData"
+		};
 	}
 
 	@Test

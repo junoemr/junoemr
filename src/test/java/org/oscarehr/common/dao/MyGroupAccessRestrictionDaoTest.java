@@ -54,9 +54,12 @@ public class MyGroupAccessRestrictionDaoTest extends DaoTestFixtures
 	@Autowired
 	protected MyGroupAccessRestrictionDao myGroupAccessRestrictionDao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("MyGroupAccessRestriction");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"MyGroupAccessRestriction"
+		};
 	}
 
 	@Test

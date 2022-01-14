@@ -41,6 +41,14 @@ public class BasicOscarIT extends SeleniumTestBase
 	@Autowired
 	Environment environment;
 
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"log", "property"
+		};
+	}
+
 	@Test
 	public void isOscarReachable()
 	{
@@ -56,8 +64,8 @@ public class BasicOscarIT extends SeleniumTestBase
 				AuthUtils.TEST_PASSWORD,
 				AuthUtils.TEST_PIN,
 				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-				driver
-		);
+				driver,
+			webDriverWait);
 	}
 
 }

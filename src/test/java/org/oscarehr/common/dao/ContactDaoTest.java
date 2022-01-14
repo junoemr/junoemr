@@ -36,7 +36,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.Contact;
+import org.oscarehr.contact.dao.ContactDao;
+import org.oscarehr.contact.entity.Contact;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -56,10 +57,13 @@ public class ContactDaoTest extends DaoTestFixtures
 	public void doSimpleExceptionTest() {
 		MiscUtils.getLogger().error("Unable to run doSimpleExceptionTest on this DAO");
 	}
-	
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("Contact");
+
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"Contact"
+		};
 	}
 
 	@Test

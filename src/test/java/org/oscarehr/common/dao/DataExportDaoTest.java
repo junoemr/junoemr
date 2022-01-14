@@ -52,10 +52,12 @@ public class DataExportDaoTest extends DaoTestFixtures
 
 	Logger logger = MiscUtils.getLogger();
 
-	@Before
-	@After
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("dataExport");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"dataExport"
+		};
 	}
 
 	@Test

@@ -45,10 +45,12 @@ public class FlowSheetCustomizationDaoTest extends DaoTestFixtures
 	public FlowSheetCustomizationDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("flowsheet_customization","flowsheet_drug");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"flowsheet_customization","flowsheet_drug"
+		};
 	}
 
 	@Test

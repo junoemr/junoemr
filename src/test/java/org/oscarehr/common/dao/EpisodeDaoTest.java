@@ -42,10 +42,12 @@ public class EpisodeDaoTest extends DaoTestFixtures
 	@Autowired
 	protected EpisodeDao episodeDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("Episode");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"Episode"
+		};
 	}
 
 	@Test

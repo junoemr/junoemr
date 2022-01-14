@@ -30,6 +30,7 @@ import {
 import {AqsQueuesApi, AqsQueuedAppointmentApi} from "../../../../generated";
 import AppointmentBooking from "../../../common/modals/bookAppointmentModal/appointmentBooking";
 import {ErrorCodes} from "../../../lib/integration/aqs/error/ErrorCodes";
+import ToastService from "../../../lib/alerts/service/ToastService";
 
 angular.module('Layout.Components').component('appointmentQueue', {
 	templateUrl: 'src/layout/components/appointmentQueue/appointmentQueue.jsp',
@@ -61,6 +62,9 @@ angular.module('Layout.Components').component('appointmentQueue', {
 				'../ws/rs');
 		let aqsQueuedAppointmentApi = new AqsQueuedAppointmentApi($http, $httpParamSerializer,
 				'../ws/rs');
+
+		ctrl.toastService = new ToastService();
+		ctrl.supportEmail = "support@junoemr.com"; // TODO read from centralized config?
 
 		// if true show no queues zero state
 		ctrl.noQueues = false;
@@ -161,7 +165,10 @@ angular.module('Layout.Components').component('appointmentQueue', {
 			}
 			catch(err)
 			{
-				console.error("Failed to fetch appointment queues with error: " + err);
+				const message = "Appointment Queue: " +
+					((err && err.data && err.data.error && err.data.error.message) ? err.data.error.message : "Unknown Error. please contact support");
+				console.error("Failed to fetch appointment queues with error: " + message, err);
+				ctrl.toastService.errorToast(message, false);
 			}
 		}
 

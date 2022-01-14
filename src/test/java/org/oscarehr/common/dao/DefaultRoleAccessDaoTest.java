@@ -41,9 +41,12 @@ public class DefaultRoleAccessDaoTest extends DaoTestFixtures
 	@Autowired
 	protected DefaultRoleAccessDAO defaultRoleAccessDAO;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("default_role_access", "access_type", "secRole");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"default_role_access", "access_type", "secRole"
+		};
 	}
 
 	@Test

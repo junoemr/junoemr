@@ -42,10 +42,12 @@ public class OcanFormOptionDaoTest extends DaoTestFixtures
 	@Autowired
 	protected OcanFormOptionDao ocanFormOptionDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("OcanFormOption");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"OcanFormOption"
+		};
 	}
 
 	@Test

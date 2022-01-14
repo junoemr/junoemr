@@ -48,9 +48,12 @@ public class PrescriptionDaoTest extends DaoTestFixtures
 	@Autowired
 	protected PrescriptionDao prescriptionDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("prescription");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"prescription"
+		};
 	}
 	
 	@Test

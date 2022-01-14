@@ -42,9 +42,12 @@ public class BatchEligibilityDaoTest extends DaoTestFixtures
 	@Autowired
 	protected BatchEligibilityDao batchEligibilityDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("batchEligibility");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"batchEligibility"
+		};
 	}
 
 	@Test

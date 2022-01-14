@@ -46,9 +46,12 @@ public class ScratchPadDaoTest extends DaoTestFixtures
 	public ScratchPadDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("scratch_pad");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"scratch_pad"
+		};
 	}
 
         @Test

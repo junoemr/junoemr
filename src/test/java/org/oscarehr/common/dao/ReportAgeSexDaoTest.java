@@ -58,10 +58,13 @@ public class ReportAgeSexDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("reportagesex", "demographic", "lst_gender", "admission", "demographic_merged", "program", 
-				"health_safety", "provider", "providersite", "site", "program_team","log", "Facility");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"reportagesex", "demographic", "lst_gender", "admission", "demographic_merged", "program",
+			"health_safety", "provider", "providersite", "site", "program_team","log", "Facility"
+		};
 	}
 
 	@Test 

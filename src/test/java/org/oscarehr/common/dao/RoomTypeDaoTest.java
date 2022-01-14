@@ -42,10 +42,12 @@ public class RoomTypeDaoTest extends DaoTestFixtures
 	@Autowired
 	protected RoomTypeDao roomTypeDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("room_type");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"room_type"
+		};
 	}
 
 	@Test

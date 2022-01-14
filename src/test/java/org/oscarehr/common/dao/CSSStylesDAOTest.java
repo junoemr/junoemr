@@ -49,9 +49,12 @@ public class CSSStylesDAOTest extends DaoTestFixtures
 	@Autowired
 	protected CSSStylesDAO dao;
 
-	@Before
-	public void setUp() throws Exception { 
-		SchemaUtils.restoreTable("cssStyles");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"cssStyles"
+		};
 	}
 
 	@Test

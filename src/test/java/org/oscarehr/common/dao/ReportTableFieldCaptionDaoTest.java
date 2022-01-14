@@ -48,10 +48,12 @@ public class ReportTableFieldCaptionDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ReportTableFieldCaptionDao reportTableFieldCaptionDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("reportTableFieldCaption");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"reportTableFieldCaption"
+		};
 	}
 
 	@Test

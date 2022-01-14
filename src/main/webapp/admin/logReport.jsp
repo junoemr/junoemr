@@ -317,7 +317,7 @@ boolean authed=true;
 			<td><%=StringUtils.trimToEmpty(logEntry.getContentId())%>&nbsp;</td>
 			<td><%=StringUtils.trimToEmpty(logEntry.getIp())%>&nbsp;</td>
 			<td><%=(logEntry.getDemographicId() != null) ? logEntry.getDemographicId() : ""%>&nbsp;</td>
-			<td><%=StringUtils.trimToEmpty(logEntry.getData())%>&nbsp;</td>
+			<td><%= StringUtils.trimToEmpty(oscar.util.StringUtils.filterHTMLFromString(logEntry.getData())) %>&nbsp;</td>
 		</tr>
 		<%
 		}

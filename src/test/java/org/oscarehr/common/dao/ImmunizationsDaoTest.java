@@ -42,10 +42,12 @@ public class ImmunizationsDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ImmunizationsDao immunizationsDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("immunizations");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"immunizations"
+		};
 	}
 
 	@Test

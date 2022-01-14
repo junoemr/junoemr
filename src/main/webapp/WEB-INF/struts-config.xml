@@ -243,7 +243,7 @@
 			<form-property name="installDate" type="java.lang.String" />
 		</form-bean>
 		<form-bean name="ticklerForm" type="org.apache.struts.validator.DynaValidatorForm">
-			<form-property name="tickler" type="org.oscarehr.common.model.Tickler"/>
+			<form-property name="tickler" type="org.oscarehr.ticklers.entity.Tickler"/>
 			<form-property name="filter" type="org.oscarehr.common.model.CustomFilter"/>
 		</form-bean>
 		<form-bean name="TicklerSettingsForm" type="org.oscarehr.ticklers.web.TicklerSettingsForm" />
@@ -542,7 +542,7 @@
 		</form-bean>
 
 		<form-bean name="contactForm" type="org.apache.struts.validator.DynaValidatorForm">
-			<form-property name="contact" type="org.oscarehr.common.model.Contact" />
+			<form-property name="contact" type="org.oscarehr.contact.entity.Contact" />
 			<form-property name="pcontact" type="org.oscarehr.common.model.ProfessionalContact" />
 		</form-bean>
 
@@ -838,8 +838,8 @@
 		</action>
 		<action path="/oscarEncounter/IncomingEncounter" scope="request" type="oscar.oscarEncounter.pageUtil.EctIncomingEncounterAction">
 			<forward name="failure" path="/oscarEncounter/error.jsp" />
-			<forward name="success" path="/oscarEncounter/Index.jsp" />
-			<forward name="success2" path="/oscarEncounter/Index2.jsp" />
+<!--			<forward name="success" path="/oscarEncounter/Index.jsp" />-->
+<!--			<forward name="success2" path="/oscarEncounter/Index2.jsp" />-->
 			<forward name="junoEncounter" path="/oscarEncounter/junoEncounter.do" />
 			<forward name="domain-error" path="/casemgmt/domain-error.jsp" />
 		</action>
@@ -1126,7 +1126,6 @@
 		</action>
 		<action name="FrmFormForm" path="/form/SetupForm" scope="request" type="oscar.form.pageUtil.FrmSetupFormAction" />
 		<action name="FrmFormForm" path="/form/SubmitForm" scope="request" type="oscar.form.pageUtil.FrmFormAction" />
-		<action path="/oscarEncounter/displayLabs" scope="request" type="oscar.oscarEncounter.pageUtil.EctDisplayLabAction2"></action>
 		<action path="/oscarEncounter/displayForms" scope="request" type="oscar.oscarEncounter.pageUtil.EctDisplayFormAction"></action>
 		<action path="/oscarEncounter/displayEForms" scope="request" type="oscar.oscarEncounter.pageUtil.EctDisplayEFormAction"></action>
 		<action path="/oscarEncounter/displayMessages" scope="request" type="oscar.oscarEncounter.pageUtil.EctDisplayMsgAction"></action>
@@ -1158,25 +1157,25 @@
 		</action>
 		<action path="/oscarEncounter/displayMyOscar" scope="request" type="oscar.oscarEncounter.pageUtil.EctDisplayMyOscarAction"></action>
 		
-		<action input="/Index.jsp" path="/oscarEncounter/SaveEncounter" scope="request" type="oscar.oscarEncounter.pageUtil.EctSaveEncounterAction">
-			<forward name="saveAndStay" path="/oscarEncounter/Index.jsp?saved=true" />
-			<forward name="failure" path="/oscarEncounter/error.jsp" />
-			<forward name="success" path="/oscarEncounter/TimeOut.jsp" />
-			<forward name="bill" path="/billing.do" />
-			<forward name="splitchart" path="/oscarEncounter/Index.jsp?saved=true&amp;splitchart=true" />
-			<forward name="close" path="/oscarEncounter/close.jsp" />
-			<forward name="concurrencyError" path="/oscarEncounter/concurrencyError.jsp" />
-		</action>
-		<action input="/Index2.jsp" path="/oscarEncounter/SaveEncounter2" scope="request" type="oscar.oscarEncounter.pageUtil.EctSaveEncounterAction">
-			<forward name="saveAndStay" path="/oscarEncounter/Index2.jsp?saved=true" />
-			<forward name="failure" path="/oscarEncounter/error.jsp" />
-			<forward name="success" path="/oscarEncounter/TimeOut.jsp" />
-			<forward name="bill" path="/billing.do" />
-			<forward name="splitchart" path="/oscarEncounter/Index2.jsp?saved=true&amp;splitchart=true" />
-			<forward name="surveillance" path="/oscarSurveillance/CheckSurveillance.do" />
-			<forward name="close" path="/oscarEncounter/close.jsp" />
-			<forward name="concurrencyError" path="/oscarEncounter/concurrencyError.jsp" />
-		</action>
+<!--		<action input="/Index.jsp" path="/oscarEncounter/SaveEncounter" scope="request" type="oscar.oscarEncounter.pageUtil.EctSaveEncounterAction">-->
+<!--			<forward name="saveAndStay" path="/oscarEncounter/Index.jsp?saved=true" />-->
+<!--			<forward name="failure" path="/oscarEncounter/error.jsp" />-->
+<!--			<forward name="success" path="/oscarEncounter/TimeOut.jsp" />-->
+<!--			<forward name="bill" path="/billing.do" />-->
+<!--			<forward name="splitchart" path="/oscarEncounter/Index.jsp?saved=true&amp;splitchart=true" />-->
+<!--			<forward name="close" path="/oscarEncounter/close.jsp" />-->
+<!--			<forward name="concurrencyError" path="/oscarEncounter/concurrencyError.jsp" />-->
+<!--		</action>-->
+<!--		<action input="/Index2.jsp" path="/oscarEncounter/SaveEncounter2" scope="request" type="oscar.oscarEncounter.pageUtil.EctSaveEncounterAction">-->
+<!--			<forward name="saveAndStay" path="/oscarEncounter/Index2.jsp?saved=true" />-->
+<!--			<forward name="failure" path="/oscarEncounter/error.jsp" />-->
+<!--			<forward name="success" path="/oscarEncounter/TimeOut.jsp" />-->
+<!--			<forward name="bill" path="/billing.do" />-->
+<!--			<forward name="splitchart" path="/oscarEncounter/Index2.jsp?saved=true&amp;splitchart=true" />-->
+<!--			<forward name="surveillance" path="/oscarSurveillance/CheckSurveillance.do" />-->
+<!--			<forward name="close" path="/oscarEncounter/close.jsp" />-->
+<!--			<forward name="concurrencyError" path="/oscarEncounter/concurrencyError.jsp" />-->
+<!--		</action>-->
 		<action input=" " name="EctIncomingConsultationForm" path="/oscarEncounter/IncomingConsultation" scope="request" type="oscar.oscarEncounter.oscarConsultationRequest.pageUtil.EctIncomingConsultationAction">
 			<forward name="success" path="/oscarEncounter/oscarConsultationRequest/ViewConsultationRequests.jsp" />
 		</action>

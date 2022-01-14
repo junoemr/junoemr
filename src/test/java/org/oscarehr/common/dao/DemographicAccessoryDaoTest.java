@@ -43,9 +43,12 @@ public class DemographicAccessoryDaoTest extends DaoTestFixtures
 	@Autowired
 	protected DemographicAccessoryDao demographicAccessoryDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("demographicaccessory");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"demographicaccessory"
+		};
 	}
 
 	@Test

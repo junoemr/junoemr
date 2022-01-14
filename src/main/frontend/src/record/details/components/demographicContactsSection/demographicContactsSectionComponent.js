@@ -30,6 +30,7 @@ import {
     from "../../../../common/components/junoComponentConstants";
 
     import {DemographicApi} from "../../../../../generated";
+import ToastService from "../../../../lib/alerts/service/ToastService";
 
 angular.module('Record.Details').component('demographicContactsSection', {
     templateUrl: 'src/record/details/components/demographicContactsSection/demographicContactsSection.jsp',
@@ -45,10 +46,11 @@ angular.module('Record.Details').component('demographicContactsSection', {
         function ($uibModal,
                   $http,
                   $httpParamSerializer,
-                  $stateParams,)
+                  $stateParams)
         {
-            let ctrl = this;
-            const demographicApi = new DemographicApi($http, $httpParamSerializer, "../ws/rs");
+            const ctrl = this;
+            ctrl.demographicApi = new DemographicApi($http, $httpParamSerializer, "../ws/rs");
+            ctrl.toastService = new ToastService();
 
             ctrl.category = {
                 PERSONAL: "personal",
@@ -70,26 +72,26 @@ angular.module('Record.Details').component('demographicContactsSection', {
             {
                 ctrl.thisDemo = $stateParams.demographicNo;
 
-                demographicApi.getDemographicContacts(ctrl.thisDemo, ctrl.category.PERSONAL).then(
+                ctrl.demographicApi.getDemographicContacts(ctrl.thisDemo, ctrl.category.PERSONAL).then(
                     (data) => {
                         ctrl.demoContacts = (data.data.body);
                     },
                     () => {
-                        Juno.Common.Util.errorAlert($uibModal, 'Error', 'Could not retrieve personal contacts');
+                        ctrl.toastService.errorToast('Could not retrieve personal contacts', true);
                     });
 
-                demographicApi.getDemographicContacts(ctrl.thisDemo, ctrl.category.PROFESSIONAL).then(
+                ctrl.demographicApi.getDemographicContacts(ctrl.thisDemo, ctrl.category.PROFESSIONAL).then(
                     (data) => {
                         ctrl.demoContactPros = (data.data.body);
                     },
                     () => {
-                        Juno.Common.Util.errorAlert($uibModal, 'Error', 'Could not retrieve professional contacts');
+                        ctrl.toastService.errorToast('Could not retrieve professional contacts', true);
                     });
             }
 
             ctrl.openContacts = function (demoContact)
             {
-                ctrl.dialog = $uibModal.open(
+                $uibModal.open(
                     {
                         component: 'demographicContactsModal',
                         backdrop: 'static',
@@ -98,25 +100,24 @@ angular.module('Record.Details').component('demographicContactsSection', {
                             demoContact: demoContact,
                             demographic: () => ctrl.thisDemo,
                         }
-                    });
-
-                ctrl.dialog.result.then(
-                    function onClose(updatedContact)
+                    }
+                ).result.then((updatedContact) =>
+                {
+                    if (updatedContact)
                     {
                         ctrl.demoContacts.forEach((contact, index) =>
                         {
-                            if (contact.contactId === updatedContact.data.body.contactId)
+                            if (contact.id === updatedContact.id)
                             {
-                                ctrl.demoContacts[index] = updatedContact.data.body;
+                                ctrl.demoContacts[index] = updatedContact;
                             }
                         });
-                        ctrl.dialog = null;
-                    },
-                    function onDismiss()
-                    {
-                        ctrl.dialog = null;
                     }
-                );
+                }).catch((error) =>
+                {
+                    console.error(error);
+                    ctrl.toastService.errorToast("An unknown error occurred", true);
+                });
             };
 
             ctrl.manageContacts = function manageContacts()

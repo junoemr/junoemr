@@ -50,9 +50,12 @@ public class FlowSheetDrugDaoTest extends DaoTestFixtures
 	@Autowired
 	protected FlowSheetDrugDao flowSheetDrugDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("flowsheet_drug");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"flowsheet_drug"
+		};
 	}
 
         @Test

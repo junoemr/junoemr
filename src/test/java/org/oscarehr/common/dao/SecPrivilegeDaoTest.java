@@ -53,11 +53,14 @@ public class SecPrivilegeDaoTest extends DaoTestFixtures
 	@Autowired
 	protected SecPrivilegeDao secPrivilegeDao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "secPrivilege");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"secPrivilege"
+		};
 	}
-	
+
 	@Test
 	public void testFindAll() throws Exception {
 		

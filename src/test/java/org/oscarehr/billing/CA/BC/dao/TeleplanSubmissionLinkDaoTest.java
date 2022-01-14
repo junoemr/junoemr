@@ -46,9 +46,12 @@ public class TeleplanSubmissionLinkDaoTest extends DaoTestFixtures
 	public TeleplanSubmissionLinkDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("teleplan_submission_link");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"teleplan_submission_link"
+		};
 	}
 
 	@Test

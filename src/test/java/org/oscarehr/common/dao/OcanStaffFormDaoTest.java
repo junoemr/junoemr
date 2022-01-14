@@ -55,9 +55,12 @@ public class OcanStaffFormDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("OcanStaffForm");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"OcanStaffForm"
+		};
 	}
 
 	@Test

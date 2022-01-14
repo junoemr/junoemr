@@ -28,10 +28,10 @@ package org.oscarehr.common.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.oscarehr.common.dao.ContactDao;
-import org.oscarehr.common.dao.DemographicContactDao;
-import org.oscarehr.common.model.Contact;
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.contact.dao.ContactDao;
+import org.oscarehr.contact.dao.DemographicContactDao;
+import org.oscarehr.contact.entity.Contact;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.util.SpringUtils;
 
 public class ContactManager {

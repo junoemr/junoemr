@@ -67,11 +67,10 @@ public class DefaultNoteServiceTest extends DaoTestFixtures
 	@Autowired
 	private ProgramProviderDAO programProviderDao;
 
-	@BeforeClass
-	public static void beforeClass() throws Exception {
-		//SchemaUtils.restoreAllTables();
-
-		SchemaUtils.restoreTable(
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
 			"program_provider",
 			"casemgmt_note",
 			"access_type",
@@ -153,7 +152,7 @@ public class DefaultNoteServiceTest extends DaoTestFixtures
 			"formTreatmentPref",
 			"formVTForm",
 			"program_team"
-		);
+		};
 	}
 
 	@Test

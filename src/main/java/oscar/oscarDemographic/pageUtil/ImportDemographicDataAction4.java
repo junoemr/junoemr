@@ -71,7 +71,7 @@ import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
-import org.oscarehr.common.dao.DemographicContactDao;
+import org.oscarehr.contact.dao.DemographicContactDao;
 import org.oscarehr.common.dao.DrugReasonDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.PartialDateDao;
@@ -79,7 +79,7 @@ import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicArchive;
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.common.model.Facility;
 import org.oscarehr.common.model.MeasurementsExt;
 import org.oscarehr.common.model.PartialDate;
@@ -171,6 +171,7 @@ import java.util.zip.ZipInputStream;
     private static final String REPORTBINARY = "Binary";
     private static final String REPORTTEXT = "Text";
     private static final String RISKFACTOR = "Risk";
+	public static final String IMPORT_FILE_PARAM = "importlog";
 
 
     boolean matchProviderNames = true;
@@ -296,7 +297,10 @@ import java.util.zip.ZipInputStream;
 
         //channel warnings and importlog to browser
         request.setAttribute("warnings",warnings);
-        if (importLog!=null) request.setAttribute("importlog",importLog.getPath());
+        if (importLog != null)
+        {
+            request.setAttribute(IMPORT_FILE_PARAM, importLog.getName());
+        }
 
         logger.info("IMPORT PROCESS COMPLETE");
         return mapping.findForward("success");

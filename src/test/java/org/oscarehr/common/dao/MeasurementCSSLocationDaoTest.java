@@ -47,9 +47,12 @@ public class MeasurementCSSLocationDaoTest extends DaoTestFixtures
 	@Autowired
 	protected MeasurementCSSLocationDao measurementCSSLocationDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("measurementCSSLocation");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"measurementCSSLocation"
+		};
 	}
 
 	@Test

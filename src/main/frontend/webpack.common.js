@@ -387,7 +387,7 @@ module.exports = {
 			'./src/record/tracker/measurement/measurementPageComponent.ts',
 
 			'./src/tickler/module.js',
-			'./src/tickler/ticklerListController.js',
+			'./src/tickler/ticklerListComponent.js',
 			'./src/tickler/ticklerViewController.js',
 			'./src/tickler/ticklerAddComponent.js',
 			'./src/tickler/ticklerNoteController.js',

@@ -42,10 +42,12 @@ public class FunctionalCentreDaoTest extends DaoTestFixtures
 	@Autowired
 	protected FunctionalCentreDao functionalCentreDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("FunctionalCentre","program");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"FunctionalCentre", "program"
+		};
 	}
 
 	@Test

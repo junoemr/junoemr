@@ -49,10 +49,12 @@ public class SecUserRoleDaoTest extends DaoTestFixtures
 	@Autowired
 	protected SecUserRoleDao secUserRoleDao;
 	
-	@Before
-	public void before() throws Exception {
-		
-		SchemaUtils.restoreTable("secUserRole");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"secUserRole"
+		};
 	}
 	
 	@Test

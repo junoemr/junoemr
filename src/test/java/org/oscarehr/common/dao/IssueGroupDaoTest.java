@@ -49,10 +49,12 @@ public class IssueGroupDaoTest extends DaoTestFixtures
 	@Autowired
 	protected IssueGroupDao issueGroupDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("IssueGroup");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"IssueGroup"
+		};
 	}
 
 	@Test

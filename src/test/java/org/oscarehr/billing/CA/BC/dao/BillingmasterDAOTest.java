@@ -53,9 +53,12 @@ public class BillingmasterDAOTest extends DaoTestFixtures
 	@Autowired
 	public BillingmasterDAO billingmasterDAO;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billingmaster", "wcb", "billing","teleplanC12","demographic");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billingmaster", "wcb", "billing", "teleplanC12", "demographic"
+		};
 	}
 
 	@Test

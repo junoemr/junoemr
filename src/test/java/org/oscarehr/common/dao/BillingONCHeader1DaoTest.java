@@ -50,11 +50,14 @@ public class BillingONCHeader1DaoTest extends DaoTestFixtures
 	public BillingONCHeader1DaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billing_on_cheader1", "billing_on_item", "gstControl", "billingservice", "provider", 
-				"demographic", "lst_gender", "admission", "demographic_merged", "program", 
-				"health_safety", "provider", "providersite", "site", "program_team","log", "Facility","billing_on_payment");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billing_on_cheader1", "billing_on_item", "gstControl", "billingservice", "provider",
+			"demographic", "lst_gender", "admission", "demographic_merged", "program",
+			"health_safety", "provider", "providersite", "site", "program_team","log", "Facility","billing_on_payment"
+		};
 	}
 
 	@Test

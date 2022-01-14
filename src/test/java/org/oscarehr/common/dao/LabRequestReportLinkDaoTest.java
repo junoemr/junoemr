@@ -48,10 +48,12 @@ public class LabRequestReportLinkDaoTest extends DaoTestFixtures
 	@Autowired
 	protected LabRequestReportLinkDao labRequestReportLinkDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("labRequestReportLink");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"labRequestReportLink"
+		};
 	}
 
 	@Test

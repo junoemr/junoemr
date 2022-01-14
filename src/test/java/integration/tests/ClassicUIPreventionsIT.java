@@ -24,28 +24,25 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Set;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
 
 /*
 -------------------------------------------------------------------------------
@@ -75,7 +72,6 @@ Session ID: c9167a0a-a7f2-485c-97b7-41f3bde5438c
 @Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-
 public class ClassicUIPreventionsIT extends SeleniumTestBase
 {
 	// Reused URLs to navigate to
@@ -88,7 +84,7 @@ public class ClassicUIPreventionsIT extends SeleniumTestBase
 	{
 		return new String[]{
 			"admission", "demographic", "demographicArchive", "demographiccust", "log", "preventions",
-			"preventionsExt"
+			"preventionsExt", "property"
 		};
 	}
 
@@ -118,6 +114,7 @@ public class ClassicUIPreventionsIT extends SeleniumTestBase
 		String originalNeverReason = "well this is sure clear";
 
 		// fill in various empty fields on page
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='name']")));
 		driver.findElement(By.xpath("//input[@name='name']")).sendKeys(originalName);
 		driver.findElement(By.xpath("//input[@name='location']")).sendKeys(originalLocation);
 		driver.findElement(By.xpath("//input[@name='route']")).sendKeys(originalRoute);
@@ -141,6 +138,7 @@ public class ClassicUIPreventionsIT extends SeleniumTestBase
 
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]")));
 		Assert.assertTrue("Can't find anything resembling an added prevention on page",
 				PageUtil.isExistsBy(By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), driver));
 
@@ -154,10 +152,11 @@ public class ClassicUIPreventionsIT extends SeleniumTestBase
 
 		// Attempt to view prevention and verify information is correct
 		driver.findElement(By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]")).click();
-		Thread.sleep(2000);
+		findWaitClickByXpath(driver, webDriverWait, "//div[contains(@onclick, 'AddPreventionData.jsp?id=')]");
 		PageUtil.switchToLastWindow(driver);
 
 		// Pull out current assigned values and make sure they match
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='name']")));
 		String currentName = driver.findElement(By.xpath("//input[@name='name']")).getAttribute("value");
 		String currentLocation = driver.findElement(By.xpath("//input[@name='location']")).getAttribute("value");
 		String currentRoute = driver.findElement(By.xpath("//input[@name='route']")).getAttribute("value");
@@ -187,22 +186,27 @@ public class ClassicUIPreventionsIT extends SeleniumTestBase
 		String originalComments = "I'm a smoking check!";
 
 		// you should be able to do nothing here and hit save, but for testing purposes we'll fill in comments
-		driver.findElement(By.xpath("//textarea[@name='comments']")).sendKeys(originalComments);
+		findWaitSendKeysByXpath(driver, webDriverWait, "//textarea[@name='comments']", originalComments);
 		driver.findElement(By.xpath("//input[@type='submit']")).click();
 
 		// window closes, find following URL and verify entry shows
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + PREVENTION_URL);
 		Set<String> oldWindowHandles = driver.getWindowHandles();
 
+		String xpath = "//div[contains(@onclick, 'AddPreventionData.jsp?id=')]" +
+			"//preceding::div[@class='headPrevention _nifty']//" +
+			"child::p//" +
+			"child::a[contains(@onclick, 'AddPreventionData.jsp?prevention=Smoking')]";
+
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
+
 		// Click on prevention to edit it
 		Assert.assertTrue("Can't find anything resembling an added exam prevention on page", PageUtil.isExistsBy(
-				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]" +
-				"//preceding::div[@class='headPrevention _nifty']//" +
-				"child::p//" +
-				"child::a[contains(@onclick, 'AddPreventionData.jsp?prevention=Smoking')]"), driver));
+				By.xpath(xpath), driver));
 
 		PageUtil.switchToNewWindow(driver,
-				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), oldWindowHandles);
+				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), oldWindowHandles,
+			webDriverWait);
 		String currentComment = driver.findElement(By.xpath("//textarea[@name='comments']")).getAttribute("value");
 		Assert.assertEquals("Exam-style prevention comments not updated successfully", originalComments, currentComment);
 	}

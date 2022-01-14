@@ -46,9 +46,12 @@ public class EncounterTemplateDaoTest extends DaoTestFixtures
 
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("encountertemplate");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"encountertemplate"
+		};
 	}
 
 	@Test
