@@ -28,6 +28,8 @@ import lombok.Data;
 public class OLISSearchResultTransfer
 {
 	private String uuid;
+	private String accessionId;
+	private String versionId;
 	private boolean duplicate;
 	private boolean hiddenByUser;
 }

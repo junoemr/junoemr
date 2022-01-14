@@ -18,6 +18,7 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.stream.Collectors" %>
 <%@ page import="org.oscarehr.olis.transfer.OLISSearchResultTransfer" %>
+<%@ page import="oscar.OscarProperties" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -34,8 +35,21 @@
 
 <script type="text/javascript">
 
-	let showDuplicates = false;
+	function hideResult(uuid, accessionNo, versionId, isHidden=true)
+	{
+		jQuery.ajax({
+			url: "<%=request.getContextPath() %>/olis/Results.do?method=hideResult",
+			data: "accessionNo=" + accessionNo + "&version=" + versionId + "&isHidden=" + isHidden,
+			success: function(data) {
+				let selector = jQuery("." + uuid + "_row_selector");
+				selector.toggleClass("removed", isHidden);
+				selector.toggle(showRemoved || !isHidden);
 
+				selector.find(".remove_button").toggle(!isHidden);
+				selector.find(".unremove_button").toggle(isHidden);
+			}
+		});
+	}
 	function addToInbox(uuid, params="")
 	{
 		jQuery(uuid).attr("disabled", "disabled");
@@ -63,9 +77,19 @@
 	{
 		reportWindow('<%=request.getContextPath()%>/lab/CA/ALL/labDisplayOLIS.jsp?segmentID=0&preview=true&uuid=' + uuid);
 	}
+
+	let showDuplicates = false;
 	function toggleShowDuplicates()
 	{
-		jQuery(".duplicate").toggle();
+		showDuplicates = !showDuplicates;
+		jQuery(".duplicate").toggle(showDuplicates);
+	}
+
+	let showRemoved = false;
+	function toggleShowRemoved()
+	{
+		showRemoved = !showRemoved;
+		jQuery(".removed").toggle(showRemoved);
 	}
 
 	var patientFilter = "";
@@ -85,6 +109,18 @@
 		jQuery(".evenLine").each(performFilter);
 		jQuery(".oddLine").each(performFilter);
 	}
+
+	jQuery( document ).ready(function()
+	{
+		// initialize various display states
+		let rowSelector = jQuery(".result_row");
+		rowSelector.not(".removed").find(".unremove_button").toggle(false);
+		rowSelector.filter(".removed").find(".remove_button").toggle(false);
+
+		let duplicateSelector = rowSelector.filter(".duplicate");
+		duplicateSelector.find(".remove_button").attr("disabled", true);
+		duplicateSelector.find(".unremove_button").attr("disabled", true);
+	});
 </script>
 <style type="text/css">
 .oddLine { 
@@ -127,6 +163,10 @@
 	color: darkgreen;
 	display: none;
 }
+.removed {
+	color: red;
+	display: none;
+}
 
 </style>
 	
@@ -153,6 +193,7 @@
 		<td colspan="2">
 			<%
 			Demographic demographic = (Demographic) request.getAttribute("demographic");
+			boolean removeSearchResults = OscarProperties.getInstance().isPropertyActive("olis.enable_search_result_removal");
 
 			if (request.getAttribute("searchException") != null) {
 			%>
@@ -314,6 +355,12 @@
 							<input type="button" onClick="toggleShowDuplicates()"
 								   value="Show/Hide duplicates"
 								   title="Show or hide results already within the system"/>
+							<% if(removeSearchResults)
+							{ %>
+							<input type="button" onClick="toggleShowRemoved()"
+								   value="Show/Hide removed"
+								   title="Show or hide removed results"/>
+							<%}%>
 						</td>
 					</tr>
 					<tr><td colspan="10">
@@ -332,6 +379,12 @@
 						<th class="width-sm">Test Request Status</th>
 						<th class="width-sm">Ordering Practitioner</th>
 						<th class="width-sm">Admitting Practitioner</th>
+						<% if(removeSearchResults)
+						{%>
+						<th class="unsortable"></th>
+						<%
+						}
+						%>
 					</tr>
 					
 					<%  int lineNum = 0;
@@ -345,7 +398,11 @@
 							for(int i=0; i < result.getOBRCount(); i++)
 							{
 								int obrRep = result.getMappedOBR(i); // aka use sort keys
-								String cssClass = (++lineNum % 2 == 1 ? "oddLine" : "evenLine") + (transfer.isDuplicate() ? " duplicate" : "");
+								String cssClass =
+										(++lineNum % 2 == 1 ? "oddLine" : "evenLine") +
+										(transfer.isDuplicate() ? " duplicate" : "") +
+										(transfer.isHiddenByUser() ? " removed" : "") +
+										(" result_row " + resultUuid + "_row_selector");
 							%>
 							<tr class="<%=cssClass%>"
 							    patientName="<%=result.getPatientName()%>"
@@ -372,6 +429,19 @@
 								<td><%=result.getObrStatusDisplayValue(obrRep)%></td>
 								<td><%=result.getShortDocName()%></td>
 								<td><%=result.getAdmittingProviderNameShort()%></td>
+								<% if(removeSearchResults)
+								{%>
+								<td>
+									<input type="button"
+										   value="Remove"
+										   class="remove_button"
+										   onClick="hideResult('<%=resultUuid %>','<%=transfer.getAccessionId()%>','<%=transfer.getVersionId()%>', true); return false;"/>
+									<input type="button"
+										   value="Un-Remove"
+										   class="unremove_button"
+										   onClick="hideResult('<%=resultUuid %>','<%=transfer.getAccessionId()%>','<%=transfer.getVersionId()%>', false); return false;"/>
+								</td> <%
+								}%>
 
 							</tr>
 						<%

@@ -10,7 +10,20 @@ package org.oscarehr.olis;
 
 import com.indivica.olis.Driver;
 import com.indivica.olis.DriverResponse;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -26,24 +39,18 @@ import oscar.oscarLab.ca.all.parsers.OLIS.OLISError;
 import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
 import oscar.oscarLab.ca.all.util.Utilities;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 public class OLISResultsAction extends DispatchAction
 {
+	private static final Logger logger = MiscUtils.getLogger();
 	private static final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
 	private static final Map<String, OLISHL7Handler> searchResultsMap = new HashMap<>();
+	private static final Set<String> removedResultSet = new HashSet<>();
 
-	@Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+		return prepareResults(mapping, form, request, response);
+	}
+    public ActionForward prepareResults(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
 		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
 		securityInfoManager.requireAllPrivilege(loggedInProviderNo, Permission.LAB_READ);
@@ -69,6 +76,7 @@ public class OLISResultsAction extends DispatchAction
 
 					List<OLISSearchResultTransfer> resultList = new LinkedList<>();
 					request.setAttribute("resultList", resultList);
+					request.setAttribute("blockedContent", false);
 					return mapping.findForward("results");
 				}
 			}
@@ -113,7 +121,10 @@ public class OLISResultsAction extends DispatchAction
 
 				OLISSearchResultTransfer transfer = new OLISSearchResultTransfer();
 				transfer.setUuid(resultUuid);
+				transfer.setAccessionId(handler.getAccessionNum());
+				transfer.setVersionId(handler.getFillerOrderNumber());
 				transfer.setDuplicate(OLISUtils.isDuplicate(LoggedInInfo.getLoggedInInfoFromRequest(request), handler, message));
+				transfer.setHiddenByUser(removedResultSet.contains(transfer.getAccessionId()+transfer.getVersionId()));
 				resultList.add(transfer);
 			}
 
@@ -123,9 +134,31 @@ public class OLISResultsAction extends DispatchAction
 		}
 		catch(Exception e)
 		{
-			MiscUtils.getLogger().error("Can't pull out messages from OLIS response.", e);
+			logger.error("Can't pull out messages from OLIS response.", e);
 		}
 		return mapping.findForward("results");
+	}
+
+	public ActionForward hideResult(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
+		String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderNo, Permission.LAB_UPDATE);
+
+		String accessionNo = request.getParameter("accessionNo");
+		String versionId = request.getParameter("version");
+		boolean isHidden = Boolean.parseBoolean(request.getParameter("isHidden"));
+
+		if(isHidden)
+		{
+			logger.info("Hide OLIS search result " + accessionNo + "(" + versionId + ")");
+			removedResultSet.add(accessionNo + versionId);
+		}
+		else
+		{
+			logger.info("Un-Hide OLIS search result " + accessionNo + "(" + versionId + ")");
+			removedResultSet.remove(accessionNo + versionId);
+		}
+		return null;
 	}
 
 	public static OLISHL7Handler getHandlerByUUID(String uuid)

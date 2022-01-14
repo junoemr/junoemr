@@ -1021,7 +1021,7 @@
         <action input="/olis/Search.jsp" path="/olis/Search" scope="request" type="org.oscarehr.olis.OLISSearchAction">
         	<forward name="results" path="/olis/Results.do" />
         </action>
-        <action input="/olis/Search.jsp" path="/olis/Results" scope="request" type="org.oscarehr.olis.OLISResultsAction">
+        <action input="/olis/Search.jsp" path="/olis/Results" scope="request" parameter="method" type="org.oscarehr.olis.OLISResultsAction">
         	<forward name="results" path="/olis/Results.jsp" />
         </action>
         <action input="/olis/Results.jsp" path="/olis/AddToInbox" scope="request" type="org.oscarehr.olis.OLISAddToInboxAction">
