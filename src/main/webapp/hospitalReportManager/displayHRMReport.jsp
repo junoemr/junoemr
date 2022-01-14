@@ -245,6 +245,30 @@
 			});
 		}
 
+		initCategorizeButtons = function initCategorizeButtons()
+		{
+			var uncategorized = "-1";
+			var categoryId = $("#category-select").val();
+
+			if (categoryId === uncategorized)
+			{
+				$('#recategorize-future').attr('disabled' , true);
+			}
+
+			$("#category-select").change(function ()
+			{
+				var categoryId = $("#category-select").val();
+				if (categoryId === uncategorized)
+				{
+					$('#recategorize-future').attr('disabled' , true);
+				}
+				else
+				{
+					$('#recategorize-future').attr('disabled' , false);
+				}
+			})
+		}
+
 		reclassifyReport = function(documentId)
         {
             var categoryId = $("#category-select").val();
@@ -280,6 +304,7 @@
         }
 
 		jQuery(document).ready(function() {
+			initCategorizeButtons();
 			initProviderAutoComplete();
 
 			var demographicSearch = $("#demographic-search");
@@ -673,9 +698,9 @@
                 </tr>
                 <tr>
                     <td>Status:</td>
-                    <% if (hrmDocument.getReportStatus().equals(HRMDocument.STATUS.SIGNED)) { %>
-                    <td class="attention">Signed by author</td>
-                    <% } else if (hrmDocument.getReportStatus().equals(HRMDocument.STATUS.CANCELLED)) { %>
+                    <% if (hrmDocument.getReportStatus().equals(HrmDocument.ReportStatus.SIGNED)) { %>
+                    <td>Signed by author</td>
+                    <% } else if (hrmDocument.getReportStatus().equals(HrmDocument.ReportStatus.CANCELLED)) { %>
                     <td class="attention">Cancelled</td>
                     <% } else { %>
                     <td>Unsigned / Unknown</td>
@@ -889,8 +914,9 @@
             <input class="action-button" type="button" onClick="setDescription('<%=hrmReportId %>')" value="Save"/><span id="descriptionstatus<%=hrmReportId %>"></span>
         </div>
         <div style="width: 75%">
-            <b class="label">Change Report Classification:</b>
+            <b class="label">Change Report Category:</b>
             <select class="input" id="category-select">
+				<option value="-1">Uncategorized</option>
                 <%
                     HRMCategoryService categoryService = SpringUtils.getBean(HRMCategoryService.class);
                     List<HrmCategoryModel> categories = categoryService.getActiveCategories();
@@ -902,11 +928,12 @@
 
                 %>
                 <% for (HrmCategoryModel category : categories) { %>
-                <option value="<%=category.getId()%>"><%=category.getName()%></option>
+				<% boolean isSelected = hrmDocument.getCategory() != null && hrmDocument.getCategory().getId().equals(category.getId()); %>
+                <option value="<%=category.getId()%>" <%= isSelected ? "selected" : ""%>><%=category.getName()%></option>
                 <% } %>
             </select>
             <input class="action-button" type="button" onClick="reclassifyReport('<%=hrmReportId%>')" value="This Report"/>
-            <input class="action-button" type="button" onClick="reclassifyFutureReports('<%=hrmReportId%>')" value="Future Reports"/>
+            <input class="action-button" id="recategorize-future" type="button" onClick="reclassifyFutureReports('<%=hrmReportId%>')" value="Future Reports"/>
         </div>
     </div>
 

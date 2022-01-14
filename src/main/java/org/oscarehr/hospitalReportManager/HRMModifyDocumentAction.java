@@ -351,7 +351,6 @@ public class HRMModifyDocumentAction extends DispatchAction {
 			String documentId = request.getParameter("reportId");
 			String descriptionString = request.getParameter("description");
 
-
 			boolean updated = false;
 			HRMDocument document = hrmDocumentDao.find(Integer.parseInt(documentId));
 			if (document != null)
@@ -361,7 +360,8 @@ public class HRMModifyDocumentAction extends DispatchAction {
 				updated = true;
 			}
 			request.setAttribute("success", updated);
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			MiscUtils.getLogger().error("Couldn't set description for HRM document", e);
 			request.setAttribute("success", false);
@@ -375,20 +375,32 @@ public class HRMModifyDocumentAction extends DispatchAction {
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.HRM_UPDATE);
 
-		Integer documentId = Integer.parseInt(request.getParameter("documentId"));
-		Integer categoryId = Integer.parseInt(request.getParameter("categoryId"));
+		final Integer UNCATEGORIZED = -1;
 
-		HrmDocument documentModel = hrmDocumentService.getHrmDocument(documentId);
-
-		HrmCategoryModel categoryModel = categoryService.getActiveCategory(categoryId);
-
-		if (categoryModel != null)
+		try
 		{
-			documentModel.setCategory(categoryModel);
+			Integer documentId = Integer.parseInt(request.getParameter("documentId"));
+			Integer categoryId = Integer.parseInt(request.getParameter("categoryId"));
+
+			HrmDocument documentModel = hrmDocumentService.getHrmDocument(documentId);
+
+			if (categoryId.equals(UNCATEGORIZED))
+			{
+				documentModel.setCategory(null);
+			}
+			else
+			{
+				HrmCategoryModel categoryModel = categoryService.getActiveCategory(categoryId);
+				if (categoryModel != null)
+				{
+					documentModel.setCategory(categoryModel);
+				}
+			}
+
 			hrmDocumentService.updateHrmDocument(documentModel);
 			request.setAttribute("success", true);
 		}
-		else
+		catch (Exception e)
 		{
 			request.setAttribute("success", false);
 		}
@@ -409,8 +421,16 @@ public class HRMModifyDocumentAction extends DispatchAction {
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.HRM_UPDATE);
 
+		final Integer UNCATEGORIZED = -1;
+
 		Integer documentId = Integer.parseInt(request.getParameter("documentId"));
 		Integer categoryId = Integer.parseInt(request.getParameter("categoryId"));
+
+		if (categoryId.equals(UNCATEGORIZED))
+		{
+			request.setAttribute("success", false);
+			return mapping.findForward("ajax");
+		}
 
 		HRMDocumentService hrmDocumentService = SpringUtils.getBean(HRMDocumentService.class);
 		HrmDocument documentModel = hrmDocumentService.getHrmDocument(documentId);
