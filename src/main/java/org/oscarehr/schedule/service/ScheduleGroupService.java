@@ -75,11 +75,19 @@ public class ScheduleGroupService
 	{
 		List<ScheduleGroup> groups = getMyGroupScheduleGroups();
 
-		List<String> myGroupAccessRestrictionIds = myGroupAccessRestrictionDao
-			.findByProviderNo(accessControlProviderNo)
-			.stream()
-			.map(MyGroupAccessRestriction::getMyGroupNo)
-			.collect(Collectors.toList());
+		List<String> myGroupAccessRestrictionIds;
+		if (accessControlProviderNo != null)
+		{
+			myGroupAccessRestrictionIds = myGroupAccessRestrictionDao
+				.findByProviderNo(accessControlProviderNo)
+				.stream()
+				.map(MyGroupAccessRestriction::getMyGroupNo)
+				.collect(Collectors.toList());
+		}
+		else
+		{
+			myGroupAccessRestrictionIds = new ArrayList<String>(0);
+		}
 
 		// Get a list of providers
 		List<ProviderData> providers = providerDataDao.findAll(false);
