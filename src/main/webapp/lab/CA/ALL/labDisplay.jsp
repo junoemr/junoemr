@@ -1279,6 +1279,16 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                             </div>
                                                         </td>
                                                     </tr>
+													<% if (handler.isReportBlocked()) {
+													%>
+													<tr>
+														<td align="center" bgcolor="white">
+															<div class="FieldData" style="text-align: center;">
+																<span style="color:red; font-weight:bold;">Do Not Disclose Without Explicit Patient Consent</span>
+															</div>
+														</td>
+													</tr>
+													<% } %>
                                                 </table>
 
                                             <%//}
@@ -1380,6 +1390,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	                               <td bgcolor="#FFCC00" width="300" valign="bottom">
 	                                   <div class="Title2">
 	                                       <%=headers.get(i)%>
+									   <% if (handler.isOBRBlocked(i))
+									   {%>
+										   <br/>
+										   <span style="font-size:8px; color:red;">(Do Not Disclose Without Explicit Patient Consent)</span>
+									   <% } %>
 	                                   </div>
 	                               </td>
 	                               <%--<td align="right" bgcolor="#FFCC00" width="100">&nbsp;</td>--%>

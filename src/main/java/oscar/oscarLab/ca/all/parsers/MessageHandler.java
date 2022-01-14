@@ -643,6 +643,34 @@ public abstract class MessageHandler
 		return (docNums);
 	}
 
+	/**
+	 * check if the report is marked as blocked. mostly related to OLIS and custom lab imports
+	 * @return true if blocked
+	 */
+	public boolean isReportBlocked()
+	{
+		boolean isBlocked = false;
+		for(int i = 0; i < getOBRCount(); i++)
+		{
+			if(isOBRBlocked(i))
+			{
+				isBlocked = true;
+				break;
+			}
+		}
+		return isBlocked;
+	}
+
+	/**
+	 * check for a blocked marker on an OBR segment
+	 * @param obr segment index
+	 * @return true if blocked
+	 */
+	public boolean isOBRBlocked(int obr)
+	{
+		return false;
+	}
+
 	/* ===================================== OBX ====================================== */
 
 	/**

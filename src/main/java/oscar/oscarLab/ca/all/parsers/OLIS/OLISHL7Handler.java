@@ -433,11 +433,13 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		}
 	}
 
+	@Override
 	public boolean isReportBlocked()
 	{
 		return reportBlocked;
 	}
 
+	@Override
 	public boolean isOBRBlocked(int obr)
 	{
 		String indicator = get("/.ORDER_OBSERVATION(" + obr + ")/ZBR-1-1-1");

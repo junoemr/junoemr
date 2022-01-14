@@ -131,6 +131,31 @@ public class JunoGenericLabHandler extends ORU_R01MessageHandler
 		return false;
 	}
 
+	@Override
+	public boolean isOBRBlocked(int obr)
+	{
+		try
+		{
+			ORU_R01 msg = (ORU_R01) message;
+			int obr47Reps = msg.getPATIENT_RESULT().getORDER_OBSERVATION(obr).getOBR()
+				.getObr47_FillerSupplementalServiceInformationReps();
+
+			for (int k = 0; k < obr47Reps; k++)
+			{
+				String indicator = get("/.ORDER_OBSERVATION(" + obr + ")/OBR-47(" + k + ")-1");
+				if ("B".equals(indicator))
+				{
+					return true;
+				}
+			}
+		}
+		catch (HL7Exception e)
+		{
+			logger.error("HL7 Parsing Error", e);
+		}
+		return false;
+	}
+
 	/* ===================================== OBX ====================================== */
 
 
