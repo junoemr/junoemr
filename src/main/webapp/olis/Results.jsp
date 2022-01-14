@@ -37,18 +37,23 @@
 
 	function hideResult(uuid, accessionNo, versionId, isHidden=true)
 	{
-		jQuery.ajax({
-			url: "<%=request.getContextPath() %>/olis/Results.do?method=hideResult",
-			data: "accessionNo=" + accessionNo + "&version=" + versionId + "&isHidden=" + isHidden,
-			success: function(data) {
-				let selector = jQuery("." + uuid + "_row_selector");
-				selector.toggleClass("removed", isHidden);
-				selector.toggle(showRemoved || !isHidden);
+		// require confirmation for hiding/removing items
+		if(!isHidden || window.confirm("You are about to remove this result from the search results. Are you sure?"))
+		{
+			jQuery.ajax({
+				url: "<%=request.getContextPath() %>/olis/Results.do?method=hideResult",
+				data: "accessionNo=" + accessionNo + "&version=" + versionId + "&isHidden=" + isHidden,
+				success: function (data)
+				{
+					let selector = jQuery("." + uuid + "_row_selector");
+					selector.toggleClass("removed", isHidden);
+					selector.toggle(showRemoved || !isHidden);
 
-				selector.find(".remove_button").toggle(!isHidden);
-				selector.find(".unremove_button").toggle(isHidden);
-			}
-		});
+					selector.find(".remove_button").toggle(!isHidden);
+					selector.find(".unremove_button").toggle(isHidden);
+				}
+			});
+		}
 	}
 	function addToInbox(uuid, params="")
 	{
