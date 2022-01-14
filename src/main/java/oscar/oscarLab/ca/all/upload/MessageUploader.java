@@ -34,19 +34,6 @@
 
 package oscar.oscarLab.ca.all.upload;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
@@ -56,6 +43,7 @@ import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
+import org.oscarehr.common.hl7.Hl7Const;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Hl7TextInfo;
@@ -76,7 +64,6 @@ import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.OscarProperties;
 import oscar.oscarDemographic.data.DemographicMerged;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
@@ -87,6 +74,19 @@ import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
 import oscar.oscarLab.ca.all.parsers.SpireHandler;
 import oscar.util.UtilDateUtilities;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 import static org.oscarehr.common.io.FileFactory.createEmbeddedLabFile;
 
@@ -211,20 +211,9 @@ public final class MessageUploader {
 				throw e;
 			}
 
-			int i = 0;
-			int j;
-			while (resultStatus.equals("") && i < messageHandler.getOBRCount())
+			if (messageHandler.isAbnormal())
 			{
-				j = 0;
-				while (resultStatus.equals("") && j < messageHandler.getOBXCount(i))
-				{
-					if (messageHandler.isOBXAbnormal(i, j))
-					{
-						resultStatus = "A";
-					}
- 					j++;
-				}
-				i++;
+				resultStatus = Hl7Const.ABNORMAL_FLAG_YES;
 			}
 
 			ArrayList<String> disciplineArray = messageHandler.getHeaders();
@@ -244,7 +233,7 @@ public final class MessageUploader {
 			}
 			String discipline = next.substring(0, sepMark).trim();
 
-			for (i = 1; i < disciplineArray.size(); i++)
+			for (int i = 1; i < disciplineArray.size(); i++)
 			{
 				next = disciplineArray.get(i);
 				if ((sepMark = next.indexOf("<br />")) < 0)
@@ -290,7 +279,7 @@ public final class MessageUploader {
 				String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
 				// Every PDF should be prefixed with this due to b64 encoding of PDF header
 
-				for (i = 0; i < messageHandler.getOBRCount(); i++)
+				for (int i = 0; i < messageHandler.getOBRCount(); i++)
 				{
 					for (int c =0; c < messageHandler.getOBXCount(i); c ++)
 					{
@@ -472,16 +461,16 @@ public final class MessageUploader {
 		return retVal;
 
 	}
-	
+
 	/**
 	 * Method findProvidersForSpireLab
 	 * Finds the providers that are associated with a spire lab.  (need to do this using doctor names, as
 	 * spire labs don't have a valid ohip number associated with them).
-	 */ 
+	 */
 	private static ArrayList<String> findProvidersForSpireLab(List<String> docNames) {
 		List<String> docNums = new ArrayList<String>();
 		ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
-		
+
 		for (int i=0; i < docNames.size(); i++) {
 			String[] firstLastName = docNames.get(i).split("\\s");
 			if (firstLastName != null && firstLastName.length >= 2) {
@@ -506,18 +495,18 @@ public final class MessageUploader {
 				}
 			}
 		}
-		
+
 		return (ArrayList<String>)docNums;
 	}
-	
+
 	/**
 	 * Method findProviderWithShortestFirstName
 	 * Finds the provider with the shortest first name in a list of providers.
-	 */ 
+	 */
 	private static int findProviderWithShortestFirstName(List<Provider> provList) {
 		if (provList == null || provList.isEmpty())
 			return -1;
-			
+
 		int index = 0;
 		int shortestLength = provList.get(0).getFirstName().length();
 		for (int i=1; i < provList.size(); i++) {
@@ -527,22 +516,22 @@ public final class MessageUploader {
 				shortestLength = curLength;
 			}
 		}
-		
+
 		return index;
 	}
-	
+
 	/**
 	 * Attempt to match the doctors from the lab to a provider
-	 */ 
+	 */
 	private static void providerRouteReport(String labId, ArrayList<String> docNums, Connection conn, String altProviderNo, String labType, String search_on, Integer limit, boolean orderByLength) throws Exception {
 		ArrayList<String> providerNums = new ArrayList<String>();
 		String sqlSearchOn = "ohip_no";
 		String routeToProvider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");
-		
+
 		if (search_on != null && search_on.length() > 0) {
 			sqlSearchOn = search_on;
 		}
-		
+
 		if (docNums != null) {
 			for (int i = 0; i < docNums.size(); i++) {
 				if (docNums.get(i) != null && !(docNums.get(i)).trim().equals("")) {
@@ -632,7 +621,7 @@ public final class MessageUploader {
 
 		patientLabRoutingResult.setDemographicNo(demographicNumber);
 		patientLabRoutingResult.setProviderNo(providerNumber);
-		
+
 		//did this link a merged patient? if so, we need to make sure we are the head record,
 		// or update result to be the head record.
 		DemographicMerged demographicMerged = new DemographicMerged();
