@@ -28,6 +28,7 @@ import ca.uhn.hl7v2.model.v24.message.ORU_R01;
 import ca.uhn.hl7v2.model.v24.segment.MSH;
 import org.oscarehr.common.hl7.copd.writer.JunoCoPDLabWriter;
 import org.oscarehr.common.hl7.copd.writer.JunoGenericImportLabWriter;
+import org.oscarehr.common.hl7.copd.writer.JunoLabCode;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
 public class JunoGenericLabHandler extends ORU_R01MessageHandler
@@ -142,8 +143,9 @@ public class JunoGenericLabHandler extends ORU_R01MessageHandler
 
 			for (int k = 0; k < obr47Reps; k++)
 			{
+				String codingSystem = get("/.ORDER_OBSERVATION(" + obr + ")/OBR-47(" + k + ")-3");
 				String indicator = get("/.ORDER_OBSERVATION(" + obr + ")/OBR-47(" + k + ")-1");
-				if ("B".equals(indicator))
+				if (JunoLabCode.CODING_SYSTEM.equals(codingSystem) && JunoLabCode.B.name().equals(indicator))
 				{
 					return true;
 				}
