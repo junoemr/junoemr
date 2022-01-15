@@ -22,12 +22,13 @@ services:
 
   juno-maven:
     depends_on: [juno-test-db, juno-selenium-firefox]
-    build: .
+    build:
+      context: .
     command: mvn -Dis_docker_testing_enabled=true -Duser.home=/home/maven clean verify
     volumes:
       - ../../:/usr/src/mymaven:Z
-      - ~/.m2:/home/maven/.m2:Z
-      - ~/.npm.docker:/home/maven/.npm:Z
+      - $USER_HOME/.m2:/home/maven/.m2:Z
+      - $USER_HOME/.npm.docker:/home/maven/.npm:Z
     environment:
       HOME: /home/maven
       MAVEN_CONFIG: /home/maven/.m2
@@ -38,8 +39,3 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-    ports:
-      - "8080:8080"
-    links:
-      - "juno-test-db:juno-test-db"
-      - "juno-selenium-firefox:juno-selenium-firefox"
