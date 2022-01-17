@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -34,6 +35,8 @@ import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.OLIS.OLISError;
 import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
@@ -147,17 +150,26 @@ public class OLISResultsAction extends DispatchAction
 		String accessionNo = request.getParameter("accessionNo");
 		String versionId = request.getParameter("version");
 		boolean isHidden = Boolean.parseBoolean(request.getParameter("isHidden"));
+		String demographicIdStr = request.getParameter("demographicId");
+		Integer demographicId = StringUtils.isNotBlank(demographicIdStr) ? Integer.parseInt(demographicIdStr) : null;
 
+		String logMessaage = " OLIS search result " + accessionNo + "(" + versionId + ")";
 		if(isHidden)
 		{
-			logger.info("Hide OLIS search result " + accessionNo + "(" + versionId + ")");
+			logMessaage = "Hide" + logMessaage;
 			removedResultSet.add(accessionNo + versionId);
 		}
 		else
 		{
-			logger.info("Un-Hide OLIS search result " + accessionNo + "(" + versionId + ")");
+			logMessaage = "Un-Hide" + logMessaage;
 			removedResultSet.remove(accessionNo + versionId);
 		}
+
+		// OMD requirement: log the user hiding the OLIS result.
+		logger.info(logMessaage);
+		LogAction.addLogEntry(loggedInProviderNo, demographicId,
+			LogConst.ACTION_UPDATE, LogConst.CON_OLIS_LAB, LogConst.STATUS_SUCCESS,
+			null, request.getLocalAddr(), logMessaage);
 		return null;
 	}
 

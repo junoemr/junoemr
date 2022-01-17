@@ -35,14 +35,20 @@
 
 <script type="text/javascript">
 
-	function hideResult(uuid, accessionNo, versionId, isHidden=true)
+	function hideResult(uuid, accessionNo, versionId, demographicId, isHidden=true)
 	{
 		// require confirmation for hiding/removing items
 		if(!isHidden || window.confirm("You are about to remove this result from the search results. Are you sure?"))
 		{
 			jQuery.ajax({
 				url: "<%=request.getContextPath() %>/olis/Results.do?method=hideResult",
-				data: "accessionNo=" + accessionNo + "&version=" + versionId + "&isHidden=" + isHidden,
+				// data: "accessionNo=" + accessionNo + "&version=" + versionId + "&isHidden=" + isHidden + "&demographicId=" + demographicId,
+				data: {
+					"accessionNo" : accessionNo,
+					"version" : versionId,
+					"isHidden" : isHidden,
+					"demographicId" : demographicId,
+				},
 				success: function (data)
 				{
 					let selector = jQuery("." + uuid + "_row_selector");
@@ -440,11 +446,11 @@
 									<input type="button"
 										   value="Remove"
 										   class="remove_button"
-										   onClick="hideResult('<%=resultUuid %>','<%=transfer.getAccessionId()%>','<%=transfer.getVersionId()%>', true); return false;"/>
+										   onClick="hideResult('<%=resultUuid %>','<%=transfer.getAccessionId()%>','<%=transfer.getVersionId()%>', '<%=(demographic != null) ? demographic.getId() : "" %>', true); return false;"/>
 									<input type="button"
 										   value="Un-Remove"
 										   class="unremove_button"
-										   onClick="hideResult('<%=resultUuid %>','<%=transfer.getAccessionId()%>','<%=transfer.getVersionId()%>', false); return false;"/>
+										   onClick="hideResult('<%=resultUuid %>','<%=transfer.getAccessionId()%>','<%=transfer.getVersionId()%>', '<%=(demographic != null) ? demographic.getId() : "" %>', false); return false;"/>
 								</td> <%
 								}%>
 
