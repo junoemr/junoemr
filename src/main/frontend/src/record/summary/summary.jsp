@@ -100,7 +100,7 @@
 						 id="summary-section-right"
 						 ng-click="summaryCtrl.checkAction($event)"
 						 ng-keypress="summaryCtrl.checkAction($event)">
-						<div ng-repeat="mod in summaryCtrl.page.columnThree.modules">
+						<div ng-repeat="mod in summaryCtrl.page.columnThree.modules" class="module-list">
 							<summary-module
 									module="mod"
 									item-display-count="mod.displaySize"
@@ -112,6 +112,14 @@
 		                                            filter-type-options="summaryCtrl.getSummaryModuleFilterOptions(mod)"
 							>
 							</summary-module>
+						</div>
+						<div ng-if="summaryCtrl.olisSearchEnabled"
+							 class="flex-column w-100 justify-content-center align-items-end">
+							<div class="w-128 m-t-8">
+								<juno-button click="summaryCtrl.openOlisSearch()">
+									OLIS Search
+								</juno-button>
+							</div>
 						</div>
 					</div>
 				</div>

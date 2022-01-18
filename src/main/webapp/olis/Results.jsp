@@ -42,7 +42,6 @@
 		{
 			jQuery.ajax({
 				url: "<%=request.getContextPath() %>/olis/Results.do?method=hideResult",
-				// data: "accessionNo=" + accessionNo + "&version=" + versionId + "&isHidden=" + isHidden + "&demographicId=" + demographicId,
 				data: {
 					"accessionNo" : accessionNo,
 					"version" : versionId,

@@ -16,12 +16,29 @@
 	<%@page import="org.oscarehr.common.model.UserProperty" %>
 	<%@page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicDao" %>
+<%@ page import="org.apache.commons.lang3.StringUtils" %>
+<%@ page import="org.oscarehr.demographic.model.Demographic" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 	<%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 
 	<% 
 	if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+
+	ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
+	DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+	List<Provider> allProvidersList = providerDao.getActiveProviders();
+
+	String demographicId = request.getParameter("demographic");
+	String requestingHicId = request.getParameter("hic");
+
+	Demographic demographic = null;
+	if(StringUtils.isNotBlank(demographicId))
+	{
+		demographic = demographicDao.find(Integer.parseInt(demographicId));
+	}
+
 	%>
 
 
@@ -261,15 +278,25 @@
 		}
 	}
 
+	$(document).ready(function()
+	{
+		const initialHicVal = "<%=requestingHicId%>";
+		const hasInitialDemographic = "<%=(demographic != null)%>";
+
+		if(initialHicVal)
+		{
+			$("#requestingHic").val(initialHicVal);
+		}
+
+		if(hasInitialDemographic)
+		{
+			const demographicName = "<%=demographic.getDisplayName() + " (" + demographic.getDateOfBirth() + ")"%>"
+			$("#demofind1").val("<%=demographic.getId()%>");
+			$("#autocompletedemo1").val(demographicName);
+		}
+	})
+
 	</script>
-
-
-
-<%
-ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
-List<Provider> allProvidersList = providerDao.getActiveProviders();
-%>
-			
 
 	<select id="queryType" onchange="displaySearch(this)" style="margin-left:30px;">
 		<option value="Z01">Z01 - Retrieve Laboratory Information for Patient</option>
