@@ -382,6 +382,8 @@ public class ScheduleGroupServiceTest
 		MyGroupAccessRestriction restriction1 = new MyGroupAccessRestriction();
 		List<ScheduleGroup> expectedResult = new ArrayList<>(0);
 
+		expectedResult.add(new ScheduleGroup("1", ScheduleGroup.IdentifierType.PROVIDER, ".default", new ArrayList<>(0)));
+
 		provider1.set("1");
 		provider1.setFirstName("first1");
 		provider1.setLastName("last1");
@@ -487,6 +489,7 @@ public class ScheduleGroupServiceTest
 		provider1.set("1");
 
 		List<ScheduleGroup> expectedResult = new ArrayList<>();
+		expectedResult.add(new ScheduleGroup("1", ScheduleGroup.IdentifierType.PROVIDER, ".default", new ArrayList<>(0)));
 
 		restriction.setProviderNo("1");
 		restriction.setMyGroupNo("name");

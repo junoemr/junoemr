@@ -113,9 +113,19 @@ public class ScheduleGroupService
 		}
 
 		// Filter out any schedules this provider is restricted from seeing
-		return groups.stream().filter(group -> !myGroupAccessRestrictionIds
-			.contains(group.getIdentifier()))
+		List<ScheduleGroup> filtered_groups = groups.stream()
+			.filter(group -> !myGroupAccessRestrictionIds
+				.contains(group.getIdentifier()))
 			.collect(Collectors.toList());
+
+		// If filtered groups is empty create and add a default one
+		if (filtered_groups.size() == 0 && accessControlProviderNo != null)
+		{
+			ScheduleGroup defaultGroup = new ScheduleGroup(accessControlProviderNo,
+				ScheduleGroup.IdentifierType.PROVIDER, ".default", new ArrayList<>(0));
+			filtered_groups.add(defaultGroup);
+		}
+		return filtered_groups;
 	}
 
 	private List<ScheduleGroup> getMyGroupScheduleGroups()
