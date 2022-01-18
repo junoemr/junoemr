@@ -30,7 +30,7 @@ import lombok.Getter;
 @Getter
 public enum JunoLabCode
 {
-	B("Blocked");
+	BLOCKED("Blocked by patient request");
 
 	public static final String CODING_SYSTEM = "JunoCustom";
 	private final String description;

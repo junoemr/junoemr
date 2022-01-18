@@ -145,7 +145,7 @@ public class JunoGenericLabHandler extends ORU_R01MessageHandler
 			{
 				String codingSystem = get("/.ORDER_OBSERVATION(" + obr + ")/OBR-47(" + k + ")-3");
 				String indicator = get("/.ORDER_OBSERVATION(" + obr + ")/OBR-47(" + k + ")-1");
-				if (JunoLabCode.CODING_SYSTEM.equals(codingSystem) && JunoLabCode.B.name().equals(indicator))
+				if (JunoLabCode.CODING_SYSTEM.equals(codingSystem) && JunoLabCode.BLOCKED.name().equals(indicator))
 				{
 					return true;
 				}

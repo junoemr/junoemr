@@ -152,8 +152,8 @@ public class JunoGenericImportLabWriter extends HL7LabWriter
 
 		if(observation.isBlockedResult())
 		{
-			terser.set(obrPath + "OBR-47(0)-1", JunoLabCode.B.name());
-			terser.set(obrPath + "OBR-47(0)-2", JunoLabCode.B.getDescription());
+			terser.set(obrPath + "OBR-47(0)-1", JunoLabCode.BLOCKED.name());
+			terser.set(obrPath + "OBR-47(0)-2", JunoLabCode.BLOCKED.getDescription());
 			terser.set(obrPath + "OBR-47(0)-3", JunoLabCode.CODING_SYSTEM);
 		}
 
