@@ -19,6 +19,7 @@
 <%@ page import="org.oscarehr.demographic.dao.DemographicDao" %>
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
 <%@ page import="org.oscarehr.demographic.model.Demographic" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 	<%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 
@@ -281,17 +282,16 @@
 	$(document).ready(function()
 	{
 		const initialHicVal = "<%=requestingHicId%>";
-		const hasInitialDemographic = "<%=(demographic != null)%>";
-
 		if(initialHicVal)
 		{
 			$("#requestingHic").val(initialHicVal);
 		}
 
-		if(hasInitialDemographic)
+		const demographicId = <%=(demographic != null) ? (demographic.getId()) : "null" %>
+		const demographicName = "<%=(demographic != null) ? (demographic.getDisplayName() + " (" + demographic.getDateOfBirth() + ")") : "" %>"
+		if(demographicId && demographicName)
 		{
-			const demographicName = "<%=demographic.getDisplayName() + " (" + demographic.getDateOfBirth() + ")"%>"
-			$("#demofind1").val("<%=demographic.getId()%>");
+			$("#demofind1").val(demographicId);
 			$("#autocompletedemo1").val(demographicName);
 		}
 	})

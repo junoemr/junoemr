@@ -14,11 +14,10 @@
 <%@ page import="org.oscarehr.olis.OLISResultsAction" %>
 <%@ page import="org.oscarehr.dataMigration.model.demographic.Demographic" %>
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
-<%@ page import="java.util.HashSet" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.stream.Collectors" %>
 <%@ page import="org.oscarehr.olis.transfer.OLISSearchResultTransfer" %>
 <%@ page import="oscar.OscarProperties" %>
+<%@ page import="java.util.Set" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -102,19 +101,74 @@
 		jQuery(".removed").toggle(showRemoved);
 	}
 
-	var patientFilter = "";
-	var labFilter = "";
-	function filterResults(select) {
-		if (select.name == "labFilter") {
-			labFilter = select.value;
-		} else if(select.name == "patientFilter") {
-			patientFilter = select.value;
-		}
-		var performFilter = function() {
-			var visible = (patientFilter == "" || jQuery(this).attr("patientName") == patientFilter)
-					   && (labFilter == "" || jQuery(this).attr("reportingLaboratory") == labFilter);
-			if (visible) { jQuery(this).show(); }
-			else { jQuery(this).hide(); }
+	const filter = {
+		patientName: {
+			attribute: "patientName",
+			value: "",
+		},
+		performingLab: {
+			attribute: "performingLaboratory",
+			value: "",
+		},
+		reportingLab: {
+			attribute: "reportingLaboratory",
+			value: "",
+		},
+		discipline: {
+			attribute: "discipline",
+			value: "",
+		},
+		abnormal: {
+			attribute: "abnormal",
+			value: "",
+		},
+		requestStatus: {
+			attribute: "requestStatus",
+			value: "",
+		},
+		reportStatus: {
+			attribute: "reportStatus",
+			value: "",
+		},
+		orderingPractitioner: {
+			attribute: "orderingPractitioner",
+			value: "",
+		},
+		admittingPractitioner: {
+			attribute: "admittingPractitioner",
+			value: "",
+		},
+		attendingPractitioner: {
+			attribute: "attendingPractitioner",
+			value: "",
+		},
+		ccPractitoner: {
+			attribute: "ccPractitoner",
+			value: "",
+		},
+	}
+
+	function filterResults(filterKey, filterValue)
+	{
+		console.info("filtering", filterKey, filterValue);
+		filterKey.value = filterValue;
+		console.info("filters", filter);
+
+		const performFilter = function ()
+		{
+			const element = jQuery(this);
+			let visible = true;
+
+			for (const [key, options] of Object.entries(filter))
+			{
+				// determine visibility of element based on filters
+				visible = (!options.value || element.attr(options.attribute) === options.value);
+				if(!visible)
+				{
+					break;
+				}
+			}
+			element.toggle(visible);
 		};
 		jQuery(".evenLine").each(performFilter);
 		jQuery(".oddLine").each(performFilter);
@@ -279,36 +333,47 @@
 					<tr>
 						<td colspan="4">
 						Filter by patient name:
-						<select name="patientFilter" onChange="filterResults(this)">
+						<select name="patientFilter" onChange="filterResults(filter.patientName, this.value)">
 							<option value="">All Patients</option>
-							<%  List<String> names = new ArrayList<String>();
-								String name;
-								for (OLISHL7Handler result : resultHandlers)
-								{
-									name = oscar.Misc.getStr(result.getPatientName(), "").trim();
-									if (!name.equals("")) { names.add(name); }
-								}
-								for (String tmp: new HashSet<String>(names)) {
-							%>
-								<option value="<%=tmp%>"><%=tmp%></option>
+							<% Set<String> patientNames = resultHandlers.stream()
+										.map(OLISHL7Handler::getPatientName).map(String::trim)
+										.filter(StringUtils::isNotBlank)
+										.collect(Collectors.toSet());
+								for (String name : patientNames)
+								{%>
+							<option value="<%=name%>"><%=name%></option>
 							<% } %>
 						</select>
 						</td>
 						<td colspan="5">
 						Filter by reporting laboratory:
-						<select name="labFilter" onChange="filterResults(this)">
+						<select name="labFilter" onChange="filterResults(filter.reportingLab, this.value)">
 							<option value="">All Labs</option>
-							<%  List<String> labs = new ArrayList<String>();
-								for (OLISHL7Handler result : resultHandlers)
-								{
-									name = oscar.Misc.getStr(result.getReportingFacilityName(), "").trim();
-									if (!name.equals("")) { labs.add(name); }
-								}
-								for (String tmp: new HashSet<String>(labs)) {
-							%>
-								<option value="<%=tmp%>"><%=tmp%></option>
+							<%
+								Set<String> reportingLabs = resultHandlers.stream()
+										.map(OLISHL7Handler::getReportingFacilityName).map(String::trim)
+										.filter(StringUtils::isNotBlank)
+										.collect(Collectors.toSet());
+								for (String name: reportingLabs)
+								{%>
+							<option value="<%=name%>"><%=name%></option>
 							<% } %>
 						</select>
+						</td>
+
+						<td colspan="4">
+							Filter by discipline:
+							<select name="disciplineFilter" onChange="filterResults(filter.discipline, this.value)">
+								<option value="">All Disciplines</option>
+								<% Set<String> disciplines = resultHandlers.stream()
+										.map(OLISHL7Handler::getDisciplines).flatMap(List::stream)
+										.filter(StringUtils::isNotBlank)
+										.collect(Collectors.toSet());
+									for (String discipline : disciplines)
+									{%>
+								<option value="<%=discipline%>"><%=discipline%></option>
+								<% } %>
+							</select>
 						</td>
 					</tr>
 				<% if (demographic != null) { %>
@@ -415,8 +480,11 @@
 										(" result_row " + resultUuid + "_row_selector");
 							%>
 							<tr class="<%=cssClass%>"
-							    patientName="<%=result.getPatientName()%>"
-							    reportingLaboratory="<%=result.getReportingFacilityName()%>">
+								patientName="<%=result.getPatientName()%>"
+							    reportingLaboratory="<%=result.getReportingFacilityName()%>"
+								performingLaboratory="<%=result.getPerformingFacilityName()%>"
+								discipline="<%=result.getOBRCategory(obrRep)%>"
+							>
 								<td>
 									<div id="<%=resultUuid %>_result"></div>
 									<input type="button" onClick="save('<%=resultUuid %>'); return false;" id="<%=resultUuid %>" value="Add to Inbox" />
