@@ -148,7 +148,10 @@ angular.module('Patient').component('addDemographicModal', {
 
 			ctrl.resetFocus = () =>
 			{
-
+				$timeout(() =>
+				{
+					ctrl.formRef.find(":input:visible:active:first").focus();
+				});
 			}
 
 			ctrl.validateDemographic = function ()
