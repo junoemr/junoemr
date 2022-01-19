@@ -18,6 +18,7 @@
 <%@ page import="org.oscarehr.olis.transfer.OLISSearchResultTransfer" %>
 <%@ page import="oscar.OscarProperties" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="java.util.stream.IntStream" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -105,46 +106,57 @@
 		patientName: {
 			attribute: "patientName",
 			value: "",
+			exactMatch: true,
 		},
 		performingLab: {
 			attribute: "performingLaboratory",
 			value: "",
+			exactMatch: true,
 		},
 		reportingLab: {
 			attribute: "reportingLaboratory",
 			value: "",
+			exactMatch: true,
 		},
 		discipline: {
 			attribute: "discipline",
 			value: "",
+			exactMatch: true,
 		},
 		abnormal: {
 			attribute: "abnormal",
 			value: "",
+			exactMatch: true,
 		},
 		requestStatus: {
 			attribute: "requestStatus",
 			value: "",
+			exactMatch: true,
 		},
 		reportStatus: {
 			attribute: "reportStatus",
 			value: "",
+			exactMatch: false,
 		},
 		orderingPractitioner: {
 			attribute: "orderingPractitioner",
 			value: "",
+			exactMatch: true,
 		},
 		admittingPractitioner: {
 			attribute: "admittingPractitioner",
 			value: "",
+			exactMatch: true,
 		},
 		attendingPractitioner: {
 			attribute: "attendingPractitioner",
 			value: "",
+			exactMatch: true,
 		},
-		ccPractitoner: {
-			attribute: "ccPractitoner",
+		ccPractitioner: {
+			attribute: "ccPractitioner",
 			value: "",
+			exactMatch: false,
 		},
 	}
 
@@ -152,17 +164,24 @@
 	{
 		console.info("filtering", filterKey, filterValue);
 		filterKey.value = filterValue;
-		console.info("filters", filter);
 
 		const performFilter = function ()
 		{
 			const element = jQuery(this);
 			let visible = true;
 
+			// determine visibility of element based on applied filters
 			for (const [key, options] of Object.entries(filter))
 			{
-				// determine visibility of element based on filters
-				visible = (!options.value || element.attr(options.attribute) === options.value);
+				if(options.exactMatch)
+				{
+					visible = (!options.value || element.attr(options.attribute) === options.value);
+				}
+				else
+				{
+					visible = (!options.value ||
+							String(element.attr(options.attribute)).includes(String(options.value)));
+				}
 				if(!visible)
 				{
 					break;
@@ -210,15 +229,22 @@
 	min-width: 32px;
 }
 
-#patientTable {
+#patientTable,
+#filterTable {
 	border: 1px solid lightgrey;
 }
-#patientTable td {
+#patientTable td,
+#filterTable td {
 	font-weight: normal;
 }
-#patientTable .table-title {
+#patientTable .table-title,
+#filterTable .table-title {
 	background-color: lightgrey;
 }
+#filterTable select {
+	width: 100%;
+}
+
 .page-wrapper {
 	display: flex;
 	flex-direction: column;
@@ -321,59 +347,210 @@
 				</div>
 			</form>
 			<%
-			}
-
-			if (resultList != null) {
-			%>
+			}%>
 			<table>
 				<tr>
 					<td colspan=8>Found <%=resultList.size() %> result(s)</td>
 				</tr>
 				<% if (resultList.size() > 0) { %>
 					<tr>
-						<td colspan="4">
-						Filter by patient name:
-						<select name="patientFilter" onChange="filterResults(filter.patientName, this.value)">
-							<option value="">All Patients</option>
-							<% Set<String> patientNames = resultHandlers.stream()
-										.map(OLISHL7Handler::getPatientName).map(String::trim)
-										.filter(StringUtils::isNotBlank)
-										.collect(Collectors.toSet());
-								for (String name : patientNames)
-								{%>
-							<option value="<%=name%>"><%=name%></option>
-							<% } %>
-						</select>
-						</td>
-						<td colspan="5">
-						Filter by reporting laboratory:
-						<select name="labFilter" onChange="filterResults(filter.reportingLab, this.value)">
-							<option value="">All Labs</option>
-							<%
-								Set<String> reportingLabs = resultHandlers.stream()
-										.map(OLISHL7Handler::getReportingFacilityName).map(String::trim)
-										.filter(StringUtils::isNotBlank)
-										.collect(Collectors.toSet());
-								for (String name: reportingLabs)
-								{%>
-							<option value="<%=name%>"><%=name%></option>
-							<% } %>
-						</select>
-						</td>
+						<td>
+							<table id="filterTable">
+								<tbody>
+								<tr class="table-title">
+									<th colspan="4">
+										<span>Filter Results</span>
+									</th>
+								</tr>
+								<tr>
+									<td>
+										<span>Patient name:</span>
+									</td>
+									<td>
+										<select name="patientFilter" onChange="filterResults(filter.patientName, this.value)">
+											<option value="">All Patients</option>
+											<% Set<String> patientNames = resultHandlers.stream()
+													.map(OLISHL7Handler::getPatientName).map(String::trim)
+													.filter(StringUtils::isNotBlank)
+													.collect(Collectors.toSet());
+												for (String name : patientNames)
+												{%>
+											<option value="<%=name%>"><%=name%></option>
+											<% } %>
+										</select>
+									</td>
+									<td>
+										<span>Reporting laboratory:</span>
+									</td>
+									<td>
+										<select name="reportingLabFilter" onChange="filterResults(filter.reportingLab, this.value)">
+											<option value="">All Labs</option>
+											<%
+												Set<String> reportingLabs = resultHandlers.stream()
+														.map(OLISHL7Handler::getReportingFacilityName).map(String::trim)
+														.filter(StringUtils::isNotBlank)
+														.collect(Collectors.toSet());
+												for (String name: reportingLabs)
+												{%>
+											<option value="<%=name%>"><%=name%></option>
+											<% } %>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td></td>
+									<td>
+										<span>Performing laboratory:</span>
+									</td>
+									<td>
+										<select name="performingLabFilter" onChange="filterResults(filter.performingLab, this.value)">
+											<option value="">All Labs</option>
+											<%
+												Set<String> performingLabs = resultHandlers.stream()
+														.map(OLISHL7Handler::getPerformingFacilityName).map(String::trim)
+														.filter(StringUtils::isNotBlank)
+														.collect(Collectors.toSet());
+												for (String name: performingLabs)
+												{%>
+											<option value="<%=name%>"><%=name%></option>
+											<% } %>
+										</select>
+									</td>
 
-						<td colspan="4">
-							Filter by discipline:
-							<select name="disciplineFilter" onChange="filterResults(filter.discipline, this.value)">
-								<option value="">All Disciplines</option>
-								<% Set<String> disciplines = resultHandlers.stream()
-										.map(OLISHL7Handler::getDisciplines).flatMap(List::stream)
-										.filter(StringUtils::isNotBlank)
-										.collect(Collectors.toSet());
-									for (String discipline : disciplines)
-									{%>
-								<option value="<%=discipline%>"><%=discipline%></option>
-								<% } %>
-							</select>
+								</tr>
+								<tr>
+									<td>
+										<span>Ordering Provider:</span>
+									</td>
+									<td>
+										<select name="orderingPractitionerFilter" onChange="filterResults(filter.orderingPractitioner, this.value)">
+											<option value="">Any Provider</option>
+											<% Set<String> orderingProviders = resultHandlers.stream()
+													.map(OLISHL7Handler::getDocName)
+													.filter(StringUtils::isNotBlank)
+													.collect(Collectors.toSet());
+												for (String provider : orderingProviders)
+												{%>
+											<option value="<%=provider%>"><%=provider%></option>
+											<% } %>
+										</select>
+									</td>
+									<td>
+										<span>Discipline:</span>
+									</td>
+									<td>
+										<select name="disciplineFilter" onChange="filterResults(filter.discipline, this.value)">
+											<option value="">All Disciplines</option>
+											<% Set<String> disciplines = resultHandlers.stream()
+													.map(OLISHL7Handler::getDisciplines).flatMap(List::stream)
+													.filter(StringUtils::isNotBlank)
+													.collect(Collectors.toSet());
+												for (String discipline : disciplines)
+												{%>
+											<option value="<%=discipline%>"><%=discipline%></option>
+											<% } %>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span>Admitting Provider:</span>
+									</td>
+									<td>
+										<select name="admittingPractitionerFilter" onChange="filterResults(filter.admittingPractitioner, this.value)">
+											<option value="">Any Provider</option>
+											<% Set<String> admittingProviders = resultHandlers.stream()
+													.map(OLISHL7Handler::getAdmittingProviderNameShort)
+													.filter(StringUtils::isNotBlank)
+													.collect(Collectors.toSet());
+												for (String provider : admittingProviders)
+												{%>
+											<option value="<%=provider%>"><%=provider%></option>
+											<% } %>
+										</select>
+									</td>
+									<td>
+										<span>Abnormal:</span>
+									</td>
+									<td>
+										<select name="abnormalFilter" onChange="filterResults(filter.abnormal, this.value)">
+											<option value="">All</option>
+											<option value="true">Yes</option>
+											<option value="false">No</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span>Attending Provider:</span>
+									</td>
+									<td>
+										<select name="attendingPractitionerFilter" onChange="filterResults(filter.attendingPractitioner, this.value)">
+											<option value="">Any Provider</option>
+											<% Set<String> attendingProviders = resultHandlers.stream()
+													.map(OLISHL7Handler::getAttendingProviderNameShort)
+													.filter(StringUtils::isNotBlank)
+													.collect(Collectors.toSet());
+												for (String provider : attendingProviders)
+												{%>
+											<option value="<%=provider%>"><%=provider%></option>
+											<% } %>
+										</select>
+									</td>
+									<td>
+										<span>Request Status:</span>
+									</td>
+									<td>
+										<select name="requestStatusFilter" onChange="filterResults(filter.requestStatus, this.value)">
+											<option value="">Any Status</option>
+											<% Set<String> requestStatuses = resultHandlers.stream()
+													.map(OLISHL7Handler::getAllObrStatuses)
+													.flatMap(Set::stream)
+													.collect(Collectors.toSet());
+												for (String status : requestStatuses)
+												{%>
+											<option value="<%=status%>"><%=OLISHL7Handler.getObrTestResultStatusValue(status)%></option>
+											<% } %>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span>CC Provider:</span>
+									</td>
+									<td>
+										<select name="ccPractitionerFilter" onChange="filterResults(filter.ccPractitioner, this.value)">
+											<option value="">Any Provider</option>
+											<% Set<String> ccProviders = resultHandlers.stream()
+													.map(OLISHL7Handler::getCCDocsList).flatMap(List::stream)
+													.filter(StringUtils::isNotBlank)
+													.collect(Collectors.toSet());
+												for (String provider : ccProviders)
+												{%>
+											<option value="<%=provider%>"><%=provider%></option>
+											<% } %>
+										</select>
+									</td>
+									<td>
+										<span>Report Status:</span>
+									</td>
+									<td>
+										<select name="reportStatusFilter" onChange="filterResults(filter.reportStatus, this.value)">
+											<option value="">Any Status</option>
+											<% Set<String> reportStatuses = resultHandlers.stream()
+													.map(OLISHL7Handler::getAllObxStatuses)
+													.flatMap(Set::stream)
+													.collect(Collectors.toSet());
+												for (String status : reportStatuses)
+												{%>
+											<option value="<%=status%>"><%=OLISHL7Handler.getObxTestResultStatusValue(status)%></option>
+											<% } %>
+										</select>
+									</td>
+								</tr>
+								</tbody>
+							</table>
 						</td>
 					</tr>
 				<% if (demographic != null) { %>
@@ -483,7 +660,18 @@
 								patientName="<%=result.getPatientName()%>"
 							    reportingLaboratory="<%=result.getReportingFacilityName()%>"
 								performingLaboratory="<%=result.getPerformingFacilityName()%>"
+								orderingPractitioner="<%=result.getDocName()%>"
+								admittingPractitioner="<%=result.getAdmittingProviderNameShort()%>"
+								attendingPractitioner="<%=result.getAttendingProviderNameShort()%>"
+								ccPractitioner="<%=result.getCCDocs()%>"
 								discipline="<%=result.getOBRCategory(obrRep)%>"
+								abnormal="<%=result.isOBRAbnormal(obrRep)%>"
+								requestStatus="<%=result.getObrStatus(obrRep)%>"
+								reportStatus="<%=
+								IntStream.range(0, result.getOBXCount(obrRep))
+								.mapToObj(obxRep -> result.getOBXResultStatus(obrRep, obxRep))
+								.distinct()
+								.collect(Collectors.joining(","))%>"
 							>
 								<td>
 									<div id="<%=resultUuid %>_result"></div>
@@ -545,9 +733,6 @@
 				<%
 				}%>
 			</table>
-			<%
-			}
-			%>
 		</td>
 	</tr></tbody>
 </table>

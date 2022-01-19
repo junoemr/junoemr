@@ -13,6 +13,9 @@
 
 package oscar.oscarLab.ca.all.parsers.OLIS;
 
+import static org.oscarehr.common.io.GenericFile.ALLOWED_CONTENT_TYPES;
+import static org.oscarehr.olis.service.OLISPollingService.OLIS_DATE_FORMAT;
+
 import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.HapiContext;
@@ -24,6 +27,26 @@ import ca.uhn.hl7v2.parser.ModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.lang.StringUtils;
@@ -44,28 +67,6 @@ import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static org.oscarehr.common.io.GenericFile.ALLOWED_CONTENT_TYPES;
-import static org.oscarehr.olis.service.OLISPollingService.OLIS_DATE_FORMAT;
 
 /**
  * @author Adam Balanga
@@ -221,6 +222,11 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	public String getSourceOrganization(String org)
 	{
 		return sourceOrganizations.containsKey(org) ? sourceOrganizations.get(org) : defaultSourceOrganizations.get(org);
+	}
+
+	public Set<String> getAllObrStatuses()
+	{
+		return IntStream.range(0, getOBRCount()).mapToObj(this::getObrStatus).collect(Collectors.toSet());
 	}
 
 	public String getObrStatus(int rep)
@@ -415,6 +421,14 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	public String getAttendingProviderName() {
 		try {
 			return getFullDocName("/.PV1-7-");
+		} catch (HL7Exception e) {
+			MiscUtils.getLogger().error("OLIS HL7 Error", e);
+			return "";
+		}
+	}
+	public String getAttendingProviderNameShort() {
+		try {
+			return getShortName("/.PV1-7-");
 		} catch (HL7Exception e) {
 			MiscUtils.getLogger().error("OLIS HL7 Error", e);
 			return "";
@@ -1690,6 +1704,11 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 		return formatDateTime(get("/.ORDER_OBSERVATION(" + i + ")/OBR-7-1"));
 	}
 
+	public boolean isOBRAbnormal(int i)
+	{
+		return IntStream.range(0, getOBXCount(i)).anyMatch(j -> isOBXAbnormal(i, j));
+	}
+
 	@Override
 	public boolean isOBXAbnormal(int i, int j)
 	{
@@ -1857,6 +1876,15 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	public String getOBXResultStatus(int i, int j)
 	{
 		return (getOBXField(i, j, 11, 0, 1));
+	}
+
+	public Set<String> getAllObxStatuses()
+	{
+		return IntStream.range(0, getOBRCount())
+			.mapToObj(obr -> IntStream.range(0, getOBXCount(obr))
+				.mapToObj(obx -> getOBXResultStatus(obr, obx)))
+			.flatMap(Function.identity())
+			.collect(Collectors.toSet());
 	}
 
 	@Override
@@ -2317,27 +2345,34 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public String getCCDocs() {
-
-		try {
-			int i = 0;
-			String docs = getShortName("/.OBR-28(" + i + ")-");
-			i++;
-			String nextDoc = getShortName("/.OBR-28(" + i + ")-");
-
-			while (!nextDoc.equals("")) {
-				docs = docs + ", " + nextDoc;
-				i++;
-				nextDoc = getShortName("/.OBR-28(" + i + ")-");
-			}
-
-			return (docs);
-		} catch (Exception e) {
-			return ("");
-		}
+	public String getCCDocs()
+	{
+		return StringUtils.trimToEmpty(String.join(", ", getCCDocsList()));
 	}
 
 	public List<String> getCCDocsList()
+	{
+		List<String> ccDocList = new LinkedList<>();
+		try
+		{
+			int i = 0;
+			String nextDoc = getShortName("/.OBR-28(" + i + ")-");
+
+			while(!nextDoc.equals(""))
+			{
+				ccDocList.add(nextDoc);
+				i++;
+				nextDoc = getShortName("/.OBR-28(" + i + ")-");
+			}
+		}
+		catch(Exception e)
+		{
+			logger.error("Olis hl7 error", e);
+		}
+		return ccDocList;
+	}
+
+	public List<String> getCCDocsListFullName()
 	{
 		List<String> ccDocList = new LinkedList<>();
 		try

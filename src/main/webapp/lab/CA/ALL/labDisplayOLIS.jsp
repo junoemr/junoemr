@@ -1386,17 +1386,11 @@ public String strikeOutInvalidContent(String content, String status) {
                                 <td bgcolor="white" colspan="2">
                                     <table width="100%" border="0" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
                                         <tr>
-                                            <%-- <td bgcolor="white">
-                                    <div class="FieldData">
-                                        <strong><bean:message key="oscarMDS.segmentDisplay.formReportToClient"/>: </strong>
-                                            <%= No admitting Doctor for CML messages%>
-                                    </div>
-                                </td> --%>
                                             <td bgcolor="white" colspan="2">
                                                 <div class="FieldData">
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formCCClient"/>: </strong>
 	                                                <%
-		                                                for(String ccDoc : handler.getCCDocsList())
+		                                                for(String ccDoc : handler.getCCDocsListFullName())
 		                                                {
 															%><div><%=ccDoc%></div><%
 		                                                }
