@@ -498,7 +498,7 @@ angular.module("Common.Services").service("staticDataService", [
 			provinces.push(
 			{
 				"value": "NT",
-				"label": "NT-Northwest Territory"
+				"label": "NT-Northwest Territories"
 			});
 			provinces.push(
 			{

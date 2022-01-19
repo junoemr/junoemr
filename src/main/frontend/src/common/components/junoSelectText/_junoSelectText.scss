@@ -1,0 +1,45 @@
+juno-select-text {
+	.label-style {
+		padding: var(--juno-input-label-padding);
+		width: var(--juno-input-label-width);
+	}
+
+	.juno-select-text-container {
+		border: 1px solid var(--theme-color-form-field-border);
+		border-radius: var(--theme-form-field-border-radius);
+
+		.juno-select {
+			.select-container
+			{
+				select {
+					border-radius: var(--theme-form-field-border-radius) 0 0 var(--theme-form-field-border-radius);
+					background-color: var(--color-neutral-light);
+					color: var(--color-primary-darker);
+					border: none;
+
+					&:focus, &:active {
+						border: none;
+					}
+
+				}
+			}
+		}
+
+		.juno-input {
+			@include juno-form-inputs-style(1px, var(--theme-form-field-border-radius));
+
+			input {
+				border: none;
+				border-radius: 0 var(--theme-form-field-border-radius) var(--theme-form-field-border-radius) 0;
+
+				&:focus, &:active {
+					border: none;
+				}
+
+				&:focus-visible {
+					outline: none;
+				}
+			}
+		}
+	}
+}

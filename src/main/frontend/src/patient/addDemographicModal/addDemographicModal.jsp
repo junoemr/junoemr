@@ -11,46 +11,39 @@
 		<h3>Add Demographic</h3>
 	</modal-title>
 
-	<modal-body class="add-demographic-content">
-		<div class="col-xs-6 flex flex-row justify-content-center">
-			<div class="left-column-container">
+	<modal-body>
+		<div class="add-demographic-content d-flex justify-content-center">
+		<div class="flex flex-row justify-content-between width-80"
+			 ng-ref="$ctrl.formRef">
+			<div class="flex-col column-container" ng-ref="$ctrl.firstInputRef">
 				<!-- LAST NAME -->
-				<div ng-class="{'invalid-field': $ctrl.invalidLastName}">
-					<ca-field-text
-						ca-name="lastName"
-						ca-title="Last Name"
-						ca-model="$ctrl.newDemographicData.lastName"
-						ca-rows="1"
-						ca-required-field="true"
-						ca-focus-field="$ctrl.focusField"
-					>
-					</ca-field-text>
-				</div>
+				<juno-input ng-model="$ctrl.newDemographicData.lastName"
+							label="Last Name"
+							label-position="$ctrl.LABEL_POSITION"
+							component-style="$ctrl.COMPONENT_STYLE"
+							invalid="!$ctrl.newDemographicData.lastName"
+							show-invalid-focus="true"
+				>
+				</juno-input>
 				<!-- FIRST NAME -->
-				<div ng-class="{'invalid-field': $ctrl.invalidFirstName}">
-					<ca-field-text
-									ca-name="firstName"
-									ca-title="First Name"
-									ca-model="$ctrl.newDemographicData.firstName"
-									ca-rows="1"
-									ca-required-field="true"
-					>
-					</ca-field-text>
-				</div>
+				<juno-input ng-model="$ctrl.newDemographicData.firstName"
+							label="First Name"
+							label-position="$ctrl.LABEL_POSITION"
+							component-style="$ctrl.COMPONENT_STYLE"
+							invalid="!$ctrl.newDemographicData.firstName"
+							show-invalid-focus="true"
+				>
+				</juno-input>
 				<!-- GENDER -->
-				<div ng-class="{'invalid-field': $ctrl.invalidSex}">
-					<ca-field-select
-									ca-template="label"
-									ca-name="gender"
-									ca-title="Gender"
-									ca-model="$ctrl.newDemographicData.sex"
-									ca-options="$ctrl.genders"
-									ca-empty-option="false"
-									ca-required-field="true"
-					>
-					</ca-field-select>
-				</div>
+				<juno-select label="Gender"
+							 label-position="$ctrl.LABEL_POSITION"
+							 component-style="$ctrl.COMPONENT_STYLE"
+							 ng-model="$ctrl.newDemographicData.sex"
+							 invalid="!$ctrl.newDemographicData.sex"
+							 options="$ctrl.genders">
+				</juno-select>
 				<!-- DOB -->
+				</juno-date-select>
 				<div ng-class="{'invalid-field': $ctrl.invalidDob}">
 					<ca-field-date
 									ca-title="Date of Birth"
@@ -63,98 +56,90 @@
 					</ca-field-date>
 				</div>
 				<!-- HIN -->
-				<div class="hin-fields">
+				<div class="flex-row flex-grow-1 align-items-center">
 					<!-- HIN NUM-->
-					<ca-field-text
-									class="hin"
-									ca-name="hin"
-									ca-title="Health Insurance Number"
-									ca-model="$ctrl.newDemographicData.hin"
-									ca-rows="1"
+					<juno-select-text select-model="$ctrl.newDemographicData.hcType"
+									  select-options="$ctrl.provinces"
+									  text-model="$ctrl.newDemographicData.hin"
+									  label="Health Insurance Number"
+									  label-position="$ctrl.LABEL_POSITION"
+									  component-style="$ctrl.COMPONENT_STYLE"
 					>
-					</ca-field-text>
+					</juno-select-text>
 					<!-- HIN VER -->
-					<ca-field-text
-									class="ver"
-									ca-name="ver"
-									ca-title="&nbsp;"
-									ca-text-placeholder="Ver."
-									ca-model="$ctrl.newDemographicData.ver"
-									ca-rows="1"
-					>
-					</ca-field-text>
-					<!-- HIN TYPE -->
-					<ca-field-select
-									ca-template="label"
-									ca-name="hcType"
-									ca-title="HIN Type"
-									ca-model="$ctrl.newDemographicData.hcType"
-									ca-options="$ctrl.provinces"
-									ca-empty-option="false"
-					>
-					</ca-field-select>
+					<juno-input label="Ver"
+								ng-model="$ctrl.newDemographicData.ver"
+								label-position="$ctrl.LABEL_POSITION"
+								component-style="$ctrl.COMPONENT_STYLE"
+								placeholder="Ver">
+					</juno-input>
 				</div>
+				<juno-select label="MRP"
+							 label-position="$ctrl.LABEL_POSITION"
+							 component-style="$ctrl.COMPONENT_STYLE"
+							 ng-model="$ctrl.newDemographicData.mrp"
+							 options="$ctrl.mrpOptions">
+
+				</juno-select>
+			</div>
+			<div class="flex-col column-container">
+				<!-- ADDRESS -->
+				<juno-input ng-model="$ctrl.newDemographicData.address.address"
+							label="Address"
+							label-position="$ctrl.LABEL_POSITION"
+							component-style="$ctrl.COMPONENT_STYLE"
+				>
+				</juno-input>
+				<!-- CITY -->
+				<juno-input ng-model="$ctrl.newDemographicData.address.city"
+							label="City"
+							label-position="$ctrl.LABEL_POSITION"
+							component-style="$ctrl.COMPONENT_STYLE"
+				>
+				</juno-input>
+				<!-- PROVINCE -->
+				<juno-select label="Province"
+							 label-position="$ctrl.LABEL_POSITION"
+							 component-style="$ctrl.COMPONENT_STYLE"
+							 options="$ctrl.provincesCA"
+							 ng-model="$ctrl.newDemographicData.address.province"
+				></juno-select>
+				<!-- POSTAL CODE -->
+				<juno-input ng-model="$ctrl.newDemographicData.address.postal"
+							label="Postal Code"
+							label-position="$ctrl.LABEL_POSITION"
+							component-style="$ctrl.COMPONENT_STYLE"
+				>
+				</juno-input>
+				<!-- EMAIL -->
+				<juno-input ng-model="$ctrl.newDemographicData.email"
+							label="Email"
+							label-position="$ctrl.LABEL_POSITION"
+							component-style="$ctrl.COMPONENT_STYLE"
+				>
+				</juno-input>
+				<!-- PHONE -->
+				<juno-input ng-model="$ctrl.newDemographicData.phone"
+							label="Phone"
+							label-position="$ctrl.LABEL_POSITION"
+							component-style="$ctrl.COMPONENT_STYLE"
+				>
+				</juno-input>
 			</div>
 		</div>
-		<div class="col-xs-6 flex flex-row justify-content-center">
-			<div class="right-column-container">
-				<!-- ADDRESS -->
-				<ca-field-text
-								ca-name="address"
-								ca-title="Address"
-								ca-model="$ctrl.newDemographicData.address.address"
-								ca-rows="1"
-				>
-				</ca-field-text>
-				<!-- CITY -->
-				<ca-field-text
-								ca-name="city"
-								ca-title="City"
-								ca-model="$ctrl.newDemographicData.address.city"
-								ca-rows="1"
-				>
-				</ca-field-text>
-				<!-- PROVINCE -->
-				<ca-field-select
-								ca-template="label"
-								ca-name="province"
-								ca-title="Province"
-								ca-model="$ctrl.newDemographicData.address.province"
-								ca-options="$ctrl.provincesCA"
-								ca-empty-option="false"
-				>
-				</ca-field-select>
-				<!-- POSTAL CODE -->
-				<ca-field-text
-								ca-name="postal-code"
-								ca-title="Postal Code"
-								ca-model="$ctrl.newDemographicData.address.postal"
-								ca-rows="1"
-				>
-				</ca-field-text>
-				<!-- EMAIL -->
-				<ca-field-text
-								ca-name="email"
-								ca-title="Email"
-								ca-model="$ctrl.newDemographicData.email"
-								ca-rows="1"
-				>
-				</ca-field-text>
-				<!-- PHONE -->
-				<ca-field-text
-								ca-name="phone"
-								ca-title="Phone"
-								ca-model="$ctrl.newDemographicData.phone"
-								ca-rows="1"
-				>
-				</ca-field-text>
-			</div>
 		</div>
 	</modal-body>
 
 
 	<modal-footer>
-		<div class="flex flex-row justify-content-center">
+		<div class="d-flex justify-content-center">
+		<div class="d-flex flex-row justify-content-end align-items-center width-80">
+			<div class="flex-row align-items-center m-r-24">
+				<juno-check-box id="create-another"
+								ng-model="$ctrl.isCreateAnotherEnabled">
+				</juno-check-box>
+				<span class="d-inline-block m-l-8">Create another demographic</span>
+			</div>
 			<juno-button
 				 class="add-demographic-button"
 				 title="Add"
@@ -164,6 +149,7 @@
 				 disabled="$ctrl.buttonClicked">
 				Add
 			</juno-button>
+		</div>
 		</div>
 	</modal-footer>
 </juno-modal>

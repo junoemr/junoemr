@@ -7,16 +7,17 @@
 	<div>
 		<i ng-if="$ctrl.icon" class="icon" ng-class="$ctrl.icon"></i>
 		<input type="{{$ctrl.type}}"
-						ng-model="$ctrl.ngModel"
-						ng-change="$ctrl.onChange()"
-						ng-class="$ctrl.inputClasses()"
-						ng-readonly="$ctrl.readonly"
-						ng-focus="$ctrl.onFocus()"
-						ng-blur="$ctrl.onBlur()"
-						maxlength="{{$ctrl.characterLimit}}"
-						ng-disabled="$ctrl.disabled"
-						placeholder="{{$ctrl.placeholder}}"
-						autocomplete="{{$ctrl.autocompleteValue()}}">
+			   ng-model="$ctrl.ngModel"
+			   ng-change="$ctrl.onChange()"
+			   ng-class="$ctrl.inputClasses()"
+			   ng-readonly="$ctrl.readonly"
+			   ng-focus="$ctrl.onFocus()"
+			   ng-blur="$ctrl.onBlur()"
+			   maxlength="{{$ctrl.characterLimit}}"
+			   ng-disabled="$ctrl.disabled"
+			   placeholder="{{$ctrl.placeholder}}"
+			   ng-ref="$ctrl.input"
+		>
 		<div ng-if="!$ctrl.hideCharacterLimit" class="character-display">
 			{{$ctrl.ngModel.length}}/{{$ctrl.characterLimit}}
 		</div>
