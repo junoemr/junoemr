@@ -58,8 +58,9 @@ angular.module("Common.Services").service("noteService", [
 				},
 				function error(errors)
 				{
-					console.log("noteService::getNotesFrom error", errors);
-					deferred.reject("An error occurred while fetching notes");
+					let message = (errors) ? errors.data.error.message : "An error occurred while fetching notes";
+					console.error("noteService::getNotesFrom error", errors);
+					deferred.reject(message);
 				});
 
 			return deferred.promise;
@@ -77,8 +78,9 @@ angular.module("Common.Services").service("noteService", [
 				},
 				function error(errors)
 				{
-					console.log("noteService::saveNote error", errors);
-					deferred.reject("An error occurred while saving note");
+					let message = (errors) ? errors.data.error.message : "An error occurred while saving note";
+					console.error("noteService::saveNote error", errors);
+					deferred.reject(message);
 				});
 
 			return deferred.promise;
@@ -96,8 +98,9 @@ angular.module("Common.Services").service("noteService", [
 				},
 				function error(errors)
 				{
-					console.log("noteService::saveIssueNote error", errors);
-					deferred.reject("An error occurred while saving issue note");
+					let message = (errors) ? errors.data.error.message : "An error occurred while saving issue note";
+					console.error("noteService::saveIssueNote error", errors);
+					deferred.reject(message);
 				});
 
 			return deferred.promise;
@@ -115,8 +118,9 @@ angular.module("Common.Services").service("noteService", [
 				},
 				function error(errors)
 				{
+					let message = (errors) ? errors.data.error.message : "An error occurred while fetching current note";
 					console.log("noteService::getCurrentNote error", errors);
-					deferred.reject("An error occurred while fetching current note");
+					deferred.reject(message);
 				});
 
 			return deferred.promise;
