@@ -24,6 +24,7 @@ package org.oscarehr.dataMigration.mapper.cds.in;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -300,7 +301,7 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 	 * @param dosage
 	 * @return String Array containing the split dosage, or null
 	 */
-	protected  String[] getDosageMinMax(String dosage)
+	protected String[] getDosageMinMax(String dosage)
 	{
 		if (dosage != null)
 		{
@@ -318,11 +319,17 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 					if (min.isEmpty() && !max.isEmpty())
 					{
 						logger.warn("Empty minimum dosage found" + minmax.toString());
+						minmax = Arrays.copyOf(minmax, 2);
+						minmax[0] = max;
+						minmax[1] = max;
+						return minmax;
 					}
-					if (max.isEmpty() && (!min.isEmpty() || min != null))
+					if (max.isEmpty() && (!StringUtils.isBlank(min)))
 					{
 						logger.warn("Empty maximum dosage found" + minmax.toString());
+						minmax = Arrays.copyOf(minmax, 2);
 						minmax[0] = min;
+						minmax[1] = min;
 						return minmax;
 					}
 					minmax[0] = min;

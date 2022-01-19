@@ -88,6 +88,10 @@ public class CDSMedicationImportMapperTest
 				.when(Util.class, "leadingNum", "2");
 			PowerMockito.doReturn("")
 				.when(Util.class, "leadingNum", "");
+			PowerMockito.doReturn("1")
+				.when(Util.class, "leadingNum", "1 dosage");
+			PowerMockito.doReturn("")
+				.when(Util.class, "leadingNum", "dosage");
 		}
 		catch(Exception e)
 		{
@@ -323,7 +327,7 @@ public class CDSMedicationImportMapperTest
 	{
 		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
 		String dosage = "1-";
-		String[] expected = {"1"};
+		String[] expected = {"1", "1"};
 		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
 	}
 
@@ -332,7 +336,7 @@ public class CDSMedicationImportMapperTest
 	{
 		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
 		String dosage = "-1";
-		String[] expected = {"", "1"};
+		String[] expected = {"1", "1"};
 		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
 	}
 
@@ -359,5 +363,31 @@ public class CDSMedicationImportMapperTest
 	{
 		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
 		assertNull(cdsMedicationImportMapper.getDosageMinMax(null));
+	}
+	@Test
+	public void testgetDosageMinMax_nonNumericLowerOnly()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "1 dosage-";
+		String[] expected = {"1", "1"};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
+	}
+
+	@Test
+	public void testgetDosageMinMax_nonNumericUpperOnly()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "-1 dosage";
+		String[] expected = {"1","1"};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
+	}
+
+	@Test
+	public void testgetDosageMinMax_nonNumeric()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "dosage";
+		String[] expected = {"", ""};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
 	}
 }
