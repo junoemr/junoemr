@@ -383,6 +383,15 @@ public class CDSMedicationImportMapperTest
 	}
 
 	@Test
+	public void testgetDosageMinMax_nonNumericRangeFull()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "1 dosage-1 dosage";
+		String[] expected = {"1", "1"};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
+	}
+
+	@Test
 	public void testgetDosageMinMax_nonNumeric()
 	{
 		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
