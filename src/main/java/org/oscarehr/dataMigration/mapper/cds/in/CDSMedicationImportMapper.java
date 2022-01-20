@@ -324,7 +324,7 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 						minmax[1] = max;
 						return minmax;
 					}
-					if (max.isEmpty() && (!StringUtils.isBlank(min)))
+					if (max.isEmpty() && (StringUtils.isNotBlank(min)))
 					{
 						logger.warn("Empty maximum dosage found" + minmax.toString());
 						minmax = Arrays.copyOf(minmax, 2);
