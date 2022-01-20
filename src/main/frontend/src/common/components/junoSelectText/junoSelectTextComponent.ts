@@ -28,7 +28,7 @@ angular.module('Common.Components').component('junoSelectText', {
 	templateUrl: 'src/common/components/junoSelectText/junoSelectText.jsp',
 	bindings: {
 		selectModel: "=",
-		selectOptions: "=",
+		selectOptions: "<",
 		textModel: "=",
 		textPlaceholder: "@?",
 		uppercase: "<?",

@@ -4,7 +4,7 @@
 	</label>
 	<div class="flex-row juno-select-text-container">
 		<juno-select
-				ng-class="$ctrl.selectModel"
+				ng-model="$ctrl.selectModel"
 				options="$ctrl.selectOptions"
 				disabled="$ctrl.disabled"
 		>

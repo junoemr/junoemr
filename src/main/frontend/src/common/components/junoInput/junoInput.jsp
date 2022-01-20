@@ -16,7 +16,7 @@
 			   maxlength="{{$ctrl.characterLimit}}"
 			   ng-disabled="$ctrl.disabled"
 			   placeholder="{{$ctrl.placeholder}}"
-			   ng-ref="$ctrl.input"
+			   ng-ref="$ctrl.inputRef"
 		>
 		<div ng-if="!$ctrl.hideCharacterLimit" class="character-display">
 			{{$ctrl.ngModel.length}}/{{$ctrl.characterLimit}}

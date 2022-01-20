@@ -136,11 +136,6 @@ angular.module('Patient').component('addDemographicModal', {
 				);
 			}
 
-			ctrl.$postLink = () =>
-			{
-				ctrl.resetFocus();
-			}
-
 			ctrl.resetDemographic = () =>
 			{
 				ctrl.newDemographicData = angular.copy(ctrl.emptyDemographicData);
@@ -150,7 +145,7 @@ angular.module('Patient').component('addDemographicModal', {
 			{
 				$timeout(() =>
 				{
-					ctrl.formRef.find(":input:visible:active:first").focus();
+					ctrl.formRef.find(":input:visible:first").focus();
 				});
 			}
 

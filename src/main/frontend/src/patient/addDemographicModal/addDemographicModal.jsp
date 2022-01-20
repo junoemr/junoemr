@@ -14,7 +14,7 @@
 	<modal-body>
 		<div class="add-demographic-content d-flex justify-content-center">
 		<div class="flex flex-row justify-content-between width-80">
-			<div class="flex-col column-container" ng-ref="$ctrl.formRef">
+			<div class="flex-col column-container">
 				<!-- LAST NAME -->
 				<juno-input ng-model="$ctrl.newDemographicData.lastName"
 							label="Last Name"
@@ -22,6 +22,7 @@
 							component-style="$ctrl.COMPONENT_STYLE"
 							invalid="!$ctrl.newDemographicData.lastName"
 							show-invalid-focus="true"
+							auto-focus="true"
 				>
 				</juno-input>
 				<!-- FIRST NAME -->

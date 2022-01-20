@@ -50,6 +50,7 @@ angular.module('Common.Components').component('junoInput', {
 		componentStyle: "<?",
 		icon: "@?",
 		allowAutocomplete: "<?",
+		autoFocus: "<"
 	},
 	controller: [ "$scope", function ($scope) {
 		let ctrl = this;
@@ -77,9 +78,17 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.oldNgModel = ctrl.ngModel;
-
 			ctrl.deviceInfo = new DeviceInfo();
+			ctrl.autoFocus = ctrl.autoFocus || false;
 		};
+
+		ctrl.$postLink = () =>
+		{
+			if (ctrl.autoFocus && !ctrl.disabled)
+			{
+				ctrl.inputRef.focus();
+			}
+		}
 
 		$scope.$watch("$ctrl.ngModel", () =>
 		{
