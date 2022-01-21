@@ -22,7 +22,7 @@
  */
 
 
-package org.oscarehr.demographic.model;
+package org.oscarehr.demographic.entity;
 
 import org.oscarehr.common.model.AbstractModel;
 import oscar.util.ConversionUtils;

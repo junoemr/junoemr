@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.mapper.cds.in;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
-import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +41,12 @@ import xml.cds.v5_0.PersonStatus;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.LocalDate;
 
-import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
-import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
-import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_ACTIVE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_DECEASED;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_INACTIVE;
 
 @Component
-public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demographics, Demographic>
+public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demographics, DemographicModel>
 {
 	@Autowired
 	protected CDSEnrollmentHistoryImportMapper cdsEnrollmentHistoryImportMapper;
@@ -57,9 +57,9 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 	}
 
 	@Override
-	public Demographic importToJuno(Demographics importStructure) throws Exception
+	public DemographicModel importToJuno(Demographics importStructure) throws Exception
 	{
-		Demographic demographic = new Demographic();
+		DemographicModel demographic = new DemographicModel();
 		mapBasicInfo(importStructure, demographic);
 		mapHealthInsuranceInfo(importStructure, demographic);
 		mapContactInfo(importStructure, demographic);
@@ -67,7 +67,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		return demographic;
 	}
 
-	protected void mapBasicInfo(Demographics importStructure, Demographic demographic)
+	protected void mapBasicInfo(Demographics importStructure, DemographicModel demographic)
 	{
 		demographic.setFirstName(importStructure.getNames().getLegalName().getFirstName().getPart());
 		demographic.setLastName(importStructure.getNames().getLegalName().getLastName().getPart());
@@ -77,7 +77,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		PersonNamePrefixCode namePrefixCode = importStructure.getNames().getNamePrefix();
 		if(namePrefixCode != null)
 		{
-			demographic.setTitle(Demographic.TITLE.fromStringIgnoreCase(namePrefixCode.value()));
+			demographic.setTitle(DemographicModel.TITLE.fromStringIgnoreCase(namePrefixCode.value()));
 			if(demographic.getTitle() == null)
 			{
 				logEvent("Invalid Title value: " + namePrefixCode.value());
@@ -88,7 +88,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		if(officialLanguage != null)
 		{
 			demographic.setOfficialLanguage(OfficialSpokenLanguageCode.FRE.equals(officialLanguage) ?
-					Demographic.OFFICIAL_LANGUAGE.FRENCH : Demographic.OFFICIAL_LANGUAGE.ENGLISH);
+					DemographicModel.OFFICIAL_LANGUAGE.FRENCH : DemographicModel.OFFICIAL_LANGUAGE.ENGLISH);
 		}
 		demographic.setSpokenLanguage(fromISO639_2LanguageCode(StringUtils.trimToNull(importStructure.getPreferredSpokenLanguage())));
 		demographic.setPatientNote(generatePatientNote(importStructure));
@@ -112,7 +112,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		return StringUtils.trimToNull(note);
 	}
 
-	protected void mapHealthInsuranceInfo(Demographics importStructure, Demographic demographic)
+	protected void mapHealthInsuranceInfo(Demographics importStructure, DemographicModel demographic)
 	{
 		HealthCard healthCard = importStructure.getHealthCard();
 		if(healthCard != null)
@@ -125,7 +125,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		}
 	}
 
-	protected void mapContactInfo(Demographics importStructure, Demographic demographic)
+	protected void mapContactInfo(Demographics importStructure, DemographicModel demographic)
 	{
 		demographic.setEmail(importStructure.getEmail());
 
@@ -162,7 +162,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		}
 	}
 
-	protected void mapCareTeamInfo(Demographics importStructure, Demographic demographic) throws Exception
+	protected void mapCareTeamInfo(Demographics importStructure, DemographicModel demographic) throws Exception
 	{
 		demographic.setEmail(importStructure.getEmail());
 		demographic.setMrpProvider(getImportPrimaryPhysician(importStructure));

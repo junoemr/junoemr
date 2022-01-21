@@ -53,7 +53,7 @@ import org.oscarehr.caisi_integrator.ws.DemographicWs;
 import org.oscarehr.casemgmt.util.ExtPrint;
 import org.oscarehr.consultations.service.ConsultationPDFCreationService;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
 import org.oscarehr.encounterNote.dao.IssueDao;
 import org.oscarehr.encounterNote.model.CaseManagementNote;

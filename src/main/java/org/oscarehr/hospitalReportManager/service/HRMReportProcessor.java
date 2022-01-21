@@ -32,7 +32,7 @@ import org.oscarehr.dataMigration.converter.in.hrm.HrmDocumentModelToDbConverter
 import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportDemographicMatcher;
 import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportImportMapper;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.HRMReport;

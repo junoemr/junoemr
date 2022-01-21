@@ -25,8 +25,8 @@
 package org.oscarehr.demographic.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.demographic.model.DemographicCust;
-import org.oscarehr.demographic.model.DemographicCustArchive;
+import org.oscarehr.demographic.entity.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicCustArchive;
 import org.springframework.stereotype.Repository;
 
 @Repository

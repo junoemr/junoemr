@@ -23,28 +23,32 @@
  */
 
 
-package org.oscarehr.demographic.model;
+package org.oscarehr.demographic.entity;
 
 import org.oscarehr.common.model.AbstractModel;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
 
 @Entity
-@Table(name="demographiccustArchive")
-public class DemographicCustArchive extends AbstractModel<Integer>
+@Table(name="demographiccust")
+public class DemographicCust extends AbstractModel<Integer>
 {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
-	
 	@Column(name="demographic_no")
-	private Integer demographicNo;
+	private Integer id;
 
 	@Column(name="cust1")
 	private String nurse;
@@ -61,18 +65,16 @@ public class DemographicCustArchive extends AbstractModel<Integer>
 	@Column(name="content")
 	private String notes;
 
-	
-	@Override
+	@OneToOne(fetch= FetchType.LAZY)
+	@JoinColumn(name="demographic_no", insertable=false, updatable=false)
+	private Demographic demographic;
+
 	public Integer getId() {
 		return id;
 	}
-	
-	public Integer getDemographicNo() {
-		return demographicNo;
-	}
-	
-	public void setDemographicNo(Integer demographicNo) {
-		this.demographicNo = demographicNo;
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public String getNurse() {
@@ -114,16 +116,41 @@ public class DemographicCustArchive extends AbstractModel<Integer>
 	public void setNotes(String notes) {
     	this.notes = notes;
     }
-	
-	//constructors
-	public DemographicCustArchive() {}
-	
-	public DemographicCustArchive(DemographicCust dc) {
-		this.demographicNo = dc.getId();
-		this.alert = dc.getAlert();
-		this.midwife = dc.getMidwife();
-		this.nurse = dc.getNurse();
-		this.resident = dc.getResident();
-		this.notes = dc.getNotes();
+
+	public String getParsedNotes()
+	{
+		try
+		{
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document document = builder.parse(new InputSource(new StringReader(notes)));
+
+			NodeList list = document.getElementsByTagName("unotes");
+
+			if (list != null && list.getLength() > 0)
+			{
+				return list.item(0).getTextContent();
+			}
+
+		} catch (Exception e)
+		{
+		}
+
+		return null;
+	}
+
+	public void setParsedNotes(String notes)
+	{
+		this.notes = "<unotes>" + notes + "</unotes>";
+	}
+
+	public Demographic getDemographic()
+	{
+		return demographic;
+	}
+
+	public void setDemographic(Demographic demographic)
+	{
+		this.demographic = demographic;
 	}
 }

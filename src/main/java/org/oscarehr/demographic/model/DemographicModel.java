@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.model.demographic;
+package org.oscarehr.demographic.model;
 
 import lombok.Data;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -29,6 +29,7 @@ import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.contact.Contact;
+import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
 
 import java.time.LocalDate;
@@ -37,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class Demographic extends AbstractTransientModel implements Person, Contact
+public class DemographicModel extends AbstractTransientModel implements Person, Contact
 {
 	public enum OFFICIAL_LANGUAGE
 	{
@@ -121,7 +122,7 @@ public class Demographic extends AbstractTransientModel implements Person, Conta
 	private String patientNote;
 	private String patientAlert;
 
-	public Demographic()
+	public DemographicModel()
 	{
 		this.addressList = new ArrayList<>();
 		this.rosterHistory = new ArrayList<>();

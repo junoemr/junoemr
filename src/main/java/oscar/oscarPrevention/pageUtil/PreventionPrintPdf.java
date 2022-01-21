@@ -44,7 +44,7 @@ import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.printing.FontSettings;
 import org.oscarehr.common.printing.PdfWriterFactory;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.dao.PreventionExtDao;
 import org.oscarehr.prevention.model.Prevention;

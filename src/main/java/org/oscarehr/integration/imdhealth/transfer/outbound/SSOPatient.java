@@ -26,7 +26,7 @@ package org.oscarehr.integration.imdhealth.transfer.outbound;
 import lombok.Data;
 import org.apache.commons.validator.EmailValidator;
 import org.oscarehr.common.Gender;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.integration.imdhealth.exception.SSOLoginException;
 
 import java.io.Serializable;

@@ -27,7 +27,7 @@ import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.consultations.dao.ConsultRequestDao;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.managers.model.ProviderSettings;
 import org.oscarehr.provider.dao.ProviderDataDao;

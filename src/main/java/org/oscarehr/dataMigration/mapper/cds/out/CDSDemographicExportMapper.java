@@ -28,7 +28,7 @@ import org.oscarehr.dataMigration.model.PatientRecord;
 import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.contact.DemographicContact;
-import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.pharmacy.Pharmacy;
 import org.oscarehr.dataMigration.model.provider.Provider;
@@ -58,9 +58,9 @@ import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEMOGRAPHIC_CON
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_FALSE;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
-import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
-import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
-import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_ACTIVE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_DECEASED;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_INACTIVE;
 
 @Component
 public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemographicInterface, PatientRecord>
@@ -73,7 +73,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 	@Override
 	public Demographics exportFromJuno(PatientRecord exportStructure)
 	{
-		Demographic exportDemographic = exportStructure.getDemographic();
+		DemographicModel exportDemographic = exportStructure.getDemographic();
 		Demographics demographics = objectFactory.createDemographics();
 
 		demographics.setNames(getExportNames(exportDemographic));
@@ -101,7 +101,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		return demographics;
 	}
 
-	protected PersonNameStandard getExportNames(Demographic exportStructure)
+	protected PersonNameStandard getExportNames(DemographicModel exportStructure)
 	{
 		PersonNameStandard names = objectFactory.createPersonNameStandard();
 		PersonNameStandard.LegalName legalName = objectFactory.createPersonNameStandardLegalName();
@@ -156,7 +156,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		}
 	}
 
-	protected HealthCard getExportHealthCard(Demographic exportStructure)
+	protected HealthCard getExportHealthCard(DemographicModel exportStructure)
 	{
 		HealthCard healthCard = objectFactory.createHealthCard();
 		healthCard.setNumber(exportStructure.getHealthNumber());
@@ -168,7 +168,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		return healthCard;
 	}
 
-	protected List<xml.cds.v5_0.Address> getExportAddresses(Demographic exportStructure)
+	protected List<xml.cds.v5_0.Address> getExportAddresses(DemographicModel exportStructure)
 	{
 		List<Address> addressList = exportStructure.getAddressList();
 		List<xml.cds.v5_0.Address> exportAddressList = new ArrayList<>(addressList.size());
@@ -184,7 +184,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		return exportAddressList;
 	}
 
-	protected List<PhoneNumber> getExportPhones(Demographic exportStructure)
+	protected List<PhoneNumber> getExportPhones(DemographicModel exportStructure)
 	{
 		List<PhoneNumber> exportPhoneList = new ArrayList<>(3);
 
@@ -221,7 +221,8 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		return phone;
 	}
 
-	protected Demographics.PrimaryPhysician getExportPrimaryPhysician(Demographic exportStructure)
+	protected Demographics.PrimaryPhysician getExportPrimaryPhysician(
+		DemographicModel exportStructure)
 	{
 		Provider provider = exportStructure.getMrpProvider();
 		Demographics.PrimaryPhysician primaryPhysician = null;
@@ -263,7 +264,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		return personStatusCode;
 	}
 
-	protected OfficialSpokenLanguageCode getExportOfficialLanguage(Demographic.OFFICIAL_LANGUAGE officialLanguage)
+	protected OfficialSpokenLanguageCode getExportOfficialLanguage(DemographicModel.OFFICIAL_LANGUAGE officialLanguage)
 	{
 		if(officialLanguage != null)
 		{
@@ -277,7 +278,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 	}
 
 	// roster info
-	protected Demographics.Enrolment getEnrollment(Demographic exportStructure)
+	protected Demographics.Enrolment getEnrollment(DemographicModel exportStructure)
 	{
 		Demographics.Enrolment enrolment = null;
 

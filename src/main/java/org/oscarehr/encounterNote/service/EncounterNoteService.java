@@ -26,7 +26,7 @@ import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.dataMigration.converter.in.note.EncounterNoteModelToDbConverter;
 import org.oscarehr.dataMigration.model.encounterNote.EncounterNote;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.encounterNote.model.CaseManagementIssue;

@@ -47,7 +47,7 @@ import org.oscarehr.dataMigration.converter.out.note.ReminderNoteDbToModelConver
 import org.oscarehr.dataMigration.converter.out.note.RiskFactorNoteDbToModelConverter;
 import org.oscarehr.dataMigration.converter.out.note.SocialHistoryNoteDbToModelConverter;
 import org.oscarehr.dataMigration.model.PatientRecord;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;

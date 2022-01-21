@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographic.model;
+package org.oscarehr.demographic.entity;
 
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;

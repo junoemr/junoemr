@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographic.model;
+package org.oscarehr.demographic.entity;
 
 import org.oscarehr.common.model.AbstractModel;
 

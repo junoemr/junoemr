@@ -41,9 +41,9 @@ import java.time.LocalDateTime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
-import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
-import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_ACTIVE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_DECEASED;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_INACTIVE;
 
 public class CDSDemographicExportMapperTest
 {

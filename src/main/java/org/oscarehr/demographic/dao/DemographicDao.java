@@ -23,7 +23,7 @@
 package org.oscarehr.demographic.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.springframework.stereotype.Repository;
 
 @SuppressWarnings("unchecked")

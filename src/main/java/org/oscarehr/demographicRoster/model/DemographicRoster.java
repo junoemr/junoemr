@@ -25,7 +25,7 @@ package org.oscarehr.demographicRoster.model;
 
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.rosterStatus.model.RosterStatus;
 
 import javax.persistence.Column;

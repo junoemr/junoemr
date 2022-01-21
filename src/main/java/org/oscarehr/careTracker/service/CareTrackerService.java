@@ -29,7 +29,7 @@ import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.careTrackerDecisionSupport.dao.DsRuleDao;
 import org.oscarehr.careTrackerDecisionSupport.transfer.DsRuleUpdateInput;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.careTracker.converter.CareTrackerEntityToModelConverter;
 import org.oscarehr.careTracker.dao.CareTrackerDao;
 import org.oscarehr.careTracker.entity.CareTrackerItem;

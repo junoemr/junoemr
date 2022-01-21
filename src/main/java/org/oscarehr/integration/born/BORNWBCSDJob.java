@@ -52,7 +52,7 @@ import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.common.jobs.OscarRunnable;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.integration.born.BornCDADocument.BORNCDADocumentType;

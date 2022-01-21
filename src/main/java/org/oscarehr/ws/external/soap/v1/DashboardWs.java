@@ -26,7 +26,7 @@ import org.apache.cxf.annotations.GZIP;
 import org.oscarehr.dashboard.dao.BillingMasterClinicaidDao;
 import org.oscarehr.dashboard.model.BillingMasterClinicaid;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;

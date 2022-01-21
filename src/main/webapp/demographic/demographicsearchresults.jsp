@@ -48,7 +48,7 @@
 <%@page import="org.oscarehr.caisi_integrator.ws.MatchingDemographicTransferScore"%>
 <%@page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
 <%@page import="org.oscarehr.demographic.dao.DemographicDao"%>
-<%@page import="org.oscarehr.demographic.model.Demographic"%>
+<%@page import="org.oscarehr.demographic.entity.Demographic"%>
 <%@page import="org.oscarehr.demographic.search.DemographicCriteriaSearch"%>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
@@ -83,7 +83,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
-<%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
+<%@ page import="org.oscarehr.demographic.entity.DemographicMerged" %>
 
 <jsp:useBean id="providerBean" class="java.util.Properties"	scope="session" />
 

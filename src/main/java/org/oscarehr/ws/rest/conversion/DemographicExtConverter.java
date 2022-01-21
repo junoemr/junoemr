@@ -23,7 +23,7 @@
  */
 package org.oscarehr.ws.rest.conversion;
 
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
 import org.springframework.stereotype.Component;

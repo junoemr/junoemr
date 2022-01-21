@@ -44,7 +44,7 @@
 <%@ page import="org.oscarehr.ticklers.entity.Tickler" %>
 
 <%@ page import="java.util.Calendar"%>
-<%@ page import="org.oscarehr.demographic.model.Demographic" %>
+<%@ page import="org.oscarehr.demographic.entity.Demographic" %>
 <%
 	Calendar now = Calendar.getInstance();
 int curYear = now.get(Calendar.YEAR);

@@ -27,7 +27,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.oscarehr.common.annotation.SiteLocation;
 import org.oscarehr.common.listeners.BeanValidationEventListener;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.integration.aqs.model.QueuedAppointmentLink;
 import org.oscarehr.provider.model.ProviderData;
 import oscar.util.ConversionUtils;

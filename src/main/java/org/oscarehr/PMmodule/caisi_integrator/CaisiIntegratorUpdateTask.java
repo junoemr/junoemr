@@ -130,7 +130,7 @@ import org.oscarehr.common.model.BillingONItem;
 import org.oscarehr.common.model.Consent;
 import org.oscarehr.common.model.ConsentType;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.eform.model.EFormData;

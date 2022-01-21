@@ -41,7 +41,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.common.model.Provider;
 
 /*

@@ -29,7 +29,7 @@ import org.oscarehr.dataMigration.mapper.cds.CDSDemographicInterface;
 import org.oscarehr.dataMigration.model.PatientRecord;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.contact.DemographicContact;
-import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.springframework.stereotype.Component;
@@ -57,8 +57,8 @@ import java.util.List;
 
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_FALSE;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
-import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
-import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_DECEASED;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_INACTIVE;
 
 @Component
 public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemographicInterface, PatientRecord>
@@ -75,7 +75,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 	public Demographics exportFromJuno(PatientRecord exportStructure)
 	{
 		Demographics demographics = objectFactory.createDemographics();
-		Demographic exportDemographic = exportStructure.getDemographic();
+		DemographicModel exportDemographic = exportStructure.getDemographic();
 
 		demographics.setNames(getExportNames(exportDemographic));
 		demographics.setDateOfBirth(toNullableDateFullOrPartial(exportDemographic.getDateOfBirth()));
@@ -106,7 +106,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		return demographics;
 	}
 
-	protected PersonNameStandard getExportNames(Demographic exportStructure)
+	protected PersonNameStandard getExportNames(DemographicModel exportStructure)
 	{
 		PersonNameStandard names = objectFactory.createPersonNameStandard();
 		PersonNameStandard.LegalName legalName = objectFactory.createPersonNameStandardLegalName();
@@ -131,7 +131,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		return names;
 	}
 
-	protected PersonNamePrefixCode getExportNamePrefix(Demographic exportStructure)
+	protected PersonNamePrefixCode getExportNamePrefix(DemographicModel exportStructure)
 	{
 		String title = exportStructure.getTitleString();
 		PersonNamePrefixCode prefixCode = null;
@@ -162,7 +162,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		}
 	}
 
-	protected HealthCard getExportHealthCard(Demographic exportStructure)
+	protected HealthCard getExportHealthCard(DemographicModel exportStructure)
 	{
 		HealthCard healthCard = objectFactory.createHealthCard();
 		healthCard.setNumber(exportStructure.getHealthNumber());
@@ -184,7 +184,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		return exportAddressList;
 	}
 
-	protected List<PhoneNumber> getExportPhones(Demographic exportStructure)
+	protected List<PhoneNumber> getExportPhones(DemographicModel exportStructure)
 	{
 		List<PhoneNumber> exportPhoneList = new ArrayList<>(3);
 
@@ -221,7 +221,8 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		return phone;
 	}
 
-	protected Demographics.PrimaryPhysician getExportPrimaryPhysician(Demographic exportStructure)
+	protected Demographics.PrimaryPhysician getExportPrimaryPhysician(
+		DemographicModel exportStructure)
 	{
 		Provider provider = exportStructure.getMrpProvider();
 		Demographics.PrimaryPhysician primaryPhysician = null;
@@ -247,7 +248,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		return personStatus;
 	}
 
-	protected OfficialSpokenLanguageCode getExportOfficialLanguage(Demographic.OFFICIAL_LANGUAGE officialLanguage)
+	protected OfficialSpokenLanguageCode getExportOfficialLanguage(DemographicModel.OFFICIAL_LANGUAGE officialLanguage)
 	{
 		if(officialLanguage != null)
 		{

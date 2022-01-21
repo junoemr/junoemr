@@ -31,10 +31,11 @@ import org.oscarehr.common.model.DemographicArchive;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicIntegrationDao;
-import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographic.model.DemographicCust;
-import org.oscarehr.demographic.model.DemographicExt;
-import org.oscarehr.demographic.model.DemographicIntegration;
+import org.oscarehr.demographic.entity.Demographic;
+import org.oscarehr.demographic.entity.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicIntegration;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.dataMigration.converter.in.DemographicModelToDbConverter;
 import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
@@ -348,7 +349,7 @@ public class DemographicService
 
 		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtSet);
 	}
-	public Demographic addNewDemographicRecord(String providerNoStr, org.oscarehr.dataMigration.model.demographic.Demographic demographicModel)
+	public Demographic addNewDemographicRecord(String providerNoStr, DemographicModel demographicModel)
 	{
 		Demographic demographic = demographicModelToDBConverter.convert(demographicModel);
 		Set<DemographicExt> demographicExtSet = demographic.getDemographicExtSet();

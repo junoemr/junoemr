@@ -47,7 +47,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.demographic.dao.DemographicMergedDao;
-import org.oscarehr.demographic.model.DemographicMerged;
+import org.oscarehr.demographic.entity.DemographicMerged;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;

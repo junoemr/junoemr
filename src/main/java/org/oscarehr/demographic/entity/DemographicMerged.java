@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.demographic.model;
+package org.oscarehr.demographic.entity;
 
 import org.oscarehr.common.model.AbstractModel;
 

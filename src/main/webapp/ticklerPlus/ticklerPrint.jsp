@@ -41,7 +41,7 @@
 <%@ include file="/taglibs.jsp"%>
 <%@ page import="java.util.Date"%>
 <%@ page import="org.oscarehr.ticklers.entity.Tickler" %>
-<%@ page import="org.oscarehr.demographic.model.Demographic" %>
+<%@ page import="org.oscarehr.demographic.entity.Demographic" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
 <%@ page import="org.springframework.context.ApplicationContext" %>

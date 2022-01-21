@@ -27,7 +27,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.dataMigration.mapper.cds.out.CDSExportMapper;
 import org.oscarehr.dataMigration.model.PatientRecord;
-import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.parser.cds.CDSFileParser;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
@@ -74,7 +74,7 @@ public class CDSExporter implements DemographicExporter
 	public GenericFile exportDemographic(PatientRecord patientRecord) throws Exception
 	{
 		Instant instant = Instant.now();
-		Demographic demographic = patientRecord.getDemographic();
+		DemographicModel demographic = patientRecord.getDemographic();
 		CDSFileParser parser = new CDSFileParser();
 
 		PatientExportContext context = patientExportContextService.getContext();
@@ -110,7 +110,7 @@ public class CDSExporter implements DemographicExporter
 	/**
 	 * creates the filename string according to CDS requirement PatientFN_PatientLN_PatientUniqueID_DOB
 	 */
-	protected String createExportFilename(Demographic demographic)
+	protected String createExportFilename(DemographicModel demographic)
 	{
 		String filename = GenericFile.getSanitizedFileName(
 				String.join("_",
@@ -129,7 +129,7 @@ public class CDSExporter implements DemographicExporter
 	 * @param baseDirectory the main export folder path
 	 * @return the patient specific export directory path
 	 */
-	protected Path getExportFolder(Demographic demographic, Path baseDirectory) throws IOException
+	protected Path getExportFolder(DemographicModel demographic, Path baseDirectory) throws IOException
 	{
 		String folderName;
 		Provider mrpProvider = demographic.getMrpProvider();

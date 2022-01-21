@@ -27,9 +27,10 @@ import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
-import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographic.model.DemographicCust;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.Demographic;
+import org.oscarehr.demographic.entity.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicExt;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
@@ -48,14 +49,14 @@ import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_TERMINA
 
 @Component
 public class DemographicModelToDbConverter
-		extends BaseModelToDbConverter<org.oscarehr.dataMigration.model.demographic.Demographic, Demographic>
+		extends BaseModelToDbConverter<DemographicModel, Demographic>
 {
 
 	@Autowired
 	private RosterModelToDbConverter rosterModelToDbConverter;
 
 	@Override
-	public Demographic convert(org.oscarehr.dataMigration.model.demographic.Demographic input)
+	public Demographic convert(DemographicModel input)
 	{
 		if(input == null)
 		{

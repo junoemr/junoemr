@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.log4j.Logger;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;

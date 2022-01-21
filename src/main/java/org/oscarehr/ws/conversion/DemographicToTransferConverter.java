@@ -24,7 +24,7 @@
 package org.oscarehr.ws.conversion;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.ws.rest.conversion.DemographicExtConverter;
 import org.oscarehr.ws.rest.to.model.AddressTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;

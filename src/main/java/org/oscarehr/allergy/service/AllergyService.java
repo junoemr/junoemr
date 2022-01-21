@@ -28,7 +28,7 @@ import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.dataMigration.converter.in.AllergyModelToDbConverter;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.provider.model.ProviderData;

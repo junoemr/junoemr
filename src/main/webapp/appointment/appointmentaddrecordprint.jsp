@@ -53,7 +53,7 @@ oscar.log.LogAction,oscar.log.LogConst"%>
 <%@page import="oscar.util.UtilDateUtilities" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
-<%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
+<%@ page import="org.oscarehr.demographic.entity.DemographicMerged" %>
 <%
 	OscarAppointmentDao appointmentDao = (OscarAppointmentDao)SpringUtils.getBean("oscarAppointmentDao");
     		

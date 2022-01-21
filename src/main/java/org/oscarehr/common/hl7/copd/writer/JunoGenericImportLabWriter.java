@@ -27,7 +27,7 @@ import ca.uhn.hl7v2.model.v24.message.ORU_R01;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
-import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.lab.Lab;
 import org.oscarehr.dataMigration.model.lab.LabObservation;
@@ -49,7 +49,7 @@ public class JunoGenericImportLabWriter extends HL7LabWriter
 
 	private ORU_R01 oru_r01;
 
-	public JunoGenericImportLabWriter(Demographic demographic, Lab labModel) throws IOException, HL7Exception
+	public JunoGenericImportLabWriter(DemographicModel demographic, Lab labModel) throws IOException, HL7Exception
 	{
 		super(new ORU_R01());
 		oru_r01 = (ORU_R01) this.message;
@@ -83,7 +83,7 @@ public class JunoGenericImportLabWriter extends HL7LabWriter
 		}
 	}
 
-	private void buildPID(Demographic demographic) throws HL7Exception
+	private void buildPID(DemographicModel demographic) throws HL7Exception
 	{
 		terser.set("/.PID-1", "1"); // force set the SetId
 

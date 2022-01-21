@@ -34,8 +34,8 @@ import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.WaitingList;
 import org.oscarehr.common.model.WaitingListName;
-import org.oscarehr.demographic.model.DemographicCust;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
@@ -327,7 +327,7 @@ public class DemographicService extends AbstractServiceImpl {
 				WLWaitingListUtil.updateWaitingListRecord(data.getWaitingListID().toString(), data.getWaitingListNote(), data.getDemographicNo().toString(), null);
 			}
 
-			org.oscarehr.demographic.model.Demographic demographic = demographicToDomainConverter.convert(data);
+			org.oscarehr.demographic.entity.Demographic demographic = demographicToDomainConverter.convert(data);
 			demographicManager.updateDemographic(loggedInInfo, demographic);
 
 			LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), demographic.getDemographicId(),

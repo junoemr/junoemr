@@ -29,7 +29,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import lombok.Getter;
 import lombok.Setter;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.integration.aqs.model.CommunicationType;
 import org.oscarehr.integration.aqs.model.QueuedAppointment;
 import org.oscarehr.util.SpringUtils;

@@ -33,7 +33,7 @@ import org.oscarehr.common.model.ConsultationRequest;
 import org.oscarehr.common.model.ConsultationServices;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.email.EmailTemplateConfig;
 import org.oscarehr.email.dao.EmailLogDao;
 import org.oscarehr.email.model.EmailLog;

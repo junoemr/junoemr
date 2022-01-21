@@ -29,7 +29,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oscarehr.dataMigration.logger.cds.CDSImportLogger;
-import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
@@ -47,9 +47,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
-import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
-import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
-import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_ACTIVE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_DECEASED;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_INACTIVE;
 
 public class CDSDemographicImportMapperTest
 {
@@ -176,7 +176,7 @@ public class CDSDemographicImportMapperTest
 		Demographics importStructure = mockCareTeamForEnrolledPhysicianCheck(rosterDataList);
 
 		// run the test
-		Demographic demographic = new Demographic();
+		DemographicModel demographic = new DemographicModel();
 		cdsDemographicImportMapper.mapCareTeamInfo(importStructure, demographic);
 
 		// check results
@@ -212,7 +212,7 @@ public class CDSDemographicImportMapperTest
 		Demographics importStructure = mockCareTeamForEnrolledPhysicianCheck(rosterDataList);
 
 		// run the test
-		Demographic demographic = new Demographic();
+		DemographicModel demographic = new DemographicModel();
 		cdsDemographicImportMapper.mapCareTeamInfo(importStructure, demographic);
 
 		// check results
@@ -241,7 +241,7 @@ public class CDSDemographicImportMapperTest
 		Demographics importStructure = mockFamilyPhysician(familyDoctor);
 
 		// run the test
-		Demographic demographic = new Demographic();
+		DemographicModel demographic = new DemographicModel();
 		demographic.setPatientNote(cdsDemographicImportMapper.generatePatientNote(importStructure));
 
 		// check results
@@ -259,7 +259,7 @@ public class CDSDemographicImportMapperTest
 		Demographics importStructure = mockFamilyPhysician(familyDoctor);
 
 		// run the test
-		Demographic demographic = new Demographic();
+		DemographicModel demographic = new DemographicModel();
 		demographic.setPatientNote(cdsDemographicImportMapper.generatePatientNote(importStructure));
 
 		// check results
@@ -282,7 +282,7 @@ public class CDSDemographicImportMapperTest
 		Demographics importStructure = mockUniqueVendorIdSequence(vendorId);
 
 		// run the test
-		Demographic demographic = new Demographic();
+		DemographicModel demographic = new DemographicModel();
 		demographic.setPatientNote(cdsDemographicImportMapper.generatePatientNote(importStructure));
 
 		// check results
@@ -299,7 +299,7 @@ public class CDSDemographicImportMapperTest
 		Demographics importStructure = mockUniqueVendorIdSequence(null);
 
 		// run the test
-		Demographic demographic = new Demographic();
+		DemographicModel demographic = new DemographicModel();
 		demographic.setPatientNote(cdsDemographicImportMapper.generatePatientNote(importStructure));
 
 		// check results

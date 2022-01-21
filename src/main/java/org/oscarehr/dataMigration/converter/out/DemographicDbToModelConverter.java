@@ -28,20 +28,21 @@ import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.demographic.dao.DemographicExtDao;
-import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographic.model.DemographicCust;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.Demographic;
+import org.oscarehr.demographic.entity.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicExt;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.COUNTRY_CODE_CANADA;
-import static org.oscarehr.dataMigration.model.demographic.Demographic.OFFICIAL_LANGUAGE;
+import static org.oscarehr.demographic.model.DemographicModel.OFFICIAL_LANGUAGE;
 
 @Component
 public class DemographicDbToModelConverter extends
-		BaseDbToModelConverter<Demographic, org.oscarehr.dataMigration.model.demographic.Demographic>
+		BaseDbToModelConverter<Demographic, DemographicModel>
 {
 	@Autowired
 	private DemographicExtDao demographicExtDao;
@@ -50,14 +51,14 @@ public class DemographicDbToModelConverter extends
 	private RosterDbToModelConverter rosterDbToModelConverter;
 
 	@Override
-	public org.oscarehr.dataMigration.model.demographic.Demographic convert(Demographic input)
+	public DemographicModel convert(Demographic input)
 	{
 		if(input == null)
 		{
 			return null;
 		}
 
-		org.oscarehr.dataMigration.model.demographic.Demographic exportDemographic = new org.oscarehr.dataMigration.model.demographic.Demographic();
+		DemographicModel exportDemographic = new DemographicModel();
 		BeanUtils.copyProperties(input, exportDemographic, "address", "email", "dateOfBirth", "title", "sin", "officialLanguage");
 
 		exportDemographic.setId(input.getDemographicId());

@@ -25,7 +25,7 @@ package org.oscarehr.ws.rest.conversion;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import oscar.util.ConversionUtils;

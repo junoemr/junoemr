@@ -30,11 +30,10 @@ import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
