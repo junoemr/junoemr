@@ -24,9 +24,9 @@
 
 --%>
 
-<%@ page import="org.oscarehr.common.model.DemographicContact"%>
+<%@ page import="org.oscarehr.contact.entity.DemographicContact"%>
 <%@ page import="java.util.List"%>
-<%@ page import="org.oscarehr.common.model.DemographicContact"%>
+<%@ page import="org.oscarehr.contact.entity.DemographicContact"%>
 <%@ page import="org.apache.commons.text.StringEscapeUtils" %>
 
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>

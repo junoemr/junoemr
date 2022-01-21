@@ -204,7 +204,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 							newItem.typeCode = data.code;
 							newItem.description = data.description;
 							newItem.guideline = data.instructions;
-							newItem.valueType = CareTrackerItemValueType.String;
+							newItem.valueType = CareTrackerItemValueType.Numeric;
 						}
 						else
 						{
@@ -212,7 +212,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 							newItem.type = CareTrackerItemType.Prevention;
 							newItem.typeCode = data.code;
 							newItem.description = data.description;
-							newItem.valueType = CareTrackerItemValueType.String;
+							newItem.valueType = CareTrackerItemValueType.Numeric;
 						}
 						itemGroup.careTrackerItems.push(newItem);
 					}

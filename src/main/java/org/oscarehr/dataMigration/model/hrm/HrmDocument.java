@@ -31,7 +31,9 @@ import org.oscarehr.dataMigration.model.provider.Reviewer;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DOC_CLASS_MEDICAL_RECORDS_LEGACY_VALUE;
 
@@ -150,13 +152,18 @@ public class HrmDocument extends AbstractTransientModel
 	private ReportStatus reportStatus;
 	private GenericFile reportFile;
 	private String reportFileSchemaVersion;
+	@Deprecated
+	/**
+	 * @deprecated This field is used to store a reference to a temporary file created during the CDS import.
+	 * Use reportFile if you actually want the file associated with the document.
+	 */
 	private Document document;
 	private String sendingFacility;
 	private String sendingFacilityId;
 	private String sendingFacilityReport;
 	private HrmDocument parentReport;
-	private HrmCategory category;
-	private HrmDocumentMatchingData hashData;
+	private HrmCategoryModel category;
+	private HrmDocumentMatchingData matchingData;
 
 	private List<HrmComment> comments;
 	private List<HrmObservation> observations;
@@ -193,7 +200,13 @@ public class HrmDocument extends AbstractTransientModel
 		{
 			this.reviewers = new ArrayList<>();
 		}
-
 		this.reviewers.addAll(reviewers);
+	}
+
+	public Optional<HrmObservation> getFirstObservation()
+	{
+		return this.getObservations()
+			.stream()
+			.min(Comparator.nullsLast(Comparator.comparingInt(HrmObservation::getId)));
 	}
 }

@@ -23,8 +23,8 @@
 
 package org.oscarehr.ticklers.dao;
 
-import org.oscarehr.common.model.Tickler;
-import org.oscarehr.ticklers.model.CDMTicklerInfo;
+import org.oscarehr.ticklers.entity.Tickler;
+import org.oscarehr.ticklers.entity.CDMTicklerInfo;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

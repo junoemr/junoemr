@@ -57,7 +57,7 @@ public abstract class Measurement extends AbstractTransientModel
 		this.measurementValue = dbModel.getDataField();
 		this.measuringInstruction = dbModel.getMeasuringInstruction();
 		this.comments = dbModel.getComments();
-		this.observationDateTime = ConversionUtils.toLocalDateTime(dbModel.getDateObserved());
+		this.observationDateTime = ConversionUtils.toNullableLocalDateTime(dbModel.getDateObserved());
 		this.createdDateTime = ConversionUtils.toLocalDateTime(dbModel.getCreateDate());
 	}
 

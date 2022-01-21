@@ -31,7 +31,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.managers.TicklerManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;

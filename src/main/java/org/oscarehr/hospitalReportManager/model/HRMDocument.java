@@ -61,6 +61,7 @@ public class HRMDocument extends AbstractModel<Integer>
 
 	private Date timeReceived;
 	private String reportType;
+	private String subClass;
 	private String reportHash;
 	private String reportLessTransactionInfoHash;
 	private String reportLessDemographicInfoHash;
@@ -89,7 +90,7 @@ public class HRMDocument extends AbstractModel<Integer>
 	private List<HRMDocumentComment> commentList;
 
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmDocument", cascade = CascadeType.PERSIST)
-	private List<HRMDocumentSubClass> documentSubClassList;
+	private List<HRMObservation> observationList;
 
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmDocument")
 	private List<HRMDocumentToDemographic> documentToDemographicList;

@@ -1145,12 +1145,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 				switch (controller.appointmentReasonDisplayLevel)
 				{
-					case ProviderSettings.AppointmentReasonDisplayLevelEnum.NONE:
+					case ProviderSettings.AppointmentReasonDisplayLevelEnum.None:
 						break;
-					case ProviderSettings.AppointmentReasonDisplayLevelEnum.REASONONLY:
+					case ProviderSettings.AppointmentReasonDisplayLevelEnum.ReasonOnly:
 						detailText += `(${eventReason})`;
 						break;
-					case ProviderSettings.AppointmentReasonDisplayLevelEnum.DEFAULTALL:
+					case ProviderSettings.AppointmentReasonDisplayLevelEnum.DefaultAll:
 					default:
 						detailText += `(${controller.appointmentReasons[event.data.reasonCode]} - ${eventReason})`;
 				}

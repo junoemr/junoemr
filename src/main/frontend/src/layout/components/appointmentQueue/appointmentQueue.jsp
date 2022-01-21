@@ -23,7 +23,11 @@
 															indicator-type="dot-pulse">
 			</juno-loading-indicator>
 			<h2 class="no-queues-zero-state" ng-if="$ctrl.noQueues">
-				Appointment Queue feature is not available at this time.
+				<span class="body-normal">
+					This is a new feature which can be used to manage a queue of patients (eg. for walk in clinics). Please contact
+					<a href="mailto: {{$ctrl.supportEmail}}">{{$ctrl.supportEmail}}</a>
+					for more information.
+				</span>
 			</h2>
 			<ul dnd-list="$ctrl.currentQueue.items"
 					dnd-drop="$ctrl.onDragDrop(index, item, event)">
@@ -46,21 +50,22 @@
 	</div>
 
 	<juno-round-button
-					class="add-button"
-					component-style="$ctrl.compoentStyle"
-					button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL"
-					button-color="JUNO_BUTTON_COLOR.PRIMARY"
-					title="add to queue"
-					ng-click="$ctrl.openBookQueuedAppointmentModal()"
+			ng-if="$ctrl.currentQueue"
+			class="add-button"
+			component-style="$ctrl.compoentStyle"
+			button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.FILL"
+			button-color="JUNO_BUTTON_COLOR.PRIMARY"
+			title="add to queue"
+			ng-click="$ctrl.openBookQueuedAppointmentModal()"
 	>
 		<i class="icon icon-plus"></i>
 	</juno-round-button>
 
-	<div class="list-footer juno-text" ng-class="[$ctrl.componentStyle + '-background']">
+	<div ng-if="$ctrl.currentQueue" class="list-footer juno-text" ng-class="[$ctrl.componentStyle + '-background']">
 		{{$ctrl.currentQueue.items.length}}
 		<span class="middle-text juno-text-secondary">
-				items in queue. max capacity
-			</span>
+			items in queue. max capacity
+		</span>
 		{{$ctrl.currentQueue.queueLimit}}
 	</div>
 </div>

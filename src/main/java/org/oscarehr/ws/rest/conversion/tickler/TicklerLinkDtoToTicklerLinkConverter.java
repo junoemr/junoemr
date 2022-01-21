@@ -24,8 +24,8 @@
 package org.oscarehr.ws.rest.conversion.tickler;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.common.dao.TicklerDao;
-import org.oscarehr.common.model.TicklerLink;
+import org.oscarehr.ticklers.dao.TicklerDao;
+import org.oscarehr.ticklers.entity.TicklerLink;
 import org.oscarehr.ws.rest.transfer.tickler.TicklerLinkDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
