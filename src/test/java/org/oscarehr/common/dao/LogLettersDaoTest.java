@@ -42,10 +42,12 @@ public class LogLettersDaoTest extends DaoTestFixtures
 	@Autowired
 	protected LogLettersDao logLettersDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("log_letters");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"log_letters"
+		};
 	}
 
 	@Test

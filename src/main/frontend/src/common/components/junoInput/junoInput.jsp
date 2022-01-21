@@ -15,7 +15,8 @@
 						ng-blur="$ctrl.onBlur()"
 						maxlength="{{$ctrl.characterLimit}}"
 						ng-disabled="$ctrl.disabled"
-						placeholder="{{$ctrl.placeholder}}">
+						placeholder="{{$ctrl.placeholder}}"
+						autocomplete="{{$ctrl.autocompleteValue()}}">
 		<div ng-if="!$ctrl.hideCharacterLimit" class="character-display">
 			{{$ctrl.ngModel.length}}/{{$ctrl.characterLimit}}
 		</div>

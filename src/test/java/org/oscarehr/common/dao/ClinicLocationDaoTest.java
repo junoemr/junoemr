@@ -51,12 +51,16 @@ public class ClinicLocationDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ClinicLocationDao clinicLocationDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "clinic_location");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"clinic_location"
+		};
 	}
 
-        @Test
+
+	@Test
         public void testCreate() throws Exception {
                 ClinicLocation entity = new ClinicLocation();
                 EntityDataGenerator.generateTestDataForModelClass(entity);

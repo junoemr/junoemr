@@ -43,10 +43,12 @@ public class OnCallQuestionnaireDaoTest extends DaoTestFixtures
 	@Autowired
 	protected OnCallQuestionnaireDao dao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("oncall_questionnaire");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"oncall_questionnaire"
+		};
 	}
 
 	@Test

@@ -32,13 +32,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.Tickler;
-import org.oscarehr.common.model.TicklerLink;
+import org.oscarehr.ticklers.dao.TicklerDao;
+import org.oscarehr.ticklers.dao.TicklerLinkDao;
+import org.oscarehr.ticklers.entity.Tickler;
+import org.oscarehr.ticklers.entity.TicklerLink;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,12 +52,15 @@ public class TicklerLinkDaoTest extends DaoTestFixtures
 	@Autowired
 	protected TicklerLinkDao ticklerLinkDao;
 
-	@Autowired TicklerDao ticklerDao;
+	@Autowired
+	TicklerDao ticklerDao;
 
-	@Before
-	@After
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("tickler_link", "tickler");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"tickler_link", "tickler"
+		};
 	}
 
 	@Test

@@ -65,11 +65,13 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.dao.ProgramDao;
 import org.oscarehr.PMmodule.dao.ProgramProviderDAO;
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.contact.dao.DemographicContactDao;
 import org.oscarehr.security.dao.SecUserRoleDao;
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.PMmodule.model.ProgramProvider;
@@ -94,7 +96,7 @@ import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.common.model.DemographicQueryFavourite;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.prevention.dao.PreventionDao;
@@ -105,7 +107,7 @@ import org.oscarehr.common.model.Measurement;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Security;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.managers.TicklerManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -117,7 +119,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import oscar.form.FrmLabReq07Record;
 
-
+@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class OntarioMDSpec4DataTest extends DaoTestFixtures
@@ -127,12 +129,11 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
 
 	protected Integer oscarProgramID;
 
-	@Before
-	@After
-	public void before() throws Exception {
-		//SchemaUtils.restoreAllTables();
-		SchemaUtils.restoreTable(
-		    "program",
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"program",
 			"provider",
 			"program_provider",
 			"security",
@@ -148,9 +149,9 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
 			"casemgmt_note_ext",
 			"formLabReq07",
 			"document",
-		    "ctl_document",
+			"ctl_document",
 			"program_queue",
-		    "Facility",
+			"Facility",
 			"issue",
 			"DemographicContact",
 			"appointment",
@@ -158,7 +159,7 @@ public class OntarioMDSpec4DataTest extends DaoTestFixtures
 			"drugs",
 			"measurements",
 			"preventions"
-        );
+		};
 	}
 
 	Document getDocument(String doctype,String docdesc,String docxml,String docfilename,String doccreator,String responsible,String source,Integer program_id,

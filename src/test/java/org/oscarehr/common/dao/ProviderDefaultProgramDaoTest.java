@@ -42,9 +42,12 @@ public class ProviderDefaultProgramDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ProviderDefaultProgramDao providerDefaultProgramDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("provider_default_program", "program", "admission", "program_queue", "Facility","program_provider");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"provider_default_program", "program", "admission", "program_queue", "Facility","program_provider"
+		};
 	}
 
 	@Test

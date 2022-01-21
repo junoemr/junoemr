@@ -71,7 +71,7 @@ import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
-import org.oscarehr.common.dao.DemographicContactDao;
+import org.oscarehr.contact.dao.DemographicContactDao;
 import org.oscarehr.common.dao.DrugReasonDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.PartialDateDao;
@@ -79,7 +79,7 @@ import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicArchive;
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.common.model.Facility;
 import org.oscarehr.common.model.MeasurementsExt;
 import org.oscarehr.common.model.PartialDate;
@@ -93,7 +93,7 @@ import org.oscarehr.hospitalReportManager.dao.HRMDocumentSubClassDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
+import org.oscarehr.hospitalReportManager.model.HRMObservation;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.dao.ProviderDataDao;
@@ -171,6 +171,7 @@ import java.util.zip.ZipInputStream;
     private static final String REPORTBINARY = "Binary";
     private static final String REPORTTEXT = "Text";
     private static final String RISKFACTOR = "Risk";
+	public static final String IMPORT_FILE_PARAM = "importlog";
 
 
     boolean matchProviderNames = true;
@@ -296,7 +297,10 @@ import java.util.zip.ZipInputStream;
 
         //channel warnings and importlog to browser
         request.setAttribute("warnings",warnings);
-        if (importLog!=null) request.setAttribute("importlog",importLog.getPath());
+        if (importLog != null)
+        {
+            request.setAttribute(IMPORT_FILE_PARAM, importLog.getName());
+        }
 
         logger.info("IMPORT PROCESS COMPLETE");
         return mapping.findForward("success");
@@ -1917,13 +1921,17 @@ import java.util.zip.ZipInputStream;
                         HRMDocumentToDemographic hrmDocToDemo = new HRMDocumentToDemographic();
 
                         hrmDoc.setReportFile(HRMfile);
-                        if (repR[i].getSourceFacility()!=null) hrmDoc.setSourceFacility(repR[i].getSourceFacility());
+                        if (repR[i].getSourceFacility()!=null)
+						{
+							// not a typo: The CDS source facility is the name which the sending facility id maps to.
+							hrmDoc.setSendingFacility(repR[i].getSourceFacility());
+						}
                         if (repR[i].getReceivedDateTime()!=null) {
                             hrmDoc.setTimeReceived(dateTimeFPtoDate(repR[i].getReceivedDateTime(), timeShiftInDays));
                         } else {
                             hrmDoc.setTimeReceived(new Date());
                         }
-                        if (repR[i].getHRMResultStatus()!=null) hrmDoc.setReportStatus(repR[i].getHRMResultStatus());
+                        if (repR[i].getHRMResultStatus()!=null) hrmDoc.setReportStatus(HRMDocument.STATUS.fromValueString(repR[i].getHRMResultStatus()));
                         if (repR[i].getClass1()!=null) hrmDoc.setReportType(repR[i].getClass1().toString());
                         if (repR[i].getEventDateTime()!=null) hrmDoc.setReportDate(dateTimeFPtoDate(repR[i].getEventDateTime(), timeShiftInDays));
                         hrmDocDao.persist(hrmDoc);
@@ -1940,11 +1948,11 @@ import java.util.zip.ZipInputStream;
 
                         ReportsReceived.OBRContent[] obr = repR[i].getOBRContentArray();
                         for (int j=0; j<obr.length; j++) {
-                            HRMDocumentSubClass hrmDocSc = new HRMDocumentSubClass();
-                            if (obr[j].getAccompanyingSubClass()!=null) hrmDocSc.setSubClass(obr[j].getAccompanyingSubClass());
-                            if (obr[j].getAccompanyingDescription()!=null) hrmDocSc.setSubClassDescription(obr[j].getAccompanyingDescription());
-                            if (obr[j].getAccompanyingMnemonic()!=null) hrmDocSc.setSubClassMnemonic(obr[j].getAccompanyingMnemonic());
-                            if (obr[j].getObservationDateTime()!=null) hrmDocSc.setSubClassDateTime(dateTimeFPtoDate(obr[j].getObservationDateTime(), timeShiftInDays));
+                            HRMObservation hrmDocSc = new HRMObservation();
+                            if (obr[j].getAccompanyingSubClass()!=null) hrmDocSc.setAccompanyingSubClassName(obr[j].getAccompanyingSubClass());
+                            if (obr[j].getAccompanyingDescription()!=null) hrmDocSc.setAccompanyingSubClassDescription(obr[j].getAccompanyingDescription());
+                            if (obr[j].getAccompanyingMnemonic()!=null) hrmDocSc.setAccompanyingSubClassMnemonic(obr[j].getAccompanyingMnemonic());
+                            if (obr[j].getObservationDateTime()!=null) hrmDocSc.setAccompanyingSubClassObrDate(dateTimeFPtoDate(obr[j].getObservationDateTime(), timeShiftInDays));
                             hrmDocSc.setHrmDocument(hrmDoc);
                             hrmDocSc.setActive(true);
                             hrmDocSubClassDao.persist(hrmDocSc);

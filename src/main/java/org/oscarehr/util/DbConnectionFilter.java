@@ -43,7 +43,7 @@ public class DbConnectionFilter implements javax.servlet.Filter
 	private static final Logger logger = MiscUtils.getLogger();
 
 	private static ThreadLocal<Connection> dbConnection = new ThreadLocal<Connection>();
-
+	
 	/**
 	 * deprecated we should stop using raw jdbc connections. Don't write new code using raw jdbc, use JPA and native queries instead.
 	 */

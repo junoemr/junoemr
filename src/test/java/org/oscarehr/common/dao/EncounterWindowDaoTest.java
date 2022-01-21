@@ -45,10 +45,12 @@ public class EncounterWindowDaoTest extends DaoTestFixtures
 	public EncounterWindowDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("encounterWindow");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"encounterWindow"
+		};
 	}
 
 	@Test

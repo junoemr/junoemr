@@ -229,11 +229,7 @@
 		<put name="rightNavigation" value="/casemgmt/rightColumn.jsp" />
 
 	</definition>
-	<definition name="page.casemgmt.view" path="/casemgmt/encounterLayout.jsp">
-		<put name="navigation" value="/casemgmt/navigation.jsp" />
-		<put name="body" value="/casemgmt/CaseManagementView.jsp" />
-	</definition>
-	
+
 	<!--
 		<definition name="page.customreport.list" path="/PMmodule/layout.jsp">
 		<put name="navigation" value="/PMmodule/navigation.jsp" /> <put

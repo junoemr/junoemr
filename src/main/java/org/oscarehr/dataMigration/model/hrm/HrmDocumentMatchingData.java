@@ -31,5 +31,5 @@ public class HrmDocumentMatchingData
 	private String reportLessTransactionInfoHash;
 	private String reportLessDemographicInfoHash;
 	private String unmatchedProviders;
-	private Integer numDuplicatesReceived;
+	private Integer numDuplicatesReceived = 0;
 }

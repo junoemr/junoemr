@@ -39,7 +39,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.common.model.TicklerTextSuggest;
+import org.oscarehr.ticklers.dao.TicklerTextSuggestDao;
+import org.oscarehr.ticklers.entity.TicklerTextSuggest;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,11 +53,14 @@ public class TicklerTextSuggestDaoTest extends DaoTestFixtures
 	@Autowired
 	protected TicklerTextSuggestDao ticklerTextSuggestDao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "tickler_text_suggest");
-		
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"tickler_text_suggest"
+		};
 	}
+
 	@Test
 	public void testGetActiveTicklerTextSuggests() throws Exception {
 		

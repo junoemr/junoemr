@@ -43,10 +43,12 @@ public class Hl7OrcDaoTest extends DaoTestFixtures
 	@Autowired
 	public Hl7OrcDao hl7OrcDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("hl7_orc", "hl7_pid", "hl7_link", "hl7_msh", "hl7_obr", "hl7_obx");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"hl7_orc", "hl7_pid", "hl7_link", "hl7_msh", "hl7_obr", "hl7_obx"
+		};
 	}
 
 	@Test

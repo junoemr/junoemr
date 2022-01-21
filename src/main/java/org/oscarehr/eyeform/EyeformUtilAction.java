@@ -40,7 +40,7 @@ import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DiagnosticCode;
 import org.oscarehr.common.model.EyeformMacro;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.eyeform.model.EyeformMacroBillingItem;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.managers.TicklerManager;

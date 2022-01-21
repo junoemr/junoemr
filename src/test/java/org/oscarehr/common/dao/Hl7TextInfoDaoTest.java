@@ -35,6 +35,9 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -43,9 +46,21 @@ public class Hl7TextInfoDaoTest extends DaoTestFixtures
 	@Autowired
 	protected Hl7TextInfoDao hl7TextInfoDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("hl7TextInfo", "patientLabRouting", "hl7TextInfo", "providerLabRouting", "ctl_document", "demographic", "hl7TextMessage");
+	@Override
+	protected List<String> getSimpleExceptionTestExcludes()
+	{
+		List<String> result = super.getSimpleExceptionTestExcludes();
+		result.add("listBasicInfoByDemographicNo");
+		result.add("countByDemographicNo");
+		return result;
+	}
+
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"hl7TextInfo", "patientLabRouting", "hl7TextInfo", "providerLabRouting", "ctl_document", "demographic", "hl7TextMessage"
+		};
 	}
 
 	@Test

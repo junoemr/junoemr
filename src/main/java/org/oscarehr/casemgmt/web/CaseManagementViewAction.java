@@ -24,6 +24,28 @@
 package org.oscarehr.casemgmt.web;
 
 import com.quatro.model.security.Secrole;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Vector;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import net.sf.json.processors.JsDateJsonBeanProcessor;
@@ -36,7 +58,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.LabelValueBean;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
-import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.PMmodule.model.ProgramTeam;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicIssue;
@@ -63,7 +84,6 @@ import org.oscarehr.casemgmt.web.formbeans.CaseManagementViewFormBean;
 import org.oscarehr.common.dao.BillingONCHeader1Dao;
 import org.oscarehr.common.dao.CaseManagementIssueNotesDao;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.EncounterFormDao;
 import org.oscarehr.common.dao.GroupNoteDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.BillingONCHeader1;
@@ -98,29 +118,6 @@ import oscar.oscarEncounter.data.EctFormData.PatientForm;
 import oscar.oscarRx.pageUtil.RxSessionBean;
 import oscar.util.ConversionUtils;
 import oscar.util.OscarRoleObjectPrivilege;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Vector;
 
 /*
  * Updated by Eugene Petruhin on 21 jan 2009 while fixing missing "New Note" link
@@ -262,9 +259,6 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		long beginning = start;
 		long current = 0;
 		CaseManagementViewFormBean caseForm = (CaseManagementViewFormBean) form;
-		boolean useNewCaseMgmt = false;
-		String useNewCaseMgmtString = (String) request.getSession().getAttribute("newCaseManagement");
-		if (useNewCaseMgmtString != null) useNewCaseMgmt = Boolean.parseBoolean(useNewCaseMgmtString);
 
 		logger.debug("Starting VIEW");
 		String tab = request.getParameter("tab");
@@ -362,45 +356,6 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		}
 		request.setAttribute("teamName", teamName);
 
-		if (OscarProperties.getInstance().isCaisiLoaded() && !useNewCaseMgmt)
-		{
-
-			logger.debug("Get program providers");
-			List<String> teamMembers = new ArrayList<String>();
-			List<ProgramProvider> programProviders = programMgr.getProgramProviders(programId);
-			current = System.currentTimeMillis();
-			logger.debug("Get program providers " + (current - start));
-			start = current;
-
-			for (ProgramProvider programProvider : programProviders)
-			{
-				logger.debug("Get program provider teams");
-				for (ProgramTeam programTeam : programProvider.getTeams())
-				{
-					String programTeamName = programTeam.getName();
-					if (programTeamName != null && programTeamName.equals(request.getAttribute("teamName")))
-					{
-						teamMembers.add(programProvider.getProvider().getFormattedName());
-					}
-				}
-				current = System.currentTimeMillis();
-				logger.debug("Get program provider teams " + (current - start));
-				start = current;
-
-			}
-			request.setAttribute("teamMembers", teamMembers);
-
-			/* prepare new form list for patient */
-			EncounterFormDao encounterFormDao = (EncounterFormDao) SpringUtils.getBean("encounterFormDao");
-			session.setAttribute("casemgmt_newFormBeans", encounterFormDao.findAll());
-
-			/* prepare messenger list */
-			session.setAttribute("casemgmt_msgBeans", this.caseManagementMgr.getMsgBeans(new Integer(demoNo)));
-
-			// readonly access to define creat a new note button in jsp.
-			session.setAttribute("readonly", new Boolean(this.caseManagementMgr.hasAccessRight("note-read-only", "access", loggedInInfo.getLoggedInProviderNo(), demoNo, (String) session.getAttribute("case_program_id"))));
-
-		}
 		/* Dx */
 		List<Dxresearch> dxList = this.caseManagementMgr.getDxByDemographicNo(demoNo);
 		Map<String, Dxresearch> dxMap = new HashMap<String, Dxresearch>();
@@ -419,14 +374,7 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		/* ISSUES */
 		if ("Current Issues".equals(tab))
 		{
-			if (useNewCaseMgmt)
-			{
-				viewCurrentIssuesTabForNewCme(request, caseForm, demoNo, programId);
-			}
-			else
-			{
-				viewCurrentIssuesTabForOldCme(request, caseForm, demoNo, programId);
-			}
+			viewCurrentIssuesTabForNewCme(request, caseForm, demoNo, programId);
 		} // end Current Issues Tab
 
 		logger.debug("Get CPP");
@@ -488,21 +436,14 @@ public class CaseManagementViewAction extends BaseCaseManagementViewAction {
 		else
 		{
 
-			if (useNewCaseMgmt)
+			String fwdName = request.getParameter("ajaxview");
+			if (StringUtils.isEmpty(fwdName) || fwdName.equalsIgnoreCase("null"))
 			{
-				String fwdName = request.getParameter("ajaxview");
-				if (StringUtils.isEmpty(fwdName) || fwdName.equalsIgnoreCase("null"))
-				{
-					return mapping.findForward("page.newcasemgmt.view");
-				}
-				else
-				{
-					return mapping.findForward(fwdName);
-				}
+				return mapping.findForward("page.newcasemgmt.view");
 			}
 			else
 			{
-				return mapping.findForward("page.casemgmt.view");
+				return mapping.findForward(fwdName);
 			}
 		}
 	}

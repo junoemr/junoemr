@@ -35,7 +35,6 @@ import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.EpisodeDao;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
-import org.oscarehr.common.dao.TicklerDao;
 import org.oscarehr.common.hl7.copd.mapper.AlertMapper;
 import org.oscarehr.common.hl7.copd.mapper.AllergyMapper;
 import org.oscarehr.common.hl7.copd.mapper.AppointmentMapper;
@@ -65,14 +64,14 @@ import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.MessageList;
 import org.oscarehr.common.model.MessageTbl;
 import org.oscarehr.common.model.ProviderInboxItem;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.demographic.model.DemographicCust;
 import org.oscarehr.demographic.model.DemographicExt;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
-import org.oscarehr.dataMigration.transfer.CoPDRecordData;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
@@ -83,6 +82,7 @@ import org.oscarehr.encounterNote.service.MedicalHistoryNoteService;
 import org.oscarehr.encounterNote.service.ReminderNoteService;
 import org.oscarehr.encounterNote.service.SocialHistoryNoteService;
 import org.oscarehr.labs.service.LabService;
+import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.message.service.MessageService;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.model.Prevention;
@@ -96,6 +96,8 @@ import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.rx.dao.PrescriptionDao;
 import org.oscarehr.rx.model.Drug;
 import org.oscarehr.rx.model.Prescription;
+import org.oscarehr.ticklers.dao.TicklerDao;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,8 +121,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -204,6 +206,9 @@ public class CoPDImportService
 
 	@Autowired
 	ProviderRoleService providerRoleService;
+
+	@Autowired
+	ProviderManager2 providerManager2;
 
 	private static long missingDocumentCount = 0;
 
@@ -420,6 +425,7 @@ public class CoPDImportService
 				String billCenterCode = properties.getProperty("default_bill_center", "");
 				provider = providerService.addNewProvider(IMPORT_PROVIDER, provider, billCenterCode);
 				providerRoleService.setDefaultRoleForNewProvider(provider.getId());
+				providerManager2.updateSingleSetting(provider.getId(), UserProperty.COBALT, UserProperty.PROPERTY_ON_YES);
 
 				logger.info("Created new Provider record " + provider.getId() + " (" + provider.getLastName() + "," + provider.getFirstName() + ")");
 			}

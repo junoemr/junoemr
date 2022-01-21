@@ -26,9 +26,14 @@ package org.oscarehr.e2e.model;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.export.AbstractExportModelTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class PatientExportTest extends AbstractExportModelTest {
 	@Test
 	public void patientExportTest() {

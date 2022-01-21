@@ -33,7 +33,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts.util.MessageResources;
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.managers.TicklerManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;

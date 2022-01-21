@@ -29,8 +29,8 @@
 <%@ page import="java.util.Properties"%>
 <%@ page import="java.util.List, org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@ page import="org.oscarehr.common.dao.ContactSpecialtyDao" %>
-<%@ page import="org.oscarehr.common.model.ContactSpecialty" %>
+<%@ page import="org.oscarehr.contact.dao.ContactSpecialtyDao" %>
+<%@ page import="org.oscarehr.contact.entity.ContactSpecialty" %>
 
 <html:html locale="true">
 <head>

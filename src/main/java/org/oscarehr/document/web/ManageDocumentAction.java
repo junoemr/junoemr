@@ -356,7 +356,8 @@ public class ManageDocumentAction extends DispatchAction {
 		File returnFile = null;
 		try
 		{
-			if(document.hasEncodingError())
+			String pdfMimeType = GenericFile.ALLOWED_CONTENT_TYPES.APPLICATION_PDF.getContentType();
+			if(document.hasEncodingError() || !pdfMimeType.equals(document.getContenttype()))
 			{
 				returnFile = generatePdfPreviewUnavailableImage();
 			}
@@ -915,54 +916,49 @@ public class ManageDocumentAction extends DispatchAction {
 			programId = pp.getProgramId().intValue();
 		}
 
-		GenericFile sourceFile = FileFactory.getExistingFile(sourceFilePath);
-		boolean success = sourceFile.moveToDocuments();
-		if(!success)
+		boolean success = false;
+		try
 		{
-			logger.error("Not able to move " + sourceFile.getName() + " to documents");
-			// File was not successfully moved
-		}
-		else
-		{
-            try
-            {
-	            Document document = new Document();
-	            document.setPublic1(false);
-	            document.setDocClass(docClass);
-	            document.setDocSubClass(docSubClass);
-	            document.setResponsible(user);
-	            document.setDocCreator(user);
-	            document.setDocdesc(documentDescription);
-	            document.setDoctype(docType);
-	            document.setDocfilename(fileName);
-	            document.setSource(source);
-	            document.setObservationdate(obDate);
-	            document.setProgramId(programId);
+			GenericFile sourceFile = FileFactory.getExistingFile(sourceFilePath);
+			sourceFile.moveToDocuments();
 
-	            document = documentService.uploadNewDemographicDocument(document, sourceFile, demographicNo);
-	            documentNo = document.getDocumentNo();
+			Document document = new Document();
+			document.setPublic1(false);
+			document.setDocClass(docClass);
+			document.setDocSubClass(docSubClass);
+			document.setResponsible(user);
+			document.setDocCreator(user);
+			document.setDocdesc(documentDescription);
+			document.setDoctype(docType);
+			document.setDocfilename(fileName);
+			document.setSource(source);
+			document.setObservationdate(obDate);
+			document.setProgramId(programId);
 
-	            if(flagproviders != null && flagproviders.length > 0)
-	            {
-		            try
-		            {
-		            	inboxManager.addDocumentToProviderInbox(documentNo, flagproviders);
-		            }
-		            catch(Exception e)
-		            {
+			document = documentService.uploadNewDemographicDocument(document, sourceFile, demographicNo);
+			documentNo = document.getDocumentNo();
+
+			if(flagproviders != null && flagproviders.length > 0)
+			{
+				try
+				{
+					inboxManager.addDocumentToProviderInbox(documentNo, flagproviders);
+				}
+				catch(Exception e)
+				{
 			            MiscUtils.getLogger().error("Error routing to provider ", e);
-		            }
-	            }
-	            success = true;
-            }
-            catch (IOException e) {
-                MiscUtils.getLogger().error("Error", e);
-	            success = false;
-            }
-        }
-        String logStatus = success ? LogConst.STATUS_SUCCESS : LogConst.STATUS_FAILURE;
-        LogAction.addLogEntry(user, demographicNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT,
-		        logStatus, (documentNo==null)?null:String.valueOf(documentNo), request.getRemoteAddr(), fileName);
+				}
+			}
+
+			LogAction.addLogEntry(user, demographicNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT,
+				LogConst.STATUS_SUCCESS, (documentNo==null)?null:String.valueOf(documentNo), request.getRemoteAddr(), fileName);
+		}
+		catch (IOException e)
+		{
+			MiscUtils.getLogger().error("Error", e);
+			LogAction.addLogEntry(user, demographicNo, LogConst.ACTION_ADD, LogConst.CON_DOCUMENT,
+				LogConst.STATUS_FAILURE, (documentNo==null)?null:String.valueOf(documentNo), request.getRemoteAddr(), fileName);
+		}
 
         return (mapping.findForward("nextIncomingDoc"));
     }

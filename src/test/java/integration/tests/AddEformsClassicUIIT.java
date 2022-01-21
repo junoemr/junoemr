@@ -31,6 +31,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.By.ByLinkText;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 
 import java.sql.SQLException;
@@ -39,6 +41,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysById;
+import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -52,7 +58,7 @@ public class AddEformsClassicUIIT extends SeleniumTestBase
 			"eform_data", "eform_values", "Facility", "issue", "log", "log_ws_rest", "measurementType",
 			"LookupList", "LookupListItem", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
 			"providerArchive", "providerbillcenter", "ProviderPreference", "roster_status", "security", "secUserRole",
-			"tickler_text_suggest", "validations"
+			"tickler_text_suggest", "validations", "log_ws_rest", "provider_recent_demographic_access"
 		};
 	}
 
@@ -72,17 +78,13 @@ public class AddEformsClassicUIIT extends SeleniumTestBase
 		String subject = "EFormTest";
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
-		driver.findElement(By.xpath("//div[@id='menuTitleeforms']//descendant::a[contains(., '+')]")).click();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-		PageUtil.switchToLastWindow(driver);
-		driver.findElement(By.linkText("letter")).click();
-		PageUtil.switchToLastWindow(driver);
-		driver.findElement(By.id("subject")).sendKeys(subject);
-		driver.findElement((By.xpath("//input[@value='Submit']"))).click();
+		clickWaitSwitchToLast(driver, webDriverWait, By.xpath("//div[@id='menuTitleeforms']//descendant::a[contains(., '+')]"));
+		clickWaitSwitchToLast(driver, webDriverWait, By.linkText("letter"));
+		findWaitSendKeysById(driver, webDriverWait, "subject", subject);
+		findWaitClickByXpath(driver, webDriverWait, "//input[@value='Submit']");
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(subject)));
 		Assert.assertTrue("Eform Letter is NOT added successfully.", PageUtil.isExistsBy(By.partialLinkText(subject), driver));
 	}
 }

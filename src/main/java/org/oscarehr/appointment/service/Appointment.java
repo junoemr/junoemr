@@ -30,9 +30,9 @@ import org.oscarehr.common.dao.LookupListItemDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.LookupList;
 import org.oscarehr.common.model.LookupListItem;
+import org.oscarehr.dataMigration.converter.in.AppointmentModelToDbConverter;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.dataMigration.converter.in.AppointmentModelToDbConverter;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.dto.ClinicUserLoginTokenTo1;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
@@ -430,7 +430,8 @@ public class Appointment
 						details.isConfirmed(),
 						details.getCreatorSecurityId(),
 						details.getBookingSource(),
-						isCritical
+						isCritical,
+						details.getVirtualAppointmentType()
 				);
 				// for the case where appointments are saved with a name but no demographic
 				if((appointment.getDemographicNo() == null || appointment.getDemographicNo() == 0) && details.getName() != null)
@@ -509,9 +510,16 @@ public class Appointment
 	private void validateAppointmentUpdate(org.oscarehr.common.model.Appointment oldRecord, org.oscarehr.common.model.Appointment newRecord) throws IllegalArgumentException
 	{
 		// Virtual appointments can not have their locations changed
-		if (newRecord.getIsVirtual() && !newRecord.getLocation().equals(oldRecord.getLocation()))
+		if (newRecord.getIsVirtual())
 		{
-			throw new IllegalArgumentException("Appointment ID: " + newRecord.getId() + " can't be updated. Virtual appointments can not change location.");
+			if(!newRecord.getLocation().equals(oldRecord.getLocation()))
+			{
+				throw new IllegalArgumentException("Appointment ID: " + newRecord.getId() + " can't be updated. Virtual appointments can not change location.");
+			}
+			if(newRecord.getDemographicNo() != oldRecord.getDemographicNo())
+			{
+				throw new IllegalArgumentException("Appointment ID: " + newRecord.getId() + " can't be updated. Virtual appointments can not change demographic.");
+			}
 		}
 	}
 

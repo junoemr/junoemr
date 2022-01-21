@@ -30,6 +30,7 @@ require('angular-drag-and-drop-lists');
 require('file-saver');
 require('chart.js');
 require('angular-chart.js');
+require('detect-browser');
 
 import {FORM_CONTROLLER_STATES} from "./src/record/forms/formsConstants";
 import {EDIT_PROVIDER_MODE} from "./src/admin/section/editProviderPage/editProviderAdminConstants";
@@ -167,11 +168,31 @@ oscarApp.config([
 			url: '/panelManagement',
 			component: 'panelManagementAdmin'
 		})
-        .state('admin.iMDHealth',
-        {
-            url: '/imdHealth',
-            component: 'imdHealthAdmin',
-        })
+		.state('admin.hrm',
+		{
+			url: '/hrm',
+			component: 'hrmIndex'
+		})
+		.state('admin.hrm.admin',
+		{
+			url: '/admin',
+			component: 'hrmAdmin',
+		})
+		.state('admin.hrm.settings',
+		{
+			url: '/settings',
+			component: 'hrmSettings',
+		})
+		.state('admin.hrm.category',
+		{
+			url: '/category',
+			component: 'hrmCategory',
+		})
+        	.state('admin.iMDHealth',
+        	{
+            		url: '/imdHealth',
+            		component: 'imdHealthAdmin',
+        	})
 		.state('admin.iceFall',
 		{
 			url: '/iceFall',
@@ -282,18 +303,7 @@ oscarApp.config([
 		.state('ticklers',
 		{
 			url: '/ticklers',
-			templateUrl: 'src/tickler/ticklerList.jsp',
-			controller: 'Tickler.TicklerListController as ticklerListCtrl',
-			resolve:
-			{
-				providers: ['providerService', function(providerService)
-				{
-					return providerService.searchProviders(
-					{
-						active: true
-					});
-				}],
-			}
+			component: "ticklerListController",
 		})
 		.state('search',
 		{
@@ -842,18 +852,7 @@ oscarApp.config([
 		.state('record.tickler',
 		{
 			url: '/tickler',
-			templateUrl: 'src/tickler/ticklerList.jsp',
-			controller: 'Tickler.TicklerListController as ticklerListCtrl',
-			resolve:
-			{
-				providers: ['providerService', function(providerService)
-				{
-					return providerService.searchProviders(
-					{
-						active: true
-					});
-				}]
-			},
+			component: "ticklerListController",
 			meta:
 			{
 				auth: {
@@ -864,7 +863,7 @@ oscarApp.config([
 		.state('record.tracker',
 		{
 			url: '/tracker',
-			component: 'healthTracker',
+			component: 'healthTrackerPage',
 			resolve:
 			{
 				user: ['providerService', function (providerService)

@@ -129,13 +129,13 @@ public class CDSReportDocumentImportMapperTest
 	@Test
 	public void testReviewer_Null()
 	{
-		assertNull(cdsReportDocumentImportMapper.getReviewer(null));
+		assertNull(cdsReportDocumentImportMapper.getFirstReviewer(null));
 	}
 
 	@Test
 	public void testReviewer_Empty()
 	{
-		assertNull(cdsReportDocumentImportMapper.getReviewer(new ArrayList<>()));
+		assertNull(cdsReportDocumentImportMapper.getFirstReviewer(new ArrayList<>()));
 	}
 
 	@Test
@@ -183,7 +183,7 @@ public class CDSReportDocumentImportMapperTest
 		reportReviewed.setDateTimeReportReviewed(dateFullOrPartial);
 		reviewers.add(reportReviewed);
 
-		Reviewer convertedReviewer = cdsReportDocumentImportMapper.getReviewer(reviewers);
+		Reviewer convertedReviewer = cdsReportDocumentImportMapper.getFirstReviewer(reviewers);
 
 		assertEquals(expectedFirstName, convertedReviewer.getFirstName());
 		assertEquals(expectedLastName, convertedReviewer.getLastName());

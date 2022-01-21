@@ -26,16 +26,16 @@
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security" %>
 
 <%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
-<%@ page import="org.oscarehr.common.dao.DemographicDao" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicDao" %>
 <%@ page import="org.oscarehr.common.dao.SiteDao" %>
-<%@ page import="org.oscarehr.common.dao.TicklerLinkDao" %>
+<%@ page import="org.oscarehr.ticklers.dao.TicklerLinkDao" %>
 <%@ page import="org.oscarehr.common.model.CustomFilter" %>
-<%@ page import="org.oscarehr.common.model.Demographic" %>
+<%@ page import="org.oscarehr.demographic.model.Demographic" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ page import="org.oscarehr.common.model.Site" %>
-<%@ page import="org.oscarehr.common.model.Tickler" %>
-<%@ page import="org.oscarehr.common.model.TicklerComment" %>
-<%@ page import="org.oscarehr.common.model.TicklerLink" %>
+<%@ page import="org.oscarehr.ticklers.entity.Tickler" %>
+<%@ page import="org.oscarehr.ticklers.entity.TicklerComment" %>
+<%@ page import="org.oscarehr.ticklers.entity.TicklerLink" %>
 <%@ page import="org.oscarehr.managers.TicklerManager" %>
 <%@ page import="org.oscarehr.util.LocaleUtils" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
@@ -53,12 +53,8 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="org.oscarehr.common.dao.UserPropertyDAO" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
-<%@ page import="oscar.util.StringUtils" %>
-<%@ page import="org.oscarehr.ticklers.search.TicklerCriteriaSearch" %>
-<%@ page import="java.text.ParseException" %>
-<%@ page import="java.util.*" %>
-<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="org.json.JSONObject" %>
+<%@ page import="java.util.Optional" %>
 
 <%
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -137,13 +133,14 @@
 	String demographic_chartno = "";
 	if (tempDemoNo != null && !tempDemoNo.trim().isEmpty() && !tempDemoNo.equals("all"))
 	{
-		DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
-		Demographic de = demographicDao.getDemographic(tempDemoNo);
-		if (de != null)
+		DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+		Optional<Demographic> optionalDemographic = demographicDao.findOptional(Integer.parseInt(tempDemoNo));
+		if (optionalDemographic.isPresent())
 		{
+			Demographic de = optionalDemographic.get();
 			demographic_no = tempDemoNo;
 			demographic_name = de.getDisplayName();
-			demographic_name_bd = demographic_name + "(" + de.getBirthDayAsString() + ")";
+			demographic_name_bd = demographic_name + "(" + ConversionUtils.toDateString(de.getDateOfBirth()) + ")";
 			demographic_chartno = de.getChartNo();
 			demographic_chartno = (demographic_chartno == null) ? "" : demographic_chartno;
 		}
@@ -1299,13 +1296,13 @@
 					}
 				%>
 				<TD width="12%" ROWSPAN="1" class="<%=cellColour%>">
-					<a href=# onClick="popupPage(600,800,'../demographic/demographiccontrol.jsp?demographic_no=<%=demo.getDemographicNo()%>&displaymode=edit&dboperation=search_detail')">
+					<a href=# onClick="popupPage(600,800,'../demographic/demographiccontrol.jsp?demographic_no=<%=demo.getId()%>&displaymode=edit&dboperation=search_detail')">
 						<%=demo.getDisplayName()%>
 					</a>
 					<span class="pipe-separator">|</span>
 					<a title="<bean:message key="demographic.demographiceditdemographic.btnEChart"/>"
 					   href=# onClick="popupPage(710, 1024,'<c:out
-							value="${ctx}"/>/oscarEncounter/IncomingEncounter.do?providerNo=<%=user_no%>&demographicNo=<%=demo.getDemographicNo()%>')">
+							value="${ctx}"/>/oscarEncounter/IncomingEncounter.do?providerNo=<%=user_no%>&demographicNo=<%=demo.getId()%>')">
 						E
 					</a>
 				</TD>
@@ -1377,7 +1374,7 @@
 				</TD>
 				<td ROWSPAN="1" class="<%=cellColour%> noprint">
 					<a href="#"
-					   onClick="return openNoteDialog('<%=demo.getDemographicNo() %>','<%=tickler.getId() %>');return false;">
+					   onClick="return openNoteDialog('<%=demo.getId() %>','<%=tickler.getId() %>');return false;">
 						<img border="0" src="<%=request.getContextPath()%>/images/notepad.gif"/>
 					</a>
 				</td>

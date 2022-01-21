@@ -24,7 +24,7 @@ package org.oscarehr.dataMigration.converter.out.hrm;
 
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
-import org.oscarehr.dataMigration.model.hrm.HrmCategory;
+import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
 import org.oscarehr.dataMigration.model.hrm.HrmComment;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmDocumentMatchingData;
@@ -32,7 +32,7 @@ import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.hospitalReportManager.model.HRMCategory;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentSubClass;
+import org.oscarehr.hospitalReportManager.model.HRMObservation;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -54,12 +54,13 @@ public class HrmDocumentDbToModelConverter extends
 		hrmDocument.setReportDateTime(ConversionUtils.toNullableLocalDateTime(input.getReportDate()));
 		hrmDocument.setReceivedDateTime(ConversionUtils.toNullableLocalDateTime(input.getTimeReceived()));
 		hrmDocument.setDescription(input.getDescription());
-		hrmDocument.setSourceFacility(input.getSourceFacility());
+		hrmDocument.setSendingFacility(input.getSendingFacility());
 		hrmDocument.setSendingFacilityId(input.getSendingFacilityId());
 		hrmDocument.setSendingFacilityReport(input.getSendingFacilityReportId());
 		hrmDocument.setCreatedBy(null); // TODO not sure how to determine this
-		hrmDocument.setReportStatus(HrmDocument.REPORT_STATUS.fromValueString(input.getReportStatus()));
-		hrmDocument.setReportClass(HrmDocument.REPORT_CLASS.fromValueString(input.getReportType()));
+		hrmDocument.setReportStatus(HrmDocument.ReportStatus.fromValueString(input.getReportStatus().toValueString()));
+		hrmDocument.setReportClass(HrmDocument.ReportClass.fromValueString(input.getReportType()));
+		hrmDocument.setReportSubClass(input.getSubClass());
 		hrmDocument.setMessageUniqueId(input.getMessageUniqueId());
 		hrmDocument.setDeliverToUserId(input.getDeliverToUserId());
 
@@ -74,15 +75,15 @@ public class HrmDocumentDbToModelConverter extends
 			throw new RuntimeException("Missing HRM Document File", e);
 		}
 
-		hrmDocument.setHashData(getHashData(input));
-		hrmDocument.setObservations(getObservations(input.getDocumentSubClassList()));
-		hrmDocument.setComments(getComments(input.getCommentList()));
-		hrmDocument.setCategory(getCategory(input.getHrmCategory()));
+		hrmDocument.setMatchingData(convertDocumentMatchingData(input));
+		hrmDocument.setObservations(convertObservations(input.getObservationList()));
+		hrmDocument.setComments(convertComments(input.getCommentList()));
+		hrmDocument.setCategory(convertCategory(input.getHrmCategory()));
 
 		return hrmDocument;
 	}
 
-	protected HrmDocumentMatchingData getHashData(HRMDocument input)
+	protected HrmDocumentMatchingData convertDocumentMatchingData(HRMDocument input)
 	{
 		HrmDocumentMatchingData hashData = new HrmDocumentMatchingData();
 		hashData.setReportHash(input.getReportHash());
@@ -93,25 +94,25 @@ public class HrmDocumentDbToModelConverter extends
 		return hashData;
 	}
 
-	protected List<HrmObservation> getObservations(List<HRMDocumentSubClass> subClassList)
+	protected List<HrmObservation> convertObservations(List<HRMObservation> subClassList)
 	{
 		List<HrmObservation> observations = new ArrayList<>(subClassList.size());
 
-		for(HRMDocumentSubClass subClass : subClassList)
+		for(HRMObservation subClass : subClassList)
 		{
 			HrmObservation observation = new HrmObservation();
 			observation.setId(subClass.getId());
-			observation.setAccompanyingSubClass(subClass.getSubClass());
-			observation.setAccompanyingMnemonic(subClass.getSubClassMnemonic());
-			observation.setAccompanyingDescription(subClass.getSubClassDescription());
-			observation.setObservationDateTime(ConversionUtils.toNullableLocalDateTime(subClass.getSubClassDateTime()));
+			observation.setAccompanyingSubClass(subClass.getAccompanyingSubClassName());
+			observation.setAccompanyingMnemonic(subClass.getAccompanyingSubClassMnemonic());
+			observation.setAccompanyingDescription(subClass.getAccompanyingSubClassDescription());
+			observation.setObservationDateTime(ConversionUtils.toNullableLocalDateTime(subClass.getAccompanyingSubClassObrDate()));
 			observations.add(observation);
 		}
 
 		return observations;
 	}
 
-	protected List<HrmComment> getComments(List<HRMDocumentComment> commentList)
+	protected List<HrmComment> convertComments(List<HRMDocumentComment> commentList)
 	{
 		List<HrmComment> comments = new ArrayList<>(commentList.size());
 		for(HRMDocumentComment hrmComment : commentList)
@@ -126,15 +127,15 @@ public class HrmDocumentDbToModelConverter extends
 		return comments;
 	}
 
-	protected HrmCategory getCategory(HRMCategory hrmCategory)
+	protected HrmCategoryModel convertCategory(HRMCategory hrmCategory)
 	{
-		HrmCategory category = null;
+		HrmCategoryModel category = null;
 		if(hrmCategory != null)
 		{
-			category = new HrmCategory();
+			category = new HrmCategoryModel();
 			category.setId(hrmCategory.getId());
 			category.setName(hrmCategory.getCategoryName());
-			category.setSubClassNameMnemonic(hrmCategory.getSubClassNameMnemonic());
+			category.setDisabledAt(hrmCategory.getDisabledAt());
 		}
 		return category;
 	}

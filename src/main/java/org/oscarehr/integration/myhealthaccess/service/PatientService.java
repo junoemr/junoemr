@@ -46,6 +46,7 @@ import org.springframework.util.MultiValueMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service("myHealthPatientService")
@@ -57,6 +58,10 @@ public class PatientService extends BaseService
 	@Autowired
 	DemographicExtDao demographicExtDao;
 
+
+	// ==========================================================================
+	// Public Methods
+	// ==========================================================================
 
 	public boolean isPatientConfirmed(Integer demographicNo, Integration integration)
 	{
@@ -76,18 +81,8 @@ public class PatientService extends BaseService
 		{
 			if (integration != null)
 			{
-				try
-				{
-					MHAPatient patient = getConfirmedPatientByDemographicNo(integration, demographicNo);
-					if (patient != null)
-					{
-						return confirmedStatuses.contains(patient.getLinkStatus());
-					}
-				}
-				catch(RecordNotFoundException | RecordNotUniqueException e)
-				{
-					return false;
-				}
+				Optional<MHAPatient> patient = getPatient(integration, this.demographicDao.find(demographicNo));
+				return patient.filter(mhaPatient -> confirmedStatuses.contains(mhaPatient.getLinkStatus())).isPresent();
 			}
 		}
 		catch(InvalidIntegrationException e)
@@ -95,55 +90,6 @@ public class PatientService extends BaseService
 			logInvalidIntegrationWarn(e);
 		}
 		return false;
-	}
-
-	/**
-	 * get a mha patient via hin lookup
-	 * @param integration - the mha integration to look in
-	 * @param hin - the health number to search
-	 * @param hinProvince - the province of the health number
-	 * @param isNewborn - if the patient is a newborn or not. This determines which set of patients MHA will search.
-	 * @return an MHA patient object.
-	 */
-	public MHAPatient getPatientByHin(Integration integration, String hin, MHAPatient.PROVINCE_CODES hinProvince, boolean isNewborn)
-	{
-		if (hin == null || hin.isEmpty())
-		{
-			throw new IllegalArgumentException("hin cannot be null or empty");
-		}
-
-		try
-		{
-			RestClientBase restClient = RestClientFactory.getRestClient(integration);
-
-			String url = restClient.formatEndpoint(
-					"/clinic/" + integration.getRemoteId() +
-					"/patients?search_by=hin&health_number=%s&health_care_province=%s&newborn=%s",
-					hin,
-					hinProvince,
-					isNewborn);
-
-			PatientSingleSearchResponseTo1 response = restClient.doGet(url, PatientSingleSearchResponseTo1.class);
-
-			if (response.isSuccess())
-			{
-				return new MHAPatient(response.getPatientTo1());
-			}
-			else if (response.isNotFound())
-			{
-				throw new RecordNotFoundException("Could not find MHA patient with hin: " + hin + " province: " + hinProvince.toString());
-			}
-			else if (response.isNotUnique())
-			{
-				throw new RecordNotUniqueException("Multiple patients with hin: " + hin + " province: " + hinProvince.toString());
-			}
-		}
-		catch(InvalidIntegrationException e)
-		{
-			logInvalidIntegrationWarn(e);
-		}
-
-		return null;
 	}
 
 	/**
@@ -228,43 +174,6 @@ public class PatientService extends BaseService
 	}
 
 	/**
-	 * get a confirmed MHA patient by demographic number
-	 * @param integration - the integration to search
-	 * @param demographicNo - the demographic number to look up.
-	 * @return mha patient object
-	 */
-	public MHAPatient getConfirmedPatientByDemographicNo(Integration integration, Integer demographicNo)
-	{
-		try
-		{
-			RestClientBase restClient = RestClientFactory.getRestClient(integration);
-
-			String url = restClient.formatEndpoint("/clinic/" + integration.getRemoteId() +
-					"/patients?search_by=remote_id&remote_id=%s", demographicNo);
-			PatientSingleSearchResponseTo1 response = restClient.doGet(url, PatientSingleSearchResponseTo1.class);
-
-			if (response.isSuccess())
-			{
-				return new MHAPatient(response.getPatientTo1());
-			}
-			else if (response.isNotFound())
-			{
-				throw new RecordNotFoundException("Could not find MHA patient with demographicNo: " + demographicNo.toString());
-			}
-			else if (response.isNotUnique())
-			{
-				throw new RecordNotUniqueException("Multiple patients with demographicNo: " + demographicNo.toString());
-			}
-		}
-		catch(InvalidIntegrationException e)
-		{
-			logInvalidIntegrationWarn(e);
-		}
-
-		return null;
-	}
-
-	/**
 	 * get at remote patient from MHA by remote id
 	 * @param integration - the integration to fetch the patient from
 	 * @param remotePatientId - the remote patient id to fetch
@@ -283,45 +192,17 @@ public class PatientService extends BaseService
 
 	/**
 	 * get a remote MHA patient
+	 * @param integration - the MHA integration to search for the MHA profile in.
 	 * @param demographic - the demographic who's remote MHA patient will be fetched
 	 * @return - the remote MHA patient.
 	 */
-	public MHAPatient getPatient(Integration integration, Demographic demographic)
+	public Optional<MHAPatient> getPatient(Integration integration, Demographic demographic)
 	{
-		if (isPatientConfirmed(demographic.getId(), integration))
-		{
-			return getConfirmedPatientByDemographicNo(integration, demographic.getId());
-		}
-		else
-		{
-			if (StringUtils.trimToNull(demographic.getHin()) != null)
-			{
-				return getPatientByHin(
-						integration,
-						demographic.getHin(),
-						MHAPatient.PROVINCE_CODES.valueOf(demographic.getHcType()),
-						demographic.isMarkedAsBCNewborn());
-			}
-			else
-			{
-				throw new RecordNotFoundException("Demographic is not confirmed and has no HIN.");
-			}
-		}
-	}
+		Optional<MHAPatient> patient = getPatientByDemographicNo(integration, demographic.getId());
 
-	public boolean updatePatientConnection(Integration integration, String loginToken, Demographic demographic, Boolean rejected)
-	{
-		try
+		if (!patient.isPresent())
 		{
-			// lookup MHA patient
-			MHAPatient patient = null;
-			// we must consider CLINIC_REJECTED as confirmed to deal with edge case around un_rejecting confirmed patient who's HIN does not match in MHA.
-			if (isPatientConfirmed(demographic.getId(), integration,
-					Arrays.asList(MHAPatient.LINK_STATUS.CONFIRMED, MHAPatient.LINK_STATUS.VERIFIED, MHAPatient.LINK_STATUS.CLINIC_REJECTED)))
-			{
-				patient = getConfirmedPatientByDemographicNo(integration, demographic.getId());
-			}
-			else
+			if (StringUtils.trimToNull(demographic.getHin()) != null && MHAPatient.isValidProvinceCode(demographic.getHcType()))
 			{
 				patient = getPatientByHin(
 						integration,
@@ -329,15 +210,33 @@ public class PatientService extends BaseService
 						MHAPatient.PROVINCE_CODES.valueOf(demographic.getHcType()),
 						demographic.isMarkedAsBCNewborn());
 			}
+		}
 
-			String action = rejected ? "reject_connection" : "cancel_reject_connection";
+		return patient;
+	}
 
-			RestClientBase restClient = RestClientFactory.getRestClient(integration);
-			return restClient.doPostWithToken(
-					restClient.formatEndpoint("/clinic_user/self/clinic/patient/" + patient.getId() + "/" + action),
-					loginToken,
-					null,
-					Boolean.class);
+	public boolean updatePatientConnection(Integration integration, String loginToken, Demographic demographic, Boolean rejected)
+	{
+		try
+		{
+			// lookup MHA patient
+			Optional<MHAPatient> patient = this.getPatient(integration, demographic);
+
+			if (patient.isPresent())
+			{
+				String action = rejected ? "reject_connection" : "cancel_reject_connection";
+
+				RestClientBase restClient = RestClientFactory.getRestClient(integration);
+				return restClient.doPostWithToken(
+						restClient.formatEndpoint("/clinic_user/self/clinic/patient/" + patient.get().getId() + "/" + action),
+						loginToken,
+						null,
+						Boolean.class);
+			}
+			else
+			{
+				throw new RecordNotFoundException("Failed to update patient MHA connection status. MHA profile not found for demographic [" + demographic.getId() + "]");
+			}
 		}
 		catch(InvalidIntegrationException e)
 		{
@@ -361,6 +260,98 @@ public class PatientService extends BaseService
 
 		Boolean response = restClient.doPostWithToken(url, loginToken, patientInvite, Boolean.class);
 	}
+
+	// ==========================================================================
+	// Protected Methods
+	// ==========================================================================
+
+	/**
+	 * get a MHA patient by demographic number
+	 * @param integration - the integration to search
+	 * @param demographicNo - the demographic number to look up.
+	 * @return mha patient object
+	 */
+	protected Optional<MHAPatient> getPatientByDemographicNo(Integration integration, Integer demographicNo)
+	{
+		try
+		{
+			RestClientBase restClient = RestClientFactory.getRestClient(integration);
+
+			String url = restClient.formatEndpoint("/clinic/" + integration.getRemoteId() +
+					"/patients?search_by=remote_id&remote_id=%s", demographicNo);
+			PatientSingleSearchResponseTo1 response = restClient.doGet(url, PatientSingleSearchResponseTo1.class);
+
+			if (response.isSuccess())
+			{
+				return Optional.of(new MHAPatient(response.getPatientTo1()));
+			}
+			else if (response.isNotFound())
+			{
+				return Optional.empty();
+			}
+			else if (response.isNotUnique())
+			{
+				throw new RecordNotUniqueException("Multiple patients with demographicNo: " + demographicNo.toString());
+			}
+		}
+		catch(InvalidIntegrationException e)
+		{
+			logInvalidIntegrationWarn(e);
+		}
+
+		return Optional.empty();
+	}
+
+
+	/**
+	 * get a mha patient via hin lookup
+	 * @param integration - the mha integration to look in
+	 * @param hin - the health number to search
+	 * @param hinProvince - the province of the health number
+	 * @param isNewborn - if the patient is a newborn or not. This determines which set of patients MHA will search.
+	 * @return an MHA patient object.
+	 */
+	protected Optional<MHAPatient> getPatientByHin(Integration integration, String hin, MHAPatient.PROVINCE_CODES hinProvince, boolean isNewborn)
+	{
+		if (hin == null || hin.isEmpty())
+		{
+			throw new IllegalArgumentException("hin cannot be null or empty");
+		}
+
+		try
+		{
+			RestClientBase restClient = RestClientFactory.getRestClient(integration);
+
+			String url = restClient.formatEndpoint(
+					"/clinic/" + integration.getRemoteId() +
+							"/patients?search_by=hin&health_number=%s&health_care_province=%s&newborn=%s",
+					hin,
+					hinProvince,
+					isNewborn);
+
+			PatientSingleSearchResponseTo1 response = restClient.doGet(url, PatientSingleSearchResponseTo1.class);
+
+			if (response.isSuccess())
+			{
+				return Optional.of(new MHAPatient(response.getPatientTo1()));
+			}
+			else
+			{
+				return Optional.empty();
+			}
+		}
+		catch(InvalidIntegrationException e)
+		{
+			logInvalidIntegrationWarn(e);
+		}
+
+		return Optional.empty();
+	}
+
+	// ==========================================================================
+	// Private Methods
+	// ==========================================================================
+
 
 	private void logInvalidIntegrationWarn(InvalidIntegrationException e)
 	{

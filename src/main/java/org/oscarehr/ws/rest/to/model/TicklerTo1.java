@@ -30,7 +30,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.oscarehr.common.model.Tickler;
+import org.oscarehr.ticklers.entity.Tickler;
 
 @XmlRootElement(name="tickler")
 public class TicklerTo1 implements Serializable {

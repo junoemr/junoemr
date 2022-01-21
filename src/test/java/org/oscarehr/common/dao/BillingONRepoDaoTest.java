@@ -42,9 +42,12 @@ public class BillingONRepoDaoTest extends DaoTestFixtures
 	@Autowired
 	protected BillingONRepoDao billingONRepoDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billing_on_repo");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billing_on_repo"
+		};
 	}
 
 	@Test

@@ -34,6 +34,7 @@ import java.util.GregorianCalendar;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.II;
 import org.marc.everest.datatypes.NullFlavor;
 import org.marc.everest.datatypes.TS;
@@ -42,7 +43,11 @@ import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Author;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.ContextControl;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.export.AbstractExportModelTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class AuthorParticipationModelTest extends AbstractExportModelTest {
 	private static Date date;
 

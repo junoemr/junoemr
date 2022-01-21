@@ -40,9 +40,10 @@ import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.Tickler;
-import org.oscarehr.common.model.TicklerComment;
-import org.oscarehr.common.model.TicklerUpdate;
+import org.oscarehr.ticklers.dao.TicklerDao;
+import org.oscarehr.ticklers.entity.Tickler;
+import org.oscarehr.ticklers.entity.TicklerComment;
+import org.oscarehr.ticklers.entity.TicklerUpdate;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,10 +60,15 @@ public class TicklerDaoTest extends DaoTestFixtures
 	private ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	private ProgramDao programDao = SpringUtils.getBean(ProgramDao.class);
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("tickler", "tickler_update","tickler_comments","custom_filter","provider","demographic","program","lst_gender", "admission", "demographic_merged",  
-				"health_safety", "providersite", "site", "program_team","log", "Facility","program_queue","tickler_category");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"tickler", "tickler_update","tickler_comments","custom_filter","provider","demographic",
+			"program","lst_gender", "admission", "demographic_merged", "health_safety",
+			"providersite", "site", "program_team","log", "Facility","program_queue",
+			"tickler_category"
+		};
 	}
 	
 	protected Tickler createTickler(int demographicNo, String message, Integer programId,Date serviceDate, Tickler.STATUS status, String taskAssignedTo) {

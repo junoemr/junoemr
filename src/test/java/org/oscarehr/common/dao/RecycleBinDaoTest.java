@@ -45,9 +45,12 @@ public class RecycleBinDaoTest extends DaoTestFixtures
 	public RecycleBinDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("recyclebin");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"recyclebin"
+		};
 	}
 
 	@Test

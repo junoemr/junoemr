@@ -25,6 +25,7 @@ package org.oscarehr.appointment.service;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -33,6 +34,7 @@ import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.schedule.dto.AppointmentDetails;
 import org.oscarehr.schedule.dto.CalendarAppointment;
 import org.oscarehr.schedule.dto.CalendarEvent;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import oscar.OscarProperties;
 
@@ -60,7 +62,7 @@ public class AppointmentTest
 	@Before
 	public void setUp()
 	{
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 	}
 
 	@Test
@@ -135,7 +137,8 @@ public class AppointmentTest
 			null,
 			false,
 			false,
-			1
+			1,
+			org.oscarehr.common.model.Appointment.VirtualAppointmentType.NONE
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -194,7 +197,8 @@ public class AppointmentTest
 				false, // isConfirmed
 				1, // creatorSecurityId
 				null, // bookingSource
-				false // critical
+				false, // critical
+				org.oscarehr.common.model.Appointment.VirtualAppointmentType.NONE
 			)
 		));
 
@@ -254,7 +258,8 @@ public class AppointmentTest
 				null,
 				false,
 				false,
-				1
+				1,
+				org.oscarehr.common.model.Appointment.VirtualAppointmentType.NONE
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -313,7 +318,8 @@ public class AppointmentTest
 						false, // isConfirmed
 						1, // creatorSecurityId
 						org.oscarehr.common.model.Appointment.BookingSource.MYOSCAR_SELF_BOOKING.name(),
-						false // critical
+						false, // critical
+						org.oscarehr.common.model.Appointment.VirtualAppointmentType.NONE
 				)
 		));
 		Assert.assertArrayEquals(expectedResult.toArray(), result.toArray());
@@ -372,7 +378,8 @@ public class AppointmentTest
 			null,
 			false,
 				false,
-			1
+			1,
+			org.oscarehr.common.model.Appointment.VirtualAppointmentType.NONE
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -432,7 +439,8 @@ public class AppointmentTest
 				false, // isConfirmed
 				1, // creatorSecurityId
 				null, // bookingSource
-				false // critical
+				false, // critical
+				org.oscarehr.common.model.Appointment.VirtualAppointmentType.NONE
 			)
 		));
 
@@ -492,7 +500,8 @@ public class AppointmentTest
 			null,
 			false,
 			false,
-			1
+			1,
+			org.oscarehr.common.model.Appointment.VirtualAppointmentType.NONE
 		));
 
 		mockData.put(keyTime1, valueList);
@@ -551,7 +560,8 @@ public class AppointmentTest
 				false, // isConfirmed
 				1, // creatorSecurityId
 				null, // bookingSource
-				false // critical
+				false, // critical
+				org.oscarehr.common.model.Appointment.VirtualAppointmentType.NONE
 			)
 		));
 

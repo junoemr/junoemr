@@ -30,18 +30,18 @@ import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.dao.AdmissionDao;
-import org.oscarehr.common.dao.ContactDao;
+import org.oscarehr.contact.dao.ContactDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
-import org.oscarehr.common.dao.DemographicContactDao;
+import org.oscarehr.contact.dao.DemographicContactDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.PHRVerificationDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Admission;
-import org.oscarehr.common.model.Contact;
+import org.oscarehr.contact.entity.Contact;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Demographic.PatientStatus;
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
@@ -66,7 +66,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.to.model.AddressTo1;
-import org.oscarehr.ws.rest.to.model.DemographicContactFewTo1;
+import org.oscarehr.contact.transfer.DemographicContactFewTo1;
 import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -416,7 +416,7 @@ public class DemographicManager {
 		contact.setLastName(StringUtils.trimToNull(demographicContactFewTo1.getLastName()));
 		contact.setMiddleName(StringUtils.trimToNull(demographicContactFewTo1.getMiddleName()));
 		contact.setAddress(StringUtils.trimToNull(demographicContactFewTo1.getAddress()));
-		contact.setCity(StringUtils.trimToNull(demographicContactFewTo1.getCity()));;
+		contact.setCity(StringUtils.trimToNull(demographicContactFewTo1.getCity()));
 		contact.setPostal(StringUtils.trimToNull(demographicContactFewTo1.getPostal()));
 		contact.setProvince(StringUtils.trimToNull(demographicContactFewTo1.getProvince()));
 		contact.setResidencePhone(StringUtils.trimToNull(demographicContactFewTo1.getHomePhone()));
@@ -439,21 +439,12 @@ public class DemographicManager {
 
 	public DemographicContact updateExternalDemographicContact(DemographicContactFewTo1 demographicContactFewTo1, String contactId, Integer demographicId)
 	{
-		DemographicContact demographicContact = demographicContactDao.find(demographicId, contactId, demographicContactFewTo1.getCategory());
+		DemographicContact demographicContact = demographicContactDao.find(demographicId, contactId, demographicContactFewTo1.getType());
 
 		demographicContact.setRole(demographicContactFewTo1.getRole());
 		demographicContact.setConsentToContact(demographicContactFewTo1.isConsentToContact());
 
 		return (DemographicContact) demographicContactDao.merge(demographicContact);
-	}
-
-
-
-	public List<Demographic> getDemographicsByProvider(LoggedInInfo loggedInInfo, Provider provider) {
-		checkPrivilege(loggedInInfo, Permission.DEMOGRAPHIC_READ);
-		List<Demographic> result = demographicDao.getDemographicByProvider(provider.getProviderNo(), true);
-
-		return result;
 	}
 
 	public void createDemographic(LoggedInInfo loggedInInfo, Demographic demographic)
@@ -531,10 +522,11 @@ public class DemographicManager {
 		demographic.setPhone2(oscar.util.StringUtils.filterControlCharacters(demographic.getPhone2()));
 
 		addRosterHistoryEntry(demographic, previousDemographic);
-		newDemographicDao.merge(demographic);
 
 		// update MyHealthAccess connection status.
 		demographicService.queueMHAPatientUpdates(demographic, previousDemographic, loggedInInfo);
+
+		newDemographicDao.merge(demographic);
 
 		if (demographic.getDemographicExtSet() != null)
 		{

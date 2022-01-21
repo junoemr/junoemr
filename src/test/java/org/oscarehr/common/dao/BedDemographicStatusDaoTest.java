@@ -45,10 +45,14 @@ public class BedDemographicStatusDaoTest extends DaoTestFixtures
 	@Autowired
 	protected BedDemographicStatusDao bedDemographicStatusDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "bed_demographic_status");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"bed_demographic_status"
+		};
 	}
+
 
 	@Test
 	public void testCreate() throws Exception {

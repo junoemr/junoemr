@@ -44,7 +44,6 @@ public class DefaultViewConfig implements WebMvcConfigurer
 		registry.addViewController("/schedule/").setViewName("forward:/schedule/index.jsp");
 		registry.addViewController("/survey/").setViewName("forward:/survey/index.jsp");
 		registry.addViewController("/oscarPrevention/").setViewName("forward:/oscarPrevention/index.jsp");
-		registry.addViewController("/oscarEncounter/").setViewName("forward:/oscarEncounter/Index.jsp");
 		registry.addViewController("/eaaps/").setViewName("forward:/eaaps/index.jsp");
 		registry.addViewController("/administration/").setViewName("forward:/administration/index.jsp");
 		registry.addViewController("/appointment/").setViewName("forward:/appointment/index.jsp");

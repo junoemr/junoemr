@@ -1,5 +1,7 @@
 #patient-details-page {
 
+	@include juno-page-padding-default;
+
 	#profile-fields {
 		margin-left: 10px;
 	}

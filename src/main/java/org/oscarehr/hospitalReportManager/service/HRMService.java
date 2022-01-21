@@ -23,24 +23,32 @@
  */
 package org.oscarehr.hospitalReportManager.service;
 
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
+
+import lombok.Synchronized;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.io.XMLFile;
+import org.oscarehr.common.model.ProviderLabRoutingModel;
+import org.oscarehr.dataMigration.converter.out.hrm.HrmDocumentDbToModelConverter;
 import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.dataMigration.converter.in.hrm.HrmDocumentModelToDbConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
-import org.oscarehr.dataMigration.parser.hrm.HRMFileParser;
-import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
-import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
-import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
-import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
 import org.oscarehr.hospitalReportManager.dto.HRMDemographicDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
+import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
+import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
+import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
+import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
 import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -49,14 +57,26 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import oscar.oscarLab.ca.on.HRMResultsData;
+import java.util.stream.Collectors;
+
+import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
+import oscar.util.ConversionUtils;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class HRMService
 {
 	@Autowired
-	private HrmDocumentModelToDbConverter hrmDocumentModelToDbConverter;
+	private HRMSftpService sftpService;
+	
+	@Autowired
+	private HRMReportProcessor reportProcessor;
+	
+	@Autowired
+	private HrmDocumentModelToDbConverter modelToEntity;
+
+	@Autowired
+	private HrmDocumentDbToModelConverter entityToModel;
 
 	@Autowired
 	private HRMDocumentDao hrmDocumentDao;
@@ -66,9 +86,74 @@ public class HRMService
 
 	@Autowired
 	private HRMDocumentToProviderDao hrmDocumentToProviderDao;
-
+	
+	private Logger logger = MiscUtils.getLogger();
+	
+	// Access only via synchronized methods
+	private HrmFetchResultsModel lastFetchResults = null;
+	
 	/**
-	 * upload a new HRM document to the database with an associated document reference.
+	 * Get the results of the last fetch operation
+	 * @return
+	 */
+	@Synchronized
+	public HrmFetchResultsModel getLastFetchResults()
+	{
+		return this.lastFetchResults;
+	}
+	
+	/**
+	 * Download and process HRM documents from the OMD sftp server.
+	 *
+	 * @return object containing results of the operation
+	 */
+	@Synchronized
+	public HrmFetchResultsModel consumeRemoteHRMDocuments()
+	{
+		HrmFetchResultsModel results = new HrmFetchResultsModel();
+		List<GenericFile> downloadedFiles = sftpService.pullHRMFromSource(results);
+		reportProcessor.processHRMFiles(downloadedFiles, true, results);
+		
+		this.lastFetchResults = results;
+		return results;
+	}
+	
+	/**
+	 * Skip downloading, and process the results of the local override directory instead.  These files
+	 * will not be decrypted, only parsed and routed.
+	 *
+	 * @return object containing results of the operation
+	 */
+	@Synchronized
+	HrmFetchResultsModel consumeLocalHRMDocuments(Path localHRMPath)
+	{
+		HrmFetchResultsModel results = new HrmFetchResultsModel();
+		results.setLoginSuccess(true);
+		results.setReportsDownloaded(0);
+		results.setDownloadSuccess(true);
+		
+		try
+		{
+			List<GenericFile> localFiles = Files.list(localHRMPath)
+			                                    .map(path -> new XMLFile(path.toFile()))
+			                                    .collect(Collectors.toList());
+			reportProcessor.processHRMFiles(localFiles, true, results);
+		}
+		catch(IOException e)
+		{
+			results.setProcessingSuccess(false);
+		}
+		finally
+		{
+			this.lastFetchResults = results;
+		}
+		
+		return results;
+	}
+	
+	/**
+	 * Upload a new HRM document to the database and move the associated hrm report xml file to the to the HRM documents folder.
+	 *
 	 * @param hrmDocumentModel - the model
 	 * @param demographic - the demographic entity
 	 * @return - the persisted HRM entity
@@ -76,25 +161,24 @@ public class HRMService
 	 */
 	public HRMDocument uploadNewHRMDocument(HrmDocument hrmDocumentModel, Demographic demographic) throws IOException
 	{
-		HRMDocument hrmDocument = hrmDocumentModelToDbConverter.convert(hrmDocumentModel);
-
-		// persist hrm database info and associated objects through cascade
+		HRMDocument hrmDocument = modelToEntity.convert(hrmDocumentModel);
 		HRMReportParser.fillDocumentHashData(hrmDocument, hrmDocumentModel.getReportFile());
-		hrmDocumentDao.persist(hrmDocument);
-		hrmDocumentModel.getReportFile().moveToHRMDocuments();
 
-		// assign the hrm document to the demographic
-		routeToDemographic(hrmDocument, demographic);
+		// The intent here was to move the document into documents folder as close to the end of the import
+		// process as possible, such that a failure earlier on doesn't result in an orphaned file in the
+		// documents directory with no database references
+		Path hrmBaseDirectory = Paths.get(GenericFile.HRM_BASE_DIR);
 
-		// link the associated providers
-		for(HRMDocumentToProvider documentToProvider : hrmDocument.getDocumentToProviderList())
-		{
-			hrmDocumentToProviderDao.persist(documentToProvider);
-		}
+		GenericFile hrmReportFile = hrmDocumentModel.getReportFile();
+		hrmReportFile.moveToHRMDocuments();
+		Path relativePath = hrmBaseDirectory.relativize(Paths.get(hrmReportFile.getPath()));
+		hrmDocument.setReportFile(relativePath.toString());
 
-		return hrmDocument;
+		HRMDocument documentModel = persistAndLinkHRMDocument(hrmDocument, demographic);
+
+		return documentModel;
 	}
-
+	
 	public void uploadAllNewHRMDocuments(List<HrmDocument> hrmDocumentModels, Demographic demographic) throws IOException
 	{
 		for(HrmDocument documentModel : hrmDocumentModels)
@@ -103,6 +187,66 @@ public class HRMService
 		}
 	}
 
+	public boolean isDuplicateReport(HRMDocument model)
+	{
+		List<Integer> duplicateIds = hrmDocumentDao.findByMessageUniqueId(model.getMessageUniqueId());
+		return duplicateIds != null && duplicateIds.size() > 0;
+	}
+	
+	/**
+	 * Persist HRMDocument and any associated provider and demographic linkages through cascade.
+	 *
+	 * @param hrmDocument duplicate to persist
+	 * @param demographic <optional>Demographic to associate with the HRM document</optional>
+	 * @return HRMDocument entity
+	 */
+	public HRMDocument persistAndLinkHRMDocument(HRMDocument hrmDocument, Demographic demographic)
+	{
+		hrmDocumentDao.persist(hrmDocument);
+		
+		if (demographic != null && demographic.getId() != null)
+		{
+			routeToDemographic(hrmDocument, demographic);
+		}
+		
+		if (!hrmDocument.getDocumentToProviderList().isEmpty())
+		{
+			// includes the deliverTo provider and any associated reviewers
+			routeToProviders(hrmDocument.getDocumentToProviderList());
+		}
+		else
+		{
+			routeToGeneralInbox(hrmDocument);
+		}
+		
+		return hrmDocument;
+	}
+	
+	private void routeToProviders(List<HRMDocumentToProvider> providerLinks)
+	{
+		for(HRMDocumentToProvider documentToProvider : providerLinks)
+		{
+			hrmDocumentToProviderDao.persist(documentToProvider);
+			
+			
+			
+			ProviderLabRouting inboxRouting = new ProviderLabRouting();
+			inboxRouting.routeMagic(documentToProvider.getHrmDocument().getId(),
+			                        documentToProvider.getProviderNo(),
+			                        ProviderLabRoutingModel.LAB_TYPE_HRM,
+			                        documentToProvider.getHrmDocument().getReportDate());
+		}
+	}
+	
+	private void routeToGeneralInbox(HRMDocument hrmDocument)
+	{
+		ProviderLabRouting inboxRouting = new ProviderLabRouting();
+		inboxRouting.routeMagic(hrmDocument.getId(),
+		                        String.valueOf(ProviderLabRoutingModel.PROVIDER_UNMATCHED),
+		                        ProviderLabRoutingModel.LAB_TYPE_HRM,
+		                        hrmDocument.getReportDate());
+	}
+	
 	public void routeToDemographic(HRMDocument document, Demographic demographic)
 	{
 		HRMDocumentToDemographic hrmDocumentToDemographic = hrmDocumentToDemographicDao.findByHrmDocumentIdAndDemographicNo(document.getId(), demographic.getId());
@@ -133,126 +277,62 @@ public class HRMService
 				hrmDocumentToProvider.setProvider(provider);
 				hrmDocumentToProviderDao.persist(hrmDocumentToProvider);
 			}
+			
+			ProviderLabRouting inboxRouting = new ProviderLabRouting();
+			inboxRouting.routeMagic(document.getId(),
+			                        String.valueOf(provider.getProviderNo()),
+			                        ProviderLabRoutingModel.LAB_TYPE_HRM,
+			                        document.getReportDate());
 		}
 	}
 
 	public Map<String, HRMDemographicDocument> getHrmDocumentsForDemographic(Integer demographicNo)
 	{
-		List<HRMDocument> allHrmDocsForDemo = hrmDocumentDao.findByDemographicId(demographicNo);
-
-		List<Integer> doNotShowList = new LinkedList<>();
-		HashMap<String, HRMDocument> labReports = new HashMap<>();
-
 		Map<String, HRMDemographicDocument> out = new HashMap<>();
+
+		List<HRMDocument> allHrmDocsForDemo = hrmDocumentDao.findByDemographicId(demographicNo);
 
 		for (HRMDocument doc : allHrmDocsForDemo)
 		{
-			String facilityId = doc.getSendingFacilityId();
-			String facilityReportId = doc.getSendingFacilityReportId();
-			String deliverToUserId = doc.getDeliverToUserId();
-
 			// filter duplicate reports
 			String duplicateKey;
-			if(!HRMFileParser.SCHEMA_VERSION.equals(doc.getReportFileSchemaVersion())) // legacy xml lookup
-			{
-				HRMReport hrmReport = HRMReportParser.parseReport(doc.getReportFile(), doc.getReportFileSchemaVersion());
-				if(hrmReport != null)
-				{
-					facilityId = hrmReport.getSendingFacilityId();
-					facilityReportId = hrmReport.getSendingFacilityReportNo();
-					deliverToUserId = hrmReport.getDeliverToUserId();
-				}
-			}
 
-			// if we are missing too much data (cds imports can cause this), we don't want to filter the reports, just choose a unique key
-			if(facilityId == null && facilityReportId == null)
+			// A duplicate is simply an exact match on the contents of the message, minus the transactional segment
+			// and there is no versioning system.
+			if (ConversionUtils.hasContent(doc.getReportLessTransactionInfoHash()))
 			{
-				duplicateKey = String.valueOf(doc.getId());
+				duplicateKey = doc.getReportLessTransactionInfoHash();
 			}
 			else
 			{
-				// the key = SendingFacility+':'+ReportNumber+':'+DeliverToUserID as per HRM spec can be used to signify duplicate report
-				duplicateKey = facilityId + ':' + facilityReportId + ':' + deliverToUserId;
+				// if we are missing too much data (cds imports can cause this), we don't want to filter the reports, just choose a unique key
+				duplicateKey = String.valueOf(doc.getId());
 			}
 
-			List<HRMDocument> relationshipDocs = hrmDocumentDao.findAllDocumentsWithRelationship(doc.getId());
-
-			HRMDocument oldestDocForTree = doc;
-			for(HRMDocument relationshipDoc : relationshipDocs)
+			if (!out.containsKey(duplicateKey))
 			{
-				if(relationshipDoc.getId().intValue() != doc.getId().intValue())
-				{
-					if(relationshipDoc.getReportDate().compareTo(oldestDocForTree.getReportDate()) >= 0
-						|| relationshipDoc.getReportStatus().equalsIgnoreCase(HrmDocument.REPORT_STATUS.CANCELLED.getValue()))
-					{
-						doNotShowList.add(oldestDocForTree.getId());
-						oldestDocForTree = relationshipDoc;
-					}
-				}
-			}
-
-			boolean addToList = true;
-			for(HRMDemographicDocument demographicDocument: out.values())
-			{
-				HRMDocument displayDoc = demographicDocument.getHrmDocument();
-				if(displayDoc.getId().intValue() == oldestDocForTree.getId().intValue())
-				{
-					addToList = false;
-					break;
-				}
-			}
-
-			for(Integer doNotShowId : doNotShowList)
-			{
-				if(doNotShowId.intValue() == oldestDocForTree.getId().intValue())
-				{
-					addToList = false;
-					break;
-				}
-			}
-
-			if (addToList)
-			{
-				// if no duplicate
-				if (!out.containsKey(duplicateKey))
-				{
-					HRMDemographicDocument demographicDocument = new HRMDemographicDocument();
-					demographicDocument.setHrmDocument(oldestDocForTree);
-
-					out.put(duplicateKey, demographicDocument);
-					labReports.put(duplicateKey, doc);
-				}
-				else // there exists an entry like this one
-				{
-					Integer duplicateIdToAdd;
-
-					HRMDocument previousHrmReport = labReports.get(duplicateKey);
-					HRMDemographicDocument demographicDocument = out.get(duplicateKey);
-
-					// if the current entry is newer than the previous one then replace it, other wise just keep the previous entry
-					if (HRMResultsData.isNewer(doc, previousHrmReport))
-					{
-						HRMDocument previousHRMDocument = demographicDocument.getHrmDocument();
-						duplicateIdToAdd = previousHRMDocument.getId();
-
-						demographicDocument.setHrmDocument(oldestDocForTree);
-						labReports.put(duplicateKey, doc);
-					}
-					else
-					{
-						duplicateIdToAdd = doc.getId();
-					}
-
-					if (demographicDocument.getDuplicateIds() == null)
-					{
-						demographicDocument.setDuplicateIds(new ArrayList<>());
-					}
-
-					demographicDocument.getDuplicateIds().add(duplicateIdToAdd);
-				}
+				HRMDemographicDocument demographicDocument = new HRMDemographicDocument();
+				demographicDocument.setHrmDocument(doc);
+				out.put(duplicateKey, demographicDocument);
 			}
 		}
 
 		return out;
+	}
+	
+	public void handleDuplicateDocument(HRMDocument duplicate)
+	{
+		List<Integer> matchingDocuments = hrmDocumentDao.findByMessageUniqueId(duplicate.getMessageUniqueId());
+		if (matchingDocuments != null && !matchingDocuments.isEmpty())
+		{
+			if (matchingDocuments.size() > 1)
+			{
+				logger.warn(String.format("Multiple HRM documents have the same unique id %s", duplicate.getMessageUniqueId()));
+			}
+
+			HRMDocument original = hrmDocumentDao.find(matchingDocuments.get(0));
+			original.setNumDuplicatesReceived(original.getNumDuplicatesReceived() + 1);
+			hrmDocumentDao.merge(original);
+		}
 	}
 }

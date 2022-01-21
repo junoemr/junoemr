@@ -1113,23 +1113,7 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 
 		CommonLabResultData comLab = new CommonLabResultData();
 
-		//we need to check the patient lab routing table on it's own too..the case where a lab is updated, but the link is done later
-		OscarProperties op = OscarProperties.getInstance();
-		String cml = op.getProperty("CML_LABS","false");
-		String mds = op.getProperty("MDS_LABS","false");
-		String pathnet = op.getProperty("PATHNET_LABS","false");
-		String hl7text = op.getProperty("HL7TEXT_LABS","false");
-		String epsilon = op.getProperty("Epsilon_LABS","false");
-
-		List<LabIdAndType> results = new ArrayList<LabIdAndType>();
-		if("yes".equals(epsilon) || "yes".equals(cml))
-			results.addAll(comLab.getCmlAndEpsilonLabResultsSince(demographicId, lastDataUpdated));
-		if("yes".equals(mds))
-			results.addAll(comLab.getMdsLabResultsSince(demographicId, lastDataUpdated));
-		if("yes".equals(pathnet))
-			results.addAll(comLab.getPathnetResultsSince(demographicId, lastDataUpdated));
-		if("yes".equals(hl7text))
-			results.addAll(comLab.getHl7ResultsSince(demographicId, lastDataUpdated));
+		List<LabIdAndType> results = comLab.getHl7ResultsSince(demographicId, lastDataUpdated);
 
 		for(LabIdAndType id:results) {
 			logger.debug("id="+id.getLabId() + ",type=" + id.getLabType());

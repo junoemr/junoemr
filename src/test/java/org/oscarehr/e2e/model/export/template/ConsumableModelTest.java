@@ -31,8 +31,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.EN;
 import org.marc.everest.datatypes.NullFlavor;
 import org.marc.everest.datatypes.ST;
@@ -55,7 +55,11 @@ import org.oscarehr.e2e.model.PatientExport.Immunization;
 import org.oscarehr.e2e.model.export.AbstractExportModelTest;
 import org.oscarehr.e2e.util.EverestUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class ConsumableModelTest extends AbstractExportModelTest {
 	public static PreventionDao preventionDao;
 	public static PreventionExtDao preventionExtDao;
@@ -65,8 +69,9 @@ public class ConsumableModelTest extends AbstractExportModelTest {
 	public static Drug drug;
 	public static ConsumableModel consumableModel;
 
-	@BeforeClass
-	public static void beforeClass() {
+	@Before
+	public void before()
+	{
 		preventionDao = SpringUtils.getBean(PreventionDao.class);
 		preventionExtDao = SpringUtils.getBean(PreventionExtDao.class);
 		drugDao = SpringUtils.getBean(DrugDao.class);
@@ -75,10 +80,6 @@ public class ConsumableModelTest extends AbstractExportModelTest {
 		Prevention prevention = preventionDao.findNotDeletedByDemographicId(Constants.Runtime.VALID_DEMOGRAPHIC).get(0);
 		List<PreventionExt> preventionExt = preventionExtDao.findByPreventionId(Constants.Runtime.VALID_PREVENTION);
 		immunization = new Immunization(prevention, preventionExt);
-	}
-
-	@Before
-	public void before() {
 		drug = drugDao.findByDemographicId(Constants.Runtime.VALID_DEMOGRAPHIC).get(0);
 	}
 

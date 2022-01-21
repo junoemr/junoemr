@@ -32,6 +32,7 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.integration.aqs.conversion.CommunicationTypeToVirtualAppointmentTypeConverter;
 import org.oscarehr.integration.aqs.conversion.IntegerToQueuedAppointmentMoveDtoConverter;
 import org.oscarehr.integration.aqs.conversion.QueuedAppointmentDtoQueuedAppointmentConverter;
 import org.oscarehr.integration.aqs.conversion.QueuedAppointmentQueuedAppointmentInputConverter;
@@ -41,6 +42,7 @@ import org.oscarehr.integration.aqs.model.AppointmentQueue;
 import org.oscarehr.integration.aqs.model.QueuedAppointment;
 import org.oscarehr.integration.aqs.model.QueuedAppointmentLink;
 import org.oscarehr.integration.model.Integration;
+import org.oscarehr.integration.myhealthaccess.conversion.VirtualAppointmentTypeToMHAAppointmentTypeConverter;
 import org.oscarehr.integration.myhealthaccess.model.MHAAppointment;
 import org.oscarehr.integration.myhealthaccess.service.AppointmentService;
 import org.oscarehr.integration.service.IntegrationService;
@@ -270,6 +272,7 @@ public class QueuedAppointmentService extends BaseService
 		appointment.setName(demographic.getDisplayName());
 		appointment.setIsVirtual(queuedAppointment.isVirtual());
 		appointment.setReasonCode(queuedAppointment.getReasonTypeId());
+		appointment.setVirtualAppointmentType((new CommunicationTypeToVirtualAppointmentTypeConverter()).convert(queuedAppointment.getCommunicationType()));
 
 		if (queuedAppointment.getCritical() != null && queuedAppointment.isCritical())
 		{
@@ -328,7 +331,12 @@ public class QueuedAppointmentService extends BaseService
 		if (queuedAppointment.isVirtual())
 		{
 			// book the appointment in to MHA
-			mhaAppointmentService.bookTelehealthAppointment(loggedInInfo, newAppointment, false, UUID.fromString(queuedAppointment.getCreatedBy()), MHAAppointment.APPOINTMENT_TYPE.REGULAR);
+			mhaAppointmentService.bookTelehealthAppointment(
+					loggedInInfo,
+					newAppointment,
+					false,
+					UUID.fromString(queuedAppointment.getCreatedBy()),
+					(new VirtualAppointmentTypeToMHAAppointmentTypeConverter()).convert(appointment.getVirtualAppointmentType()));
 
 			// link the mha appointments telehealth session to the AQS telehealth session
 			Integration integration = integrationService.findMhaIntegration(StringUtils.trimToNull(appointment.getLocation()));

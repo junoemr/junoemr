@@ -31,7 +31,7 @@ export default class MhaPatientService
 
 	/**
 	 * get mha profiles from all integrations matching this id.
-	 * @param remoteId - the
+	 * @param remoteId - the MHA patient id
 	 * @return promise that resolves to a list of MHA profiles.
 	 */
 	public async getProfiles(remoteId: string): Promise<MhaPatient[]>

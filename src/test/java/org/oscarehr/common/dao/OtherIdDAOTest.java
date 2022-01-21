@@ -45,10 +45,12 @@ public class OtherIdDAOTest extends DaoTestFixtures
 	public OtherIdDAOTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("other_id");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"other_id"
+		};
 	}
 
 	@Test

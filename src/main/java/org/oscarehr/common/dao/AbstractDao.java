@@ -512,17 +512,14 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 		return results;
 	}
 
-	/** escapes some special characters that the entity manager will not allow in native queries correctly.
-	 * Proper escaping (\\: etc.) is not available until hibernate version 4.1.3
-	 * So this uses a quick and dirty hack to allow the characters through:
-	 *    Hibernate code treats everything between ' as a string (ignores it).
-	 *    MySQL on the other hand will ignore everything inside a blockquote and will evaluate the whole expression to an assignment operator.
+	/**
+	 * escapes some special characters that the entity manager will not allow in native queries correctly.
 	 */
 	private String escapeJpaParamCharacters(String unescapedSql)
 	{
 		String escapedSql = unescapedSql
-				.replaceAll(":=", "/*'*/:=/*'*/")
-				.replaceAll("\\?", "/*'*/?/*'*/");
+				.replaceAll(":=", "\\\\:=")
+				.replaceAll("\\?", "\\\\?");
 		MiscUtils.getLogger().info("ESCAPED:\n" + escapedSql);
 		return escapedSql;
 	}

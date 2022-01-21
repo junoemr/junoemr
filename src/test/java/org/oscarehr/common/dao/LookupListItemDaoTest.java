@@ -42,10 +42,12 @@ public class LookupListItemDaoTest extends DaoTestFixtures
 	@Autowired
 	protected LookupListItemDao lookupListItemDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("LookupList","LookupListItem");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"LookupList","LookupListItem"
+		};
 	}
 
 	@Test

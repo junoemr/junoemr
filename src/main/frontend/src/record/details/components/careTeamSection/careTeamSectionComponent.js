@@ -77,21 +77,21 @@ angular.module('Record.Details').component('careTeamSection', {
 			providersServiceApi.getBySecurityRole("doctor").then(
 					function success(data) {
 						ctrl.doctors = data.data.body.map((doc) => {return {label: doc.name, value: doc.providerNo}});
-						ctrl.doctors.push({label: "--", value: ""})
+						ctrl.doctors.push({label: "Unassigned", value: null})
 					}
 			);
 
 			providersServiceApi.getBySecurityRole("nurse").then(
 					function success(data) {
 						ctrl.nurses = data.data.body.map((doc) => {return {label: doc.name, value: doc.providerNo}});
-						ctrl.nurses.push({label: "--", value: ""})
+						ctrl.nurses.push({label: "Unassigned", value: null})
 					}
 			);
 
 			providersServiceApi.getBySecurityRole("midwife").then(
 					function success(data) {
 						ctrl.midwives = data.data.body.map((doc) => {return {label: doc.name, value: doc.providerNo}});
-						ctrl.midwives.push({label: "--", value: ""})
+						ctrl.midwives.push({label: "Unassigned", value: null})
 					}
 			);
 

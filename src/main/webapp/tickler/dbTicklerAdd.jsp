@@ -26,9 +26,9 @@
 
 <%@ taglib uri="/WEB-INF/rewrite-tag.tld" prefix="rewrite" %>
 
-<%@ page import="org.oscarehr.common.dao.TicklerLinkDao"%>
-<%@ page import="org.oscarehr.common.model.Tickler"%>
-<%@ page import="org.oscarehr.common.model.TicklerLink" %>
+<%@ page import="org.oscarehr.ticklers.dao.TicklerLinkDao"%>
+<%@ page import="org.oscarehr.ticklers.entity.Tickler"%>
+<%@ page import="org.oscarehr.ticklers.entity.TicklerLink" %>
 <%@ page import="org.oscarehr.managers.TicklerManager" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>

@@ -23,7 +23,7 @@
 package org.oscarehr.dataMigration.converter.out.contact;
 
 import org.apache.commons.lang3.StringUtils;
-import org.oscarehr.common.model.Contact;
+import org.oscarehr.contact.entity.Contact;
 import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
 import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;

@@ -51,9 +51,12 @@ public class ConsultDocsDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ConsultDocsDao consultDocsDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("consultdocs", "patientLabRouting");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"consultdocs", "patientLabRouting"
+		};
 	}
 
         @Test

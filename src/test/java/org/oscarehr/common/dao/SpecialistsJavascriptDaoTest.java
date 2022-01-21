@@ -42,10 +42,12 @@ public class SpecialistsJavascriptDaoTest extends DaoTestFixtures
 	@Autowired
 	protected SpecialistsJavascriptDao specialistsJavascriptDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("specialistsJavascript");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"specialistsJavascript"
+		};
 	}
 
 	@Test

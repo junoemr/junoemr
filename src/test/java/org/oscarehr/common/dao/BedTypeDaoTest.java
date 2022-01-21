@@ -45,9 +45,19 @@ public class BedTypeDaoTest extends DaoTestFixtures
 	@Autowired
 	protected BedTypeDao bedTypeDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "bed_type");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"bed_type"
+		};
+	}
+
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+		};
 	}
 
 	@Test

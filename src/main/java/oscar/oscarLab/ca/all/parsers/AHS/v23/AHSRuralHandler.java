@@ -27,9 +27,11 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import com.google.common.collect.Sets;
-import java.util.HashSet;
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
+
+import java.util.HashSet;
 
 /**
  * Handler for:
@@ -41,24 +43,19 @@ public class AHSRuralHandler extends AHSHandler
 {
 	public static final String AHS_RURAL_LAB_TYPE = "AHS-RURAL";
 
-	protected static final HashSet<String> AHS_RURAL_SENDING_APPLICATIONS = Sets.newHashSet(
+	protected static final HashSet<String> AHS_RURAL_SENDING_APPLICATION_PREFIXES = Sets.newHashSet(
 		"LAB",
-		"LAB:POSP",
 		"BBK",
-		"BBK:POSP",
 		"MIC",
-		"MIC:POSP",
-		"PTH",
-		"PTH:POSP"
+		"PTH"
 	);
-	protected static final HashSet<String> AHS_RURAL_SENDING_FACILITIES = Sets.newHashSet(
-		"AHR-ABVA",
-		"CHR-CLRH",
-		"DTHR-DRDH",
-		"ECHR-EWAA",
-		"PCHR-PQEA",
-		"PHR-LMHA",
-		"PHR-LLCS" // not in spec, but in samples
+	protected static final HashSet<String> AHS_RURAL_SENDING_FACILITY_PREFIXES = Sets.newHashSet(
+		"AHR-",
+		"CHR-",
+		"DTHR-",
+		"ECHR-",
+		"PCHR-",
+		"PHR-"
 	);
 
 	public static boolean handlerTypeMatch(Message message)
@@ -69,11 +66,11 @@ public class AHSRuralHandler extends AHSHandler
 			ORU_R01 msh = (ORU_R01) message;
 			MSH messageHeaderSegment = msh.getMSH();
 
-			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
-			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
+			String sendingApplication = StringUtils.trimToEmpty(messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue());
+			String sendingFacility = StringUtils.trimToEmpty(messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue());
 
-			return AHS_RURAL_SENDING_APPLICATIONS.contains(sendingApplication.toUpperCase()) &&
-				AHS_RURAL_SENDING_FACILITIES.contains(sendingFacility.toUpperCase());
+			return AHS_RURAL_SENDING_APPLICATION_PREFIXES.stream().anyMatch(sendingApplication::startsWith) &&
+					AHS_RURAL_SENDING_FACILITY_PREFIXES.stream().anyMatch(sendingFacility::startsWith);
 		}
 		return false;
 	}

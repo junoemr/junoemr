@@ -56,7 +56,7 @@ import org.oscarehr.casemgmt.model.CaseManagementNoteExt;
 import org.oscarehr.casemgmt.model.CaseManagementNoteLink;
 import org.oscarehr.casemgmt.service.CaseManagementManager;
 import org.oscarehr.common.dao.DemographicArchiveDao;
-import org.oscarehr.common.dao.DemographicContactDao;
+import org.oscarehr.contact.dao.DemographicContactDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
@@ -64,7 +64,7 @@ import org.oscarehr.common.dao.PartialDateDao;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.DemographicArchive;
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.common.model.PartialDate;
@@ -1896,8 +1896,10 @@ public class DemographicExportAction4 extends Action {
 										}
 
 										// Source Facility
-										if (hrmDoc.getSourceFacility() != null) {
-											rpr.setSourceFacility(hrmDoc.getSourceFacility());
+										if (hrmDoc.getSendingFacility() != null) {
+											// not a typo:  Specification is that the source facility
+											// is the user friendly name which maps the sendingFacilityId
+											rpr.setSourceFacility(hrmDoc.getSendingFacility());
 										}
 
 										// reviewing info

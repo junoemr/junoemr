@@ -22,7 +22,7 @@
  */
 package org.oscarehr.dataMigration.converter.in.contact;
 
-import org.oscarehr.common.model.DemographicContact;
+import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
 import org.oscarehr.dataMigration.model.contact.Contact;
 import org.springframework.stereotype.Component;

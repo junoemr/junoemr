@@ -47,10 +47,12 @@ public class IntegratorControlDaoTest extends DaoTestFixtures
 	public IntegratorControlDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("IntegratorControl");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"IntegratorControl"
+		};
 	}
 
 	@Test

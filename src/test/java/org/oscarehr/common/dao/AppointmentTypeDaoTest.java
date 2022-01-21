@@ -49,9 +49,12 @@ public class AppointmentTypeDaoTest extends DaoTestFixtures
 	@Autowired
 	protected AppointmentTypeDao appointmentTypeDao;
 
-	@Before
-	public void setup() throws Exception {
-		SchemaUtils.restoreTable(false, "appointmentType");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"appointmentType"
+		};
 	}
 
 	@Test

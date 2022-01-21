@@ -48,9 +48,11 @@ public class GstControlDaoTest extends DaoTestFixtures
 	public GstControlDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("gstControl");
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"gstControl"
+		};
 	}
 
 	@Test

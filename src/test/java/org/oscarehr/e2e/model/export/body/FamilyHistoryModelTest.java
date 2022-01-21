@@ -32,8 +32,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.ANY;
 import org.marc.everest.datatypes.ED;
 import org.marc.everest.datatypes.II;
@@ -64,7 +64,11 @@ import org.oscarehr.e2e.model.PatientExport.FamilyHistoryEntry;
 import org.oscarehr.e2e.model.export.AbstractExportModelTest;
 import org.oscarehr.e2e.util.EverestUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class FamilyHistoryModelTest extends AbstractExportModelTest {
 	public static CaseManagementNoteDAO caseManagementNoteDao;
 	public static CaseManagementNoteExtDAO caseManagementNoteExtDao;
@@ -74,16 +78,13 @@ public class FamilyHistoryModelTest extends AbstractExportModelTest {
 	public static FamilyHistoryModel familyHistoryModel;
 	public static FamilyHistoryModel nullFamilyHistoryModel;
 
-	@BeforeClass
-	public static void beforeClass() {
+	@Before
+	public void before()
+	{
 		caseManagementNoteDao = SpringUtils.getBean(CaseManagementNoteDAO.class);
 		caseManagementNoteExtDao = SpringUtils.getBean(CaseManagementNoteExtDAO.class);
 		familyHistory = caseManagementNoteDao.getNotesByDemographic(Constants.Runtime.VALID_DEMOGRAPHIC.toString()).get(2);
 		noteExts = caseManagementNoteExtDao.getExtByNote(Constants.Runtime.VALID_FAMILY_HISTORY);
-	}
-
-	@Before
-	public void before() {
 		familyHistoryEntry = new FamilyHistoryEntry(familyHistory, noteExts);
 		familyHistoryModel = new FamilyHistoryModel(familyHistoryEntry);
 		nullFamilyHistoryModel = new FamilyHistoryModel(new FamilyHistoryEntry(null, null));

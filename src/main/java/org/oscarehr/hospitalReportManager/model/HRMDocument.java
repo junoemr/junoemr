@@ -24,24 +24,51 @@ import javax.persistence.OneToMany;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Data
 @Entity
 public class HRMDocument extends AbstractModel<Integer>
 {
+	public enum STATUS
+	{
+		SIGNED("S"),
+		CANCELLED("C");
+		
+		private String value;
+		
+		STATUS(String value)
+		{
+			this.value = value;
+		}
+		
+		public String toValueString() {
+			return value;
+		}
+		
+		public static STATUS fromValueString(String value)
+		{
+			return Stream.of(STATUS.values())
+			             .filter(status -> status.toValueString().equals(value))
+			             .findFirst()
+			             .orElseThrow(IllegalArgumentException::new);
+		}
+	}
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
 	private Date timeReceived;
 	private String reportType;
+	private String subClass;
 	private String reportHash;
 	private String reportLessTransactionInfoHash;
 	private String reportLessDemographicInfoHash;
-	private String reportStatus;
+	private STATUS reportStatus;
 	private String reportFile;
 	private String reportFileSchemaVersion;
-	private String sourceFacility;
+	private String sendingFacility;
 	private String sendingFacilityId;
 	private String sendingFacilityReportId;
 	private String messageUniqueId;
@@ -63,7 +90,7 @@ public class HRMDocument extends AbstractModel<Integer>
 	private List<HRMDocumentComment> commentList;
 
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmDocument", cascade = CascadeType.PERSIST)
-	private List<HRMDocumentSubClass> documentSubClassList;
+	private List<HRMObservation> observationList;
 
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmDocument")
 	private List<HRMDocumentToDemographic> documentToDemographicList;
@@ -76,7 +103,7 @@ public class HRMDocument extends AbstractModel<Integer>
 	{
 		return id;
 	}
-
+	
 	/**
 	 * This comparator sorts HRM Docs ascending based on the time received
 	 */

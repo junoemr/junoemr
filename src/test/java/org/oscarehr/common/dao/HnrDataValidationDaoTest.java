@@ -56,10 +56,12 @@ public class HnrDataValidationDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("Facility","provider","demographic","HnrDataValidation");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"Facility","provider","demographic","HnrDataValidation"
+		};
 	}
 
 	@Test

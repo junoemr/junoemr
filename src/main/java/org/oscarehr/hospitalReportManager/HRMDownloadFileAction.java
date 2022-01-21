@@ -28,8 +28,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DownloadAction;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
+import org.oscarehr.hospitalReportManager.exception.HrmDocumentException;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
+import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
@@ -39,17 +40,11 @@ import oscar.util.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.util.List;
 
 public class HRMDownloadFileAction extends DownloadAction
 {
 	private static final HRMDocumentDao hrmDocumentDao = (HRMDocumentDao) SpringUtils.getBean("HRMDocumentDao");
 	private final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	 
-    /** Creates a new instance of DownloadFileAction */
-    public HRMDownloadFileAction()
-    {
-    }
 
 	protected StreamInfo getStreamInfo(
 			ActionMapping mapping,
@@ -60,51 +55,41 @@ public class HRMDownloadFileAction extends DownloadAction
 	{
 		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_READ);
 
-	    String hash = request.getParameter("hash");
-	    if(StringUtils.isNullOrEmpty(hash))
+	    String id = request.getParameter("id");
+
+	    if(StringUtils.isNullOrEmpty(id))
 	    {
-		    throw new Exception("no hash parameter passed");
+		    throw new HrmDocumentException("document id is null");
 	    }
-    	
-    	List<Integer> ids  = hrmDocumentDao.findByHash(hash);
 
-		if(ids == null || ids.size() == 0)
-		{
-			throw new Exception("no documents found for hash - " + hash);
-		}
-
-		if(ids.size() > 1)
-		{
-			throw new Exception("too many documents found for hash - " + hash);
-		}
-    	
-    	HRMDocument hd = hrmDocumentDao.find(ids.get(0));
+    	HRMDocument hd = hrmDocumentDao.find(Integer.parseInt(id));
 		if(hd == null)
 		{
-			throw new Exception("HRMDocument not found - " + ids.get(0));
+			throw new HrmDocumentException("document not found - " + id);
 		}
 
-		HRMReport report = HRMReportParser.parseReport(hd.getReportFile(), hd.getReportFileSchemaVersion());
+		HRMReport report = HRMReportParser.parseRelativeLocation(hd.getReportFile(), hd.getReportFileSchemaVersion());
 
 		if(report == null)
 		{
-			throw new Exception("Failed to parse HRMDocument with id " + hd.getId());
+			throw new HrmDocumentException("failed to parse hrm document with id " + hd.getId());
 		}
 
 		if(!report.isBinary())
 		{
-			throw new Exception("no binary document found");
+			throw new HrmDocumentException("document is not binary");
 		}
-    	
-    	byte[] binaryContent = report.getBinaryContent();
-
+  
+		// This is somehow already decoding the base64 content... don't ask me how.
+    	byte[] binaryContent = report.getBase64BinaryContent();
+		
     	String fileExtension = report.getFileExtension().toLowerCase();
 	    fileExtension = fileExtension.replaceAll("\\.", "");
 
 	    String fileName = GenericFile.getSanitizedFileName(
 			    report.getLegalLastName() + "-" +
 					    report.getLegalFirstName() + "-" +
-					    report.getFirstReportClass() + "." + fileExtension
+					    report.getClassName() + "." + fileExtension
 	    );
 
     	String contentType = "application/octet-stream";

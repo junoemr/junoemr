@@ -49,10 +49,12 @@ public class ViewDaoTest extends DaoTestFixtures
 	public ViewDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("view");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"view"
+		};
 	}
 
 	@Test

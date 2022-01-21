@@ -20,7 +20,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextMessageInfo;
-import org.oscarehr.hospitalReportManager.SFTPConnector;
 import org.oscarehr.hospitalReportManager.xsd.DateFullOrPartial;
 import org.oscarehr.hospitalReportManager.xsd.HealthCard;
 import org.oscarehr.hospitalReportManager.xsd.OmdCds;
@@ -31,6 +30,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.UtilDateUtilities;
+import oscar.util.plugin.OscarProperties;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
 
 /**
@@ -60,6 +61,7 @@ public class HRMXMLHandler extends ORU_R01MessageHandler
 {
 
 	private static Logger logger = MiscUtils.getLogger();
+	Properties properties = OscarProperties.getProperties();
 
 	private ArrayList<String> headers = null;
 
@@ -78,7 +80,9 @@ public class HRMXMLHandler extends ORU_R01MessageHandler
 			SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
 			// Load a WXS schema, represented by a Schema instance.
-			Source schemaFile = new StreamSource(new File(SFTPConnector.OMD_directory + "report_manager_cds.xsd"));
+			
+			// TODO replace this with the actual location
+			Source schemaFile = new StreamSource(new File(properties.getProperty("omd.hrm.local_base_directory") + "/report_manager_cds.xsd"));
 			Schema schema = factory.newSchema(schemaFile); //new File(SFTPConnector.OMD_directory + "report_manager_cds.xsd"));
 
 			JAXBContext jc = JAXBContext.newInstance("org.oscarehr.hospitalReportManager.xsd");

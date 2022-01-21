@@ -1,0 +1,1 @@
+angular.module('Record.Nav', ['Common', 'Common.Services']);

@@ -46,9 +46,12 @@ public class BillingONFilenameDaoTest extends DaoTestFixtures
 	public BillingONFilenameDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billing_on_filename");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billing_on_filename"
+		};
 	}
 
 	@Test

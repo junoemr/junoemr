@@ -14,7 +14,7 @@
 			<input id="input-{{name}}"
 						 type="text"
 						 class="form-control"
-						 autocomplete="off"
+						 autocomplete="{{autocompleteOff}}"
 						 spellcheck="false"
 						 placeholder="{{input_placeholder}}"
 						 ng-model="search_field"

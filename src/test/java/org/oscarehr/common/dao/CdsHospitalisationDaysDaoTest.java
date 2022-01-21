@@ -50,9 +50,12 @@ public class CdsHospitalisationDaysDaoTest extends DaoTestFixtures
 
 	Logger logger = MiscUtils.getLogger(); 
 	
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("CdsHospitalisationDays");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"CdsHospitalisationDays"
+		};
 	}
 
 	@Test

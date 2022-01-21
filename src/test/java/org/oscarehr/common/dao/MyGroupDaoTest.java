@@ -49,10 +49,12 @@ public class MyGroupDaoTest extends DaoTestFixtures
 	public MyGroupDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("mygroup","provider");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"mygroup", "provider"
+		};
 	}
 
 	@Test

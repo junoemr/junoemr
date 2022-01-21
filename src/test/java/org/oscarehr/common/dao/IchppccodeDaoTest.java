@@ -38,9 +38,12 @@ public class IchppccodeDaoTest extends DaoTestFixtures
 	@Autowired
 	protected IchppccodeDao ichppccodeDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("ichppccode");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"ichppccode"
+		};
 	}
 	
 	@Test

@@ -1,0 +1,54 @@
+#hrm-admin {
+	.stats-panel {
+		.summary-step {
+			height: 32px;
+
+			.status {
+				@include juno-font-button(16px, bold, normal);
+				background-color: var(--color-neutral-lightest);
+				border: solid 2px;
+				border-radius: 4px;
+
+				width: 256px;
+				text-align: center;
+
+				&.ok {
+					border-color: var(--color-lime-darker);
+					color: var(--color-lime-darker);
+				}
+
+				&.warn {
+					border-color: var(--color-orange-dark);
+					color: var(--color-orange-dark);
+				}
+
+				&.error {
+					border-color: var(--color-red-base);
+					color: var(--color-red-base);
+				}
+			}
+
+			.status-text {
+				white-space: pre-line;
+			}
+		}
+
+		.xs-text {
+			@include juno-font-body-smallest;
+		}
+	}
+
+	.polling-panel {
+		.loading-container {
+			overflow: hidden;
+			height: 30px;
+			width: 256px;
+		}
+
+		juno-input {
+			flex-grow: 0;
+			display: inline-block;
+			width: 512px;
+		}
+	}
+}

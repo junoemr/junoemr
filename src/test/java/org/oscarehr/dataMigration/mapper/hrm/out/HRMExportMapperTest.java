@@ -33,6 +33,7 @@ import xml.hrm.v4_3.DateFullOrPartial;
 import xml.hrm.v4_3.PersonNameSimple;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -49,8 +50,6 @@ public class HRMExportMapperTest
 	{
 		MockitoAnnotations.initMocks(this);
 	}
-
-
 
 	@Test
 	public void testPersonNameSimple_Null()
@@ -87,6 +86,15 @@ public class HRMExportMapperTest
 		LocalDate localDate = LocalDate.of(2021, 4, 6);
 		DateFullOrPartial dateFullOrPartial = hrmExportMapper.toNullableDateFullOrPartial(localDate);
 		assertEquals("2021-04-06", String.valueOf(dateFullOrPartial.getFullDate()));
+	}
+
+	@Test
+	public void TestToNullableDateFullOrPartial_LocalDateTimeDefault()
+	{
+		LocalDateTime localDateTime = LocalDateTime.of(2021, 4, 6, 13, 14, 15);
+		DateFullOrPartial dateFullOrPartial = hrmExportMapper.toNullableDateFullOrPartial(localDateTime);
+
+		assertEquals("2021-04-06T13:14:15", String.valueOf(dateFullOrPartial.getDateTime()));
 	}
 
 }

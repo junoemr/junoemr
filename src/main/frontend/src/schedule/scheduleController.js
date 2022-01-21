@@ -5,6 +5,7 @@ import {ProviderPreferenceApi} from '../../generated/api/ProviderPreferenceApi';
 import {SystemPreferenceApi} from "../../generated/api/SystemPreferenceApi";
 import {MhaAppointmentApi, MhaIntegrationApi, ProviderSettings, ProvidersServiceApi} from "../../generated";
 import {SecurityPermissions} from "../common/security/securityConstants";
+import {VirtualAppointmentType} from "../lib/appointment/model/VirtualAppointmentType";
 
 angular.module('Schedule').controller('Schedule.ScheduleController', [
 
@@ -1089,6 +1090,16 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 					// Only show telehealth icon if it's both on for the instance and the appointment has the virtual flag
 					telehealthElem.show();
 
+					// modify icon  depending on virtual appointment type
+					if (event.data.virtualAppointmentType === VirtualAppointmentType.Audio)
+					{
+						telehealthElem.find("i").className = "icon icon-tele-call onclick-event-telehealth";
+					}
+					else if (event.data.virtualAppointmentType === VirtualAppointmentType.Chat)
+					{
+						telehealthElem.find("i").get(0).className = "icon icon-chat onclick-event-telehealth";
+					}
+
 					// On hover show telehealth status
 					telehealthElem.hover(() =>
 					{
@@ -1134,12 +1145,12 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 				switch (controller.appointmentReasonDisplayLevel)
 				{
-					case ProviderSettings.AppointmentReasonDisplayLevelEnum.NONE:
+					case ProviderSettings.AppointmentReasonDisplayLevelEnum.None:
 						break;
-					case ProviderSettings.AppointmentReasonDisplayLevelEnum.REASONONLY:
+					case ProviderSettings.AppointmentReasonDisplayLevelEnum.ReasonOnly:
 						detailText += `(${eventReason})`;
 						break;
-					case ProviderSettings.AppointmentReasonDisplayLevelEnum.DEFAULTALL:
+					case ProviderSettings.AppointmentReasonDisplayLevelEnum.DefaultAll:
 					default:
 						detailText += `(${controller.appointmentReasons[event.data.reasonCode]} - ${eventReason})`;
 				}

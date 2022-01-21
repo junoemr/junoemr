@@ -62,9 +62,12 @@ public class PreventionDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("preventions", "demographic_merged");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"preventions", "demographic_merged"
+		};
 	}
 
 	@Test

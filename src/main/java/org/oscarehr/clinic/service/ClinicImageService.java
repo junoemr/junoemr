@@ -38,13 +38,15 @@ public class ClinicImageService
 	// Keeping in mind that these images are stored in the resource directory
 	public enum IMAGE_TYPE {
 		WATERMARK,
-		CARD_LOGO
+		CARD_LOGO,
+		NAV_LOGO,
 	}
 	private static Map<IMAGE_TYPE, String> imageTypeMap = new HashMap<>();
 	static
 	{
 		imageTypeMap.put(IMAGE_TYPE.WATERMARK, "watermark.png");
 		imageTypeMap.put(IMAGE_TYPE.CARD_LOGO, "card_logo.png");
+		imageTypeMap.put(IMAGE_TYPE.NAV_LOGO, "nav_logo.png");
 	}
 
 	/**

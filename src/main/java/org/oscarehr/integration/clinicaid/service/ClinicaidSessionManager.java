@@ -102,7 +102,7 @@ public class ClinicaidSessionManager
 		connection.disconnect();
 		return result;
 	}
-
+	
 	protected String getLoginToken(Provider loggedInProvider) throws IOException
 	{
 		clinicaidUser = new ClinicaidUserTo1();

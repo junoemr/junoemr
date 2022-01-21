@@ -23,20 +23,26 @@
 
 package org.oscarehr.config.modules;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.hospitalReportManager.service.HRMScheduleService;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 import oscar.OscarProperties;
+
+import javax.annotation.PostConstruct;
 
 @Configuration
 @Conditional(HrmModuleConfig.Condition.class)
-@ImportResource({"classpath*:applicationContextHRM.xml"})
 public class HrmModuleConfig
 {
-	private static final Logger logger = MiscUtils.getLogger();
+	@Autowired
+	private HRMScheduleService hrmScheduleService;
 
+	private static final Logger logger = MiscUtils.getLogger();
+	
 	public HrmModuleConfig()
 	{
 		logger.info("Loaded HRM module");
@@ -47,6 +53,18 @@ public class HrmModuleConfig
 		public OscarProperties.Module getModule()
 		{
 			return OscarProperties.Module.MODULE_HRM;
+		}
+	}
+	
+	@PostConstruct
+	public void startSchedule()
+	{
+		boolean pollingEnabled = OscarProperties.getInstance().isPropertyActive("omd.hrm.polling_enabled");
+
+		if (pollingEnabled)
+		{
+			String interval = OscarProperties.getInstance().getProperty("omd.hrm.poll_interval_sec");
+			hrmScheduleService.scheduleRegularFetch(Math.max(NumberUtils.toInt(interval), HRMScheduleService.HRM_MINIMUM_POLL_TIME_SEC));
 		}
 	}
 }
