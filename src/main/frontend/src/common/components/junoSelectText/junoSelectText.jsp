@@ -3,12 +3,13 @@
 		{{$ctrl.label}}
 	</label>
 	<div class="flex-row juno-select-text-container">
-		<juno-select
+		<select
 				ng-model="$ctrl.selectModel"
-				options="$ctrl.selectOptions"
-				disabled="$ctrl.disabled"
-		>
-		</juno-select>
+				ng-options="option.value as $ctrl.resolveSelectLabel(option) disable when option.disabled for option in $ctrl.fullOptionsList"
+				ng-disabled="$ctrl.disabled"
+				ng-click="$ctrl.onSelectClick()"
+				ng-change="$ctrl.onSelectChange()">
+		</select>
 		<juno-input
 				ng-model="$ctrl.textModel"
 				placeholder="{{$ctrl.textPlaceholder}}"

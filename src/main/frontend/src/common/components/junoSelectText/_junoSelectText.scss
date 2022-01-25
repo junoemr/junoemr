@@ -8,36 +8,40 @@ juno-select-text {
 		border: 1px solid var(--theme-color-form-field-border);
 		border-radius: var(--theme-form-field-border-radius);
 
-		.juno-select {
-			.select-container
-			{
-				select {
-					border-radius: var(--theme-form-field-border-radius) 0 0 var(--theme-form-field-border-radius);
-					background-color: var(--color-neutral-light);
-					color: var(--color-primary-darker);
+		select {
+			border-radius: var(--theme-form-field-border-radius) 0 0 var(--theme-form-field-border-radius);
+			background-color: var(--color-neutral-light);
+			color: var(--color-neutral-dark);	/* or is this the disabled state */
+			border: none;
+			padding: 0 24px 0 8px;
+			width: 60px;
+			outline: none;
+
+			&:focus, &:active {
+				border: none;
+				color: var(--color-primary-darker);
+			}
+		}
+
+		juno-input {
+			width: 100%;
+
+			.juno-input {
+				@include juno-form-inputs-style(1px, var(--theme-form-field-border-radius));
+				display: flex;
+
+				input {
 					border: none;
+					border-radius: 0 var(--theme-form-field-border-radius) var(--theme-form-field-border-radius) 0;
+					padding: 0 8px;
 
 					&:focus, &:active {
 						border: none;
 					}
 
-				}
-			}
-		}
-
-		.juno-input {
-			@include juno-form-inputs-style(1px, var(--theme-form-field-border-radius));
-
-			input {
-				border: none;
-				border-radius: 0 var(--theme-form-field-border-radius) var(--theme-form-field-border-radius) 0;
-
-				&:focus, &:active {
-					border: none;
-				}
-
-				&:focus-visible {
-					outline: none;
+					&:focus-visible {
+						outline: none;
+					}
 				}
 			}
 		}

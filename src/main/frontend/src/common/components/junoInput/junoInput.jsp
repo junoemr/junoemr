@@ -2,6 +2,7 @@
 
 	<label ng-if="$ctrl.label" ng-class="$ctrl.labelClasses()">
 		{{$ctrl.label}}
+		<span ng-if="$ctrl.requiredIndicator" class="required-icon">*</span>
 	</label>
 
 	<div>

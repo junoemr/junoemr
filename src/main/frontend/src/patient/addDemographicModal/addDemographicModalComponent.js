@@ -26,7 +26,6 @@ angular.module('Patient').component('addDemographicModal', {
 			staticDataService,
 			demographicService,
 			providerService,
-			focusService,
 		)
 		{
 			let ctrl = this;
@@ -63,7 +62,7 @@ angular.module('Patient').component('addDemographicModal', {
 				hin: "",
 				ver: "",
 				hcType: "BC",
-				mrp: "",
+				providerNo: "",
 				dateJoined: Juno.Common.Util.getDateMoment(new Date()),
 				patientStatusDate: Juno.Common.Util.getDateMoment(new Date())
 			}
@@ -79,6 +78,24 @@ angular.module('Patient').component('addDemographicModal', {
 			ctrl.invalidDob = false;
 
 			ctrl.buttonClicked = false;
+
+			ctrl.test = [
+				{
+					label: "British Columbia",
+					value : "CA-BC",
+					shortLabel: "BC"
+				},
+				{
+					label: "Alberta",
+					value: "CA-AB",
+					shortLabel: "AB"
+				},
+				{
+					label: "Saskatchewan",
+					value: "CA-SK",
+					shortLabel: "SK"
+				}
+			];
 
 			ctrl.$onInit = () =>
 			{
@@ -158,6 +175,11 @@ angular.module('Patient').component('addDemographicModal', {
 					ctrl.newDemographicData.firstName &&
 					ctrl.newDemographicData.sex
 			};
+
+			ctrl.onMRPChange = function(value)
+			{
+				ctrl.newDemographicData.mrp = value;
+			}
 
 			ctrl.onCancel = function()
 			{
