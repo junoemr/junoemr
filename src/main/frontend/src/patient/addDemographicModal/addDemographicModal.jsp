@@ -86,7 +86,7 @@
 				<juno-select label="MRP"
 							 label-position="$ctrl.LABEL_POSITION"
 							 component-style="$ctrl.COMPONENT_STYLE"
-							 ng-model="$ctrl.newDemographicData.providerNo"
+							 ng-model="$ctrl.newDemographicData.mrp"
 							 options="$ctrl.mrpOptions"
 							 on-change="$ctrl.onMRPChange(value)">
 
