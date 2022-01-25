@@ -22,7 +22,9 @@
 							component-style="$ctrl.COMPONENT_STYLE"
 							invalid="!$ctrl.newDemographicData.lastName"
 							show-invalid-focus="true"
+							show-invalid-pristine="false"
 							auto-focus="true"
+							required-indicator="true"
 				>
 				</juno-input>
 				<!-- FIRST NAME -->
@@ -32,6 +34,8 @@
 							component-style="$ctrl.COMPONENT_STYLE"
 							invalid="!$ctrl.newDemographicData.firstName"
 							show-invalid-focus="true"
+							show-invalid-pristine="false"
+							required-indicator="true"
 				>
 				</juno-input>
 				<!-- GENDER -->
@@ -40,7 +44,9 @@
 							 component-style="$ctrl.COMPONENT_STYLE"
 							 ng-model="$ctrl.newDemographicData.sex"
 							 invalid="!$ctrl.newDemographicData.sex"
-							 options="$ctrl.genders">
+							 show-invalid-pristine="false"
+							 options="$ctrl.genders"
+							 required-indicator="true">
 				</juno-select>
 				<!-- DOB -->
 				</juno-date-select>
@@ -59,11 +65,13 @@
 				<div class="flex-row flex-grow-1 align-items-center">
 					<!-- HIN NUM-->
 					<juno-select-text select-model="$ctrl.newDemographicData.hcType"
-									  select-options="$ctrl.provinces"
+									  select-placeholder="{{ {label: 'Select a Province', shortLabel: '--'} }}"
+									  select-options="$ctrl.test"
 									  text-model="$ctrl.newDemographicData.hin"
 									  label="Health Insurance Number"
 									  label-position="$ctrl.LABEL_POSITION"
 									  component-style="$ctrl.COMPONENT_STYLE"
+									  class="m-r-8"
 					>
 					</juno-select-text>
 					<!-- HIN VER -->
@@ -74,11 +82,13 @@
 								placeholder="Ver">
 					</juno-input>
 				</div>
+				<!-- MRP -->
 				<juno-select label="MRP"
 							 label-position="$ctrl.LABEL_POSITION"
 							 component-style="$ctrl.COMPONENT_STYLE"
 							 ng-model="$ctrl.newDemographicData.mrp"
-							 options="$ctrl.mrpOptions">
+							 options="$ctrl.mrpOptions"
+							 on-change="$ctrl.onMRPChange(value)">
 
 				</juno-select>
 			</div>

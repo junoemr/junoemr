@@ -29,28 +29,15 @@ angular.module('Common.Components').component('junoSelectText', {
 	bindings: {
 		selectModel: "=",
 		selectOptions: "<",
+		selectPlaceholder: "@?",
+
 		textModel: "=",
 		textPlaceholder: "@?",
-		uppercase: "<?",
 
 		label: "@?",
 		labelPosition: "<?",
 		change: "&?",
 		disabled: "<?",
-
-		characterLimit: "<?",
-		hideCharacterLimit: "<?",
-
-		// if try only numbers can be entered in to this input
-		onlyNumeric: "<?",
-
-		// block characters from being entered that do not match this regex
-		validRegex: "<?",
-
-		invalid: "<?",
-
-		// if true show invalid state even while focused
-		showInvalidFocus: "<?",
 
 		componentStyle: "<?",
 		allowAutocomplete: "<?",
@@ -62,15 +49,20 @@ angular.module('Common.Components').component('junoSelectText', {
 		ctrl.oldNgModel = null;
 		ctrl.isFocused = false;
 
+		ctrl.fullOptionsList = [];
+
 		ctrl.$onInit = () =>
 		{
-			ctrl.uppercase = ctrl.uppercase || false;
-			ctrl.invalid = ctrl.invalid || false;
-			ctrl.noBox = ctrl.noBox || false;
-			ctrl.onlyNumeric = ctrl.onlyNumeric || false;
-			ctrl.hideCharacterLimit = ctrl.hideCharacterLimit || true;
+			ctrl.selectPlaceholder = ctrl.selectPlaceholder || { label: "Select", shortLabel: "Select" }
+
+			ctrl.fullOptionsList = [{ label: ctrl.selectPlaceholder.label,
+				disabled: true,
+				value:"",
+				shortLabel: ctrl.selectPlaceholder.shortLabel
+			}, ...ctrl.selectOptions]
+
 			ctrl.allowAutocomplete = ctrl.allowAutocomplete || false;
-			ctrl.placeholder = ctrl.placeholder || null;
+			ctrl.textPlaceholder = ctrl.textPlaceholder || null;
 
 			if (ctrl.showInvalidFocus === undefined)
 			{
@@ -79,15 +71,9 @@ angular.module('Common.Components').component('junoSelectText', {
 
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-			ctrl.oldNgModel = ctrl.ngModel;
 
 			ctrl.deviceInfo = new DeviceInfo();
 		};
-
-		$scope.$watch("$ctrl.ngModel", () =>
-		{
-			ctrl.oldNgModel = ctrl.ngModel;
-		});
 
 		ctrl.componentClasses = () =>
 		{
@@ -110,48 +96,20 @@ angular.module('Common.Components').component('junoSelectText', {
 			return [ctrl.labelPosition, "label-style"];
 		};
 
-		ctrl.onChange = () =>
+		ctrl.resolveSelectLabel = (option) =>
 		{
-			if (ctrl.ngModel)
+			if (ctrl.selectModel === option.value && option.shortLabel)
 			{
-				if (!ctrl.isNgModelValid())
-				{
-					// reset to old value
-					ctrl.ngModel = ctrl.oldNgModel;
-				}
+					return option.shortLabel;
 			}
 
-			// update the old value
-			ctrl.oldNgModel = ctrl.ngModel;
-
-			if (ctrl.ngChange)
-			{
-				ctrl.ngChange({});
-			}
+			return option.label
 		}
 
-		ctrl.isNgModelValid = () =>
+		// Reset the select model on click, otherwise the dropdown menu will show the abbreviated label
+		ctrl.onSelectClick = () =>
 		{
-			if (ctrl.validRegex && !ctrl.validRegex.test(ctrl.ngModel))
-			{
-				return false;
-			}
-			else if (ctrl.onlyNumeric && !((/^\d+$/).test(ctrl.ngModel)))
-			{
-				return false;
-			}
-
-			return true;
-		}
-
-		ctrl.onFocus = () =>
-		{
-			ctrl.isFocused = true;
-		}
-
-		ctrl.onBlur = () =>
-		{
-			ctrl.isFocused = false;
+			ctrl.selectModel = "";
 		}
 
 		ctrl.autocompleteValue = () =>
