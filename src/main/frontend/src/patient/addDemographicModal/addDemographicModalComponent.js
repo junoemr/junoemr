@@ -17,7 +17,6 @@ angular.module('Patient').component('addDemographicModal', {
 		'staticDataService',
 		'demographicService',
 		'providerService',
-		'focusService',
 		function (
 			$scope,
 			$http,
