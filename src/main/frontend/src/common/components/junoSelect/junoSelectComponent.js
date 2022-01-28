@@ -37,9 +37,6 @@ angular.module('Common.Components').component('junoSelect', {
 		onChange: "&?",
 		// Show a required field indicator to the right of the label.
 		requiredIndicator: "<?",
-
-		// Show an invalid state if controller model is pristine
-		showInvalidPristine: "<?"
 	},
 	controller: [function ()
 	{
@@ -73,16 +70,8 @@ angular.module('Common.Components').component('junoSelect', {
 		ctrl.inputClasses = () =>
 		{
 			return {
-				"field-invalid": ctrl.invalid && ctrl.calcShowInvalid()
+				"field-invalid": ctrl.invalid && !ctrl.pristine
 			};
-		}
-
-		ctrl.calcShowInvalid = () =>
-		{
-			if (!ctrl.showInvalidPristine && ctrl.pristine)
-			{
-				return false;
-			}
 		}
 
 		ctrl.onSelectChange = (value) =>

@@ -22,7 +22,6 @@
 							component-style="$ctrl.COMPONENT_STYLE"
 							invalid="!$ctrl.newDemographicData.lastName"
 							show-invalid-focus="true"
-							show-invalid-pristine="false"
 							auto-focus="true"
 							required-indicator="true"
 				>
@@ -34,7 +33,6 @@
 							component-style="$ctrl.COMPONENT_STYLE"
 							invalid="!$ctrl.newDemographicData.firstName"
 							show-invalid-focus="true"
-							show-invalid-pristine="false"
 							required-indicator="true"
 				>
 				</juno-input>
@@ -44,7 +42,6 @@
 							 component-style="$ctrl.COMPONENT_STYLE"
 							 ng-model="$ctrl.newDemographicData.sex"
 							 invalid="!$ctrl.newDemographicData.sex"
-							 show-invalid-pristine="false"
 							 options="$ctrl.genders"
 							 required-indicator="true">
 				</juno-select>

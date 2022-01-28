@@ -45,8 +45,6 @@ angular.module('Common.Components').component('junoInput', {
 		invalid: "<?",
 		// if true show invalid state even while focused
 		showInvalidFocus: "<?",
-		// if true show invalid on pristine state
-		showInvalidPristine: "<?",
 		// if true do not draw the input "box" just draw its contents
 		noBox: "<?",
 		componentStyle: "<?",
@@ -79,12 +77,6 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.allowAutocomplete = ctrl.allowAutocomplete || false;
 
 			ctrl.showInvalidFocus = ctrl.showInvalidFocus  || false;
-
-			if (ctrl.showInvalidPristine === undefined)
-			{
-				ctrl.showInvalidPristine = true;
-			}
-
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.oldNgModel = ctrl.ngModel;
@@ -128,12 +120,12 @@ angular.module('Common.Components').component('junoInput', {
 		// Function assumes that ctrl.invalid is true, is determining edge cases
 		ctrl.calcShowInvalid = () =>
 		{
-			if (!ctrl.showInvalidFocus && ctrl.isFocused)
+			if (ctrl.pristine)
 			{
 				return false;
 			}
 
-			if (!ctrl.showInvalidPristine && ctrl.pristine)
+			if (!ctrl.showInvalidFocus && ctrl.isFocused)
 			{
 				return false;
 			}
