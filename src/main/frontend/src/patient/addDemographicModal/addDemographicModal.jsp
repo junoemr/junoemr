@@ -59,16 +59,16 @@
 					</ca-field-date>
 				</div>
 				<!-- HIN -->
-				<div class="flex-row flex-grow-1 align-items-center">
+				<div class="flex-row flex-grow-1 align-items-center hin-fields">
 					<!-- HIN NUM-->
 					<juno-select-text select-model="$ctrl.newDemographicData.hcType"
-									  select-placeholder="{{ {label: 'Select a Province', shortLabel: '--'} }}"
-									  select-options="$ctrl.test"
+									  select-placeholder="$ctrl.hcTypePlaceHolder"
+									  select-options="$ctrl.hcTypeProvs"
 									  text-model="$ctrl.newDemographicData.hin"
 									  label="Health Insurance Number"
 									  label-position="$ctrl.LABEL_POSITION"
 									  component-style="$ctrl.COMPONENT_STYLE"
-									  class="m-r-8"
+									  class="m-r-8 hin"
 					>
 					</juno-select-text>
 					<!-- HIN VER -->
@@ -76,7 +76,8 @@
 								ng-model="$ctrl.newDemographicData.ver"
 								label-position="$ctrl.LABEL_POSITION"
 								component-style="$ctrl.COMPONENT_STYLE"
-								placeholder="Ver">
+								placeholder="Ver"
+								class="ver">
 					</juno-input>
 				</div>
 				<!-- MRP -->

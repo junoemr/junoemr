@@ -69,7 +69,6 @@ angular.module('Patient').component('addDemographicModal', {
 			ctrl.newDemographicData = {};
 			ctrl.isCreateAnotherEnabled = false;
 
-
 			// validation
 			ctrl.invalidLastName = false;
 			ctrl.invalidFirstName = false;
@@ -78,23 +77,15 @@ angular.module('Patient').component('addDemographicModal', {
 
 			ctrl.buttonClicked = false;
 
-			ctrl.test = [
-				{
-					label: "British Columbia",
-					value : "CA-BC",
-					shortLabel: "BC"
-				},
-				{
-					label: "Alberta",
-					value: "CA-AB",
-					shortLabel: "AB"
-				},
-				{
-					label: "Saskatchewan",
-					value: "CA-SK",
-					shortLabel: "SK"
+			ctrl.hcTypePlaceholder = {label: "Prov", shortLabel: "Prov"};
+			ctrl.hcTypeProvs = ctrl.provincesCA.map(prov =>
+			{
+				return {
+					value: prov.value,
+					label: prov.label,
+					shortLabel: prov.value
 				}
-			];
+			});
 
 			ctrl.$onInit = () =>
 			{

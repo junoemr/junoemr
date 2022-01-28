@@ -16,10 +16,11 @@ juno-select-text {
 			padding: 0 24px 0 8px;
 			width: 60px;
 			outline: none;
+			height: 30px;
 
 			&:focus, &:active {
 				border: none;
-				color: var(--color-primary-darker);
+				color: var(--juno-form-input-height) - 2px;
 			}
 		}
 
@@ -34,6 +35,7 @@ juno-select-text {
 					border: none;
 					border-radius: 0 var(--theme-form-field-border-radius) var(--theme-form-field-border-radius) 0;
 					padding: 0 8px;
+					height: var(--juno-form-input-height) - 2px;
 
 					&:focus, &:active {
 						border: none;
