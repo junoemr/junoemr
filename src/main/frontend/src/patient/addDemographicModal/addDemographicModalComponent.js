@@ -77,7 +77,6 @@ angular.module('Patient').component('addDemographicModal', {
 
 			ctrl.buttonClicked = false;
 
-			ctrl.hcTypePlaceholder = {label: "Prov", shortLabel: "Prov"};
 			ctrl.hcTypeProvs = ctrl.provincesCA.map(prov =>
 			{
 				return {
@@ -166,7 +165,12 @@ angular.module('Patient').component('addDemographicModal', {
 					ctrl.newDemographicData.sex
 			};
 
-			ctrl.onMRPChange = function(value)
+			ctrl.onHcTypeChange = (value) =>
+			{
+				ctrl.newDemographicData.hcType = value;
+			}
+
+			ctrl.onMRPChange = (value) =>
 			{
 				ctrl.newDemographicData.mrp = value;
 			}

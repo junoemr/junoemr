@@ -30,6 +30,7 @@ angular.module('Common.Components').component('junoSelectText', {
 		selectModel: "=",
 		selectOptions: "<",
 		selectPlaceholder: "@?",
+		selectChange: "&?",
 
 		textModel: "=",
 		textPlaceholder: "@?",
@@ -50,15 +51,19 @@ angular.module('Common.Components').component('junoSelectText', {
 		ctrl.isFocused = false;
 
 		ctrl.fullOptionsList = [];
+		ctrl.selectPlaceholderValue = "";
 
 		ctrl.$onInit = () =>
 		{
-			ctrl.selectPlaceholder = ctrl.selectPlaceholder || { label: "Select", shortLabel: "Select" }
+			ctrl.selectPlaceholder = ctrl.selectPlaceholder || "";
 
-			ctrl.fullOptionsList = [{ label: ctrl.selectPlaceholder.label,
+			// First option is a dummy placeholder which is hidden.  When the select is in
+			// an unselected state, the shortLabel value is shown.
+			ctrl.fullOptionsList = [{
+				label: "",
 				disabled: true,
-				value:"",
-				shortLabel: ctrl.selectPlaceholder.shortLabel
+				value: ctrl.selectPlaceholderValue,
+				shortLabel: ctrl.selectPlaceholder
 			}, ...ctrl.selectOptions]
 
 			ctrl.allowAutocomplete = ctrl.allowAutocomplete || false;
@@ -74,6 +79,11 @@ angular.module('Common.Components').component('junoSelectText', {
 
 			ctrl.deviceInfo = new DeviceInfo();
 		};
+
+		ctrl.isPlaceHolder = (option) =>
+		{
+			return option.value === ctrl.selectPlaceholderValue;
+		}
 
 		ctrl.componentClasses = () =>
 		{
@@ -106,10 +116,20 @@ angular.module('Common.Components').component('junoSelectText', {
 			return option.label
 		}
 
-		// Reset the select model on click, otherwise the dropdown menu will show the abbreviated label
-		ctrl.onSelectClick = () =>
+		// Reset the select model when touched. This must be attached to a mousedown event, not a click
+		// event, otherwise this handler will fire again when the option is selected
+		ctrl.onSelectTouched = () =>
 		{
-			ctrl.selectModel = "";
+			ctrl.selectModel = ctrl.selectPlaceholderValue;
+		}
+
+		ctrl.onSelectChange = (value) =>
+		{
+			if (ctrl.selectChange)
+			{
+				const option = (ctrl.selectOptions) ? ctrl.selectOptions.find((option) => option.value === value) : null;
+				ctrl.selectChange({value: value, option: option});
+			}
 		}
 
 		ctrl.autocompleteValue = () =>

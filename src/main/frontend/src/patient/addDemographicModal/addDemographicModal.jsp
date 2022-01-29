@@ -62,8 +62,8 @@
 				<div class="flex-row flex-grow-1 align-items-center hin-fields">
 					<!-- HIN NUM-->
 					<juno-select-text select-model="$ctrl.newDemographicData.hcType"
-									  select-placeholder="$ctrl.hcTypePlaceHolder"
 									  select-options="$ctrl.hcTypeProvs"
+									  select-change="$ctrl.onHcTypeChange(value)"
 									  text-model="$ctrl.newDemographicData.hin"
 									  label="Health Insurance Number"
 									  label-position="$ctrl.LABEL_POSITION"

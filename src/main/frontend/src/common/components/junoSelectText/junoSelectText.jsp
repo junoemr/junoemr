@@ -5,10 +5,12 @@
 	<div class="flex-row juno-select-text-container">
 		<select
 				ng-model="$ctrl.selectModel"
-				ng-options="option.value as $ctrl.resolveSelectLabel(option) disable when option.disabled for option in $ctrl.fullOptionsList"
 				ng-disabled="$ctrl.disabled"
-				ng-click="$ctrl.onSelectClick()"
-				ng-change="$ctrl.onSelectChange()">
+				ng-mousedown="$ctrl.onSelectTouched()"
+				ng-change="$ctrl.onSelectChange($ctrl.selectModel)">
+			<option ng-repeat="option in $ctrl.fullOptionsList" value="{{option.value}}" ng-hide="$ctrl.isPlaceHolder(option)">
+				{{ $ctrl.resolveSelectLabel(option) }}
+			</option>
 		</select>
 		<juno-input
 				ng-model="$ctrl.textModel"
