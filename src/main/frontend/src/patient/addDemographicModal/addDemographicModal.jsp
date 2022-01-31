@@ -127,12 +127,15 @@
 				>
 				</juno-input>
 				<!-- PHONE -->
-				<juno-input ng-model="$ctrl.newDemographicData.phone"
-							label="Phone"
-							label-position="$ctrl.LABEL_POSITION"
-							component-style="$ctrl.COMPONENT_STYLE"
-				>
-				</juno-input>
+				<juno-select-text select-model="$ctrl.preferredPhoneType"
+								  select-options="$ctrl.preferredPhoneOptions"
+								  select-change="$ctrl.onPreferredPhoneTypeChange(value)"
+								  text-model="$ctrl.preferredPhoneNumber"
+								  label="Preferred Phone"
+								  label-position="$ctrl.LABEL_POSITION"
+								  component-style="$ctrl.COMPONENT_STYLE"
+								  id="preferredPhone">
+				</juno-select-text>
 			</div>
 		</div>
 		</div>

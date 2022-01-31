@@ -1,7 +1,13 @@
-import {SystemPreferenceApi} from "../../../generated/api/SystemPreferenceApi";
+import {Demographic, DemographicTo1, SystemPreferenceApi} from "../../../generated";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION, JUNO_STYLE} from "../../common/components/junoComponentConstants";
 import {ProvidersServiceApi} from "../../../generated";
 import ToastService from "../../lib/alerts/service/ToastService";
+
+enum PHONE_TYPE {
+	HOME = "HOME",
+	WORK = "WORK",
+	CELL = "CELL"
+}
 
 angular.module('Patient').component('addDemographicModal', {
 	templateUrl: 'src/patient/addDemographicModal/addDemographicModal.jsp',
@@ -14,6 +20,7 @@ angular.module('Patient').component('addDemographicModal', {
 		'$http',
 		'$httpParamSerializer',
 		'$timeout',
+		'$stateParams',
 		'staticDataService',
 		'demographicService',
 		'providerService',
@@ -22,6 +29,7 @@ angular.module('Patient').component('addDemographicModal', {
 			$http,
 			$httpParamSerializer,
 			$timeout,
+			$stateParams,
 			staticDataService,
 			demographicService,
 			providerService,
@@ -32,6 +40,7 @@ angular.module('Patient').component('addDemographicModal', {
 			ctrl.LABEL_POSITION = LABEL_POSITION.TOP;
 			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+			ctrl.COMPONENT_STYLE = JUNO_STYLE.DEFAULT;
 
 			ctrl.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
 				'../ws/rs');
@@ -58,12 +67,12 @@ angular.module('Patient').component('addDemographicModal', {
 				},
 				email: "",
 				phone: "",
+				alternativePhone: "",
 				hin: "",
 				ver: "",
 				hcType: "BC",
 				providerNo: "",
-				dateJoined: Juno.Common.Util.getDateMoment(new Date()),
-				patientStatusDate: Juno.Common.Util.getDateMoment(new Date())
+				extras: [],
 			}
 
 			ctrl.newDemographicData = {};
@@ -86,9 +95,33 @@ angular.module('Patient').component('addDemographicModal', {
 				}
 			});
 
+			ctrl.preferredPhoneType = PHONE_TYPE.HOME;
+			ctrl.preferredPhone = null;
+
+			ctrl.preferredPhoneOptions = [
+				{
+					value: PHONE_TYPE.HOME,
+					label: "Home Phone",
+					shortLabel: "Home",
+
+				},
+				{
+					value: PHONE_TYPE.CELL,
+					label: "Mobile Phone",
+					shortLabel: "Mobile",
+				},
+				{
+					value: PHONE_TYPE.WORK,
+					label: "Work Phone",
+					shortLabel: "Work",
+				}
+			]
+
 			ctrl.$onInit = () =>
 			{
 				ctrl.resetDemographic();
+				ctrl.preferredPhone = "";
+				ctrl.preferredPhoneType = PHONE_TYPE.HOME;
 
 				// Pull phone prefix from Oscar Properties file
 				ctrl.systemPreferenceApi.getPreferenceValue("phone_prefix", "").then(
@@ -175,18 +208,64 @@ angular.module('Patient').component('addDemographicModal', {
 				ctrl.newDemographicData.mrp = value;
 			}
 
-			ctrl.onCancel = function()
+			ctrl.onPreferredPhoneTypeChange = (value) =>
+			{
+				ctrl.preferredPhoneType = value;
+			}
+
+			ctrl.onCancel = () =>
 			{
 				ctrl.modalInstance.dismiss("cancel");
 			};
+
+			ctrl.finalizePhoneNumber = () =>
+			{
+				const preferredPhone = ctrl.preferredPhone + "*";
+
+				switch (ctrl.preferredPhoneType)
+				{
+					case PHONE_TYPE.HOME:
+						ctrl.newDemographicData.phone = preferredPhone;
+						break;
+					case PHONE_TYPE.WORK:
+						ctrl.newDemographicData.alternativePhone = preferredPhone;
+						break;
+					case PHONE_TYPE.CELL:
+						ctrl.newDemographicData.extras.push({
+							name: "demo_cell",
+							value: preferredPhone,
+							providerNo: $stateParams.providerNo,
+							demographicNo: null
+						})
+				}
+			}
+
+			ctrl.finalizeHin = () =>
+			{
+				ctrl.newDemographicData.hin = ctrl.newDemographicData.hin.replace(/[\W_]/gi, '');
+			}
+
+			ctrl.finalizeStatusDates = () =>
+			{
+				const now = Juno.Common.Util.getDateMoment(new Date());
+				ctrl.newDemographicData.dateJoined = now;
+				ctrl.newDemographicData.patientStatusDate = now;
+			}
 
 			ctrl.onAdd = function ()
 			{
 				ctrl.buttonClicked = true;
 
-				if (Juno.Common.Util.exists(ctrl.newDemographicData.hin))
+				ctrl.finalizeStatusDates();
+
+				if (ctrl.newDemographicData.preferredPhone)
 				{
-					ctrl.newDemographicData.hin = ctrl.newDemographicData.hin.replace(/[\W_]/gi, '');
+					ctrl.finalizePhoneNumber();
+				}
+
+				if (ctrl.newDemographicData.hin)
+				{
+					ctrl.finalizeHin();
 				}
 
 				if (ctrl.validateDemographic())

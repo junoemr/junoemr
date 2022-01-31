@@ -331,7 +331,7 @@ module.exports = {
 			...(glob.sync("./src/messaging/inbox/modals/**/*.js", {nosort: true})),
 
 			'./src/patient/module.js',
-			'./src/patient/addDemographicModal/addDemographicModalComponent.js',
+			'./src/patient/addDemographicModal/addDemographicModalComponent.ts',
 			'./src/patient/demographicCardComponent.js',
 			'./src/patient/demographicApi.service.ts',
 
