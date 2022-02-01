@@ -132,7 +132,17 @@ public class dxResearchAction extends Action {
 						valid = false;
 						errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.codeNotFound", xml_research[i], codingSystem));
 						saveErrors(request, errors);
-					} else {
+					}
+					else if (csDao.findByCode(xml_research[i]) == null)
+					{
+						valid = false;
+						errors.add(ActionMessages.GLOBAL_MESSAGE,
+							new ActionMessage("errors.codeNotFound", xml_research[i],
+								codingSystem));
+						saveErrors(request, errors);
+					}
+					else
+					{
 						Dxresearch dr = new Dxresearch();
 						dr.setDemographicNo(Integer.valueOf(demographicNo));
 						dr.setStartDate(new Date());
