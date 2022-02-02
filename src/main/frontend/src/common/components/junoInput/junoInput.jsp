@@ -18,6 +18,7 @@
 			   ng-disabled="$ctrl.disabled"
 			   placeholder="{{$ctrl.placeholder}}"
 			   ng-ref="$ctrl.inputRef"
+			   autocomplete="{{$ctrl.autocompleteValue()}}"
 		>
 		<div ng-if="!$ctrl.hideCharacterLimit" class="character-display">
 			{{$ctrl.ngModel.length}}/{{$ctrl.characterLimit}}
