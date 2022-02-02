@@ -108,6 +108,9 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		medication.setNonAuthoritative(toBooleanOrNull(importStructure.getNonAuthoritativeIndicator()));
 		medication.setDispenseInterval(toIntOrNull(Util.leadingNum(importStructure.getDispenseInterval())));
 		medication.setRxEndDate(getEndDate(importStructure));
+		medication.setRxStartDate(getStartDate(importStructure) == null ?
+			PartialDate.from(LocalDate.from(patientImportContextService.getContext().getDefaultDate().atStartOfDay()))
+			: getStartDate(importStructure));
 		medication.setResidualInfo(generateResidualInfo(importStructure));
 
 		return medication;

@@ -67,13 +67,28 @@ public abstract class AbstractCDSReportImportMapper<E> extends AbstractCDSImport
 		try
 		{
 			ReportFormat format = importStructure.getFormat();
+			String fileExtention = importStructure.getFileExtensionAndVersion();
+
 			if(format.equals(ReportFormat.BINARY)) //Document file
 			{
-				String filePath = importStructure.getFilePath();
+				String filePath = importStructure.getFilePath().replace('\\','/');
+
 				if(filePath != null) // external document
 				{
-					GenericFile externalFile = FileFactory.getExistingFile(patientImportContextService.getContext().getImportPreferences().getExternalDocumentPath(), filePath);
-					tempFile = FileFactory.createTempFile(externalFile.asFileInputStream(), "." + externalFile.getExtension().toLowerCase());
+					if(filePath.endsWith(fileExtention))
+					{
+						GenericFile externalFile = FileFactory.getExistingFile(patientImportContextService.getContext().getImportPreferences()
+								.getExternalDocumentPath(), filePath);
+						tempFile = FileFactory.createTempFile(externalFile.asFileInputStream(),
+							"." + externalFile.getExtension().toLowerCase());
+					}
+					else
+					{
+						GenericFile externalFile = FileFactory.getExistingFile(patientImportContextService.getContext().getImportPreferences()
+								.getExternalDocumentPath(), filePath+fileExtention);
+						tempFile = FileFactory.createTempFile(externalFile.asFileInputStream(),
+							"." + externalFile.getExtension().toLowerCase());
+					}
 				}
 				else
 				{

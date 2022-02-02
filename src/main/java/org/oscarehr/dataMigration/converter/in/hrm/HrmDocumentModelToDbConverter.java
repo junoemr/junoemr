@@ -78,11 +78,13 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		hrmDocument.setCommentList(convertCommentList(hrmDocument, input.getComments()));
 
 		hrmDocument.setHrmCategory(categoryToEntity.convert(input.getCategory()));
-
-		hrmDocument.setNumDuplicatesReceived(input.getMatchingData().getNumDuplicatesReceived());
-		hrmDocument.setReportHash(input.getMatchingData().getReportHash());
-		hrmDocument.setReportLessDemographicInfoHash(input.getMatchingData().getReportLessDemographicInfoHash());
-		hrmDocument.setReportLessTransactionInfoHash(input.getMatchingData().getReportLessTransactionInfoHash());
+		if (input.getMatchingData() != null)
+		{
+			hrmDocument.setNumDuplicatesReceived(input.getMatchingData().getNumDuplicatesReceived());
+			hrmDocument.setReportHash(input.getMatchingData().getReportHash());
+			hrmDocument.setReportLessDemographicInfoHash(input.getMatchingData().getReportLessDemographicInfoHash());
+			hrmDocument.setReportLessTransactionInfoHash(input.getMatchingData().getReportLessTransactionInfoHash());
+		}
 		
 		List<HRMDocumentToProvider> providerLinks = new ArrayList<>();
 		HRMDocumentToProvider deliverToProviderLink = createDeliverToLink(hrmDocument, input.getDeliverToUserId());
@@ -158,13 +160,18 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		List<HRMDocumentComment> hrmDocumentCommentList = new ArrayList<>(comments.size());
 		for(HrmComment comment : comments)
 		{
-			HRMDocumentComment hrmDocumentComment = new HRMDocumentComment();
-			hrmDocumentComment.setComment(comment.getText());
-			hrmDocumentComment.setDeleted(false);
-			hrmDocumentComment.setHrmDocument(hrmDocument);
-			hrmDocumentComment.setCommentTime(ConversionUtils.toNullableLegacyDateTime(comment.getObservationDateTime()));
-			hrmDocumentComment.setProvider(findOrCreateProviderRecord(comment.getProvider(), false));
-			hrmDocumentCommentList.add(hrmDocumentComment);
+			if (comment != null)
+			{
+				HRMDocumentComment hrmDocumentComment = new HRMDocumentComment();
+				hrmDocumentComment.setComment(comment.getText());
+				hrmDocumentComment.setDeleted(false);
+				hrmDocumentComment.setHrmDocument(hrmDocument);
+				hrmDocumentComment.setCommentTime(
+					ConversionUtils.toNullableLegacyDateTime(comment.getObservationDateTime()));
+				hrmDocumentComment
+					.setProvider(findOrCreateProviderRecord(comment.getProvider(), false));
+				hrmDocumentCommentList.add(hrmDocumentComment);
+			}
 		}
 		return hrmDocumentCommentList;
 	}

@@ -26,6 +26,7 @@ import org.oscarehr.dataMigration.exception.InvalidImportDataException;
 import org.oscarehr.dataMigration.exception.InvalidDocumentException;
 import org.oscarehr.dataMigration.model.appointment.Appointment;
 import org.oscarehr.dataMigration.model.document.Document;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.measurement.Measurement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -138,7 +139,7 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, org.oscareh
 		patientModel.setDocumentList(getDocuments(patientRecord.getReports()));
 		instant = LogAction.printDuration(instant, "ImportMapper: document reports");
 
-		patientModel.setHrmDocumentList(cdsReportHrmImportMapper.importAll(getHrmReports(patientRecord.getReports())));
+		patientModel.setHrmDocumentList(getHrmDocuments(patientRecord.getReports()));
 		instant = LogAction.printDuration(instant, "ImportMapper: HRM reports");
 
 		patientModel.setMeasurementList(getMeasurementsList(patientRecord.getCareElements()));
@@ -210,6 +211,34 @@ public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, org.oscareh
 			}
 		}
 		return documentList;
+	}
+
+	private List<HrmDocument> getHrmDocuments(List<Reports> reports) throws Exception
+	{
+		boolean skipMissingDocs = patientImportContextService.getContext().getImportPreferences().isSkipMissingDocs();
+		List<Reports> hrmDocumentReports = getHrmReports(reports);
+		List<HrmDocument> hrmDocumentList = new ArrayList<>(hrmDocumentReports.size());
+		for(Reports report : hrmDocumentReports)
+		{
+			try
+			{
+				cdsReportHrmImportMapper.importToJuno(report);
+			}
+			catch(InvalidDocumentException e)
+			{
+				String message = e.getMessage() == null ? "Invalid Document" : e.getMessage();
+				if(skipMissingDocs)
+				{
+					logEvent(message  +" [SKIPPED]");
+				}
+				else
+				{
+					logEvent(message);
+					throw e;
+				}
+			}
+		}
+		return hrmDocumentList;
 	}
 
 	private List<Reports> getDocumentReports(List<Reports> reports)

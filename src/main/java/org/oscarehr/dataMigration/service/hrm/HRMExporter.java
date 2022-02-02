@@ -69,7 +69,7 @@ public class HRMExporter implements DemographicExporter
 
 		String name = "-HRM_" + StringUtils.trimToEmpty(firstDocument.getSendingFacilityId()) + "-" +
 				StringUtils.trimToEmpty(firstDocument.getSendingFacilityReport()) + "_" +
-				StringUtils.trimToEmpty(firstDocument.getMessageUniqueId()) + ".xml";
+				 ".xml";
 
 		return GenericFile.getFormattedFileName(name);
 	}
