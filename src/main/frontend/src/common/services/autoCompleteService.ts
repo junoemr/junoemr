@@ -25,23 +25,23 @@
  Ontario, Canada
 
  */
+import Demographic from "../../lib/demographic/model/demographic";
+
 angular.module("Common.Services").service("autoCompleteService", [
 	"$q",
 	"demographicService",
-	function(
+	function (
 		$q,
 		demographicService
 	)
 	{
-		var service = {};
+		const service = this;
 
-		service.init_autocomplete_values = function init_autocomplete_values(patient, autocomplete_values){
+		service.init_autocomplete_values = function init_autocomplete_values(patient, autocomplete_values)
+		{
 			var deferred = $q.defer();
 
-			demographicService.getDemographic(patient.patient).then(function(result){
-				console.log(result);
-				result.dob = moment([result.dobYear, result.dobMonth, result.dobDay]);
-
+			demographicService.getDemographic(patient.patient).then(function(result: Demographic){
 				deferred.resolve({
 					data:{
 						patient:{
@@ -55,17 +55,15 @@ angular.module("Common.Services").service("autoCompleteService", [
 			return deferred.promise;
 		};
 
-		service.formatDemographic = function formatDemographic(result)
+		service.formatDemographic = function formatDemographic(result: Demographic)
 		{
 			return {
-				uuid: result.demographicNo,
-				full_name: result.lastName + ',' + result.firstName,
-				birth_date: Juno.Common.Util.formatMomentDate(result.dob),
-				health_number: result.hin,
-				phone_number_primary: result.phone
+				uuid: result.id,
+				full_name: result.displayName,
+				birth_date: Juno.Common.Util.formatMomentDate(result.dateOfBirth),
+				health_number: result.healthNumber,
+				phone_number_primary: result.primaryPhone,
 			};
 		};
-
-		return service;
 	}
 ]);

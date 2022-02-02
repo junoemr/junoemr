@@ -146,10 +146,10 @@ module.exports = {
 
 			'./src/common/services/module.js',
 			'./src/common/services/appService.js',
-			'./src/common/services/autoCompleteService.js',
+			'./src/common/services/autoCompleteService.ts',
 			'./src/common/services/billingService.js',
 			'./src/common/services/consultService.js',
-			'./src/common/services/demographicService.js',
+			'./src/common/services/demographicService.ts',
 			'./src/common/services/demographicsService.js',
 			'./src/common/services/diseaseRegistryService.js',
 			'./src/common/services/errorsService.js',

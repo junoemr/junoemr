@@ -138,7 +138,7 @@ angular.module('Patient').component('addDemographicModal', {
 
 			if (ctrl.validateDemographic())
 			{
-				demographicService.saveDemographic(ctrl.newDemographicData)
+				demographicService.createDemographic(ctrl.newDemographicData)
 					.then((results) =>
 					{
 						ctrl.modalInstance.close(results);

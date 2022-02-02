@@ -28,6 +28,7 @@ import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.DemographicArchive;
+import org.oscarehr.dataMigration.converter.out.DemographicDbToModelConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicIntegrationDao;
@@ -102,6 +103,9 @@ public class DemographicService
 
 	@Autowired
 	private DemographicModelToDbConverter demographicModelToDBConverter;
+
+	@Autowired
+	private DemographicDbToModelConverter demographicDbToModelConverter;
 
 	public enum SEARCH_MODE
 	{
@@ -321,6 +325,11 @@ public class DemographicService
 		}
 
 		return result;
+	}
+
+	public DemographicModel getDemographic(Integer id)
+	{
+		return demographicDbToModelConverter.convert(demographicDao.find(id));
 	}
 
 	/**

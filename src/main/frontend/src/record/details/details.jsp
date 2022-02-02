@@ -37,7 +37,7 @@
 										<bean:message key="demographic.demographicprintdemographic.btnPrint"/> <span class="caret"></span>
 									</button>
 									<ul class="dropdown-menu">
-										<li><a href="../report/GenerateEnvelopes.do?demos={{detailsCtrl.page.demo.demographicNo}}">PDF Envelope</a></li>
+										<li><a href="../report/GenerateEnvelopes.do?demos={{detailsCtrl.page.demo.id}}">PDF Envelope</a></li>
 										<li><a class="hand-hover" ng-click="detailsCtrl.printLabel('PDFLabel')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFLabel"/></a></li>
 										<li><a class="hand-hover" ng-click="detailsCtrl.printLabel('PDFAddress')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFAddressLabel"/></a></li>
 										<li><a class="hand-hover" ng-click="detailsCtrl.printLabel('PDFChart')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFChartLabel"/></a></li>
@@ -187,7 +187,7 @@
 					<img class="pull-left" id="photo"
 						 title="Click to upload photo"
 						 ng-click="detailsCtrl.launchPhoto()"
-						 ng-src="../imageRenderingServlet?source=local_client&clientId={{detailsCtrl.page.demo.demographicNo}}"
+						 ng-src="../imageRenderingServlet?source=local_client&clientId={{detailsCtrl.page.demo.id}}"
 					/>
 				</div>
 				<div id="pd2" ng-click="detailsCtrl.checkAction($event)" ng-keypress="detailsCtrl.checkAction($event)">

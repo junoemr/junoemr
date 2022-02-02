@@ -52,11 +52,12 @@ angular.module('Record.Details').component('additionalInformationSection', {
 
 		ctrl.$doCheck = () =>
 		{
-			if (ctrl.ngModel && (!ctrl.waitingListNames || ctrl.waitingListNames.length !== ctrl.ngModel.waitingListNames.length))
-			{
-				ctrl.waitingListNames =
-						ctrl.ngModel.waitingListNames.map((item) => Object.assign({}, item, {label: item.name, value: item.id}));
-			}
+			// if (ctrl.ngModel && (!ctrl.waitingListNames || ctrl.waitingListNames.length !== ctrl.ngModel.waitingListNames.length))
+			// {
+			// 	ctrl.waitingListNames =
+			// 			ctrl.ngModel.waitingListNames.map((item) => Object.assign({}, item, {label: item.name, value: item.id}));
+			// }
+			// TODO re-implement before release
 		}
 	}
 

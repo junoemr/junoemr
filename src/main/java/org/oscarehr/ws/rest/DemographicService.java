@@ -32,10 +32,8 @@ import org.oscarehr.common.dao.WaitingListDao;
 import org.oscarehr.common.dao.WaitingListNameDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.WaitingList;
-import org.oscarehr.common.model.WaitingListName;
 import org.oscarehr.demographic.entity.DemographicCust;
-import org.oscarehr.demographic.entity.DemographicExt;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
@@ -54,11 +52,9 @@ import org.oscarehr.ws.rest.conversion.WaitingListNameConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
-import org.oscarehr.ws.rest.to.model.AddressTo1;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
 import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
-import org.oscarehr.ws.rest.to.model.WaitingListNameTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
@@ -120,6 +116,9 @@ public class DemographicService extends AbstractServiceImpl {
 	@Autowired
 	private DemographicToTransferConverter demographicToTransferConverter;
 
+	@Autowired
+	private org.oscarehr.demographic.service.DemographicService demographicService;
+
 	private CaseManagementManager caseManagementMgr;
 
 	public void setCaseManagementManager(CaseManagementManager caseManagementMgr)
@@ -148,6 +147,8 @@ public class DemographicService extends AbstractServiceImpl {
 	 * 		Returns all demographics.
 	 */
 	@GET
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
 	public OscarSearchResponse<DemographicTo1> getAllDemographics(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
@@ -183,73 +184,81 @@ public class DemographicService extends AbstractServiceImpl {
 	@GET
 	@Path("/{dataId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> getDemographicData(@PathParam("dataId") Integer id) throws PatientDirectiveException
+	public RestResponse<DemographicModel> getDemographicData(@PathParam("dataId") Integer id) throws PatientDirectiveException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), id, Permission.DEMOGRAPHIC_READ);
+		String loggedInUserId = getLoggedInProviderId();
+		securityInfoManager.requireAllPrivilege(loggedInUserId, id, Permission.DEMOGRAPHIC_READ);
 
-		try
-		{
-			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
-			int providerNo = Integer.parseInt(providerNoStr);
+		DemographicModel demo = demographicService.getDemographic(id);
+		LogAction.addLogEntry(loggedInUserId, demo.getId(), LogConst.ACTION_READ,
+				LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
+		recentDemographicAccessService.updateAccessRecord(loggedInUserId, demo.getId());
 
-			Demographic demo = demographicManager.getDemographic(getLoggedInInfo(), id);
-			if (demo == null)
-			{
-				return RestResponse.errorResponse("No demographic found with id " + id);
-			}
+		return RestResponse.successResponse(demo);
 
-			List<DemographicExt> demoExts = demographicManager.getDemographicExts(getLoggedInInfo(), id);
-			if (demoExts != null && !demoExts.isEmpty())
-			{
-				DemographicExt[] demoExtArray = demoExts.toArray(new DemographicExt[demoExts.size()]);
-				demo.setExtras(demoExtArray);
-			}
-
-			DemographicTo1 result = demoConverter.getAsTransferObject(getLoggedInInfo(), demo);
-			AddressTo1 extraAddress = demographicManager.getExtraAddress(result);
-			result.setAddress2(extraAddress);
-
-			DemographicCust demoCust = demographicManager.getDemographicCust(getLoggedInInfo(), id);
-			if (demoCust != null)
-			{
-				result.setNurse(demoCust.getNurse());
-				result.setResident(demoCust.getResident());
-				result.setAlert(demoCust.getAlert());
-				result.setMidwife(demoCust.getMidwife());
-				result.setNotes(demoCust.getNotes());
-			}
-
-			List<WaitingList> waitingList = waitingListDao.search_wlstatus(id);
-			if (waitingList != null && !waitingList.isEmpty())
-			{
-				WaitingList wl = waitingList.get(0);
-				result.setWaitingListID(wl.getListId());
-				result.setWaitingListNote(wl.getNote());
-				result.setOnWaitingListSinceDate(wl.getOnListSince());
-			}
-
-			List<WaitingListName> waitingListNames = waitingListNameDao.findAll(null, null);
-			if (waitingListNames != null)
-			{
-				for (WaitingListName waitingListName : waitingListNames)
-				{
-					if (waitingListName.getIsHistory().equals("Y")) continue;
-
-					WaitingListNameTo1 waitingListNameTo1 = waitingListNameConverter.getAsTransferObject(getLoggedInInfo(), waitingListName);
-					result.getWaitingListNames().add(waitingListNameTo1);
-				}
-			}
-
-			LogAction.addLogEntry(providerNoStr, demo.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
-			recentDemographicAccessService.updateAccessRecord(providerNo, demo.getDemographicNo());
-
-			return RestResponse.successResponse(result);
-		}
-		catch (Exception e)
-		{
-			logger.error("Error",e);
-		}
-		return RestResponse.errorResponse("Error");
+//		try
+//		{
+//			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
+//			int providerNo = Integer.parseInt(providerNoStr);
+//
+//			Demographic demo = demographicManager.getDemographic(getLoggedInInfo(), id);
+//			if (demo == null)
+//			{
+//				return RestResponse.errorResponse("No demographic found with id " + id);
+//			}
+//
+//			List<DemographicExt> demoExts = demographicManager.getDemographicExts(getLoggedInInfo(), id);
+//			if (demoExts != null && !demoExts.isEmpty())
+//			{
+//				DemographicExt[] demoExtArray = demoExts.toArray(new DemographicExt[demoExts.size()]);
+//				demo.setExtras(demoExtArray);
+//			}
+//
+//			DemographicTo1 result = demoConverter.getAsTransferObject(getLoggedInInfo(), demo);
+//			AddressTo1 extraAddress = demographicManager.getExtraAddress(result);
+//			result.setAddress2(extraAddress);
+//
+//			DemographicCust demoCust = demographicManager.getDemographicCust(getLoggedInInfo(), id);
+//			if (demoCust != null)
+//			{
+//				result.setNurse(demoCust.getNurse());
+//				result.setResident(demoCust.getResident());
+//				result.setAlert(demoCust.getAlert());
+//				result.setMidwife(demoCust.getMidwife());
+//				result.setNotes(demoCust.getNotes());
+//			}
+//
+//			List<WaitingList> waitingList = waitingListDao.search_wlstatus(id);
+//			if (waitingList != null && !waitingList.isEmpty())
+//			{
+//				WaitingList wl = waitingList.get(0);
+//				result.setWaitingListID(wl.getListId());
+//				result.setWaitingListNote(wl.getNote());
+//				result.setOnWaitingListSinceDate(wl.getOnListSince());
+//			}
+//
+//			List<WaitingListName> waitingListNames = waitingListNameDao.findAll(null, null);
+//			if (waitingListNames != null)
+//			{
+//				for (WaitingListName waitingListName : waitingListNames)
+//				{
+//					if (waitingListName.getIsHistory().equals("Y")) continue;
+//
+//					WaitingListNameTo1 waitingListNameTo1 = waitingListNameConverter.getAsTransferObject(getLoggedInInfo(), waitingListName);
+//					result.getWaitingListNames().add(waitingListNameTo1);
+//				}
+//			}
+//
+//			LogAction.addLogEntry(providerNoStr, demo.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
+//			recentDemographicAccessService.updateAccessRecord(providerNo, demo.getDemographicNo());
+//
+//			return RestResponse.successResponse(result);
+//		}
+//		catch (Exception e)
+//		{
+//			logger.error("Error",e);
+//		}
+//		return RestResponse.errorResponse("Error");
 	}
 
 	/**
@@ -360,32 +369,21 @@ public class DemographicService extends AbstractServiceImpl {
 	@DELETE
 	@Path("/{dataId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> deleteDemographicData(@PathParam("dataId") Integer id)
+	public RestResponse<DemographicModel> deleteDemographicData(@PathParam("dataId") Integer id)
 	{
+		//TODO This seems incorrect, as demographics should not be deleteable. remove after checking this
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), id, Permission.DEMOGRAPHIC_DELETE);
-		try
-		{
-			Demographic demo = demographicManager.getDemographic(getLoggedInInfo(), id);
-			DemographicTo1 result = getDemographicData(id).getBody();
-			if (demo == null)
-			{
-				return RestResponse.errorResponse("Demographic with id " + id + " not found");
-			}
 
-			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
-			int providerNo = Integer.parseInt(providerNoStr);
+		Demographic demo = demographicManager.getDemographic(getLoggedInInfo(), id);
 
-			demographicManager.deleteDemographic(getLoggedInInfo(), demo);
-			LogAction.addLogEntry(providerNoStr, demo.getDemographicNo(), LogConst.ACTION_DELETE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
-			recentDemographicAccessService.updateAccessRecord(providerNo, demo.getDemographicNo());
+		String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
+		int providerNo = Integer.parseInt(providerNoStr);
 
-			return RestResponse.successResponse(result);
-		}
-		catch (Exception e)
-		{
-			logger.error("Error",e);
-		}
-		return RestResponse.errorResponse("Error");
+		demographicManager.deleteDemographic(getLoggedInInfo(), demo);
+		LogAction.addLogEntry(providerNoStr, demo.getDemographicNo(), LogConst.ACTION_DELETE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
+		recentDemographicAccessService.updateAccessRecord(providerNo, demo.getDemographicNo());
+
+		return RestResponse.successResponse(demographicService.getDemographic(id));
 	}
 
 	@GET

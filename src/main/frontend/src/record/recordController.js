@@ -123,8 +123,9 @@ angular.module('Record').controller('Record.RecordController', [
 			{
 				controller.page.cannotChange = !securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterNoteCreate);
 				controller.demographic = await demographicService.getDemographic(controller.demographicNo);
-				controller.demographic.age = Juno.Common.Util.calcAge(controller.demographic.dobYear, controller.demographic.dobMonth, controller.demographic.dobDay);
 				controller.loadPreferredPhone(controller.demographic);
+
+				console.info("debug", controller.demographic);
 			}
 
 			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterNoteCreate))

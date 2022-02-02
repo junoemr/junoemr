@@ -40,14 +40,14 @@
                     <span class="patient-header-label">
 						<bean:message key="demographic.patient.context.born"/>:
 					</span>
-                    {{recordCtrl.demographic.dobYear}}-{{recordCtrl.demographic.dobMonth}}-{{recordCtrl.demographic.dobDay}}
+                    {{recordCtrl.demographic.displayDateOfBirth}}
                     (<span
                         ng-if="!recordCtrl.isNaN(recordCtrl.demographic.age)">{{recordCtrl.demographic.age}}</span>)
                 </h5>
-                <span ng-if="recordCtrl.displayPhone" class="flex-row">
+                <span ng-if="recordCtrl.demographic.primaryPhone" class="flex-row">
 				<i class="icon icon-tele-call"></i>
 				<h5 class="patient-header-info">
-					{{recordCtrl.displayPhone}}
+					{{recordCtrl.demographic.primaryPhone}}
 				</h5></span>
                 <div ng-if="recordCtrl.canMHACallPatient"
                      class="flex-item-grow flex-row justify-content-end p-8">
