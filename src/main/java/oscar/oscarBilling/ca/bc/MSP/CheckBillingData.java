@@ -95,7 +95,7 @@ public class CheckBillingData {
                 if (checkOldPHN(m)) ret = "";
             }
         }
-        if (m != null && m.equals("") && ins != null && !ins.equals(""))
+        if (m != null && (m.equals("") || m.equals("0000000000")) && ins != null && !ins.equals(""))
                 ret = "";
         return ret;
     }

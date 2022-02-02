@@ -145,8 +145,15 @@ public class BillingReProcessBillAction extends Action {
     String originalMSPNumber = Misc.forwardZero("", 20);
 
     String oinInsurerCode = frm.getInsurerCode(); //fy
-    String oinRegistrationNo = org.apache.commons.lang3.StringUtils.leftPad(
-    		demo.getHin() + org.apache.commons.lang3.StringUtils.trimToEmpty(demo.getVer()),12, '0');
+    String oinRegistrationNo = demo.getHin() + org.apache.commons.lang3.StringUtils.trimToEmpty(demo.getVer());
+    if("PP".equals(oinInsurerCode))
+    {
+		oinRegistrationNo = org.apache.commons.lang3.StringUtils.rightPad(oinRegistrationNo,12, '0');
+    }
+    else
+    {
+		oinRegistrationNo = org.apache.commons.lang3.StringUtils.leftPad(oinRegistrationNo,12, '0');
+    }
     String oinBirthdate = DemographicData.getDob(demo); //d
     String oinFirstName = demo.getFirstName(); //d
     String oinSecondName = ""; //d
@@ -197,7 +204,7 @@ public class BillingReProcessBillAction extends Action {
 
     } else { //other provinces
       oinInsurerCode = hcType;
-      hcNo = "000000000";
+      hcNo = "0000000000";
       name_verify = "0000";
     }
 
