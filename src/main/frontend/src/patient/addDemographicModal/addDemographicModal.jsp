@@ -68,7 +68,7 @@
 									  label="Health Insurance Number"
 									  label-position="$ctrl.LABEL_POSITION"
 									  component-style="$ctrl.COMPONENT_STYLE"
-									  class="m-r-8 hin"
+									  class="m-r-4 hin"
 					>
 					</juno-select-text>
 					<!-- HIN VER -->
@@ -76,7 +76,6 @@
 								ng-model="$ctrl.newDemographicData.ver"
 								label-position="$ctrl.LABEL_POSITION"
 								component-style="$ctrl.COMPONENT_STYLE"
-								placeholder="Ver"
 								class="ver">
 					</juno-input>
 				</div>

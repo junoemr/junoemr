@@ -200,7 +200,9 @@ angular.module('Patient').component('addDemographicModal', {
 
 			ctrl.onHcTypeChange = (value) =>
 			{
+				console.log("hc changed");
 				ctrl.newDemographicData.hcType = value;
+				console.log(ctrl.newDemographicData.hcType);
 			}
 
 			ctrl.onMRPChange = (value) =>
@@ -210,7 +212,9 @@ angular.module('Patient').component('addDemographicModal', {
 
 			ctrl.onPreferredPhoneTypeChange = (value) =>
 			{
+				console.log("phone number changed");
 				ctrl.preferredPhoneType = value;
+				console.log(ctrl.preferredPhoneType);
 			}
 
 			ctrl.onCancel = () =>

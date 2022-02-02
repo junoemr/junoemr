@@ -1,52 +1,80 @@
 juno-select-text {
+	--border-width: 1px;
+	--field-height: calc(var(--juno-form-input-height) - calc(var(--border-width) * 2));
+
 	.label-style {
 		padding: var(--juno-input-label-padding);
 		width: var(--juno-input-label-width);
 	}
 
 	.juno-select-text-container {
-		border: 1px solid var(--theme-color-form-field-border);
+		border: var(--border-width) solid var(--theme-color-form-field-border);
 		border-radius: var(--theme-form-field-border-radius);
+		overflow: hidden;
 
-		select {
-			border-radius: var(--theme-form-field-border-radius) 0 0 var(--theme-form-field-border-radius);
-			background-color: var(--color-neutral-light);
-			color: var(--color-neutral-dark);	/* or is this the disabled state */
-			border: none;
-			padding: 0 24px 0 8px;
-			width: 60px;
-			outline: none;
-			height: calc(var(--juno-form-input-height) - 2px);
-			font-size: 12px;
+		&.field-focused {
+			border-color: var(--theme-color-form-field-border-active);
+		}
 
-			&:focus, &:active {
+		@include juno-form-inputs-style(var(--border-width), var(--theme-form-field-border-radius));
+
+		.select-container {
+			position: relative;
+
+			select {
+				-moz-appearance: none;
+				-webkit-appearance: none;
+				appearance: none;
+				background-image: none;
+
+				border-radius: calc(var(--theme-form-field-border-radius) / 2) 0 0 calc(var(--theme-form-field-border-radius) /2);
+				background-color: var(--color-neutral-light);
+				color: var(--color-neutral-dark);
 				border: none;
-				color: var(--color-primary-darker);
+				padding: 0 24px 0 8px;
+				width: 60px;	/* Default, override this */
+				outline: none;
+				height: var(--field-height);
+				font-size: 12px;
+
+				&.field-focused {
+					color: var(--theme-color-form-field-text-active);
+				}
+
+				option {
+					background-color: var(--theme-color-form-field-background);
+				}
+			}
+
+			.select-icon {
+				position: absolute;
+				right: 8px;
+				top: calc(50% - 8px);
+				font-size: 16px;
+				pointer-events: none;
+			}
+
+		}
+
+		#divider-border {
+			border-right: var(--border-width) solid var(--theme-color-form-field-border);
+			height: var(field-height);
+
+			&.field-focused {
+				border-color: var(--theme-color-form-field-border-active);
 			}
 		}
 
-		juno-input {
+		input {
 			width: 100%;
-
-			.juno-input {
-				@include juno-form-inputs-style(1px, var(--theme-form-field-border-radius));
-				display: flex;
-
-				input {
-					border: none;
-					border-radius: 0 var(--theme-form-field-border-radius) var(--theme-form-field-border-radius) 0;
-					padding: 0 8px;
-					height: calc(var(--juno-form-input-height) - 2px);
-
-					&:focus, &:active {
-						border: none;
-					}
-
-					&:focus-visible {
-						outline: none;
-					}
-				}
-			}
+			display: flex;
+			border: none;
+			border-radius: 0 var(--theme-form-field-border-radius) var(--theme-form-field-border-radius) 0;
+			background-color: var(--theme-color-form-field-background);
+			color: var(--theme-color-form-field-text);
+			padding: 0 8px;
+			height: var(--field-height);
+			outline: none;
 		}
 	}
 }

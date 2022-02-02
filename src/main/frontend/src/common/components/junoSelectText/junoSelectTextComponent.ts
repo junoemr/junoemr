@@ -33,22 +33,20 @@ angular.module('Common.Components').component('junoSelectText', {
 		selectChange: "&?",
 
 		textModel: "=",
+		textChange: "&?",
 		textPlaceholder: "@?",
 
 		label: "@?",
 		labelPosition: "<?",
-		change: "&?",
-		disabled: "<?",
 
 		componentStyle: "<?",
 		allowAutocomplete: "<?",
 	},
+
 	controller: [ "$scope", function ($scope) {
 		let ctrl = this;
 
 		$scope.LABEL_POSITION = LABEL_POSITION;
-		ctrl.oldNgModel = null;
-		ctrl.isFocused = false;
 
 		ctrl.fullOptionsList = [];
 		ctrl.selectPlaceholderValue = "";
@@ -58,7 +56,7 @@ angular.module('Common.Components').component('junoSelectText', {
 			ctrl.selectPlaceholder = ctrl.selectPlaceholder || "";
 
 			// First option is a dummy placeholder which is hidden.  When the select is in
-			// an unselected state, the shortLabel value is shown.
+			// an unselected state, it's shortLabel value is shown.
 			ctrl.fullOptionsList = [{
 				label: "",
 				disabled: true,
@@ -74,13 +72,26 @@ angular.module('Common.Components').component('junoSelectText', {
 				ctrl.showInvalidFocus = false;
 			}
 
-			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
+			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 
 			ctrl.deviceInfo = new DeviceInfo();
+
+			ctrl.hasSelectFocus = false;
+			ctrl.hasInputFocus = false;
 		};
 
-		ctrl.isPlaceHolder = (option) =>
+		ctrl.onSelectFocus = (focused: boolean) :void =>
+		{
+			ctrl.hasSelectFocus = focused;
+		}
+
+		ctrl.onInputFocus = (focused: boolean) :void =>
+		{
+			ctrl.hasInputFocus = focused;
+		}
+
+		ctrl.isPlaceHolder = (option) :boolean =>
 		{
 			return option.value === ctrl.selectPlaceholderValue;
 		}
@@ -90,14 +101,10 @@ angular.module('Common.Components').component('junoSelectText', {
 			return [ctrl.componentStyle];
 		}
 
-		ctrl.inputClasses = () =>
+		ctrl.fieldClasses = () =>
 		{
 			return {
-				uppercase: ctrl.uppercase,
-				"field-invalid": ctrl.invalid && (ctrl.showInvalidFocus || !ctrl.isFocused),
-				"field-no-border": ctrl.noBox,
-				"field-disabled": ctrl.disabled,
-				"shift-right-for-icon": ctrl.icon,
+				"field-focused": ctrl.hasSelectFocus || ctrl.hasInputFocus
 			};
 		}
 
@@ -129,6 +136,14 @@ angular.module('Common.Components').component('junoSelectText', {
 			{
 				const option = (ctrl.selectOptions) ? ctrl.selectOptions.find((option) => option.value === value) : null;
 				ctrl.selectChange({value: value, option: option});
+			}
+		}
+
+		ctrl.onTextChange = () =>
+		{
+			if (ctrl.textChange)
+			{
+				ctrl.textChange({});
 			}
 		}
 
