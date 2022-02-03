@@ -30,7 +30,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oscarehr.dataMigration.logger.cds.CDSImportLogger;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
@@ -186,7 +186,7 @@ public class CDSImportMapperTest
 				expectedPostal
 		);
 
-		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+		AddressModel resultAddress = cdsImportMapper.getAddress(importAddress);
 
 		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
 		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
@@ -214,7 +214,7 @@ public class CDSImportMapperTest
 				expectedPostal
 		);
 
-		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+		AddressModel resultAddress = cdsImportMapper.getAddress(importAddress);
 
 		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
 		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
@@ -242,7 +242,7 @@ public class CDSImportMapperTest
 				expectedPostal
 		);
 
-		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+		AddressModel resultAddress = cdsImportMapper.getAddress(importAddress);
 
 		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
 		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
@@ -270,7 +270,7 @@ public class CDSImportMapperTest
 				expectedPostal
 		);
 
-		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+		AddressModel resultAddress = cdsImportMapper.getAddress(importAddress);
 
 		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
 		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
@@ -298,7 +298,7 @@ public class CDSImportMapperTest
 				expectedZip
 		);
 
-		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+		AddressModel resultAddress = cdsImportMapper.getAddress(importAddress);
 
 		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
 		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
@@ -326,7 +326,7 @@ public class CDSImportMapperTest
 				expectedZip
 		);
 
-		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+		AddressModel resultAddress = cdsImportMapper.getAddress(importAddress);
 
 		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
 		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
@@ -354,7 +354,7 @@ public class CDSImportMapperTest
 				expectedZip
 		);
 
-		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+		AddressModel resultAddress = cdsImportMapper.getAddress(importAddress);
 
 		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
 		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
@@ -382,7 +382,7 @@ public class CDSImportMapperTest
 				expectedZip
 		);
 
-		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+		AddressModel resultAddress = cdsImportMapper.getAddress(importAddress);
 
 		assertEquals(expectedAddressLine1, resultAddress.getAddressLine1());
 		assertEquals(expectedAddressLine2, resultAddress.getAddressLine2());
@@ -401,7 +401,7 @@ public class CDSImportMapperTest
 		xml.cds.v5_0.Address importAddress = objectFactory.createAddress();
 		importAddress.setFormatted(expectedFormattedAddress);
 
-		Address resultAddress = cdsImportMapper.getAddress(importAddress);
+		AddressModel resultAddress = cdsImportMapper.getAddress(importAddress);
 
 		assertEquals(expectedFormattedAddress, resultAddress.getAddressLine1());
 	}

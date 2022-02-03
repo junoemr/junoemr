@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.mapper.cds.CDSDemographicInterface;
 import org.oscarehr.dataMigration.model.PatientRecord;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.contact.DemographicContact;
 import org.oscarehr.demographic.model.DemographicModel;
@@ -168,16 +169,16 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		healthCard.setNumber(exportStructure.getHealthNumber());
 		healthCard.setVersion(exportStructure.getHealthNumberVersion());
 		healthCard.setExpirydate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getHealthNumberRenewDate()));
-		healthCard.setProvinceCode(org.oscarehr.dataMigration.model.common.Address.getSubdivisionCodeCT013Format(
+		healthCard.setProvinceCode(AddressModel.getSubdivisionCodeCT013Format(
 				exportStructure.getHealthNumberProvinceCode(), CDSConstants.COUNTRY_CODE_CANADA));
 
 		return healthCard;
 	}
 
-	protected List<Address> getExportAddresses(List<org.oscarehr.dataMigration.model.common.Address> addressList)
+	protected List<Address> getExportAddresses(List<AddressModel> addressList)
 	{
 		List<Address> exportAddressList = new ArrayList<>(addressList.size());
-		for(org.oscarehr.dataMigration.model.common.Address address : addressList)
+		for(AddressModel address : addressList)
 		{
 			exportAddressList.add(toHrmAddress(address, AddressType.R));
 		}
@@ -311,7 +312,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		return contactList;
 	}
 
-	protected Address toHrmAddress(org.oscarehr.dataMigration.model.common.Address addressModel, AddressType addressType)
+	protected Address toHrmAddress(AddressModel addressModel, AddressType addressType)
 	{
 		Address address = null;
 		if(addressModel != null)

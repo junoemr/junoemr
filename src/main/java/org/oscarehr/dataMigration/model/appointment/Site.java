@@ -24,7 +24,7 @@ package org.oscarehr.dataMigration.model.appointment;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 
 @Data
@@ -35,5 +35,5 @@ public class Site extends AbstractTransientModel
 	private String shortName;
 	private PhoneNumber phoneNumber;
 	private PhoneNumber faxNumber;
-	private Address address;
+	private AddressModel address;
 }

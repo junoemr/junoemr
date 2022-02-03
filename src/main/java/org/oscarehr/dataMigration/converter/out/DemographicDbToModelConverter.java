@@ -23,7 +23,7 @@
 package org.oscarehr.dataMigration.converter.out;
 
 import org.apache.commons.lang3.StringUtils;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.provider.Provider;
@@ -85,7 +85,7 @@ public class DemographicDbToModelConverter extends
 		exportDemographic.setOfficialLanguage(OFFICIAL_LANGUAGE.fromValueString(input.getOfficialLanguage()));
 		exportDemographic.addAddress(buildAddress(input));
 
-		Address alternateAddress = buildAlternativeAddress(input);
+		AddressModel alternateAddress = buildAlternativeAddress(input);
 		if (alternateAddress != null)
 		{
 			exportDemographic.addAddress(alternateAddress);
@@ -122,9 +122,9 @@ public class DemographicDbToModelConverter extends
 		return exportDemographic;
 	}
 
-	protected Address buildAddress(Demographic input)
+	protected AddressModel buildAddress(Demographic input)
 	{
-		Address address = new Address();
+		AddressModel address = new AddressModel();
 		address.setAddressLine1(StringUtils.trimToNull(input.getAddress()));
 		address.setCity(StringUtils.trimToNull(input.getCity()));
 
@@ -137,14 +137,14 @@ public class DemographicDbToModelConverter extends
 
 		return address;
 	}
-	protected Address buildAlternativeAddress(Demographic input)
+	protected AddressModel buildAlternativeAddress(Demographic input)
 	{
 		DemographicExt altAddressExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_ADDRESS);
 		DemographicExt altCityExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_CITY);
 		DemographicExt altProvinceExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_PROVINCE);
 		DemographicExt altPostalExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_POSTAL);
 
-		Address address = new Address();
+		AddressModel address = new AddressModel();
 		if (altAddressExt != null)
 		{
 			address.setAddressLine1(altAddressExt.getValue());

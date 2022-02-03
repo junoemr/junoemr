@@ -2,6 +2,7 @@ import AbstractConverter from "../../conversion/AbstractConverter";
 import Demographic from "../model/Demographic";
 import {DemographicModel} from "../../../../generated";
 import moment from "moment";
+import AddressToModelConverter from "../../common/converter/AddressToModelConverter";
 
 export default class DemographicTransferToModelConverter extends AbstractConverter<DemographicModel, Demographic>
 {
@@ -9,6 +10,8 @@ export default class DemographicTransferToModelConverter extends AbstractConvert
 	{
 		let model = new Demographic();
 		Object.assign(model, from);
+
+		model.addressList = new AddressToModelConverter().convertList(from.addressList);
 
 		model.dateOfBirth = moment(from.dateOfBirth);
 		model.healthNumberEffectiveDate = moment(from.healthNumberEffectiveDate);

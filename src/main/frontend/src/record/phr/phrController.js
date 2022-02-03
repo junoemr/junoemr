@@ -30,7 +30,6 @@ angular.module('Record.PHR').controller('Record.PHR.PHRController', [
 	'$location',
 	'$state',
 	'$stateParams',
-	'demographicService',
 	'demo',
 	'formService',
 
@@ -40,7 +39,6 @@ angular.module('Record.PHR').controller('Record.PHR.PHRController', [
 		$location,
 		$state,
 		$stateParams,
-		demographicService,
 		demo,
 		formService)
 	{

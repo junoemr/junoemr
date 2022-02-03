@@ -24,7 +24,7 @@ package org.oscarehr.dataMigration.converter.out;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.provider.model.ProviderData;
@@ -54,7 +54,7 @@ public class ProviderDbToModelConverter extends
 		exportProvider.setSex(Person.SEX.getIgnoreCase(input.getSex()));
 		exportProvider.setTitle(Person.TITLE.fromStringIgnoreCase(input.getTitle()));
 
-		Address address = new Address();
+		AddressModel address = new AddressModel();
 		address.setAddressLine1(input.getAddress());
 //		address.setCity(input.getCity());
 //		address.setRegionCode(input.getProvince());

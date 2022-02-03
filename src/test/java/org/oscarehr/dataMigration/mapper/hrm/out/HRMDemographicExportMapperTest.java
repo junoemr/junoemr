@@ -26,7 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import xml.hrm.v4_3.Gender;
@@ -69,7 +69,7 @@ public class HRMDemographicExportMapperTest
 
 		String expectedProvinceReturn = expectedCountry + "-" + expectedProvince;
 
-		Address address = new Address();
+		AddressModel address = new AddressModel();
 		address.setAddressLine1(expectedAddressLine1);
 		address.setAddressLine2(expectedAddressLine2);
 		address.setCity(expectedCity);

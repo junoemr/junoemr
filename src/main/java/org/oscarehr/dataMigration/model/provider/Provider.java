@@ -24,7 +24,7 @@ package org.oscarehr.dataMigration.model.provider;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.contact.Contact;
@@ -48,7 +48,7 @@ public class Provider extends AbstractTransientModel implements Person, Contact
 	private TITLE title;
 
 	// contact info
-	private List<Address> addressList;
+	private List<AddressModel> addressList;
 	private String email;
 	private PhoneNumber homePhone;
 	private PhoneNumber workPhone;
@@ -76,7 +76,7 @@ public class Provider extends AbstractTransientModel implements Person, Contact
 		this.addressList = new ArrayList<>();
 	}
 
-	public void addAddress(Address address)
+	public void addAddress(AddressModel address)
 	{
 		if(this.addressList == null)
 		{
@@ -85,11 +85,11 @@ public class Provider extends AbstractTransientModel implements Person, Contact
 		this.addressList.add(address);
 	}
 
-	public Address getAddress()
+	public AddressModel getAddress()
 	{
 		if(this.addressList != null && !this.addressList.isEmpty())
 		{
-			for(Address address : addressList)
+			for(AddressModel address : addressList)
 			{
 				// return the first current address found
 				if(address.isCurrentAddress())
@@ -101,7 +101,7 @@ public class Provider extends AbstractTransientModel implements Person, Contact
 		return null;
 	}
 
-	public void setAddress(Address address)
+	public void setAddress(AddressModel address)
 	{
 		this.addAddress(address);
 	}

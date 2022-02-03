@@ -4,7 +4,7 @@
 	</h4>
 
 	<div class="details-fields">
-		<juno-input ng-model="$ctrl.ngModel.address.address"
+		<juno-input ng-model="$ctrl.ngModel.address.addressLine1"
 		            label="Address"
 		            placeholder="Enter Street Address"
 		            component-style="$ctrl.componentStyle">
@@ -17,14 +17,14 @@
 		</juno-input>
 
 
-		<juno-select ng-model="$ctrl.ngModel.address.province"
+		<juno-select ng-model="$ctrl.ngModel.address.regionCode"
 		             placeholder="Select province"
 		             options="$ctrl.provinces"
 		             label="Province"
 		             component-style="$ctrl.componentStyle">
 		</juno-select>
 
-		<juno-input ng-model="$ctrl.ngModel.address.postal"
+		<juno-input ng-model="$ctrl.ngModel.address.postalCode"
 		            label="Postal code"
 		            placeholder="Enter Postal Code (e.g. K1M 1M4)"
 		            component-style="$ctrl.componentStyle">

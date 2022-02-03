@@ -22,7 +22,7 @@
  */
 package org.oscarehr.dataMigration.model.contact;
 
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 
 import static org.oscarehr.contact.entity.DemographicContact.TYPE_CONTACT;
@@ -59,8 +59,8 @@ public interface Contact
 	String getLastName();
 	void setLastName(String lastName);
 
-	Address getAddress();
-	void setAddress(Address address);
+	AddressModel getAddress();
+	void setAddress(AddressModel address);
 
 	PhoneNumber getHomePhone();
 	void setHomePhone(PhoneNumber phone);

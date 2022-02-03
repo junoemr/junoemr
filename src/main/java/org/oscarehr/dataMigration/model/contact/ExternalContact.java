@@ -23,7 +23,7 @@
 package org.oscarehr.dataMigration.model.contact;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 
 import java.time.LocalDateTime;
@@ -34,7 +34,7 @@ public class ExternalContact implements Contact
 	private String id;
 	private String lastName;
 	private String firstName;
-	private Address address;
+	private AddressModel address;
 	private PhoneNumber homePhone;
 	private PhoneNumber workPhone;
 	private PhoneNumber cellPhone;

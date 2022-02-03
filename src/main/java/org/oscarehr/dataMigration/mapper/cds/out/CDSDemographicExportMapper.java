@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.mapper.cds.out;
 import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.dataMigration.mapper.cds.CDSDemographicInterface;
 import org.oscarehr.dataMigration.model.PatientRecord;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.contact.DemographicContact;
 import org.oscarehr.demographic.model.DemographicModel;
@@ -162,7 +162,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		healthCard.setNumber(exportStructure.getHealthNumber());
 		healthCard.setVersion(exportStructure.getHealthNumberVersion());
 		healthCard.setExpirydate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getHealthNumberRenewDate()));
-		healthCard.setProvinceCode(Address.getSubdivisionCodeCT013Format(
+		healthCard.setProvinceCode(AddressModel.getSubdivisionCodeCT013Format(
 				exportStructure.getHealthNumberProvinceCode(), exportStructure.getHealthNumberCountryCode()));
 
 		return healthCard;
@@ -170,10 +170,10 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 
 	protected List<xml.cds.v5_0.Address> getExportAddresses(DemographicModel exportStructure)
 	{
-		List<Address> addressList = exportStructure.getAddressList();
+		List<AddressModel> addressList = exportStructure.getAddressList();
 		List<xml.cds.v5_0.Address> exportAddressList = new ArrayList<>(addressList.size());
 
-		for(Address address : addressList)
+		for(AddressModel address : addressList)
 		{
 			// Address in demographic table maps to residential address
 			// demographicExt address maps to mailing address

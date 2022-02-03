@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.converter.out;
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.model.PharmacyInfo;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.pharmacy.Pharmacy;
 import org.springframework.stereotype.Component;
@@ -51,7 +51,7 @@ public class PharmacyDbToModelConverter extends
 		pharmacy.setServiceLocationIdentifier(input.getServiceLocationIdentifier());
 		pharmacy.setCreatedDateTime(ConversionUtils.toNullableLocalDateTime(input.getAddDate()));
 
-		Address address = new Address();
+		AddressModel address = new AddressModel();
 		address.setAddressLine1(input.getAddress());
 		address.setCity(input.getCity());
 		address.setRegionCode(input.getProvince());

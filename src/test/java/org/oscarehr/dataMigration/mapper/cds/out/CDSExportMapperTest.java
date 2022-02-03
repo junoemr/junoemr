@@ -30,7 +30,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oscarehr.dataMigration.logger.cds.CDSExportLogger;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.dx.DxCode;
@@ -109,7 +109,7 @@ public class CDSExportMapperTest
 		String expectedCountry = "CA";
 		String expectedPostal = "V8V0T0";
 
-		Address address = new Address();
+		AddressModel address = new AddressModel();
 		address.setAddressLine1(expectedAddressLine1);
 		address.setAddressLine2(expectedAddressLine2);
 		address.setCity(expectedCity);
@@ -135,7 +135,7 @@ public class CDSExportMapperTest
 		String expectedCountry = "US";
 		String expectedZip = "40170";
 
-		Address address = new Address();
+		AddressModel address = new AddressModel();
 		address.setAddressLine1(expectedAddressLine1);
 		address.setAddressLine2(expectedAddressLine2);
 		address.setCity(expectedCity);

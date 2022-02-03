@@ -1,7 +1,7 @@
 import moment, {Moment} from "moment";
 import Address from "../../common/model/Address";
 import PhoneNumber from "../../common/model/PhoneNumber";
-import {Sex} from "./Sex";
+import {Sex, sexToHuman} from "./Sex";
 
 export default class Demographic
 {
@@ -63,7 +63,7 @@ export default class Demographic
 	}
 
 	/**
-	 * functions & helpers
+	 * display and formatting helpers
 	 */
 
 	get primaryPhone(): PhoneNumber
@@ -93,10 +93,30 @@ export default class Demographic
 		return Juno.Common.Util.formatMomentDate(this.dateOfBirth);
 	}
 
+	get displaySex(): string
+	{
+		return sexToHuman(this.sex);
+	}
+
+	get displayAge(): string
+	{
+		return this.age + " years";
+	}
+
 	get age(): number
 	{
 		let currDate = moment();
 		return currDate.diff(this.dateOfBirth, 'years');
+	}
+
+	// helper function for places where only a single address is used/supported
+	get address(): Address
+	{
+		if(this.addressList && this.addressList.length > 0)
+		{
+			return this.addressList[0];
+		}
+		return null;
 	}
 
 	/**

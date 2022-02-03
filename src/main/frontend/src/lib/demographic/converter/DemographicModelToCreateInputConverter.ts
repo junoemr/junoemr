@@ -1,6 +1,7 @@
 import AbstractConverter from "../../conversion/AbstractConverter";
 import Demographic from "../model/Demographic";
 import {DemographicCreateInput} from "../../../../generated";
+import AddressToInputConverter from "../../common/converter/AddressToInputConverter";
 
 export default class DemographicModelToCreateInputConverter extends AbstractConverter<Demographic, DemographicCreateInput>
 {
@@ -18,6 +19,7 @@ export default class DemographicModelToCreateInputConverter extends AbstractConv
 		createInput.healthNumberEffectiveDate = this.serializeDateTime(from.healthNumberEffectiveDate);
 		createInput.healthNumberRenewDate = this.serializeDateTime(from.healthNumberRenewDate);
 		createInput.dateJoined = this.serializeDateTime(from.dateJoined);
+		createInput.addressList = new AddressToInputConverter().convertList(from.addressList);
 
 		console.info("debug transfer conversion", createInput);
 		return createInput;

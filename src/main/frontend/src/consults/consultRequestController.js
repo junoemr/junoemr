@@ -80,17 +80,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function success(results)
 				{
 					consult.demographic = results;
-
-					//set cell phone
-					consult.demographic.extras = Juno.Common.Util.toArray(consult.demographic.extras);
-					for (var i = 0; i < consult.demographic.extras.length; i++)
-					{
-						if (consult.demographic.extras[i].key == "demo_cell")
-						{
-							consult.demographic.cellPhone = consult.demographic.extras[i].value;
-							break;
-						}
-					}
+					consult.demographic.cellPhone = results.cellPhone;
 				},
 				function error(errors)
 				{

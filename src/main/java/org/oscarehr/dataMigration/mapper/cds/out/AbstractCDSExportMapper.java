@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.mapper.cds.out;
 import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.dataMigration.mapper.AbstractExportMapper;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.dx.DxCode;
@@ -69,7 +69,7 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 
 	/* ==== common helper methods for cds ==== */
 
-	protected xml.cds.v5_0.Address toCdsAddress(Address addressModel, AddressType addressType)
+	protected xml.cds.v5_0.Address toCdsAddress(AddressModel addressModel, AddressType addressType)
 	{
 		xml.cds.v5_0.Address cdsAddress = null;
 		if(addressModel != null)

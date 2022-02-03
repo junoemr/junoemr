@@ -1,5 +1,9 @@
 import {SystemPreferenceApi} from "../../../generated/api/SystemPreferenceApi";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../../common/components/junoComponentConstants";
+import Demographic from "../../lib/demographic/model/Demographic";
+import PhoneNumber from "../../lib/common/model/PhoneNumber";
+import {AddressResidencyStatus} from "../../lib/common/model/AddressResidencyStatus";
+import {PhoneType} from "../../lib/common/model/PhoneType";
 
 angular.module('Patient').component('addDemographicModal', {
 	templateUrl: 'src/patient/addDemographicModal/addDemographicModal.jsp',
@@ -138,8 +142,29 @@ angular.module('Patient').component('addDemographicModal', {
 
 			if (ctrl.validateDemographic())
 			{
-				ctrl.newDemographicData.dateOfBirth = Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth);
-				demographicService.createDemographic(ctrl.newDemographicData)
+				//todo refactor with updated modal changes etc.
+				let demo = new Demographic();
+				demo.dateOfBirth = Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth);
+				demo.firstName = ctrl.newDemographicData.firstName;
+				demo.lastName = ctrl.newDemographicData.lastName;
+				demo.sex = ctrl.newDemographicData.sex;
+				demo.healthNumber = ctrl.newDemographicData.hin;
+				demo.healthNumberVersion = ctrl.newDemographicData.ver;
+				demo.healthNumberProvinceCode = ctrl.newDemographicData.hcType;
+				demo.addressList = [
+					{
+						addressLine1: ctrl.newDemographicData.address.address,
+						addressLine2: null,
+						city: ctrl.newDemographicData.address.city,
+						postalCode: ctrl.newDemographicData.address.postal,
+						regionCode: ctrl.newDemographicData.address.province,
+						countryCode: "CA",
+						residencyStatus: AddressResidencyStatus.Current,
+					},
+				];
+				demo.cellPhone = new PhoneNumber(ctrl.newDemographicData.phone, PhoneType.Cell);
+
+				demographicService.createDemographic(demo)
 					.then((results) =>
 					{
 						ctrl.modalInstance.close(results);

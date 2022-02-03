@@ -23,7 +23,7 @@
 package org.oscarehr.dataMigration.converter.in;
 
 import org.apache.commons.lang.StringUtils;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
@@ -105,8 +105,8 @@ public class DemographicModelToDbConverter
 
 		Set<DemographicExt> demographicExtSet = new HashSet<>();
 
-		List<Address> addressList = input.getAddressList();
-		for(Address address : addressList)
+		List<AddressModel> addressList = input.getAddressList();
+		for(AddressModel address : addressList)
 		{
 			// If address is marked as current address then it's the primary address
 			// Otherwise it's an alternative address.

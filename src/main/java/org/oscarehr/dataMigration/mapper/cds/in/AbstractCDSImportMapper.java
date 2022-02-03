@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.dataMigration.mapper.AbstractImportMapper;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
@@ -302,12 +302,12 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return countryCode;
 	}
 
-	protected Address getAddress(xml.cds.v5_0.Address importAddress)
+	protected AddressModel getAddress(xml.cds.v5_0.Address importAddress)
 	{
-		Address address = null;
+		AddressModel address = null;
 		if(importAddress != null)
 		{
-			address = new Address();
+			address = new AddressModel();
 			AddressStructured structured = importAddress.getStructured();
 			if(structured != null)
 			{

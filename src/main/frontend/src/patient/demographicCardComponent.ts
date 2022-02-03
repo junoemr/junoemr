@@ -23,6 +23,8 @@
 
  */
 
+import Demographic from "../lib/demographic/model/Demographic";
+
 angular.module('Patient').component('demographicCard', {
 	bindings: {
 		demographicModel: '<?',
@@ -31,7 +33,7 @@ angular.module('Patient').component('demographicCard', {
 	templateUrl: "src/patient/demographicCard.jsp",
 	controller: [function ()
 	{
-		var ctrl = this;
+		const ctrl = this;
 
 		ctrl.model = {
 			demographicNo: null,
@@ -52,50 +54,43 @@ angular.module('Patient').component('demographicCard', {
 			ctrl.disabled = ctrl.disabled || false;
 		};
 
-		ctrl.$onChanges = function(bindingHash)
+		ctrl.$onChanges = function(bindingHash: any)
 		{
 			// bindingsHash only has data for changed bindings, so check for object existance
+			// @ts-ignore
 			if(Juno.Common.Util.exists(bindingHash.demographicModel))
 			{
 				ctrl.fillDisplayData(bindingHash.demographicModel.currentValue);
 			}
+			// @ts-ignore
+
 			if(Juno.Common.Util.exists(bindingHash.disabled))
 			{
 				ctrl.disabled = bindingHash.disabled.currentValue;
 			}
 		};
 
-		ctrl.fillDisplayData = function fillDisplayData(demographicDataModel)
+		ctrl.fillDisplayData = function fillDisplayData(demographicDataModel: Demographic)
 		{
+			// @ts-ignore
 			if(Juno.Common.Util.exists(demographicDataModel))
 			{
 				ctrl.model.data = demographicDataModel;
 
-				ctrl.model.demographicNo = demographicDataModel.demographicNo;
+				ctrl.model.demographicNo = demographicDataModel.id;
 				ctrl.model.displayData.fullName = Juno.Common.Util.formatName(demographicDataModel.firstName, demographicDataModel.lastName);
 				ctrl.model.displayData.patientPhotoUrl = '/imageRenderingServlet?source=local_client&clientId=' +
-					(demographicDataModel.demographicNo ? demographicDataModel.demographicNo : 0);
-
-				var dateOfBirth = null;
-				if (Juno.Common.Util.exists(demographicDataModel.dob))
-				{
-					// XXX: Perhaps put this in util?  Is this date format common for juno?
-					dateOfBirth = moment(demographicDataModel.dob, "YYYY-MM-DDTHH:mm:ss.SSS+ZZZZ", false);
-				}
-				else
-				{
-					dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(
-						demographicDataModel.dobYear, demographicDataModel.dobMonth, demographicDataModel.dobDay);
-				}
-				ctrl.model.displayData.birthDate = Juno.Common.Util.formatMomentDate(dateOfBirth);
+					(demographicDataModel.id ? demographicDataModel.id : 0);
+				ctrl.model.displayData.birthDate = demographicDataModel.displayDateOfBirth;
 
 				if (Juno.Common.Util.exists(demographicDataModel.address))
 				{
 					ctrl.model.displayData.addressLine =
-						Juno.Common.Util.noNull(demographicDataModel.address.address) + ' ' +
+						Juno.Common.Util.noNull(demographicDataModel.address.addressLine1) + ' ' +
+						Juno.Common.Util.noNull(demographicDataModel.address.addressLine2) + ' ' +
 						Juno.Common.Util.noNull(demographicDataModel.address.city) + ' ' +
-						Juno.Common.Util.noNull(demographicDataModel.address.province) + ' ' +
-						Juno.Common.Util.noNull(demographicDataModel.address.postal);
+						Juno.Common.Util.noNull(demographicDataModel.address.regionCode) + ' ' +
+						Juno.Common.Util.noNull(demographicDataModel.address.postalCode);
 				}
 			}
 			else //clear the data model

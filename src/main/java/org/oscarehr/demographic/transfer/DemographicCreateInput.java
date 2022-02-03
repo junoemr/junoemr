@@ -24,7 +24,7 @@ package org.oscarehr.demographic.transfer;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.provider.Provider;
@@ -52,7 +52,7 @@ public class DemographicCreateInput extends AbstractTransientModel
 	private LocalDate dateJoined;
 
 	//contact info
-	private List<Address> addressList;
+	private List<AddressModel> addressList;
 	private String email;
 	private PhoneNumber homePhone;
 	private PhoneNumber workPhone;

@@ -22,12 +22,13 @@
  */
 package org.oscarehr.dataMigration.model.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 
 @Data
-public class Address extends AbstractTransientModel
+public class AddressModel extends AbstractTransientModel
 {
 	public static String REGION_CODE_OTHER = "OT";
 
@@ -54,26 +55,31 @@ public class Address extends AbstractTransientModel
 		this.setResidencyStatus(RESIDENCY_STATUS.PAST);
 	}
 
+	@JsonIgnore
 	public boolean isCurrentAddress()
 	{
 		return this.residencyStatus.equals(RESIDENCY_STATUS.CURRENT);
 	}
+	@JsonIgnore
 	public boolean isPastAddress()
 	{
 		return this.residencyStatus.equals(RESIDENCY_STATUS.PAST);
 	}
 
+	@JsonIgnore
 	public String getAddressLinesString()
 	{
 		return StringUtils.trimToNull(
 				StringUtils.trimToEmpty(getAddressLine1()) + " " + StringUtils.trimToEmpty(getAddressLine2()));
 	}
 
+	@JsonIgnore
 	public String getSubdivisionCodeCT013Format()
 	{
 		return getSubdivisionCodeCT013Format(regionCode, countryCode);
 	}
 
+	@JsonIgnore
 	public static String getSubdivisionCodeCT013Format(String regionCode, String countryCode)
 	{
 		String code = null;

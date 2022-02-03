@@ -331,7 +331,7 @@ module.exports = {
 
 			'./src/patient/module.js',
 			'./src/patient/addDemographicModal/addDemographicModalComponent.js',
-			'./src/patient/demographicCardComponent.js',
+			'./src/patient/demographicCardComponent.ts',
 			'./src/patient/demographicApi.service.ts',
 
 			'./src/dashboard/module.js',

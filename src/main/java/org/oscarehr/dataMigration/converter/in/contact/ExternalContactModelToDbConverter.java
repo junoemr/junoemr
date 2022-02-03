@@ -24,7 +24,7 @@ package org.oscarehr.dataMigration.converter.in.contact;
 
 import org.oscarehr.contact.entity.Contact;
 import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.contact.ExternalContact;
 import org.springframework.stereotype.Component;
@@ -46,7 +46,7 @@ public class ExternalContactModelToDbConverter
 		contact.setLastName(input.getLastName());
 		contact.setEmail(input.getEmail());
 
-		Address address = input.getAddress();
+		AddressModel address = input.getAddress();
 		if(address != null)
 		{
 			contact.setAddress(address.getAddressLine1());

@@ -1,9 +1,18 @@
+import {PhoneType} from "./PhoneType";
+
 export default class PhoneNumber
 {
 	private _number: string;
 	private _extension: string;
 	private _primaryContactNumber: boolean;
-	private _phoneType: any; //todo
+	private _phoneType: PhoneType;
+
+	constructor(number: string, type: any)
+	{
+		this.number = number;
+		this.phoneType = type;
+		this.primaryContactNumber = true;
+	}
 
 	get formattedForDisplay(): string
 	{
@@ -49,12 +58,12 @@ export default class PhoneNumber
 		this._primaryContactNumber = value;
 	}
 
-	get phoneType(): any
+	get phoneType(): PhoneType
 	{
 		return this._phoneType;
 	}
 
-	set phoneType(value: any)
+	set phoneType(value: PhoneType)
 	{
 		this._phoneType = value;
 	}

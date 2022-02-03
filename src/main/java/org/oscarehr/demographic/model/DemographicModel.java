@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
 import org.oscarehr.dataMigration.model.contact.Contact;
@@ -93,7 +93,7 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 	private LocalDate dateEnded;
 
 	//contact info
-	private List<Address> addressList;
+	private List<AddressModel> addressList;
 	private String email;
 	private PhoneNumber homePhone;
 	private PhoneNumber workPhone;
@@ -129,7 +129,7 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 		this.rosterHistory = new ArrayList<>();
 	}
 
-	public void addAddress(Address address)
+	public void addAddress(AddressModel address)
 	{
 		this.addressList.add(address);
 	}
@@ -164,11 +164,11 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 	}
 
 	@JsonIgnore
-	public Address getAddress()
+	public AddressModel getAddress()
 	{
 		if(this.addressList != null && !this.addressList.isEmpty())
 		{
-			for(Address address : addressList)
+			for(AddressModel address : addressList)
 			{
 				// return the first current address found
 				if(address.isCurrentAddress())
@@ -191,7 +191,7 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 		return null;
 	}
 	
-	public void setAddress(Address address)
+	public void setAddress(AddressModel address)
 	{
 		this.addAddress(address);
 	}
