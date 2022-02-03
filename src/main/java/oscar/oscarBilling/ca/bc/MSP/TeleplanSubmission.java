@@ -53,6 +53,7 @@ public class TeleplanSubmission {
 	public static String DEFAULT_BLANK_HEALTH_CARE_NUMBER = "0000000000";
 	public static String DEFAULT_BLANK_BIRTH_DATE = "00000000";
 	public static String DEFAULT_BLANK_NAME_VERIFY = "0000";
+	public static String PAY_PATIENT_CODE = "PP";
 
 	private BillingDao billingDao = SpringUtils.getBean(BillingDao.class);
     

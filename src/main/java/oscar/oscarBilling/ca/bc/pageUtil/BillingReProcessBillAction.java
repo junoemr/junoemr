@@ -147,7 +147,7 @@ public class BillingReProcessBillAction extends Action {
 
     String oinInsurerCode = frm.getInsurerCode(); //fy
     String oinRegistrationNo = demo.getHin() + org.apache.commons.lang3.StringUtils.trimToEmpty(demo.getVer());
-    if("PP".equals(oinInsurerCode))
+    if(TeleplanSubmission.PAY_PATIENT_CODE.equals(oinInsurerCode))
     {
 		oinRegistrationNo = org.apache.commons.lang3.StringUtils.rightPad(oinRegistrationNo,12, '0');
     }
@@ -184,7 +184,7 @@ public class BillingReProcessBillAction extends Action {
     }
 
     // billing region is set to PP when insurer is Pay Patient
-    if ("PP".equals(oinInsurerCode))
+    if (TeleplanSubmission.PAY_PATIENT_CODE.equals(oinInsurerCode))
     {
         hcType = oinInsurerCode;
     }
