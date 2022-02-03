@@ -51,6 +51,7 @@ import oscar.OscarProperties;
 import oscar.entities.Billingmaster;
 import oscar.oscarBilling.ca.bc.MSP.MSPBillingNote;
 import oscar.oscarBilling.ca.bc.MSP.MSPReconcile;
+import oscar.oscarBilling.ca.bc.MSP.TeleplanSubmission;
 import oscar.oscarBilling.ca.bc.Teleplan.TeleplanCodesManager;
 import oscar.oscarBilling.ca.bc.data.BillingFormData;
 import oscar.oscarBilling.ca.bc.data.BillingHistoryDAO;
@@ -204,8 +205,8 @@ public class BillingReProcessBillAction extends Action {
 
     } else { //other provinces
       oinInsurerCode = hcType;
-      hcNo = "0000000000";
-      name_verify = "0000";
+      hcNo = TeleplanSubmission.DEFAULT_BLANK_HEALTH_CARE_NUMBER;
+      name_verify = TeleplanSubmission.DEFAULT_BLANK_NAME_VERIFY;
     }
 
     if (submissionCode.equals("E")) {
@@ -311,7 +312,7 @@ public class BillingReProcessBillAction extends Action {
         billingmaster.setServiceEndTime(serviceEndTime);
         if(oinInsurerCode.equalsIgnoreCase(TeleplanCodesManager.CODE_PAY_PATIENT))
         {
-            billingmaster.setBirthDate("00000000");
+            billingmaster.setBirthDate(TeleplanSubmission.DEFAULT_BLANK_BIRTH_DATE);
         }
         else
         {
@@ -431,7 +432,7 @@ public class BillingReProcessBillAction extends Action {
    * @return String
    */
   public String convertDate8Char(String s) {
-    String sdate = "00000000", syear = "", smonth = "", sday = "";
+    String sdate = TeleplanSubmission.DEFAULT_BLANK_BIRTH_DATE, syear = "", smonth = "", sday = "";
     logger.debug("s=" + s);
     if (s != null) {
 
@@ -457,7 +458,7 @@ public class BillingReProcessBillAction extends Action {
       }
       logger.debug("sdate:" + sdate);
     }else {
-      sdate = "00000000";
+      sdate = TeleplanSubmission.DEFAULT_BLANK_BIRTH_DATE;
 
     }
     return sdate;
