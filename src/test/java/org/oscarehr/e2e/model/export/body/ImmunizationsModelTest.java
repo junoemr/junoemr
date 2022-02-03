@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.BL;
 import org.marc.everest.datatypes.ENXP;
 import org.marc.everest.datatypes.II;
@@ -65,7 +65,11 @@ import org.oscarehr.e2e.model.PatientExport.Immunization;
 import org.oscarehr.e2e.model.export.AbstractExportModelTest;
 import org.oscarehr.e2e.util.EverestUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class ImmunizationsModelTest extends AbstractExportModelTest {
 	public static Prevention prevention;
 	public static List<PreventionExt> preventionExt;
@@ -73,17 +77,14 @@ public class ImmunizationsModelTest extends AbstractExportModelTest {
 	public static ImmunizationsModel immunizationsModel;
 	public static ImmunizationsModel nullImmunizationsModel;
 
-	@BeforeClass
-	public static void beforeClass() {
+	@Before
+	public void before()
+	{
 		PreventionDao preventionDao = SpringUtils.getBean(PreventionDao.class);
 		PreventionExtDao preventionExtDao = SpringUtils.getBean(PreventionExtDao.class);
-
 		prevention = preventionDao.findNotDeletedByDemographicId(Constants.Runtime.VALID_DEMOGRAPHIC).get(0);
 		preventionExt = preventionExtDao.findByPreventionId(Constants.Runtime.VALID_PREVENTION);
-	}
 
-	@Before
-	public void before() {
 		immunization = new Immunization(prevention, preventionExt);
 		immunizationsModel = new ImmunizationsModel(immunization);
 		nullImmunizationsModel = new ImmunizationsModel(new Immunization(null, null));

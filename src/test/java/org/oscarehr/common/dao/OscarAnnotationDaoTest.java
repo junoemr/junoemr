@@ -45,10 +45,12 @@ public class OscarAnnotationDaoTest extends DaoTestFixtures
 	public OscarAnnotationDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("oscar_annotations");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"oscar_annotations"
+		};
 	}
 
 	@Test

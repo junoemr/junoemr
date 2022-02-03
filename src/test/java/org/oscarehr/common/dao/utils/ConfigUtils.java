@@ -30,19 +30,29 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.test.annotation.SystemProfileValueSource;
+import oscar.OscarProperties;
 
 public class ConfigUtils
 {
+	private static final String OVERRIDE_CONFIG_DOCKER = "/docker_test_config.properties";
+	private static final String OVERRIDE_CONFIG_DEFAULT = "/over_ride_config.properties";
+
 	private static final Logger logger=MiscUtils.getLogger();
 
 	private static Properties properties=null;
 	static
 	{
+		String defaultPropertiesUrl = OVERRIDE_CONFIG_DEFAULT;
+		if(OscarProperties.isDockerTestingEnabled())
+		{
+			defaultPropertiesUrl = OVERRIDE_CONFIG_DOCKER;
+		}
+
 		try
         {
-			String overrideProperties=System.getProperty("oscar_override_properties");
-			logger.info("loading "+overrideProperties);
-	        properties=getProperties(overrideProperties, "/over_ride_config.properties");
+			String overrideProperties = System.getProperty("oscar_override_properties");
+	        properties = getProperties(overrideProperties, defaultPropertiesUrl);
         }
         catch (IOException e)
         {
@@ -70,16 +80,19 @@ public class ConfigUtils
 	 */
 	protected static Properties getProperties(String propertiesUrl, String defaultPropertiesUrl) throws IOException
 	{
-		Properties p=new Properties();
-		readFromFile(defaultPropertiesUrl, p);
+		Properties extraProperties = new Properties();
 
-		if (propertiesUrl!=null)
+		logger.info("Loading extra properties from " + defaultPropertiesUrl);
+		readFromFile(defaultPropertiesUrl, extraProperties);
+
+		if (propertiesUrl != null)
 		{
-			p=new Properties(p);
-			readFromFile(propertiesUrl, p);
+			logger.info("Loading more extra properties from " + propertiesUrl);
+			extraProperties = new Properties(extraProperties);
+			readFromFile(propertiesUrl, extraProperties);
 		}
 
-		return(p);
+		return(extraProperties);
 	}
 
 	protected static Properties getProperties()

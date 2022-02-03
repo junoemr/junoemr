@@ -31,6 +31,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.generic.CD;
 import org.marc.everest.datatypes.generic.CE;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.EntryRelationship;
@@ -43,10 +44,16 @@ import org.marc.everest.rmim.uv.cdar2.vocabulary.EntityClassRoot;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.ParticipationType;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActMoodDocumentObservation;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntryRelationship;
+import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.export.template.observation.InstructionObservationModel;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class InstructionObservationModelTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class InstructionObservationModelTest extends DaoTestFixtures
+{
 	private static String validString = "test";
 
 	@Test

@@ -51,10 +51,12 @@ public class CriteriaSelectionOptionDaoTest extends DaoTestFixtures
 	@Autowired
 	public CriteriaSelectionOptionDao criteriaSelectionOptionDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("criteria_selection_option");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"criteria_selection_option"
+		};
 	}
 
 	@Test

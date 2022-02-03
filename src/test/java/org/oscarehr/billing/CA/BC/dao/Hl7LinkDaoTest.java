@@ -46,10 +46,13 @@ public class Hl7LinkDaoTest extends DaoTestFixtures
 	@Autowired
 	public Hl7LinkDao hl7LinkDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("hl7_link", "hl7_pid", "hl7_link", "hl7_obr", "demographic", "lst_gender", "admission","demographic_merged",
-				"hl7_message", "program", "health_safety","provider","providersite","site","program_team");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"hl7_link", "hl7_pid", "hl7_link", "hl7_obr", "demographic", "lst_gender", "admission","demographic_merged",
+			"hl7_message", "program", "health_safety","provider","providersite","site","program_team"
+		};
 	}
 
 	@Test

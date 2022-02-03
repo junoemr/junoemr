@@ -50,9 +50,12 @@ public class UserDSMessagePrefsDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("user_ds_message_prefs");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"user_ds_message_prefs"
+		};
 	}
 
 	@Test

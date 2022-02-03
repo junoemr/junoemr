@@ -59,9 +59,12 @@ public class BillingServiceDaoTest extends DaoTestFixtures
 	protected DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 	Logger logger = MiscUtils.getLogger();
 
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("billingservice", "billingperclimit", "ctl_billingservice", "wcb", "billing");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billingservice", "billingperclimit", "ctl_billingservice", "wcb", "billing"
+		};
 	}
 
 	@Test

@@ -23,7 +23,6 @@
 
 import {Moment} from "moment";
 import moment from "moment";
-import {HRMFetchResults} from "../../../../../generated";
 
 export enum HRMStatus
 {
@@ -34,45 +33,16 @@ export enum HRMStatus
 
 export default class HrmFetchResults
 {
-    private readonly _reportsDownloaded: number;
-    private readonly _reportsProcessed: number;
-    private readonly _startTime: Moment;
-    private readonly _endTime: Moment;
-    private readonly _loginSuccess: boolean;
-    private readonly _downloadSuccess: boolean;
-    private readonly _processingSuccess: boolean;
+    private _reportsDownloaded: number;
+    private _reportsProcessed: number;
+    private _startTime: Moment;
+    private _endTime: Moment;
+    private _loginSuccess: boolean;
+    private _downloadSuccess: boolean;
+    private _processingSuccess: boolean;
 
-    public constructor(transfer: HRMFetchResults)
+    public constructor()
     {
-        this._reportsProcessed = transfer.reportsProcessed;
-        this._reportsDownloaded = transfer.reportsDownloaded;
-
-        this._loginSuccess = transfer.loginSuccess;
-        this._downloadSuccess = transfer.downloadSuccess;
-        this._processingSuccess = transfer.processingSuccess;
-
-        this._startTime = moment(transfer.startTime);
-        this._endTime = moment(transfer.endTime);
-    }
-
-    get reportsDownloadedCount(): number
-    {
-        return this._reportsDownloaded;
-    }
-
-    get reportsProcessedCount(): number
-    {
-        return this._reportsProcessed;
-    }
-
-    get startTime(): Moment
-    {
-        return this._startTime;
-    }
-
-    get endTime(): Moment
-    {
-        return this._endTime;
     }
 
     public durationMS(): number
@@ -116,4 +86,60 @@ export default class HrmFetchResults
             return HRMStatus.ERROR;
         }
     }
+
+	get reportsDownloaded(): number {
+		return this._reportsDownloaded;
+	}
+
+	set reportsDownloaded(value: number) {
+		this._reportsDownloaded = value;
+	}
+
+	get reportsProcessed(): number {
+		return this._reportsProcessed;
+	}
+
+	set reportsProcessed(value: number) {
+		this._reportsProcessed = value;
+	}
+
+	get startTime(): moment.Moment {
+		return this._startTime;
+	}
+
+	set startTime(value: moment.Moment) {
+		this._startTime = value;
+	}
+
+	get endTime(): moment.Moment {
+		return this._endTime;
+	}
+
+	set endTime(value: moment.Moment) {
+		this._endTime = value;
+	}
+
+	get loginSuccess(): boolean {
+		return this._loginSuccess;
+	}
+
+	set loginSuccess(value: boolean) {
+		this._loginSuccess = value;
+	}
+
+	get downloadSuccess(): boolean {
+		return this._downloadSuccess;
+	}
+
+	set downloadSuccess(value: boolean) {
+		this._downloadSuccess = value;
+	}
+
+	get processingSuccess(): boolean {
+		return this._processingSuccess;
+	}
+
+	set processingSuccess(value: boolean) {
+		this._processingSuccess = value;
+	}
 }

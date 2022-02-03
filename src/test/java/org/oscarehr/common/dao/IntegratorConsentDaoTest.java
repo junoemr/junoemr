@@ -58,10 +58,12 @@ public class IntegratorConsentDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ProviderDao providerDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("Facility","demographic","provider","DigitalSignature","IntegratorConsent");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"Facility","demographic","provider","DigitalSignature","IntegratorConsent"
+		};
 	}
 
 	@Test

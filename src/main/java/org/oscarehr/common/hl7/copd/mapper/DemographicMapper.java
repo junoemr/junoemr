@@ -67,6 +67,7 @@ public class DemographicMapper extends AbstractMapper
 			demographic.setHin(getPHN());
 			demographic.setHcType(getHCType());
 			demographic.setSin(getSIN());
+			demographic.setChartNo(getChartNumber());
 
 			demographic.setAddress(getStreetAddress(0));
 			demographic.setCity(getCity(0));
@@ -175,7 +176,7 @@ public class DemographicMapper extends AbstractMapper
 		if (dateStr.isEmpty() || "00000000".equals(dateStr))
 		{
 			logger.warn("Replacing empty DOB string with :" + CoPDPreProcessorService.DEFAULT_DATE +
-					" for demographic: " + getLastName(0) + "," + getFirstName(0));
+				" for demographic: " + getLastName(0) + "," + getFirstName(0));
 			dateStr = CoPDPreProcessorService.DEFAULT_DATE;
 		}
 		return ConversionUtils.toLocalDate(dateStr, DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -188,11 +189,11 @@ public class DemographicMapper extends AbstractMapper
 	public String getStreetAddress(int rep) throws HL7Exception
 	{
 		String unitIdentifier = messagePID.getPatientAddress(rep).getStreetAddress().getStreetOrMailingAddress().getValue();
-		String streetName = messagePID.getPatientAddress(rep).getStreetAddress().getStreetName().getValue();
 		String streetNumber = messagePID.getPatientAddress(rep).getStreetAddress().getDwellingNumber().getValue();
+		String streetName = messagePID.getPatientAddress(rep).getStreetAddress().getStreetName().getValue();
 
 		return StringUtils.trimToNull(String.join(" ",
-				StringUtils.trimToEmpty(unitIdentifier), StringUtils.trimToEmpty(streetName), StringUtils.trimToEmpty(streetNumber)));
+			StringUtils.trimToEmpty(unitIdentifier), StringUtils.trimToEmpty(streetName), StringUtils.trimToEmpty(streetNumber)));
 	}
 	public String getCity(int rep) throws HL7Exception
 	{
@@ -320,6 +321,16 @@ public class DemographicMapper extends AbstractMapper
 	public String getSIN() throws HL7Exception
 	{
 		Integer rep = getPatientIdentifierRepByCode("SIN");
+		if(rep != null)
+		{
+			return messagePID.getPid3_PatientIdentifierList(rep).getCx1_ID().getValue();
+		}
+		return null;
+	}
+
+	public String getChartNumber() throws HL7Exception
+	{
+		Integer rep = getPatientIdentifierRepByCode("CLINIC");
 		if(rep != null)
 		{
 			return messagePID.getPid3_PatientIdentifierList(rep).getCx1_ID().getValue();

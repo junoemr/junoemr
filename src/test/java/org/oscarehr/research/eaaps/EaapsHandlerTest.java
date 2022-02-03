@@ -71,10 +71,10 @@ public class EaapsHandlerTest extends DaoTestFixtures
 		props.setProperty("DOCUMENT_DIR", documentDir.getAbsolutePath());
 	}
 	
-	@BeforeClass
-	public static void init() throws Exception {
-		//SchemaUtils.restoreAllTables();
-		SchemaUtils.restoreTable(
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
 			"demographic_merged",
 			"admission",
 			"health_safety",
@@ -99,7 +99,7 @@ public class EaapsHandlerTest extends DaoTestFixtures
 			"casemgmt_note_link",
 			"messagelisttbl",
 			"msgDemoMap"
-		);
+		};
 	}
 	
 	private String getHash(Demographic demo) {

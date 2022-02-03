@@ -53,9 +53,12 @@ public class Hsfo2PatientDaoTest extends DaoTestFixtures
 	@Autowired
 	protected Hsfo2PatientDao hsfo2PatientDao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("hsfo2_patient");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"hsfo2_patient"
+		};
 	}
 
 	@Test

@@ -45,9 +45,12 @@ public class BillingInrDaoTest extends DaoTestFixtures
 	public BillingInrDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billinginr","demographic","lst_gender","demographic_merged","admission","health_safety","provider","program");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billinginr","demographic","lst_gender","demographic_merged","admission","health_safety","provider","program"
+		};
 	}
 
 	@Test

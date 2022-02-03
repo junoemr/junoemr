@@ -28,45 +28,37 @@ import integration.tests.util.data.SiteTestCollection;
 import integration.tests.util.data.SiteTestData;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddSitesIT extends SeleniumTestBase
 {
-	@After
-	public void cleanup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	@Override
+	protected String[] getTablesToRestore()
 	{
-		SchemaUtils.restoreTable("admission", "log", "site");
+		return new String[]{
+			"admission", "log", "site", "log_ws_rest", "provider_recent_demographic_access", "property"
+		};
 	}
 
-	public static void addNewSites(SiteTestData site)
+	public static void addNewSites(SiteTestData site, String frameName)
 	{
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//a[contains(.,'System Management')]")));
-		driver.findElement(By.xpath(".//a[contains(.,'System Management')]")).click();
-		driver.findElement(By.xpath(".//a[contains(.,'Satellite-sites Admin')]")).click();
-		if (PageUtil.isExistsBy(By.id("myFrame"), driver))
-		{
-			driver.switchTo().frame("myFrame");
-		}
-		else
-		{
-			driver.switchTo().frame("content-frame");
-		}
+		findWaitClickByXpath(driver, webDriverWait, ".//a[contains(.,'System Management')]");
+		findWaitClickByXpath(driver, webDriverWait, ".//a[contains(.,'Satellite-sites Admin')]");
+		webDriverWait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(frameName));
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@value='Add New Site']")));
 		driver.findElement(By.xpath("//input[@value='Add New Site']")).click();
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@name='site.name']")));
@@ -78,7 +70,7 @@ public class AddSitesIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='site.fax']")).sendKeys(site.fax);
 		driver.findElement(By.xpath("//input[@name='site.address']")).sendKeys(site.address);
 		driver.findElement(By.xpath("//input[@name='site.city']")).sendKeys(site.city);
-		dropdownSelectByValue(driver, By.id("province-select"), site.province);
+		dropdownSelectByValue(driver, webDriverWait, By.id("province-select"), site.province);
 		driver.findElement(By.xpath("//input[@name='site.postal']")).sendKeys(site.postCode);
 		driver.findElement(By.xpath("//input[@name='site.bcFacilityNumber']")).sendKeys(site.bcpFacilityNumber);
 		driver.findElement(By.id("save-button")).click();
@@ -91,9 +83,9 @@ public class AddSitesIT extends SeleniumTestBase
 
 		// open administration panel
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("admin-panel")));
-		driver.findElement(By.id("admin-panel")).click();
-		PageUtil.switchToLastWindow(driver);
-		addNewSites(site);
+		clickWaitSwitchToLast(driver, webDriverWait, By.id("admin-panel"));
+		addNewSites(site, "myFrame");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(site.siteName)));
 		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(site.siteName), driver));
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));
 	}
@@ -103,8 +95,9 @@ public class AddSitesIT extends SeleniumTestBase
 	public void addSitesJUNOUITest()
 	{
 		SiteTestData siteJuno = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[1]);
-		accessSectionJUNOUI(driver, "Admin");
-		addNewSites(siteJuno);
+		accessSectionJUNOUI(driver, webDriverWait, "Admin");
+		addNewSites(siteJuno, "content-frame");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(siteJuno.siteName)));
 		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(siteJuno.siteName), driver));
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));
 

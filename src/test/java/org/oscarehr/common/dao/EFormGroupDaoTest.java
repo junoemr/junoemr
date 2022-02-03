@@ -42,9 +42,12 @@ public class EFormGroupDaoTest extends DaoTestFixtures
 	@Autowired
 	protected EFormGroupDao eFormGroupDao;
 
-	@Before
-	public void initSchema() throws Exception {
-		SchemaUtils.restoreTable("eform_groups");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"eform_groups"
+		};
 	}
 
 	@Test

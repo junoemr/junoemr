@@ -44,10 +44,12 @@ public class ProviderExtDaoTest extends DaoTestFixtures
 	public ProviderExtDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("providerExt");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"providerExt"
+		};
 	}
 
 	@Test

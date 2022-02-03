@@ -57,10 +57,17 @@ public class DemographicSetsDaoTest extends DaoTestFixtures
 
 	Demographic demographic = null;
 
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"demographicSets", "admission", "demographic", "lst_gender", "demographic_merged", "program", "health_safety", "provider"
+		};
+	}
+
 	@Before
 	public void before() throws Exception {
-		SchemaUtils.restoreTable("demographicSets", "admission", "demographic", "lst_gender", "demographic_merged", "program", "health_safety", "provider");
-		//SchemaUtils.restoreAllTables();
+		SchemaUtils.restoreTable();
 
 		demographic = new Demographic();
 		EntityDataGenerator.generateTestDataForModelClass(demographic);

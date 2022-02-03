@@ -50,10 +50,14 @@ public class BillingPaymentTypeDaoTest extends DaoTestFixtures
 	@Autowired
 	protected BillingPaymentTypeDao billingPaymentTypeDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "billing_payment_type");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"billing_payment_type"
+		};
 	}
+
 
 	@Test
 	public void testCreate() throws Exception {

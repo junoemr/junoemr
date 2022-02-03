@@ -48,9 +48,12 @@ public class BillingPercLimitDaoTest extends DaoTestFixtures
 	public BillingPercLimitDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billingperclimit");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billingperclimit"
+		};
 	}
 
 	@Test

@@ -52,9 +52,12 @@ public class PublicKeyDaoTest extends DaoTestFixtures
 	@Autowired
 	protected PublicKeyDao publicKeyDao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("publicKeys");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"publicKeys"
+		};
 	}
 
 	@Test

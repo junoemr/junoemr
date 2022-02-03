@@ -42,10 +42,12 @@ public class HashAuditDaoTest extends DaoTestFixtures
 	@Autowired
 	protected HashAuditDao hashAuditDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("hash_audit");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"hash_audit"
+		};
 	}
 
 	@Test

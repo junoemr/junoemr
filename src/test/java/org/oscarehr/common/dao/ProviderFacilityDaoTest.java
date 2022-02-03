@@ -25,24 +25,30 @@ package org.oscarehr.common.dao;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.model.ProviderFacility;
 import org.oscarehr.common.model.ProviderFacilityPK;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ProviderFacilityDaoTest {
-
-	protected ProviderFacilityDao dao = SpringUtils.getBean(ProviderFacilityDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ProviderFacilityDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected ProviderFacilityDao dao;
 
 	public ProviderFacilityDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("provider_facility");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"provider_facility"
+		};
 	}
 
 	@Test

@@ -72,7 +72,7 @@ import java.util.UUID;
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public abstract class BaseNoteService
 {
-	public static final String DEFAULT_RESIDUAL_INFO_NOTE_TEXT = "Residual Info Dump";
+	public static final String DEFAULT_RESIDUAL_INFO_NOTE_TEXT = "Residual Info from Import";
 
 	@Autowired
 	protected CaseManagementNoteDao caseManagementNoteDao;

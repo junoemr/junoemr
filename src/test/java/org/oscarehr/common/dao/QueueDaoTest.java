@@ -57,9 +57,12 @@ public class QueueDaoTest extends DaoTestFixtures
 		MiscUtils.getLogger().error("Unable to run doSimpleExceptionTest on this DAO");
 	}
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "queue");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"queue"
+		};
 	}
 
 	@Test

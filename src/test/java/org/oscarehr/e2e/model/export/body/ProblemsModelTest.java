@@ -31,8 +31,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.ED;
 import org.marc.everest.datatypes.II;
 import org.marc.everest.datatypes.NullFlavor;
@@ -49,7 +50,11 @@ import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.export.AbstractExportModelTest;
 import org.oscarehr.e2e.util.EverestUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class ProblemsModelTest extends AbstractExportModelTest {
 	public static DxresearchDAO dao;
 	public static Dxresearch problem;
@@ -58,8 +63,8 @@ public class ProblemsModelTest extends AbstractExportModelTest {
 	public static Dxresearch nullProblem;
 	public static ProblemsModel nullProblemsModel;
 
-	@BeforeClass
-	public static void beforeClass() {
+	@Before
+	public void beforeClass() {
 		dao = SpringUtils.getBean(DxresearchDAO.class);
 		problem = dao.getDxResearchItemsByPatient(Constants.Runtime.VALID_DEMOGRAPHIC).get(0);
 		problemsModel = new ProblemsModel(problem);

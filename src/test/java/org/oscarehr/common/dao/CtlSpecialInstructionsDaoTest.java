@@ -50,12 +50,15 @@ public class CtlSpecialInstructionsDaoTest extends DaoTestFixtures
 	@Autowired
 	protected CtlSpecialInstructionsDao ctlSpecialInstructionsDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "ctl_specialinstructions");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"ctl_specialinstructions"
+		};
 	}
 
-        @Test
+	@Test
         public void testCreate() throws Exception {
                 CtlSpecialInstructions entity = new CtlSpecialInstructions();
                 EntityDataGenerator.generateTestDataForModelClass(entity);

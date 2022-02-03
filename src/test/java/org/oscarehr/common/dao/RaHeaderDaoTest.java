@@ -54,9 +54,12 @@ public class RaHeaderDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("raheader", "radetail", "provider", "providersite", "demographic", "provider_facility", "Facility");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"raheader", "radetail", "provider", "providersite", "demographic", "provider_facility", "Facility"
+		};
 	}
 
 	@Test

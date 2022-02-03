@@ -46,9 +46,12 @@ public class BillingONFavouriteDaoTest extends DaoTestFixtures
 	public BillingONFavouriteDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billing_on_favourite");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billing_on_favourite"
+		};
 	}
 
 	@Test

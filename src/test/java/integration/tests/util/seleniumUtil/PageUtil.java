@@ -22,7 +22,6 @@
  */
 package integration.tests.util.seleniumUtil;
 
-import integration.tests.util.SeleniumTestBase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -33,40 +32,38 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
 
 public class PageUtil
 {
 	/**
 	 * wait until the webdriver changes pages
 	 * @param oldUrl
-	 * @param driver
+	 * @param webDriverWait
 	 */
-	public static void waitForPageChange(String oldUrl, WebDriver driver)
+	public static void waitForPageChange(String oldUrl, WebDriverWait webDriverWait)
 	{
-		WebDriverWait wait = new WebDriverWait(driver, 20);
-		wait.until(ExpectedConditions.not(ExpectedConditions.urlMatches(oldUrl)));
+		webDriverWait.until(ExpectedConditions.not(ExpectedConditions.urlMatches(oldUrl)));
 	}
 
 	/**
-	 * check if a given WebElement exists (with no implicit delay)
+	 * check if a given WebElement exists.  Will take a long time to timeout if used to find the
+	 * absence of an element.
 	 * @param search search method used to find element
 	 * @param driver webDriver
 	 * @return true / false depending on if the WebElement exists in the DOM
 	 */
 	public static boolean isExistsBy(By search, WebDriver driver)
 	{
-		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 		try
 		{
 			driver.findElement(search);
-			driver.manage().timeouts().implicitlyWait(SeleniumTestBase.WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 			return true;
 		}
 		catch (NoSuchElementException e)
 		{
-			driver.manage().timeouts().implicitlyWait(SeleniumTestBase.WEB_DRIVER_IMPLICIT_TIMEOUT, TimeUnit.SECONDS);
 			return false;
 		}
 	}
@@ -125,6 +122,16 @@ public class PageUtil
 		targetLocator.window(windowHandle);
 	}
 
+	public static void clickWaitSwitchToLast(WebDriver driver, WebDriverWait webDriverWait, By clickTarget)
+	{
+		int handleCount = driver.getWindowHandles().size();
+		Set<String> allHandles = driver.getWindowHandles();
+
+		findWaitClick(driver, webDriverWait, clickTarget);
+		webDriverWait.until(ExpectedConditions.numberOfWindowsToBe(handleCount + 1));
+		switchToLastWindow(driver);
+	}
+
 	public static void switchToLastWindow(WebDriver driver)
 	{
 		Set<String> allHandles = driver.getWindowHandles();
@@ -138,9 +145,12 @@ public class PageUtil
 		driver.manage().window().maximize();
 	}
 
-	public static void  switchToNewWindow(WebDriver driver, By textlink, Set<String> oldWindowHandles) throws InterruptedException {
-		driver.findElement(textlink).click();
-		Thread.sleep(2000);
+	public static void  switchToNewWindow(WebDriver driver, By textlink,
+		Set<String> oldWindowHandles, WebDriverWait webDriverWait)
+	{
+		int expectedNumberOfWindows = driver.getWindowHandles().size() + 1;
+		findWaitClick(driver, webDriverWait, textlink);
+		webDriverWait.until(ExpectedConditions.numberOfWindowsToBe(expectedNumberOfWindows));
 		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
 		PageUtil.switchToWindow(newWindows.get(0), driver);
 		driver.manage().window().maximize();
@@ -154,5 +164,4 @@ public class PageUtil
 		driver.findElement(By.linkText("E")).click();
 		PageUtil.switchToLastWindow(driver);
 	}
-
 }

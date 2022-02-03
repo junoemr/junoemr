@@ -46,9 +46,12 @@ public class BillingPreferencesDAOTest extends DaoTestFixtures
 	@Autowired
 	public BillingPreferencesDAO billingPreferencesDAO;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billing_preferences");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billing_preferences"
+		};
 	}
 
 	@Test

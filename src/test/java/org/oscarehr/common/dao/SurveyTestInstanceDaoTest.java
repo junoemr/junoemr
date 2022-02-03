@@ -47,9 +47,12 @@ public class SurveyTestInstanceDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("survey_test_instance","survey_test_data");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"survey_test_instance","survey_test_data"
+		};
 	}
 
 	@Test

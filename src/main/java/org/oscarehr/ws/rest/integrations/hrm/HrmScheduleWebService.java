@@ -24,7 +24,7 @@
 package org.oscarehr.ws.rest.integrations.hrm;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.hospitalReportManager.model.HRMFetchResults;
+import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
 import org.oscarehr.hospitalReportManager.service.HRMScheduleService;
 import org.oscarehr.hospitalReportManager.service.HRMService;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -59,19 +59,19 @@ public class HrmScheduleWebService extends AbstractServiceImpl
 	
 	@POST
 	@Path("/")
-	public RestResponse<HRMFetchResults> fetchNewDocuments() throws InterruptedException, ExecutionException, TimeoutException
+	public RestResponse<HrmFetchResultsModel> fetchNewDocuments() throws InterruptedException, ExecutionException, TimeoutException
 	{
 		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
-		HRMFetchResults results = scheduleService.scheduleFetchNow();
+		HrmFetchResultsModel results = scheduleService.scheduleFetchNow();
 		return RestResponse.successResponse(results);
 	}
 	
 	@GET
 	@Path("/")
-	public RestResponse<HRMFetchResults> getLastFetchStatus() throws InterruptedException, ExecutionException, TimeoutException
+	public RestResponse<HrmFetchResultsModel> getLastFetchStatus() throws InterruptedException, ExecutionException, TimeoutException
 	{
 		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
-		HRMFetchResults results = hrmService.getLastFetchResults();
+		HrmFetchResultsModel results = hrmService.getLastFetchResults();
 		return RestResponse.successResponse(results);
 	}
 }

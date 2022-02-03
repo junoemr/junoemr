@@ -31,9 +31,11 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Provider;
-import org.oscarehr.hospitalReportManager.model.HRMFetchResults;
+import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
 
 import com.jcraft.jsch.ChannelSftp;
@@ -51,15 +53,12 @@ import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 public class HRMSftpService
 {
-	// CONNECTION SETTINGS
-	private static final String OMD_HRM_USER = OscarProperties.getInstance().getProperty("omd.hrm.user");
-	private static final String OMD_HRM_IP = OscarProperties.getInstance().getProperty("omd.hrm.address");
-	private static final Integer OMD_HRM_PORT = NumberUtils.toInt(OscarProperties.getInstance().getProperty("omd.hrm.port"), 0);
-	private static final String REMOTE_PATH = OscarProperties.getInstance().getProperty("omd.hrm.remote_path");
-	
+	@Autowired
+	private SystemPreferenceService systemPreferences;
+
 	// LOCAL CONFIG
 	private static final String OMD_SFTP_SSH_KEY = OscarProperties.getInstance().getProperty("omd.hrm.private_key_file");
 	
@@ -75,15 +74,20 @@ public class HRMSftpService
 	 * @return List of downloaded HRM files
 	 */
 	@Synchronized
-	protected List<GenericFile> pullHRMFromSource(HRMFetchResults results)
+	protected List<GenericFile> pullHRMFromSource(HrmFetchResultsModel results)
 	{
+		final String OMD_HRM_USER = systemPreferences.getPreferenceValue("omd.hrm.user", null);
+		final String OMD_HRM_IP = systemPreferences.getPreferenceValue("omd.hrm.address", null);
+		final Integer OMD_HRM_PORT = NumberUtils.toInt(systemPreferences.getPreferenceValue("omd.hrm.port", null), 0);
+		final String REMOTE_PATH = systemPreferences.getPreferenceValue("omd.hrm.remote_path", null);
+
 		JSch jsch = new JSch();
 		Session session = null;
 		ChannelSftp sftp = null;
 		
 		List<GenericFile> downloadedFiles = null;
 		LocalDate dateSubDirectory = LocalDate.now();
-		
+
 		try
 		{
 			jsch.addIdentity(OMD_SFTP_SSH_KEY);

@@ -34,8 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.ANY;
 import org.marc.everest.datatypes.ED;
 import org.marc.everest.datatypes.ENXP;
@@ -78,7 +78,11 @@ import org.oscarehr.e2e.model.PatientExport.LabComponent;
 import org.oscarehr.e2e.model.export.AbstractExportModelTest;
 import org.oscarehr.e2e.util.EverestUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class ResultComponentModelTest extends AbstractExportModelTest {
 	public static MeasurementDao measurementDao;
 	public static MeasurementsExtDao measurementsExtDao;
@@ -90,18 +94,15 @@ public class ResultComponentModelTest extends AbstractExportModelTest {
 	public static LabComponent nullLabComponent;
 	public static ResultComponentModel resultComponentModel;
 
-	@BeforeClass
-	public static void beforeClass() throws Exception {
+	@Before
+	public void before() {
 		measurementDao = SpringUtils.getBean(MeasurementDao.class);
 		measurementsExtDao = SpringUtils.getBean(MeasurementsExtDao.class);
 
 		measurement = measurementDao.find(Constants.Runtime.VALID_LAB_MEASUREMENT);
 		measurementsExt = measurementsExtDao.getMeasurementsExtByMeasurementId(Constants.Runtime.VALID_LAB_MEASUREMENT);
 		resultComponentModel = new ResultComponentModel();
-	}
 
-	@Before
-	public void before() {
 		labComponent = new LabComponent(measurement, measurementsExt);
 		nullLabComponent = new LabComponent(null, null);
 	}

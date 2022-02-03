@@ -53,9 +53,12 @@ public class Billing3rdPartyAddressDaoTest extends DaoTestFixtures
 	public Billing3rdPartyAddressDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billing_on_3rdPartyAddress");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billing_on_3rdPartyAddress"
+		};
 	}
 
 	@Test

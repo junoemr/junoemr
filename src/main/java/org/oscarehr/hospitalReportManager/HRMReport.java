@@ -11,8 +11,10 @@ package org.oscarehr.hospitalReportManager;
 
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface HRMReport
 {
@@ -30,15 +32,13 @@ public interface HRMReport
 
 	List<String> getLegalOtherNames();
 
-	List<Integer> getDateOfBirth();
-
-	String getDateOfBirthAsString();
+	Optional<LocalDate> getDateOfBirth();
 
 	String getHCN();
 
 	String getHCNVersion();
 
-	Calendar getHCNExpiryDate();
+	Optional<LocalDate> getHCNExpiryDate();
 
 	String getHCNProvinceCode();
 
@@ -68,20 +68,20 @@ public interface HRMReport
 
 	String getFileExtension();
 
-	String getFirstReportTextContent();
+	String getTextContent();
 
 	byte[] getBinaryContent();
 
 	byte[] getBase64BinaryContent();
 
-	String getFirstReportClass();
+	String getClassName();
 
-	String getFirstReportSubClass();
+	String getSubClassName();
 
-	Calendar getFirstReportEventTime();
+	Optional<LocalDateTime> getEventTime();
 
-	List<String> getFirstReportAuthorPhysician();
-	
+	String getAuthorPhysician();
+
 	String getSendingFacilityId();
 
 	String getSendingFacilityReportNo();
@@ -90,15 +90,15 @@ public interface HRMReport
 
 	List<HrmObservation> getObservations();
 
-	Calendar getFirstAccompanyingSubClassDateTime();
+	Optional<LocalDateTime> getFirstAccompanyingSubClassDateTime();
 
 	String getMessageUniqueId();
 
 	String getDeliverToUserId();
 
-	String getDeliverToUserIdFirstName();
+	String getDeliverToUserFirstName();
 
-	String getDeliverToUserIdLastName();
+	String getDeliverToUserLastName();
 
 	Integer getHrmDocumentId();
 

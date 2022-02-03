@@ -66,7 +66,7 @@ public class CDSFamilyHistoryImportMapper extends AbstractCDSNoteImportMapper<Fa
 
 		if (StringUtils.trimToNull(importStructure.getProblemDiagnosisProcedureDescription()) != null)
 		{
-			note += "\nProblemDiagnosisProcedureDescription: " + importStructure.getProblemDiagnosisProcedureDescription() + "\n";
+			note += "\n" + importStructure.getProblemDiagnosisProcedureDescription() + "\n";
 		}
 		if (importStructure.getDiagnosisProcedureCode() != null)
 		{

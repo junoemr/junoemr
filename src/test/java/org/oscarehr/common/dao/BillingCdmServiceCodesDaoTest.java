@@ -50,9 +50,12 @@ public class BillingCdmServiceCodesDaoTest extends DaoTestFixtures
 	@Autowired
 	protected BillingCdmServiceCodesDao billingCdmServiceCodesDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "ctl_billingservice_age_rules", "billing_cdm_service_codes");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"ctl_billingservice_age_rules", "billing_cdm_service_codes"
+		};
 	}
 
 	@Test

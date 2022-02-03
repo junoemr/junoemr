@@ -56,9 +56,12 @@ public class DigitalSignatureDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ProviderDao providerDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("demographic","provider","Facility","DigitalSignature");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"demographic","provider","Facility","DigitalSignature"
+		};
 	}
 
 	@Test

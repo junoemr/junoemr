@@ -48,10 +48,12 @@ public class ReportConfigDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ReportConfigDao reportConfigDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "reportConfig");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"reportConfig"
+		};
 	}
 
 	@Test

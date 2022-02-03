@@ -48,9 +48,12 @@ public class CtlBillingServiceSexRulesDaoTest extends DaoTestFixtures
 	@Autowired
 	protected CtlBillingServiceSexRulesDao ctlBillingServiceSexRulesDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("ctl_billingservice_sex_rules", "ctl_billingservice_age_rules");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"ctl_billingservice_sex_rules", "ctl_billingservice_age_rules"
+		};
 	}
 
 	@Test

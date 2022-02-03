@@ -59,10 +59,18 @@ public class WaitingListDaoTest extends DaoTestFixtures
 	private WaitingListName wn;
 	private Demographic demographic;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("Facility","lst_gender","demographic_merged","admission","health_safety","program","waitingList", "waitingListName", "demographic","appointment");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"Facility","lst_gender","demographic_merged","admission","health_safety","program",
+			"waitingList", "waitingListName", "demographic","appointment"
+		};
+	}
 
+	@Before
+	public void before() throws Exception
+	{
 		wn = new WaitingListName();
 		wn.setCreateDate(new Date());
 		wn.setName("NAHBLIAYH");

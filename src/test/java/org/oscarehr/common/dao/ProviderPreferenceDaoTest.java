@@ -42,10 +42,12 @@ public class ProviderPreferenceDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ProviderPreferenceDao providerPreferenceDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("ProviderPreference");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"ProviderPreference"
+		};
 	}
 
 	@Test

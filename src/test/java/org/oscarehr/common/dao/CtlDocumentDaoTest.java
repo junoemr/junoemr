@@ -44,9 +44,12 @@ public class CtlDocumentDaoTest extends DaoTestFixtures
 	@Autowired
 	protected CtlDocumentDao ctlDocumentDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("ctl_document","document","demographic");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"ctl_document","document","demographic"
+		};
 	}
 
 	@Test

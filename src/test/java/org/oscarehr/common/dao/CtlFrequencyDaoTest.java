@@ -45,9 +45,12 @@ public class CtlFrequencyDaoTest extends DaoTestFixtures
 	@Autowired
 	protected CtlFrequencyDao ctlFrequencyDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("ctl_frequency");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"ctl_frequency"
+		};
 	}
 
 	@Test

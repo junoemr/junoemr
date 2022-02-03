@@ -42,9 +42,12 @@ public class FavoriteDaoTest extends DaoTestFixtures
 	@Autowired
 	protected FavoriteDao favoriteDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("favorites");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"favorites"
+		};
 	}
 
 	@Test

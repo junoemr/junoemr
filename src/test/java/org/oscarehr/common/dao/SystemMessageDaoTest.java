@@ -63,10 +63,12 @@ public class SystemMessageDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("SystemMessage");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"SystemMessage"
+		};
 	}
 
 	@Test

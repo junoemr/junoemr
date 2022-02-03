@@ -50,9 +50,12 @@ public class BillingONExtDaoTest extends DaoTestFixtures
 	@Autowired
 	protected BillingONExtDao billingONExtDao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billing_on_ext", "billing_on_payment", "billing_on_cheader1");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billing_on_ext", "billing_on_payment", "billing_on_cheader1"
+		};
 	}
 	
 	@Test
