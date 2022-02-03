@@ -192,15 +192,6 @@ angular.module('Patient').component('addDemographicModal', {
 				});
 			}
 
-			ctrl.resolveKeys = ($event) =>
-			{
-				// Ctrl-Enter
-				if ($event.ctrlKey && $event.charCode === 13 && !ctrl.buttonClicked)
-				{
-					ctrl.onAdd();
-				}
-			}
-
 			ctrl.validateDemographic = function ()
 			{
 				let dateOfBirthValid = Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth).isValid();
@@ -299,6 +290,7 @@ angular.module('Patient').component('addDemographicModal', {
 						if (ctrl.isCreateAnotherEnabled)
 						{
 							ctrl.resetToDefaults();
+							ctrl.resetFocus();
 						}
 						else
 						{

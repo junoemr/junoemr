@@ -12,8 +12,10 @@
 	</modal-title>
 
 	<modal-body>
+		<form ng-submit="$ctrl.onAdd()" ng-ref="$ctrl.formRef">
 		<div class="add-demographic-content d-flex justify-content-center">
 		<div class="flex flex-row justify-content-between width-80">
+
 			<div class="flex-col column-container">
 				<!-- LAST NAME -->
 				<juno-input ng-model="$ctrl.newDemographicData.lastName"
@@ -138,6 +140,9 @@
 			</div>
 		</div>
 		</div>
+			<!-- required for ng-submit -->
+			<input type="submit" id="hidden-submit">
+		</form>
 	</modal-body>
 
 
@@ -152,8 +157,7 @@
 			</div>
 			<juno-button
 				 class="add-demographic-button"
-				 title="Ctrl+Enter"
-				 ng-keypress="$ctrl.resolveKeys($event);"
+				 title="Enter"
 				 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 				 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
 				 click="$ctrl.onAdd()"
