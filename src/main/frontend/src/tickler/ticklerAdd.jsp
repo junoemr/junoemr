@@ -59,14 +59,14 @@
 					<div class="col-xs-5">
 						<div class="row" ng-if="$ctrl.tickler.demographic != null">
 							<div class="col-xs-3">
-								<img width="60px" ng-src="../imageRenderingServlet?source=local_client&clientId={{$ctrl.tickler.demographic.demographicNo}}"/>
+								<img width="60px" ng-src="../imageRenderingServlet?source=local_client&clientId={{$ctrl.tickler.demographic.id}}"/>
 							</div>
 							<div class="col-xs-9">
 								<div class="blue-text">
-									<h4 class="no-margin">{{$ctrl.tickler.demographic.lastName}}, {{$ctrl.tickler.demographic.firstName}}</h4>
+									<h4 class="no-margin">{{$ctrl.tickler.demographic.displayName}}</h4>
 								</div>
-								<div>{{$ctrl.tickler.demographic.hin}}</div>
-								<div>{{$ctrl.tickler.demographic.dateOfBirth | date : 'yyyy-MM-dd'}}</div>
+								<div>{{$ctrl.tickler.demographic.healthNumber}}</div>
+								<div>{{$ctrl.tickler.demographic.displayDateOfBirth}}</div>
 							</div>
 						</div>
 

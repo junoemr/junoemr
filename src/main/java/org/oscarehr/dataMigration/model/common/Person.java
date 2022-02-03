@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.model.common;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.demographic.model.DemographicModel;
 
@@ -78,10 +79,19 @@ public interface Person
 		{
 			this.value = value;
 		}
+
+		@JsonValue
 		public String getValue()
 		{
 			return value;
 		}
+
+		@Override
+		public String toString()
+		{
+			return getValue();
+		}
+
 		public static SEX fromStringIgnoreCase(String enumString)
 		{
 			if(EnumUtils.isValidEnumIgnoreCase(DemographicModel.SEX.class, enumString))

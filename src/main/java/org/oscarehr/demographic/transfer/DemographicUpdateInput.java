@@ -20,18 +20,16 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographic.model;
+package org.oscarehr.demographic.transfer;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.common.Address;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumber;
-import org.oscarehr.dataMigration.model.contact.Contact;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.demographic.model.DemographicModel;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,46 +37,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class DemographicModel extends AbstractTransientModel implements Person, Contact
+public class DemographicUpdateInput extends AbstractTransientModel
 {
-	public enum OFFICIAL_LANGUAGE
-	{
-		ENGLISH("English"),
-		FRENCH("French");
-
-		private final String value;
-
-		OFFICIAL_LANGUAGE(String value)
-		{
-			this.value = value;
-		}
-
-		public String getValue()
-		{
-			return this.value;
-		}
-
-		public static OFFICIAL_LANGUAGE fromValueString(String value)
-		{
-			for(OFFICIAL_LANGUAGE language : OFFICIAL_LANGUAGE.values())
-			{
-				if(language.getValue().equalsIgnoreCase(value))
-				{
-					return language;
-				}
-			}
-			return null;
-		}
-	}
-
 	private Integer id;
 
 	// base info
 	private String firstName;
 	private String lastName;
-	private TITLE title;
+	private Person.TITLE title;
 	private LocalDate dateOfBirth;
-	private SEX sex;
+	private Person.SEX sex;
 	private String healthNumber;
 	private String healthNumberVersion;
 	private String healthNumberProvinceCode;
@@ -114,7 +82,7 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 	private String alias;
 	private String citizenship;
 	private String spokenLanguage;
-	private OFFICIAL_LANGUAGE officialLanguage;
+	private DemographicModel.OFFICIAL_LANGUAGE officialLanguage;
 	private String countryOfOrigin;
 	private String newsletter;
 	private String nameOfMother;
@@ -123,88 +91,9 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 	private String patientNote;
 	private String patientAlert;
 
-	public DemographicModel()
+	public DemographicUpdateInput()
 	{
 		this.addressList = new ArrayList<>();
 		this.rosterHistory = new ArrayList<>();
-	}
-
-	public void addAddress(Address address)
-	{
-		this.addressList.add(address);
-	}
-
-	@Override
-	@JsonIgnore
-	public String getIdString()
-	{
-		return String.valueOf(getId());
-	}
-
-	@Override
-	@JsonIgnore
-	public String getTitleString()
-	{
-		if(this.title != null)
-		{
-			return this.title.name();
-		}
-		return null;
-	}
-
-	@Override
-	@JsonIgnore
-	public String getSexString()
-	{
-		if(this.sex != null)
-		{
-			return this.sex.getValue();
-		}
-		return null;
-	}
-
-	@JsonIgnore
-	public Address getAddress()
-	{
-		if(this.addressList != null && !this.addressList.isEmpty())
-		{
-			for(Address address : addressList)
-			{
-				// return the first current address found
-				if(address.isCurrentAddress())
-				{
-					return address;
-				}
-			}
-		}
-		return null;
-	}
-
-	@JsonIgnore
-	public RosterData getCurrentRosterData()
-	{
-		if(this.rosterHistory != null && !this.rosterHistory.isEmpty())
-		{
-			//the last record is the most recent
-			return rosterHistory.get(rosterHistory.size() - 1);
-		}
-		return null;
-	}
-	
-	public void setAddress(Address address)
-	{
-		this.addAddress(address);
-	}
-
-	@Override
-	public TYPE getContactType()
-	{
-		return TYPE.DEMOGRAPHIC;
-	}
-
-	@Override
-	public String toString()
-	{
-		return new ReflectionToStringBuilder(this).toString();
 	}
 }

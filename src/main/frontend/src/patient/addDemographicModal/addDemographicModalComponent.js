@@ -138,6 +138,7 @@ angular.module('Patient').component('addDemographicModal', {
 
 			if (ctrl.validateDemographic())
 			{
+				ctrl.newDemographicData.dateOfBirth = Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth);
 				demographicService.createDemographic(ctrl.newDemographicData)
 					.then((results) =>
 					{

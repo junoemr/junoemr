@@ -29,6 +29,7 @@ import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.DemographicArchive;
 import org.oscarehr.dataMigration.converter.out.DemographicDbToModelConverter;
+import org.oscarehr.demographic.converter.DemographicInputToModelConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicIntegrationDao;
@@ -39,6 +40,8 @@ import org.oscarehr.demographic.entity.DemographicIntegration;
 import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.dataMigration.converter.in.DemographicModelToDbConverter;
+import org.oscarehr.demographic.transfer.DemographicCreateInput;
+import org.oscarehr.demographic.transfer.DemographicUpdateInput;
 import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.integration.service.IntegrationPushUpdateService;
@@ -106,6 +109,9 @@ public class DemographicService
 
 	@Autowired
 	private DemographicDbToModelConverter demographicDbToModelConverter;
+
+	@Autowired
+	private DemographicInputToModelConverter demographicInputToModelConverter;
 
 	public enum SEARCH_MODE
 	{
@@ -358,6 +364,11 @@ public class DemographicService
 
 		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtSet);
 	}
+	public DemographicModel addNewDemographicRecord(String providerNoStr, DemographicCreateInput demographicInput)
+	{
+		DemographicModel model = demographicInputToModelConverter.convert(demographicInput);
+		return demographicDbToModelConverter.convert(addNewDemographicRecord(providerNoStr, model));
+	}
 	public Demographic addNewDemographicRecord(String providerNoStr, DemographicModel demographicModel)
 	{
 		Demographic demographic = demographicModelToDBConverter.convert(demographicModel);
@@ -454,6 +465,17 @@ public class DemographicService
 
 		demographicDao.merge(demographic);
 		return demographic;
+	}
+
+	public DemographicModel updateDemographicRecord(DemographicUpdateInput updateInput, LoggedInInfo loggedInInfo)
+	{
+		Demographic demographic = demographicDao.find(updateInput.getId());
+		archiveDemographicRecord(demographic);
+
+		queueMHAPatientUpdates(demographic, demographic, loggedInInfo);
+
+		demographicDao.merge(demographic);
+		return demographicDbToModelConverter.convert(demographic);
 	}
 
 	/**

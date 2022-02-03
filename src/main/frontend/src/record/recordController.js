@@ -123,9 +123,6 @@ angular.module('Record').controller('Record.RecordController', [
 			{
 				controller.page.cannotChange = !securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterNoteCreate);
 				controller.demographic = await demographicService.getDemographic(controller.demographicNo);
-				controller.loadPreferredPhone(controller.demographic);
-
-				console.info("debug", controller.demographic);
 			}
 
 			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterNoteCreate))
@@ -205,55 +202,6 @@ angular.module('Record').controller('Record.RecordController', [
 				profiles = profiles.filter((profile) => profile.isConfirmed && profile.hasVoipToken);
 				controller.canMHACallPatient = profiles.length > 0;
 			}
-		}
-
-		// quick and dirty way to show preferred phone
-		controller.loadPreferredPhone = (demographic) =>
-		{
-			// default is home phone
-			controller.displayPhone = controller.formatPhone(
-				demographic.phone,
-				controller.findExtValue(demographic, controller.phone.homePhoneExtensionKey));
-
-			// check work phone
-			if(demographic.alternativePhone && demographic.alternativePhone.endsWith(controller.phone.preferredIndicator))
-			{
-				controller.displayPhone = controller.formatPhone(
-					demographic.alternativePhone,
-					controller.findExtValue(demographic, controller.phone.workPhoneExtensionKey));
-			}
-			else  // check cell
-			{
-				const cellExtValue = controller.findExtValue(demographic, controller.phone.cellExtKey);
-				if(cellExtValue && cellExtValue.endsWith(controller.phone.preferredIndicator))
-				{
-					controller.displayPhone = controller.formatPhone(cellExtValue);
-				}
-			}
-		}
-
-		controller.formatPhone = (number, extension = null) =>
-		{
-			let formatted = Juno.Common.Util.toTrimmedString(number).replace(controller.phone.preferredIndicator, "");
-			if(!Juno.Common.Util.isBlank(extension))
-			{
-				formatted += " Ext: " + Juno.Common.Util.toTrimmedString(extension);
-			}
-			return formatted;
-		}
-
-		controller.findExtValue = (demographic, key) =>
-		{
-			let value = null;
-			if(demographic.extras)
-			{
-				const ext = demographic.extras.find((extra) => extra.key === key);
-				if(ext)
-				{
-					value = ext.value;
-				}
-			}
-			return value;
 		}
 
 		controller.canSaveIssues = () =>

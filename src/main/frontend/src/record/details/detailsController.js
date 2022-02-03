@@ -29,6 +29,8 @@ import {DemographicApi, ProvidersServiceApi, SystemPreferenceApi} from "../../..
 import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
 import {SecurityPermissions} from "../../common/security/securityConstants";
 import {BILLING_REGION} from "../../billing/billingConstants";
+import Demographic from "../../lib/demographic/model/Demographic";
+import ToastService from "../../lib/alerts/service/ToastService";
 
 angular.module('Record.Details').controller('Record.Details.DetailsController', [
 
@@ -72,9 +74,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		uxService)
 	{
 
-		var controller = this;
+		const controller = this;
 		controller.page = {};
 		const demographicApi = new DemographicApi($http, $httpParamSerializer, "../ws/rs");
+
+		controller.toastService = new ToastService();
 
 		// Global variables
 		var posExtras = {};
@@ -289,7 +293,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 								console.log(errors);
 							});
 
-						controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
+						// controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
 						controller.formatLastName(); //done on page load
 						controller.formatFirstName(); //done on page load
 					},
@@ -355,35 +359,35 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		controller.initDemographicVars = function initDemographicVars()
 		{
-			var effDateMoment = moment(controller.page.demo.effDate);
-			if(effDateMoment.isValid())
-			{
-				controller.page.demo.effDate = Juno.Common.Util.formatMomentDate(effDateMoment);
-			}
-			else
-			{
-				controller.page.demo.effDate = null;
-			}
-			var hcRenewDateMoment = moment(controller.page.demo.hcRenewDate);
-			if(hcRenewDateMoment.isValid())
-			{
-				controller.page.demo.hcRenewDate = Juno.Common.Util.formatMomentDate(hcRenewDateMoment);
-			}
-			else
-			{
-				controller.page.demo.hcRenewDate = null;
-			}
+			// var effDateMoment = moment(controller.page.demo.effDate);
+			// if(effDateMoment.isValid())
+			// {
+			// 	controller.page.demo.effDate = Juno.Common.Util.formatMomentDate(effDateMoment);
+			// }
+			// else
+			// {
+			// 	controller.page.demo.effDate = null;
+			// }
+			// var hcRenewDateMoment = moment(controller.page.demo.hcRenewDate);
+			// if(hcRenewDateMoment.isValid())
+			// {
+			// 	controller.page.demo.hcRenewDate = Juno.Common.Util.formatMomentDate(hcRenewDateMoment);
+			// }
+			// else
+			// {
+			// 	controller.page.demo.hcRenewDate = null;
+			// }
 
 			// convert dates to moment
-			controller.page.demo.dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.dobYear,
-					controller.page.demo.dobMonth, controller.page.demo.dobDay);
-			controller.page.demo.effDate = Juno.Common.Util.getDateMoment(controller.page.demo.effDate);
-			controller.page.demo.hcRenewDate = Juno.Common.Util.getDateMoment(controller.page.demo.hcRenewDate);
-			controller.page.demo.rosterDate = Juno.Common.Util.getDateMoment(controller.page.demo.rosterDate);
-			controller.page.demo.rosterTerminationDate = Juno.Common.Util.getDateMoment(controller.page.demo.rosterTerminationDate);
-			controller.page.demo.dateJoined = moment(controller.page.demo.dateJoined);
-			controller.page.demo.patientStatusDate = moment(controller.page.demo.patientStatusDate);
-			controller.page.demo.endDate = Juno.Common.Util.getDateMoment(controller.page.demo.endDate);
+			// controller.page.demo.dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.dobYear,
+			// 		controller.page.demo.dobMonth, controller.page.demo.dobDay);
+			// controller.page.demo.effDate = Juno.Common.Util.getDateMoment(controller.page.demo.effDate);
+			// controller.page.demo.hcRenewDate = Juno.Common.Util.getDateMoment(controller.page.demo.hcRenewDate);
+			// controller.page.demo.rosterDate = Juno.Common.Util.getDateMoment(controller.page.demo.rosterDate);
+			// controller.page.demo.rosterTerminationDate = Juno.Common.Util.getDateMoment(controller.page.demo.rosterTerminationDate);
+			// controller.page.demo.dateJoined = moment(controller.page.demo.dateJoined);
+			// controller.page.demo.patientStatusDate = moment(controller.page.demo.patientStatusDate);
+			// controller.page.demo.endDate = Juno.Common.Util.getDateMoment(controller.page.demo.endDate);
 			if (controller.page.demo.onWaitingListSinceDate)
 			{
 				controller.page.demo.onWaitingListSinceDate = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.onWaitingListSinceDate.getFullYear(),
@@ -391,10 +395,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 
 			// oscar stores no country of origin as "-1" because why not.
-			if (controller.page.demo.countryOfOrigin === "-1")
-			{
-				controller.page.demo.countryOfOrigin = null;
-			}
+			// if (controller.page.demo.countryOfOrigin === "-1")
+			// {
+			// 	controller.page.demo.countryOfOrigin = null;
+			// }
 
 			phoneNum["C"] = controller.page.demo.scrCellPhone;
 			phoneNum["H"] = controller.page.demo.scrHomePhone;
@@ -558,9 +562,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 			if (Oscar.HealthCardParser.validateDate(cardData.dobYear, cardData.dobMonth, cardData.dobDay))
 			{
-				controller.page.demo.dobYear = cardData.dobYear;
-				controller.page.demo.dobMonth = cardData.dobMonth;
-				controller.page.demo.dobDay = cardData.dobDay;
+				controller.page.demo.dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(cardData.dobYear, cardData.dobMonth, cardData.dobDay)
 				controller.displayMessages.add_field_warning('dob', "Date of Birth Changed");
 			}
 			if (Oscar.HealthCardParser.validateDate(cardData.effYear, cardData.effMonth, cardData.effDay))
@@ -1013,15 +1015,15 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//HCValidation on open & save
 		controller.validateHCSave = function validateHCSave(doSave)
 		{
-			if ((controller.page.demo.hin == null || controller.page.demo.hin === "") && doSave)
+			if ((controller.page.demo.healthNumber == null || controller.page.demo.healthNumber === "") && doSave)
 			{
 				controller.save();
 			}
 			else
 			{
-				let hin = controller.page.demo.hin;
-				let ver = controller.page.demo.ver;
-				let hcType = controller.page.demo.hcType;
+				let hin = controller.page.demo.healthNumber;
+				let ver = controller.page.demo.healthNumberVersion;
+				let hcType = controller.page.demo.healthNumberProvinceCode;
 				let demographicNo = controller.page.demo.id;
 				patientDetailStatusService.isUniqueHC(hin, ver, hcType, demographicNo).then(
 					function success(results)
@@ -1072,27 +1074,29 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				alert("Sex is required");
 				return;
 			}
-			else if (dateEmpty(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay))
+
+			//validate field inputs
+			else if (controller.page.demo.dateOfBirth == null)
+			{
+				alert("Invalid Date of Birth");
+				return;
+			}
+			else if (!controller.page.demo.dateOfBirth.isValid())
 			{
 				alert("Date of Birth is required");
 				return;
 			}
 
-			//validate field inputs
-			if (controller.page.demo.dateOfBirth == null)
-			{
-				alert("Invalid Date of Birth");
-				return;
-			}
 			if (!controller.checkPatientStatus()) return;
-			if (!controller.isPostalComplete(controller.page.demo.address.postal, controller.page.demo.address.province)) return;
-			if (!controller.isPostalComplete(controller.page.demo.address2.postal, controller.page.demo.address2.province)) return;
-			if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
-			if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
+			// if (!controller.isPostalComplete(controller.page.demo.address.postal, controller.page.demo.address.province)) return;
+			// if (!controller.isPostalComplete(controller.page.demo.address2.postal, controller.page.demo.address2.province)) return;
+			// if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
+			// if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
+			//todo
 
-			if (Juno.Common.Util.exists(controller.page.demo.hin))
+			if (Juno.Common.Util.exists(controller.page.demo.healthNumber))
             {
-                controller.page.demo.hin = controller.page.demo.hin.replace(/[\W_]/gi, '');
+                controller.page.demo.healthNumber = controller.page.demo.hin.replace(/[\W_]/gi, '');
             }
 
 			//save notes
@@ -1135,14 +1139,14 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			controller.page.demo.extras = newDemoExtras;
 
 			// clone the demographic, so that final modifications can be made before save.
-			let demographicForSave = {};
+			let demographicForSave = new Demographic();
 			Object.assign(demographicForSave, controller.page.demo)
 
 			// convert null back to "-1" why? because Oscar.
-			if (!demographicForSave.countryOfOrigin)
-			{
-				demographicForSave.countryOfOrigin = "-1";
-			}
+			// if (!demographicForSave.countryOfOrigin)
+			// {
+			// 	demographicForSave.countryOfOrigin = "-1";
+			// }
 
 			//save to database
 			demographicService.updateDemographic(demographicForSave).then(
@@ -1151,11 +1155,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					controller.resetEditState();
 				},
 
-				function error()
+				function error(e)
 				{
 					controller.page.saving = false;
-					alert('Failed to save demographic');
-					// TODO-legacy: handle error
+					controller.toastService.errorToast('Failed to save demographic');
+					console.error(e);
 				}
 			);
 		};
@@ -1210,11 +1214,6 @@ function updateDemoExtras(extKey, newVal, posExtras, oldExtras, newExtras)
 		});
 	}
 	return newExtras;
-}
-
-function dateEmpty(year, month, day)
-{
-	return ((year == null || year == "") && (month == null || month == "") && (day == null || day == ""));
 }
 
 function dateValid(dateStr)

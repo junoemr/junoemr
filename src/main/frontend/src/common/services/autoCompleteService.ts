@@ -25,7 +25,7 @@
  Ontario, Canada
 
  */
-import Demographic from "../../lib/demographic/model/demographic";
+import Demographic from "../../lib/demographic/model/Demographic";
 
 angular.module("Common.Services").service("autoCompleteService", [
 	"$q",

@@ -1,5 +1,5 @@
 import AbstractConverter from "../../conversion/AbstractConverter";
-import Demographic from "../model/demographic";
+import Demographic from "../model/Demographic";
 import {DemographicModel} from "../../../../generated";
 import moment from "moment";
 

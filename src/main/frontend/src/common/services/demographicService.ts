@@ -27,9 +27,9 @@
  */
 
 import {DemographicApi} from "../../../generated";
-import Demographic from "../../lib/demographic/model/demographic";
-import DemographicTransferToModelConverter from "../../lib/demographic/converter/demographicTransferToModelConverter";
-import DemographicModelToTransferConverter from "../../lib/demographic/converter/demographicModelToTransferConverter";
+import Demographic from "../../lib/demographic/model/Demographic";
+import DemographicTransferToModelConverter from "../../lib/demographic/converter/DemographicTransferToModelConverter";
+import DemographicModelToCreateInputConverter from "../../lib/demographic/converter/DemographicModelToCreateInputConverter";
 
 angular.module("Common.Services").service("demographicService", [
 	'$http',
@@ -42,17 +42,18 @@ angular.module("Common.Services").service("demographicService", [
 		service.demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
 
 		service.demographicTransferToModelConverter = new DemographicTransferToModelConverter();
-		service.demographicModelToTransferConverter = new DemographicModelToTransferConverter();
+		service.demographicModelToCreateInputConverter = new DemographicModelToCreateInputConverter();
 
 		service.getDemographic = async (demographicId: number): Promise<Demographic> =>
 		{
 			let transfer = (await service.demographicApi.getDemographicData(demographicId));
+			console.info("debug", service.demographicTransferToModelConverter.convert(transfer.data.body));
 			return service.demographicTransferToModelConverter.convert(transfer.data.body);
 		}
 
 		service.createDemographic = async (demographic: Demographic): Promise<Demographic> =>
 		{
-			const transfer = service.demographicModelToTransferConverter.convert(demographic);
+			const transfer = service.demographicModelToCreateInputConverter.convert(demographic);
 			return service.demographicTransferToModelConverter.convert(
 				(await service.demographicApi.createDemographicData(transfer)).data.body);
 		}

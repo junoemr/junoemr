@@ -1,6 +1,7 @@
-import {Moment} from "moment";
+import moment, {Moment} from "moment";
 import Address from "../../common/model/Address";
 import PhoneNumber from "../../common/model/PhoneNumber";
+import {Sex} from "./Sex";
 
 export default class Demographic
 {
@@ -11,7 +12,7 @@ export default class Demographic
 	private _lastName: string;
 	private _title: string;
 	private _dateOfBirth: Moment;
-	private _sex: string;
+	private _sex: Sex;
 	private _healthNumber: string;
 	private _healthNumberVersion: string;
 	private _healthNumberProvinceCode: string;
@@ -152,12 +153,12 @@ export default class Demographic
 		this._dateOfBirth = value;
 	}
 
-	get sex(): string
+	get sex(): Sex
 	{
 		return this._sex;
 	}
 
-	set sex(value: string)
+	set sex(value: Sex)
 	{
 		this._sex = value;
 	}

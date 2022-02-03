@@ -1,3 +1,4 @@
+import {Moment} from "moment";
 
 export default abstract class AbstractConverter<F, T>
 {
@@ -14,6 +15,15 @@ export default abstract class AbstractConverter<F, T>
 			return from.map((from) => this.convert(from, ...args));
 		}
 		return [];
+	}
+
+	protected serializeDateTime(moment: Moment)
+	{
+		if(moment && moment.isValid())
+		{
+			return Juno.Common.Util.formatMomentDateTimeNoTimezone(moment);
+		}
+		return null;
 	}
 
 }
