@@ -20,7 +20,7 @@ angular.module('Patient').component('addDemographicModal', {
 		'$http',
 		'$httpParamSerializer',
 		'$timeout',
-		'$stateParams',
+		'securityService',
 		'staticDataService',
 		'demographicService',
 		'providerService',
@@ -29,7 +29,7 @@ angular.module('Patient').component('addDemographicModal', {
 			$http,
 			$httpParamSerializer,
 			$timeout,
-			$stateParams,
+			securityService,
 			staticDataService,
 			demographicService,
 			providerService,
@@ -71,7 +71,7 @@ angular.module('Patient').component('addDemographicModal', {
 				hin: "",
 				ver: "",
 				hcType: "BC",
-				providerNo: "",
+				providerNo: null,
 				extras: [],
 			}
 
@@ -90,55 +90,51 @@ angular.module('Patient').component('addDemographicModal', {
 			{
 				return {
 					value: prov.value,
-					label: prov.label,
-					shortLabel: prov.value
+					label: prov.value
 				}
 			});
 
-			ctrl.preferredPhoneType = PHONE_TYPE.HOME;
-			ctrl.preferredPhone = null;
+			// User configurable defaults.
+			ctrl.defaultProvince = null;
+			ctrl.defaultSex = null;
+			ctrl.defaultPhoneNumber = null;
+
+			ctrl.preferredPhoneType = PHONE_TYPE.CELL;
+			ctrl.preferredPhoneNumber = "";
 
 			ctrl.preferredPhoneOptions = [
 				{
 					value: PHONE_TYPE.HOME,
-					label: "Home Phone",
-					shortLabel: "Home",
-
+					label: "Home",
 				},
 				{
 					value: PHONE_TYPE.CELL,
-					label: "Mobile Phone",
-					shortLabel: "Mobile",
+					label: "Mobile",
 				},
 				{
 					value: PHONE_TYPE.WORK,
-					label: "Work Phone",
-					shortLabel: "Work",
+					label: "Work",
 				}
 			]
 
-			ctrl.$onInit = () =>
+			ctrl.$onInit = async () =>
 			{
-				ctrl.resetDemographic();
-				ctrl.preferredPhone = "";
-				ctrl.preferredPhoneType = PHONE_TYPE.HOME;
-
 				// Pull phone prefix from Oscar Properties file
 				ctrl.systemPreferenceApi.getPreferenceValue("phone_prefix", "").then(
 					function success(results)
 					{
-						ctrl.newDemographicData.phone = results.data.body;
+						ctrl.defaultPhoneNumber = results.data.body;
 					},
 					function error(errors)
 					{
-						console.log("errors::" + errors);
+						console.error("errors::" + errors);
 					}
 				);
 
 				ctrl.providersServiceApi.getBySecurityRole("doctor").then(
 					function success(data) {
 						ctrl.mrpOptions = data.data.body.map((doc) => {return {label: doc.name, value: doc.providerNo}});
-						ctrl.mrpOptions.push({label: "--", value: ""})
+						ctrl.mrpOptions.push({label: "--", value: null})
 					}
 				);
 
@@ -146,7 +142,7 @@ angular.module('Patient').component('addDemographicModal', {
 				providerService.getSettings().then(
 					function success(result)
 					{
-						ctrl.newDemographicData.sex = result.defaultSex;
+						ctrl.defaultSex = result.defaultSex;
 
 						// If the user doesn't have a HC type pre-set, pull from system-wide setting
 						if (result.defaultHcType === "")
@@ -154,18 +150,19 @@ angular.module('Patient').component('addDemographicModal', {
 							ctrl.systemPreferenceApi.getPropertyValue("hctype", "BC").then(
 								function success(results)
 								{
-									ctrl.newDemographicData.address.province = results.data.body;
+									ctrl.defaultProvince = results.data.body;
+									ctrl.resetToDefaults();
 								},
 								function error(errors)
 								{
-									console.log("Failed to fetch system properties with error:" + errors);
+									console.error("Failed to fetch system properties with error:" + errors);
 								}
 							)
 						}
 						else
 						{
-							ctrl.newDemographicData.hcType = result.defaultHcType;
-							ctrl.newDemographicData.address.province = result.defaultHcType;
+							ctrl.defaultProvince = result.defaultHcType;
+							ctrl.resetToDefaults();
 						}
 					},
 					function error(errors)
@@ -175,9 +172,16 @@ angular.module('Patient').component('addDemographicModal', {
 				);
 			}
 
-			ctrl.resetDemographic = () =>
+			ctrl.resetToDefaults = () =>
 			{
 				ctrl.newDemographicData = angular.copy(ctrl.emptyDemographicData);
+
+				ctrl.newDemographicData.sex = ctrl.defaultSex;
+				ctrl.newDemographicData.hcType = ctrl.defaultProvince;
+				ctrl.newDemographicData.address.province = ctrl.defaultProvince;
+
+				ctrl.preferredPhoneNumber = ctrl.defaultPhoneNumber;
+				ctrl.preferredPhoneType = PHONE_TYPE.CELL;
 			}
 
 			ctrl.resetFocus = () =>
@@ -186,6 +190,15 @@ angular.module('Patient').component('addDemographicModal', {
 				{
 					ctrl.formRef.find(":input:visible:first").focus();
 				});
+			}
+
+			ctrl.resolveKeys = ($event) =>
+			{
+				// Ctrl-Enter
+				if ($event.ctrlKey && $event.charCode === 13 && !ctrl.buttonClicked)
+				{
+					ctrl.onAdd();
+				}
 			}
 
 			ctrl.validateDemographic = function ()
@@ -200,21 +213,17 @@ angular.module('Patient').component('addDemographicModal', {
 
 			ctrl.onHcTypeChange = (value) =>
 			{
-				console.log("hc changed");
 				ctrl.newDemographicData.hcType = value;
-				console.log(ctrl.newDemographicData.hcType);
 			}
 
 			ctrl.onMRPChange = (value) =>
 			{
-				ctrl.newDemographicData.mrp = value;
+				ctrl.newDemographicData.providerNo = value;
 			}
 
 			ctrl.onPreferredPhoneTypeChange = (value) =>
 			{
-				console.log("phone number changed");
 				ctrl.preferredPhoneType = value;
-				console.log(ctrl.preferredPhoneType);
 			}
 
 			ctrl.onCancel = () =>
@@ -224,10 +233,14 @@ angular.module('Patient').component('addDemographicModal', {
 
 			ctrl.finalizePhoneNumber = () =>
 			{
-				const preferredPhone = ctrl.preferredPhone + "*";
+				// Reset the all phone numbers in case the first attempt to save failed
+				ctrl.newDemographicData.phone = "";
+				ctrl.newDemographicData.alternativePhone = "";
+				ctrl.newDemographicData.extras = [];
 
-				switch (ctrl.preferredPhoneType)
-				{
+				const preferredPhone = ctrl.preferredPhoneNumber + "*";
+
+				switch (ctrl.preferredPhoneType) {
 					case PHONE_TYPE.HOME:
 						ctrl.newDemographicData.phone = preferredPhone;
 						break;
@@ -235,12 +248,16 @@ angular.module('Patient').component('addDemographicModal', {
 						ctrl.newDemographicData.alternativePhone = preferredPhone;
 						break;
 					case PHONE_TYPE.CELL:
-						ctrl.newDemographicData.extras.push({
-							name: "demo_cell",
+						const demoExt = {
+							id: null,
+							key: "demo_cell",
 							value: preferredPhone,
-							providerNo: $stateParams.providerNo,
+							providerNo: securityService.getUser().providerNo,
+							dateCreated: Juno.Common.Util.getDateMoment(new Date()),
 							demographicNo: null
-						})
+						}
+						ctrl.newDemographicData.extras.push(demoExt);
+						break;
 				}
 			}
 
@@ -262,7 +279,7 @@ angular.module('Patient').component('addDemographicModal', {
 
 				ctrl.finalizeStatusDates();
 
-				if (ctrl.newDemographicData.preferredPhone)
+				if (ctrl.preferredPhoneNumber)
 				{
 					ctrl.finalizePhoneNumber();
 				}
@@ -281,7 +298,7 @@ angular.module('Patient').component('addDemographicModal', {
 
 						if (ctrl.isCreateAnotherEnabled)
 						{
-							ctrl.resetDemographic();
+							ctrl.resetToDefaults();
 						}
 						else
 						{
@@ -300,6 +317,7 @@ angular.module('Patient').component('addDemographicModal', {
 				}
 				else // Need this to reset button if validation fails
 				{
+					ctrl.toastService.errorToast("Demographic is missing required fields (*)");
 					ctrl.buttonClicked = false;
 				}
 			}

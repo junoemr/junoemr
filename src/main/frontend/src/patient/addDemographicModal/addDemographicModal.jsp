@@ -152,7 +152,8 @@
 			</div>
 			<juno-button
 				 class="add-demographic-button"
-				 title="Add"
+				 title="Ctrl+Enter"
+				 ng-keypress="$ctrl.resolveKeys($event);"
 				 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 				 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
 				 click="$ctrl.onAdd()"

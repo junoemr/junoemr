@@ -29,7 +29,6 @@ angular.module('Common.Components').component('junoSelectText', {
 	bindings: {
 		selectModel: "=",
 		selectOptions: "<",
-		selectPlaceholder: "@?",
 		selectChange: "&?",
 
 		textModel: "=",
@@ -48,21 +47,8 @@ angular.module('Common.Components').component('junoSelectText', {
 
 		$scope.LABEL_POSITION = LABEL_POSITION;
 
-		ctrl.fullOptionsList = [];
-		ctrl.selectPlaceholderValue = "";
-
 		ctrl.$onInit = () =>
 		{
-			ctrl.selectPlaceholder = ctrl.selectPlaceholder || "";
-
-			// First option is a dummy placeholder which is hidden.  When the select is in
-			// an unselected state, it's shortLabel value is shown.
-			ctrl.fullOptionsList = [{
-				label: "",
-				disabled: true,
-				value: ctrl.selectPlaceholderValue,
-				shortLabel: ctrl.selectPlaceholder
-			}, ...ctrl.selectOptions]
 
 			ctrl.allowAutocomplete = ctrl.allowAutocomplete || false;
 			ctrl.textPlaceholder = ctrl.textPlaceholder || null;
@@ -91,11 +77,6 @@ angular.module('Common.Components').component('junoSelectText', {
 			ctrl.hasInputFocus = focused;
 		}
 
-		ctrl.isPlaceHolder = (option) :boolean =>
-		{
-			return option.value === ctrl.selectPlaceholderValue;
-		}
-
 		ctrl.componentClasses = () =>
 		{
 			return [ctrl.componentStyle];
@@ -113,22 +94,6 @@ angular.module('Common.Components').component('junoSelectText', {
 			return [ctrl.labelPosition, "label-style"];
 		};
 
-		ctrl.resolveSelectLabel = (option) =>
-		{
-			if (ctrl.selectModel === option.value && option.shortLabel)
-			{
-					return option.shortLabel;
-			}
-
-			return option.label
-		}
-
-		// Reset the select model when touched. This must be attached to a mousedown event, not a click
-		// event, otherwise this handler will fire again when the option is selected
-		ctrl.onSelectTouched = () =>
-		{
-			ctrl.selectModel = ctrl.selectPlaceholderValue;
-		}
 
 		ctrl.onSelectChange = (value) =>
 		{

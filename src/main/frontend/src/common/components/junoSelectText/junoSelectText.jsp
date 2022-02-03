@@ -8,13 +8,11 @@
 		<div class="select-container">
 			<select ng-model="$ctrl.selectModel"
 					ng-class="$ctrl.fieldClasses()"
-					ng-mousedown="$ctrl.onSelectTouched()"
 					ng-change="$ctrl.onSelectChange($ctrl.selectModel)"
 					ng-focus="$ctrl.onSelectFocus(true)"
-					ng-blur="$ctrl.onSelectFocus(false)">
-				<option ng-repeat="option in $ctrl.fullOptionsList" value="{{option.value}}" ng-hide="$ctrl.isPlaceHolder(option)">
-					{{ $ctrl.resolveSelectLabel(option) }}
-				</option>
+					ng-blur="$ctrl.onSelectFocus(false)"
+					ng-options="option.value as option.label for option in $ctrl.selectOptions"
+			>
 			</select>
 			<i class="icon select-icon icon-chevron-down"></i>
 		</div>
