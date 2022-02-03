@@ -39,9 +39,12 @@ public class ClientLinkDaoTest extends DaoTestFixtures{
 
 	Logger logger = MiscUtils.getLogger();
 
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("Facility","demographic","provider","ClientLink");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"Facility","demographic","provider","ClientLink"
+		};
 	}
 
 	// ALL TESTS SKIPPED DUE TO LOCAL DATABASE ERROR:

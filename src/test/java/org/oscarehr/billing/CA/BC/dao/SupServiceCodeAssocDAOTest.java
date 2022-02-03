@@ -49,9 +49,12 @@ public class SupServiceCodeAssocDAOTest extends DaoTestFixtures
 	@Autowired
 	public SupServiceCodeAssocDAO supServiceCodeAssocDAO;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billing_trayfees", "billingservice");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billing_trayfees", "billingservice"
+		};
 	}
 
 	@Test

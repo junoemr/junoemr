@@ -43,10 +43,12 @@ public class HL7HandlerMSHMappingDaoTest extends DaoTestFixtures
 	@Autowired
 	protected HL7HandlerMSHMappingDao hl7HandlerMSHMappingDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("HL7HandlerMSHMapping");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"HL7HandlerMSHMapping"
+		};
 	}
 
         @Test

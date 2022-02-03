@@ -28,16 +28,23 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.NullFlavor;
 import org.marc.everest.datatypes.generic.CD;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.EntryRelationship;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Observation;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActMoodDocumentObservation;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntryRelationship;
+import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.export.template.observation.SecondaryCodeICD9ObservationModel;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class SecondaryCodeICD9ObservationModelTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SecondaryCodeICD9ObservationModelTest extends DaoTestFixtures
+{
 	@Test
 	public void validSecondaryCodeICD9ObservationTest() {
 		String validString = "250";

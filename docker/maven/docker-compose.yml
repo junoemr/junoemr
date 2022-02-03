@@ -1,0 +1,41 @@
+version: '3.1'
+services:
+  juno-test-db:
+    command: mysqld --log-output=NONE --slow-query-log=0 --general-log=0 --innodb-flush-log-at-trx-commit=2 --innodb-log-buffer-size=3M --innodb-buffer-pool-size=180M
+    image: mariadb:10.4
+    tmpfs: /var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "test"
+      MYSQL_USER: oscar
+      MYSQL_PASSWORD: oscar
+      MYSQL_DATABASE: oscar_test
+      TZ: America/Vancouver
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
+  juno-selenium-firefox:
+    image: selenium/standalone-firefox:latest
+    environment:
+      TZ: America/Vancouver
+
+  juno-maven:
+    depends_on: [juno-test-db, juno-selenium-firefox]
+    build:
+      context: .
+    command: mvn -Dis_docker_testing_enabled=true -Duser.home=/home/maven clean verify
+    volumes:
+      - ../../:/usr/src/mymaven:Z
+      - $USER_HOME/.m2:/home/maven/.m2:Z
+      - $USER_HOME/.npm.docker:/home/maven/.npm:Z
+    environment:
+      HOME: /home/maven
+      MAVEN_CONFIG: /home/maven/.m2
+      TZ: America/Vancouver
+    working_dir: /usr/src/mymaven
+    user: $DOCKER_USER
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536

@@ -44,11 +44,14 @@ public class TeleplanRefusalCodeDaoTest extends DaoTestFixtures
 	public TeleplanRefusalCodeDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("teleplan_refusal_code");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"teleplan_refusal_code"
+		};
 	}
-	
+
 	@Test
 	public void testFindByCode() {
 		assertNotNull(teleplanRefusalCodeDao.findByCode("CODE"));

@@ -46,9 +46,12 @@ public class FlowsheetDaoTest extends DaoTestFixtures
 	@Autowired
 	protected FlowsheetDao flowsheetDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("Flowsheet");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"Flowsheet"
+		};
 	}
 
         @Test

@@ -345,7 +345,7 @@ public class ScheduleService extends AbstractServiceImpl {
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
 
-		List<ScheduleGroup> scheduleGroups = scheduleGroupService.getScheduleGroups();
+		List<ScheduleGroup> scheduleGroups = scheduleGroupService.getScheduleGroups(getLoggedInProviderId());
 
 		// TODO-legacy: paginate?
 		return RestSearchResponse.successResponseOnePage(scheduleGroups);

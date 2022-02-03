@@ -24,6 +24,7 @@
 package integration.tests;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
 
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
@@ -49,7 +50,9 @@ public class EditUnresolvedIssuesClassicUIIT extends SeleniumTestBase
 	{
 		return new String[]{
 				"casemgmt_cpp", "casemgmt_issue", "casemgmt_issue_notes", "casemgmt_note",
-				"casemgmt_note_ext", "eChart", "hash_audit", "log"
+				"casemgmt_note_ext", "eChart", "hash_audit", "log", "property", "measurementType",
+				"demographic", "admission", "log_ws_rest","validations"
+
 		};
 	}
 
@@ -82,9 +85,11 @@ public class EditUnresolvedIssuesClassicUIIT extends SeleniumTestBase
 		driver.findElement(By.id("issueAutocomplete")).sendKeys(issueChange);
 		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#issueTable div.enTemplate_name_auto_complete li"), "1844 - " + issueChange));
 		driver.findElement(By.id("issueAutocomplete")).sendKeys(Keys.ENTER);
-		driver.findElement(By.id("changeIssues")).click();
-		driver.findElement(By.id("saveImg")).click();
+		webDriverWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("#issueTable div.enTemplate_name_auto_complete li")));
+		findWaitClickById(driver, webDriverWait, "changeIssues");
+		findWaitClickById(driver, webDriverWait, "saveImg");
 		driver.navigate().refresh();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(issueChange)));
 		Assert.assertTrue("Changed unresolved issue is NOT added to Unresolved Issues section successfully",
 			PageUtil.isExistsBy(By.partialLinkText(issueChange), driver));
 

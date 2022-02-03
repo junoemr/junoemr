@@ -41,10 +41,15 @@ public abstract class AbstractPopulatorTest extends DaoTestFixtures
 {
 	protected static ClinicalDocument clinicalDocument;
 
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return Constants.Runtime.TABLES;
+	}
+
 	@Before
 	public void abstractBeforeClass() throws Exception
 	{
-		SchemaUtils.restoreTable(Constants.Runtime.TABLES);
 		assertEquals(0, SchemaUtils.loadFileIntoMySQL(Constants.Runtime.E2E_SETUP));
 
 		clinicalDocument = E2ECreator.createEmrConversionDocument(Constants.Runtime.VALID_DEMOGRAPHIC);

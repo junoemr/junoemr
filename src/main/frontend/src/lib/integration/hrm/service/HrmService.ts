@@ -35,6 +35,8 @@ import {getAngular$http, getAngular$httpParamSerializer} from "../../../util/Ang
 import HrmCategoryToTransferConverter from "../converter/HrmCategoryToTransferConverter";
 import HrmSubClassFromTransferConverter from "../converter/HrmSubClassFromTransferConverter";
 import HrmCategoryFromTransferConverter from "../converter/HrmCategoryFromTransferConverter";
+import HrmFetchResultsFromTransferConverter
+	from "../converter/HrmFetchResultsFromTransferConverter";
 
 export default class HrmService
 {
@@ -46,6 +48,7 @@ export default class HrmService
     protected _hrmCategoryFromTransfer: HrmCategoryFromTransferConverter = new HrmCategoryFromTransferConverter();
     protected _hrmCategoryToTransfer: HrmCategoryToTransferConverter = new HrmCategoryToTransferConverter();
     protected _hrmSubClassFromTransfer: HrmSubClassFromTransferConverter = new HrmSubClassFromTransferConverter();
+    protected _hrmFetchResultsFromTransfer: HrmFetchResultsFromTransferConverter = new HrmFetchResultsFromTransferConverter();
 
     // ==========================================================================
     // Public Methods
@@ -54,13 +57,13 @@ export default class HrmService
     public async fetchNewHRMDocuments(): Promise<HrmFetchResults>
     {
         const rawResponse = await this._hrmSchedulerApi.fetchNewDocuments();
-        return new HrmFetchResults(rawResponse.data.body);
+        return this._hrmFetchResultsFromTransfer.convert(rawResponse.data.body);
     }
 
     public async getLastResults(): Promise<HrmFetchResults>
     {
         const rawResponse = await this._hrmSchedulerApi.getLastFetchStatus();
-        return new HrmFetchResults(rawResponse.data.body);
+				return this._hrmFetchResultsFromTransfer.convert(rawResponse.data.body);
     }
 
     public async getActiveCategories(): Promise<HrmCategory[]>

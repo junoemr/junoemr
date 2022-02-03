@@ -42,10 +42,12 @@ public class RoomDemographicDaoTest extends DaoTestFixtures
 	@Autowired
 	protected RoomDemographicDao roomDemographicDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("room_demographic");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"room_demographic"
+		};
 	}
 
 	@Test

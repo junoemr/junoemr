@@ -189,8 +189,8 @@ public class DemographicMapper extends AbstractMapper
 	public String getStreetAddress(int rep) throws HL7Exception
 	{
 		String unitIdentifier = messagePID.getPatientAddress(rep).getStreetAddress().getStreetOrMailingAddress().getValue();
-		String streetName = messagePID.getPatientAddress(rep).getStreetAddress().getStreetName().getValue();
 		String streetNumber = messagePID.getPatientAddress(rep).getStreetAddress().getDwellingNumber().getValue();
+		String streetName = messagePID.getPatientAddress(rep).getStreetAddress().getStreetName().getValue();
 
 		return StringUtils.trimToNull(String.join(" ",
 			StringUtils.trimToEmpty(unitIdentifier), StringUtils.trimToEmpty(streetName), StringUtils.trimToEmpty(streetNumber)));

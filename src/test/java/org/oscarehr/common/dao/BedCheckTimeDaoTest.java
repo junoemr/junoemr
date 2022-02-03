@@ -51,9 +51,12 @@ public class BedCheckTimeDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("bed_check_time");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"bed_check_time"
+		};
 	}
 	
 	@Test

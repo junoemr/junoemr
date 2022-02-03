@@ -26,22 +26,23 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
-import java.sql.SQLException;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.Consultation_URL;
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -52,7 +53,7 @@ public class AddConsultationsClassicUIIT extends SeleniumTestBase
 	{
 		return new String[]{
 			"admission", "consultationRequestExt", "consultationRequests", "demographic", "log",
-			"measurementType", "program", "validations"
+			"measurementType", "program", "validations", "log_ws_rest", "property"
 		};
 	}
 
@@ -69,26 +70,21 @@ public class AddConsultationsClassicUIIT extends SeleniumTestBase
 	{
 		String serviceName = "Cardiology";
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
-		Thread.sleep(5000);
 		String eChartWindowHandle = driver.getWindowHandle();
-		driver.findElement(By.xpath("//div[@id='menuTitleconsultation']//descendant::a[contains(., '+')]")).click();
-		//Thread.sleep(5000);
-		PageUtil.switchToLastWindow(driver);
-		Thread.sleep(2000);
-		dropdownSelectByVisibleText(driver, By.id("service"), serviceName);
-		driver.findElement(By.xpath("//input[@name='submitSaveOnly']")).click();
+		clickWaitSwitchToLast(driver, webDriverWait, By.xpath("//div[@id='menuTitleconsultation']//descendant::a[contains(., '+')]"));
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("service"), serviceName);
+		findWaitClickByXpath(driver, webDriverWait, "//input[@name='submitSaveOnly']");
 
 		//** Verify under Consultations section on eChart page. **
 		PageUtil.switchToWindow(eChartWindowHandle, driver);
 		driver.navigate().refresh();
-		Thread.sleep(2000);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(serviceName)));
 		Assert.assertTrue(serviceName + " is NOT added under Consultations successfully.",
 				PageUtil.isExistsBy(By.linkText(serviceName), driver));
 
 		//** Verify from Consultations top menu. **
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Consultation_URL);
-		Thread.sleep(2000);
-		PageUtil.switchToLastWindow(driver);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(serviceName)));
 		Assert.assertTrue(serviceName + " is NOT added under Consultations successfully.",
 				PageUtil.isExistsBy(By.linkText(serviceName), driver));
 	}

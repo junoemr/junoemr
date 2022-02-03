@@ -53,11 +53,20 @@ public class MeasurementMapDaoTest extends DaoTestFixtures
 	public MeasurementMapDaoTest() {
 	}
 
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"measurementType"
+		};
+	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "measurementMap");
-		SchemaUtils.restoreTable("measurementType");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"measurementMap"
+		};
 	}
 
         @Test

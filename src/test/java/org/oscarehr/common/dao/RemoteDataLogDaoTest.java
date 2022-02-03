@@ -44,10 +44,12 @@ public class RemoteDataLogDaoTest extends DaoTestFixtures
 	@Autowired
 	protected RemoteDataLogDao remoteDataLogDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("RemoteDataLog");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"RemoteDataLog"
+		};
 	}
 
 	@Test

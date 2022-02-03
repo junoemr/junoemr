@@ -44,11 +44,13 @@ public class MsgDemoMapDaoTest extends DaoTestFixtures
 	public MsgDemoMapDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("msgDemoMap", "demographic","lst_gender","admission","demographic_merged",
-				"program","health_safety","provider","providersite","site","program_team", "messagetbl");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"msgDemoMap", "demographic","lst_gender","admission","demographic_merged",
+			"program","health_safety","provider","providersite","site","program_team", "messagetbl"
+		};
 	}
 
 	@Test

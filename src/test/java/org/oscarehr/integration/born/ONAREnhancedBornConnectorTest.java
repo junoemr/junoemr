@@ -33,19 +33,28 @@ import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-//@RunWith(SpringRunner.class)
-//@SpringBootTest
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class ONAREnhancedBornConnectorTest extends DaoTestFixtures
 {
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"BornTransmissionLog"
+		};
+	}
+
 	//@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(new String[]{"formONAREnhanced","BornTransmissionLog"});
+	public void before() throws Exception
+	{
 		assertEquals(SchemaUtils.loadFileIntoMySQL(System.getProperty("basedir") + "/src/test/resources/initFormONAREnhanced.sql"),0);
 	}
 
 	@Test
 	@Ignore
-	public void testConnector() {
+	public void testConnector()
+	{
 		ONAREnhancedBornConnector c = new ONAREnhancedBornConnector();
 		//not sure it's worth fixing right now
 		//c.updateBorn();

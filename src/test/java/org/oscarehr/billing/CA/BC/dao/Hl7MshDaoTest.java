@@ -46,9 +46,12 @@ public class Hl7MshDaoTest extends DaoTestFixtures
 	public Hl7MshDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("hl7_msh", "hl7_pid", "hl7_link", "hl7_obr", "hl7_obx", "hl7_orc", "patientLabRouting", "providerLabRouting");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"hl7_msh", "hl7_pid", "hl7_link", "hl7_obr", "hl7_obx", "hl7_orc", "patientLabRouting", "providerLabRouting"
+		};
 	}
 
 	@Test

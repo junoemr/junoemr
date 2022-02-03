@@ -49,9 +49,12 @@ public class MessageListDaoTest extends DaoTestFixtures
 	@Autowired
 	protected MessageListDao messageListDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("messagelisttbl","msgDemoMap");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"messagelisttbl","msgDemoMap"
+		};
 	}
 
 	@Test

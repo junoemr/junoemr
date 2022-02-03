@@ -51,11 +51,14 @@ public class WaitingListNameDaoTest extends DaoTestFixtures
 	@Autowired
 	protected WaitingListNameDao waitingListNameDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "mygroup", "waitingListName");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"mygroup", "waitingListName"
+		};
 	}
-	
+
 	@Test
 	public void testCountActiveWatingListNames() throws Exception {
 		

@@ -44,6 +44,8 @@ import java.util.List;
 public abstract class AbstractHRMImportMapper<I, E> extends AbstractImportMapper<I, E>
 {
 	protected final ObjectFactory objectFactory;
+	protected final String STUB_REVIEWER_FIRST_NAME = "IMPORTED";
+	protected final String STUB_REVIEWER_LAST_NAME = "REVIEWER";
 	
 	public AbstractHRMImportMapper()
 	{
@@ -122,8 +124,8 @@ public abstract class AbstractHRMImportMapper<I, E> extends AbstractImportMapper
 		Reviewer reviewer = new Reviewer();
 		reviewer.setOhipNumber(reviewerOHIPNo);
 		reviewer.setReviewDateTime(toPartialDateTime(reviewDate));
-		reviewer.setFirstName("Reviewer");
-		reviewer.setLastName("OMD HRM");
+		reviewer.setFirstName(STUB_REVIEWER_FIRST_NAME);
+		reviewer.setLastName(STUB_REVIEWER_LAST_NAME);
 		
 		reviewers.add(reviewer);
 		

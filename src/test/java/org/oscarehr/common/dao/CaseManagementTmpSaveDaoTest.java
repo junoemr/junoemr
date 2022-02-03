@@ -48,10 +48,12 @@ public class CaseManagementTmpSaveDaoTest extends DaoTestFixtures
 	@Autowired
 	protected CaseManagementTmpSaveDao caseManagementTmpSaveDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("casemgmt_tmpsave");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"casemgmt_tmpsave"
+		};
 	}
 
 	@Test

@@ -53,10 +53,14 @@ public class ProfessionalSpecialistDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ProfessionalSpecialistDao professionalSpecialistDao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "professionalSpecialists");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"professionalSpecialists"
+		};
 	}
+
 
 	@Test
 	public void testFindAll() throws Exception {

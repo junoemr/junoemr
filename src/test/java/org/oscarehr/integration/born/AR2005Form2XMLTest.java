@@ -30,11 +30,19 @@ import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 
 
-public class AR2005Form2XMLTest extends DaoTestFixtures {
+public class AR2005Form2XMLTest extends DaoTestFixtures
+{
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"formONAR"
+		};
+	}
 
 	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(new String[]{"formONAR"});
+	public void before() throws Exception
+	{
 		assertEquals(SchemaUtils.loadFileIntoMySQL(System.getProperty("basedir") + "/src/test/resources/initFormONAR.sql"),0);
 	}
 

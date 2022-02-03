@@ -41,9 +41,12 @@ public class ProgramDaoTest extends DaoTestFixtures
 	@Autowired
 	public ProgramDao programDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("program","admission","Facility","program_queue","lst_orgcd","secUserRole","provider");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"program","admission","Facility","program_queue","lst_orgcd","secUserRole","provider"
+		};
 	}
 
 	@Test

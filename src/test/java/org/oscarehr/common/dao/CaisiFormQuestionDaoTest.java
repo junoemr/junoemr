@@ -49,10 +49,12 @@ public class CaisiFormQuestionDaoTest extends DaoTestFixtures
 	@Autowired
 	public CaisiFormQuestionDao caisiFormQuestionDao;
 	
-	@Before
-	public void before() throws Exception {
-		
-		SchemaUtils.restoreTable("caisi_form_question");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"caisi_form_question"
+		};
 	}
 	
 	@Test

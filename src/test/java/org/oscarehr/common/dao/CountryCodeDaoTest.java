@@ -47,9 +47,12 @@ public class CountryCodeDaoTest extends DaoTestFixtures
 
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("country_codes");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"country_codes"
+		};
 	}
 
 	@Test

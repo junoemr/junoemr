@@ -43,10 +43,12 @@ public class VacancyTemplateDaoTest extends DaoTestFixtures
 	@Autowired
 	public VacancyTemplateDao vacancyTemplateDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("vacancy_template");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"vacancy_template"
+		};
 	}
 
 	@Test

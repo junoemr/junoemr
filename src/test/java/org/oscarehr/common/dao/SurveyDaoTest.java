@@ -42,9 +42,12 @@ public class SurveyDaoTest extends DaoTestFixtures
 	@Autowired
 	protected SurveyDao surveyDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("survey");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"survey"
+		};
 	}
 
 	@Test

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.ANY;
 import org.marc.everest.datatypes.ED;
 import org.marc.everest.datatypes.NullFlavor;
@@ -44,11 +45,17 @@ import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.EntryRelationship;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.Observation;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActMoodDocumentObservation;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntryRelationship;
+import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.export.template.observation.ReactionObservationModel;
 import org.oscarehr.e2e.util.EverestUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class ReactionObservationModelTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class ReactionObservationModelTest extends DaoTestFixtures
+{
 	private static final String test = "test";
 	private static final Date time = new Date();
 

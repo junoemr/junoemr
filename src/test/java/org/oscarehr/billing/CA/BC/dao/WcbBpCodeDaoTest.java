@@ -47,9 +47,12 @@ public class WcbBpCodeDaoTest extends DaoTestFixtures
 	@Autowired
 	public WcbBpCodeDao wcbBpCodeDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("wcb_bp_code");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"wcb_bp_code"
+		};
 	}
 
 	@Test

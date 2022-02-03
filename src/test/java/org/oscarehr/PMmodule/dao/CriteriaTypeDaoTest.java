@@ -52,10 +52,12 @@ public class CriteriaTypeDaoTest extends DaoTestFixtures
 	@Autowired
 	public CriteriaTypeDao criteriaTypeDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "criteria_type");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"criteria_type"
+		};
 	}
 
 	@Test

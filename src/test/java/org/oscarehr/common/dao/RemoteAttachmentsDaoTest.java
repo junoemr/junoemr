@@ -25,23 +25,30 @@ package org.oscarehr.common.dao;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.RemoteAttachments;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class RemoteAttachmentsDaoTest {
-	
-	protected RemoteAttachmentsDao dao = SpringUtils.getBean(RemoteAttachmentsDao.class);
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class RemoteAttachmentsDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected RemoteAttachmentsDao dao;
 
 	public RemoteAttachmentsDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(new String[]{"remoteAttachments"});
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"remoteAttachments"
+		};
 	}
 
 	@Test

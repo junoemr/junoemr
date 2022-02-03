@@ -50,9 +50,12 @@ public class CtlBillingServicePremiumDaoTest extends DaoTestFixtures
 	@Autowired
 	protected CtlBillingServicePremiumDao ctlBillingServicePremiumDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("ctl_billingservice_premium","billingservice");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"ctl_billingservice_premium", "billingservice"
+		};
 	}
 
        @Test

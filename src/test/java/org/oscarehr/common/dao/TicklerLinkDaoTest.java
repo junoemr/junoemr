@@ -55,10 +55,12 @@ public class TicklerLinkDaoTest extends DaoTestFixtures
 	@Autowired
 	TicklerDao ticklerDao;
 
-	@Before
-	@After
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("tickler_link", "tickler");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"tickler_link", "tickler"
+		};
 	}
 
 	@Test

@@ -57,11 +57,14 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.NotImplementedException;
@@ -159,37 +162,107 @@ public class SchemaUtils
 		String osName = System.getProperty("os.name");
 		return osName.toLowerCase().contains("windows");
 	}
-	
-	public static void restoreTable(boolean includeInitData, String... tableNames) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
-	{
-		long start = System.currentTimeMillis();
-		String schema=ConfigUtils.getProperty("db_schema");
 
-		Connection c=getConnection();
-		Statement s=c.createStatement();
+	public static Set<String> getFailedChecksums()
+		throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
+	{
+		Connection connection = getConnection();
+		Statement statement = connection.createStatement();
+
+		Set<String> errors = new HashSet<String>();
 		try
 		{
-			s.executeUpdate("use "+schema);
-			s.executeUpdate("set foreign_key_checks = 0");
-			for (int i = 0; i < tableNames.length; i++) {
-				String tableName = tableNames[i];
-				if (isWindows()) {
-					tableName = tableName.toLowerCase(); // make it case insensitive by default
-				}
-				String sql = "truncate table " + tableName;
-				s.executeUpdate(sql);
-				if(includeInitData)
-				{
-					s.executeUpdate("insert into " + tableName + " select * from " + tableName + "_maventest");
-				}
-            }
+			String schema = ConfigUtils.getProperty("db_schema");
+			statement.executeUpdate("use " + schema);
 
+			for (String tableName : createTableStatements.keySet())
+			{
+				// Check if there are any modified tables
+				String checksumValueSql = "CHECKSUM TABLE `" + tableName + "`";
+				ResultSet checksumResult = statement.executeQuery(checksumValueSql);
+
+				String defaultChecksum = null;
+				String checksum = null;
+				if (checksumResult.next())
+				{
+					checksum = checksumResult.getString("Checksum");
+				}
+
+				String checksumValueDefaultSql = "CHECKSUM TABLE `" + tableName + "_maventest`";
+				ResultSet checksumDefaultResult = statement.executeQuery(checksumValueDefaultSql);
+
+				if (checksumDefaultResult.next())
+				{
+					defaultChecksum = checksumDefaultResult.getString("Checksum");
+				}
+
+				if (checksum != null && !checksum.equals(defaultChecksum))
+				{
+					String errorMessage = "\n***** Checksums don't match for table \"" + tableName + "\"\n" +
+						"***** This means a test modified the database and didn't clean up after itself.\n" +
+						"***** It's possible that it wasn't this test's fault, but one of the previous tests.\n";
+
+					logger.error(errorMessage);
+					errors.add(errorMessage);
+
+					String sql = "SELECT * FROM `" + tableName + "`";
+					ResultSet changedResult = statement.executeQuery(sql);
+					ResultSetMetaData metaData = changedResult.getMetaData();
+
+					logger.error(tableName);
+					logger.error("===============================");
+					while(changedResult.next())
+					{
+						logger.error("-------------------------------");
+						for(int i = 1; i <= metaData.getColumnCount(); i++)
+						{
+							logger.error(metaData.getColumnName(i) + " = " + changedResult.getString(i));
+						}
+					}
+				}
+			}
 		}
 		finally
 		{
-			s.executeUpdate("set foreign_key_checks = 1");
-			s.close();
-			c.close();
+			statement.close();
+			connection.close();
+		}
+
+		return errors;
+	}
+
+	public static void restoreTable(boolean includeInitData, String... tableNames) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
+	{
+		long start = System.currentTimeMillis();
+		String schema = ConfigUtils.getProperty("db_schema");
+
+		Connection connection = getConnection();
+		Statement statement = connection.createStatement();
+		try
+		{
+			statement.executeUpdate("use "+schema);
+			statement.executeUpdate("set foreign_key_checks = 0");
+			for (int i = 0; i < tableNames.length; i++)
+			{
+				String tableName = tableNames[i];
+				if (isWindows())
+				{
+					tableName = tableName.toLowerCase(); // make it case insensitive by default
+				}
+				String sql = "truncate table " + tableName;
+				statement.executeUpdate(sql);
+				if (includeInitData)
+				{
+					statement.executeUpdate("insert into " + tableName + " select * from " + tableName +
+						"_maventest");
+				}
+            }
+		}
+		finally
+		{
+			statement.executeUpdate("set foreign_key_checks = 1");
+			statement.close();
+			connection.close();
 		}
 		long end = System.currentTimeMillis();
 		long secsTaken = (end-start)/1000;
@@ -212,6 +285,10 @@ public class SchemaUtils
 			s.executeUpdate("use "+schema);
 			s.executeUpdate("SET foreign_key_checks = 0");
 			for (String tableName:createTableStatements.keySet()) {
+				if("dashboard_report_view".equals(tableName))
+				{
+					continue;
+				}
 				try
 				{
 					s.executeUpdate("truncate table " + tableName);

@@ -44,9 +44,12 @@ public class ReportByExamplesDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ReportByExamplesDao reportByExamplesDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("reportByExamples", "provider");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"reportByExamples", "provider"
+		};
 	}
 
 	@Test

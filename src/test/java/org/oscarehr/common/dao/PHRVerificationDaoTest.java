@@ -62,10 +62,12 @@ public class PHRVerificationDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 	
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("PHRVerification");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"PHRVerification"
+		};
 	}
 
 	@Test

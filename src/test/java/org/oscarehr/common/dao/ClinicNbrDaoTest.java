@@ -46,9 +46,12 @@ public class ClinicNbrDaoTest extends DaoTestFixtures
 
 	Logger logger = MiscUtils.getLogger();
 
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("clinic_nbr");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"clinic_nbr"
+		};
 	}
 
 //	@Test

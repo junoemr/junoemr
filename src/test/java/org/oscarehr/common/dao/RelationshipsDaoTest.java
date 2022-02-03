@@ -50,9 +50,12 @@ public class RelationshipsDaoTest extends DaoTestFixtures
 	@Autowired
 	protected RelationshipsDao relationshipsDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("relationships");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"relationships"
+		};
 	}
 
 	@Test

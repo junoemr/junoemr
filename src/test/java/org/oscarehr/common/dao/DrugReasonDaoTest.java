@@ -49,12 +49,14 @@ public class DrugReasonDaoTest extends DaoTestFixtures
 	@Autowired
 	protected DrugReasonDao drugReasonDao;
 
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("drugReason");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"drugReason"
+		};
 	}
 
-	
 	@Test
 	/**
 	 * Ensures that addNewDrugReason() persists the passed in drug reason record.

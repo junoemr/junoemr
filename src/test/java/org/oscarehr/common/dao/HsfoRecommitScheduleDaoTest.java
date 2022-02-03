@@ -25,20 +25,27 @@ package org.oscarehr.common.dao;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.HsfoRecommitSchedule;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class HsfoRecommitScheduleDaoTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class HsfoRecommitScheduleDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	protected HsfoRecommitScheduleDao dao;
 
-	protected HsfoRecommitScheduleDao dao = SpringUtils.getBean(HsfoRecommitScheduleDao.class);
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("hsfo_recommit_schedule");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"hsfo_recommit_schedule"
+		};
 	}
 
 	@Test
