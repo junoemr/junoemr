@@ -158,7 +158,7 @@
 				</div>
 				<juno-button
 						class="add-demographic-button"
-						title="Enter"
+						title="Ctrl-Enter"
 						button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
 						click="$ctrl.onAdd()"
