@@ -117,7 +117,11 @@ angular.module('Patient').component('addDemographicModal', {
 				}
 			]
 
-			ctrl.$onInit = async () =>
+			ctrl.firstNamePristine = true;
+			ctrl.lastNamePristine = true;
+			ctrl.genderPristine = true;
+
+			ctrl.$onInit = () :void =>
 			{
 				// Pull phone prefix from Oscar Properties file
 				ctrl.systemPreferenceApi.getPreferenceValue("phone_prefix", "").then(
@@ -172,9 +176,13 @@ angular.module('Patient').component('addDemographicModal', {
 				);
 			}
 
-			ctrl.resetToDefaults = () =>
+			ctrl.resetToDefaults = () :void =>
 			{
 				ctrl.newDemographicData = angular.copy(ctrl.emptyDemographicData);
+
+				ctrl.firstNamePristine = true;
+				ctrl.lastNamePristine = true;
+				ctrl.genderPristine = true;
 
 				ctrl.newDemographicData.sex = ctrl.defaultSex;
 				ctrl.newDemographicData.hcType = ctrl.defaultProvince;
@@ -184,15 +192,15 @@ angular.module('Patient').component('addDemographicModal', {
 				ctrl.preferredPhoneType = PHONE_TYPE.CELL;
 			}
 
-			ctrl.resetFocus = () =>
+			ctrl.resetFocus = () :void =>
 			{
 				$timeout(() =>
 				{
-					ctrl.formRef.find(":input:visible:first").focus();
+					ctrl.firstColumnRef.find(":input:visible:first").focus();
 				});
 			}
 
-			ctrl.validateDemographic = function ()
+			ctrl.validateDemographic = () :void =>
 			{
 				let dateOfBirthValid = Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth).isValid();
 
@@ -202,27 +210,60 @@ angular.module('Patient').component('addDemographicModal', {
 					ctrl.newDemographicData.sex
 			};
 
-			ctrl.onHcTypeChange = (value) =>
+			ctrl.firstNameValid = () :boolean =>
+			{
+				return ctrl.newDemographicData.firstName || ctrl.firstNamePristine;
+			}
+
+
+			ctrl.lastNameValid = () :boolean =>
+			{
+				return ctrl.newDemographicData.lastName || ctrl.lastNamePristine;
+			}
+
+
+			ctrl.genderValid = () :boolean =>
+			{
+				return ctrl.newDemographicData.sex || ctrl.genderPristine;
+			}
+
+			ctrl.onFirstNameChange = () :void =>
+			{
+				ctrl.firstNamePristine = false;
+			}
+
+			ctrl.onLastNameChange = () :void =>
+			{
+				ctrl.lastNamePristine = false;
+			}
+
+			ctrl.onGenderChange = (value :object) :void =>
+			{
+				ctrl.newDemographicData.sex = value;
+				ctrl.genderPristine = false;
+			}
+
+			ctrl.onHcTypeChange = (value :object) :void =>
 			{
 				ctrl.newDemographicData.hcType = value;
 			}
 
-			ctrl.onMRPChange = (value) =>
+			ctrl.onMRPChange = (value :object) :void =>
 			{
 				ctrl.newDemographicData.providerNo = value;
 			}
 
-			ctrl.onPreferredPhoneTypeChange = (value) =>
+			ctrl.onPreferredPhoneTypeChange = (value :object) :void =>
 			{
 				ctrl.preferredPhoneType = value;
 			}
 
-			ctrl.onCancel = () =>
+			ctrl.onCancel = () :void =>
 			{
 				ctrl.modalInstance.dismiss("cancel");
 			};
 
-			ctrl.finalizePhoneNumber = () =>
+			ctrl.finalizePhoneNumber = () :void =>
 			{
 				// Reset the all phone numbers in case the first attempt to save failed
 				ctrl.newDemographicData.phone = "";
@@ -252,19 +293,30 @@ angular.module('Patient').component('addDemographicModal', {
 				}
 			}
 
-			ctrl.finalizeHin = () =>
+			ctrl.finalizeHin = () :void =>
 			{
 				ctrl.newDemographicData.hin = ctrl.newDemographicData.hin.replace(/[\W_]/gi, '');
 			}
 
-			ctrl.finalizeStatusDates = () =>
+			ctrl.finalizeStatusDates = ()  :void =>
 			{
 				const now = Juno.Common.Util.getDateMoment(new Date());
 				ctrl.newDemographicData.dateJoined = now;
 				ctrl.newDemographicData.patientStatusDate = now;
 			}
 
-			ctrl.onAdd = function ()
+			ctrl.submitOnCtrlEnter = ($event :any) :void =>
+			{
+				if ($event.ctrlKey && $event.charCode === 13)
+				{
+					if (!ctrl.buttonClicked)
+					{
+						ctrl.onAdd();
+					}
+				}
+			}
+
+			ctrl.onAdd = () :void =>
 			{
 				ctrl.buttonClicked = true;
 
