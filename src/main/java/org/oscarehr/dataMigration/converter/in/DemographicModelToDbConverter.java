@@ -24,7 +24,7 @@ package org.oscarehr.dataMigration.converter.in;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.dataMigration.model.common.AddressModel;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.demographic.entity.Demographic;
@@ -135,7 +135,7 @@ public class DemographicModelToDbConverter
 		}
 
 		// phone conversions
-		PhoneNumber homePhone = input.getHomePhone();
+		PhoneNumberModel homePhone = input.getHomePhone();
 		if(homePhone != null)
 		{
 			dbDemographic.setPhone(homePhone.getNumber());
@@ -148,7 +148,7 @@ public class DemographicModelToDbConverter
 			}
 		}
 
-		PhoneNumber workPhone = input.getWorkPhone();
+		PhoneNumberModel workPhone = input.getWorkPhone();
 		if(workPhone != null)
 		{
 			dbDemographic.setPhone2(workPhone.getNumber());
@@ -161,7 +161,7 @@ public class DemographicModelToDbConverter
 			}
 		}
 
-		PhoneNumber cellPhone = input.getCellPhone();
+		PhoneNumberModel cellPhone = input.getCellPhone();
 		if(cellPhone != null)
 		{
 			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_CELL, cellPhone.getNumber());

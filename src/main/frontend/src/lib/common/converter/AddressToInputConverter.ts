@@ -4,8 +4,13 @@ import Address from "../model/Address";
 
 export default class AddressToInputConverter extends AbstractConverter<Address, AddressModel>
 {
-	convert(from: Address, args: any): AddressModel
+	convert(from: Address): AddressModel
 	{
+		if(!from)
+		{
+			return null;
+		}
+
 		let input = {} as AddressModel;
 
 		input.addressLine1 = from.addressLine1;

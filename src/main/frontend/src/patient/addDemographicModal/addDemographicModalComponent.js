@@ -162,7 +162,7 @@ angular.module('Patient').component('addDemographicModal', {
 						residencyStatus: AddressResidencyStatus.Current,
 					},
 				];
-				demo.cellPhone = new PhoneNumber(ctrl.newDemographicData.phone, PhoneType.Cell);
+				demo.cellPhone = new PhoneNumber(ctrl.newDemographicData.phone, null, PhoneType.Cell);
 
 				demographicService.createDemographic(demo)
 					.then((results) =>

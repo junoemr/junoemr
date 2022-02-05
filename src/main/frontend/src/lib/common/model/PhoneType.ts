@@ -23,5 +23,5 @@
 
  */
 
-import {PhoneNumber} from "../../../../generated";
-export import PhoneType = PhoneNumber.PhoneTypeEnum;
+import {PhoneNumberModel} from "../../../../generated";
+export import PhoneType = PhoneNumberModel.PhoneTypeEnum;

@@ -193,12 +193,12 @@
 				<div id="pd2" ng-click="detailsCtrl.checkAction($event)" ng-keypress="detailsCtrl.checkAction($event)">
 					<div class="col-md-12">
 						<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formAlert"/></h3>
-						<textarea id="alert-text-box" ng-model="detailsCtrl.page.demo.alert" class="form-control form-control-details"></textarea>
+						<textarea id="alert-text-box" ng-model="detailsCtrl.page.demo.patientAlert" class="form-control form-control-details"></textarea>
 					</div>
 					<br/>
 					<div class="col-md-12">
 						<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formNotes"/></h3>
-						<textarea id="notes-text-box" ng-model="detailsCtrl.page.demo.scrNotes" class="form-control form-control-details"></textarea>
+						<textarea id="notes-text-box" ng-model="detailsCtrl.page.demo.patientNote" class="form-control form-control-details"></textarea>
 					</div>
 				</div>
 				<hr>

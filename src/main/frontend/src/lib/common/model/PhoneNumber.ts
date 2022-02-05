@@ -7,17 +7,18 @@ export default class PhoneNumber
 	private _primaryContactNumber: boolean;
 	private _phoneType: PhoneType;
 
-	constructor(number: string, type: any)
+	constructor(number: string, extension: string, type: any, primaryContactNumber: boolean = true)
 	{
 		this.number = number;
+		this.extension = extension;
 		this.phoneType = type;
-		this.primaryContactNumber = true;
+		this.primaryContactNumber = primaryContactNumber;
 	}
 
 	get formattedForDisplay(): string
 	{
 		let display = "";
-		if(this.number && this.number.length == 10)
+		if(this.number && this.number.length === 10)
 		{
 			display = "(" + this.number.substring(0,3) + ") " + this.number.substring(3,6) + "-" + this.number.substring(6);
 		}

@@ -26,7 +26,7 @@ import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.contact.Contact;
 
 import java.time.LocalDate;
@@ -50,9 +50,9 @@ public class Provider extends AbstractTransientModel implements Person, Contact
 	// contact info
 	private List<AddressModel> addressList;
 	private String email;
-	private PhoneNumber homePhone;
-	private PhoneNumber workPhone;
-	private PhoneNumber cellPhone;
+	private PhoneNumberModel homePhone;
+	private PhoneNumberModel workPhone;
+	private PhoneNumberModel cellPhone;
 
 	// professional info
 	private String specialty;

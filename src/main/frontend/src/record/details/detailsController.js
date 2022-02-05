@@ -152,12 +152,12 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
                     );
 
 						// show notes
-						if (controller.page.demo.notes != null)
-						{
-							controller.page.demo.scrNotes = controller.page.demo.notes;
-							if (/^<unotes>[\s\S]*/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring("<unotes>".length);
-							if (/[\s\S]*<\/unotes>$/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring(0, controller.page.demo.scrNotes.lastIndexOf("</unotes>"));
-						}
+						// if (controller.page.demo.notes != null)
+						// {
+						// 	controller.page.demo.scrNotes = controller.page.demo.notes;
+						// 	if (/^<unotes>[\s\S]*/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring("<unotes>".length);
+						// 	if (/[\s\S]*<\/unotes>$/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring(0, controller.page.demo.scrNotes.lastIndexOf("</unotes>"));
+						// }
 
 						// format referral doctor
 						if (controller.page.demo.familyDoctor != null)
@@ -175,36 +175,36 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 							controller.page.demo.scrFamilyDoc = familyDoc.name;
 						}
 
-						if (controller.page.demo.extras != null)
-						{
-							controller.page.demo.extras = toArray(controller.page.demo.extras);
-							for (var i = 0; i < controller.page.demo.extras.length; i++)
-							{
-								if (controller.page.demo.extras[i].key == "demo_cell") controller.page.demo.scrDemoCell = controller.page.demo.extras[i].value;
-								else if (controller.page.demo.extras[i].key == "aboriginal") controller.page.demo.scrAboriginal = controller.page.demo.extras[i].value;
-								else if (controller.page.demo.extras[i].key == "hPhoneExt") controller.page.demo.scrHPhoneExt = controller.page.demo.extras[i].value;
-								else if (controller.page.demo.extras[i].key == "wPhoneExt") controller.page.demo.scrWPhoneExt = controller.page.demo.extras[i].value;
-								else if (controller.page.demo.extras[i].key == "cytolNum") controller.page.demo.scrCytolNum = controller.page.demo.extras[i].value;
-								else if (controller.page.demo.extras[i].key == "phoneComment") controller.page.demo.scrPhoneComment = controller.page.demo.extras[i].value;
-								else if (controller.page.demo.extras[i].key == "paper_chart_archived") controller.page.demo.scrPaperChartArchived = controller.page.demo.extras[i].value;
-								else if (controller.page.demo.extras[i].key == "paper_chart_archived_date") controller.page.demo.scrPaperChartArchivedDate = controller.page.demo.extras[i].value;
-								else if (controller.page.demo.extras[i].key == "usSigned") controller.page.demo.scrUsSigned = controller.page.demo.extras[i].value;
-								else if (controller.page.demo.extras[i].key == "privacyConsent") controller.page.demo.scrPrivacyConsent = controller.page.demo.extras[i].value;
-								else if (controller.page.demo.extras[i].key == "informedConsent") controller.page.demo.scrInformedConsent = controller.page.demo.extras[i].value;
-								else if (controller.page.demo.extras[i].key == "securityQuestion1") controller.page.demo.scrSecurityQuestion1 = controller.page.demo.extras[i].value;
-								else if (controller.page.demo.extras[i].key == "securityAnswer1") controller.page.demo.scrSecurityAnswer1 = controller.page.demo.extras[i].value;
-								else if (controller.page.demo.extras[i].key == "rxInteractionWarningLevel") controller.page.demo.scrRxInteractionLevel = controller.page.demo.extras[i].value;
-
-
-								//record array position of extras by keys - to be used on saving
-								posExtras[controller.page.demo.extras[i].key] = i;
-							}
-						}
+						// if (controller.page.demo.extras != null)
+						// {
+						// 	controller.page.demo.extras = toArray(controller.page.demo.extras);
+						// 	for (var i = 0; i < controller.page.demo.extras.length; i++)
+						// 	{
+						// 		if (controller.page.demo.extras[i].key == "demo_cell") controller.page.demo.scrDemoCell = controller.page.demo.extras[i].value;
+						// 		else if (controller.page.demo.extras[i].key == "aboriginal") controller.page.demo.scrAboriginal = controller.page.demo.extras[i].value;
+						// 		else if (controller.page.demo.extras[i].key == "hPhoneExt") controller.page.demo.scrHPhoneExt = controller.page.demo.extras[i].value;
+						// 		else if (controller.page.demo.extras[i].key == "wPhoneExt") controller.page.demo.scrWPhoneExt = controller.page.demo.extras[i].value;
+						// 		else if (controller.page.demo.extras[i].key == "cytolNum") controller.page.demo.scrCytolNum = controller.page.demo.extras[i].value;
+						// 		else if (controller.page.demo.extras[i].key == "phoneComment") controller.page.demo.scrPhoneComment = controller.page.demo.extras[i].value;
+						// 		else if (controller.page.demo.extras[i].key == "paper_chart_archived") controller.page.demo.scrPaperChartArchived = controller.page.demo.extras[i].value;
+						// 		else if (controller.page.demo.extras[i].key == "paper_chart_archived_date") controller.page.demo.scrPaperChartArchivedDate = controller.page.demo.extras[i].value;
+						// 		else if (controller.page.demo.extras[i].key == "usSigned") controller.page.demo.scrUsSigned = controller.page.demo.extras[i].value;
+						// 		else if (controller.page.demo.extras[i].key == "privacyConsent") controller.page.demo.scrPrivacyConsent = controller.page.demo.extras[i].value;
+						// 		else if (controller.page.demo.extras[i].key == "informedConsent") controller.page.demo.scrInformedConsent = controller.page.demo.extras[i].value;
+						// 		else if (controller.page.demo.extras[i].key == "securityQuestion1") controller.page.demo.scrSecurityQuestion1 = controller.page.demo.extras[i].value;
+						// 		else if (controller.page.demo.extras[i].key == "securityAnswer1") controller.page.demo.scrSecurityAnswer1 = controller.page.demo.extras[i].value;
+						// 		else if (controller.page.demo.extras[i].key == "rxInteractionWarningLevel") controller.page.demo.scrRxInteractionLevel = controller.page.demo.extras[i].value;
+						//
+						//
+						// 		//record array position of extras by keys - to be used on saving
+						// 		posExtras[controller.page.demo.extras[i].key] = i;
+						// 	}
+						// }
 
 						//show phone numbers with preferred check
-						controller.page.demo.scrCellPhone = getPhoneNum(controller.page.demo.scrDemoCell);
-						controller.page.demo.scrHomePhone = getPhoneNum(controller.page.demo.phone);
-						controller.page.demo.scrWorkPhone = getPhoneNum(controller.page.demo.alternativePhone);
+						// controller.page.demo.scrCellPhone = getPhoneNum(controller.page.demo.scrDemoCell);
+						// controller.page.demo.scrHomePhone = getPhoneNum(controller.page.demo.phone);
+						// controller.page.demo.scrWorkPhone = getPhoneNum(controller.page.demo.alternativePhone);
 
 						//show waitingListNames
 						if (controller.page.demo.waitingListNames != null)
@@ -223,34 +223,34 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						}
 
 
-						controller.page.cellPhonePreferredMsg = defPhTitle;
-						controller.page.homePhonePreferredMsg = defPhTitle;
-						controller.page.workPhonePreferredMsg = defPhTitle;
-						if (isPreferredPhone(controller.page.demo.scrDemoCell))
-						{
-							controller.page.demo.scrPreferredPhone = "C";
-							controller.page.preferredPhoneNumber = controller.page.demo.scrCellPhone;
-							controller.page.cellPhonePreferredMsg = prefPhTitle;
-							controller.page.cellPhonePreferredColor = colorAttn;
-						}
-						else if (isPreferredPhone(controller.page.demo.phone))
-						{
-							controller.page.demo.scrPreferredPhone = "H";
-							controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
-							controller.page.homePhonePreferredMsg = prefPhTitle;
-							controller.page.homePhonePreferredColor = colorAttn;
-						}
-						else if (isPreferredPhone(controller.page.demo.alternativePhone))
-						{
-							controller.page.demo.scrPreferredPhone = "W";
-							controller.page.preferredPhoneNumber = controller.page.demo.scrWorkPhone;
-							controller.page.workPhonePreferredMsg = prefPhTitle;
-							controller.page.workPhonePreferredColor = colorAttn;
-						}
-						else
-						{
-							controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
-						}
+						// controller.page.cellPhonePreferredMsg = defPhTitle;
+						// controller.page.homePhonePreferredMsg = defPhTitle;
+						// controller.page.workPhonePreferredMsg = defPhTitle;
+						// if (isPreferredPhone(controller.page.demo.scrDemoCell))
+						// {
+						// 	controller.page.demo.scrPreferredPhone = "C";
+						// 	controller.page.preferredPhoneNumber = controller.page.demo.scrCellPhone;
+						// 	controller.page.cellPhonePreferredMsg = prefPhTitle;
+						// 	controller.page.cellPhonePreferredColor = colorAttn;
+						// }
+						// else if (isPreferredPhone(controller.page.demo.phone))
+						// {
+						// 	controller.page.demo.scrPreferredPhone = "H";
+						// 	controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
+						// 	controller.page.homePhonePreferredMsg = prefPhTitle;
+						// 	controller.page.homePhonePreferredColor = colorAttn;
+						// }
+						// else if (isPreferredPhone(controller.page.demo.alternativePhone))
+						// {
+						// 	controller.page.demo.scrPreferredPhone = "W";
+						// 	controller.page.preferredPhoneNumber = controller.page.demo.scrWorkPhone;
+						// 	controller.page.workPhonePreferredMsg = prefPhTitle;
+						// 	controller.page.workPhonePreferredColor = colorAttn;
+						// }
+						// else
+						// {
+						// 	controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
+						// }
 
 						controller.page.dataChanged = false;
 
@@ -294,12 +294,13 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 							});
 
 						// controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
-						controller.formatLastName(); //done on page load
-						controller.formatFirstName(); //done on page load
+						// controller.formatLastName(); //done on page load
+						// controller.formatFirstName(); //done on page load
 					},
 					function error(errors)
 					{
-						alert('Error loading demographic: ', errors) // TODO-legacy: Display actual error message
+						controller.toastService.errorToast("Error loading demographic");
+						console.error(errors);
 					}
 				);
 			}
@@ -477,14 +478,14 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		});
 
 		//format lastname, firstname
-		controller.formatLastName = function formatLastName()
-		{
-			controller.page.demo.lastName = controller.page.demo.lastName.toUpperCase();
-		};
-		controller.formatFirstName = function formatFirstName()
-		{
-			controller.page.demo.firstName = controller.page.demo.firstName.toUpperCase();
-		};
+		// controller.formatLastName = function formatLastName()
+		// {
+		// 	controller.page.demo.lastName = controller.page.demo.lastName.toUpperCase();
+		// };
+		// controller.formatFirstName = function formatFirstName()
+		// {
+		// 	controller.page.demo.firstName = controller.page.demo.firstName.toUpperCase();
+		// };
 
 		controller.openSwipecardModal = function openSwipecardModal()
 		{

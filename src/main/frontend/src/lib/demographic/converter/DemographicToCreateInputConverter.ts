@@ -2,8 +2,9 @@ import AbstractConverter from "../../conversion/AbstractConverter";
 import Demographic from "../model/Demographic";
 import {DemographicCreateInput} from "../../../../generated";
 import AddressToInputConverter from "../../common/converter/AddressToInputConverter";
+import PhoneNumberToInputConverter from "../../common/converter/PhoneNumberToInputConverter";
 
-export default class DemographicModelToCreateInputConverter extends AbstractConverter<Demographic, DemographicCreateInput>
+export default class DemographicToCreateInputConverter extends AbstractConverter<Demographic, DemographicCreateInput>
 {
 	convert(from: Demographic, args: any): DemographicCreateInput
 	{
@@ -21,7 +22,11 @@ export default class DemographicModelToCreateInputConverter extends AbstractConv
 		createInput.dateJoined = this.serializeDateTime(from.dateJoined);
 		createInput.addressList = new AddressToInputConverter().convertList(from.addressList);
 
-		console.info("debug transfer conversion", createInput);
+		const phoneConverter = new PhoneNumberToInputConverter();
+		createInput.cellPhone = phoneConverter.convert(from.cellPhone);
+		createInput.homePhone = phoneConverter.convert(from.homePhone);
+		createInput.workPhone = phoneConverter.convert(from.workPhone);
+
 		return createInput;
 	}
 }

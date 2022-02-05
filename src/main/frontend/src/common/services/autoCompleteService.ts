@@ -60,9 +60,9 @@ angular.module("Common.Services").service("autoCompleteService", [
 			return {
 				uuid: result.id,
 				full_name: result.displayName,
-				birth_date: Juno.Common.Util.formatMomentDate(result.dateOfBirth),
+				birth_date: result.displayDateOfBirth,
 				health_number: result.healthNumber,
-				phone_number_primary: result.primaryPhone,
+				phone_number_primary: result.primaryPhone.formattedForDisplay,
 			};
 		};
 	}

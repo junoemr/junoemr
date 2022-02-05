@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.converter.out;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.common.AddressModel;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -48,8 +48,8 @@ public class SiteDbToModelConverter extends BaseDbToModelConverter<Site, org.osc
 		address.setPostalCode(input.getPostal());
 		site.setAddress(address);
 
-		site.setPhoneNumber(PhoneNumber.of(input.getPhone()));
-		site.setFaxNumber(PhoneNumber.of(input.getFax()));
+		site.setPhoneNumber(PhoneNumberModel.of(input.getPhone()));
+		site.setFaxNumber(PhoneNumberModel.of(input.getFax()));
 
 		return site;
 	}

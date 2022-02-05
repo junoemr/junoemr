@@ -38,7 +38,7 @@
 
 		<!-- Cell Phone -->
 		<div class="mobile-phone">
-			<juno-input ng-model="$ctrl.ngModel.scrCellPhone"
+			<juno-input ng-model="$ctrl.ngModel.cellPhone.number"
 			            label="Mobile phone"
 			            placeholder="000-000-0000"
 			            valid-regex="$ctrl.phoneNumberRegex"
@@ -53,14 +53,14 @@
 
 		<!-- Home Phone -->
 		<div class="phone-with-ext">
-			<juno-input ng-model="$ctrl.ngModel.scrHomePhone"
+			<juno-input ng-model="$ctrl.ngModel.homePhone.number"
 			            label="Home Phone"
 			            placeholder="000-000-0000"
 			            valid-regex="$ctrl.phoneNumberRegex"
 			            component-style="$ctrl.componentStyle">
 			</juno-input>
 
-			<juno-input ng-model="$ctrl.ngModel.scrHPhoneExt"
+			<juno-input ng-model="$ctrl.ngModel.homePhone.extension"
 			            label="Ext"
 			            valid-regex="$ctrl.phoneNumberRegex"
 			            component-style="$ctrl.componentStyle"
@@ -76,7 +76,7 @@
 
 		<!-- Work Phone -->
 		<div class="phone-with-ext">
-			<juno-input ng-model="$ctrl.ngModel.scrWorkPhone"
+			<juno-input ng-model="$ctrl.ngModel.workPhone.number"
 			            label="Work Phone"
 			            placeholder="000-000-0000"
 			            valid-regex="$ctrl.phoneNumberRegex"
@@ -85,7 +85,7 @@
 			</juno-input>
 
 			<div class="phone-ext">
-				<juno-input ng-model="$ctrl.ngModel.scrWPhoneExt"
+				<juno-input ng-model="$ctrl.ngModel.workPhone.extension"
 				            label="Ext"
 				            valid-regex="$ctrl.phoneNumberRegex"
 				            component-style="$ctrl.componentStyle"
@@ -100,7 +100,7 @@
 			</juno-check-box>
 		</div>
 
-		<juno-input ng-model="$ctrl.ngModel.scrPhoneComment"
+		<juno-input ng-model="$ctrl.ngModel.phoneComment"
 		            label="Phone Comment"
 		            component-style="$ctrl.componentStyle">
 		</juno-input>

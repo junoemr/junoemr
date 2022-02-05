@@ -26,7 +26,7 @@ import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.demographic.model.DemographicModel;
@@ -63,9 +63,9 @@ public class DemographicUpdateInput extends AbstractTransientModel
 	//contact info
 	private List<AddressModel> addressList;
 	private String email;
-	private PhoneNumber homePhone;
-	private PhoneNumber workPhone;
-	private PhoneNumber cellPhone;
+	private PhoneNumberModel homePhone;
+	private PhoneNumberModel workPhone;
+	private PhoneNumberModel cellPhone;
 
 	// physician info
 	private Provider mrpProvider;

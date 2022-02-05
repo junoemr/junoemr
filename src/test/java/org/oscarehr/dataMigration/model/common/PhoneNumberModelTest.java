@@ -27,12 +27,12 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class PhoneNumberTest
+public class PhoneNumberModelTest
 {
 	@Test
 	public void testStaticConstructorOf_Null()
 	{
-		assertNull(PhoneNumber.of(null));
+		assertNull(PhoneNumberModel.of(null));
 	}
 
 	@Test
@@ -40,7 +40,7 @@ public class PhoneNumberTest
 	{
 		String number = "2505554567";
 
-		PhoneNumber result = PhoneNumber.of(number);
+		PhoneNumberModel result = PhoneNumberModel.of(number);
 		assertEquals(number, result.getNumber());
 		assertNull(result.getExtension());
 	}
@@ -51,7 +51,7 @@ public class PhoneNumberTest
 		String number = "2505554567";
 		String extension = "123";
 
-		PhoneNumber result = PhoneNumber.of(number, extension);
+		PhoneNumberModel result = PhoneNumberModel.of(number, extension);
 		assertEquals(number, result.getNumber());
 		assertEquals(extension, result.getExtension());
 	}
@@ -63,7 +63,7 @@ public class PhoneNumberTest
 		String extension = "123";
 		boolean isPrimary = true;
 
-		PhoneNumber result = PhoneNumber.of(number, extension, isPrimary);
+		PhoneNumberModel result = PhoneNumberModel.of(number, extension, isPrimary);
 		assertEquals(number, result.getNumber());
 		assertEquals(extension, result.getExtension());
 		assertEquals(isPrimary, result.isPrimaryContactNumber());
@@ -75,7 +75,7 @@ public class PhoneNumberTest
 		String number = "(250) 555-4567*";
 		String expected = "2505554567";
 
-		PhoneNumber result = PhoneNumber.of(number);
+		PhoneNumberModel result = PhoneNumberModel.of(number);
 		assertEquals(expected, result.getNumber());
 	}
 	@Test
@@ -85,28 +85,28 @@ public class PhoneNumberTest
 		String extension = "(12-3)";
 		String expected = "123";
 
-		PhoneNumber result = PhoneNumber.of(number, extension);
+		PhoneNumberModel result = PhoneNumberModel.of(number, extension);
 		assertEquals(expected, result.getExtension());
 	}
 
 	@Test
 	public void testGetNumberFormattedHL7_Null()
 	{
-		PhoneNumber phoneNumber = new PhoneNumber();
+		PhoneNumberModel phoneNumber = new PhoneNumberModel();
 		assertNull(phoneNumber.getNumberFormattedHL7());
 	}
 
 	@Test
 	public void testGetNumberFormattedHL7_Invalid()
 	{
-		PhoneNumber phoneNumber = PhoneNumber.of("1234");
+		PhoneNumberModel phoneNumber = PhoneNumberModel.of("1234");
 		assertNull(phoneNumber.getNumberFormattedHL7());
 	}
 
 	@Test
 	public void testGetNumberFormattedHL7_Valid()
 	{
-		PhoneNumber phoneNumber = PhoneNumber.of("2505557878");
+		PhoneNumberModel phoneNumber = PhoneNumberModel.of("2505557878");
 		assertEquals("(250)555-7878", phoneNumber.getNumberFormattedHL7());
 	}
 }

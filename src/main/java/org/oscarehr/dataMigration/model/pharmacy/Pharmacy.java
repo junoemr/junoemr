@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.model.pharmacy;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.common.AddressModel;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 
 import java.time.LocalDateTime;
 
@@ -41,9 +41,9 @@ public class Pharmacy extends AbstractTransientModel
 	private String name;
 	private String email;
 	private AddressModel address;
-	private PhoneNumber phone1;
-	private PhoneNumber phone2;
-	private PhoneNumber fax;
+	private PhoneNumberModel phone1;
+	private PhoneNumberModel phone2;
+	private PhoneNumberModel fax;
 	private LocalDateTime createdDateTime;
 	private String notes;
 

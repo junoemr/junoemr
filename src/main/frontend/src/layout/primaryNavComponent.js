@@ -696,7 +696,7 @@ angular.module('Layout').component("primaryNavigation", {
 				function success(results)
 				{
 					$location.path('/record/' +
-						encodeURIComponent(results.demographicNo) +
+						encodeURIComponent(results.id) +
 						'/details');
 				},
 				function error(errors)

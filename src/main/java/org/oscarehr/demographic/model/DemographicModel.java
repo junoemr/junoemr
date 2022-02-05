@@ -28,7 +28,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.contact.Contact;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
@@ -95,9 +95,9 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 	//contact info
 	private List<AddressModel> addressList;
 	private String email;
-	private PhoneNumber homePhone;
-	private PhoneNumber workPhone;
-	private PhoneNumber cellPhone;
+	private PhoneNumberModel homePhone;
+	private PhoneNumberModel workPhone;
+	private PhoneNumberModel cellPhone;
 
 	// physician info
 	private Provider mrpProvider;

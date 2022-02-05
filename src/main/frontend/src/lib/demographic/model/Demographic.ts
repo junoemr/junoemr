@@ -2,6 +2,7 @@ import moment, {Moment} from "moment";
 import Address from "../../common/model/Address";
 import PhoneNumber from "../../common/model/PhoneNumber";
 import {Sex, sexToHuman} from "./Sex";
+import {ElectronicMessagingConsentStatus} from "../ElectronicMessagingConsentStatus";
 
 export default class Demographic
 {
@@ -32,6 +33,7 @@ export default class Demographic
 	private _homePhone: PhoneNumber;
 	private _workPhone: PhoneNumber;
 	private _cellPhone: PhoneNumber;
+	private _phoneComment: string;
 
 	// physician info
 	private _mrpProvider: object; //todo
@@ -57,6 +59,10 @@ export default class Demographic
 	private _patientNote: string;
 	private _patientAlert: string;
 
+	private _electronicMessagingConsentStatus: ElectronicMessagingConsentStatus;
+	private _electronicMessagingConsentGivenAt: Moment;
+	private _electronicMessagingConsentRejectedAt: Moment;
+
 	constructor()
 	{
 
@@ -68,6 +74,11 @@ export default class Demographic
 
 	get primaryPhone(): PhoneNumber
 	{
+		// prioritize the marked primary contact
+		if(this.cellPhone && this.cellPhone.primaryContactNumber)
+		{
+			return this.cellPhone;
+		}
 		if(this.homePhone && this.homePhone.primaryContactNumber)
 		{
 			return this.homePhone;
@@ -76,9 +87,18 @@ export default class Demographic
 		{
 			return this.workPhone;
 		}
-		if(this.cellPhone && this.cellPhone.primaryContactNumber)
+		// prioritize by existence
+		if(this.cellPhone)
 		{
 			return this.cellPhone;
+		}
+		if(this.homePhone)
+		{
+			return this.homePhone;
+		}
+		if(this.workPhone)
+		{
+			return this.workPhone;
 		}
 		return null;
 	}
@@ -100,7 +120,11 @@ export default class Demographic
 
 	get displayAge(): string
 	{
-		return this.age + " years";
+		if(isNaN(this.age))
+		{
+			return "NA";
+		}
+		return String(this.age);
 	}
 
 	get age(): number
@@ -353,6 +377,16 @@ export default class Demographic
 		this._cellPhone = value;
 	}
 
+	get phoneComment(): string
+	{
+		return this._phoneComment;
+	}
+
+	set phoneComment(value: string)
+	{
+		this._phoneComment = value;
+	}
+
 	get mrpProvider(): object
 	{
 		return this._mrpProvider;
@@ -521,5 +555,35 @@ export default class Demographic
 	set patientAlert(value: string)
 	{
 		this._patientAlert = value;
+	}
+
+	get electronicMessagingConsentStatus(): ElectronicMessagingConsentStatus
+	{
+		return this._electronicMessagingConsentStatus;
+	}
+
+	set electronicMessagingConsentStatus(value: ElectronicMessagingConsentStatus)
+	{
+		this._electronicMessagingConsentStatus = value;
+	}
+
+	get electronicMessagingConsentGivenAt(): moment.Moment
+	{
+		return this._electronicMessagingConsentGivenAt;
+	}
+
+	set electronicMessagingConsentGivenAt(value: moment.Moment)
+	{
+		this._electronicMessagingConsentGivenAt = value;
+	}
+
+	get electronicMessagingConsentRejectedAt(): moment.Moment
+	{
+		return this._electronicMessagingConsentRejectedAt;
+	}
+
+	set electronicMessagingConsentRejectedAt(value: moment.Moment)
+	{
+		this._electronicMessagingConsentRejectedAt = value;
 	}
 }

@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.converter.in;
 import org.oscarehr.common.model.PharmacyInfo;
 import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
 import org.oscarehr.dataMigration.model.common.AddressModel;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.pharmacy.Pharmacy;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -69,9 +69,9 @@ public class PharmacyModelToDbConverter extends
 			pharmacyInfo.setPostalCode(address.getPostalCode());
 		}
 
-		PhoneNumber phone1 = input.getPhone1();
-		PhoneNumber phone2 = input.getPhone2();
-		PhoneNumber fax = input.getFax();
+		PhoneNumberModel phone1 = input.getPhone1();
+		PhoneNumberModel phone2 = input.getPhone2();
+		PhoneNumberModel fax = input.getFax();
 
 		if(phone1 != null)
 		{

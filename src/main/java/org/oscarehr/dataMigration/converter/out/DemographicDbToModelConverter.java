@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.converter.out;
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.entity.Demographic;
@@ -209,10 +209,10 @@ public class DemographicDbToModelConverter extends
 		}
 	}
 
-	private PhoneNumber buildPhoneNumber(String phoneNumber, String extension)
+	private PhoneNumberModel buildPhoneNumber(String phoneNumber, String extension)
 	{
 		boolean primaryPhone = phoneNumber.endsWith("*");
-		return PhoneNumber.of(phoneNumber, extension, primaryPhone);
+		return PhoneNumberModel.of(phoneNumber, extension, primaryPhone);
 	}
 
 	private Provider getReferralProvider(Demographic input)

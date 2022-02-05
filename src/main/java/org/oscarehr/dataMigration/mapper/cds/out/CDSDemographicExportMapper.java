@@ -27,6 +27,7 @@ import org.oscarehr.dataMigration.mapper.cds.CDSDemographicInterface;
 import org.oscarehr.dataMigration.model.PatientRecord;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.contact.DemographicContact;
 import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
@@ -188,9 +189,9 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 	{
 		List<PhoneNumber> exportPhoneList = new ArrayList<>(3);
 
-		org.oscarehr.dataMigration.model.common.PhoneNumber homePhone = exportStructure.getHomePhone();
-		org.oscarehr.dataMigration.model.common.PhoneNumber workPhone = exportStructure.getWorkPhone();
-		org.oscarehr.dataMigration.model.common.PhoneNumber cellPhone = exportStructure.getCellPhone();
+		PhoneNumberModel homePhone = exportStructure.getHomePhone();
+		PhoneNumberModel workPhone = exportStructure.getWorkPhone();
+		PhoneNumberModel cellPhone = exportStructure.getCellPhone();
 		if(homePhone != null)
 		{
 			exportPhoneList.add(getExportPhone(PhoneNumberType.R, homePhone));
@@ -206,7 +207,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		return exportPhoneList;
 	}
 
-	protected PhoneNumber getExportPhone(PhoneNumberType type, 	org.oscarehr.dataMigration.model.common.PhoneNumber phoneNumber)
+	protected PhoneNumber getExportPhone(PhoneNumberType type, 	PhoneNumberModel phoneNumber)
 	{
 		String number = phoneNumber.getNumber();
 		String extension = phoneNumber.getExtension();
@@ -342,9 +343,9 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 			contact.setNote(demographicContact.getNote());
 
 			//contact phone conversion
-			org.oscarehr.dataMigration.model.common.PhoneNumber homePhone = demographicContact.getContact().getHomePhone();
-			org.oscarehr.dataMigration.model.common.PhoneNumber workPhone = demographicContact.getContact().getWorkPhone();
-			org.oscarehr.dataMigration.model.common.PhoneNumber cellPhone = demographicContact.getContact().getCellPhone();
+			PhoneNumberModel homePhone = demographicContact.getContact().getHomePhone();
+			PhoneNumberModel workPhone = demographicContact.getContact().getWorkPhone();
+			PhoneNumberModel cellPhone = demographicContact.getContact().getCellPhone();
 			if(homePhone != null)
 			{
 				contact.getPhoneNumber().add(getExportPhone(PhoneNumberType.R, homePhone));
@@ -394,7 +395,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 			preferredPharmacy.setAddress(toCdsAddress(exportPharmacy.getAddress(), AddressType.M));
 
 			// note: the spec says this handles multiple numbers, but the schema file structure does not
-			org.oscarehr.dataMigration.model.common.PhoneNumber phoneNumber = exportPharmacy.getPhone1();
+			PhoneNumberModel phoneNumber = exportPharmacy.getPhone1();
 			if(phoneNumber != null)
 			{
 				preferredPharmacy.setPhoneNumber(getExportPhone(PhoneNumberType.W, phoneNumber));

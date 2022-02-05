@@ -29,7 +29,7 @@ import org.oscarehr.dataMigration.mapper.AbstractImportMapper;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.springframework.stereotype.Component;
@@ -202,7 +202,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return null;
 	}
 
-	protected PhoneNumber getPhoneNumber(xml.cds.v5_0.PhoneNumber importNumber)
+	protected PhoneNumberModel getPhoneNumber(xml.cds.v5_0.PhoneNumber importNumber)
 	{
 		if(importNumber == null)
 		{
@@ -241,7 +241,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		}
 
 		String fullNumber = StringUtils.trimToEmpty(area) + StringUtils.trimToEmpty(exchange) + StringUtils.trimToEmpty(number);
-		PhoneNumber phoneNumber = PhoneNumber.of(fullNumber, extension);
+		PhoneNumberModel phoneNumber = PhoneNumberModel.of(fullNumber, extension);
 
 		PhoneNumberType type = importNumber.getPhoneNumberType();
 		if(PhoneNumberType.R.equals(type))

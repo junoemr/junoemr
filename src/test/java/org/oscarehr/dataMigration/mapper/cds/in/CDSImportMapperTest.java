@@ -33,7 +33,7 @@ import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
@@ -425,7 +425,7 @@ public class CDSImportMapperTest
 		JAXBElement<String> number = objectFactory.createPhoneNumberPhoneNumber(expectedNumber);
 		phoneNumber.getContent().add(number);
 
-		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		PhoneNumberModel resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
 		assertEquals(expectedNumber, resultNumber.getNumber());
 		assertNull(resultNumber.getExtension());
 	}
@@ -448,7 +448,7 @@ public class CDSImportMapperTest
 		JAXBElement<String> extension = objectFactory.createPhoneNumberExtension(expectedExtension);
 		phoneNumber.getContent().add(extension);
 
-		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		PhoneNumberModel resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
 		assertEquals(expectedNumber, resultNumber.getNumber());
 		assertEquals(expectedExtension, resultNumber.getExtension());
 	}
@@ -471,7 +471,7 @@ public class CDSImportMapperTest
 		JAXBElement<String> number = objectFactory.createPhoneNumberNumber(expectedNumber);
 		phoneNumber.getContent().add(number);
 
-		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		PhoneNumberModel resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
 		assertEquals(expectedArea + expectedNumber, resultNumber.getNumber());
 	}
 
@@ -498,7 +498,7 @@ public class CDSImportMapperTest
 		JAXBElement<String> extension = objectFactory.createPhoneNumberExtension(expectedExtension);
 		phoneNumber.getContent().add(extension);
 
-		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		PhoneNumberModel resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
 		assertEquals(expectedArea + expectedNumber, resultNumber.getNumber());
 		assertEquals(expectedExtension, resultNumber.getExtension());
 	}
@@ -526,7 +526,7 @@ public class CDSImportMapperTest
 		JAXBElement<String> exchange = objectFactory.createPhoneNumberExchange(expectedExchange);
 		phoneNumber.getContent().add(exchange);
 
-		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		PhoneNumberModel resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
 		assertEquals(expectedArea + expectedExchange + expectedNumber, resultNumber.getNumber());
 	}
 
@@ -558,7 +558,7 @@ public class CDSImportMapperTest
 		JAXBElement<String> exchange = objectFactory.createPhoneNumberExchange(expectedExchange);
 		phoneNumber.getContent().add(exchange);
 
-		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		PhoneNumberModel resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
 		assertEquals(expectedArea + expectedExchange + expectedNumber, resultNumber.getNumber());
 		assertEquals(expectedExtension, resultNumber.getExtension());
 	}
@@ -577,8 +577,8 @@ public class CDSImportMapperTest
 
 		phoneNumber.setPhoneNumberType(PhoneNumberType.R);
 
-		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
-		assertEquals(PhoneNumber.PHONE_TYPE.HOME, resultNumber.getPhoneType());
+		PhoneNumberModel resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		assertEquals(PhoneNumberModel.PHONE_TYPE.HOME, resultNumber.getPhoneType());
 	}
 
 	@Test
@@ -595,8 +595,8 @@ public class CDSImportMapperTest
 
 		phoneNumber.setPhoneNumberType(PhoneNumberType.W);
 
-		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
-		assertEquals(PhoneNumber.PHONE_TYPE.WORK, resultNumber.getPhoneType());
+		PhoneNumberModel resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		assertEquals(PhoneNumberModel.PHONE_TYPE.WORK, resultNumber.getPhoneType());
 	}
 
 	@Test
@@ -613,8 +613,8 @@ public class CDSImportMapperTest
 
 		phoneNumber.setPhoneNumberType(PhoneNumberType.C);
 
-		PhoneNumber resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
-		assertEquals(PhoneNumber.PHONE_TYPE.CELL, resultNumber.getPhoneType());
+		PhoneNumberModel resultNumber = cdsImportMapper.getPhoneNumber(phoneNumber);
+		assertEquals(PhoneNumberModel.PHONE_TYPE.CELL, resultNumber.getPhoneType());
 	}
 
 	@Test

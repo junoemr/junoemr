@@ -24,7 +24,7 @@ package org.oscarehr.dataMigration.mapper.cds.in;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.dataMigration.model.common.Person;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
@@ -136,7 +136,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 
 		for(xml.cds.v5_0.PhoneNumber importNumber : importStructure.getPhoneNumber())
 		{
-			PhoneNumber phoneNumber = getPhoneNumber(importNumber);
+			PhoneNumberModel phoneNumber = getPhoneNumber(importNumber);
 
 			if(phoneNumber.isTypeHome() && demographic.getHomePhone() == null)
 			{

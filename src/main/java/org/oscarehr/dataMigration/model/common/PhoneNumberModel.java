@@ -22,11 +22,12 @@
  */
 package org.oscarehr.dataMigration.model.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 
 @Data
-public class PhoneNumber extends AbstractTransientModel
+public class PhoneNumberModel extends AbstractTransientModel
 {
 	public enum PHONE_TYPE {
 		HOME,
@@ -39,22 +40,22 @@ public class PhoneNumber extends AbstractTransientModel
 	private boolean primaryContactNumber;
 	private PHONE_TYPE phoneType;
 
-	public PhoneNumber()
+	public PhoneNumberModel()
 	{
 		this(null, null);
 	}
 
-	public PhoneNumber(String number)
+	public PhoneNumberModel(String number)
 	{
 		this(number, null);
 	}
 
-	public PhoneNumber(String number, String extension)
+	public PhoneNumberModel(String number, String extension)
 	{
 		this(number, extension, false);
 	}
 
-	public PhoneNumber(String number, String extension, boolean primaryContactNumber)
+	public PhoneNumberModel(String number, String extension, boolean primaryContactNumber)
 	{
 		this.setNumber(number);
 		this.setExtension(extension);
@@ -73,6 +74,7 @@ public class PhoneNumber extends AbstractTransientModel
 		this.extension = stripInvalidChars(extension);
 	}
 
+	@JsonIgnore
 	public String getNumberFormattedHL7()
 	{
 		if(number != null && number.length() == 10)
@@ -95,32 +97,35 @@ public class PhoneNumber extends AbstractTransientModel
 		this.setPhoneType(PHONE_TYPE.CELL);
 	}
 
+	@JsonIgnore
 	public boolean isTypeHome()
 	{
 		return (PHONE_TYPE.HOME.equals(this.getPhoneType()));
 	}
+	@JsonIgnore
 	public boolean isTypeWork()
 	{
 		return (PHONE_TYPE.WORK.equals(this.getPhoneType()));
 	}
+	@JsonIgnore
 	public boolean isTypeCell()
 	{
 		return (PHONE_TYPE.CELL.equals(this.getPhoneType()));
 	}
 
-	public static PhoneNumber of(String number)
+	public static PhoneNumberModel of(String number)
 	{
-		return PhoneNumber.of(number, null, false);
+		return PhoneNumberModel.of(number, null, false);
 	}
-	public static PhoneNumber of(String number, String extension)
+	public static PhoneNumberModel of(String number, String extension)
 	{
-		return PhoneNumber.of(number, extension, false);
+		return PhoneNumberModel.of(number, extension, false);
 	}
-	public static PhoneNumber of(String number, String extension, boolean primaryContactNumber)
+	public static PhoneNumberModel of(String number, String extension, boolean primaryContactNumber)
 	{
 		if(number != null)
 		{
-			return new PhoneNumber(number, extension, primaryContactNumber);
+			return new PhoneNumberModel(number, extension, primaryContactNumber);
 		}
 		return null;
 	}

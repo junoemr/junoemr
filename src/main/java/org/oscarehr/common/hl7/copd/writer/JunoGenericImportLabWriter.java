@@ -28,7 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.writer.HL7LabWriter;
 import org.oscarehr.demographic.model.DemographicModel;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.lab.Lab;
 import org.oscarehr.dataMigration.model.lab.LabObservation;
 import org.oscarehr.dataMigration.model.lab.LabObservationResult;
@@ -103,8 +103,8 @@ public class JunoGenericImportLabWriter extends HL7LabWriter
 		terser.set("/.PID-8", demographic.getSexString());
 
 		// phone numbers
-		PhoneNumber homePhone = demographic.getHomePhone();
-		PhoneNumber workPhone = demographic.getWorkPhone();
+		PhoneNumberModel homePhone = demographic.getHomePhone();
+		PhoneNumberModel workPhone = demographic.getWorkPhone();
 		if(homePhone == null)
 		{
 			homePhone = demographic.getCellPhone();

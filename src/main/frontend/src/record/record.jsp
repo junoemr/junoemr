@@ -29,26 +29,26 @@
         <div class="flex-row align-items-center patient-record-header">
             <div class="flex-row align-items-centerflex-item-grow">
                 <h3 class="patient-header-name" ng-cloak>
-                    {{recordCtrl.demographic.lastName}}, {{recordCtrl.demographic.firstName}}
+                    {{recordCtrl.demographic.displayName}}
                     <span ng-show="recordCtrl.demographic.alias">({{recordCtrl.demographic.alias}})</span>
                 </h3>
                 <h5 class="patient-header-info">
 					<span class="patient-header-label">
 						<bean:message key="demographic.patient.context.sex"/>:
 					</span>
-                    {{recordCtrl.demographic.sex}}
+                    {{recordCtrl.demographic.displaySex}}
                     <span class="patient-header-label">
 						<bean:message key="demographic.patient.context.born"/>:
 					</span>
                     {{recordCtrl.demographic.displayDateOfBirth}}
-                    (<span
-                        ng-if="!recordCtrl.isNaN(recordCtrl.demographic.age)">{{recordCtrl.demographic.age}}</span>)
+                    (<span>{{recordCtrl.demographic.displayAge}}</span>)
                 </h5>
-                <span ng-if="recordCtrl.demographic.primaryPhone" class="flex-row">
-				<i class="icon icon-tele-call"></i>
-				<h5 class="patient-header-info">
-					{{recordCtrl.demographic.primaryPhone}}
-				</h5></span>
+                <div ng-if="recordCtrl.demographic.primaryPhone" class="flex-row">
+                    <i class="icon icon-tele-call"></i>
+                    <h5 class="patient-header-info">
+                        {{recordCtrl.demographic.primaryPhone.formattedForDisplay}}
+                    </h5>
+                </div>
                 <div ng-if="recordCtrl.canMHACallPatient"
                      class="flex-item-grow flex-row justify-content-end p-8">
                     <juno-button title="Call patient through the MHA app"
