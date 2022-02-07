@@ -24,32 +24,37 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.junoUtil.AppointmentUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
+import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties.Web;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import oscar.util.ConversionUtils;
 
 import static integration.tests.AddPatientsIT.mom;
 import static integration.tests.AddPatientsIT.momFullNameJUNO;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
+import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-
 public class ChangeAppointmentStatusIT extends SeleniumTestBase
 {
 	String statusExpectedTD = "To Do";
@@ -66,7 +71,7 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 			"measurementType", "mygroup", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
 			"provider_billing", "providerArchive", "providerbillcenter", "ProviderPreference", "providersite",
 			"rschedule", "secUserRole", "scheduledate", "scheduletemplate", "scheduletemplatecode", "site",
-			"tickler_text_suggest"
+			"tickler_text_suggest", "provider_recent_demographic_access"
 		};
 	}
 
@@ -81,7 +86,7 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 
 	public static String apptStatusHoverOver()
 	{
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.className("apptStatus")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.className("apptStatus")));
 		WebElement statusButton = driver.findElement(By.className("apptStatus"));
 		Actions builder = new Actions(driver);
 		builder.clickAndHold().moveToElement(statusButton);
@@ -117,8 +122,9 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 
 		//Edit from "Edit An Appointment" page
 		Set<String> oldWindowHandles = driver.getWindowHandles();
-		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='status']"), "b");//Customized 2
+		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles,
+			webDriverWait);
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='status']"), "b");//Customized 2
 		driver.findElement(By.id("updateButton")).click();
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
@@ -131,7 +137,10 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 			throws InterruptedException
 	{
 		// Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
-		driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
+		String viewNextDaySelector = "//img[@alt='View Next DAY']";
+		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath(viewNextDaySelector)));
+		driver.findElement(By.xpath(viewNextDaySelector)).click();
+
 		String currWindowHandle = driver.getWindowHandle();
 		AddAppointmentsIT addAppointmentsTests = new AddAppointmentsIT();
 		addAppointmentsTests.addAppointmentsSchedulePage("10:00", currWindowHandle, mom.firstName);
@@ -139,26 +148,26 @@ public class ChangeAppointmentStatusIT extends SeleniumTestBase
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
-		accessSectionJUNOUI(driver, "Schedule");
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
-		driver.findElement(By.xpath("//button[@title='Next Day']")).click();
-		driver.findElement(By.xpath("//button[@title='Next Day']")).click();
-		Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));
-		providerDropDown.selectByVisibleText("oscardoc, doctor");
+		accessSectionJUNOUI(driver, webDriverWait, "Schedule");
+
+		AppointmentUtil.skipTwoDaysJUNOUI(driver, webDriverWait);
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("schedule-select"), "oscardoc, doctor");
+
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//i[@class='icon icon-status onclick-event-status icon-starbill rotate']")));
 		WebElement statusButton = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-starbill rotate']"));
 		String statusTD = statusButton.getAttribute("title");
 		Assert.assertEquals("Status is NOT To Do", statusExpectedTD, statusTD);
 
 		//Edit by clicking the status button from Schedule page
 		statusButton.click();
-		Thread.sleep(3000);//wait for clicking to change the status.
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//i[@class='icon icon-status onclick-event-status icon-todo rotate']")));
 		String statusDP = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-todo rotate']"))
 				.getAttribute("title");
 		Assert.assertEquals("JUNO UI: Status is NOT updated to Daysheet Printed Successfully", statusExpectedDP, statusDP);
 
 		//Edit from "Modify Appointment" page
 		driver.findElement(By.xpath("//span[contains(., '" + momFullNameJUNO + "')]")).click();
-		dropdownSelectByValue(driver, By.id("input-event-appt-status"), "C");//Cancelled
+		dropdownSelectByValue(driver, webDriverWait, By.id("input-event-appt-status"), "C");//Cancelled
 		driver.findElement(By.xpath("//button[contains(., 'Modify')]")).click();
 		String statusCancelled = driver.findElement(By.xpath("//i[@class='icon icon-status onclick-event-status icon-cancel rotate']"))
 				.getAttribute("title");

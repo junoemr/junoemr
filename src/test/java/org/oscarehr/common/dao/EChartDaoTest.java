@@ -42,9 +42,12 @@ public class EChartDaoTest extends DaoTestFixtures
 	@Autowired
 	protected EChartDao eChartDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("eChart");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"eChart"
+		};
 	}
 
 	@Test

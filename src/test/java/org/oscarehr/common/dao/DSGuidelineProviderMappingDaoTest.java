@@ -48,9 +48,12 @@ public class DSGuidelineProviderMappingDaoTest extends DaoTestFixtures
 	@Autowired
 	protected DSGuidelineProviderMappingDao dsGuidelineProviderMappingDao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("dsGuidelineProviderMap");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"dsGuidelineProviderMap"
+		};
 	}
 	
 	@Test 

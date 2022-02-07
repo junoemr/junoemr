@@ -56,9 +56,12 @@ public class ReportLettersDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("report_letters");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"report_letters"
+		};
 	}
 
 	@Test

@@ -39,6 +39,7 @@ import org.oscarehr.common.dao.ClinicDAO;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.SpringUtils;
+import org.oscarehr.ws.rest.transfer.billing.BCBillingLocationTo1;
 import org.oscarehr.ws.rest.transfer.billing.BCBillingVisitCodeTo1;
 import oscar.OscarProperties;
 
@@ -88,11 +89,18 @@ public class ClinicManageAction extends DispatchAction
 	    SystemPreferenceService systemPreferences = SpringUtils.getBean(SystemPreferenceService.class);
 	    String serviceLocationCode = systemPreferences.getPreferenceValue("service_location_code", "");
         frm.set("clinicServiceLocationCode", serviceLocationCode);
+		
+		String visitLocationCode = systemPreferences.getPreferenceValue("visit_location", "");
+		frm.set("clinicVisitLocationCode", visitLocationCode);
         
 	    BillingBCDao billingBCDao = SpringUtils.getBean(BillingBCDao.class);
 	    List<Object[]> rawBCServiceCodes = billingBCDao.findBillingVisits(BillingServiceDao.BC);
 	    List<BCBillingVisitCodeTo1> bcServiceCodes = BCBillingVisitCodeTo1.fromList(rawBCServiceCodes);
 	    request.setAttribute("serviceLocationCodes", bcServiceCodes);
+
+		List<Object[]> rawBCLocationCodes = billingBCDao.findBillingLocations(BillingServiceDao.BC);
+		List<BCBillingLocationTo1> bcLocationCodes = BCBillingLocationTo1.fromList(rawBCLocationCodes);
+		request.setAttribute("visitLocationCodes", bcLocationCodes);
         
         request.setAttribute("clinicForm", form);
         request.setAttribute("hasCustomBillingAddress", hasCustomBillingAddress);
@@ -160,9 +168,13 @@ public class ClinicManageAction extends DispatchAction
         
         if (OscarProperties.getInstance().isBritishColumbiaInstanceType())
         {
-	        String bcServiceLocationCode = StringUtils.trimToNull(request.getParameter("clinicServiceLocationCode"));
-	        SystemPreferenceService systemPreferences = SpringUtils.getBean(SystemPreferenceService.class);
+			SystemPreferenceService systemPreferences = SpringUtils.getBean(SystemPreferenceService.class);
+	        
+			String bcServiceLocationCode = StringUtils.trimToNull(request.getParameter("clinicServiceLocationCode"));
 	        systemPreferences.setPreferenceValue("service_location_code", bcServiceLocationCode);
+
+			String bcVisitLocationCode = StringUtils.trimToNull(request.getParameter("clinicVisitLocationCode"));
+			systemPreferences.setPreferenceValue("visit_location", bcVisitLocationCode);
         }
 
         request.setAttribute("updateSuccess", "Updated Successfully");

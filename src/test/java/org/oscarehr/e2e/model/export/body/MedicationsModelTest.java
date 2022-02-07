@@ -31,8 +31,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.II;
 import org.marc.everest.datatypes.generic.CD;
 import org.marc.everest.datatypes.generic.SET;
@@ -46,7 +47,11 @@ import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.export.AbstractExportModelTest;
 import org.oscarehr.e2e.util.EverestUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class MedicationsModelTest extends AbstractExportModelTest {
 	public static DrugDao dao;
 	public static Drug drug;
@@ -55,8 +60,8 @@ public class MedicationsModelTest extends AbstractExportModelTest {
 	public static Drug nullDrug;
 	public static MedicationsModel nullMedicationsModel;
 
-	@BeforeClass
-	public static void beforeClass() {
+	@Before
+	public void beforeClass() {
 		dao = SpringUtils.getBean(DrugDao.class);
 		drug = dao.findByDemographicId(Constants.Runtime.VALID_DEMOGRAPHIC).get(0);
 		medicationsModel = new MedicationsModel(drug);

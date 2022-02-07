@@ -45,9 +45,12 @@ public class BillingBCDaoTest extends DaoTestFixtures
 	@Autowired
 	public BillingBCDao dao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billing", "ctl_billingservice", "billingservice", "billinglocation", "billingvisit", "wcb_side");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billing", "ctl_billingservice", "billingservice", "billinglocation", "billingvisit", "wcb_side"
+		};
 	}
 
 	@Test

@@ -41,7 +41,11 @@ import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
 public class IHAHandler extends ORU_R01MessageHandler
 {
-    
+	protected enum SendingApplicationType
+	{
+		OE, RAD, LAB
+	}
+
     Logger logger = Logger.getLogger(IHAHandler.class);
     protected Message msg = null;
     protected ArrayList<ArrayList<Segment>> obrGroups = null;
@@ -123,9 +127,9 @@ public class IHAHandler extends ORU_R01MessageHandler
     public String getMsgPriority(){
         return("");
     }
-    /*
-     *  MSH METHODS
-     */
+
+    /* ===================================== MSH ====================================== */
+
     
     @Override
     public String getMsgDate(){
@@ -138,32 +142,18 @@ public class IHAHandler extends ORU_R01MessageHandler
         }
     }
 
-        /*
-     *  PID METHODS
-     */
+    @Override
+    public String getPatientLocation()
+    {
+	    return (getString(get("/.MSH-4-1")));
+    }
+
+    /* ===================================== PID ====================================== */
+
     @Override
     public String getPatientName(){
         return(getFirstName()+" "+getLastName());
     }
-    
-/*    @Override
-    public String getFirstName(){
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getGivenName().getValue()));
-    }
-    
-    @Override
-    public String getLastName(){
-        return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientName().getFamilyName().getValue()));
-    }
-    
-    @Override
-    public String getDOB(){
-        try{
-            return(formatDateTime(getString(msg.getRESPONSE().getPATIENT().getPID().getDateOfBirth().getTimeOfAnEvent().getValue())).substring(0, 10));
-        }catch(Exception e){
-            return("");
-        }
-    }*/
 
     public String getAdmittingProviderMnemonic(){
         try {
@@ -286,42 +276,26 @@ public class IHAHandler extends ORU_R01MessageHandler
             return("");
         }
     }
-    
+
     @Override
-    public String getPatientLocation(){
-        try{
-            return(getString(terser.get("/.MSH-4-1")));
-        }catch(Exception e){
-            return("");
-        }
+    public String getAccessionNum()
+    {
+		String accessionNo = get("/.OBR-18-1");
+		if(StringUtils.isBlank(accessionNo))
+		{
+			accessionNo = get("/.OBR-3-1");
+		}
+		return accessionNo;
     }
 
-    /*@Override
-    public String getPatientLocation(){
-        return(getString(msg.getMSH().getSendingFacility().getNamespaceID().getValue()));
-    }*/
-    
-    /*
-     *  OBC METHODS
-     */
     @Override
-    public String getAccessionNum(){
-        try{
-            return (getString(terser.get("/.ORC-3-1")));
-        }catch(Exception e){
-            logger.error("Could not return accession number", e);
-            return("");
-        }
+    public String getFillerOrderNumber()
+    {
+		// use lab date with code to identify a unique version
+		return getString(get("/.OBR-7")) + getString(get("/.OBR-25"));
     }
-    
-    /*
-     *  OBR METHODS
-     */
-    
-    /*@Override
-    public int getOBRCount(){
-        return(msg.getRESPONSE().getORDER_OBSERVATIONReps());
-    }*/
+
+    /* ===================================== OBR ====================================== */
     
     /**
      *  Methods to get information about the Observation Request
@@ -350,14 +324,29 @@ public class IHAHandler extends ORU_R01MessageHandler
             return(i-1);
         }
     }
-    
-    private String getSendingApplication() {
-    	try {
-    	return(getString(terser.get("/.MSH-3-1")));
-        }catch(Exception e){
-            return("");
-        }
-    }
+
+	/**
+	 * First 3 characters are the authority ID (IHA = Interior Health Authority), last 2 characters are the sending application
+	 * @return the string value of the field
+	 */
+	private String getSendingApplication()
+	{
+		return getString(get("/.MSH-3-1"));
+	}
+
+	/**
+	 * First 3 characters are the authority ID (IHA = Interior Health Authority), last 2 characters are the sending application
+	 * @return last characters as an enum type, or null if segment is empty
+	 */
+	private SendingApplicationType getSendingApplicationType()
+	{
+		String sendingApplication = getSendingApplication();
+		if(sendingApplication.length() > 3)
+		{
+			return SendingApplicationType.valueOf(sendingApplication.substring(3));
+		}
+		throw new IllegalStateException("Unknown sending application type: " + sendingApplication);
+	}
     
     private String getReceivingApplication() {
     	try {
@@ -420,15 +409,6 @@ public class IHAHandler extends ORU_R01MessageHandler
         }
     }
     
-    /*()@Override
-    public String getOBRComment(int i, int j){
-        try {
-            return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getNTE(j).getComment(0).getValue()));
-        } catch (Exception e) {
-            return("");
-        }
-    }*/
-    
     @Override
     public String getOBRComment(int i, int j){
         
@@ -446,16 +426,6 @@ public class IHAHandler extends ORU_R01MessageHandler
             return("");
         }
     }
-    
-    /*@Override
-    public String getServiceDate(){
-        try{
-            return(formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getObservationDateTime().getTimeOfAnEvent().getValue())));
-            //return(formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getObservationDateTime().getTimeOfAnEvent().getValue())));
-        }catch(Exception e){
-            return("");
-        }
-    }*/
     
     @Override
     public String getServiceDate(){
@@ -486,19 +456,6 @@ public class IHAHandler extends ORU_R01MessageHandler
         }
     }
     
-    /*@Override
-    public String getOrderStatus(){
-        try{
-	        return(getString(terser.get("/.OBR-7-1")));
-        	String header = getObservationHeader(0,0);
-        	if(header.equalsIgnoreCase("RAD"))
-        		return "F";
-            return(getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultStatus().getValue()));
-        }catch(Exception e){
-            return("");
-        }
-    }*/
-    
     @Override
     public String getOrderStatus(){
         try{
@@ -507,27 +464,6 @@ public class IHAHandler extends ORU_R01MessageHandler
             return("");
         }
     }
-
-    /*@Override
-    public String getClientRef(){
-        String docNum = null;
-        int i=0;
-        try{
-            while(!getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue()).equals("")){
-                if (i==0){
-                    docNum = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue());
-                }else{
-                    docNum = docNum + ", " + getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i).getIDNumber().getValue());
-                }
-                i++;
-            }
-            return(docNum);
-        }catch(Exception e){
-            logger.error("Could not return doctor id numbers", e);
-            
-            return("");
-        }
-    }*/
     
     @Override
     public String getClientRef(){
@@ -538,27 +474,6 @@ public class IHAHandler extends ORU_R01MessageHandler
         }
     }
 
-   /* @Override
-    public String getDocName(){
-        String temp=null,docName = null;
-        int i=0;
-        try{
-            while((temp=getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(i)))!=null && !temp.equals("")){
-                if (i==0){
-                    docName = temp;
-                }else{
-                    docName = docName + ", " + temp;
-                }
-                i++;
-            }
-            return(docName);
-        }catch(Exception e){
-            logger.error("Could not return doctor names", e);
-            
-            return("");
-        }
-    }*/
-    
     public String getDocName(){
         try{
             return(getFullDocName("/.OBR-16-"));
@@ -567,27 +482,6 @@ public class IHAHandler extends ORU_R01MessageHandler
         }
     }
 
-    /*@Override
-    public String getCCDocs(){
-        String temp=null,docName = null;
-        int i=0;
-        try{
-            while((temp=getFullDocName(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i)))!=null && !temp.equals("")){
-                if (i==0){
-                    docName = temp;
-                }else{
-                    docName = docName + ", " + temp;
-                }
-                i++;
-            }
-            return(docName);
-        }catch(Exception e){
-            logger.error("Could not return cc'ed doctors", e);
-            
-            return("");
-        }
-    }*/
-    
     @Override
     public String getCCDocs(){
         
@@ -608,30 +502,6 @@ public class IHAHandler extends ORU_R01MessageHandler
             return("");
         }
     }
-
-    /*@Override
-    public ArrayList<String> getDocNums(){
-        ArrayList<String> docNums = new ArrayList<String>();
-        String id;
-        int i;
-        
-        try{
-            String providerId = msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getOrderingProvider(0).getIDNumber().getValue();
-            docNums.add(providerId);
-            
-            i=0;
-            while((id = msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getResultCopiesTo(i).getIDNumber().getValue()) != null){
-                if (!id.equals(providerId))
-                    docNums.add(id);
-                i++;
-            }
-        }catch(Exception e){
-            logger.error("Could not return doctor nums", e);
-            
-        }
-        
-        return(docNums);
-    }*/
     
     @Override
     public ArrayList<String> getDocNums(){
@@ -686,44 +556,14 @@ public class IHAHandler extends ORU_R01MessageHandler
 
         return mnemonicList;
     }
-    
-    /*
-     *  OBX METHODS
-     */
-    /*@Override
-    public int getOBXCount(int i){
-        int count = 0;
-        try{
-            count = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATIONReps();
-            // if count is 1 there may only be an nte segment and no obx segments so check
-            if (count == 1){
-                String test = msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(0).getOBX().getObservationIdentifier().getText().getValue();
-                logger.info("name: "+test);
-                if (test == null)
-                    count = 0;
-            }
-        }catch(Exception e){
-            logger.error("Error retrieving obx count", e);
-            count = 0;
-        }
-        return count;
-    }*/
+
+    /* ===================================== OBX ====================================== */
     
     @Override
     public int getOBXCount(int i){
         ArrayList<Segment> obxSegs = obrGroups.get(i);
         return(obxSegs.size());
     }
-    
-    /*@Override
-    public String getOBXIdentifier(int i, int j){
-        try{
-        	String test = getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getIdentifier().getValue());
-            return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getIdentifier().getValue()));
-        }catch(Exception e){
-            return("");
-        }
-    }*/
     
     @Override
     public String getOBXIdentifier(int i, int j){
@@ -764,16 +604,6 @@ public class IHAHandler extends ORU_R01MessageHandler
         }
     }
 
-    /*@Override
-    public String getOBXName(int i, int j){
-        try{
-        	String test = getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getText().getValue());
-            return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservationIdentifier().getText().getValue()));
-        }catch(Exception e){
-            return("");
-        }
-    }*/
-    
     @Override
     public String getOBXName(int i, int j){
     	int index;
@@ -781,59 +611,21 @@ public class IHAHandler extends ORU_R01MessageHandler
     	if((index=repType.indexOf("OE"))!=-1) return "Narrative Report";
         return(getOBXField(i, j, 3, 0, 2));
     }
-    
-    /*@Override
-    public String getOBXResult(int i, int j){
-        try{
-           String testText = (getString(Terser.get(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(),5,0,1,1)));
-           return (getString(Terser.get(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(),5,0,1,1)));
-           //*return(getString(Terser.get(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX(),5,0,1,1)));
-        }catch(Exception e){
-            return("");
-        }
-    }*/
-    
+
     @Override
     public String getOBXResult(int i, int j){
         return(getOBXField(i, j, 5, 0, 1));
     }
-    
-    /*@Override
-    public String getOBXReferenceRange(int i, int j){
-        try{
-            return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getReferencesRange().getValue()));
-        }catch(Exception e){
-            return("");
-        }
-    }*/
-    
+
     @Override
     public String getOBXReferenceRange(int i, int j){
         return(getOBXField(i, j, 7, 0, 1));
     }
     
-    /*@Override
-    public String getOBXUnits(int i, int j){
-        try{
-            return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getUnits().getIdentifier().getValue()));
-        }catch(Exception e){
-            return("");
-        }
-    }*/
-    
     @Override
     public String getOBXUnits(int i, int j){
         return(getOBXField(i, j, 6, 0, 1));
     }
-    
-    /*@Override
-    public String getOBXResultStatus(int i, int j){
-        try{
-            return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getObservResultStatus().getValue()));
-        }catch(Exception e){
-            return("");
-        }
-    }*/
     
     @Override
     public String getOBXResultStatus(int i, int j){
@@ -866,15 +658,6 @@ public class IHAHandler extends ORU_R01MessageHandler
         return count;
     }
     
-    /*@Override
-    public String getTimeStamp(int i, int j){
-        try{
-            return(formatDateTime(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getDateTimeOfTheObservation().getTimeOfAnEvent().getValue())));
-        }catch(Exception e){
-            return("");
-        }
-    }*/
-    
     @Override
     public String getTimeStamp(int i, int j){
         String timeStamp;
@@ -906,34 +689,11 @@ public class IHAHandler extends ORU_R01MessageHandler
             return(false);
         }
     }
-    
-    /*@Override
-    public String getOBXAbnormalFlag(int i, int j){
-        try{
-            return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getOBX().getAbnormalFlags(0).getValue()));
-        }catch(Exception e){
-            logger.error("Error retrieving obx abnormal flag", e);
-            return("");
-        }
-    }*/
-    
+
     public String getOBXAbnormalFlag(int i, int j){
         return(getOBXField(i, j, 8, 0, 1));
     }
-    
-    /*@Override
-    public int getOBXCommentCount(int i, int j){
-        try {
-            if ( !getOBXComment(i, j, 0).equals("") ){
-                return(1);
-            }else{
-                return(0);
-            }
-        } catch (Exception e) {
-            return(0);
-        }
-    }*/
-    
+
     @Override
     public int getOBXCommentCount(int i, int j){
         // jth obx of the ith obr
@@ -959,16 +719,7 @@ public class IHAHandler extends ORU_R01MessageHandler
         }
         
     }
-    
-    /*@Override
-    public String getOBXComment(int i, int j, int k){
-        try {
-            return(getString(msg.getRESPONSE().getORDER_OBSERVATION(i).getOBSERVATION(j).getNTE(k).getComment(0).getValue()));
-        } catch (Exception e) {
-            return("");
-        }
-    }*/
-    
+
     @Override
     public String getOBXComment(int i, int j, int nteNum){
         
@@ -1066,31 +817,6 @@ public class IHAHandler extends ORU_R01MessageHandler
         return(k);
     }
     
-    /*private String getFullDocName(XCN docSeg){
-        String docName = null;
-        
-        if(docSeg.getPrefixEgDR().getValue() != null)
-            docName = docSeg.getPrefixEgDR().getValue();
-        
-        if(docSeg.getGivenName().getValue() != null){
-            if (docName==null){
-                docName = docSeg.getGivenName().getValue();
-            }else{
-                docName = docName +" "+ docSeg.getGivenName().getValue();
-            }
-        }
-        if(docSeg.getMiddleInitialOrName().getValue() != null)
-            docName = docName +" "+ docSeg.getMiddleInitialOrName().getValue();
-        if(docSeg.getFamilyName().getValue() != null)
-            docName = docName +" "+ docSeg.getFamilyName().getValue();
-        if(docSeg.getSuffixEgJRorIII().getValue() != null)
-            docName = docName +" "+ docSeg.getSuffixEgJRorIII().getValue();
-        if(docSeg.getDegreeEgMD().getValue() != null)
-            docName = docName +" "+ docSeg.getDegreeEgMD().getValue();
-        
-        return (docName);
-    }*/
-    
     private String getFullDocName(String docSeg) throws HL7Exception{
         String docName = "";
         String temp;
@@ -1126,10 +852,7 @@ public class IHAHandler extends ORU_R01MessageHandler
     protected String getString(String retrieve) {
         return super.getString(retrieve).replaceAll("\\\\\\.br\\\\", "<br />");
     }
-    
-    public String getFillerOrderNumber(){
-		return "";
-	}
+
     public String getEncounterId(){
     	return "";
     }

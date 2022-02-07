@@ -51,15 +51,12 @@ public class ScheduleTemplateCodeDaoTest extends DaoTestFixtures {
 	// MySql performs case insensitive matching unless specified using the BINARY keyword
 	// Therefore need to test codes of the same letter, with different cases
 
-	@AfterClass
-	public static void cleanUp() throws Exception
+	@Override
+	protected String[] getTablesToClear()
 	{
-		SchemaUtils.restoreTable(false, "scheduletemplatecode");
-	}
-
-	@Before
-	public void resetTable() throws Exception {
-		SchemaUtils.restoreTable(false, "scheduletemplatecode");
+		return new String[]{
+			"scheduletemplatecode"
+		};
 	}
 
 	@Test

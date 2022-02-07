@@ -29,37 +29,53 @@ import static org.junit.Assert.assertNull;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.ResourceStorage;
 import org.oscarehr.e2e.constant.Constants;
+import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class E2ECreatorTest {
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class E2ECreatorTest extends DaoTestFixtures
+{
 	private static Logger logger = MiscUtils.getLogger();
 
+	@Autowired
 	protected DemographicDao demographicDao = null;
 	Demographic demographic = null;
 
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"demographic", "lst_gender", "admission",
+			"demographic_merged", "program", "health_safety", "provider", "providersite",
+			"site", "program_team","log", "Facility","demographicExt", "issue",
+			"casemgmt_issue", "ResourceStorage", "clinic",
+			"casemgmt_note", "preventions", "patientLabRouting", "drugs", "dxresearch",
+			"allergies", "measurements", "secRole"
+		};
+	}
+
 	@Before
-	public void before() throws Exception {
-		if(!SchemaUtils.inited) {
+	public void before() throws Exception
+	{
+		if(!SchemaUtils.inited)
+		{
 			logger.info("dropAndRecreateDatabase");
 			SchemaUtils.dropAndRecreateDatabase();
 		}
-		DaoTestFixtures.setupBeanFactory();
-		SchemaUtils.restoreTable("demographic", "lst_gender", "admission",
-				"demographic_merged", "program", "health_safety", "provider", "providersite",
-				"site", "program_team","log", "Facility","demographicExt", "issue",
-				"casemgmt_issue", "ResourceStorage", "clinic",
-				"casemgmt_note", "preventions", "patientLabRouting", "drugs", "dxresearch",
-				"allergies", "measurements", "secRole");
-		demographicDao = SpringUtils.getBean(DemographicDao.class);
+		//DaoTestFixtures.setupBeanFactory();
+		//demographicDao = SpringUtils.getBean(DemographicDao.class);
 
 		demographic = new Demographic();
 		EntityDataGenerator.generateTestDataForModelClass(demographic);

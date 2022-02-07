@@ -46,9 +46,12 @@ public class CaisiAccessTypeDaoTest extends DaoTestFixtures
 	@Autowired
 	protected CaisiAccessTypeDao caisiAccessTypeDao;
 
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("access_type");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"access_type"
+		};
 	}
 	
 	@Test

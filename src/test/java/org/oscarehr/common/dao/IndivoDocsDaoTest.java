@@ -38,9 +38,12 @@ public class IndivoDocsDaoTest extends DaoTestFixtures
 	@Autowired
 	protected IndivoDocsDao indivoDocsDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("indivoDocs");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"indivoDocs"
+		};
 	}
 	
 	@Test

@@ -75,15 +75,15 @@ public class HrmDocumentDbToModelConverter extends
 			throw new RuntimeException("Missing HRM Document File", e);
 		}
 
-		hrmDocument.setMatchingData(getHashData(input));
-		hrmDocument.setObservations(getObservations(input.getObservationList()));
-		hrmDocument.setComments(getComments(input.getCommentList()));
-		hrmDocument.setCategory(getCategory(input.getHrmCategory()));
+		hrmDocument.setMatchingData(convertDocumentMatchingData(input));
+		hrmDocument.setObservations(convertObservations(input.getObservationList()));
+		hrmDocument.setComments(convertComments(input.getCommentList()));
+		hrmDocument.setCategory(convertCategory(input.getHrmCategory()));
 
 		return hrmDocument;
 	}
 
-	protected HrmDocumentMatchingData getHashData(HRMDocument input)
+	protected HrmDocumentMatchingData convertDocumentMatchingData(HRMDocument input)
 	{
 		HrmDocumentMatchingData hashData = new HrmDocumentMatchingData();
 		hashData.setReportHash(input.getReportHash());
@@ -94,7 +94,7 @@ public class HrmDocumentDbToModelConverter extends
 		return hashData;
 	}
 
-	protected List<HrmObservation> getObservations(List<HRMObservation> subClassList)
+	protected List<HrmObservation> convertObservations(List<HRMObservation> subClassList)
 	{
 		List<HrmObservation> observations = new ArrayList<>(subClassList.size());
 
@@ -112,7 +112,7 @@ public class HrmDocumentDbToModelConverter extends
 		return observations;
 	}
 
-	protected List<HrmComment> getComments(List<HRMDocumentComment> commentList)
+	protected List<HrmComment> convertComments(List<HRMDocumentComment> commentList)
 	{
 		List<HrmComment> comments = new ArrayList<>(commentList.size());
 		for(HRMDocumentComment hrmComment : commentList)
@@ -127,7 +127,7 @@ public class HrmDocumentDbToModelConverter extends
 		return comments;
 	}
 
-	protected HrmCategoryModel getCategory(HRMCategory hrmCategory)
+	protected HrmCategoryModel convertCategory(HRMCategory hrmCategory)
 	{
 		HrmCategoryModel category = null;
 		if(hrmCategory != null)

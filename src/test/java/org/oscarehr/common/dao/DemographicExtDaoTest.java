@@ -53,11 +53,13 @@ public class DemographicExtDaoTest extends DaoTestFixtures
 
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("demographicExt");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"demographicExt"
+		};
 	}
-
 
 	@Test
 	public void testCreate() throws Exception {

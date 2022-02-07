@@ -53,9 +53,12 @@ public class AppointmentArchiveDaoTest extends DaoTestFixtures
 	public AppointmentArchiveDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("appointmentArchive", "appointment");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"appointmentArchive", "appointment"
+		};
 	}
 
 	@Test

@@ -49,17 +49,12 @@ public class CtlDocTypeDaoTest extends DaoTestFixtures
 	private final String lower = "mydocuments";
 	private final String upper = "MyDocuments";
 
-	@Before
-	public void setup() throws Exception
+	@Override
+	protected String[] getTablesToRestore()
 	{
-		// ctl_doctype_maventest table comes initialized with 9 demographic doctypes and 8 provider doctypes
-		SchemaUtils.restoreTable("ctl_doctype");
-	}
-
-	@AfterClass
-	public static void restore() throws Exception
-	{
-		SchemaUtils.restoreTable("ctl_doctype");
+		return new String[]{
+			"ctl_doctype"
+		};
 	}
 
 	@Test

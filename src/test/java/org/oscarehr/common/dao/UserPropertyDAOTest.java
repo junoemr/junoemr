@@ -55,9 +55,12 @@ public class UserPropertyDAOTest extends DaoTestFixtures
 	@Autowired
 	protected UserPropertyDAO userPropertyDAO;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("property");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"property"
+		};
 	}
 
 	@Test

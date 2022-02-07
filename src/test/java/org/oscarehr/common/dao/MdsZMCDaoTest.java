@@ -38,9 +38,11 @@ public class MdsZMCDaoTest extends DaoTestFixtures
 	@Autowired
 	protected MdsZMCDao mdsZMCDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("mdsZMC");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"mdsZMC"
+		};
 	}
-
 }

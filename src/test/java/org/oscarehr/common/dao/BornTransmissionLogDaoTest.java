@@ -47,9 +47,12 @@ public class BornTransmissionLogDaoTest extends DaoTestFixtures
 	public BornTransmissionLogDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("BornTransmissionLog");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"BornTransmissionLog"
+		};
 	}
 
 	@Test

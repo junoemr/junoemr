@@ -42,10 +42,12 @@ public class ReportFilterDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ReportFilterDao reportFilterDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("reportFilter");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"reportFilter"
+		};
 	}
 
 	@Test

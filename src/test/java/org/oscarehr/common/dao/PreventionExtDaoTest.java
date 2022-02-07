@@ -60,9 +60,12 @@ public class PreventionExtDaoTest extends DaoTestFixtures
 	@Autowired
 	protected PreventionExtDao preventionExtDao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("preventionsExt", "preventions");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"preventionsExt", "preventions"
+		};
 	}
 
 	@Test

@@ -52,9 +52,12 @@ public class ProviderLabRoutingFavoritesDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ProviderLabRoutingFavoritesDao providerLabRoutingFavoritesDao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("providerLabRoutingFavorites");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"providerLabRoutingFavorites"
+		};
 	}
 
 	@Test

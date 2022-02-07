@@ -50,9 +50,12 @@ public class ProviderInboxRoutingDaoTest extends DaoTestFixtures
 	public ProviderInboxRoutingDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("providerLabRouting", "incomingLabRules","table_modification");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"providerLabRouting", "incomingLabRules","table_modification"
+		};
 	}
 
 	@Test

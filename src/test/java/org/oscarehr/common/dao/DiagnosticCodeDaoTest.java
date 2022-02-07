@@ -48,10 +48,12 @@ public class DiagnosticCodeDaoTest extends DaoTestFixtures
 	public DiagnosticCodeDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("diagnosticcode","ctl_diagcode");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"diagnosticcode","ctl_diagcode"
+		};
 	}
 
 	@Test

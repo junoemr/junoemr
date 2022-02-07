@@ -68,16 +68,16 @@ public class HRMUtil {
 			
 			
 			HRMReport report = HRMReportParser.parseReport(hrmDocument.getReportFile(), hrmDocument.getReportFileSchemaVersion());
-			if (report.getFirstReportClass().equalsIgnoreCase("Diagnostic Imaging Report") || report.getFirstReportClass().equalsIgnoreCase("Cardio Respiratory Report")) {
+			if (report.getClassName().equalsIgnoreCase("Diagnostic Imaging Report") || report.getClassName().equalsIgnoreCase("Cardio Respiratory Report")) {
 				// We'll only care about the first one, as long as there is at least one
 				if (subClassList != null && subClassList.size() > 0) {
 					HRMObservation firstSubClass = subClassList.get(0);
-					thisReportSubClassMapping = hrmSubClassDao.findApplicableSubClassMapping(report.getFirstReportClass(), firstSubClass.getAccompanyingSubClassName(), firstSubClass.getAccompanyingSubClassMnemonic(), report.getSendingFacilityId());
+					thisReportSubClassMapping = hrmSubClassDao.findApplicableSubClassMapping(report.getClassName(), firstSubClass.getAccompanyingSubClassName(), firstSubClass.getAccompanyingSubClassMnemonic(), report.getSendingFacilityId());
 				}
 			} else {
 				// Medical records report
-				String[] reportSubClass = report.getFirstReportSubClass().split("\\^");
-				thisReportSubClassMapping = hrmSubClassDao.findApplicableSubClassMapping(report.getFirstReportClass(), reportSubClass[0], null, report.getSendingFacilityId());
+				String[] reportSubClass = report.getSubClassName().split("\\^");
+				thisReportSubClassMapping = hrmSubClassDao.findApplicableSubClassMapping(report.getClassName(), reportSubClass[0], null, report.getSendingFacilityId());
 			}
 			
 			if (thisReportSubClassMapping != null) {

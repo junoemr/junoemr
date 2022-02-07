@@ -51,7 +51,14 @@ public class MeasurementGroupStyleDaoTest extends DaoTestFixtures
 
 	@Before
 	public void before() throws Exception {
-		SchemaUtils.restoreTable("measurementGroupStyle");
+		SchemaUtils.restoreTable();
+	}
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"measurementGroupStyle"
+		};
 	}
 
 	@Test

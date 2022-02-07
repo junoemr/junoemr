@@ -52,9 +52,6 @@ import java.util.Optional;
 public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3, HrmDocument>
 {
 	@Autowired
-	private HRMReportDocumentMapper documentMapper;
-	
-	@Autowired
 	private ClinicAidService clinicAidService;
 
 	@Autowired
@@ -131,8 +128,6 @@ public class HRMReportImportMapper extends AbstractHRMImportMapper<HRMReport_4_3
 			model.setDescription(model.getReportClass().getValue());
 		}
 
-
-		model.setDocument(documentMapper.importToJuno(importStructure));
 		model.setReportFile(FileFactory.getExistingFile(importStructure.getFileLocation()));
 
 		model.setMatchingData(createMatchingData(FileUtils.getStringFromFile(model.getReportFile().getFileObject())));

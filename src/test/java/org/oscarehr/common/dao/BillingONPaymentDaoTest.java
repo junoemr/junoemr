@@ -59,10 +59,12 @@ public class BillingONPaymentDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billing_on_payment", "billing_on_cheader1","billing_on_ext", "billing_payment_type");
-
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billing_on_payment", "billing_on_cheader1","billing_on_ext", "billing_payment_type"
+		};
 	}
 
 	@Test

@@ -21,44 +21,110 @@
  * Canada
  */
 
-import {JUNO_STYLE, } from "../../../../../common/components/junoComponentConstants";;
+import {JUNO_STYLE, LABEL_POSITION, JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../../../../../common/components/junoComponentConstants";
+import HrmUserSettings from "../../../../../lib/integration/hrm/model/HrmUserSettings"
 import SystemPreferenceService from "../../../../../lib/system/service/SystemPreferenceService";
+import ToastService from "../../../../../lib/alerts/service/ToastService";
+import {SecurityPermissions} from "../../../../../common/security/securityConstants";
 
 angular.module('Admin.Section').component('hrmSettings',
 	{
 		templateUrl: 'src/admin/section/hrm/components/settings/HRMSettings.jsp',
 		bindings: {},
-		controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$uibModal', function ($scope, $http, $httpParamSerializer, $state, $uibModal)
-		{
-			let ctrl = this;
-			let systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
+		controller: ['$scope', '$http', '$httpParamSerializer', 'securityRolesService',
+			function ($scope, $http, $httpParamSerializer, securityRolesService)
+			{
+				let ctrl = this;
+				const systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
+				const toastService = new ToastService();
 
-			ctrl.user = "";
-			ctrl.address = "";
-			ctrl.port = "";
-			ctrl.remotePath = "";
-			ctrl.interval = 0;
-			ctrl.working = false;
-			ctrl.latestResults = null;
 
-			ctrl.$onInit = async () => {
-				ctrl.COMPONENT_STYLE = ctrl.COMPONENT_STYLE || JUNO_STYLE.DEFAULT;
+				ctrl.userSettings = new HrmUserSettings();
+				ctrl.orginalSettings = new HrmUserSettings();
 
-				let propertyValues = await systemPreferenceService.getProperties(
-					"omd.hrm.user",
-					"omd.hrm.address",
-					"omd.hrm.port",
-					"omd.hrm.remote_path",
-					"omd.hrm.poll_interval_sec"
-				);
+				ctrl.isWorking = false;
+				ctrl.isReadOnly = true;
 
-				ctrl.user = propertyValues["omd.hrm.user"];
-				ctrl.address = propertyValues["omd.hrm.address"];
-				ctrl.port = propertyValues["omd.hrm.port"];
-				ctrl.remotePath = "/" + propertyValues["omd.hrm.remote_path"];
-				ctrl.interval = (parseInt(propertyValues["omd.hrm.poll_interval_sec"]))/60;
+				ctrl.USERNAME_KEY = "omd.hrm.user";
+				ctrl.MAILBOX_ADDRESS_KEY = "omd.hrm.address";
+				ctrl.REMOTE_PATH_KEY = "omd.hrm.remote_path";
+				ctrl.PORT_KEY = "omd.hrm.port";
 
-				$scope.$apply();
-			};
-		}]
+				ctrl.LABEL_POSITION = LABEL_POSITION.TOP;
+				ctrl.COMPONENT_STYLE = JUNO_STYLE.DEFAULT;
+				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+
+				ctrl.canEdit = () =>
+				{
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.HrmUpdate);
+				}
+
+				ctrl.$onInit = async () =>
+				{
+					ctrl.COMPONENT_STYLE = ctrl.COMPONENT_STYLE || JUNO_STYLE.DEFAULT;
+					await ctrl.fetchUserSettings();
+					$scope.$apply();
+				};
+
+				ctrl.onEdit = () =>
+				{
+					ctrl.originalSettings = angular.copy(ctrl.userSettings)
+					ctrl.isReadOnly = false;
+				}
+
+				ctrl.onCancel = () =>
+				{
+					ctrl.userSettings = angular.copy(ctrl.originalSettings);
+					ctrl.isReadOnly = true;
+					$scope.$apply();
+				}
+
+				ctrl.onSave = async () =>
+				{
+					ctrl.isWorking = true;
+
+					try
+					{
+						await Promise.all([
+							systemPreferenceService.setPreference(ctrl.USERNAME_KEY, ctrl.userSettings.userName),
+							systemPreferenceService.setPreference(ctrl.MAILBOX_ADDRESS_KEY, ctrl.userSettings.mailBoxAddress),
+							systemPreferenceService.setPreference(ctrl.REMOTE_PATH_KEY, ctrl.userSettings.remotePath),
+							systemPreferenceService.setPreference(ctrl.PORT_KEY, ctrl.userSettings.port)
+						]);
+
+						toastService.successToast("HRM settings updated");
+					}
+					catch(err)
+					{
+						toastService.errorToast("There was an error updating your HRM settings");
+					}
+					finally
+					{
+						// Refresh values based on the only source of truth, which is the backend.
+						await ctrl.fetchUserSettings();
+						ctrl.isReadOnly = true;
+						ctrl.isWorking = false;
+						$scope.$apply();
+					}
+				}
+
+				ctrl.fetchUserSettings = async() =>
+				{
+					let propertyValues = await systemPreferenceService.getPreferences(
+						ctrl.USERNAME_KEY,
+						ctrl.MAILBOX_ADDRESS_KEY,
+						ctrl.REMOTE_PATH_KEY,
+						ctrl.PORT_KEY,
+					);
+
+					let settings = new HrmUserSettings();
+					settings.userName = propertyValues[ctrl.USERNAME_KEY];
+					settings.mailBoxAddress = propertyValues[ctrl.MAILBOX_ADDRESS_KEY];
+					settings.remotePath = propertyValues[ctrl.REMOTE_PATH_KEY];
+					settings.port = propertyValues[ctrl.PORT_KEY];
+
+					ctrl.userSettings = settings;
+				}
+			}]
 	});

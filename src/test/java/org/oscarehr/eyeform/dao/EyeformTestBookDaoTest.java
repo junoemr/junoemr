@@ -43,10 +43,12 @@ public class EyeformTestBookDaoTest extends DaoTestFixtures
 	@Autowired
 	public EyeformTestBookDao eyeformTestBookDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("EyeformTestBook");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"EyeformTestBook"
+		};
 	}
 
 	@Test

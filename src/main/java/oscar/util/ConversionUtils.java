@@ -72,6 +72,7 @@ public class ConversionUtils {
 	public static final String DATE_PATTERN_DAY = "dd";
 
 	public static final String DEFAULT_DATE_PATTERN = "yyyy-MM-dd";
+	public static final String DEFAULT_DATE_PATTERN_NO_DELIMITER = "yyyyMMdd";
 	public static final String DEFAULT_TIME_PATTERN = "HH:mm:ss";
 	public static final String TIME_PATTERN_NO_SEC = "HH:mm";
 	public static final String DEFAULT_TS_PATTERN = "yyyy-MM-dd HH:mm:ss";
@@ -83,7 +84,7 @@ public class ConversionUtils {
 
 	public static final String HL7_V2_DATE_TIME_OFFICIAL_PATTERN = "yyyyMMddHHmmssX";
 	public static final String HL7_DATE_TIME_DEFAULT_IN_PATTERN = "yyyyMMddHHmmss";
-	public static final String HL7_DATE_FORMAT = "yyyyMMdd";
+	public static final String HL7_DATE_FORMAT = DEFAULT_DATE_PATTERN_NO_DELIMITER;
 
 	public static final String TS_NO_SEC_PATTERN = "yyyy-MM-dd HH:mm";
 

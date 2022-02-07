@@ -26,6 +26,19 @@ package oscar.oscarEncounter.pageUtil;
 
 import com.quatro.dao.security.SecroleDao;
 import com.quatro.model.security.Secrole;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -61,21 +74,6 @@ import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.util.DateUtils;
 import oscar.util.UtilDateUtilities;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
 
 public class EctIncomingEncounterAction extends Action {
 
@@ -259,28 +257,7 @@ public class EctIncomingEncounterAction extends Action {
 
 		}
 
-		if(
-			OscarProperties.getInstance().isJunoEncounterEnabled() && (
-				request.getParameter("old_encounter") == null ||
-				!request.getParameter("old_encounter").equals("1")
-			)
-		)
-		{
-			return (mapping.findForward("junoEncounter"));
-		}
-
-		ArrayList newDocArr = (ArrayList) request.getSession().getServletContext().getAttribute("newDocArr");
-		Boolean useNewEchart = (Boolean) request.getSession().getServletContext().getAttribute("useNewEchart");
-                
-		String proNo = (String) request.getSession().getAttribute("user");
-		if (proNo != null && newDocArr != null && Collections.binarySearch(newDocArr, proNo) >= 0) {
-			return (mapping.findForward("success2"));
-		} else if (useNewEchart != null && useNewEchart.equals(Boolean.TRUE)) {
-                    
-			return (mapping.findForward("success2"));
-		} else {
-			return (mapping.findForward("success"));
-		}
+		return (mapping.findForward("junoEncounter"));
 	}
 
 	private Set<Long> getIssueIdSet(String providerNo, String wlProgramId) {

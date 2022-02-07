@@ -24,6 +24,7 @@
 package integration.tests;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByLinkText;
 
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
@@ -47,8 +48,10 @@ public class EditFamilyHistoryClassicUIIT extends SeleniumTestBase
 	protected String[] getTablesToRestore()
 	{
 		return new String[]{
-				"casemgmt_cpp", "casemgmt_issue", "casemgmt_issue_notes", "casemgmt_note",
-				"casemgmt_note_ext", "eChart", "hash_audit", "log"
+			"casemgmt_cpp", "casemgmt_issue", "casemgmt_issue_notes", "casemgmt_note",
+			"casemgmt_note_ext", "eChart", "hash_audit", "log", "admission", "demographic",
+			"log_ws_rest", "measurementType", "partial_date", "property", "validations",
+			"casemgmt_tmpsave"
 		};
 	}
 
@@ -125,7 +128,7 @@ public class EditFamilyHistoryClassicUIIT extends SeleniumTestBase
 		String noteCPP = cppType + " in CPP";
 		String editedNoteCPP = "Edited " + noteCPP;
 		driver.navigate().refresh();
-		driver.findElement(By.linkText(noteCPP)).click();
+		findWaitClickByLinkText(driver, webDriverWait, noteCPP);
 		driver.findElement(By.id("noteEditTxt")).clear();
 		driver.findElement(By.id("noteEditTxt")).sendKeys(editedNoteCPP);
 		driver.findElement(By.xpath("//form[@id='frmIssueNotes']//descendant::input[@title='Sign & Save']")).click();

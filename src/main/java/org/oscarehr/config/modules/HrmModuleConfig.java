@@ -39,8 +39,8 @@ import javax.annotation.PostConstruct;
 public class HrmModuleConfig
 {
 	@Autowired
-	HRMScheduleService hrmScheduleService;
-	
+	private HRMScheduleService hrmScheduleService;
+
 	private static final Logger logger = MiscUtils.getLogger();
 	
 	public HrmModuleConfig()
@@ -59,13 +59,12 @@ public class HrmModuleConfig
 	@PostConstruct
 	public void startSchedule()
 	{
-		
-		String intervalProp = OscarProperties.getInstance().getProperty("omd.hrm.poll_interval_sec");
-		int frequency = NumberUtils.toInt(intervalProp);
-		
-		if (frequency != 0)
+		boolean pollingEnabled = OscarProperties.getInstance().isPropertyActive("omd.hrm.polling_enabled");
+
+		if (pollingEnabled)
 		{
-			hrmScheduleService.scheduleRegularFetch(frequency);
+			String interval = OscarProperties.getInstance().getProperty("omd.hrm.poll_interval_sec");
+			hrmScheduleService.scheduleRegularFetch(Math.max(NumberUtils.toInt(interval), HRMScheduleService.HRM_MINIMUM_POLL_TIME_SEC));
 		}
 	}
 }

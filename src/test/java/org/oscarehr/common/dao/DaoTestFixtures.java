@@ -53,6 +53,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.oscarehr.common.dao.utils.ConfigUtils;
 import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -68,7 +69,7 @@ import java.util.List;
 
 import static junit.framework.Assert.fail;
 
-public abstract class DaoTestFixtures
+public abstract class DaoTestFixtures extends DatabaseTestBase
 {
 	private static Logger logger=MiscUtils.getLogger();
 	
@@ -97,7 +98,7 @@ public abstract class DaoTestFixtures
 			//SpringUtils.beanFactory = context;
 		}
 	}
-	
+
 	@BeforeClass
 	public static void classSetUp() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException
 	{

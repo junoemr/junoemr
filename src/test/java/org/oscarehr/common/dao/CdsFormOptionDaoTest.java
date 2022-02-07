@@ -24,17 +24,27 @@
 package org.oscarehr.common.dao;
 
 import org.apache.log4j.Logger;
-import org.junit.Before;
-import org.oscarehr.common.dao.utils.SchemaUtils;
+import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CdsFormOptionDaoTest {
+@Ignore
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CdsFormOptionDaoTest extends DaoTestFixtures
+{
 
 	Logger logger = MiscUtils.getLogger();
 	
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("CdsFormOption");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"CdsFormOption"
+		};
 	}
 
 //	@Test @Ignore

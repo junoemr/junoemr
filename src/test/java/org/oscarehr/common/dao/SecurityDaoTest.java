@@ -54,10 +54,14 @@ public class SecurityDaoTest extends DaoTestFixtures
 		MiscUtils.getLogger().error("Unable to run doSimpleExceptionTest on this DAO");
 	}
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "security");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"security"
+		};
 	}
+
 
 	@Test 
 	public void testFindAllOrderBy() throws Exception {

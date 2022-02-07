@@ -42,10 +42,12 @@ public class OscarCommLocationsDaoTest extends DaoTestFixtures
 	@Autowired
 	protected OscarCommLocationsDao oscarCommLocationsDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("oscarcommlocations", "messagetbl");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"oscarcommlocations", "messagetbl"
+		};
 	}
 
 	@Test

@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.ANY;
 import org.marc.everest.datatypes.ED;
 import org.marc.everest.datatypes.II;
@@ -60,7 +61,11 @@ import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.constant.Mappings;
 import org.oscarehr.e2e.util.EverestUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class ClinicallyMeasuredObservationsModelTest extends AbstractExportModelTest {
 	public static MeasurementDao dao;
 	public static Measurement measurement;

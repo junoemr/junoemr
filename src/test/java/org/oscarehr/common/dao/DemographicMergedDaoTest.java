@@ -48,10 +48,12 @@ public class DemographicMergedDaoTest extends DaoTestFixtures
 
 	protected DemographicMergedDao dao = SpringUtils.getBean(DemographicMergedDao.class);
 
-	@Before
-	public void before() throws Exception
+	@Override
+	protected String[] getTablesToRestore()
 	{
-		SchemaUtils.restoreTable("demographic_merged");
+		return new String[]{
+			"demographic_merged"
+		};
 	}
 
 	@Test

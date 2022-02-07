@@ -45,10 +45,12 @@ public class Icd9DaoTest extends DaoTestFixtures
 	public Icd9DaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("icd9","Icd9Synonym");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"icd9","Icd9Synonym"
+		};
 	}
 
 	@Test

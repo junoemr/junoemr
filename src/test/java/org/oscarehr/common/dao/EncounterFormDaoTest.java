@@ -51,10 +51,14 @@ public class EncounterFormDaoTest extends DaoTestFixtures
 
 	Logger logger = MiscUtils.getLogger();
 
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable(false, "encounterForm");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"encounterForm"
+		};
 	}
+
 
 	@Test
 	/**

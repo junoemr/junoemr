@@ -29,8 +29,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.ANY;
 import org.marc.everest.datatypes.II;
 import org.marc.everest.datatypes.ST;
@@ -55,7 +56,11 @@ import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.export.AbstractExportModelTest;
 import org.oscarehr.e2e.util.EverestUtils;
 import org.oscarehr.util.SpringUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class EncountersModelTest extends AbstractExportModelTest {
 	public static CaseManagementNoteDAO dao;
 	public static CaseManagementNote encounter;
@@ -64,8 +69,9 @@ public class EncountersModelTest extends AbstractExportModelTest {
 	public static CaseManagementNote nullEncounter;
 	public static EncountersModel nullEncountersModel;
 
-	@BeforeClass
-	public static void beforeClass() {
+	@Before
+	public void beforeClass()
+	{
 		dao = SpringUtils.getBean(CaseManagementNoteDAO.class);
 		encounter = dao.getNotesByDemographic(Constants.Runtime.VALID_DEMOGRAPHIC.toString()).get(0);
 		encountersModel = new EncountersModel(encounter);

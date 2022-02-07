@@ -70,9 +70,12 @@ public class RemoteIntegratedDataCopyDaoTest extends DaoTestFixtures
 	@Autowired
 	RemoteIntegratedDataCopyDao  remoteIntegratedDataCopyDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(new String[]{"RemoteIntegratedDataCopy"});
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"RemoteIntegratedDataCopy"
+		};
 	}
 	
 	@Test

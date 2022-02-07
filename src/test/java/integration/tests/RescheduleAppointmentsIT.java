@@ -24,21 +24,24 @@
 package integration.tests;
 
 import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.junoUtil.AppointmentUtil;
+import integration.tests.util.seleniumUtil.ActionUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,7 +49,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.AddPatientsIT.mom;
 import static integration.tests.AddPatientsIT.momFullNameJUNO;
-import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
+import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
 @RunWith(SpringRunner.class)
@@ -58,11 +61,12 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
     protected String[] getTablesToRestore()
     {
         return new String[]{
-            "admission", "appointment","appointmentArchive", "billingservice", "caisi_role",
-            "demographic", "documentDescriptionTemplate", "Facility", "issue", "log", "log_ws_rest", "LookupList",
-            "LookupListItem", "measurementType", "OscarJob", "OscarJobType",
-            "provider", "provider_recent_demographic_access", "providerbillcenter", "ProviderPreference", "providersite",
-            "secUserRole", "site", "tickler_text_suggest"
+            "admission", "appointment", "appointmentArchive", "billingservice", "caisi_role",
+            "demographic", "documentDescriptionTemplate", "Facility", "issue", "log", "log_ws_rest",
+			"LookupList", "LookupListItem", "measurementType", "OscarJob", "OscarJobType",
+            "provider", "provider_recent_demographic_access", "providerbillcenter",
+			"ProviderPreference", "providersite", "secUserRole", "site", "tickler_text_suggest",
+			"property"
         };
     }
 
@@ -90,11 +94,11 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
 
         //Edit from "Edit An Appointment" page
         Set<String> oldWindowHandles = driver.getWindowHandles();
-        PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles);
+        PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles,
+			webDriverWait);
         //Cut & Paste from 9:00 to 9:45
         driver.findElement(By.xpath("//input[@value='Cut']")).click();
         PageUtil.switchToWindow(currWindowHandle, driver);
-        Thread.sleep(2000);
         driver.findElement(By.linkText("09:45")).click();
         PageUtil.switchToLastWindow(driver);
         driver.findElement(By.id("pasteButton")).click();
@@ -107,7 +111,8 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
                 PageUtil.isExistsBy(By.xpath(apptXpath), driver));
 
         //Copy & paste from 9:45 to 10:45
-        PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles);
+        PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles,
+			webDriverWait);
         driver.findElement(By.xpath("//input[@value='Copy']")).click();
         PageUtil.switchToWindow(currWindowHandle, driver);
         Thread.sleep(2000);
@@ -126,7 +131,12 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
     public void rescheduleAppointmentTestsJUNOUI()
             throws InterruptedException
     {
-        // Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEEE MMM d");
+		LocalDate dateToday = LocalDate.now();
+		String dateTodayString = dtf.format(dateToday);
+		String dateTomorrowString = dtf.format(dateToday.plusDays(1));
+
+		// Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
         driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
         String currWindowHandle = driver.getWindowHandle();
         AddAppointmentsIT addAppointmentsTests = new AddAppointmentsIT();
@@ -135,20 +145,27 @@ public class RescheduleAppointmentsIT extends SeleniumTestBase
         Assert.assertTrue("Appointments is NOT added successfully.",
                 PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
-        accessSectionJUNOUI(driver, "Schedule");
-        webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@title='Next Day']")));
-        driver.findElement(By.xpath("//button[@title='Next Day']")).click();
-        driver.findElement(By.xpath("//button[@title='Next Day']")).click();
-        Select providerDropDown = new Select(driver.findElement(By.id("schedule-select")));
-        providerDropDown.selectByVisibleText("oscardoc, doctor");
+        accessSectionJUNOUI(driver, webDriverWait, "Schedule");
+
+		AppointmentUtil.skipTwoDaysJUNOUI(driver, webDriverWait);
+
+		/*
+		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-today span"), "(0) " + dateTodayString));
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
+
+		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#ca-calendar th.fc-future span"), "(0) " + dateTomorrowString));
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@title='Next Day']");
+		 */
+
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("schedule-select"), "oscardoc, doctor");
 
         //Reschedule the appointment from 10:00am to 10:45am
-        driver.findElement(By.xpath("//span[contains(., '" + momFullNameJUNO + "')]")).click();
-        textEdit(driver, By.id("input-startTime"), "10:45 AM");
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//span[contains(., '" + momFullNameJUNO + "')]");
+        ActionUtil.findWaitEditById(driver, webDriverWait, "input-startTime", "10:45 AM");
         driver.findElement(By.xpath("//button[contains(., 'Modify')]")).click();
 
         String timeFrameExpected = "10:45:00";
-        driver.findElement(By.xpath("//span[contains(., '" + momFullNameJUNO + "')]")).click();
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//span[contains(., '" + momFullNameJUNO + "')]");
         String startTimeAfterReschedule = driver.findElement(By.id("input-startTime")).getAttribute("value");
         driver.findElement(By.xpath("//button[@title='Cancel']")).click();
         Assert.assertEquals("Appointment is NOT rescheduled from 10:00 to 10:45",

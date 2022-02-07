@@ -54,10 +54,12 @@ public class QueueDocumentLinkDaoTest extends DaoTestFixtures
 	public QueueDocumentLinkDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("queue_document_link");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"queue_document_link"
+		};
 	}
 
         @Test

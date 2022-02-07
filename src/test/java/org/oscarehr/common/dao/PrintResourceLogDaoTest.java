@@ -59,10 +59,12 @@ public class PrintResourceLogDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("PrintResourceLog");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"PrintResourceLog"
+		};
 	}
 
 	@Test

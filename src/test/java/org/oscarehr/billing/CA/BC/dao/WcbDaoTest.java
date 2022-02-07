@@ -43,10 +43,12 @@ public class WcbDaoTest extends DaoTestFixtures
 	@Autowired
 	public WcbDao wcbDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("wcb");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"wcb"
+		};
 	}
 
 	@Test
