@@ -12,10 +12,9 @@
 	</modal-title>
 
 	<modal-body>
-		<form ng-keypress="$ctrl.submitOnCtrlEnter($event)">
+		<form ng-keydown="$ctrl.submitOnCtrlEnter($event)">
 			<div class="add-demographic-content d-flex justify-content-center">
 				<div class="flex flex-row justify-content-between width-80">
-
 					<div class="flex-col column-container" ng-ref="$ctrl.firstColumnRef">
 						<!-- LAST NAME -->
 						<juno-input ng-model="$ctrl.newDemographicData.lastName"
@@ -138,7 +137,7 @@
 										  label="Preferred Phone"
 										  label-position="$ctrl.LABEL_POSITION"
 										  component-style="$ctrl.COMPONENT_STYLE"
-										  id="preferredPhone">
+										  id="preferred-phone">
 						</juno-select-text>
 					</div>
 				</div>
@@ -149,7 +148,17 @@
 
 	<modal-footer>
 		<div class="d-flex justify-content-center">
-			<div class="d-flex flex-row justify-content-end align-items-center width-80">
+			<div class="d-flex justify-content-between width-80">
+			<juno-button
+					id="swipe-healthcard-button"
+					class="w-128 flex-grow-0"
+					button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+					button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED"
+					click="$ctrl.openSwipecardModal()"
+					disabled="$ctrl.buttonClicked">
+				Swipe Health Card
+			</juno-button>
+			<div class="d-flex flex-row justify-content-end align-items-center">
 				<div class="flex-row align-items-center m-r-24">
 					<juno-check-box id="create-another"
 									ng-model="$ctrl.isCreateAnotherEnabled">
@@ -157,7 +166,7 @@
 					<span class="d-inline-block m-l-8">Create another demographic</span>
 				</div>
 				<juno-button
-						class="add-demographic-button"
+						class="add-demographic-button w-128 flex-grow-0"
 						title="Ctrl-Enter"
 						button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
@@ -165,6 +174,7 @@
 						disabled="$ctrl.buttonClicked">
 					Add
 				</juno-button>
+			</div>
 			</div>
 		</div>
 	</modal-footer>

@@ -30,18 +30,16 @@
 		}
 	}
 
-	#preferredPhone {
+	#preferred-phone {
 		select {
 			width: 80px;
 		}
 	}
 
-	#hidden-submit {
-		display: none;
-	}
-
-	.add-demographic-button {
-		max-width: 112px;
+	#swipe-healthcard-button {
+		button {
+			border-color: var(--theme-color-primary-base);
+		}
 	}
 
 	.add-demographic-content {

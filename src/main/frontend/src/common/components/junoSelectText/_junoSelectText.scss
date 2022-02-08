@@ -10,6 +10,7 @@ juno-select-text {
 	.juno-select-text-container {
 		border: var(--border-width) solid var(--theme-color-form-field-border);
 		border-radius: var(--theme-form-field-border-radius);
+		flex: 1 1 0;
 		overflow: hidden;
 
 		&.field-focused {

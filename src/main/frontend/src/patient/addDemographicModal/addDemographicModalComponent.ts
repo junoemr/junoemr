@@ -20,6 +20,7 @@ angular.module('Patient').component('addDemographicModal', {
 		'$http',
 		'$httpParamSerializer',
 		'$timeout',
+		'$uibModal',
 		'securityService',
 		'staticDataService',
 		'demographicService',
@@ -29,6 +30,7 @@ angular.module('Patient').component('addDemographicModal', {
 			$http,
 			$httpParamSerializer,
 			$timeout,
+			$uibModal,
 			securityService,
 			staticDataService,
 			demographicService,
@@ -305,9 +307,81 @@ angular.module('Patient').component('addDemographicModal', {
 				ctrl.newDemographicData.patientStatusDate = now;
 			}
 
+			ctrl.openSwipecardModal = () :void =>
+			{
+				var modalInstance = $uibModal.open(
+						{
+							templateUrl: 'src/record/details/swipecard.jsp',
+							controller: 'Record.Details.SwipecardController as swipecardController',
+							backdrop: 'static',
+							windowClass: 'juno-modal',
+						});
+				modalInstance.result.then(
+						// the object passed back on closing
+						function success(cardInfo)
+						{
+							ctrl.fillDataFromSwipecard(cardInfo.data);
+						});
+			}
+
+			ctrl.fillDataFromSwipecard = (data :any) :void =>
+			{
+				if (data.address)
+				{
+					ctrl.newDemographicData.address.address = data.address;
+				}
+
+				if (data.city)
+				{
+					ctrl.newDemographicData.address.city = data.city;
+				}
+
+				if (data.province)
+				{
+					ctrl.newDemographicData.address.province = data.province;
+					ctrl.hcType = data.province;
+				}
+
+				if (data.postal)
+				{
+					ctrl.newDemographicData.address.postal = data.postal;
+				}
+
+				if (data.firstName)
+				{
+					ctrl.newDemographicData.firstName = data.firstName;
+				}
+
+				if (data.lastName)
+				{
+					ctrl.newDemographicData.lastName = data.lastName;
+				}
+
+				if (data.sex)
+				{
+					ctrl.newDemographicData.sex = data.sex;
+				}
+
+				if (data.hin)
+				{
+					ctrl.newDemographicData.hin = data.hin;
+				}
+
+				if (data.versionCode)
+				{
+					ctrl.newDemographicData.ver = data.versionCode;
+				}
+
+				let dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(data.dobYear, data.dobMonth, data.dobDay)
+				if (dateOfBirth.isValid())
+				{
+					ctrl.newDemographicData.dateOfBirth = dateOfBirth.format('YYYY-MM-DD');
+				}
+			}
+
 			ctrl.submitOnCtrlEnter = ($event :any) :void =>
 			{
-				if ($event.ctrlKey && $event.charCode === 13)
+				if ($event.ctrlKey && $event.keyCode === 13)
 				{
 					if (!ctrl.buttonClicked)
 					{
