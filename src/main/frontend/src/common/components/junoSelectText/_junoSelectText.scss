@@ -28,7 +28,7 @@ juno-select-text {
 				appearance: none;
 				background-image: none;
 
-				border-radius: calc(var(--theme-form-field-border-radius) / 2) 0 0 calc(var(--theme-form-field-border-radius) /2);
+				border-radius: 0;
 				background-color: var(--color-neutral-light);
 				color: var(--color-neutral-dark);
 				border: none;
@@ -57,7 +57,7 @@ juno-select-text {
 
 		}
 
-		#divider-border {
+		.divider-border {
 			border-right: var(--border-width) solid var(--theme-color-form-field-border);
 			height: var(field-height);
 
@@ -70,7 +70,7 @@ juno-select-text {
 			width: 100%;
 			display: flex;
 			border: none;
-			border-radius: 0 var(--theme-form-field-border-radius) var(--theme-form-field-border-radius) 0;
+			border-radius: 0;
 			background-color: var(--theme-color-form-field-background);
 			color: var(--theme-color-form-field-text);
 			padding: 0 8px;

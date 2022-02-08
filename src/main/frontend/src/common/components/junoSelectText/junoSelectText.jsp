@@ -16,7 +16,7 @@
 			</select>
 			<i class="icon select-icon icon-chevron-down"></i>
 		</div>
-		<div id="divider-border"
+		<div class="divider-border"
 			 ng-class="$ctrl.fieldClasses()"></div>
 		<input ng-model="$ctrl.textModel"
 			   ng-class="$ctrl.fieldClasses()"
