@@ -20,9 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.converter.in;
+package org.oscarehr.demographic.converter;
 
 import org.apache.commons.lang.StringUtils;
+import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
+import org.oscarehr.dataMigration.converter.in.RosterModelToDbConverter;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;

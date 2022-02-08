@@ -28,8 +28,10 @@ import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.DemographicArchive;
-import org.oscarehr.dataMigration.converter.out.DemographicDbToModelConverter;
-import org.oscarehr.demographic.converter.DemographicInputToModelConverter;
+import org.oscarehr.demographic.converter.DemographicCreateInputToModelConverter;
+import org.oscarehr.demographic.converter.DemographicDbToModelConverter;
+import org.oscarehr.demographic.converter.DemographicModelToDbConverter;
+import org.oscarehr.demographic.converter.DemographicUpdateInputToEntityConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicIntegrationDao;
@@ -39,7 +41,6 @@ import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.demographic.entity.DemographicIntegration;
 import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
-import org.oscarehr.dataMigration.converter.in.DemographicModelToDbConverter;
 import org.oscarehr.demographic.transfer.DemographicCreateInput;
 import org.oscarehr.demographic.transfer.DemographicUpdateInput;
 import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
@@ -111,7 +112,10 @@ public class DemographicService
 	private DemographicDbToModelConverter demographicDbToModelConverter;
 
 	@Autowired
-	private DemographicInputToModelConverter demographicInputToModelConverter;
+	private DemographicCreateInputToModelConverter demographicCreateInputToModelConverter;
+
+	@Autowired
+	private DemographicUpdateInputToEntityConverter demographicUpdateInputToEntityConverter;
 
 	public enum SEARCH_MODE
 	{
@@ -366,7 +370,7 @@ public class DemographicService
 	}
 	public DemographicModel addNewDemographicRecord(String providerNoStr, DemographicCreateInput demographicInput)
 	{
-		DemographicModel model = demographicInputToModelConverter.convert(demographicInput);
+		DemographicModel model = demographicCreateInputToModelConverter.convert(demographicInput);
 		return demographicDbToModelConverter.convert(addNewDemographicRecord(providerNoStr, model));
 	}
 	public Demographic addNewDemographicRecord(String providerNoStr, DemographicModel demographicModel)
@@ -469,10 +473,13 @@ public class DemographicService
 
 	public DemographicModel updateDemographicRecord(DemographicUpdateInput updateInput, LoggedInInfo loggedInInfo)
 	{
-		Demographic demographic = demographicDao.find(updateInput.getId());
-		archiveDemographicRecord(demographic);
+		Demographic oldDemographic = demographicDao.find(updateInput.getId());
+		archiveDemographicRecord(oldDemographic);
 
-		queueMHAPatientUpdates(demographic, demographic, loggedInInfo);
+		Demographic demographic = demographicUpdateInputToEntityConverter.convert(updateInput);
+		demographic.setDemographicId(updateInput.getId());
+
+		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
 
 		demographicDao.merge(demographic);
 		return demographicDbToModelConverter.convert(demographic);
@@ -534,7 +541,12 @@ public class DemographicService
 	 */
 	public void queueMHAPatientUpdates(Demographic updatedDemographic, Demographic oldDemographic, LoggedInInfo loggedInInfo)
 	{
-		if (!updatedDemographic.getPatientStatus().equals(oldDemographic.getPatientStatus()))
+		queueMHAPatientUpdates(updatedDemographic, oldDemographic.getPatientStatus(), loggedInInfo);
+	}
+
+	public void queueMHAPatientUpdates(Demographic updatedDemographic, String previousPatientStatus, LoggedInInfo loggedInInfo)
+	{
+		if (!updatedDemographic.getPatientStatus().equals(previousPatientStatus))
 		{// patient status change
 			updateMHAPatientConnectionStatus(updatedDemographic.getId(), loggedInInfo, !updatedDemographic.isActive());
 		}

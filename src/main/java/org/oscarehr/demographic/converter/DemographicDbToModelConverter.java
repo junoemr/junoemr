@@ -20,9 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.dataMigration.converter.out;
+package org.oscarehr.demographic.converter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
+import org.oscarehr.dataMigration.converter.out.RosterDbToModelConverter;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
@@ -58,37 +60,37 @@ public class DemographicDbToModelConverter extends
 			return null;
 		}
 
-		DemographicModel exportDemographic = new DemographicModel();
-		BeanUtils.copyProperties(input, exportDemographic, "address", "email", "dateOfBirth", "title", "sin", "officialLanguage");
+		DemographicModel model = new DemographicModel();
+		BeanUtils.copyProperties(input, model, "address", "email", "dateOfBirth", "title", "sin", "officialLanguage");
 
-		exportDemographic.setId(input.getDemographicId());
-		exportDemographic.setDateOfBirth(input.getDateOfBirth());
-		exportDemographic.setTitle(Person.TITLE.fromStringIgnoreCase(input.getTitle()));
-		exportDemographic.setSex(Person.SEX.getIgnoreCase(input.getSex()));
-		exportDemographic.setSin(numericSin(input.getSin()));
-		exportDemographic.setEmail(StringUtils.trimToNull(input.getEmail()));
+		model.setId(input.getDemographicId());
+		model.setDateOfBirth(input.getDateOfBirth());
+		model.setTitle(Person.TITLE.fromStringIgnoreCase(input.getTitle()));
+		model.setSex(Person.SEX.getIgnoreCase(input.getSex()));
+		model.setSin(numericSin(input.getSin()));
+		model.setEmail(StringUtils.trimToNull(input.getEmail()));
 
-		exportDemographic.setHealthNumber(StringUtils.trimToNull(input.getHin()));
-		exportDemographic.setHealthNumberVersion(StringUtils.trimToNull(input.getVer()));
-		exportDemographic.setHealthNumberProvinceCode(findRegionCodeValue(StringUtils.trimToNull(input.getHcType())));
-		exportDemographic.setHealthNumberCountryCode(findCountryCodeValue(StringUtils.trimToNull(input.getHcType()), COUNTRY_CODE_CANADA));
-		exportDemographic.setHealthNumberRenewDate(ConversionUtils.toNullableLocalDate(input.getHcRenewDate()));
-		exportDemographic.setHealthNumberEffectiveDate(ConversionUtils.toNullableLocalDate(input.getHcEffectiveDate()));
-		exportDemographic.setDateJoined(ConversionUtils.toNullableLocalDate(input.getDateJoined()));
-		exportDemographic.setDateEnded(ConversionUtils.toNullableLocalDate(input.getEndDate()));
-		exportDemographic.setChartNumber(StringUtils.trimToNull(input.getChartNo()));
-		exportDemographic.setRosterHistory(rosterDbToModelConverter.convert(input.getRosterHistory()));
-		exportDemographic.setMrpProvider(findProvider(input.getProviderNo()));
-		exportDemographic.setReferralDoctor(getReferralProvider(input));
-		exportDemographic.setFamilyDoctor(getFamilyProvider(input));
-		exportDemographic.setPatientStatusDate(ConversionUtils.toNullableLocalDate(input.getPatientStatusDate()));
-		exportDemographic.setOfficialLanguage(OFFICIAL_LANGUAGE.fromValueString(input.getOfficialLanguage()));
-		exportDemographic.addAddress(buildAddress(input));
+		model.setHealthNumber(StringUtils.trimToNull(input.getHin()));
+		model.setHealthNumberVersion(StringUtils.trimToNull(input.getVer()));
+		model.setHealthNumberProvinceCode(findRegionCodeValue(StringUtils.trimToNull(input.getHcType())));
+		model.setHealthNumberCountryCode(findCountryCodeValue(StringUtils.trimToNull(input.getHcType()), COUNTRY_CODE_CANADA));
+		model.setHealthNumberRenewDate(ConversionUtils.toNullableLocalDate(input.getHcRenewDate()));
+		model.setHealthNumberEffectiveDate(ConversionUtils.toNullableLocalDate(input.getHcEffectiveDate()));
+		model.setDateJoined(ConversionUtils.toNullableLocalDate(input.getDateJoined()));
+		model.setDateEnded(ConversionUtils.toNullableLocalDate(input.getEndDate()));
+		model.setChartNumber(StringUtils.trimToNull(input.getChartNo()));
+		model.setRosterHistory(rosterDbToModelConverter.convert(input.getRosterHistory()));
+		model.setMrpProvider(findProvider(input.getProviderNo()));
+		model.setReferralDoctor(getReferralProvider(input));
+		model.setFamilyDoctor(getFamilyProvider(input));
+		model.setPatientStatusDate(ConversionUtils.toNullableLocalDate(input.getPatientStatusDate()));
+		model.setOfficialLanguage(OFFICIAL_LANGUAGE.fromValueString(input.getOfficialLanguage()));
+		model.addAddress(buildAddress(input));
 
 		AddressModel alternateAddress = buildAlternativeAddress(input);
 		if (alternateAddress != null)
 		{
-			exportDemographic.addAddress(alternateAddress);
+			model.addAddress(alternateAddress);
 		}
 
 		// phone conversions
@@ -96,30 +98,30 @@ public class DemographicDbToModelConverter extends
 		{
 			DemographicExt homePhoneExtensionExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_H_PHONE_EXT);
 			String homePhoneExtension = (homePhoneExtensionExt != null) ? StringUtils.trimToNull(homePhoneExtensionExt.getValue()) : null;
-			exportDemographic.setHomePhone(buildPhoneNumber(input.getPhone(), homePhoneExtension));
+			model.setHomePhone(buildPhoneNumber(input.getPhone(), homePhoneExtension));
 		}
 		if(input.getPhone2() != null)
 		{
 			DemographicExt workPhoneExtensionExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_W_PHONE_EXT);
 			String workPhoneExtension = (workPhoneExtensionExt != null) ? StringUtils.trimToNull(workPhoneExtensionExt.getValue()) : null;
-			exportDemographic.setWorkPhone(buildPhoneNumber(input.getPhone2(), workPhoneExtension));
+			model.setWorkPhone(buildPhoneNumber(input.getPhone2(), workPhoneExtension));
 		}
 
 		DemographicExt cellNoExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_CELL);
 		String cellPhoneNumber = (cellNoExt != null) ? StringUtils.trimToNull(cellNoExt.getValue()) : null;
 		if(cellPhoneNumber != null)
 		{
-			exportDemographic.setCellPhone(buildPhoneNumber(cellPhoneNumber, null));
+			model.setCellPhone(buildPhoneNumber(cellPhoneNumber, null));
 		}
 
 		DemographicCust demographicCustom = input.getDemographicCust();
 		if(demographicCustom != null)
 		{
-			exportDemographic.setPatientNote(StringUtils.trimToNull(demographicCustom.getParsedNotes()));
-			exportDemographic.setPatientAlert(StringUtils.trimToNull(demographicCustom.getAlert()));
+			model.setPatientNote(StringUtils.trimToNull(demographicCustom.getParsedNotes()));
+			model.setPatientAlert(StringUtils.trimToNull(demographicCustom.getAlert()));
 			//TODO midwife/nurse,resident providers ?
 		}
-		return exportDemographic;
+		return model;
 	}
 
 	protected AddressModel buildAddress(Demographic input)

@@ -30,6 +30,7 @@ import {DemographicApi} from "../../../generated";
 import Demographic from "../../lib/demographic/model/Demographic";
 import DemographicTransferToModelConverter from "../../lib/demographic/converter/DemographicTransferToModelConverter";
 import DemographicToCreateInputConverter from "../../lib/demographic/converter/DemographicToCreateInputConverter";
+import DemographicToUpdateInputConverter from "../../lib/demographic/converter/DemographicToUpdateInputConverter";
 
 angular.module("Common.Services").service("demographicService", [
 	'$http',
@@ -42,7 +43,8 @@ angular.module("Common.Services").service("demographicService", [
 		service.demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
 
 		service.demographicTransferToModelConverter = new DemographicTransferToModelConverter();
-		service.demographicModelToCreateInputConverter = new DemographicToCreateInputConverter();
+		service.demographicToCreateInputConverter = new DemographicToCreateInputConverter();
+		service.demographicToUpdateInputConverter = new DemographicToUpdateInputConverter();
 
 		service.getDemographic = async (demographicId: number): Promise<Demographic> =>
 		{
@@ -53,14 +55,14 @@ angular.module("Common.Services").service("demographicService", [
 
 		service.createDemographic = async (demographic: Demographic): Promise<Demographic> =>
 		{
-			const transfer = service.demographicModelToCreateInputConverter.convert(demographic);
+			const transfer = service.demographicToCreateInputConverter.convert(demographic);
 			return service.demographicTransferToModelConverter.convert(
 				(await service.demographicApi.createDemographicData(transfer)).data.body);
 		}
 
 		service.updateDemographic = async (demographic: Demographic): Promise<Demographic> =>
 		{
-			const transfer = service.demographicModelToTransferConverter.convert(demographic);
+			const transfer = service.demographicToUpdateInputConverter.convert(demographic);
 			return service.demographicTransferToModelConverter.convert(
 				(await service.demographicApi.updateDemographicData(transfer)).data.body);
 		}

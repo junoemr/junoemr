@@ -29,7 +29,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DemographicInputToModelConverter
+public class DemographicCreateInputToModelConverter
 		extends BaseModelToDbConverter<DemographicCreateInput, DemographicModel>
 {
 	@Override

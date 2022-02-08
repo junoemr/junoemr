@@ -23,61 +23,31 @@
 package org.oscarehr.demographic.transfer;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.dataMigration.model.common.AddressModel;
-import org.oscarehr.dataMigration.model.common.Person;
-import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
-import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
 import org.oscarehr.demographic.model.DemographicModel;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
-public class DemographicUpdateInput extends AbstractTransientModel
+public class DemographicUpdateInput extends DemographicCreateInput
 {
 	private Integer id;
 
 	// base info
-	private String firstName;
-	private String lastName;
-	private Person.TITLE title;
-	private LocalDate dateOfBirth;
-	private Person.SEX sex;
-	private String healthNumber;
-	private String healthNumberVersion;
-	private String healthNumberProvinceCode;
-	private String healthNumberCountryCode;
-	private LocalDate healthNumberEffectiveDate;
-	private LocalDate healthNumberRenewDate;
-	private String chartNumber;
 	private String sin;
 	private String patientStatus;
 	private LocalDate patientStatusDate;
 	private LocalDate dateJoined;
 	private LocalDate dateEnded;
 
-	//contact info
-	private List<AddressModel> addressList;
-	private String email;
-	private PhoneNumberModel homePhone;
-	private PhoneNumberModel workPhone;
-	private PhoneNumberModel cellPhone;
-
 	// physician info
-	private Provider mrpProvider;
+//	private Provider mrpProvider;
 	private Provider referralDoctor;
 	private Provider familyDoctor;
 
 	// roster info
-	private List<RosterData> rosterHistory;
 
 	// other info
-	private String lastUpdateProviderId;
-	private LocalDateTime lastUpdateDateTime;
 
 	private String alias;
 	private String citizenship;
@@ -93,7 +63,5 @@ public class DemographicUpdateInput extends AbstractTransientModel
 
 	public DemographicUpdateInput()
 	{
-		this.addressList = new ArrayList<>();
-		this.rosterHistory = new ArrayList<>();
 	}
 }

@@ -1141,7 +1141,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 			// clone the demographic, so that final modifications can be made before save.
 			let demographicForSave = new Demographic();
-			Object.assign(demographicForSave, controller.page.demo)
+			Object.assign(demographicForSave, controller.page.demo);
 
 			// convert null back to "-1" why? because Oscar.
 			// if (!demographicForSave.countryOfOrigin)
