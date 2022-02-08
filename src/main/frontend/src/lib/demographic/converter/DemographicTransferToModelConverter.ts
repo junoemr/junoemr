@@ -5,6 +5,8 @@ import moment from "moment";
 import AddressToModelConverter from "../../common/converter/AddressToModelConverter";
 import PhoneNumber from "../../common/model/PhoneNumber";
 import {Sex} from "../model/Sex";
+import {TitleType} from "../model/TitleType";
+import {OfficialLanguageType} from "../model/OfficialLanguageType";
 
 export default class DemographicTransferToModelConverter extends AbstractConverter<DemographicModel, Demographic>
 {
@@ -16,7 +18,7 @@ export default class DemographicTransferToModelConverter extends AbstractConvert
 		model.firstName = from.firstName;
 		model.lastName = from.lastName;
 		model.alias = from.alias;
-		model.title = String(from.title);
+		model.title = from.title as any as TitleType;
 		model.dateOfBirth = moment(from.dateOfBirth);
 		model.sex = from.sex as any as Sex;
 		model.chartNumber = from.chartNumber;
@@ -37,6 +39,9 @@ export default class DemographicTransferToModelConverter extends AbstractConvert
 		model.workPhone = from.workPhone ? new PhoneNumber(from.workPhone.number, from.workPhone.extension, from.workPhone.phoneType, from.workPhone.primaryContactNumber) : null;
 		model.cellPhone = from.cellPhone ? new PhoneNumber(from.cellPhone.number, from.cellPhone.extension, from.cellPhone.phoneType, from.cellPhone.primaryContactNumber) : null;
 
+		model.officialLanguage = from.officialLanguage as any as OfficialLanguageType;
+		model.spokenLanguage = from.spokenLanguage;
+		model.countryOfOrigin = from.countryOfOrigin;
 		model.patientNote = from.patientNote;
 		model.patientAlert = from.patientAlert;
 		model.aboriginal = from.aboriginal;

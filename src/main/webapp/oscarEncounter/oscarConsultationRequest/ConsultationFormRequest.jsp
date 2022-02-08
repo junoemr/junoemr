@@ -1406,7 +1406,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 		}
 
 		int demographic_no = demographic.getDemographicNo();
-		DemographicExt demoExt = demographicExtDao.getLatestDemographicExt(demographic_no, "demo_cell");
+		DemographicExt demoExt = demographicExtDao.getLatestDemographicExt(demographic_no, "demo_cell").orElse(null);
 		String patientCPhone = (demoExt == null) ? "" : StringUtils.trimToEmpty(demoExt.getValue());
 		thisForm.setPatientCPhone(patientCPhone);
 

@@ -3,6 +3,8 @@ import Address from "../../common/model/Address";
 import PhoneNumber from "../../common/model/PhoneNumber";
 import {Sex, sexToHuman} from "./Sex";
 import {ElectronicMessagingConsentStatus} from "../ElectronicMessagingConsentStatus";
+import {TitleType} from "./TitleType";
+import {OfficialLanguageType} from "./OfficialLanguageType";
 
 export default class Demographic
 {
@@ -11,7 +13,7 @@ export default class Demographic
 	// base info
 	private _firstName: string;
 	private _lastName: string;
-	private _title: string;
+	private _title: TitleType;
 	private _dateOfBirth: Moment;
 	private _sex: Sex;
 	private _healthNumber: string;
@@ -50,12 +52,8 @@ export default class Demographic
 	private _alias: string;
 	private _citizenship: string;
 	private _spokenLanguage: string;
-	private _officialLanguage: string;
+	private _officialLanguage: OfficialLanguageType;
 	private _countryOfOrigin: string;
-	private _newsletter: string;
-	private _nameOfMother: string;
-	private _nameOfFather: string;
-	private _veteranNumber: string;
 	private _patientNote: string;
 	private _patientAlert: string;
 
@@ -188,12 +186,12 @@ export default class Demographic
 		this._lastName = value;
 	}
 
-	get title(): string
+	get title(): TitleType
 	{
 		return this._title;
 	}
 
-	set title(value: string)
+	set title(value: TitleType)
 	{
 		this._title = value;
 	}
@@ -488,12 +486,12 @@ export default class Demographic
 		this._spokenLanguage = value;
 	}
 
-	get officialLanguage(): string
+	get officialLanguage(): OfficialLanguageType
 	{
 		return this._officialLanguage;
 	}
 
-	set officialLanguage(value: string)
+	set officialLanguage(value: OfficialLanguageType)
 	{
 		this._officialLanguage = value;
 	}
@@ -506,46 +504,6 @@ export default class Demographic
 	set countryOfOrigin(value: string)
 	{
 		this._countryOfOrigin = value;
-	}
-
-	get newsletter(): string
-	{
-		return this._newsletter;
-	}
-
-	set newsletter(value: string)
-	{
-		this._newsletter = value;
-	}
-
-	get nameOfMother(): string
-	{
-		return this._nameOfMother;
-	}
-
-	set nameOfMother(value: string)
-	{
-		this._nameOfMother = value;
-	}
-
-	get nameOfFather(): string
-	{
-		return this._nameOfFather;
-	}
-
-	set nameOfFather(value: string)
-	{
-		this._nameOfFather = value;
-	}
-
-	get veteranNumber(): string
-	{
-		return this._veteranNumber;
-	}
-
-	set veteranNumber(value: string)
-	{
-		this._veteranNumber = value;
 	}
 
 	get patientNote(): string

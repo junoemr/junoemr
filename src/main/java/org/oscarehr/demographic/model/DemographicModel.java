@@ -44,7 +44,8 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 	public enum OFFICIAL_LANGUAGE
 	{
 		ENGLISH("English"),
-		FRENCH("French");
+		FRENCH("French"),
+		OTHER("Other");
 
 		private final String value;
 

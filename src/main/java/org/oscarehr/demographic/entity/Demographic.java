@@ -35,6 +35,7 @@ import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -213,10 +214,10 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date electronicMessagingConsentRejectedAt;
 
-	@OneToOne(fetch=FetchType.LAZY, mappedBy = "demographic")
+	@OneToOne(fetch=FetchType.LAZY, mappedBy = "demographic", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private DemographicCust demographicCust;
 
-	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo")
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo", cascade = CascadeType.MERGE)
 	private Set<DemographicExt> demographicExtSet;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo")

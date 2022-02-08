@@ -26,6 +26,7 @@
 
  */
 import {Sex} from "../../lib/demographic/model/Sex";
+import {OfficialLanguageType} from "../../lib/demographic/model/OfficialLanguageType";
 
 angular.module("Common.Services").service("staticDataService", [
 	function()
@@ -2147,17 +2148,17 @@ angular.module("Common.Services").service("staticDataService", [
 			var langs = [];
 			langs.push(
 			{
-				"value": "English",
+				"value": OfficialLanguageType.English,
 				"label": "English"
 			});
 			langs.push(
 			{
-				"value": "French",
+				"value": OfficialLanguageType.French,
 				"label": "French"
 			});
 			langs.push(
 			{
-				"value": "Other",
+				"value": OfficialLanguageType.Other,
 				"label": "Other"
 			});
 			return langs;
@@ -4886,18 +4887,18 @@ angular.module("Common.Services").service("staticDataService", [
 		service.getAboriginalStatuses = () =>
 		{
 			return [
-				{label: "Yes", value: "Yes"},
-				{label: "No", value: "No"},
-				{label: "Select Aboriginal status", value: ""}
+				{label: "Yes", value: true},
+				{label: "No", value: false},
+				{label: "Select Aboriginal status", value: null}
 			]
 		};
 
 		service.getArchivedChartOptions = () =>
 		{
 			return [
-				{label: "--", value: ""},
-				{label: "No", value: "NO"},
-				{label: "Yes", value: "YES"},
+				{label: "--", value: null},
+				{label: "No", value: false},
+				{label: "Yes", value: true},
 			]
 		}
 

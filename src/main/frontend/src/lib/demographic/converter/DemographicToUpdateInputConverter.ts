@@ -13,7 +13,7 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.firstName = from.firstName;
 		updateInput.lastName = from.lastName;
 		updateInput.alias = from.alias;
-		updateInput.title = DemographicUpdateInput.TitleEnum[from.title];
+		updateInput.title = from.title as DemographicUpdateInput.TitleEnum;
 		updateInput.dateOfBirth = this.serializeDateTime(from.dateOfBirth);
 		updateInput.sex = DemographicUpdateInput.SexEnum[from.sex];
 		updateInput.chartNumber = from.chartNumber;
@@ -25,6 +25,9 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.healthNumberEffectiveDate = this.serializeDateTime(from.healthNumberEffectiveDate);
 		updateInput.healthNumberRenewDate = this.serializeDateTime(from.healthNumberRenewDate);
 		updateInput.dateJoined = this.serializeDateTime(from.dateJoined);
+		updateInput.patientStatus = from.patientStatus;
+
+		// contact info
 		updateInput.addressList = new AddressToInputConverter().convertList(from.addressList);
 		updateInput.email = from.email;
 
@@ -33,7 +36,15 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.homePhone = phoneConverter.convert(from.homePhone);
 		updateInput.workPhone = phoneConverter.convert(from.workPhone);
 
-		updateInput.patientStatus = from.patientStatus;
+		// physician info
+		//todo
+
+		// other
+		updateInput.officialLanguage = from.officialLanguage as DemographicUpdateInput.OfficialLanguageEnum;
+		updateInput.spokenLanguage = from.spokenLanguage;
+		updateInput.countryOfOrigin = from.countryOfOrigin;
+		updateInput.patientNote = from.patientNote;
+		updateInput.patientAlert = from.patientAlert;
 
 		updateInput.aboriginal = from.aboriginal;
 		updateInput.cytolNum = from.cytolNum;

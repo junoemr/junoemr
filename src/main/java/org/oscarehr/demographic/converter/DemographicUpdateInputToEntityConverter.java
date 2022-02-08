@@ -146,9 +146,68 @@ public class DemographicUpdateInputToEntityConverter
 		PhoneNumberModel cellPhone = input.getCellPhone();
 		if(cellPhone != null)
 		{
-			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_CELL, cellPhone.getNumber());
+			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+					DemographicExt.KEY_DEMO_CELL, cellPhone.getNumber());
 			demographicExtSet.add(ext);
 		}
+
+		if(input.getAboriginal() != null)
+		{
+			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+					DemographicExt.KEY_ABORIGINAL, input.getAboriginal() ? "Yes" : "No");
+			demographicExtSet.add(ext);
+		}
+		if(input.getUsSigned() != null)
+		{
+			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+					DemographicExt.KEY_US_SIGNED, input.getUsSigned());
+			demographicExtSet.add(ext);
+		}
+		if(input.getPrivacyConsent() != null)
+		{
+			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+					DemographicExt.KEY_PRIVACY_CONSENT, input.getPrivacyConsent());
+			demographicExtSet.add(ext);
+		}
+		if(input.getInformedConsent() != null)
+		{
+			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+					DemographicExt.KEY_INFORMED_CONSENT, input.getInformedConsent());
+			demographicExtSet.add(ext);
+		}
+		if(input.getPaperChartArchived() != null)
+		{
+			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+					DemographicExt.KEY_PAPER_CHART_ARCHIVED, input.getPaperChartArchived() ? "YES" : "NO");
+			demographicExtSet.add(ext);
+		}
+		if(input.getPaperChartArchivedDate() != null)
+		{
+			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+					DemographicExt.KEY_PAPER_CHART_ARCHIVED_DATE,
+					ConversionUtils.toDateString(input.getPaperChartArchivedDate()));
+			demographicExtSet.add(ext);
+		}
+		if(input.getSecurityQuestion1() != null)
+		{
+			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+					DemographicExt.KEY_SECURITY_QUESTION_1, input.getSecurityQuestion1());
+			demographicExtSet.add(ext);
+		}
+		if(input.getSecurityAnswer1() != null)
+		{
+			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+					DemographicExt.KEY_SECURITY_ANSWER_1, input.getSecurityAnswer1());
+			demographicExtSet.add(ext);
+		}
+		if(input.getRxInteractionWarningLevel() != null)
+		{
+			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+					DemographicExt.KEY_RX_INTERACTION_WARNING_LEVEL, input.getRxInteractionWarningLevel());
+			demographicExtSet.add(ext);
+		}
+
+
 		dbDemographic.setDemographicExtSet(demographicExtSet);
 
 		DemographicCust demographicCust = Optional.ofNullable(dbDemographic.getDemographicCust()).orElse(new DemographicCust());
