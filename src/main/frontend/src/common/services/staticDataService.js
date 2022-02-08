@@ -25,6 +25,8 @@
  Ontario, Canada
 
  */
+import {Sex} from "../../lib/demographic/model/Sex";
+
 angular.module("Common.Services").service("staticDataService", [
 	function()
 	{
@@ -35,27 +37,27 @@ angular.module("Common.Services").service("staticDataService", [
 			var genders = [];
 			genders.push(
 			{
-				"value": "M",
+				"value": Sex.Male,
 				"label": "Male"
 			});
 			genders.push(
 			{
-				"value": "F",
+				"value": Sex.Female,
 				"label": "Female"
 			});
 			genders.push(
 			{
-				"value": "T",
+				"value": Sex.Transgender,
 				"label": "Transgender"
 			});
 			genders.push(
 			{
-				"value": "O",
+				"value": Sex.Other,
 				"label": "Other"
 			});
 			genders.push(
 			{
-				"value": "U",
+				"value": Sex.Undefined,
 				"label": "Undefined"
 			});
 			return genders;

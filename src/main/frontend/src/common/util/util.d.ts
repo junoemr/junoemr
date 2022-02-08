@@ -5,4 +5,6 @@ declare const Juno: {
 		// @ts-ignore
 		Util: Juno.Common.Util,
 	}
+	// @ts-ignore
+	Validations: Juno.Validations,
 };

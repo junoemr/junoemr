@@ -72,7 +72,7 @@ public class CkdScreenerReportHandler {
 			
 			result.setMedication(ckdScreener.checkMedication(demographicNo));
 			
-			DemographicExt ab = demographicExtDao.getLatestDemographicExt(demographicNo, "aboriginal");
+			DemographicExt ab = demographicExtDao.getLatestDemographicExt(demographicNo, DemographicExt.KEY_ABORIGINAL).orElse(null);
 			if(ab != null && ab.getValue().equals("Yes")) {
 				result.setAboriginalStr("Yes");
 			} else if(ab != null && ab.getValue().equals("No")) {

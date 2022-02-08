@@ -123,6 +123,17 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 	private String patientNote;
 	private String patientAlert;
 
+	private Boolean aboriginal;
+	private String cytolNum;
+	private Boolean paperChartArchived;
+	private LocalDate paperChartArchivedDate;
+	private String usSigned;
+	private String privacyConsent;
+	private String informedConsent;
+	private String securityQuestion1;
+	private String securityAnswer1;
+	private String rxInteractionWarningLevel;
+
 	public DemographicModel()
 	{
 		this.addressList = new ArrayList<>();

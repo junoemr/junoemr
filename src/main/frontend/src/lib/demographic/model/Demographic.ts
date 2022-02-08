@@ -63,6 +63,17 @@ export default class Demographic
 	private _electronicMessagingConsentGivenAt: Moment;
 	private _electronicMessagingConsentRejectedAt: Moment;
 
+	private _aboriginal: boolean;
+	private _cytolNum: string;
+	private _paperChartArchived: boolean;
+	private _paperChartArchivedDate: Moment;
+	private _usSigned: string;
+	private _privacyConsent: string;
+	private _informedConsent: string;
+	private _securityQuestion1: string;
+	private _securityAnswer1: string;
+	private _rxInteractionWarningLevel: string;
+
 	constructor()
 	{
 
@@ -585,5 +596,105 @@ export default class Demographic
 	set electronicMessagingConsentRejectedAt(value: moment.Moment)
 	{
 		this._electronicMessagingConsentRejectedAt = value;
+	}
+
+	get aboriginal(): boolean
+	{
+		return this._aboriginal;
+	}
+
+	set aboriginal(value: boolean)
+	{
+		this._aboriginal = value;
+	}
+
+	get cytolNum(): string
+	{
+		return this._cytolNum;
+	}
+
+	set cytolNum(value: string)
+	{
+		this._cytolNum = value;
+	}
+
+	get paperChartArchived(): boolean
+	{
+		return this._paperChartArchived;
+	}
+
+	set paperChartArchived(value: boolean)
+	{
+		this._paperChartArchived = value;
+	}
+
+	get paperChartArchivedDate(): moment.Moment
+	{
+		return this._paperChartArchivedDate;
+	}
+
+	set paperChartArchivedDate(value: moment.Moment)
+	{
+		this._paperChartArchivedDate = value;
+	}
+
+	get usSigned(): string
+	{
+		return this._usSigned;
+	}
+
+	set usSigned(value: string)
+	{
+		this._usSigned = value;
+	}
+
+	get privacyConsent(): string
+	{
+		return this._privacyConsent;
+	}
+
+	set privacyConsent(value: string)
+	{
+		this._privacyConsent = value;
+	}
+
+	get informedConsent(): string
+	{
+		return this._informedConsent;
+	}
+
+	set informedConsent(value: string)
+	{
+		this._informedConsent = value;
+	}
+
+	get securityQuestion1(): string
+	{
+		return this._securityQuestion1;
+	}
+
+	set securityQuestion1(value: string)
+	{
+		this._securityQuestion1 = value;
+	}
+
+	get securityAnswer1(): string
+	{
+		return this._securityAnswer1;
+	}
+
+	set securityAnswer1(value: string)
+	{
+		this._securityAnswer1 = value;
+	}
+
+	get rxInteractionWarningLevel(): string
+	{
+		return this._rxInteractionWarningLevel;
+	}
+
+	set rxInteractionWarningLevel(value: string)
+	{
+		this._rxInteractionWarningLevel = value;
 	}
 }

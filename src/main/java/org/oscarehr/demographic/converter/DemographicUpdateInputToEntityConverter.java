@@ -24,7 +24,6 @@ package org.oscarehr.demographic.converter;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
-import org.oscarehr.dataMigration.converter.in.RosterModelToDbConverter;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
@@ -36,7 +35,6 @@ import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.transfer.DemographicUpdateInput;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -153,7 +151,7 @@ public class DemographicUpdateInputToEntityConverter
 		}
 		dbDemographic.setDemographicExtSet(demographicExtSet);
 
-		DemographicCust demographicCust = dbDemographic.getDemographicCust();
+		DemographicCust demographicCust = Optional.ofNullable(dbDemographic.getDemographicCust()).orElse(new DemographicCust());
 		demographicCust.setParsedNotes(input.getPatientNote());
 		demographicCust.setAlert(input.getPatientAlert());
 		demographicCust.setDemographic(dbDemographic);

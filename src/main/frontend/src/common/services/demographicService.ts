@@ -64,7 +64,7 @@ angular.module("Common.Services").service("demographicService", [
 		{
 			const transfer = service.demographicToUpdateInputConverter.convert(demographic);
 			return service.demographicTransferToModelConverter.convert(
-				(await service.demographicApi.updateDemographicData(transfer)).data.body);
+				(await service.demographicApi.updateDemographicData(demographic.id, transfer)).data.body);
 		}
     }
 ]);

@@ -1809,7 +1809,7 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 		int demographicFetchCount = 0;
 		for(Integer demographicNo:demographicNos){
 			logger.debug("Demographic "+demographicNo+" updated on the integrator, primary emr ? ");
-			DemographicExt demographicExt = demographicExtDao.getLatestDemographicExt(demographicNo, "primaryEMR");
+			DemographicExt demographicExt = demographicExtDao.getLatestDemographicExt(demographicNo, "primaryEMR").orElse(null);
 			if (demographicExt != null && demographicExt.getValue().equals("1")){
 				demographicFetchCount++;
 				BenchmarkTimer benchTimer = new BenchmarkTimer("fetch and save for facilityId:" + facility.getId() + ", demographicId:" + demographicNo + "  " + demographicFetchCount + " of " + demographicNos.size());

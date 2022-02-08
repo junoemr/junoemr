@@ -39,6 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
+import java.util.Optional;
+
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.COUNTRY_CODE_CANADA;
 import static org.oscarehr.demographic.model.DemographicModel.OFFICIAL_LANGUAGE;
 
@@ -96,23 +98,21 @@ public class DemographicDbToModelConverter extends
 		// phone conversions
 		if(input.getPhone() != null)
 		{
-			DemographicExt homePhoneExtensionExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_H_PHONE_EXT);
-			String homePhoneExtension = (homePhoneExtensionExt != null) ? StringUtils.trimToNull(homePhoneExtensionExt.getValue()) : null;
+			String homePhoneExtension = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_H_PHONE_EXT)
+					.map(ext -> StringUtils.trimToNull(ext.getValue())).orElse(null);
 			model.setHomePhone(buildPhoneNumber(input.getPhone(), homePhoneExtension));
 		}
 		if(input.getPhone2() != null)
 		{
-			DemographicExt workPhoneExtensionExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_W_PHONE_EXT);
-			String workPhoneExtension = (workPhoneExtensionExt != null) ? StringUtils.trimToNull(workPhoneExtensionExt.getValue()) : null;
+			String workPhoneExtension = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_W_PHONE_EXT)
+					.map(ext -> StringUtils.trimToNull(ext.getValue())).orElse(null);
 			model.setWorkPhone(buildPhoneNumber(input.getPhone2(), workPhoneExtension));
 		}
 
-		DemographicExt cellNoExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_CELL);
-		String cellPhoneNumber = (cellNoExt != null) ? StringUtils.trimToNull(cellNoExt.getValue()) : null;
-		if(cellPhoneNumber != null)
-		{
-			model.setCellPhone(buildPhoneNumber(cellPhoneNumber, null));
-		}
+		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_CELL)
+				.map(ext -> StringUtils.trimToNull(ext.getValue())).ifPresent(
+						cellPhoneNumber -> model.setCellPhone(buildPhoneNumber(cellPhoneNumber, null))
+				);
 
 		DemographicCust demographicCustom = input.getDemographicCust();
 		if(demographicCustom != null)
@@ -121,6 +121,39 @@ public class DemographicDbToModelConverter extends
 			model.setPatientAlert(StringUtils.trimToNull(demographicCustom.getAlert()));
 			//TODO midwife/nurse,resident providers ?
 		}
+
+		// fill additional EXT entries
+		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_ABORIGINAL).ifPresent(
+				demographicExt -> model.setAboriginal("YES".equalsIgnoreCase(demographicExt.getValue()))
+		);
+		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_CYTOL_NO).ifPresent(
+				demographicExt -> model.setCytolNum(StringUtils.trimToNull(demographicExt.getValue()))
+		);
+		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_PAPER_CHART_ARCHIVED).ifPresent(
+				demographicExt -> model.setPaperChartArchived("YES".equalsIgnoreCase(demographicExt.getValue()))
+		);
+		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_PAPER_CHART_ARCHIVED_DATE).ifPresent(
+				demographicExt -> model.setPaperChartArchivedDate(ConversionUtils.toLocalDate(demographicExt.getValue()))
+		);
+		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_US_SIGNED).ifPresent(
+				demographicExt -> model.setUsSigned(StringUtils.trimToNull(demographicExt.getValue()))
+		);
+		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_PRIVACY_CONSENT).ifPresent(
+				demographicExt -> model.setPrivacyConsent(StringUtils.trimToNull(demographicExt.getValue()))
+		);
+		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_INFORMED_CONSENT).ifPresent(
+				demographicExt -> model.setInformedConsent(StringUtils.trimToNull(demographicExt.getValue()))
+		);
+		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_RX_INTERACTION_WARNING_LEVEL).ifPresent(
+				demographicExt -> model.setRxInteractionWarningLevel(StringUtils.trimToNull(demographicExt.getValue()))
+		);
+		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_SECURITY_QUESTION_1).ifPresent(
+				demographicExt -> model.setSecurityQuestion1(StringUtils.trimToNull(demographicExt.getValue()))
+		);
+		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_SECURITY_ANSWER_1).ifPresent(
+				demographicExt -> model.setSecurityAnswer1(StringUtils.trimToNull(demographicExt.getValue()))
+		);
+
 		return model;
 	}
 
@@ -141,28 +174,28 @@ public class DemographicDbToModelConverter extends
 	}
 	protected AddressModel buildAlternativeAddress(Demographic input)
 	{
-		DemographicExt altAddressExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_ADDRESS);
-		DemographicExt altCityExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_CITY);
-		DemographicExt altProvinceExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_PROVINCE);
-		DemographicExt altPostalExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_POSTAL);
+		Optional<DemographicExt> altAddressExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_ADDRESS);
+		Optional<DemographicExt> altCityExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_CITY);
+		Optional<DemographicExt> altProvinceExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_PROVINCE);
+		Optional<DemographicExt> altPostalExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_POSTAL);
 
 		AddressModel address = new AddressModel();
-		if (altAddressExt != null)
+		if (altAddressExt.isPresent())
 		{
-			address.setAddressLine1(altAddressExt.getValue());
+			address.setAddressLine1(altAddressExt.get().getValue());
 		}
-		if (altCityExt != null)
+		if (altCityExt.isPresent())
 		{
-			address.setCity(altCityExt.getValue());
+			address.setCity(altCityExt.get().getValue());
 		}
-		if (altProvinceExt != null)
+		if (altProvinceExt.isPresent())
 		{
-			address.setRegionCode(findRegionCodeValue(altProvinceExt.getValue()));
-			address.setCountryCode(findCountryCodeValue(altProvinceExt.getValue(), COUNTRY_CODE_CANADA));
+			address.setRegionCode(findRegionCodeValue(altProvinceExt.get().getValue()));
+			address.setCountryCode(findCountryCodeValue(altProvinceExt.get().getValue(), COUNTRY_CODE_CANADA));
 		}
-		if (altPostalExt != null)
+		if (altPostalExt.isPresent())
 		{
-			address.setPostalCode(StringUtils.deleteWhitespace(altPostalExt.getValue()));
+			address.setPostalCode(StringUtils.deleteWhitespace(altPostalExt.get().getValue()));
 		}
 
 		if (address.getAddressLine1() == null && address.getCity() == null && address.getRegionCode() == null

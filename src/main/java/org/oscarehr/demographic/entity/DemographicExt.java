@@ -55,6 +55,18 @@ public class DemographicExt extends AbstractModel<Integer> implements Serializab
 	public static final String ALTERNATE_POSTAL = "postal";
 	public static final String ALTERNATE_PROVINCE = "province";
 
+	public static final String KEY_ABORIGINAL = "aboriginal";
+	public static final String KEY_CYTOL_NO = "cytolNum";
+	public static final String KEY_PHONE_COMMENT = "phoneComment";
+	public static final String KEY_PAPER_CHART_ARCHIVED = "paper_chart_archived";
+	public static final String KEY_PAPER_CHART_ARCHIVED_DATE = "paper_chart_archived_date";
+	public static final String KEY_US_SIGNED = "usSigned";
+	public static final String KEY_PRIVACY_CONSENT = "privacyConsent";
+	public static final String KEY_INFORMED_CONSENT = "informedConsent";
+	public static final String KEY_SECURITY_QUESTION_1 = "securityQuestion1";
+	public static final String KEY_SECURITY_ANSWER_1 = "securityAnswer1";
+	public static final String KEY_RX_INTERACTION_WARNING_LEVEL = "rxInteractionWarningLevel";
+
 	@Transient
     private int hashCode = Integer.MIN_VALUE;// primary key
 	@Id

@@ -532,7 +532,7 @@ public class DemographicManager {
 		{
 			for (DemographicExt ext : demographic.getDemographicExtSet())
 			{
-				DemographicExt existingExt = demographicExtDao.getLatestDemographicExt(demographic.getDemographicId(), ext.getKey());
+				DemographicExt existingExt = demographicExtDao.getLatestDemographicExt(demographic.getDemographicId(), ext.getKey()).orElse(null);
 				if (existingExt != null)
 				{
 					ext.setId(existingExt.getId());
@@ -593,7 +593,7 @@ public class DemographicManager {
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {
 
-				DemographicExt existingExt = demographicExtDao.getLatestDemographicExt(demographic.getDemographicNo(), ext.getKey());
+				DemographicExt existingExt = demographicExtDao.getLatestDemographicExt(demographic.getDemographicNo(), ext.getKey()).orElse(null);
 				if (existingExt != null)
 				{
 					ext.setId(existingExt.getId());

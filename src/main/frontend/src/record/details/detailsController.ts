@@ -31,6 +31,7 @@ import {SecurityPermissions} from "../../common/security/securityConstants";
 import {BILLING_REGION} from "../../billing/billingConstants";
 import Demographic from "../../lib/demographic/model/Demographic";
 import ToastService from "../../lib/alerts/service/ToastService";
+import moment from "moment";
 
 angular.module('Record.Details').controller('Record.Details.DetailsController', [
 
@@ -76,6 +77,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		const controller = this;
 		controller.page = {};
+		controller.page.demo = null as Demographic;
 		const demographicApi = new DemographicApi($http, $httpParamSerializer, "../ws/rs");
 
 		controller.toastService = new ToastService();
@@ -123,7 +125,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead))
 			{
 				demographicService.getDemographic($stateParams.demographicNo).then(
-					function success(results)
+					function success(results: Demographic)
 					{
 						controller.page.demo = results;
 						controller.initDemographicVars();
@@ -211,14 +213,15 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						{
 							if (controller.page.demo.waitingListNames.id != null)
 							{ //only 1 entry, convert to array
-								var tmp = {};
-								tmp.id = controller.page.demo.waitingListNames.id;
-								tmp.name = controller.page.demo.waitingListNames.name;
-								tmp.groupNo = controller.page.demo.waitingListNames.groupNo;
-								tmp.providerNo = controller.page.demo.waitingListNames.providerNo;
-								tmp.createDate = controller.page.demo.waitingListNames.createDate;
-								tmp.isHistory = controller.page.demo.waitingListNames.isHistory;
-								controller.page.demo.waitingListNames = [tmp];
+								// var tmp = {};
+								// tmp.id = controller.page.demo.waitingListNames.id;
+								// tmp.name = controller.page.demo.waitingListNames.name;
+								// tmp.groupNo = controller.page.demo.waitingListNames.groupNo;
+								// tmp.providerNo = controller.page.demo.waitingListNames.providerNo;
+								// tmp.createDate = controller.page.demo.waitingListNames.createDate;
+								// tmp.isHistory = controller.page.demo.waitingListNames.isHistory;
+								// controller.page.demo.waitingListNames = [tmp];
+								// todo
 							}
 						}
 
@@ -548,12 +551,12 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 			if (!Juno.Common.Util.isBlank(cardData.hin))
 			{
-				controller.page.demo.hin = cardData.hin;
+				controller.page.demo.healthNumber = cardData.hin;
 				controller.displayMessages.add_field_warning('hin', "HIN Changed");
 			}
 			if (!Juno.Common.Util.isBlank(cardData.versionCode))
 			{
-				controller.page.demo.ver = cardData.versionCode;
+				controller.page.demo.healthNumberVersion = cardData.versionCode;
 				controller.displayMessages.add_field_warning('ver', "Version Code Changed");
 			}
 			if (!Juno.Common.Util.isBlank(cardData.sex))
@@ -561,25 +564,28 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				controller.page.demo.sex = cardData.sex;
 				controller.displayMessages.add_field_warning('sex', "Sex Changed");
 			}
+			// @ts-ignore
 			if (Oscar.HealthCardParser.validateDate(cardData.dobYear, cardData.dobMonth, cardData.dobDay))
 			{
 				controller.page.demo.dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(cardData.dobYear, cardData.dobMonth, cardData.dobDay)
 				controller.displayMessages.add_field_warning('dob', "Date of Birth Changed");
 			}
+			// @ts-ignore
 			if (Oscar.HealthCardParser.validateDate(cardData.effYear, cardData.effMonth, cardData.effDay))
 			{
-				controller.page.demo.effDate = Juno.Common.Util.formatMomentDate(
+				controller.page.demo.healthNumberEffectiveDate = Juno.Common.Util.formatMomentDate(
 					Juno.Common.Util.getDateMomentFromComponents(cardData.effYear, cardData.effMonth, cardData.effDay));
 				controller.displayMessages.add_field_warning('effDate', "Effective Date Changed");
 			}
+			// @ts-ignore
 			if (Oscar.HealthCardParser.validateDate(cardData.endYear, cardData.endMonth, cardData.endDay))
 			{
-				var expireDate = Juno.Common.Util.getDateMomentFromComponents(cardData.endYear, cardData.endMonth, cardData.endDay);
+				let expireDate = Juno.Common.Util.getDateMomentFromComponents(cardData.endYear, cardData.endMonth, cardData.endDay);
 
-				controller.page.demo.hcRenewDate = Juno.Common.Util.formatMomentDate(expireDate);
+				controller.page.demo.healthNumberRenewDate = Juno.Common.Util.formatMomentDate(expireDate);
 				controller.displayMessages.add_field_warning('endDate', "Hin End Date Changed");
 
-				var now = moment();
+				let now = moment();
 				if(now.isAfter(expireDate))
 				{
 					controller.displayMessages.add_field_warning('endDate', "Health Card Expired");
@@ -588,7 +594,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 			if (!Juno.Common.Util.isBlank(cardData.address))
 			{
-				controller.page.demo.address.address = cardData.address;
+				controller.page.demo.address.addressLine1 = cardData.address;
 				controller.displayMessages.add_field_warning('address', "Address Changed");
 			}
 			if (!Juno.Common.Util.isBlank(cardData.city))
@@ -598,7 +604,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 			if (!Juno.Common.Util.isBlank(cardData.postal))
 			{
-				controller.page.demo.address.postal = cardData.postal;
+				controller.page.demo.address.postalCode = cardData.postal;
 				controller.displayMessages.add_field_warning('postal', "Postal Code Changed");
 			}
 		};
@@ -608,50 +614,48 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		{
 			controller.displayMessages.remove_field_error('hin');
 
-			if (controller.page.demo.hcType != "ON" || controller.page.demo.hin == null || controller.page.demo.hin == "") return;
-			if (controller.page.demo.ver == null) controller.page.demo.ver = "";
-			patientDetailStatusService.validateHC(controller.page.demo.hin, controller.page.demo.ver).then(
-				function success(results)
-				{
-					if (results.valid == null)
+			if (controller.page.demo.healthNumberCountryCode != "ON" || controller.page.demo.healthNumber == null || controller.page.demo.healthNumber == "") return;
+			if (controller.page.demo.healthNumberVersion == null) controller.page.demo.healthNumberVersion = "";
+			{
+				patientDetailStatusService.validateHC(
+					controller.page.demo.healthNumber,
+					controller.page.demo.healthNumberVersion).then(
+					function success(results)
 					{
-						controller.page.HCValidation = "n/a";
-						controller.page.swipecardMsg = "Done Health Card Action";
-					}
-					else
-					{
-						controller.page.HCValidation = results.valid ? "valid" : "invalid";
-						controller.page.swipecardMsg = results.responseDescription + " (" + results.responseCode + ")";
-					}
+						if (results.valid == null)
+						{
+							controller.page.HCValidation = "n/a";
+							controller.page.swipecardMsg = "Done Health Card Action";
+						}
+						else
+						{
+							controller.page.HCValidation = results.valid ? "valid" : "invalid";
+							controller.page.swipecardMsg = results.responseDescription + " (" + results.responseCode + ")";
+						}
 
-					if(!results.valid)
+						if (!results.valid)
+						{
+							controller.displayMessages.add_field_error('hin', controller.page.swipecardMsg);
+						}
+					},
+					function error(errors)
 					{
-						controller.displayMessages.add_field_error('hin', controller.page.swipecardMsg);
-					}
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
+						console.log(errors);
+					});
+			}
 		};
 
 		//check Patient Status if endDate is entered
 		controller.checkPatientStatus = function checkPatientStatus()
 		{
-			var now = new Date();
 			if (controller.page.demo.patientStatus == "AC")
 			{
-				if (controller.page.demo.endDate != null && controller.page.demo.endDate != "")
+				if (controller.page.demo.dateEnded != null && controller.page.demo.dateEnded.isValid())
 				{
-					if (dateValid(controller.page.demo.endDate))
+					if (moment().isAfter(controller.page.demo.dateEnded))
 					{
-						var datePart = controller.page.demo.endDate.split("-");
-						var endDate = new Date(datePart[0], datePart[1] - 1, datePart[2]);
-						if (now > endDate)
-						{
-							alert("Patient Status cannot be Active after End Date.");
-							return false;
-						}
+						alert("Patient Status cannot be Active after End Date.");
+						return false;
 					}
 				}
 			}
@@ -692,13 +696,13 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		//check Chart No (length)
 		controller.checkChartNo = function checkChartNo()
 		{
-			if (controller.page.demo.chartNo == null || controller.page.demo.chartNo === "")
+			if (controller.page.demo.chartNumber == null || controller.page.demo.chartNumber === "")
 			{
-				chartNo0 = controller.page.demo.chartNo;
+				chartNo0 = controller.page.demo.chartNumber;
 				return;
 			}
-			if (controller.page.demo.chartNo.length > 10) controller.page.demo.chartNo = chartNo0;
-			else chartNo0 = controller.page.demo.chartNo;
+			if (controller.page.demo.chartNumber.length > 10) controller.page.demo.chartNumber = chartNo0;
+			else chartNo0 = controller.page.demo.chartNumber;
 		};
 
 		//check Family Doctor No
@@ -878,32 +882,67 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				}
 				else if (controller.page.billregion === BILLING_REGION.ON)
 				{
-					url = "../billing/CA/ON/billinghistory.jsp?demographic_no=" + controller.page.demo.id + "&last_name=" + encodeURI(controller.page.demo.lastName) + "&first_name=" + encodeURI(controller.page.demo.firstName) + "&orderby=appointment_date&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=10";
+					url = "../billing/CA/ON/billinghistory.jsp?demographic_no=" + controller.page.demo.id +
+						"&last_name=" + encodeURI(controller.page.demo.lastName) +
+						"&first_name=" + encodeURI(controller.page.demo.firstName) +
+						"&orderby=appointment_date&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=10";
 				}
 				else
 				{
-					url = "../billing/CA/BC/billStatus.jsp?lastName=" + encodeURI(controller.page.demo.lastName) + "&firstName=" + encodeURI(controller.page.demo.firstName) + "&filterPatient=true&demographicNo=" + controller.page.demo.id;
+					url = "../billing/CA/BC/billStatus.jsp?lastName=" + encodeURI(controller.page.demo.lastName) +
+						"&firstName=" + encodeURI(controller.page.demo.firstName) +
+						"&filterPatient=true&demographicNo=" + controller.page.demo.id;
 				}
 			}
 			else if (func === "CreateInvoice")
 			{
-				url = "../billing.do?billRegion=" + controller.page.billregion + "&billForm=" + controller.page.defaultView + "&hotclick=&appointment_no=0&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) + "&demographic_no=" + controller.page.demo.id + "&providerview=" + controller.page.demo.providerNo + "&user_no=" + user.providerNo + "&apptProvider_no=none&appointment_date=" + now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + "&start_time=00:00:00&bNewForm=1&status=t";
+				url = "../billing.do?billRegion=" + controller.page.billregion + "&billForm=" + controller.page.defaultView +
+					"&hotclick=&appointment_no=0&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
+					"&demographic_no=" + controller.page.demo.id +
+					"&providerview=" + controller.page.demo.providerNo +
+					"&user_no=" + user.providerNo +
+					"&apptProvider_no=none&appointment_date=" + now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() +
+					"&start_time=00:00:00&bNewForm=1&status=t";
 			}
 			else if (func === "FluBilling")
 			{
-				url = "../billing/CA/ON/specialtyBilling/fluBilling/addFluBilling.jsp?function=demographic&functionid=" + controller.page.demo.id + "&creator=" + user.providerNo + "&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) + "&hin=" + controller.page.demo.hin + controller.page.demo.ver + "&demo_sex=" + controller.page.demo.sex + "&demo_hctype=" + controller.page.demo.hcType + "&rd=" + encodeURI(controller.page.demo.scrReferralDoc) + "&rdohip=" + controller.page.demo.scrReferralDocNo + "&dob=" + controller.page.demo.dobYear + controller.page.demo.dobMonth + controller.page.demo.dobDay + "&mrp=" + controller.page.demo.providerNo;
+				url = "../billing/CA/ON/specialtyBilling/fluBilling/addFluBilling.jsp?function=demographic&functionid=" + controller.page.demo.id +
+					"&creator=" + user.providerNo +
+					"&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
+					"&hin=" + controller.page.demo.healthNumber + controller.page.demo.healthNumberVersion +
+					"&demo_sex=" + controller.page.demo.sex +
+					"&demo_hctype=" + controller.page.demo.healthNumberProvinceCode +
+					"&rd=" + encodeURI(controller.page.demo.scrReferralDoc) +
+					"&rdohip=" + controller.page.demo.scrReferralDocNo +
+					"&dob=" + encodeURI(Juno.Common.Util.formatMomentDate(controller.page.demo.dateOfBirth)) +
+					"&mrp=" + controller.page.demo.providerNo;
 			}
 			else if (func === "HospitalBilling")
 			{
-				url = "../billing/CA/ON/billingShortcutPg1.jsp?billRegion=" + controller.page.billregion + "&billForm=" + encodeURI(controller.page.hospitalView) + "&hotclick=&appointment_no=0&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) + "&demographic_no=" + controller.page.demo.id + "&providerview=" + controller.page.demo.providerNo + "&user_no=" + user.providerNo + "&apptProvider_no=none&appointment_date=" + now.getFullYear + "-" + (now.getMonth() + 1) + "-" + now.getDate() + "&start_time=00:00:00&bNewForm=1&status=t";
+				url = "../billing/CA/ON/billingShortcutPg1.jsp?billRegion=" + controller.page.billregion +
+					"&billForm=" + encodeURI(controller.page.hospitalView) +
+					"&hotclick=&appointment_no=0&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
+					"&demographic_no=" + controller.page.demo.id +
+					"&providerview=" + controller.page.demo.providerNo +
+					"&user_no=" + user.providerNo +
+					"&apptProvider_no=none&appointment_date=" + now.getFullYear + "-" + (now.getMonth() + 1) + "-" + now.getDate() +
+					"&start_time=00:00:00&bNewForm=1&status=t";
 			}
 			else if (func === "AddBatchBilling")
 			{
-				url = "../billing/CA/ON/addBatchBilling.jsp?demographic_no=" + controller.page.demo.id + "&creator=" + user.providerNo + "&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) + "&hin=" + controller.page.demo.hin + controller.page.demo.ver + "&dob=" + controller.page.demo.dobYear + controller.page.demo.dobMonth + controller.page.demo.dobDay;
+				url = "../billing/CA/ON/addBatchBilling.jsp?demographic_no=" + controller.page.demo.id +
+					"&creator=" + user.providerNo +
+					"&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
+					"&hin=" + controller.page.demo.healthNumber + controller.page.demo.healthNumberVersion +
+					"&dob=" + controller.page.demo.dobYear + controller.page.demo.dobMonth + controller.page.demo.dobDay;
 			}
 			else if (func === "AddINR")
 			{
-				url = "../billing/CA/ON/inr/addINRbilling.jsp?function=demographic&functionid=" + controller.page.demo.id + "&creator=" + user.providerNo + "&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) + "&hin=" + controller.page.demo.hin + controller.page.demo.ver + "&dob=" + controller.page.demo.dobYear + controller.page.demo.dobMonth + controller.page.demo.dobDay;
+				url = "../billing/CA/ON/inr/addINRbilling.jsp?function=demographic&functionid=" + controller.page.demo.id +
+					"&creator=" + user.providerNo +
+					"&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
+					"&hin=" + controller.page.demo.healthNumber + controller.page.demo.healthNumberVersion +
+					"&dob=" + encodeURI(Juno.Common.Util.formatMomentDate(controller.page.demo.dateOfBirth));
 			}
 			else if (func === "BillINR")
 			{
@@ -1097,14 +1136,14 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 			if (Juno.Common.Util.exists(controller.page.demo.healthNumber))
             {
-                controller.page.demo.healthNumber = controller.page.demo.hin.replace(/[\W_]/gi, '');
+                controller.page.demo.healthNumber = controller.page.demo.healthNumber.replace(/[\W_]/gi, '');
             }
 
 			//save notes
-			if (controller.page.demo.scrNotes != null)
-			{
-				controller.page.demo.notes = "<unotes>" + controller.page.demo.scrNotes + "</unotes>";
-			}
+			// if (controller.page.demo.patientNote != null)
+			// {
+			// 	controller.page.demo.patientNote = "<unotes>" + controller.page.demo.patientNote + "</unotes>";
+			// }
 
 			//save referral doctor (familyDoctor)
 			controller.page.demo.familyDoctor = controller.formatDocInput(controller.page.demo.scrReferralDoc, controller.page.demo.scrReferralDocNo);
@@ -1113,44 +1152,36 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			controller.page.demo.familyDoctor2 = controller.formatFamilyDocInput(controller.page.demo.scrFamilyDoc, controller.page.demo.scrFamilyDocNo);
 
 			//save phone numbers
-			controller.page.demo.scrDemoCell = controller.page.demo.scrCellPhone;
-			controller.page.demo.phone = controller.page.demo.scrHomePhone;
-			controller.page.demo.alternativePhone = controller.page.demo.scrWorkPhone;
+			// controller.page.demo.scrDemoCell = controller.page.demo.scrCellPhone;
+			// controller.page.demo.phone = controller.page.demo.scrHomePhone;
+			// controller.page.demo.alternativePhone = controller.page.demo.scrWorkPhone;
 
-			if (controller.page.demo.scrPreferredPhone == "C") controller.page.demo.scrDemoCell += "*";
-			else if (controller.page.demo.scrPreferredPhone == "H") controller.page.demo.phone += "*";
-			else if (controller.page.demo.scrPreferredPhone == "W") controller.page.demo.alternativePhone += "*";
+			// if (controller.page.demo.scrPreferredPhone == "C") controller.page.demo.scrDemoCell += "*";
+			// else if (controller.page.demo.scrPreferredPhone == "H") controller.page.demo.phone += "*";
+			// else if (controller.page.demo.scrPreferredPhone == "W") controller.page.demo.alternativePhone += "*";
 
 			//save extras
-			var newDemoExtras = [];
-			newDemoExtras = updateDemoExtras("demo_cell", controller.page.demo.scrDemoCell, posExtras, controller.page.demo.extras, newDemoExtras);
-			newDemoExtras = updateDemoExtras("aboriginal", controller.page.demo.scrAboriginal, posExtras, controller.page.demo.extras, newDemoExtras);
-			newDemoExtras = updateDemoExtras("hPhoneExt", controller.page.demo.scrHPhoneExt, posExtras, controller.page.demo.extras, newDemoExtras);
-			newDemoExtras = updateDemoExtras("wPhoneExt", controller.page.demo.scrWPhoneExt, posExtras, controller.page.demo.extras, newDemoExtras);
-			newDemoExtras = updateDemoExtras("cytolNum", controller.page.demo.scrCytolNum, posExtras, controller.page.demo.extras, newDemoExtras);
-			newDemoExtras = updateDemoExtras("phoneComment", controller.page.demo.scrPhoneComment, posExtras, controller.page.demo.extras, newDemoExtras);
-			newDemoExtras = updateDemoExtras("paper_chart_archived", controller.page.demo.scrPaperChartArchived, posExtras, controller.page.demo.extras, newDemoExtras);
-			newDemoExtras = updateDemoExtras("paper_chart_archived_date", controller.page.demo.scrPaperChartArchivedDate, posExtras, controller.page.demo.extras, newDemoExtras);
-			newDemoExtras = updateDemoExtras("usSigned", controller.page.demo.scrUsSigned, posExtras, controller.page.demo.extras, newDemoExtras);
-			newDemoExtras = updateDemoExtras("privacyConsent", controller.page.demo.scrPrivacyConsent, posExtras, controller.page.demo.extras, newDemoExtras);
-			newDemoExtras = updateDemoExtras("informedConsent", controller.page.demo.scrInformedConsent, posExtras, controller.page.demo.extras, newDemoExtras);
-			newDemoExtras = updateDemoExtras("securityQuestion1", controller.page.demo.scrSecurityQuestion1, posExtras, controller.page.demo.extras, newDemoExtras);
-			newDemoExtras = updateDemoExtras("securityAnswer1", controller.page.demo.scrSecurityAnswer1, posExtras, controller.page.demo.extras, newDemoExtras);
-			newDemoExtras = updateDemoExtras("rxInteractionWarningLevel", controller.page.demo.scrRxInteractionLevel, posExtras, controller.page.demo.extras, newDemoExtras);
-			controller.page.demo.extras = newDemoExtras;
+			// var newDemoExtras = [];
+			// newDemoExtras = updateDemoExtras("demo_cell", controller.page.demo.scrDemoCell, posExtras, controller.page.demo.extras, newDemoExtras);
+			// newDemoExtras = updateDemoExtras("aboriginal", controller.page.demo.scrAboriginal, posExtras, controller.page.demo.extras, newDemoExtras);
+			// newDemoExtras = updateDemoExtras("hPhoneExt", controller.page.demo.scrHPhoneExt, posExtras, controller.page.demo.extras, newDemoExtras);
+			// newDemoExtras = updateDemoExtras("wPhoneExt", controller.page.demo.scrWPhoneExt, posExtras, controller.page.demo.extras, newDemoExtras);
+			// newDemoExtras = updateDemoExtras("cytolNum", controller.page.demo.scrCytolNum, posExtras, controller.page.demo.extras, newDemoExtras);
+			// newDemoExtras = updateDemoExtras("phoneComment", controller.page.demo.scrPhoneComment, posExtras, controller.page.demo.extras, newDemoExtras);
+			// newDemoExtras = updateDemoExtras("paper_chart_archived", controller.page.demo.scrPaperChartArchived, posExtras, controller.page.demo.extras, newDemoExtras);
+			// newDemoExtras = updateDemoExtras("paper_chart_archived_date", controller.page.demo.scrPaperChartArchivedDate, posExtras, controller.page.demo.extras, newDemoExtras);
+			// newDemoExtras = updateDemoExtras("usSigned", controller.page.demo.scrUsSigned, posExtras, controller.page.demo.extras, newDemoExtras);
+			// newDemoExtras = updateDemoExtras("privacyConsent", controller.page.demo.scrPrivacyConsent, posExtras, controller.page.demo.extras, newDemoExtras);
+			// newDemoExtras = updateDemoExtras("informedConsent", controller.page.demo.scrInformedConsent, posExtras, controller.page.demo.extras, newDemoExtras);
+			// newDemoExtras = updateDemoExtras("securityQuestion1", controller.page.demo.scrSecurityQuestion1, posExtras, controller.page.demo.extras, newDemoExtras);
+			// newDemoExtras = updateDemoExtras("securityAnswer1", controller.page.demo.scrSecurityAnswer1, posExtras, controller.page.demo.extras, newDemoExtras);
+			// newDemoExtras = updateDemoExtras("rxInteractionWarningLevel", controller.page.demo.scrRxInteractionLevel, posExtras, controller.page.demo.extras, newDemoExtras);
+			// controller.page.demo.extras = newDemoExtras;
 
-			// clone the demographic, so that final modifications can be made before save.
-			let demographicForSave = new Demographic();
-			Object.assign(demographicForSave, controller.page.demo);
-
-			// convert null back to "-1" why? because Oscar.
-			// if (!demographicForSave.countryOfOrigin)
-			// {
-			// 	demographicForSave.countryOfOrigin = "-1";
-			// }
+			console.debug("pre-save", controller.page.demo);
 
 			//save to database
-			demographicService.updateDemographic(demographicForSave).then(
+			demographicService.updateDemographic(controller.page.demo).then(
 				function success()
 				{
 					controller.resetEditState();
@@ -1188,79 +1219,79 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 
 // Move these?
-function updateDemoExtras(extKey, newVal, posExtras, oldExtras, newExtras)
-{
-	if (newVal == null) return newExtras;
+// function updateDemoExtras(extKey, newVal, posExtras, oldExtras, newExtras)
+// {
+// 	if (newVal == null) return newExtras;
+//
+// 	var pos = posExtras[extKey];
+// 	if (pos != null && oldExtras[pos] != null)
+// 	{ //existing ext
+// 		if (oldExtras[pos].value != newVal)
+// 		{
+// 			newExtras.push(
+// 			{
+// 				id: oldExtras[pos].id,
+// 				key: extKey,
+// 				value: newVal,
+// 				hidden: oldExtras[pos].hidden
+// 			});
+// 		}
+// 	}
+// 	else
+// 	{ //newly added ext
+// 		newExtras.push(
+// 		{
+// 			key: extKey,
+// 			value: newVal
+// 		});
+// 	}
+// 	return newExtras;
+// }
 
-	var pos = posExtras[extKey];
-	if (pos != null && oldExtras[pos] != null)
-	{ //existing ext
-		if (oldExtras[pos].value != newVal)
-		{
-			newExtras.push(
-			{
-				id: oldExtras[pos].id,
-				key: extKey,
-				value: newVal,
-				hidden: oldExtras[pos].hidden
-			});
-		}
-	}
-	else
-	{ //newly added ext
-		newExtras.push(
-		{
-			key: extKey,
-			value: newVal
-		});
-	}
-	return newExtras;
-}
-
-function dateValid(dateStr)
-{ //valid date format: yyyy-MM-dd
-	if (dateStr == null || dateStr == "") return true;
-
-	var datePart = dateStr.toString().split("-");
-	if (datePart.length != 3) return false;
-
-	var dateDate = new Date(datePart[0], datePart[1] - 1, datePart[2]);
-	if (isNaN(dateDate.getTime())) return false;
-
-	if (dateDate.getFullYear() != datePart[0]) return false;
-	if (dateDate.getMonth() != datePart[1] - 1) return false;
-	if (dateDate.getDate() != datePart[2]) return false;
-
-	return true;
-}
+// function dateValid(dateStr)
+// { //valid date format: yyyy-MM-dd
+// 	if (dateStr == null || dateStr == "") return true;
+//
+// 	var datePart = dateStr.toString().split("-");
+// 	if (datePart.length != 3) return false;
+//
+// 	var dateDate = new Date(datePart[0], datePart[1] - 1, datePart[2]);
+// 	if (isNaN(dateDate.getTime())) return false;
+//
+// 	if (dateDate.getFullYear() != datePart[0]) return false;
+// 	if (dateDate.getMonth() != datePart[1] - 1) return false;
+// 	if (dateDate.getDate() != datePart[2]) return false;
+//
+// 	return true;
+// }
 
 function isNumber(s)
 {
 	return /^[0-9]+$/.test(s);
 }
 
-function isPreferredPhone(phone)
-{
-	phone = String(phone);
-	if (phone != null && phone != "")
-	{
-		if (phone.charAt(phone.length - 1) == "*") return true;
-	}
-	return false;
-}
+// function isPreferredPhone(phone)
+// {
+// 	phone = String(phone);
+// 	if (phone != null && phone != "")
+// 	{
+// 		if (phone.charAt(phone.length - 1) == "*") return true;
+// 	}
+// 	return false;
+// }
 
-function getPhoneNum(phone)
-{
-	if (isPreferredPhone(phone))
-	{
-		phone = phone.substring(0, phone.length - 1);
-	}
-	return phone;
-}
+// function getPhoneNum(phone)
+// {
+// 	if (isPreferredPhone(phone))
+// 	{
+// 		phone = phone.substring(0, phone.length - 1);
+// 	}
+// 	return phone;
+// }
 
-function toArray(obj)
-{ //convert single object to array
-	if (obj instanceof Array) return obj;
-	else if (obj == null) return [];
-	else return [obj];
-}
+// function toArray(obj)
+// { //convert single object to array
+// 	if (obj instanceof Array) return obj;
+// 	else if (obj == null) return [];
+// 	else return [obj];
+// }

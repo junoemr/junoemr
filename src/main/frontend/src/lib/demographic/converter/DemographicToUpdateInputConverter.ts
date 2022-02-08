@@ -33,6 +33,19 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.homePhone = phoneConverter.convert(from.homePhone);
 		updateInput.workPhone = phoneConverter.convert(from.workPhone);
 
+		updateInput.patientStatus = from.patientStatus;
+
+		updateInput.aboriginal = from.aboriginal;
+		updateInput.cytolNum = from.cytolNum;
+		updateInput.paperChartArchived = from.paperChartArchived;
+		updateInput.paperChartArchivedDate = this.serializeDateTime(from.paperChartArchivedDate);
+		updateInput.usSigned = from.usSigned;
+		updateInput.privacyConsent = from.privacyConsent;
+		updateInput.informedConsent = from.informedConsent;
+		updateInput.securityQuestion1 = from.securityQuestion1;
+		updateInput.securityAnswer1 = from.securityAnswer1;
+		updateInput.rxInteractionWarningLevel = from.rxInteractionWarningLevel;
+
 		return updateInput;
 	}
 }

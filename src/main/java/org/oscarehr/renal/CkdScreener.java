@@ -237,7 +237,7 @@ public class CkdScreener {
 			reasons.add("Family Hx");
 		
 		boolean positiveAboriginalMatch=false;
-		DemographicExt ab = demographicExtDao.getLatestDemographicExt(demographicNo, "aboriginal");
+		DemographicExt ab = demographicExtDao.getLatestDemographicExt(demographicNo, DemographicExt.KEY_ABORIGINAL).orElse(null);
 		if(ab != null && ab.getValue().equals("Yes")) {
 			positiveAboriginalMatch=true;
 		}

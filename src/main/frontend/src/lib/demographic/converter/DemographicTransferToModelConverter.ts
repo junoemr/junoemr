@@ -18,13 +18,14 @@ export default class DemographicTransferToModelConverter extends AbstractConvert
 		model.alias = from.alias;
 		model.title = String(from.title);
 		model.dateOfBirth = moment(from.dateOfBirth);
-		model.sex = Sex[String(from.sex)];
+		model.sex = from.sex as any as Sex;
 		model.chartNumber = from.chartNumber;
 		model.healthNumber = from.healthNumber;
 		model.healthNumberVersion = from.healthNumberVersion;
 		model.healthNumberProvinceCode = from.healthNumberProvinceCode;
 		model.healthNumberEffectiveDate = moment(from.healthNumberEffectiveDate);
 		model.healthNumberRenewDate = moment(from.healthNumberRenewDate);
+		model.patientStatus = from.patientStatus;
 		model.patientStatusDate = moment(from.patientStatusDate);
 		model.dateJoined = moment(from.dateJoined);
 		model.dateEnded = moment(from.dateEnded);
@@ -38,6 +39,16 @@ export default class DemographicTransferToModelConverter extends AbstractConvert
 
 		model.patientNote = from.patientNote;
 		model.patientAlert = from.patientAlert;
+		model.aboriginal = from.aboriginal;
+		model.cytolNum = from.cytolNum;
+		model.paperChartArchived = from.paperChartArchived;
+		model.paperChartArchivedDate = moment(from.paperChartArchivedDate);
+		model.usSigned = from.usSigned;
+		model.privacyConsent = from.privacyConsent;
+		model.informedConsent = from.informedConsent;
+		model.securityQuestion1 = from.securityQuestion1;
+		model.securityAnswer1 = from.securityAnswer1;
+		model.rxInteractionWarningLevel = from.rxInteractionWarningLevel;
 
 		return model;
 	}
