@@ -4,7 +4,8 @@ import ToastService from "../service/ToastService";
 
 export default class BasicToast implements Toast
 {
-	public static readonly TOAST_DEFAULT_DURATION = 5000;
+	public static readonly BASIC_TOAST_DEFAULT_DURATION = 3000;
+	public static readonly ERROR_TOAST_DEFAULT_DURATION = BasicToast.BASIC_TOAST_DEFAULT_DURATION + 2000;
 
 	protected _visible: boolean = true;
 	protected _durationMs: number;
@@ -23,7 +24,7 @@ export default class BasicToast implements Toast
 	 * @param icon - [optional] icon to use
 	 * @param duration - [optional] [default 5 seconds] duration of the toast
 	 */
-	constructor(message: string, style: ToastStyle = ToastStyle.Notification, icon: string = null, duration = BasicToast.TOAST_DEFAULT_DURATION)
+	constructor(message: string, style: ToastStyle = ToastStyle.Notification, icon: string = null, duration = BasicToast.BASIC_TOAST_DEFAULT_DURATION)
 	{
 		this._message = message;
 		this._style = style;

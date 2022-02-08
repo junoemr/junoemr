@@ -417,16 +417,25 @@ angular.module('Patient').component('addDemographicModal', {
 						{
 							ctrl.resetToDefaults();
 							ctrl.resetFocus();
+
+
+
 						}
 						else
 						{
 							ctrl.modalInstance.close(results);
 						}
 					})
-					.catch((errors) =>
+					.catch((errorMessage) =>
 					{
-						ctrl.toastService.errorToast("Unable to save demographic");
-						console.error(errors);
+						if (errorMessage)
+						{
+							ctrl.toastService.errorToast(`Unable to save demographic (${errorMessage})`);
+						}
+						else
+						{
+							ctrl.toastService.errorToast(`Unable to save demographic`);
+						}
 					})
 					.finally(() =>
 					{
