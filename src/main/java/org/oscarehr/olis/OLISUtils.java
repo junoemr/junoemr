@@ -59,6 +59,8 @@ import java.util.Optional;
 
 public class OLISUtils
 {
+	public static final String PROVINCIAL_LAB_ON = "2.16.840.1.113883.3.59.1";
+
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
 
