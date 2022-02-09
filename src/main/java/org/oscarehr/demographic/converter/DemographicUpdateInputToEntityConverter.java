@@ -28,6 +28,8 @@ import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.entity.DemographicExt;
@@ -35,6 +37,7 @@ import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.transfer.DemographicUpdateInput;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -50,6 +53,12 @@ import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
 public class DemographicUpdateInputToEntityConverter
 		extends BaseModelToDbConverter<DemographicUpdateInput, Demographic>
 {
+	@Autowired
+	private DemographicDao demographicDao;
+
+	@Autowired
+	private DemographicExtDao demographicExtDao;
+
 	@Override
 	public Demographic convert(DemographicUpdateInput input)
 	{
@@ -58,7 +67,7 @@ public class DemographicUpdateInputToEntityConverter
 			return null;
 		}
 
-		Demographic dbDemographic = new Demographic();
+		Demographic dbDemographic = demographicDao.find(input.getId());
 		BeanUtils.copyProperties(input, dbDemographic, "dateOfBirth", "title", "sex", "officialLanguage");
 
 		dbDemographic.setDemographicId(input.getId());
@@ -73,7 +82,8 @@ public class DemographicUpdateInputToEntityConverter
 		dbDemographic.setDateJoined(ConversionUtils.toNullableLegacyDate(input.getDateJoined()));
 		dbDemographic.setEndDate(ConversionUtils.toNullableLegacyDate(input.getDateEnded()));
 		dbDemographic.setChartNo(input.getChartNumber());
-		dbDemographic.setOfficialLanguage(Optional.ofNullable(input.getOfficialLanguage()).map(DemographicModel.OFFICIAL_LANGUAGE::getValue).orElse(null));
+		dbDemographic.setOfficialLanguage(Optional.ofNullable(input.getOfficialLanguage())
+				.map(DemographicModel.OFFICIAL_LANGUAGE::getValue).orElse(null));
 
 		ProviderData dbProvider = findOrCreateProviderRecord(input.getMrpProvider(), true);
 		if(dbProvider != null)
@@ -101,13 +111,13 @@ public class DemographicUpdateInputToEntityConverter
 			}
 			else
 			{
-				DemographicExt altAddress = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+				DemographicExt altAddress = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 						DemographicExt.ALTERNATE_ADDRESS, address.getAddressLinesString());
-				DemographicExt altCity = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+				DemographicExt altCity = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 						DemographicExt.ALTERNATE_CITY, address.getCity());
-				DemographicExt altProvince = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+				DemographicExt altProvince = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 						DemographicExt.ALTERNATE_PROVINCE, getProvinceCode(address.getRegionCode(), address.getCountryCode()));
-				DemographicExt altPostal = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+				DemographicExt altPostal = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 						DemographicExt.ALTERNATE_POSTAL, address.getPostalCode());
 				demographicExtSet.add(altAddress);
 				demographicExtSet.add(altCity);
@@ -125,7 +135,7 @@ public class DemographicUpdateInputToEntityConverter
 			String extension = homePhone.getExtension();
 			if(extension != null)
 			{
-				DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_H_PHONE_EXT, extension);
+				DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_H_PHONE_EXT, extension);
 				demographicExtSet.add(ext);
 			}
 		}
@@ -138,7 +148,7 @@ public class DemographicUpdateInputToEntityConverter
 			String extension = workPhone.getExtension();
 			if(extension != null)
 			{
-				DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_W_PHONE_EXT, extension);
+				DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_W_PHONE_EXT, extension);
 				demographicExtSet.add(ext);
 			}
 		}
@@ -146,63 +156,69 @@ public class DemographicUpdateInputToEntityConverter
 		PhoneNumberModel cellPhone = input.getCellPhone();
 		if(cellPhone != null)
 		{
-			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+			DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 					DemographicExt.KEY_DEMO_CELL, cellPhone.getNumber());
 			demographicExtSet.add(ext);
 		}
 
 		if(input.getAboriginal() != null)
 		{
-			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+			DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 					DemographicExt.KEY_ABORIGINAL, input.getAboriginal() ? "Yes" : "No");
+			demographicExtSet.add(ext);
+		}
+		if(input.getCytolNum() != null)
+		{
+			DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
+					DemographicExt.KEY_CYTOL_NO, input.getCytolNum());
 			demographicExtSet.add(ext);
 		}
 		if(input.getUsSigned() != null)
 		{
-			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+			DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 					DemographicExt.KEY_US_SIGNED, input.getUsSigned());
 			demographicExtSet.add(ext);
 		}
 		if(input.getPrivacyConsent() != null)
 		{
-			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+			DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 					DemographicExt.KEY_PRIVACY_CONSENT, input.getPrivacyConsent());
 			demographicExtSet.add(ext);
 		}
 		if(input.getInformedConsent() != null)
 		{
-			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+			DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 					DemographicExt.KEY_INFORMED_CONSENT, input.getInformedConsent());
 			demographicExtSet.add(ext);
 		}
 		if(input.getPaperChartArchived() != null)
 		{
-			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+			DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 					DemographicExt.KEY_PAPER_CHART_ARCHIVED, input.getPaperChartArchived() ? "YES" : "NO");
 			demographicExtSet.add(ext);
 		}
 		if(input.getPaperChartArchivedDate() != null)
 		{
-			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+			DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 					DemographicExt.KEY_PAPER_CHART_ARCHIVED_DATE,
 					ConversionUtils.toDateString(input.getPaperChartArchivedDate()));
 			demographicExtSet.add(ext);
 		}
 		if(input.getSecurityQuestion1() != null)
 		{
-			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+			DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 					DemographicExt.KEY_SECURITY_QUESTION_1, input.getSecurityQuestion1());
 			demographicExtSet.add(ext);
 		}
 		if(input.getSecurityAnswer1() != null)
 		{
-			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+			DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 					DemographicExt.KEY_SECURITY_ANSWER_1, input.getSecurityAnswer1());
 			demographicExtSet.add(ext);
 		}
 		if(input.getRxInteractionWarningLevel() != null)
 		{
-			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(),
+			DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 					DemographicExt.KEY_RX_INTERACTION_WARNING_LEVEL, input.getRxInteractionWarningLevel());
 			demographicExtSet.add(ext);
 		}
@@ -210,10 +226,11 @@ public class DemographicUpdateInputToEntityConverter
 
 		dbDemographic.setDemographicExtSet(demographicExtSet);
 
-		DemographicCust demographicCust = Optional.ofNullable(dbDemographic.getDemographicCust()).orElse(new DemographicCust());
+		DemographicCust demographicCust = Optional.ofNullable(dbDemographic.getDemographicCust()).orElse(new DemographicCust(dbDemographic.getId()));
 		demographicCust.setParsedNotes(input.getPatientNote());
 		demographicCust.setAlert(input.getPatientAlert());
 		demographicCust.setDemographic(dbDemographic);
+		dbDemographic.setDemographicCust(demographicCust);
 
 		// referral doc and family doc are not real providers and need to be handled differently from regular provider lookups
 		Provider referralDoc = input.getReferralDoctor();
@@ -250,5 +267,12 @@ public class DemographicUpdateInputToEntityConverter
 		{
 			return provinceCode;
 		}
+	}
+
+	private DemographicExt updateOrCreateExtEntity(String providerNo, Integer demographicNo, String key, String value)
+	{
+		DemographicExt ext = demographicExtDao.getLatestDemographicExt(demographicNo, key).orElse(new DemographicExt(providerNo, demographicNo, key, value));
+		ext.setValue(value);
+		return ext;
 	}
 }

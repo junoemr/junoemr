@@ -21,7 +21,7 @@
 		</juno-date-select>
 
 		<!-- Archived Paper Chart -->
-		<juno-select ng-model="$ctrl.ngModel.scrPaperChartArchived"
+		<juno-select ng-model="$ctrl.ngModel.paperChartArchived"
 						options="$ctrl.archivedChartOptions"
 						label="Archived Paper Chart"
 						component-style="$ctrl.componentStyle">
@@ -35,35 +35,35 @@
 		</juno-input>
 
 		<!-- Privacy Consent-->
-		<juno-input ng-model="$ctrl.ngModel.scrPrivacyConsent"
+		<juno-input ng-model="$ctrl.ngModel.privacyConsent"
 						label="Privacy Consent"
 						placeholder="Privacy Consent"
 						component-style="$ctrl.componentStyle">
 		</juno-input>
 
 		<!-- Informed Consent-->
-		<juno-input ng-model="$ctrl.ngModel.scrInformedConsent"
+		<juno-input ng-model="$ctrl.ngModel.informedConsent"
 		            label="Informed Consent"
 		            placeholder="Informed Consent"
 		            component-style="$ctrl.componentStyle">
 		</juno-input>
 
 		<!-- US Consent-->
-		<juno-input ng-model="$ctrl.ngModel.scrUsSigned"
+		<juno-input ng-model="$ctrl.ngModel.usSigned"
 						label="US Resident Consent"
 						placeholder="US Resident Consent"
 						component-style="$ctrl.componentStyle">
 		</juno-input>
 
 		<!-- Rx Interaction Level -->
-		<juno-select ng-model="$ctrl.ngModel.scrRxInteractionLevel"
+		<juno-select ng-model="$ctrl.ngModel.rxInteractionWarningLevel"
 		             options="$ctrl.rxInteractionLevels"
 		             label="Rx Interaction Level"
 		             component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Security Question -->
-		<juno-select ng-model="$ctrl.ngModel.scrSecurityQuestion1"
+		<juno-select ng-model="$ctrl.ngModel.securityQuestion1"
 						options="$ctrl.securityQuestions"
 						label="Security Question"
 						placeholder="Select Security Question"
@@ -71,7 +71,7 @@
 		</juno-select>
 
 		<!-- Security Answer -->
-		<juno-input ng-model="$ctrl.ngModel.scrSecurityAnswer1"
+		<juno-input ng-model="$ctrl.ngModel.securityAnswer1"
 						label="Security Answer"
 						placeholder="Answer"
 						component-style="$ctrl.componentStyle">

@@ -21,8 +21,12 @@
 * Canada
 */
 
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
-import {RosterServiceApi, SystemPreferenceApi} from "../../../../../generated/"
+import {
+	JUNO_BUTTON_COLOR,
+	JUNO_BUTTON_COLOR_PATTERN,
+	JUNO_STYLE,
+	LABEL_POSITION
+} from "../../../../common/components/junoComponentConstants";
 import {ProvidersServiceApi} from "../../../../../generated";
 
 angular.module('Record.Details').component('careTeamSection', {
@@ -48,8 +52,6 @@ angular.module('Record.Details').component('careTeamSection', {
                   referralDoctorsService)
 	{
 		let ctrl = this;
-        let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
-            '../ws/rs');
         let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 
 		$scope.LABEL_POSITION = LABEL_POSITION;
@@ -162,8 +164,7 @@ angular.module('Record.Details').component('careTeamSection', {
 
 		ctrl.updatePatientStatusDate = () =>
 		{
-			let currentDate = Juno.Common.Util.getDateMoment(new Date());
-			ctrl.ngModel.patientStatusDate = currentDate;
+			ctrl.ngModel.patientStatusDate = moment();
 		}
 	}]
 });

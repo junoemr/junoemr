@@ -477,8 +477,6 @@ public class DemographicService
 		archiveDemographicRecord(oldDemographic);
 
 		Demographic demographic = demographicUpdateInputToEntityConverter.convert(updateInput);
-		demographic.setDemographicId(updateInput.getId());
-
 		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
 
 		demographicDao.merge(demographic);

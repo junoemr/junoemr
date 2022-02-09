@@ -7,7 +7,7 @@
 	<div class="details-fields">
 		<div class="hin-fields">
 			<!-- HIN -->
-			<juno-input ng-model="$ctrl.ngModel.hin"
+			<juno-input ng-model="$ctrl.ngModel.healthNumber"
 							label="HIN"
 							invalid="!$ctrl.validations.hin()"
 							show-invalid-focus="false"
@@ -15,7 +15,7 @@
 							class="hin">
 			</juno-input>
 			<!-- HIN Version -->
-			<juno-input ng-model="$ctrl.ngModel.ver"
+			<juno-input ng-model="$ctrl.ngModel.healthNumberVersion"
 							placeholder="Ver"
 							component-style="$ctrl.componentStyle"
 							class="version">
@@ -23,14 +23,14 @@
 		</div>
 
 		<!-- Health Care Type -->
-		<juno-select ng-model="$ctrl.ngModel.hcType"
+		<juno-select ng-model="$ctrl.ngModel.healthNumberProvinceCode"
 						options="$ctrl.provinces"
 						label="Health Card Type"
 						component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Effective Date -->
-		<juno-date-select ng-model="$ctrl.ngModel.effDate"
+		<juno-date-select ng-model="$ctrl.ngModel.healthNumberEffectiveDate"
 						label="Effective date"
 						on-validity-change="$ctrl.effectiveDateValid = valid"
 						component-style="$ctrl.componentStyle">
@@ -38,7 +38,7 @@
 
 
 		<!-- HIN Renew Date -->
-		<juno-date-select ng-model="$ctrl.ngModel.hcRenewDate"
+		<juno-date-select ng-model="$ctrl.ngModel.healthNumberRenewDate"
 						label="Renew Date"
 						component-style="$ctrl.componentStyle">
 		</juno-date-select>

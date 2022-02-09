@@ -25,6 +25,7 @@
 
 package org.oscarehr.demographic.entity;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.model.AbstractModel;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -68,6 +69,14 @@ public class DemographicCust extends AbstractModel<Integer>
 	@OneToOne(fetch= FetchType.LAZY)
 	@JoinColumn(name="demographic_no", insertable=false, updatable=false)
 	private Demographic demographic;
+
+	public DemographicCust()
+	{
+	}
+	public DemographicCust(Integer id)
+	{
+		this.id = id;
+	}
 
 	public Integer getId() {
 		return id;
@@ -141,7 +150,7 @@ public class DemographicCust extends AbstractModel<Integer>
 
 	public void setParsedNotes(String notes)
 	{
-		this.notes = "<unotes>" + notes + "</unotes>";
+		this.notes = "<unotes>" + StringUtils.trimToEmpty(notes) + "</unotes>";
 	}
 
 	public Demographic getDemographic()

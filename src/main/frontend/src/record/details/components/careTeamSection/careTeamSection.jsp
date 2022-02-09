@@ -85,21 +85,21 @@
 		</juno-date-select>
 
 		<!-- End Date -->
-		<juno-date-select ng-model="$ctrl.ngModel.endDate"
+		<juno-date-select ng-model="$ctrl.ngModel.dateEnded"
 		                  label="End Date"
 		                  on-validity-change="$ctrl.endDateValid = valid"
 		                  component-style="$ctrl.componentStyle">
 		</juno-date-select>
 
 		<!-- Chart Number-->
-		<juno-input ng-model="$ctrl.ngModel.chartNo"
+		<juno-input ng-model="$ctrl.ngModel.chartNumber"
 					label="Chart Number"
 					placeholder="Chart Number"
 					component-style="$ctrl.componentStyle">
 		</juno-input>
 
 		<!-- Cytology Number-->
-		<juno-input ng-model="$ctrl.ngModel.scrCytolNum"
+		<juno-input ng-model="$ctrl.ngModel.cytolNum"
 					label="Cytology #"
 					placeholder="Cytology #"
 					valid-regex="$ctrl.numberRegex"
