@@ -154,8 +154,8 @@
 			function setfocus()
 			{
 				this.focus();
-				document.ADDAPPT.keyword.focus();
-				document.ADDAPPT.keyword.select();
+				document.serviceform.textarea.focus();
+				document.serviceform.textarea.select();
 			}
 
 			function validateForm()
