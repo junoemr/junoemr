@@ -59,8 +59,6 @@ import java.util.Optional;
 
 public class OLISUtils
 {
-	public static final String PROVINCIAL_LAB_ON = "2.16.840.1.113883.3.59.1";
-
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
 
@@ -113,11 +111,6 @@ public class OLISUtils
 		{
 			String provincialLab = sendingFacility.split(":")[0];
 			String labIdentifier = sendingFacility.split(":")[1];
-
-			if(!PROVINCIAL_LAB_ON.equals(provincialLab))
-			{
-				throw new OLISUnknownFacilityException(provincialLab + " is not the Ontario laboratory");
-			}
 
 			if(CMLIndentifier.equals(labIdentifier))
 			{
