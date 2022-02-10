@@ -91,6 +91,7 @@ public class EditEpisodesClassicUIIT extends SeleniumTestBase
 
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.linkText(description)));
 		Assert.assertTrue(" Episode is NOT added successfully",
 			PageUtil.isExistsBy(By.linkText(description), driver));
 	}

@@ -64,7 +64,7 @@ public class EditUnresolvedIssuesClassicUIIT extends SeleniumTestBase
 	}
 
 	@Test
-	public void AddUnresolvedIssuesTest() throws InterruptedException
+	public void AddUnresolvedIssuesTest()
 	{
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String issue = "PERINATAL INTEST PERFOR";
@@ -78,12 +78,15 @@ public class EditUnresolvedIssuesClassicUIIT extends SeleniumTestBase
 		driver.findElement(By.id("asgnIssues")).click();
 		driver.findElement(By.id("saveImg")).click();
 		driver.navigate().refresh();
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.linkText(issue)));
 		Assert.assertTrue("Unresolved issue is NOT added to Unresolved Issues section successfully",
 				PageUtil.isExistsBy(By.partialLinkText(issue), driver));
 
 		driver.findElement(By.id("displayUnresolvedIssuesButton")).click();
+		String issueXPath = "//tbody[@id='setIssueListBody']//descendant::a[contains(., '" + issue + "')]";
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(issueXPath)));
  		Assert.assertTrue("Unresolved issue is NOT added in Encounter note successfully",
-				PageUtil.isExistsBy(By.xpath("//tbody[@id='setIssueListBody']//descendant::a[contains(., '" + issue + "')]"), driver));
+				PageUtil.isExistsBy(By.xpath(issueXPath), driver));
 
 		//Edit Unresolved Issue
 		driver.findElement(By.linkText("Change")).click();
@@ -99,8 +102,10 @@ public class EditUnresolvedIssuesClassicUIIT extends SeleniumTestBase
 			PageUtil.isExistsBy(By.partialLinkText(issueChange), driver));
 
 		driver.findElement(By.id("displayUnresolvedIssuesButton")).click();
-		Assert.assertTrue("Chaned unresolved issue is NOT added in Encounter note successfully",
-			PageUtil.isExistsBy(By.xpath("//tbody[@id='setIssueListBody']//descendant::a[contains(., '" + issueChange + "')]"), driver));
+		String issueChangedXPath = "//tbody[@id='setIssueListBody']//descendant::a[contains(., '" + issueChange + "')]";
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(issueChangedXPath)));
+		Assert.assertTrue("Changed unresolved issue is NOT added in Encounter note successfully",
+			PageUtil.isExistsBy(By.xpath(issueChangedXPath), driver));
 
 	}
 }
