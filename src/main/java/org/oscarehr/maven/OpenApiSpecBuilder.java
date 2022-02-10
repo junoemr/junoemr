@@ -22,11 +22,14 @@
  */
 package org.oscarehr.maven;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +43,11 @@ public class OpenApiSpecBuilder
 
 	public static void main(String[] args)
 	{
+		// Disable debug logging for this because it's very verbose and I couldn't figure out how
+		// to set log levels in the maven-exec-plugin settings.
+		Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+		root.setLevel(Level.INFO);
+
 		String resourceClassCsv = System.getProperty("openApiSpecBuilder.resourceClassCsv");
 		String outputDirectory = System.getProperty("openApiSpecBuilder.outputDirectory");
 		String filename = outputDirectory + "/" + FILENAME;

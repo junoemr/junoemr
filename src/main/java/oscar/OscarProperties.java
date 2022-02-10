@@ -66,6 +66,9 @@ public class OscarProperties extends Properties {
 
 	private static final String MODULE_PROPERTY_NAME = "ModuleNames";
 
+	private static final String IS_DOCKER_TESTING_ENABLED = "is_docker_testing_enabled";
+	private static final String IS_TEST_DATABASE_FULL_RESET_ENABLED = "is_test_database_full_reset_enabled";
+
 
 	public enum Module
 	{
@@ -262,6 +265,23 @@ public class OscarProperties extends Properties {
 	public long getPDFMaxMemUsage()
 	{
 		return NumberUtils.toLong(getProperty("PDF_MAX_MEM_USAGE"), -1);
+	}
+
+
+	// =========================================================================
+	// Static methods for accessing general properties in various ways
+	// =========================================================================
+
+	/**
+	 * Will check the system properties to see if that property is set and if it's set to "true",
+	 * "yes" or "on".  If it is method returns true if not method returns false.
+	 *
+	 * @param key key of property
+	 * @return boolean whether the property is active
+	 */
+	private static boolean isSystemPropertyActive(String key)
+	{
+		return activeMarkers.contains(System.getProperty(key, "").trim().toLowerCase());
 	}
 
 	
@@ -701,5 +721,21 @@ public class OscarProperties extends Properties {
 	public boolean isOptimizeSmallSchedulesEnabled()
 	{
 		return isPropertyActive("optimize_small_schedules");
+	}
+
+
+
+	// =========================================================================
+	// Static methods for getting system property values
+	// =========================================================================
+
+	public static boolean isDockerTestingEnabled()
+	{
+		return OscarProperties.isSystemPropertyActive(IS_DOCKER_TESTING_ENABLED);
+	}
+
+	public static boolean isTestDatabaseFullResetEnabled()
+	{
+		return OscarProperties.isSystemPropertyActive(IS_TEST_DATABASE_FULL_RESET_ENABLED);
 	}
 }

@@ -42,10 +42,12 @@ public class ValidationsDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ValidationsDao validationsDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("validations", "measurements", "provider");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"validations", "measurements", "provider"
+		};
 	}
 
 	@Test

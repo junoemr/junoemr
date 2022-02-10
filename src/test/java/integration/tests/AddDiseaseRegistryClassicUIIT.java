@@ -26,7 +26,6 @@ package integration.tests;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,14 +34,14 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 
-import java.sql.SQLException;
-import java.util.concurrent.TimeUnit;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
 import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
+import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -53,7 +52,8 @@ public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 	protected String[] getTablesToRestore()
 	{
 		return new String[]{
-			"admission", "demographic", "dxresearch", "log", "measurementType", "quickListUser", "validations"
+			"admission", "demographic", "dxresearch", "log", "measurementType", "quickListUser",
+			"validations", "provider_recent_demographic_access", "log_ws_rest", "property"
 		};
 	}
 
@@ -77,16 +77,15 @@ public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 		String hiv = "042";
 		String inr = "42731";
 
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")));
-		driver.findElement(By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]")).click();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-		PageUtil.switchToLastWindow(driver);
-		driver.findElement(By.xpath("//input[@name='xml_research1']")).sendKeys(heartFailure);
-		driver.findElement(By.xpath("//input[@name='xml_research2']")).sendKeys(diabetes);
+		clickWaitSwitchToLast(driver, webDriverWait, By.xpath("//div[@id='menuTitleDx']//descendant::a[contains(., '+')]"));
+		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='xml_research1']", heartFailure);
+		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='xml_research2']", diabetes);
 		driver.findElement(By.xpath("//input[@name='xml_research3']")).sendKeys(painAssistant);
 		driver.findElement(By.xpath("//input[@name='xml_research4']")).sendKeys(asthma);
 		driver.findElement(By.xpath("//input[@name='xml_research5']")).sendKeys(hypertension);
 		driver.findElement(By.xpath("//input[@value='Add']")).click();
+
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='xml_research1']")));
 		textEdit(driver, By.xpath("//input[@name='xml_research1']"), chronicObstructivePulmonary);
 		textEdit(driver, By.xpath("//input[@name='xml_research2']"), ckd);
 		textEdit(driver, By.xpath("//input[@name='xml_research3']"), hiv);
@@ -101,14 +100,13 @@ public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 	{
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		addDiseaseRegistry();
 
 		//** Verify from Disease Registry **
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
-		driver.findElement(By.id("imgDx5")).click();
+		findWaitClickById(driver, webDriverWait, "imgDx5");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("CHR PULMONARY HEART DIS*")));
 		Assert.assertTrue("CHR PULMONARY HEART DIS icd is NOT added successfully",
 				PageUtil.isExistsBy(By.linkText("CHR PULMONARY HEART DIS*"), driver));
 		Assert.assertTrue("CHRONIC RENAL FAILURE icd is NOT added successfully",
@@ -130,8 +128,8 @@ public class AddDiseaseRegistryClassicUIIT extends SeleniumTestBase
 
 		//** Verify from Measurements **
 		driver.navigate().refresh();
-		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
-		driver.findElement(By.id("imgmeasurements5")).click();
+		findWaitClickById(driver, webDriverWait, "imgmeasurements5");
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("HIV Flowsheet")));
 		Assert.assertTrue("HIV Flowsheet is NOT added successfully",
 				PageUtil.isExistsBy(By.linkText("HIV Flowsheet"), driver));
 		Assert.assertTrue("INR Flowsheet is NOT added successfully",

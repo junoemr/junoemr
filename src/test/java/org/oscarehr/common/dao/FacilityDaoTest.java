@@ -46,9 +46,12 @@ public class FacilityDaoTest extends DaoTestFixtures
 	@Autowired
 	protected FacilityDao facilityDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(true, "Facility");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"Facility"
+		};
 	}
 
 	@Test

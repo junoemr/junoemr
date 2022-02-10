@@ -52,10 +52,12 @@ public class CriteriaDaoTest extends DaoTestFixtures
 	@Autowired
 	public CriteriaDao criteriaDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("criteria");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"criteria"
+		};
 	}
 	
 	@Test

@@ -42,10 +42,12 @@ public class MeasurementGroupDaoTest extends DaoTestFixtures
 	@Autowired
 	protected MeasurementGroupDao measurementGroupDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("measurementGroup");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"measurementGroup"
+		};
 	}
 
 	@Test

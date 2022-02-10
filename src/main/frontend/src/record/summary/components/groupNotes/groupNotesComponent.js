@@ -1,5 +1,6 @@
 import PartialDateConverter from "../../../../lib/common/partialDate/converter/partialDateConverter";
 import PartialDateModelSerializer from "../../../../lib/common/partialDate/converter/partialDateModelSerializer";
+import ToastService from "../../../../lib/alerts/service/ToastService";
 
 angular.module('Record.Summary').component('groupNotesComponent', {
 	templateUrl: 'src/record/summary/components/groupNotes/groupNotes.jsp',
@@ -30,6 +31,8 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 			diseaseRegistryService)
 		{
 			const controller = this;
+
+			controller.toastService = new ToastService();
 
 			controller.page = {};
 			controller.page.quickLists = [];
@@ -308,7 +311,7 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 			}
 
 			noteService.saveIssueNote($stateParams.demographicNo, groupNotesFormTransfer).then(
-				function success(results)
+				(results) =>
 				{
 					controller.modalInstance.close(results.body);
 					$state.transitionTo($state.current, $stateParams, {
@@ -316,11 +319,12 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 						inherit: false,
 						notify: true
 					});
-					controller.working = false;
-				},
-				function error(errors)
+				}).catch((errorMessage) =>
 				{
-					console.log(errors);
+					console.warn(errorMessage);
+					controller.toastService.errorToast(errorMessage);
+				}).finally(() =>
+				{
 					controller.working = false;
 				});
 		};

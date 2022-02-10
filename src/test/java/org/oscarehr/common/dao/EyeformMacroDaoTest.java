@@ -50,9 +50,12 @@ public class EyeformMacroDaoTest extends DaoTestFixtures
 	@Autowired
 	protected EyeformMacroDao eyeformMacroDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("eyeform_macro_def", "eyeform_macro_billing");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"eyeform_macro_def", "eyeform_macro_billing"
+		};
 	}
 
         @Test

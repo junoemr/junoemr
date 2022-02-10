@@ -24,10 +24,16 @@ package org.oscarehr.eform.parser;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.oscarehr.common.dao.DaoTestFixtures;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import oscar.eform.EFormLoader;
 import oscar.eform.data.DatabaseAP;
 import oscar.eform.data.EForm;
@@ -38,8 +44,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RunWith(Parameterized.class)
+@SpringBootTest
 public class TestSetDatabaseUpdateAPs
 {
+	// Manually boot the Spring test environment because it's not possible to use:
+	// @RunWith(SpringRunner.class)
+	@ClassRule
+	public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
+	@Rule
+	public final SpringMethodRule springMethodRule = new SpringMethodRule();
+
 	private String inputHtml;
 	private String expected;
 	private Integer expectedCount;

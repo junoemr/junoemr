@@ -59,7 +59,14 @@ public class RScheduleDaoTest extends DaoTestFixtures
 
 	@Before
 	public void before() throws Exception {
-		SchemaUtils.restoreTable("rschedule");
+		SchemaUtils.restoreTable();
+	}
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"rschedule"
+		};
 	}
 
         @Test

@@ -21,7 +21,7 @@
 * Canada
 */
 
-import {JUNO_STYLE} from "../junoComponentConstants";
+import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
 
 angular.module('Common.Components').component('junoToggle', {
     templateUrl: 'src/common/components/junoToggle/junoToggle.jsp',
@@ -29,6 +29,7 @@ angular.module('Common.Components').component('junoToggle', {
         id: "<",
         ngModel: "=",
         label: "@?",
+		labelPosition: "<?",
         change: "&?",
         disabled: "<?",
         componentStyle: "<?",
@@ -46,12 +47,19 @@ angular.module('Common.Components').component('junoToggle', {
             ctrl.toggleTrueValue = ctrl.toggleTrueValue || true;
             ctrl.toggleFalseValue = ctrl.toggleFalseValue || false;
             ctrl.showValueLabels = ctrl.showValueLabels || false;
+
+			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
         };
 
         ctrl.componentClasses = () =>
         {
             return [ctrl.componentStyle];
         };
+
+        ctrl.labelClasses = () =>
+		{
+			return [ctrl.labelPosition, "label-style"];
+		}
 
         /**
          * Change event handler.  State of the checkbox is accessible as the checked parameter on your callback function

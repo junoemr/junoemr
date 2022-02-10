@@ -49,9 +49,12 @@ public class DocumentDescriptionTemplateDaoTest extends DaoTestFixtures
 	@Autowired
 	protected DocumentDescriptionTemplateDao documentDescriptionTemplateDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("documentDescriptionTemplate");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"documentDescriptionTemplate"
+		};
 	}
 
 	@Test

@@ -58,11 +58,14 @@ public class ConsultRequestDaoTest extends DaoTestFixtures
 	@Autowired
 	protected DemographicDao demographicDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("consultationRequests", "consultationServices", "demographic",
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"consultationRequests", "consultationServices", "demographic",
 			"professionalSpecialists", "serviceSpecialists", "provider", "lst_gender",
-			"demographic_merged", "admission", "program", "health_safety");
+			"demographic_merged", "admission", "program", "health_safety"
+		};
 	}
 
 	@Test

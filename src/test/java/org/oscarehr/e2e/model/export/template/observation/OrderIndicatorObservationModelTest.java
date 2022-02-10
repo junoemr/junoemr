@@ -29,6 +29,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.marc.everest.datatypes.BL;
 import org.marc.everest.datatypes.generic.CD;
 import org.marc.everest.rmim.uv.cdar2.pocd_mt000040uv.EntryRelationship;
@@ -37,8 +38,13 @@ import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActMoodDocumentObservation;
 import org.marc.everest.rmim.uv.cdar2.vocabulary.x_ActRelationshipEntryRelationship;
 import org.oscarehr.e2e.constant.Constants;
 import org.oscarehr.e2e.model.export.template.observation.OrderIndicatorObservationModel;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class OrderIndicatorObservationModelTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class OrderIndicatorObservationModelTest
+{
 	@Test
 	public void validOrderIndicatorObservationTest() {
 		EntryRelationship entryRelationship = new OrderIndicatorObservationModel().getEntryRelationship(true);

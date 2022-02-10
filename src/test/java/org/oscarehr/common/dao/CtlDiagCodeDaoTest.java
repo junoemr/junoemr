@@ -43,9 +43,12 @@ public class CtlDiagCodeDaoTest extends DaoTestFixtures
 	@Autowired
 	protected CtlDiagCodeDao ctlDiagCodeDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("ctl_diagcode", "diagnosticcode");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"ctl_diagcode", "diagnosticcode"
+		};
 	}
 
 	@Test

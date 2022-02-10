@@ -53,10 +53,12 @@ public class RemoteReferralDaoTest extends DaoTestFixtures
 	public RemoteReferralDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(new String[]{"RemoteReferral"});
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"RemoteReferral"
+		};
 	}
 
         @Test

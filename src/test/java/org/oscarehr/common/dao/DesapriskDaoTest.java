@@ -51,10 +51,12 @@ public class DesapriskDaoTest extends DaoTestFixtures
 	public DesapriskDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("desaprisk");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"desaprisk"
+		};
 	}
 
 	@Test

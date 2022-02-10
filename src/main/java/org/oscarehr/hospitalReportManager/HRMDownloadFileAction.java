@@ -45,11 +45,6 @@ public class HRMDownloadFileAction extends DownloadAction
 {
 	private static final HRMDocumentDao hrmDocumentDao = (HRMDocumentDao) SpringUtils.getBean("HRMDocumentDao");
 	private final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	 
-    /** Creates a new instance of DownloadFileAction */
-    public HRMDownloadFileAction()
-    {
-    }
 
 	protected StreamInfo getStreamInfo(
 			ActionMapping mapping,
@@ -94,7 +89,7 @@ public class HRMDownloadFileAction extends DownloadAction
 	    String fileName = GenericFile.getSanitizedFileName(
 			    report.getLegalLastName() + "-" +
 					    report.getLegalFirstName() + "-" +
-					    report.getFirstReportClass() + "." + fileExtension
+					    report.getClassName() + "." + fileExtension
 	    );
 
     	String contentType = "application/octet-stream";

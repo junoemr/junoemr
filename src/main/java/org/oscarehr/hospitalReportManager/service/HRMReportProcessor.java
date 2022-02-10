@@ -36,7 +36,7 @@ import org.oscarehr.demographic.model.Demographic;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.HRMReport;
-import org.oscarehr.hospitalReportManager.model.HRMFetchResults;
+import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
 import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class HRMReportProcessor
@@ -78,11 +77,11 @@ public class HRMReportProcessor
 	 * @param doDecrypt decrypt file prior to parsing and routing
 	 * @param results storage object, contains result of the processing operation.
 	 */
-	public void processHRMFiles(List<GenericFile> unprocessedFiles, boolean doDecrypt, HRMFetchResults results)
+	public void processHRMFiles(List<GenericFile> unprocessedFiles, boolean doDecrypt, HrmFetchResultsModel results)
 	{
 		LocalDate today = LocalDate.now();
 		
-		AtomicInteger processedFiles = new AtomicInteger(0);
+		int processedFiles = 0;
 		
 		if (unprocessedFiles != null && !unprocessedFiles.isEmpty())
 		{
@@ -98,13 +97,13 @@ public class HRMReportProcessor
 				boolean success = processHRMFile_43(workingFile);
 				if (success)
 				{
-					processedFiles.getAndIncrement();
+					processedFiles++;
 				}
 			}
 		}
 		
-		results.setProcessingSuccess(unprocessedFiles != null && processedFiles.get() == unprocessedFiles.size());
-		results.setReportsProcessed(processedFiles.get());
+		results.setProcessingSuccess(unprocessedFiles != null && processedFiles == unprocessedFiles.size());
+		results.setReportsProcessed(processedFiles);
 		results.setEndTime(LocalDateTime.now());
 	}
 	
@@ -142,7 +141,7 @@ public class HRMReportProcessor
 			else
 			{
 				logger.info(String.format("Duplicate report hash (%s) for file: %s", hrmDocument.getReportHash(), hrmDocument.getReportFile()));
-				hrmService.handleDuplicate(hrmDocument);
+				hrmService.handleDuplicateDocument(hrmDocument);
 			}
 			
 			return true;

@@ -36,12 +36,10 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Appointment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -54,12 +52,14 @@ public class OscarAppointmentDaoTest extends DaoTestFixtures
 	@Autowired
 	protected OscarAppointmentDao oscarAppointmentDao;
 
-	@Before
-	public void before() throws Exception {
-		//nothing here yet. should clean up the appointment table to a known state
-		SchemaUtils.restoreTable("appointment", "demographic", "lst_gender", "admission", 
-				"demographic_merged", "program", "health_safety", "provider", "providersite", "site", "program_team", "log", "Facility", 
-				"mygroup", "drugs","appointmentArchive");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"appointment", "demographic", "lst_gender", "admission",
+			"demographic_merged", "program", "health_safety", "provider", "providersite", "site",
+			"program_team", "log", "Facility", "mygroup", "drugs","appointmentArchive"
+		};
 	}
 
 	@Test
@@ -77,6 +77,7 @@ public class OscarAppointmentDaoTest extends DaoTestFixtures
 		a.setProviderNo("999998");
 		a.setStatus("t");
 		a.setUpdateDateTime(new Date());
+		a.setLocation("Location");
 		oscarAppointmentDao.persist(a);
 
 		assertNotNull(a.getId());

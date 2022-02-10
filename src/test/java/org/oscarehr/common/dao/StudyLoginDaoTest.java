@@ -49,9 +49,12 @@ public class StudyLoginDaoTest extends DaoTestFixtures
 	@Autowired
 	protected StudyLoginDao studyLoginDao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("studylogin");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"studylogin"
+		};
 	}
 
 	@Test

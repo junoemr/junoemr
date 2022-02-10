@@ -54,9 +54,12 @@ public class DemographicPharmacyDaoTest extends DaoTestFixtures
 	public DemographicPharmacyDaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("demographicPharmacy");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"demographicPharmacy"
+		};
 	}
 
 	@Test

@@ -42,10 +42,12 @@ public class GroupNoteLinkDaoTest extends DaoTestFixtures
 	@Autowired
 	protected GroupNoteLinkDao groupNoteLinkDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("GroupNoteLink");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"GroupNoteLink"
+		};
 	}
 
 	@Test

@@ -45,7 +45,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.oscarehr.util.MiscUtils;
 
-import oscar.util.UtilDateUtilities;
+import oscar.util.ConversionUtils;
 
 /**
  * Encapsulates data from table billingmaster
@@ -541,14 +541,21 @@ public class Billingmaster {
         return (serviceDate != null ? serviceDate : "");
     }
 
-    public Date getServiceDateAsDate(){
-        Date d = null;
-        try{
-           d = UtilDateUtilities.getDateFromString(serviceDate, "yyyyMMdd");
-        }catch(Exception e){
-            MiscUtils.getLogger().error("Error", e);
-        }
-        return d;
+	/**
+	 * If the service date is not null or empty, return it as a java.util.Date object,
+	 * Otherwise return null.
+	 *
+	 * @return serviceDate as Date or null.
+	 */
+	public Date getServiceDateAsDate()
+	{
+    	if (ConversionUtils.hasContent(serviceDate))
+		{
+			return ConversionUtils.getLegacyDateFromDateString(serviceDate,
+				ConversionUtils.DEFAULT_DATE_PATTERN_NO_DELIMITER);
+		}
+
+    	return null;
     }
 
     /**

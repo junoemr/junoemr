@@ -54,9 +54,12 @@ public class BillingONPremiumDaoTest extends DaoTestFixtures
 
 	protected DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
-	@Before
-	public void setUp() throws Exception {
-		SchemaUtils.restoreTable("billing_on_premium");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billing_on_premium"
+		};
 	}
 
 	@Test

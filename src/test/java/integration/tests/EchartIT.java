@@ -67,7 +67,7 @@ public class EchartIT extends SeleniumTestBase
 			"admission", "demographic",
 			"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
 			"casemgmt_note", "casemgmt_cpp", "casemgmt_issue", "casemgmt_note_ext", "casemgmt_note_link", "casemgmt_note_lock",
-			"casemgmt_tmpsave", "validations", "measurementType", "eChart", "hash_audit"
+			"casemgmt_tmpsave", "validations", "measurementType", "eChart", "hash_audit", "property"
 		};
 	}
 

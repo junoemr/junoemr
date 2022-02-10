@@ -45,10 +45,12 @@ public class DesAnnualReviewPlanDaoTest extends DaoTestFixtures
 	public DesAnnualReviewPlanDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("desannualreviewplan");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"desannualreviewplan"
+		};
 	}
 
 	@Test

@@ -45,10 +45,12 @@ public class MessageTblDaoTest extends DaoTestFixtures
 	public MessageTblDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("messagetbl");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"messagetbl"
+		};
 	}
 
 	@Test

@@ -53,9 +53,12 @@ public class DrugDaoTest extends DaoTestFixtures
 		MiscUtils.getLogger().error("Unable to run doSimpleExceptionTest on this DAO");
 	}
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("drugs", "prescription", "demographic_merged");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"drugs", "prescription", "demographic_merged"
+		};
 	}
 
 	@Test

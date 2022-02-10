@@ -42,9 +42,12 @@ public class ReportByExamplesFavoriteDaoTest extends DaoTestFixtures
 	@Autowired
 	protected ReportByExamplesFavoriteDao reportByExamplesFavoriteDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("reportByExamplesFavorite");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"reportByExamplesFavorite"
+		};
 	}
 
 	@Test

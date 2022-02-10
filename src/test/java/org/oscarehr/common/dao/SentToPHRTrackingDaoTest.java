@@ -46,9 +46,12 @@ public class SentToPHRTrackingDaoTest extends DaoTestFixtures
 	@Autowired
 	protected SentToPHRTrackingDao sentToPHRTrackingDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("SentToPHRTracking");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"SentToPHRTracking"
+		};
 	}
 
 	@Test

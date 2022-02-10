@@ -45,6 +45,7 @@ import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
+import org.oscarehr.common.hl7.Hl7Const;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Demographic;
@@ -223,20 +224,9 @@ public final class MessageUploader {
 				throw e;
 			}
 
-			int i = 0;
-			int j;
-			while (resultStatus.equals("") && i < messageHandler.getOBRCount())
+			if (messageHandler.isAbnormal())
 			{
-				j = 0;
-				while (resultStatus.equals("") && j < messageHandler.getOBXCount(i))
-				{
-					if (messageHandler.isOBXAbnormal(i, j))
-					{
-						resultStatus = "A";
-					}
- 					j++;
-				}
-				i++;
+				resultStatus = Hl7Const.ABNORMAL_FLAG_YES;
 			}
 
 			ArrayList<String> disciplineArray = messageHandler.getHeaders();
@@ -256,7 +246,7 @@ public final class MessageUploader {
 			}
 			String discipline = next.substring(0, sepMark).trim();
 
-			for (i = 1; i < disciplineArray.size(); i++)
+			for (int i = 1; i < disciplineArray.size(); i++)
 			{
 				next = disciplineArray.get(i);
 				if ((sepMark = next.indexOf("<br />")) < 0)
@@ -450,16 +440,16 @@ public final class MessageUploader {
 		return retVal;
 
 	}
-	
+
 	/**
 	 * Method findProvidersForSpireLab
 	 * Finds the providers that are associated with a spire lab.  (need to do this using doctor names, as
 	 * spire labs don't have a valid ohip number associated with them).
-	 */ 
+	 */
 	private static ArrayList<String> findProvidersForSpireLab(List<String> docNames) {
 		List<String> docNums = new ArrayList<String>();
 		ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
-		
+
 		for (int i=0; i < docNames.size(); i++) {
 			String[] firstLastName = docNames.get(i).split("\\s");
 			if (firstLastName != null && firstLastName.length >= 2) {
@@ -484,18 +474,18 @@ public final class MessageUploader {
 				}
 			}
 		}
-		
+
 		return (ArrayList<String>)docNums;
 	}
-	
+
 	/**
 	 * Method findProviderWithShortestFirstName
 	 * Finds the provider with the shortest first name in a list of providers.
-	 */ 
+	 */
 	private static int findProviderWithShortestFirstName(List<Provider> provList) {
 		if (provList == null || provList.isEmpty())
 			return -1;
-			
+
 		int index = 0;
 		int shortestLength = provList.get(0).getFirstName().length();
 		for (int i=1; i < provList.size(); i++) {
@@ -505,22 +495,22 @@ public final class MessageUploader {
 				shortestLength = curLength;
 			}
 		}
-		
+
 		return index;
 	}
-	
+
 	/**
 	 * Attempt to match the doctors from the lab to a provider
-	 */ 
+	 */
 	private static void providerRouteReport(String labId, List<String> docNums, Connection conn, String altProviderNo, String labType, String search_on, Integer limit, boolean orderByLength) throws Exception {
 		ArrayList<String> providerNums = new ArrayList<String>();
 		String sqlSearchOn = "ohip_no";
 		String routeToProvider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");
-		
+
 		if (search_on != null && search_on.length() > 0) {
 			sqlSearchOn = search_on;
 		}
-		
+
 		if (docNums != null) {
 			for (int i = 0; i < docNums.size(); i++) {
 				if (docNums.get(i) != null && !(docNums.get(i)).trim().equals("")) {
@@ -610,7 +600,7 @@ public final class MessageUploader {
 
 		patientLabRoutingResult.setDemographicNo(demographicNumber);
 		patientLabRoutingResult.setProviderNo(providerNumber);
-		
+
 		//did this link a merged patient? if so, we need to make sure we are the head record,
 		// or update result to be the head record.
 		DemographicMerged demographicMerged = new DemographicMerged();

@@ -42,10 +42,14 @@ public class ClinicDAOTest extends DaoTestFixtures
 	@Autowired
 	protected ClinicDAO clinicDAO;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable(false, "clinic");
+	@Override
+	protected String[] getTablesToClear()
+	{
+		return new String[]{
+			"clinic"
+		};
 	}
+
 
 	@Test
 	public void testCreate() throws Exception {

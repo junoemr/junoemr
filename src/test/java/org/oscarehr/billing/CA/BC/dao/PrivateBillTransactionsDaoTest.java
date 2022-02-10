@@ -47,9 +47,12 @@ public class PrivateBillTransactionsDaoTest extends DaoTestFixtures
 	@Autowired
 	public PrivateBillTransactionsDAO privateBillTransactionsDAO;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("billing_private_transactions", "billing_payment_type");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"billing_private_transactions", "billing_payment_type"
+		};
 	}
 
 	@Test

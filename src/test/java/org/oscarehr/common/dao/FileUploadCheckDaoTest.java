@@ -42,9 +42,12 @@ public class FileUploadCheckDaoTest extends DaoTestFixtures
 	@Autowired
 	protected FileUploadCheckDao fileUploadCheckDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("fileUploadCheck");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"fileUploadCheck"
+		};
 	}
 
 	@Test

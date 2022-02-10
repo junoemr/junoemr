@@ -22,35 +22,44 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.oscarehr.dataMigration.logger.cds.CDSImportLogger;
-import org.oscarehr.dataMigration.service.context.PatientImportContext;
-import org.oscarehr.dataMigration.service.context.PatientImportContextService;
-import xml.cds.v5_0.DateFullOrPartial;
-import xml.cds.v5_0.DateTimeFullOrPartial;
-import xml.cds.v5_0.MedicationsAndTreatments;
-import xml.cds.v5_0.ObjectFactory;
-import xml.cds.v5_0.PersonNameSimple;
-import org.oscarehr.dataMigration.model.medication.FrequencyCode;
-import org.oscarehr.dataMigration.model.provider.Provider;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import java.time.LocalDate;
-
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.oscarehr.dataMigration.logger.cds.CDSImportLogger;
+import org.oscarehr.dataMigration.model.medication.FrequencyCode;
+import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.service.context.PatientImportContext;
+import org.oscarehr.dataMigration.service.context.PatientImportContextService;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import oscar.oscarDemographic.pageUtil.Util;
+import xml.cds.v5_0.DateFullOrPartial;
+import xml.cds.v5_0.DateTimeFullOrPartial;
+import xml.cds.v5_0.MedicationsAndTreatments;
+import xml.cds.v5_0.ObjectFactory;
+import xml.cds.v5_0.PersonNameSimple;
+
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(Util.class)
+@SuppressStaticInitializationFor("oscar.oscarDemographic.pageUtil.Util")
 public class CDSMedicationImportMapperTest
 {
 	@Autowired
@@ -68,6 +77,26 @@ public class CDSMedicationImportMapperTest
 		PatientImportContext patientImportContextMock = Mockito.mock(PatientImportContext.class);
 		when(patientImportContextMock.getImportLogger()).thenReturn(cdsImportLoggerMock);
 		when(patientImportContextService.getContext()).thenReturn(patientImportContextMock);
+
+		PowerMockito.mockStatic(Util.class);
+
+		try
+		{
+			PowerMockito.doReturn("1")
+				.when(Util.class, "leadingNum", "1");
+			PowerMockito.doReturn("2")
+				.when(Util.class, "leadingNum", "2");
+			PowerMockito.doReturn("")
+				.when(Util.class, "leadingNum", "");
+			PowerMockito.doReturn("1")
+				.when(Util.class, "leadingNum", "1 dosage");
+			PowerMockito.doReturn("")
+				.when(Util.class, "leadingNum", "dosage");
+		}
+		catch(Exception e)
+		{
+			fail(e.getMessage());
+		}
 	}
 
 	@Test
@@ -298,7 +327,7 @@ public class CDSMedicationImportMapperTest
 	{
 		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
 		String dosage = "1-";
-		String[] expected = {"1"};
+		String[] expected = {"1", "1"};
 		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
 	}
 
@@ -307,7 +336,7 @@ public class CDSMedicationImportMapperTest
 	{
 		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
 		String dosage = "-1";
-		String[] expected = {"", "1"};
+		String[] expected = {"1", "1"};
 		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
 	}
 
@@ -334,5 +363,40 @@ public class CDSMedicationImportMapperTest
 	{
 		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
 		assertNull(cdsMedicationImportMapper.getDosageMinMax(null));
+	}
+	@Test
+	public void testgetDosageMinMax_nonNumericLowerOnly()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "1 dosage-";
+		String[] expected = {"1", "1"};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
+	}
+
+	@Test
+	public void testgetDosageMinMax_nonNumericUpperOnly()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "-1 dosage";
+		String[] expected = {"1","1"};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
+	}
+
+	@Test
+	public void testgetDosageMinMax_nonNumericRangeFull()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "1 dosage-1 dosage";
+		String[] expected = {"1", "1"};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
+	}
+
+	@Test
+	public void testgetDosageMinMax_nonNumeric()
+	{
+		CDSMedicationImportMapper cdsMedicationImportMapper = new CDSMedicationImportMapper();
+		String dosage = "dosage";
+		String[] expected = {"", ""};
+		assertArrayEquals(expected, cdsMedicationImportMapper.getDosageMinMax(dosage));
 	}
 }

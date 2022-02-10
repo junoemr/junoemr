@@ -28,6 +28,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.common.dao.utils.AuthUtils;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
@@ -36,7 +37,9 @@ public class Navigation
 {
 	private static final OscarProperties properties = OscarProperties.getInstance();
 
-	public static final String OSCAR_URL = "http://localhost";
+	public static final String OSCAR_URL_DEFAULT = "http://localhost";
+	public static final String OSCAR_URL_DOCKER = "http://juno-maven";
+
 	public static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do" +
 		"?providerNo=" + AuthUtils.TEST_PROVIDER_ID +
 		"&appointmentNo=" +
@@ -60,10 +63,12 @@ public class Navigation
 	 * @param pin the pin to use at login
 	 * @param baseUrl the base url of the juno server (Ex "https://localhost:9090/")
 	 * @param driver the selenium driver to use
+	 * @param webDriverWait
 	 */
-	public static void doLogin(String username, String password, String pin, String baseUrl, WebDriver driver)
+	public static void doLogin(String username, String password, String pin, String baseUrl,
+		WebDriver driver, WebDriverWait webDriverWait)
 	{
-		logger.info("Logging in....");
+		logger.info("Logging in....(url = " + baseUrl + ")");
 
 		driver.get(baseUrl + "/index.jsp");
 		WebElement userNameInput = driver.findElement(By.name("username"));
@@ -77,7 +82,8 @@ public class Navigation
 
 		String oldUrl = driver.getCurrentUrl();
 		loginForm.submit();
-		PageUtil.waitForPageChange(oldUrl, driver);
+
+		PageUtil.waitForPageChange(oldUrl, webDriverWait);
 
 		logger.info("Logged in!");
 	}
@@ -100,6 +106,12 @@ public class Navigation
 
 	public static String getOscarUrl(String serverPort)
 	{
-		return OSCAR_URL + ":" + serverPort + "/" + properties.getProjectHome();
+		String url = OSCAR_URL_DEFAULT;
+		if(OscarProperties.isDockerTestingEnabled())
+		{
+			url = OSCAR_URL_DOCKER;
+		}
+
+		return url + ":" + serverPort + "/" + properties.getProjectHome();
 	}
 }

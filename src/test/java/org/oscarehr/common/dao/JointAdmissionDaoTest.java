@@ -48,9 +48,12 @@ public class JointAdmissionDaoTest extends DaoTestFixtures
 	@Autowired
 	protected JointAdmissionDao jointAdmissionDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("joint_admissions");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"joint_admissions"
+		};
 	}
 
 	@Test

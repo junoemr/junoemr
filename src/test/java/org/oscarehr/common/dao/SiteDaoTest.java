@@ -53,10 +53,12 @@ public class SiteDaoTest extends DaoTestFixtures
 	public SiteDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("site","providersite","provider","mygroup","appointment");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"site","providersite","provider","mygroup","appointment"
+		};
 	}
 
 	@Test

@@ -42,10 +42,12 @@ public class IncomingLabRulesDaoTest extends DaoTestFixtures
 	@Autowired
 	protected IncomingLabRulesDao incomingLabRulesDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("incomingLabRules", "provider");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"incomingLabRules", "provider"
+		};
 	}
 
 	@Test

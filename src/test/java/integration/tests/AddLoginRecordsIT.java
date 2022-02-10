@@ -48,6 +48,9 @@ import static integration.tests.AssignRolesIT.xpathDropdown;
 import static integration.tests.AssignRolesIT.xpathOption;
 import static integration.tests.AssignRolesIT.xpathProvider;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByLinkText;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
 
@@ -83,44 +86,48 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 
 	public String passwordValidation(String passwordInput) throws InterruptedException
 	{
-		driver.findElement(By.xpath("//input[@name='password']")).sendKeys(passwordInput);
-		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
+		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='password']", passwordInput);
+		findWaitClickByXpath(driver, webDriverWait, "//input[@name='subbutton']");
+		webDriverWait.until(ExpectedConditions.alertIsPresent());
 		String alertMessage8Symbols = driver.switchTo().alert().getText();
 		return alertMessage8Symbols;
 	}
 
 	private void addLoginRecord(String password, String providerNo, String pin)///
 	{
-		driver.findElement(By.xpath("//input[@name='password']")).sendKeys(password);
-		driver.findElement(By.xpath("//input[@name='conPassword']")).sendKeys(password);
-		dropdownSelectByValue(driver, By.id("provider_no"), providerNo);
+		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='password']", password);
+		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='conPassword']", password);
+		dropdownSelectByValue(driver, webDriverWait, By.id("provider_no"), providerNo);
 
 		//Add today as expiry date
-		driver.findElement(By.xpath("//input[@name='b_ExpireSet']")).click();
+		findWaitClickByXpath(driver, webDriverWait, "//input[@name='b_ExpireSet']");
 		driver.findElement(By.id("date_ExpireDate_cal")).click();
 		driver.findElement(By.xpath("//div[@class='calendar']//div[contains(., 'Today')]")).click();
 		driver.findElement(By.xpath("//input[@name='pin']")).sendKeys(pin);
 		driver.findElement(By.xpath("//input[@name='conPin']")).sendKeys(pin);
-		dropdownSelectByValue(driver, By.xpath("//select[@name='forcePasswordReset']"), "1");
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='forcePasswordReset']"), "1"
+		);
 		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
 	}
 
 	private void removeExpiryDate(String userName, String providerNo)
 	{
-		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN, Navigation.getOscarUrl(randomTomcatPort), driver);
+		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN,
+			Navigation.getOscarUrl(randomTomcatPort), driver, webDriverWait);
 		String currWindowHandle1 = driver.getWindowHandle();
 		PageUtil.switchToWindow(currWindowHandle1, driver);
-		accessAdministrationSectionClassicUI(driver, "User Management", "Search/Edit/Delete Security Records");
-		driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(providerNo);
-		driver.findElement(By.xpath("//input[@value='Search']")).click();
-		driver.findElement(By.linkText(userName)).click();
-		driver.findElement(By.xpath("//input[@name='b_ExpireSet']")).click();
-		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
+		accessAdministrationSectionClassicUI(driver, webDriverWait, "User Management", "Search/Edit/Delete Security Records"
+		);
+		findWaitClickByXpath(driver, webDriverWait, "//input[@name='keyword']");
+		findWaitClickByXpath(driver, webDriverWait, "//input[@value='Search']");
+		findWaitClickByLinkText(driver, webDriverWait, userName);
+		findWaitClickByXpath(driver, webDriverWait, "//input[@name='b_ExpireSet']");
+		findWaitClickByXpath(driver, webDriverWait, "//input[@name='subbutton']");
 	}
 
 	private void resetPassword(String password, String passwordUpdated)
 	{
-		driver.findElement(By.xpath("//input[@name='oldPassword']")).sendKeys(password);
+		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='oldPassword']", password);
 		driver.findElement(By.xpath("//input[@name='newPassword']")).sendKeys(passwordUpdated);
 		driver.findElement(By.xpath("//input[@name='confirmPassword']")).sendKeys(passwordUpdated);
 		driver.findElement(By.xpath("//input[@value='Update']")).click();
@@ -129,8 +136,9 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 	private void accessLoginApple(String currWindowHandle)
 	{
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		accessAdministrationSectionClassicUI(driver, "User Management", "Add a Login Record");
-		driver.findElement(By.xpath("//input[@name='user_name']")).sendKeys(userNameApple);
+		accessAdministrationSectionClassicUI(driver, webDriverWait, "User Management", "Add a Login Record"
+		);
+		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='user_name']", userNameApple);
 	}
 
 	@Test
@@ -140,9 +148,11 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 	{
 		String currWindowHandle = driver.getWindowHandle();
 		//Assign Roles
-		accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
+		accessAdministrationSectionClassicUI(driver, webDriverWait, "User Management", "Assign Role to Provider"
+		);
 		assignRoles(xpathDropdown, xpathProvider, "admin", "//following-sibling::td/input[@value='Add']");
 		String message = "Role " + role + " is added. (" + drApple.providerNo + ")";
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//font[contains(., '" + message + "')]")));
 		Assert.assertTrue("Admin is NOT assigned to the provider successfully.",
 				PageUtil.isExistsBy(By.xpath("//font[contains(., '" + message + "')]"), driver));
 
@@ -160,18 +170,21 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		//Account expired
 		accessLoginApple(currWindowHandle);
 		addLoginRecord(password, drApple.providerNo, pin);
-		Navigation.doLogin(userNameApple, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver);
+		Navigation.doLogin(userNameApple, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver,
+			webDriverWait);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//p[contains(., 'Your account is expired. Please contact your administrator.')]")));
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath("//p[contains(., 'Your account is expired. Please contact your administrator.')]"), driver));
 
 		//Remove expiry date.
 		removeExpiryDate(userNameApple, drApple.providerNo);
-		Navigation.doLogin(userNameApple, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver);
+		Navigation.doLogin(userNameApple, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver,
+			webDriverWait);
 		Assert.assertTrue(Navigation.isLoggedIn(driver));
 
 		//Reset password
 		Navigation.doLogin(userNameApple, password, pin,
 				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-				driver);
+				driver, webDriverWait);
 		resetPassword(password, passwordUpdated);
 		Assert.assertTrue(Navigation.isLoggedIn(driver));
 	}
@@ -183,16 +196,21 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 	{
 		String xpathProvider = "(//td[contains(., '" + drBerry.providerNo + "')])";
 		String xpathDropdown = xpathProvider + xpathOption;
+
 		//Assign Roles
-		accessAdministrationSectionClassicUI(driver, "User Management", "Assign Role to Provider");
+		accessAdministrationSectionClassicUI(driver, webDriverWait, "User Management", "Assign Role to Provider"
+		);
 		assignRoles(xpathDropdown, xpathProvider, "admin", "//following-sibling::td/input[@value='Add']");
+
 		String message = "Role " + role + " is added. (" + drBerry.providerNo + ")";
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//font[contains(., '" + message + "')]")));
 		Assert.assertTrue("Admin is NOT assigned to the provider successfully.",
 				PageUtil.isExistsBy(By.xpath("//font[contains(., '" + message + "')]"), driver));
 
 		Set<String> handles = driver.getWindowHandles();
 		PageUtil.switchToWindow(handles.iterator().next(), driver);
-		accessAdministrationSectionJUNOUI(driver, "User Management", "Add a Login Record");
+		accessAdministrationSectionJUNOUI(driver, webDriverWait, "User Management", "Add a Login Record"
+		);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='user_name']")));
 		driver.findElement(By.xpath("//input[@name='user_name']")).sendKeys(userNameBerry);
 
@@ -209,17 +227,20 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 
 		//Account expired.
 		addLoginRecord(password, drBerry.providerNo, pin);
-		Navigation.doLogin(userNameBerry, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver);
+		Navigation.doLogin(userNameBerry, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver,
+			webDriverWait);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//p[contains(., 'Your account is expired. Please contact your administrator.')]")));
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath("//p[contains(., 'Your account is expired. Please contact your administrator.')]"), driver));
 
 		//Remove Expiry date.
 		removeExpiryDate(userNameBerry, drBerry.providerNo);
-		Navigation.doLogin(userNameBerry, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver);
+		Navigation.doLogin(userNameBerry, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver,
+			webDriverWait);
 		Assert.assertTrue(Navigation.isLoggedIn(driver));
 
 		//Reset password
 		Navigation.doLogin(userNameBerry, password, pin, Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-				driver);
+				driver, webDriverWait);
 		resetPassword(password, passwordUpdated);
 		Assert.assertTrue(Navigation.isLoggedIn(driver));
 	}

@@ -49,10 +49,12 @@ public class SecurityTokenDaoTest extends DaoTestFixtures
 
 	DateFormat dfm = new SimpleDateFormat("yyyyMMdd");
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("SecurityToken");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"SecurityToken"
+		};
 	}
 
         @Test

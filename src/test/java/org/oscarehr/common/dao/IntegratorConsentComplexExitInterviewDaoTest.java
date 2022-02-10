@@ -51,9 +51,12 @@ public class IntegratorConsentComplexExitInterviewDaoTest extends DaoTestFixture
 	@Autowired
 	protected DemographicDao demographicDao;
 	
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("Facility","demographic","IntegratorConsentComplexExitInterview");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"Facility","demographic","IntegratorConsentComplexExitInterview"
+		};
 	}
 
 	@Test

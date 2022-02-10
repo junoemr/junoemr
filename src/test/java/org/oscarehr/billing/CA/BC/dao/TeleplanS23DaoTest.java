@@ -46,9 +46,12 @@ public class TeleplanS23DaoTest extends DaoTestFixtures
 	public TeleplanS23DaoTest() {
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("teleplanS23");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"teleplanS23"
+		};
 	}
 
 	@Test

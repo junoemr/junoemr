@@ -25,30 +25,40 @@ package org.oscarehr.billing.CA.BC.dao;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.oscarehr.billing.CA.BC.model.CtlServiceCodesDxCodes;
+import org.oscarehr.common.dao.DaoTestFixtures;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
-import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.util.SpringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-public class CtlServiceCodesDxCodesDaoTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class CtlServiceCodesDxCodesDaoTest extends DaoTestFixtures
+{
+	@Autowired
+	public CtlServiceCodesDxCodesDao ctlServiceCodesDxCodesDao;
 
-	public CtlServiceCodesDxCodesDao dao = SpringUtils.getBean(CtlServiceCodesDxCodesDao.class);
-
-	public CtlServiceCodesDxCodesDaoTest() {
+	public CtlServiceCodesDxCodesDaoTest()
+	{
 	}
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("ctl_servicecodes_dxcodes");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"ctl_servicecodes_dxcodes"
+		};
 	}
 
 	@Test
-	public void testCreate() throws Exception {
+	public void testCreate() throws Exception
+	{
 		CtlServiceCodesDxCodes entity = new CtlServiceCodesDxCodes();
 		EntityDataGenerator.generateTestDataForModelClass(entity);
-		dao.persist(entity);
+		ctlServiceCodesDxCodesDao.persist(entity);
 		assertNotNull(entity.getId());
 	}
 }

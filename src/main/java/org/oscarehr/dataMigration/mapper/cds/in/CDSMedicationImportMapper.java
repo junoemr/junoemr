@@ -22,6 +22,10 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.dataMigration.exception.InvalidFrequencyCodeException;
@@ -37,10 +41,6 @@ import org.springframework.stereotype.Component;
 import oscar.oscarDemographic.pageUtil.Util;
 import xml.cds.v5_0.DrugMeasure;
 import xml.cds.v5_0.MedicationsAndTreatments;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class CDSMedicationImportMapper extends AbstractCDSImportMapper<MedicationsAndTreatments, Medication>
@@ -74,9 +74,9 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 
 		// "dosage" in CDS == takemin/takemax
 		String[] dosageMinMax = getDosageMinMax(importStructure.getDosage());
-		if (dosageMinMax != null)
+		if (dosageMinMax != null && dosageMinMax.length > 0)
 		{
-			// This will throw an exception if the dosage string is in the forms "X-", "-Y", "-", "" or, if X or Y can't parse to floats
+			// This will throw an exception if the dosage string can't parse to floats
 			// Want this behaviour so that it will fail the patient in these cases, to bring attention to the invalid data
 			medication.setTakeMax(Float.parseFloat(dosageMinMax[0]));
 			medication.setTakeMin(Float.parseFloat(dosageMinMax[1]));
@@ -307,8 +307,37 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		{
 			if (dosage.matches(".*-.*"))
 			{
-				return dosage.split("-");
+				String max = "";
+				String[] minmax = dosage.split("-");
+				if (minmax.length > 0)
+				{
+					String min = Util.leadingNum(minmax[0]);
+					if (minmax.length > 1)
+					{
+						max = Util.leadingNum(minmax[1]);
+					}
+					if (min.isEmpty() && !max.isEmpty())
+					{
+						logger.warn("Empty minimum dosage found" + minmax.toString());
+						minmax = Arrays.copyOf(minmax, 2);
+						minmax[0] = max;
+						minmax[1] = max;
+						return minmax;
+					}
+					if (max.isEmpty() && (StringUtils.isNotBlank(min)))
+					{
+						logger.warn("Empty maximum dosage found" + minmax.toString());
+						minmax = Arrays.copyOf(minmax, 2);
+						minmax[0] = min;
+						minmax[1] = min;
+						return minmax;
+					}
+					minmax[0] = min;
+					minmax[1] = max;
+				}
+				return minmax;
 			}
+			dosage = Util.leadingNum(dosage);
 			return new String[] {dosage, dosage};
 		}
 		return null;

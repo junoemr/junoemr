@@ -70,14 +70,10 @@
 			<name>Spring Milestones</name>
 			<url>https://repo.spring.io/milestone</url>
 		</repository>
-		<repository>
-			<id>local_repo</id>
-			<url>file://${basedir}/local_repo</url>
-		</repository>
-		<repository>
-			<id>archiva.internal</id>
-			<url>https://mvn.cloudpractice.ca/repository/internal</url>
-		</repository>
+    <repository>
+      <id>local_repo</id>
+      <url>file://${basedir}/local_repo</url>
+    </repository>
 		<repository>
 			<id>jaspersoft-third-party</id>
 			<url>https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
@@ -85,13 +81,6 @@
 		<repository>
 			<id>openshift.nexus</id>
 			<url>http://nexus.apps.prod.cldmd.net/nexus/content/groups/public/</url>
-		</repository>
-		<repository>
-			<id>github</id>
-			<url>https://maven.pkg.github.com/cloudpracticeinc/*</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
 		</repository>
 	</repositories>
 	<pluginRepositories>
@@ -280,22 +269,24 @@
 			<artifactId>javax.el</artifactId>
 			<version>3.0.1-b08</version>
 		</dependency>
+		<!--
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>2.8.9</version>
+			<version>4.2.0</version>
 			<scope>test</scope>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-module-junit4</artifactId>
-			<version>1.7.1</version>
+			<version>2.0.9</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-mockito2</artifactId>
-			<version>1.7.1</version>
+			<version>2.0.9</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -1004,6 +995,14 @@
 					<groupId>javax.servlet</groupId>
 					<artifactId>servlet-api</artifactId>
 				</exclusion>
+        <exclusion>
+          <groupId>org.codehaus.woodstox</groupId>
+          <artifactId>woodstox-core-asl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.woodstox</groupId>
+          <artifactId>wstx-asl</artifactId>
+        </exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -1020,6 +1019,12 @@
 			<groupId>org.apache.ws.commons.axiom</groupId>
 			<artifactId>axiom-impl</artifactId>
 			<version>1.2.11</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.woodstox</groupId>
+          <artifactId>wstx-asl</artifactId>
+        </exclusion>
+      </exclusions>
 		</dependency>
 		<!-- velocity -->
 		<dependency>
@@ -1108,11 +1113,11 @@
 			<artifactId>stax2-api</artifactId>
 			<version>4.1</version>
 		</dependency>
-		<dependency>
-			<groupId>org.codehaus.woodstox</groupId>
-			<artifactId>woodstox-core-asl</artifactId>
-			<version>4.4.1</version>
-		</dependency>
+    <dependency>
+      <groupId>com.fasterxml.woodstox</groupId>
+      <artifactId>woodstox-core</artifactId>
+      <version>5.3.0</version>
+    </dependency>
 		<dependency>
 			<groupId>org.oscarehr</groupId>
 			<artifactId>myoscar_client_utils</artifactId>
@@ -1208,6 +1213,10 @@
 					<groupId>org.opensaml</groupId>
 					<artifactId>opensaml</artifactId>
 				</exclusion>
+        <exclusion>
+          <groupId>org.codehaus.woodstox</groupId>
+          <artifactId>woodstox-core-asl</artifactId>
+        </exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -1347,44 +1356,37 @@
 					<groupId>com.sun.xml.ws</groupId>
 					<artifactId>sdo-eclipselink-plugin</artifactId>
 				</exclusion>
+        <exclusion>
+          <groupId>org.codehaus.woodstox</groupId>
+          <artifactId>woodstox-core-asl</artifactId>
+        </exclusion>
 			</exclusions>
 		</dependency>
-<!--		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>javax.transaction-api</artifactId>
-			<version>1.2</version>
-		</dependency>-->
-<!--		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>2.2.8</version>
-		</dependency>
 		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
-			<version>2.2.8</version>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>3.8.1</version>
 		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>2.2.8</version>
-		</dependency>-->
-<!--		<dependency>
-			<groupId>javax.annotation</groupId>
-			<artifactId>javax.annotation-api</artifactId>
-			<version>1.3.1</version>
-		</dependency>-->
-        <!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
-        <dependency>
-            <groupId>com.auth0</groupId>
-            <artifactId>java-jwt</artifactId>
-            <version>3.8.1</version>
-        </dependency>
-        <!-- Integration Tests -->
+		<!-- Integration Tests -->
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
-			<version>3.141.59</version>
+			<version>4.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-api</artifactId>
+			<version>4.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-firefox-driver</artifactId>
+			<version>4.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-remote-driver</artifactId>
+			<version>4.1.1</version>
 		</dependency>
 		<!-- Google APIs for OAuth -->
 		<dependency>
@@ -1434,7 +1436,6 @@
 			<version>2.9.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.xeustechnologies/jcl -->
 		<dependency>
 			<groupId>org.xeustechnologies</groupId>
 			<artifactId>jcl-core</artifactId>
@@ -1505,6 +1506,10 @@
 			<plugin>
 				<groupId>pl.project13.maven</groupId>
 				<artifactId>git-commit-id-plugin</artifactId>
+        <configuration>
+          <offline>true</offline>
+          <verbose>false</verbose>
+        </configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -1518,6 +1523,104 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.0</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.doxia</groupId>
+						<artifactId>doxia-module-markdown</artifactId>
+						<version>1.3</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<inputEncoding>UTF-8</inputEncoding>
+					<outputEncoding>UTF-8</outputEncoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.3.1</version>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<git-SHA-1>${buildNumber}</git-SHA-1>
+						</manifestEntries>
+					</archive>
+					<webResources>
+						<webResource>
+							<directory>${basedir}/src/main/webapp/admin</directory>
+							<filtering>true</filtering>
+						</webResource>
+					</webResources>
+
+					<!-- do not package unneeded files from JunoUI into WAR -->
+					<!-- TODO: exclude everything but dist JS and CSS and the JSPs -->
+					<packagingExcludes>
+						web/*.sh,
+						web/bower.json,
+						web/package.json,
+						web/gulpfile.js,
+						web/node_modules/,
+						web/**/*.ts
+					</packagingExcludes>
+
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.20</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.17</version>
+				<configuration>
+					<configLocation>utils/checkstyle.xml</configLocation>
+					<failsOnError>true</failsOnError>
+					<consoleOutput>true</consoleOutput>
+					<sourceDirectory>.</sourceDirectory>
+					<includes>src/main/**/*,database/**/*.sql</includes>
+					<excludes>**/*.jar, **/*.txt, **/*.rpt, **/*.fla, **/*.xml, **/*.dtd, **/*.xslt, **/*.doc, **/*.bak, **/*.tld, **/*.jpg, **/*.png, **/*.gif, **/*.pdf, **/*.swf,
+						**/*.js, **/*.css, src/main/webapp/share/calendar/**, **/*svg.jsp, src/main/webapp/casemgmt/Index2.jsp, database/mysql/updates/update-2016-06-06.sql,
+						src/main/java/oscar/oscarMessenger/util/MsgDemoMap.java, src/main/java/oscar/oscarEncounter/pageUtil/EctDisplayMsgAction.java, database/mysql/oscarinit.sql,
+						src/main/webapp/oscarEncounter/Index.jsp, database/mysql/oscarinit_on.sql, database/mysql/oscardata.sql, database/mysql/oscarinit_bc.sql
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>checkstyle</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.oscarehr</groupId>
+						<artifactId>util</artifactId>
+						<version>2013.03.06</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 			<plugin>
 				<groupId>com.mycila.maven-license-plugin</groupId>
@@ -1543,7 +1646,7 @@
 						<validHeader>utils/headers/uvic.txt</validHeader>
 						<validHeader>utils/headers/kai.txt</validHeader>
 						<validHeader>utils/headers/cloudpractice.txt</validHeader>
-                        <validHeader>utils/headers/formated_caisi.txt</validHeader>
+						<validHeader>utils/headers/formated_caisi.txt</validHeader>
 					</validHeaders>
 					<includes>
 						<include>src/main/java/**/*.java</include>
@@ -1685,112 +1788,12 @@
 				</configuration>
 				<executions>
 					<execution>
+						<phase>process-sources</phase>
 						<goals>
 							<goal>check</goal>
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-				<version>3.0</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.apache.maven.doxia</groupId>
-						<artifactId>doxia-module-markdown</artifactId>
-						<version>1.3</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<inputEncoding>UTF-8</inputEncoding>
-					<outputEncoding>UTF-8</outputEncoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>3.3.1</version>
-				<configuration>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-						</manifest>
-						<manifestEntries>
-							<git-SHA-1>${buildNumber}</git-SHA-1>
-						</manifestEntries>
-					</archive>
-					<webResources>
-						<webResource>
-							<directory>${basedir}/src/main/webapp/admin</directory>
-							<filtering>true</filtering>
-						</webResource>
-					</webResources>
-
-					<!-- do not package unneeded files from JunoUI into WAR -->
-					<!-- TODO: exclude everything but dist JS and CSS and the JSPs -->
-					<packagingExcludes>
-						web/*.sh,
-						web/bower.json,
-						web/package.json,
-						web/gulpfile.js,
-						web/node_modules/,
-						web/**/*.ts
-					</packagingExcludes>
-
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-<!--
-					<release>1.8</release>
--->
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-							<version>1.18.20</version>
-						</path>
-					</annotationProcessorPaths>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.17</version>
-				<configuration>
-					<configLocation>utils/checkstyle.xml</configLocation>
-					<failsOnError>true</failsOnError>
-					<consoleOutput>true</consoleOutput>
-					<sourceDirectory>.</sourceDirectory>
-					<includes>src/main/**/*,database/**/*.sql</includes>
-					<excludes>**/*.jar, **/*.txt, **/*.rpt, **/*.fla, **/*.xml, **/*.dtd, **/*.xslt, **/*.doc, **/*.bak, **/*.tld, **/*.jpg, **/*.png, **/*.gif, **/*.pdf, **/*.swf,
-						**/*.js, **/*.css, src/main/webapp/share/calendar/**, **/*svg.jsp, src/main/webapp/casemgmt/Index2.jsp, database/mysql/updates/update-2016-06-06.sql,
-						src/main/java/oscar/oscarMessenger/util/MsgDemoMap.java, src/main/java/oscar/oscarEncounter/pageUtil/EctDisplayMsgAction.java, database/mysql/oscarinit.sql,
-						src/main/webapp/oscarEncounter/Index.jsp, database/mysql/oscarinit_on.sql, database/mysql/oscardata.sql, database/mysql/oscarinit_bc.sql
-					</excludes>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>checkstyle</goal>
-						</goals>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.oscarehr</groupId>
-						<artifactId>util</artifactId>
-						<version>2013.03.06</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -1847,6 +1850,7 @@
 						<exclude>org/oscarehr/integration/born/AR2005BornConnectorTest.java</exclude>
 						<exclude>org/oscarehr/integration/born/AR2005Form2XMLTest.java</exclude>
 					</excludes>
+					<trimStackTrace>false</trimStackTrace>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -1861,7 +1865,6 @@
 						</goals>
 						<configuration>
 							<skipTests>false</skipTests>
-							<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m</argLine>
 							<test>SetupDatabase</test>
 							<systemPropertyVariables>
 								<oscar.skip.dbinit>${oscar.dbinit.skip}</oscar.skip.dbinit>
@@ -1875,6 +1878,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
+          <argLine>-Xms1024m -Xmx1024m</argLine>
+          <runOrder>alphabetical</runOrder>
 					<includes>
 						<include>integration/tests/*</include>
 						<include>org/oscarehr/common/dao/**/*</include>
@@ -1911,7 +1916,6 @@
 						<exclude>**/SetupDatabase.java</exclude>
 					</excludes>
 					<skipTests>false</skipTests>
-					<argLine>-Xms512m -Xmx512m -Xss256k -XX:MaxNewSize=64m</argLine>
 					<systemPropertyVariables>
 						<oscar.skip.dbinit>true</oscar.skip.dbinit>
 					</systemPropertyVariables>
@@ -2064,6 +2068,23 @@
 					</systemProperties>
 					<skip>${juno.webpack.skip}</skip>
 				</configuration>
+        <dependencies>
+          <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>2.1</version>
+          </dependency>
+          <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-models</artifactId>
+            <version>2.0.1</version>
+          </dependency>
+          <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-jaxrs2</artifactId>
+            <version>2.0.1</version>
+          </dependency>
+        </dependencies>
 			</plugin>
 
 			<!-- This plugin generates typescript models from the openapi.json file generated -->

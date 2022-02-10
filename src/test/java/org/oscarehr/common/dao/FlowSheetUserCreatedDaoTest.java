@@ -51,10 +51,12 @@ public class FlowSheetUserCreatedDaoTest extends DaoTestFixtures
 	@Autowired
 	protected FlowSheetUserCreatedDao flowSheetUserCreatedDao;
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("FlowSheetUserCreated");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"FlowSheetUserCreated"
+		};
 	}
 
         @Test

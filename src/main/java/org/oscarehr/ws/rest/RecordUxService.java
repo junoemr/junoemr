@@ -276,11 +276,13 @@ public class RecordUxService extends AbstractServiceImpl {
 				summaryList.add(labDocSummary);
 			}
 
+			/*  Hiding this for now until it's re-built
 			if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.DECISION_SUPPORT_READ)
 					&& preferenceManager.displaySummaryItem(loggedInInfo, PreferenceManager.DS_SUPPORT_POS))
 			{
 				summaryList.add(new SummaryTo1("Decision Support", count++, SummaryTo1.DECISIONSUPPORT_CODE));
 			}
+			*/
 		}
 		else if("left".equals(summaryName))
 		{
@@ -383,7 +385,7 @@ public class RecordUxService extends AbstractServiceImpl {
 		result.put("sochx","issueNoteSummary"); 
 		result.put("famhx","issueNoteSummary"); 
 		result.put("incoming","labsDocsSummary");
-		result.put("dssupport","decisionSupportSummary");
+		/*result.put("dssupport","decisionSupportSummary");*/
 		result.put("allergies","allergiesSummary");
 		result.put("riskfactors","issueNoteSummary");
 		result.put("hrmdocuments", "HRMDocumentSummary");

@@ -22,93 +22,114 @@
  */
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../../common/components/junoComponentConstants";;
-import SystemPreferenceService from "../../../../../lib/system/service/SystemPreferenceService";
 import HrmService from "../../../../../lib/integration/hrm/service/HrmService";
 import {HRMStatus} from "../../../../../lib/integration/hrm/model/HrmFetchResults";
 import moment from "moment";
+import SystemPreferenceService from "../../../../../lib/system/service/SystemPreferenceService";
+import {SecurityPermissions} from "../../../../../common/security/securityConstants";
 
 angular.module('Admin.Section').component('hrmAdmin',
 	{
 		templateUrl: 'src/admin/section/hrm/components/admin/HRMAdmin.jsp',
 		bindings: {},
-		controller: ['$scope', '$http', '$httpParamSerializer', '$state', '$uibModal', function ($scope, $http, $httpParamSerializer, $state, $uibModal)
-		{
-			let ctrl = this;
-			let hrmService = new HrmService();
-			
-			ctrl.COMPONENT_STYLE = JUNO_STYLE.DEFAULT;
-			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
-			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+		controller: ['$scope', '$http', '$httpParamSerializer', 'securityRolesService',
+			function ($scope, $http, $httpParamSerializer, securityRolesService)
+			{
+				let ctrl = this;
+				const hrmService = new HrmService();
+				const systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
 
-			ctrl.$onInit = async () =>
-			{
-				ctrl.COMPONENT_STYLE = ctrl.COMPONENT_STYLE || JUNO_STYLE.DEFAULT;
-				try
+				ctrl.COMPONENT_STYLE = JUNO_STYLE.DEFAULT;
+				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+				ctrl.LABEL_POSITION = LABEL_POSITION.TOP;
+
+				ctrl.pollingEnabled = true;
+				ctrl.pollingInterval = 0;
+
+				ctrl.pollingEnabledPreferenceName = "omd.hrm.polling_enabled";
+				ctrl.pollingIntervalPropertyKey = "omd.hrm.poll_interval_sec";
+
+				ctrl.$onInit = async () =>
 				{
-					ctrl.latestResults = await hrmService.getLastResults();
-				}
-				finally
+					ctrl.COMPONENT_STYLE = ctrl.COMPONENT_STYLE || JUNO_STYLE.DEFAULT;
+
+					hrmService.getLastResults()
+					.then(value =>
+					{
+						ctrl.latestResults = value;
+					});
+
+					systemPreferenceService.getProperty(ctrl.pollingIntervalPropertyKey)
+					.then(value =>
+					{
+						ctrl.pollingInterval = Math.floor((value)/60);
+					});
+				};
+
+				ctrl.fetchHRMDocs = async () =>
 				{
-					$scope.$apply();
+					try
+					{
+						ctrl.working = true;
+						ctrl.latestResults = await hrmService.fetchNewHRMDocuments();
+					}
+					finally
+					{
+						ctrl.working = false;
+						$scope.$apply();
+					}
 				}
-			};
-			
-			ctrl.fetchHRMDocs = async () =>
-			{
-				try
+
+				ctrl.getSummaryText = (hrmStatus) =>
 				{
-					ctrl.working = true;
-					ctrl.latestResults = await hrmService.fetchNewHRMDocuments();
+					if (hrmStatus === HRMStatus.SUCCESS)
+					{
+						return "OK: No problems detected";
+					}
+					else if (hrmStatus === HRMStatus.HAS_ERRORS)
+					{
+						return "WARNING: One or more documents had problems. Consult the security log or contact support for assistance";
+					}
+					else
+					{
+						return "ERROR: Consult the security log or contact support for assistance";
+					}
 				}
-				finally
+
+				ctrl.getSummaryClass = (hrmStatus) =>
 				{
-					ctrl.working = false;
-					$scope.$apply();
+
+					if (hrmStatus === HRMStatus.SUCCESS)
+					{
+						return "ok";
+					}
+					else if (hrmStatus === HRMStatus.HAS_ERRORS)
+					{
+						return "warn";
+					}
+					else
+					{
+						return "error";
+					}
 				}
-			}
-			
-			ctrl.getSummaryText = (hrmStatus) =>
-			{
-				if (hrmStatus === HRMStatus.SUCCESS)
+
+				ctrl.lastCheckedMessage = () =>
 				{
-					return "OK: No problems detected";
+					if (!ctrl.latestResults)
+					{
+						return "Results have not been downloaded today";
+					}
+					else
+					{
+						const duration = moment.duration(moment().diff(ctrl.latestResults.endTime));
+						return `Last checked ${Math.floor(duration.asMinutes())} minutes ago`;
+					}
 				}
-				else if (hrmStatus === HRMStatus.HAS_ERRORS)
+
+				ctrl.canRead = () =>
 				{
-					return "WARNING: One or more documents had problems. \nConsult the security log or contact support for assistance";
+					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.HrmRead);
 				}
-				else
-				{
-					return "ERROR: Please contact support for assistance";
-				}
-			}
-			
-			ctrl.getSummaryClass = (hrmStatus) =>
-			{
-				
-				if (hrmStatus === HRMStatus.SUCCESS)
-				{
-					return "ok";
-				}
-				else if (hrmStatus === HRMStatus.HAS_ERRORS)
-				{
-					return "warn";
-				}
-				else
-				{
-					return "error";
-				}
-			}
-			
-			ctrl.lastCheckedAsMinutesAgo = () =>
-			{
-				if (!ctrl.latestResults)
-				{
-					return "-";
-				}
-				
-				const duration = moment.duration(moment().diff(ctrl.latestResults.endTime));
-				return Math.floor(duration.asMinutes());
-			}
-		}]
+			}]
 	});

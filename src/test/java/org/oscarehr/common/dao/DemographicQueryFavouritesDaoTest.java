@@ -46,10 +46,12 @@ public class DemographicQueryFavouritesDaoTest extends DaoTestFixtures
 	public DemographicQueryFavouritesDaoTest() {
 	}
 
-
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("demographicQueryFavourites");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"demographicQueryFavourites"
+		};
 	}
 
 	@Test

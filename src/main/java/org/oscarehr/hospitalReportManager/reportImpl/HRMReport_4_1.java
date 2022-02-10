@@ -13,22 +13,27 @@ import org.apache.commons.codec.binary.Base64;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.hospitalReportManager.HRMReport;
 
+import xml.hrm.v4_1.HealthCard;
 import xml.hrm.v4_1.OmdCds;
 import xml.hrm.v4_1.DateFullOrPartial;
 import xml.hrm.v4_1.Demographics;
+import xml.hrm.v4_1.PatientRecord;
 import xml.hrm.v4_1.PersonNameStandard;
 import xml.hrm.v4_1.PersonNameStandard.LegalName.OtherName;
 import xml.hrm.v4_1.ReportFormat;
 import xml.hrm.v4_1.ReportsReceived;
 
-import org.oscarehr.util.MiscUtils;
 import oscar.util.ConversionUtils;
+import xml.hrm.v4_1.ReportsReceived.OBRContent;
+import xml.hrm.v4_1.TransactionInformation;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class HRMReport_4_1 implements HRMReport
 {
@@ -39,12 +44,6 @@ public class HRMReport_4_1 implements HRMReport
 
 	private Integer hrmDocumentId;
 	private Integer hrmParentDocumentId;
-
-	public HRMReport_4_1(OmdCds hrmReport)
-	{
-		this.hrmReport = hrmReport;
-		this.demographics = hrmReport.getPatientRecord().getDemographics();
-	}
 
 	public HRMReport_4_1(OmdCds root, String hrmReportFileLocation, String fileData)
 	{
@@ -104,21 +103,17 @@ public class HRMReport_4_1 implements HRMReport
 		return otherNames;
 	}
 
-	public List<Integer> getDateOfBirth()
+	public Optional<LocalDate> getDateOfBirth()
 	{
-		List<Integer> dateOfBirthList = new ArrayList<Integer>();
+		LocalDate dateOfBirth = null;
+
 		XMLGregorianCalendar fullDate = dateFP(demographics.getDateOfBirth());
-		dateOfBirthList.add(fullDate.getYear());
-		dateOfBirthList.add(fullDate.getMonth());
-		dateOfBirthList.add(fullDate.getDay());
+		if (fullDate != null)
+		{
+			dateOfBirth = ConversionUtils.toLocalDate(fullDate);
+		}
 
-		return dateOfBirthList;
-	}
-
-	public String getDateOfBirthAsString()
-	{
-		List<Integer> dob = getDateOfBirth();
-		return dob.get(0) + "-" + dob.get(1) + "-" + dob.get(2);
+		return Optional.ofNullable(dateOfBirth);
 	}
 
 	public String getHCN()
@@ -131,9 +126,17 @@ public class HRMReport_4_1 implements HRMReport
 		return demographics.getHealthCard().getVersion();
 	}
 
-	public Calendar getHCNExpiryDate()
+	public Optional<LocalDate> getHCNExpiryDate()
 	{
-		return demographics.getHealthCard().getExpirydate().toGregorianCalendar();
+		LocalDate expiryDate = null;
+
+		HealthCard healthCard = demographics.getHealthCard();
+		if (healthCard != null)
+		{
+			expiryDate = ConversionUtils.toLocalDate(healthCard.getExpirydate());
+		}
+
+		return Optional.ofNullable(expiryDate);
 	}
 
 	public String getHCNProvinceCode()
@@ -227,142 +230,137 @@ public class HRMReport_4_1 implements HRMReport
 
 	public boolean isBinary()
 	{
-		if(hrmReport.getPatientRecord().getReportsReceived() != null || hrmReport.getPatientRecord().getReportsReceived().isEmpty())
+		if (getReport().isPresent())
 		{
-			if(hrmReport.getPatientRecord().getReportsReceived().get(0).getFormat() == ReportFormat.BINARY)
-			{
-				return true;
-			}
+			return getReport().get().getFormat().equals(ReportFormat.BINARY);
 		}
+
 		return false;
 	}
 
 	public String getFileExtension()
 	{
-		if(hrmReport.getPatientRecord().getReportsReceived() == null || hrmReport.getPatientRecord().getReportsReceived().isEmpty())
-		{
-			return "";
-		}
-		return hrmReport.getPatientRecord().getReportsReceived().get(0).getFileExtensionAndVersion();
+		return getReport()
+			.map(ReportsReceived::getFileExtensionAndVersion)
+			.orElse("");
 	}
 
-	public String getFirstReportTextContent()
+	public String getTextContent()
 	{
-		String result = null;
-		if(hrmReport.getPatientRecord().getReportsReceived() != null || hrmReport.getPatientRecord().getReportsReceived().isEmpty())
+		String content = "";
+		if (getReport().isPresent() && !isBinary() && getReport().get().getContent() != null)
 		{
-			if(hrmReport.getPatientRecord().getReportsReceived().get(0).getFormat() == ReportFormat.BINARY)
-			{
-				return new Base64().encodeToString(getBinaryContent());
-			}
-
-			try
-			{
-				result = hrmReport.getPatientRecord().getReportsReceived().get(0).getContent().getTextContent();
-			}
-			catch(Exception e)
-			{
-				MiscUtils.getLogger().error("error", e);
-			}
+			content = getReport().get().getContent().getTextContent();
 		}
-		return result;
+
+		return content;
 	}
 
 	public byte[] getBase64BinaryContent()
 	{
-		try
+		byte[] media = null;
+		if (getReport().isPresent() && getReport().get().getContent() != null)
 		{
-			return hrmReport.getPatientRecord().getReportsReceived().get(0).getContent().getMedia();
+			media = getReport().get().getContent().getMedia();
 		}
-		catch(Exception e)
-		{
-			MiscUtils.getLogger().error("error", e);
-		}
-		return null;
+
+		return media;
 	}
 
 	public byte[] getBinaryContent()
 	{
-		return Base64.decodeBase64(getBase64BinaryContent());
-	}
-
-	public String getFirstReportClass()
-	{
-		if(hrmReport.getPatientRecord().getReportsReceived() == null || hrmReport.getPatientRecord().getReportsReceived().isEmpty())
+		byte[] binaryContent = null;
+		if (getBase64BinaryContent() != null)
 		{
-			return "";
+			binaryContent = Base64.decodeBase64(getBase64BinaryContent());
 		}
-		return hrmReport.getPatientRecord().getReportsReceived().get(0).getClazz().value();
+
+		return binaryContent;
 	}
 
-	public String getFirstReportSubClass()
+	public String getClassName()
 	{
-		if(hrmReport.getPatientRecord().getReportsReceived() == null || hrmReport.getPatientRecord().getReportsReceived().isEmpty())
+		if (getReport().isPresent())
 		{
-			return "";
+			return getReport().get().getClazz().value();
 		}
-		return hrmReport.getPatientRecord().getReportsReceived().get(0).getSubClass();
+
+		return "";
 	}
 
-	public Calendar getFirstReportEventTime()
+	public String getSubClassName()
 	{
-
-		if(hrmReport.getPatientRecord().getReportsReceived() != null &&
-				!hrmReport.getPatientRecord().getReportsReceived().isEmpty() &&
-				hrmReport.getPatientRecord().getReportsReceived().get(0).getEventDateTime() != null)
-			return dateFP(hrmReport.getPatientRecord().getReportsReceived().get(0).getEventDateTime()).toGregorianCalendar();
-		return null;
+		return getReport()
+			.map(ReportsReceived::getSubClass)
+			.orElse("");
 	}
 
-	public List<String> getFirstReportAuthorPhysician()
+	public Optional<LocalDateTime> getEventTime()
 	{
-		List<String> physicianName = new ArrayList<String>();
-		String physicianHL7String = hrmReport.getPatientRecord().getReportsReceived().get(0).getAuthorPhysician().getLastName();
-		String[] physicianNameArray = physicianHL7String.split("^");
-		physicianName.add(physicianNameArray[0]);
-		physicianName.add(physicianNameArray[1]);
-		physicianName.add(physicianNameArray[2]);
-		physicianName.add(physicianNameArray[3]);
-		physicianName.add(physicianNameArray[6]);
+		LocalDateTime reportTime = null;
 
-		return physicianName;
+		if (getReport().isPresent() & getReport().get().getEventDateTime() != null)
+		{
+			XMLGregorianCalendar calendar = dateFP(hrmReport.getPatientRecord().getReportsReceived().get(0).getEventDateTime());
+
+			if (calendar != null)
+			{
+				reportTime = calendar.toGregorianCalendar().toZonedDateTime().toLocalDateTime();
+			}
+		}
+
+		return Optional.ofNullable(reportTime);
+	}
+
+	public String getAuthorPhysician()
+	{
+		StringBuilder nameBuilder = new StringBuilder();
+
+		if (getReport().isPresent())
+		{
+			String physicianHL7String = getReport().get().getAuthorPhysician().getLastName();
+			String[] physicianNameComponents = physicianHL7String.split("^");
+
+			for (int i = 0; i < physicianNameComponents.length; i++)
+			{
+				if (!physicianNameComponents[i].isEmpty())
+				{
+					nameBuilder.append(physicianNameComponents[i]).append(" ");
+				}
+			}
+		}
+
+		return nameBuilder.toString().trim();
 	}
 	
 	public String getSendingFacilityId()
 	{
-		if(hrmReport.getPatientRecord().getReportsReceived() == null || hrmReport.getPatientRecord().getReportsReceived().isEmpty())
-		{
-			return "";
-		}
-		return hrmReport.getPatientRecord().getReportsReceived().get(0).getSendingFacility();
+		return getReport()
+			.map(ReportsReceived::getSendingFacility)
+			.orElse("");
 	}
 
 	public String getSendingFacilityReportNo()
 	{
-		if(hrmReport.getPatientRecord().getReportsReceived() == null || hrmReport.getPatientRecord().getReportsReceived().isEmpty())
-		{
-			return "";
-		}
-		return hrmReport.getPatientRecord().getReportsReceived().get(0).getSendingFacilityReportNumber();
+		return getReport()
+			.map(ReportsReceived::getSendingFacilityReportNumber)
+			.orElse("");
 	}
 
 	public String getResultStatus()
 	{
-		if(hrmReport.getPatientRecord().getReportsReceived() == null || hrmReport.getPatientRecord().getReportsReceived().isEmpty())
-		{
-			return "";
-		}
-		return hrmReport.getPatientRecord().getReportsReceived().get(0).getResultStatus();
+		return getReport()
+			.map(ReportsReceived::getResultStatus)
+			.orElse("");
 	}
 
 	public List<HrmObservation> getObservations()
 	{
 		List<HrmObservation> observationList = new ArrayList<>();
-		if(hrmReport.getPatientRecord().getReportsReceived() != null || !hrmReport.getPatientRecord().getReportsReceived().isEmpty())
+		if(getReportObrContent().isPresent())
 		{
-			List<ReportsReceived.OBRContent> obrContents = hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent();
-
-			for(ReportsReceived.OBRContent obrContent : obrContents)
+			List<OBRContent> obrSegments = getReportObrContent().get();
+			for(OBRContent obrContent : obrSegments)
 			{
 				HrmObservation observation = new HrmObservation();
 				observation.setAccompanyingDescription(obrContent.getAccompanyingDescription());
@@ -374,70 +372,79 @@ public class HRMReport_4_1 implements HRMReport
 				if(obrDate != null)
 				{
 					observation.setObservationDateTime(
-							ConversionUtils.fillPartialCalendar(
-									obrDate.getFullDate(),
-									obrDate.getYearMonth(),
-									obrDate.getYearOnly())
+						ConversionUtils.fillPartialCalendar(
+							obrDate.getFullDate(),
+							obrDate.getYearMonth(),
+							obrDate.getYearOnly())
 					);
 				}
 				observationList.add(observation);
 			}
 		}
+
 		return observationList;
 	}
 
-	public Calendar getFirstAccompanyingSubClassDateTime()
+	public Optional<LocalDateTime> getFirstAccompanyingSubClassDateTime()
 	{
-		if(hrmReport.getPatientRecord().getReportsReceived() != null &&
-				!hrmReport.getPatientRecord().getReportsReceived().isEmpty() &&
-				hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent() != null &&
-				hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent().get(0) != null &&
-				hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent().get(0).getObservationDateTime() != null)
+		LocalDateTime observationTime = null;
+		if(getFirstObrContent().isPresent())
 		{
-			return dateFP(hrmReport.getPatientRecord().getReportsReceived().get(0).getOBRContent().get(0).getObservationDateTime()).toGregorianCalendar();
+			OBRContent firstObr = getFirstObrContent().get();
+			XMLGregorianCalendar calendar = dateFP(firstObr.getObservationDateTime());
+			if (calendar != null)
+			{
+				observationTime = calendar.toGregorianCalendar().toZonedDateTime().toLocalDateTime();
+			}
 		}
 
-		return null;
+		return Optional.ofNullable(observationTime);
 	}
 
 	public String getMessageUniqueId()
 	{
-		if(hrmReport.getPatientRecord().getTransactionInformation() == null || hrmReport.getPatientRecord().getTransactionInformation().isEmpty())
-		{
-			return "";
-		}
-		return hrmReport.getPatientRecord().getTransactionInformation().get(0).getMessageUniqueID();
+		return getTransactionInformation()
+			.map(TransactionInformation::getMessageUniqueID)
+			.orElse("");
 	}
 
 	public String getDeliverToUserId()
 	{
-		if(hrmReport.getPatientRecord().getTransactionInformation() == null || hrmReport.getPatientRecord().getTransactionInformation().isEmpty())
-		{
-			return "";
-		}
-		return hrmReport.getPatientRecord().getTransactionInformation().get(0).getDeliverToUserID();
+		return getTransactionInformation()
+			.map(TransactionInformation::getDeliverToUserID)
+			.orElse("");
 	}
 
-	public String getDeliverToUserIdFirstName()
+	public String getDeliverToUserFirstName()
 	{
-		if(hrmReport.getPatientRecord().getTransactionInformation() == null || hrmReport.getPatientRecord().getTransactionInformation().isEmpty())
+		String firstName = "";
+
+		if (getTransactionInformation().isPresent())
 		{
-			return "";
+			TransactionInformation txInfo = getTransactionInformation().get();
+			if (txInfo.getProvider() != null)
+			{
+				firstName = txInfo.getProvider().getFirstName();
+			}
 		}
-		if(hrmReport.getPatientRecord().getTransactionInformation().get(0).getProvider() == null)
-			return null;
-		return hrmReport.getPatientRecord().getTransactionInformation().get(0).getProvider().getFirstName();
+
+		return firstName;
 	}
 
-	public String getDeliverToUserIdLastName()
+	public String getDeliverToUserLastName()
 	{
-		if(hrmReport.getPatientRecord().getTransactionInformation() == null || hrmReport.getPatientRecord().getTransactionInformation().isEmpty())
+		String lastName = "";
+
+		if (getTransactionInformation().isPresent())
 		{
-			return "";
+			TransactionInformation txInfo = getTransactionInformation().get();
+			if (txInfo.getProvider() != null)
+			{
+				lastName = txInfo.getProvider().getLastName();
+			}
 		}
-		if(hrmReport.getPatientRecord().getTransactionInformation().get(0).getProvider() == null)
-			return null;
-		return hrmReport.getPatientRecord().getTransactionInformation().get(0).getProvider().getLastName();
+
+		return lastName;
 	}
 
 	public Integer getHrmDocumentId()
@@ -470,5 +477,61 @@ public class HRMReport_4_1 implements HRMReport
 		else if(dfp.getYearMonth() != null) return dfp.getYearMonth();
 		else if(dfp.getYearOnly() != null) return dfp.getYearOnly();
 		return null;
+	}
+
+	private boolean hasReportContent()
+	{
+		return hrmReport.getPatientRecord().getReportsReceived() != null &&
+			!hrmReport.getPatientRecord().getReportsReceived().isEmpty();
+	}
+
+	private Optional<ReportsReceived> getReport()
+	{
+		ReportsReceived reportContent = null;
+
+		if (hasReportContent())
+		{
+			reportContent = hrmReport.getPatientRecord().getReportsReceived().get(0);
+		}
+
+		return Optional.ofNullable(reportContent);
+	}
+
+	private Optional<List<OBRContent>> getReportObrContent()
+	{
+		List<OBRContent> obrContent = null;
+ 		if (getReport().isPresent())
+		{
+			if (getReport().get().getOBRContent() != null)
+			{
+				obrContent = getReport().get().getOBRContent();
+			}
+		}
+
+ 		return Optional.ofNullable(obrContent);
+	}
+
+	private Optional<OBRContent> getFirstObrContent()
+	{
+		OBRContent firstObr = null;
+		if (getReportObrContent().isPresent() && !getReportObrContent().get().isEmpty())
+		{
+			firstObr = getReportObrContent().get().get(0);
+		}
+
+		return Optional.ofNullable(firstObr);
+	}
+
+	private Optional<TransactionInformation> getTransactionInformation()
+	{
+		TransactionInformation txInfo = null;
+
+		PatientRecord patientRecord = hrmReport.getPatientRecord();
+		if (patientRecord.getTransactionInformation() != null && !patientRecord.getTransactionInformation().isEmpty())
+		{
+			txInfo = patientRecord.getTransactionInformation().get(0);
+		}
+
+		return Optional.ofNullable(txInfo);
 	}
 }

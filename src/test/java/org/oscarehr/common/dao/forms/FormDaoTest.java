@@ -41,9 +41,12 @@ public class FormDaoTest extends DaoTestFixtures
 	@Autowired
 	protected FormsDao formsDao;
 
-	@Before
-	public void before() throws Exception {
-		SchemaUtils.restoreTable("formLabReq07");
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"formLabReq07"
+		};
 	}
 
 	@Test
