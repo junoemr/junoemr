@@ -84,7 +84,6 @@ public class EditUnresolvedIssuesClassicUIIT extends SeleniumTestBase
 
 		driver.findElement(By.id("displayUnresolvedIssuesButton")).click();
 		String issueXPath = "//tbody[@id='setIssueListBody']//descendant::a[contains(., '" + issue + "')]";
-		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(issueXPath)));
  		Assert.assertTrue("Unresolved issue is NOT added in Encounter note successfully",
 				PageUtil.isExistsBy(By.xpath(issueXPath), driver));
 
@@ -103,7 +102,6 @@ public class EditUnresolvedIssuesClassicUIIT extends SeleniumTestBase
 
 		driver.findElement(By.id("displayUnresolvedIssuesButton")).click();
 		String issueChangedXPath = "//tbody[@id='setIssueListBody']//descendant::a[contains(., '" + issueChange + "')]";
-		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(issueChangedXPath)));
 		Assert.assertTrue("Changed unresolved issue is NOT added in Encounter note successfully",
 			PageUtil.isExistsBy(By.xpath(issueChangedXPath), driver));
 
