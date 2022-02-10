@@ -13,9 +13,6 @@
 
 package oscar.oscarLab.ca.all.parsers.OLIS;
 
-import static org.oscarehr.common.io.GenericFile.ALLOWED_CONTENT_TYPES;
-import static org.oscarehr.olis.service.OLISPollingService.OLIS_DATE_FORMAT;
-
 import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.HapiContext;
@@ -27,26 +24,6 @@ import ca.uhn.hl7v2.parser.ModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.lang.StringUtils;
@@ -67,6 +44,32 @@ import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static org.oscarehr.common.io.GenericFile.ALLOWED_CONTENT_TYPES;
+import static org.oscarehr.olis.service.OLISPollingService.OLIS_DATE_FORMAT;
+import static oscar.util.ConversionUtils.DEFAULT_DATE_PATTERN_NO_DELIMITER;
 
 /**
  * @author Adam Balanga
@@ -1297,8 +1300,20 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 				}
 			}
 
+			ZonedDateTime collectionDateTime;
+			// hl7 is missing the expected time component (yyyyMMdd), treat it as a local date
+			if(collectionDateStr != null && collectionDateStr.length() == 8)
+			{
+				collectionDateTime = ConversionUtils.toLocalDate(collectionDateStr,
+						DateTimeFormatter.ofPattern(DEFAULT_DATE_PATTERN_NO_DELIMITER)).atStartOfDay(ZoneId.systemDefault());
+			}
+			else // expected datetime case
+			{
+				collectionDateTime = ConversionUtils.toNullableZonedDateTime(collectionDateStr, DateTimeFormatter.ofPattern(OLIS_DATE_FORMAT));
+			}
+
 			OLISRequestSortKey key = new OLISRequestSortKey(
-					ConversionUtils.toNullableZonedDateTime(collectionDateStr, DateTimeFormatter.ofPattern(OLIS_DATE_FORMAT)),
+					collectionDateTime,
 					placerGroupNo,
 					requestSortKey,
 					olisSortKey,
