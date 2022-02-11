@@ -82,6 +82,7 @@ public class DemographicModelToDbConverter
 		dbDemographic.setChartNo(input.getChartNumber());
 		dbDemographic.setOfficialLanguage((input.getOfficialLanguage() != null) ? input.getOfficialLanguage().getValue() : null);
 		dbDemographic.setRosterHistory(rosterModelToDbConverter.convert(input.getRosterHistory()));
+		dbDemographic.updateElectronicMessagingConsentStatus(input.getElectronicMessagingConsentStatus());
 
 		//set legacy roster data fields. exclude rostered provider, use the family doctor that was already determined
 		RosterData currentRosterData = input.getCurrentRosterData();

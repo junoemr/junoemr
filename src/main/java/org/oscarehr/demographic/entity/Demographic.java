@@ -28,9 +28,9 @@ import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
 import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
@@ -214,7 +214,7 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date electronicMessagingConsentRejectedAt;
 
-	@OneToOne(fetch=FetchType.LAZY, mappedBy = "demographic", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToOne(fetch=FetchType.LAZY, mappedBy = "demographic", cascade = CascadeType.MERGE)
 	private DemographicCust demographicCust;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo", cascade = CascadeType.MERGE)
@@ -259,13 +259,6 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 		SK,
 		YT,
 		PP
-	}
-
-	public enum ELECTRONIC_MESSAGING_CONSENT_STATUS
-	{
-		NONE,
-		CONSENTED,
-		REVOKED,
 	}
 
 	/**
@@ -989,19 +982,19 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	 * get the patients electronic messaging consent status
 	 * @return - the patients consent status
 	 */
-	public ELECTRONIC_MESSAGING_CONSENT_STATUS getElectronicMessagingConsentStatus()
+	public ElectronicMessagingConsentStatus getElectronicMessagingConsentStatus()
 	{
 		if (this.electronicMessagingConsentRejectedAt != null)
 		{
-			return ELECTRONIC_MESSAGING_CONSENT_STATUS.REVOKED;
+			return ElectronicMessagingConsentStatus.REVOKED;
 		}
 		else if (this.electronicMessagingConsentGivenAt != null)
 		{
-			return ELECTRONIC_MESSAGING_CONSENT_STATUS.CONSENTED;
+			return ElectronicMessagingConsentStatus.CONSENTED;
 		}
 		else
 		{
-			return ELECTRONIC_MESSAGING_CONSENT_STATUS.NONE;
+			return ElectronicMessagingConsentStatus.NONE;
 		}
 	}
 
@@ -1009,7 +1002,7 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	 * Update the patients electronic messaging consent status.
 	 * @param status - the new consent status to use.
 	 */
-	public void updateElectronicMessagingConsentStatus(ELECTRONIC_MESSAGING_CONSENT_STATUS status)
+	public void updateElectronicMessagingConsentStatus(ElectronicMessagingConsentStatus status)
 	{
 		if (this.getElectronicMessagingConsentStatus() != status && status != null)
 		{

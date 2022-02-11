@@ -35,6 +35,7 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.cellPhone = phoneConverter.convert(from.cellPhone);
 		updateInput.homePhone = phoneConverter.convert(from.homePhone);
 		updateInput.workPhone = phoneConverter.convert(from.workPhone);
+		updateInput.phoneComment = from.phoneComment;
 
 		// physician info
 		//todo
@@ -56,6 +57,7 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.securityQuestion1 = from.securityQuestion1;
 		updateInput.securityAnswer1 = from.securityAnswer1;
 		updateInput.rxInteractionWarningLevel = from.rxInteractionWarningLevel;
+		updateInput.electronicMessagingConsentStatus = from.electronicMessagingConsentStatus as any as DemographicUpdateInput.ElectronicMessagingConsentStatusEnum;
 
 		return updateInput;
 	}

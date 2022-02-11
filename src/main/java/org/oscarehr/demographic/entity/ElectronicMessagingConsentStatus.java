@@ -20,37 +20,11 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.demographic.converter;
+package org.oscarehr.demographic.entity;
 
-import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
-import org.oscarehr.demographic.model.DemographicModel;
-import org.oscarehr.demographic.transfer.DemographicCreateInput;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
-
-import static org.oscarehr.demographic.entity.Demographic.STATUS_ACTIVE;
-
-@Component
-public class DemographicCreateInputToModelConverter
-		extends BaseModelToDbConverter<DemographicCreateInput, DemographicModel>
+public enum ElectronicMessagingConsentStatus
 {
-	@Override
-	public DemographicModel convert(DemographicCreateInput input)
-	{
-		if (input == null)
-		{
-			return null;
-		}
-
-		DemographicModel model = new DemographicModel();
-		BeanUtils.copyProperties(input, model);
-
-		model.setPatientStatus(STATUS_ACTIVE);
-		model.setPatientStatusDate(LocalDate.now());
-		model.setDateJoined(LocalDate.now());
-
-		return model;
-	}
+	NONE,
+	CONSENTED,
+	REVOKED,
 }

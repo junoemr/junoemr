@@ -24,6 +24,7 @@ package org.oscarehr.demographic.transfer;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.demographic.entity.ElectronicMessagingConsentStatus;
 import org.oscarehr.demographic.model.DemographicModel;
 
 import java.time.LocalDate;
@@ -36,16 +37,16 @@ public class DemographicUpdateInput extends DemographicCreateInput
 	// base info
 	private String sin;
 	private String patientStatus;
-	private LocalDate patientStatusDate;
 	private LocalDate dateJoined;
 	private LocalDate dateEnded;
 
+	// contact info
+	private String phoneComment;
+
 	// physician info
-//	private Provider mrpProvider;
+	private String mrpProviderId;
 	private Provider referralDoctor;
 	private Provider familyDoctor;
-
-	// roster info
 
 	// other info
 
@@ -71,6 +72,8 @@ public class DemographicUpdateInput extends DemographicCreateInput
 	private String securityQuestion1;
 	private String securityAnswer1;
 	private String rxInteractionWarningLevel;
+
+	private ElectronicMessagingConsentStatus electronicMessagingConsentStatus;
 
 	public DemographicUpdateInput()
 	{

@@ -291,11 +291,6 @@ public class DemographicService extends AbstractServiceImpl {
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), updateInput.getId(), Permission.DEMOGRAPHIC_UPDATE);
 
-		hinValidationService.validateNoDuplication(
-				updateInput.getHealthNumber(),
-				updateInput.getHealthNumberVersion(),
-				updateInput.getHealthNumberProvinceCode());
-
 		DemographicModel updatedModel = demographicService.updateDemographicRecord(updateInput, loggedInInfo);
 
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), updatedModel.getId(),

@@ -35,12 +35,12 @@ import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.transfer.DemographicUpdateInput;
-import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -68,7 +68,13 @@ public class DemographicUpdateInputToEntityConverter
 		}
 
 		Demographic dbDemographic = demographicDao.find(input.getId());
-		BeanUtils.copyProperties(input, dbDemographic, "dateOfBirth", "title", "sex", "officialLanguage");
+		BeanUtils.copyProperties(input, dbDemographic,
+				"dateOfBirth",
+				"title",
+				"sex",
+				"officialLanguage",
+				"patientStatus",
+				"patientStatusDate");
 
 		dbDemographic.setDemographicId(input.getId());
 		dbDemographic.setDateOfBirth(input.getDateOfBirth());
@@ -84,15 +90,22 @@ public class DemographicUpdateInputToEntityConverter
 		dbDemographic.setChartNo(input.getChartNumber());
 		dbDemographic.setOfficialLanguage(Optional.ofNullable(input.getOfficialLanguage())
 				.map(DemographicModel.OFFICIAL_LANGUAGE::getValue).orElse(null));
+		dbDemographic.updateElectronicMessagingConsentStatus(input.getElectronicMessagingConsentStatus());
 
-		ProviderData dbProvider = findOrCreateProviderRecord(input.getMrpProvider(), true);
-		if(dbProvider != null)
+		// if patient status changed, auto update the status date
+		if(!dbDemographic.getPatientStatus().equals(input.getPatientStatus()))
 		{
-			dbDemographic.setProviderNo(dbProvider.getId());
-			dbDemographic.setProvider(dbProvider);
+			dbDemographic.setPatientStatusDate(new Date());
 		}
 
-		dbDemographic.setPatientStatusDate(ConversionUtils.toNullableLegacyDate(input.getPatientStatusDate()));
+//		ProviderData dbProvider = findOrCreateProviderRecord(input.getMrpProvider(), true);
+//		if(dbProvider != null)
+//		{
+//			dbDemographic.setProviderNo(dbProvider.getId());
+//			dbDemographic.setProvider(dbProvider);
+//		}
+
+		// TODO how to get current user in converter?
 		dbDemographic.setLastUpdateUser(SYSTEM_PROVIDER_NO);
 
 		Set<DemographicExt> demographicExtSet = new HashSet<>();
@@ -158,6 +171,13 @@ public class DemographicUpdateInputToEntityConverter
 		{
 			DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
 					DemographicExt.KEY_DEMO_CELL, cellPhone.getNumber());
+			demographicExtSet.add(ext);
+		}
+
+		if(input.getPhoneComment() != null)
+		{
+			DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
+					DemographicExt.KEY_PHONE_COMMENT, input.getPhoneComment());
 			demographicExtSet.add(ext);
 		}
 

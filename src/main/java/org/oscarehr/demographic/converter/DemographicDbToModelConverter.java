@@ -89,6 +89,10 @@ public class DemographicDbToModelConverter extends
 		model.setOfficialLanguage(OFFICIAL_LANGUAGE.fromValueString(input.getOfficialLanguage()));
 		model.addAddress(buildAddress(input));
 
+		model.setElectronicMessagingConsentStatus(input.getElectronicMessagingConsentStatus());
+		model.setElectronicMessagingConsentGivenAt(ConversionUtils.toNullableLocalDate(input.getElectronicMessagingConsentGivenAt()));
+		model.setElectronicMessagingConsentRejectedAt(ConversionUtils.toNullableLocalDate(input.getElectronicMessagingConsentRejectedAt()));
+
 		AddressModel alternateAddress = buildAlternativeAddress(input);
 		if (alternateAddress != null)
 		{
@@ -133,7 +137,7 @@ public class DemographicDbToModelConverter extends
 				demographicExt -> model.setPaperChartArchived("YES".equalsIgnoreCase(demographicExt.getValue()))
 		);
 		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_PAPER_CHART_ARCHIVED_DATE).ifPresent(
-				demographicExt -> model.setPaperChartArchivedDate(ConversionUtils.toLocalDate(demographicExt.getValue()))
+				demographicExt -> model.setPaperChartArchivedDate(ConversionUtils.toNullableLocalDate(StringUtils.trimToNull(demographicExt.getValue())))
 		);
 		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_US_SIGNED).ifPresent(
 				demographicExt -> model.setUsSigned(StringUtils.trimToNull(demographicExt.getValue()))
@@ -152,6 +156,9 @@ public class DemographicDbToModelConverter extends
 		);
 		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_SECURITY_ANSWER_1).ifPresent(
 				demographicExt -> model.setSecurityAnswer1(StringUtils.trimToNull(demographicExt.getValue()))
+		);
+		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_PHONE_COMMENT).ifPresent(
+				demographicExt -> model.setPhoneComment(StringUtils.trimToNull(demographicExt.getValue()))
 		);
 
 		return model;

@@ -27,7 +27,6 @@ import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
-import org.oscarehr.dataMigration.model.provider.Provider;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -49,7 +48,6 @@ public class DemographicCreateInput extends AbstractTransientModel
 	private LocalDate healthNumberEffectiveDate;
 	private LocalDate healthNumberRenewDate;
 	private String chartNumber;
-	private LocalDate dateJoined;
 
 	//contact info
 	private List<AddressModel> addressList;
@@ -59,7 +57,7 @@ public class DemographicCreateInput extends AbstractTransientModel
 	private PhoneNumberModel cellPhone;
 
 	// physician info
-	private Provider mrpProvider;
+	private String mrpProviderId;
 
 	// other info
 	private String alias;

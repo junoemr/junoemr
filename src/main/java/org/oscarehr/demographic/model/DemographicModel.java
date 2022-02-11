@@ -32,6 +32,7 @@ import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.contact.Contact;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.demographic.entity.ElectronicMessagingConsentStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -99,6 +100,7 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 	private PhoneNumberModel homePhone;
 	private PhoneNumberModel workPhone;
 	private PhoneNumberModel cellPhone;
+	private String phoneComment;
 
 	// physician info
 	private Provider mrpProvider;
@@ -134,6 +136,10 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 	private String securityQuestion1;
 	private String securityAnswer1;
 	private String rxInteractionWarningLevel;
+
+	private ElectronicMessagingConsentStatus electronicMessagingConsentStatus;
+	private LocalDate electronicMessagingConsentGivenAt;
+	private LocalDate electronicMessagingConsentRejectedAt;
 
 	public DemographicModel()
 	{

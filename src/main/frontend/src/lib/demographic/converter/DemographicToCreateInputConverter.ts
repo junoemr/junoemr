@@ -19,7 +19,6 @@ export default class DemographicToCreateInputConverter extends AbstractConverter
 		createInput.healthNumberCountryCode = from.healthNumberCountryCode;
 		createInput.healthNumberEffectiveDate = this.serializeDateTime(from.healthNumberEffectiveDate);
 		createInput.healthNumberRenewDate = this.serializeDateTime(from.healthNumberRenewDate);
-		createInput.dateJoined = this.serializeDateTime(from.dateJoined);
 		createInput.addressList = new AddressToInputConverter().convertList(from.addressList);
 		createInput.email = from.email;
 

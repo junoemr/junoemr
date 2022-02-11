@@ -480,6 +480,14 @@ public class DemographicService
 		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
 
 		demographicDao.merge(demographic);
+		DemographicCust demoCustom = demographic.getDemographicCust();
+		if(demoCustom != null && !demoCustom.isPersistent())
+		{
+			demoCustom.setId(demographic.getId());
+			demoCustom.setDemographic(demographic);
+			demographicCustDao.persist(demoCustom);
+		}
+
 		return demographicDbToModelConverter.convert(demographic);
 	}
 

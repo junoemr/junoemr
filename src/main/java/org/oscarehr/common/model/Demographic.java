@@ -31,6 +31,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.oscarehr.PMmodule.utility.DateTimeFormatUtils;
 import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.demographic.entity.DemographicExt;
+import org.oscarehr.demographic.entity.ElectronicMessagingConsentStatus;
 import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
@@ -1605,19 +1606,19 @@ public class Demographic implements Serializable
 	 * get the patients electronic messaging consent status
 	 * @return - the patients consent status
 	 */
-	public org.oscarehr.demographic.entity.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS getElectronicMessagingConsentStatus()
+	public ElectronicMessagingConsentStatus getElectronicMessagingConsentStatus()
 	{
 		if (this.electronicMessagingConsentRejectedAt != null)
 		{
-			return org.oscarehr.demographic.entity.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS.REVOKED;
+			return ElectronicMessagingConsentStatus.REVOKED;
 		}
 		else if (this.electronicMessagingConsentGivenAt != null)
 		{
-			return org.oscarehr.demographic.entity.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS.CONSENTED;
+			return ElectronicMessagingConsentStatus.CONSENTED;
 		}
 		else
 		{
-			return org.oscarehr.demographic.entity.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS.NONE;
+			return ElectronicMessagingConsentStatus.NONE;
 		}
 	}
 
@@ -1625,7 +1626,7 @@ public class Demographic implements Serializable
 	 * Update the patients electronic messaging consent status.
 	 * @param status - the new consent status to use.
 	 */
-	public void updateElectronicMessagingConsentStatus(org.oscarehr.demographic.entity.Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS status)
+	public void updateElectronicMessagingConsentStatus(ElectronicMessagingConsentStatus status)
 	{
 		if (this.getElectronicMessagingConsentStatus() != status && status != null)
 		{

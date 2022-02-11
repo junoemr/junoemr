@@ -72,9 +72,10 @@
 
 		<!-- Patient Status Date -->
 		<juno-date-select ng-model="$ctrl.ngModel.patientStatusDate"
-						label="Patient Status Date"
-						on-validity-change="$ctrl.patientStatusDateValid = valid"
-						component-style="$ctrl.componentStyle">
+		                  label="Patient Status Date"
+		                  readonly="true"
+		                  on-validity-change="$ctrl.patientStatusDateValid = valid"
+		                  component-style="$ctrl.componentStyle">
 		</juno-date-select>
 
 		<!-- Date Joined -->

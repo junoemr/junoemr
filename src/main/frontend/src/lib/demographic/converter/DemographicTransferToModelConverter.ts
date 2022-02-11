@@ -7,6 +7,7 @@ import PhoneNumber from "../../common/model/PhoneNumber";
 import {Sex} from "../model/Sex";
 import {TitleType} from "../model/TitleType";
 import {OfficialLanguageType} from "../model/OfficialLanguageType";
+import {ElectronicMessagingConsentStatus} from "../ElectronicMessagingConsentStatus";
 
 export default class DemographicTransferToModelConverter extends AbstractConverter<DemographicModel, Demographic>
 {
@@ -38,6 +39,7 @@ export default class DemographicTransferToModelConverter extends AbstractConvert
 		model.homePhone = from.homePhone ? new PhoneNumber(from.homePhone.number, from.homePhone.extension, from.homePhone.phoneType, from.homePhone.primaryContactNumber) : null;
 		model.workPhone = from.workPhone ? new PhoneNumber(from.workPhone.number, from.workPhone.extension, from.workPhone.phoneType, from.workPhone.primaryContactNumber) : null;
 		model.cellPhone = from.cellPhone ? new PhoneNumber(from.cellPhone.number, from.cellPhone.extension, from.cellPhone.phoneType, from.cellPhone.primaryContactNumber) : null;
+		model.phoneComment = from.phoneComment;
 
 		model.officialLanguage = from.officialLanguage as any as OfficialLanguageType;
 		model.spokenLanguage = from.spokenLanguage;
@@ -54,6 +56,9 @@ export default class DemographicTransferToModelConverter extends AbstractConvert
 		model.securityQuestion1 = from.securityQuestion1;
 		model.securityAnswer1 = from.securityAnswer1;
 		model.rxInteractionWarningLevel = from.rxInteractionWarningLevel;
+		model.electronicMessagingConsentStatus = from.electronicMessagingConsentStatus as any as ElectronicMessagingConsentStatus;
+		model.electronicMessagingConsentGivenAt = moment(from.electronicMessagingConsentGivenAt);
+		model.electronicMessagingConsentRejectedAt = moment(from.electronicMessagingConsentGivenAt);
 
 		return model;
 	}
