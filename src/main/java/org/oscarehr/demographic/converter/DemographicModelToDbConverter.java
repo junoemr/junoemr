@@ -28,7 +28,7 @@ import org.oscarehr.dataMigration.converter.in.RosterModelToDbConverter;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.entity.DemographicExt;
@@ -179,7 +179,7 @@ public class DemographicModelToDbConverter
 		dbDemographic.setDemographicCust(demographicCust);
 
 		// referral doc and family doc are not real providers and need to be handled differently from regular provider lookups
-		Provider referralDoc = input.getReferralDoctor();
+		ProviderModel referralDoc = input.getReferralDoctor();
 		if(referralDoc != null)
 		{
 			dbDemographic.setReferralDoctor("<rdohip>" + StringUtils.trimToEmpty(referralDoc.getOhipNumber()) + "</rdohip><rd>"
@@ -187,7 +187,7 @@ public class DemographicModelToDbConverter
 					+ StringUtils.trimToEmpty(referralDoc.getFirstName()) + "</rd>");
 		}
 
-		Provider familyDoc = input.getFamilyDoctor();
+		ProviderModel familyDoc = input.getFamilyDoctor();
 		if(familyDoc != null)
 		{
 			dbDemographic.setFamilyDoctor("<fd>" + StringUtils.trimToEmpty(familyDoc.getOhipNumber()) + "</fd><fdname>"

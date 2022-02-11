@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.model.measurement;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.appointment.Appointment;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDateTime;
@@ -44,7 +44,7 @@ public abstract class Measurement extends AbstractTransientModel
 	protected LocalDateTime observationDateTime;
 	protected LocalDateTime createdDateTime;
 
-	protected Provider provider;
+	protected ProviderModel provider;
 	protected Appointment appointment;
 
 	public Measurement()

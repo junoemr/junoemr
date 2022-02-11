@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.model.appointment;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.demographic.model.DemographicModel;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -35,7 +35,7 @@ public class Appointment extends AbstractTransientModel
 {
 	private Integer id;
 
-	private Provider provider;
+	private ProviderModel provider;
 
 	private LocalDateTime appointmentStartDateTime;
 	private LocalDateTime appointmentEndDateTime;

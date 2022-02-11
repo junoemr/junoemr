@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.model.encounterNote;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.dx.DxCode;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 
 import java.time.LocalDateTime;
@@ -39,9 +39,9 @@ public abstract class BaseNote extends AbstractTransientModel
 	private String noteText;
 	private String revisionId;
 	private LocalDateTime observationDate;
-	private Provider provider;
+	private ProviderModel provider;
 	private Reviewer signingProvider;
-	private List<Provider> editors;
+	private List<ProviderModel> editors;
 
 	private String programId;
 	private String roleId;
@@ -54,7 +54,7 @@ public abstract class BaseNote extends AbstractTransientModel
 		this.dxIssueCodes = new ArrayList<>();
 	}
 
-	public void addEditor(Provider editor)
+	public void addEditor(ProviderModel editor)
 	{
 		this.editors.add(editor);
 	}

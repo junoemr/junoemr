@@ -27,7 +27,7 @@ import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.oscarDemographic.pageUtil.Util;
@@ -232,13 +232,13 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 		return status;
 	}
 
-	protected Provider getImportPrimaryPhysician(Demographics importStructure)
+	protected ProviderModel getImportPrimaryPhysician(Demographics importStructure)
 	{
-		Provider provider = null;
+		ProviderModel provider = null;
 		Demographics.PrimaryPhysician mrp = importStructure.getPrimaryPhysician();
 		if(mrp != null)
 		{
-			provider = new Provider();
+			provider = new ProviderModel();
 			provider.setFirstName(mrp.getName().getFirstName());
 			provider.setLastName(mrp.getName().getLastName());
 			provider.setOhipNumber(mrp.getOHIPPhysicianId());

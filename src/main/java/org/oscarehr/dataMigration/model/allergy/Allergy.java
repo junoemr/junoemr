@@ -26,7 +26,7 @@ import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -155,7 +155,7 @@ public class Allergy extends AbstractTransientModel
 	private LocalDateTime entryDateTime;
 	private PartialDate startDate;
 
-	private Provider provider;
+	private ProviderModel provider;
 	private String annotation;
 	private List<ResidualInfo> residualInfo;
 }

@@ -3,11 +3,12 @@ import Demographic from "../model/Demographic";
 import {DemographicModel} from "../../../../generated";
 import moment from "moment";
 import AddressToModelConverter from "../../common/converter/AddressToModelConverter";
-import PhoneNumber from "../../common/model/PhoneNumber";
 import {Sex} from "../model/Sex";
 import {TitleType} from "../model/TitleType";
 import {OfficialLanguageType} from "../model/OfficialLanguageType";
 import {ElectronicMessagingConsentStatus} from "../ElectronicMessagingConsentStatus";
+import ProviderModelToSimpleProviderConverter from "../../provider/converter/ProviderModelToSimpleProviderConverter";
+import PhoneNumberToModelConverter from "../../common/converter/PhoneNumberToModelConverter";
 
 export default class DemographicTransferToModelConverter extends AbstractConverter<DemographicModel, Demographic>
 {
@@ -36,9 +37,10 @@ export default class DemographicTransferToModelConverter extends AbstractConvert
 
 		model.addressList = new AddressToModelConverter().convertList(from.addressList);
 		model.email = from.email;
-		model.homePhone = from.homePhone ? new PhoneNumber(from.homePhone.number, from.homePhone.extension, from.homePhone.phoneType, from.homePhone.primaryContactNumber) : null;
-		model.workPhone = from.workPhone ? new PhoneNumber(from.workPhone.number, from.workPhone.extension, from.workPhone.phoneType, from.workPhone.primaryContactNumber) : null;
-		model.cellPhone = from.cellPhone ? new PhoneNumber(from.cellPhone.number, from.cellPhone.extension, from.cellPhone.phoneType, from.cellPhone.primaryContactNumber) : null;
+		const phoneNumberConverter = new PhoneNumberToModelConverter();
+		model.homePhone = phoneNumberConverter.convert(from.homePhone);
+		model.workPhone = phoneNumberConverter.convert(from.workPhone);
+		model.cellPhone = phoneNumberConverter.convert(from.cellPhone);
 		model.phoneComment = from.phoneComment;
 
 		model.officialLanguage = from.officialLanguage as any as OfficialLanguageType;
@@ -59,6 +61,14 @@ export default class DemographicTransferToModelConverter extends AbstractConvert
 		model.electronicMessagingConsentStatus = from.electronicMessagingConsentStatus as any as ElectronicMessagingConsentStatus;
 		model.electronicMessagingConsentGivenAt = moment(from.electronicMessagingConsentGivenAt);
 		model.electronicMessagingConsentRejectedAt = moment(from.electronicMessagingConsentGivenAt);
+
+		const simpleProviderConverter = new ProviderModelToSimpleProviderConverter();
+		model.mrpProvider = simpleProviderConverter.convert(from.mrpProvider);
+		model.nurseProvider = simpleProviderConverter.convert(from.nurseProvider);
+		model.midwifeProvider = simpleProviderConverter.convert(from.midwifeProvider);
+		model.residentProvider = simpleProviderConverter.convert(from.residentProvider);
+		model.familyDoctor = simpleProviderConverter.convert(from.familyDoctor);
+		model.referralDoctor = simpleProviderConverter.convert(from.referralDoctor);
 
 		return model;
 	}

@@ -23,7 +23,7 @@
 package org.oscarehr.demographic.transfer;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographic.entity.ElectronicMessagingConsentStatus;
 import org.oscarehr.demographic.model.DemographicModel;
 
@@ -45,8 +45,11 @@ public class DemographicUpdateInput extends DemographicCreateInput
 
 	// physician info
 	private String mrpProviderId;
-	private Provider referralDoctor;
-	private Provider familyDoctor;
+	private String nurseProviderId;
+	private String midwifeProviderId;
+	private String residentProviderId;
+	private ProviderModel referralDoctor;
+	private ProviderModel familyDoctor;
 
 	// other info
 

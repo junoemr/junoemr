@@ -31,7 +31,7 @@ import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.contact.Contact;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographic.entity.ElectronicMessagingConsentStatus;
 
 import java.time.LocalDate;
@@ -103,9 +103,12 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 	private String phoneComment;
 
 	// physician info
-	private Provider mrpProvider;
-	private Provider referralDoctor;
-	private Provider familyDoctor;
+	private ProviderModel mrpProvider;
+	private ProviderModel nurseProvider;
+	private ProviderModel midwifeProvider;
+	private ProviderModel residentProvider;
+	private ProviderModel referralDoctor;
+	private ProviderModel familyDoctor;
 
 	// roster info
 	private List<RosterData> rosterHistory;

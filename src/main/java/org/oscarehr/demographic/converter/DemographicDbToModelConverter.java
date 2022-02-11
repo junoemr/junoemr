@@ -28,7 +28,7 @@ import org.oscarehr.dataMigration.converter.out.RosterDbToModelConverter;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.entity.DemographicCust;
@@ -123,7 +123,9 @@ public class DemographicDbToModelConverter extends
 		{
 			model.setPatientNote(StringUtils.trimToNull(demographicCustom.getParsedNotes()));
 			model.setPatientAlert(StringUtils.trimToNull(demographicCustom.getAlert()));
-			//TODO midwife/nurse,resident providers ?
+			model.setNurseProvider(findProvider(StringUtils.trimToNull(demographicCustom.getNurse())));
+			model.setMidwifeProvider(findProvider(StringUtils.trimToNull(demographicCustom.getMidwife())));
+			model.setResidentProvider(findProvider(StringUtils.trimToNull(demographicCustom.getResident())));
 		}
 
 		// fill additional EXT entries
@@ -257,12 +259,12 @@ public class DemographicDbToModelConverter extends
 		return PhoneNumberModel.of(phoneNumber, extension, primaryPhone);
 	}
 
-	private Provider getReferralProvider(Demographic input)
+	private ProviderModel getReferralProvider(Demographic input)
 	{
 		return getProviderFromString(input.getReferralDoctorName(), input.getReferralDoctorNumber());
 	}
 
-	private Provider getFamilyProvider(Demographic input)
+	private ProviderModel getFamilyProvider(Demographic input)
 	{
 		return getProviderFromString(input.getFamilyDoctorName(), input.getFamilyDoctorNumber());
 	}

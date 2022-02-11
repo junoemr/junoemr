@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.converter.in;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.rosterStatus.dao.RosterStatusDao;
 import org.oscarehr.rosterStatus.model.RosterStatus;
@@ -56,7 +56,7 @@ public class RosterModelToDbConverter extends BaseDbToModelConverter<RosterData,
 		demographicRoster.setRosterTerminationDate(input.getTerminationDateTime());
 		demographicRoster.setRosterTerminationReason(input.getTerminationReason());
 
-		Provider rosterProvider = input.getRosterProvider();
+		ProviderModel rosterProvider = input.getRosterProvider();
 		if(rosterProvider != null)
 		{
 			demographicRoster.setRosteredPhysician(

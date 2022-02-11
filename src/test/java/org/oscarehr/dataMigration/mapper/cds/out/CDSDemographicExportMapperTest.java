@@ -29,7 +29,7 @@ import org.mockito.MockitoAnnotations;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.springframework.beans.factory.annotation.Autowired;
 import xml.cds.v5_0.Demographics;
@@ -110,7 +110,7 @@ public class CDSDemographicExportMapperTest
 		rosterData.setRostered(true);
 		rosterData.setRosterDateTime(LocalDateTime.of(2021, 12, 24, 12, 0, 0));
 
-		Provider mockProvider = new Provider();
+		ProviderModel mockProvider = new ProviderModel();
 		mockProvider.setFirstName("test");
 		mockProvider.setLastName("provider");
 		rosterData.setRosterProvider(mockProvider);
@@ -134,7 +134,7 @@ public class CDSDemographicExportMapperTest
 		RosterData rosterData = new RosterData();
 		rosterData.setRostered(false);
 
-		Provider mockProvider = new Provider();
+		ProviderModel mockProvider = new ProviderModel();
 		mockProvider.setFirstName("test");
 		mockProvider.setLastName("provider");
 		rosterData.setRosterProvider(mockProvider);

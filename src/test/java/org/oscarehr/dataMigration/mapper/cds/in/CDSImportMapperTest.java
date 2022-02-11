@@ -35,7 +35,7 @@ import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
 import org.oscarehr.dataMigration.service.context.PatientImportContextService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -634,7 +634,7 @@ public class CDSImportMapperTest
 		personNameSimple.setFirstName(expectedFirstName);
 		personNameSimple.setLastName(expectedLastName);
 
-		Provider convertedProvider = cdsImportMapper.toProvider(personNameSimple);
+		ProviderModel convertedProvider = cdsImportMapper.toProvider(personNameSimple);
 
 		assertEquals(expectedFirstName, convertedProvider.getFirstName());
 		assertEquals(expectedLastName, convertedProvider.getLastName());
@@ -654,7 +654,7 @@ public class CDSImportMapperTest
 
 		String namesString = expectedLastName + "," + expectedFirstName;
 
-		Provider convertedProvider = cdsImportMapper.toProviderNames(namesString);
+		ProviderModel convertedProvider = cdsImportMapper.toProviderNames(namesString);
 
 		assertEquals(expectedFirstName, convertedProvider.getFirstName());
 		assertEquals(expectedLastName, convertedProvider.getLastName());

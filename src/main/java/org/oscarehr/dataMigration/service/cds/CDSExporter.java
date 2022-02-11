@@ -28,7 +28,7 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.dataMigration.mapper.cds.out.CDSExportMapper;
 import org.oscarehr.dataMigration.model.PatientRecord;
 import org.oscarehr.demographic.model.DemographicModel;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.parser.cds.CDSFileParser;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
 import org.oscarehr.dataMigration.service.DemographicExporter;
@@ -132,7 +132,7 @@ public class CDSExporter implements DemographicExporter
 	protected Path getExportFolder(DemographicModel demographic, Path baseDirectory) throws IOException
 	{
 		String folderName;
-		Provider mrpProvider = demographic.getMrpProvider();
+		ProviderModel mrpProvider = demographic.getMrpProvider();
 		if(mrpProvider != null)
 		{
 			folderName = GenericFile.getSanitizedFileName(

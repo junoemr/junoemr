@@ -33,7 +33,7 @@ import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.contact.DemographicContact;
 import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 import xml.hrm.v4_3.Address;
@@ -226,7 +226,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 	protected Demographics.PrimaryPhysician getExportPrimaryPhysician(
 		DemographicModel exportStructure)
 	{
-		Provider provider = exportStructure.getMrpProvider();
+		ProviderModel provider = exportStructure.getMrpProvider();
 		Demographics.PrimaryPhysician primaryPhysician = null;
 		if(provider != null)
 		{

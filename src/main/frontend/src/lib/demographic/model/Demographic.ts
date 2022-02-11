@@ -5,6 +5,7 @@ import {Sex, sexToHuman} from "./Sex";
 import {ElectronicMessagingConsentStatus} from "../ElectronicMessagingConsentStatus";
 import {TitleType} from "./TitleType";
 import {OfficialLanguageType} from "./OfficialLanguageType";
+import SimpleProvider from "../../provider/model/SimpleProvider";
 
 export default class Demographic
 {
@@ -38,9 +39,12 @@ export default class Demographic
 	private _phoneComment: string;
 
 	// physician info
-	private _mrpProvider: object; //todo
-	private _referralDoctor: object; //todo
-	private _familyDoctor: object; //todo
+	private _mrpProvider: SimpleProvider;
+	private _nurseProvider: SimpleProvider;
+	private _midwifeProvider: SimpleProvider;
+	private _residentProvider: SimpleProvider;
+	private _referralDoctor: SimpleProvider;
+	private _familyDoctor: SimpleProvider;
 
 	// roster info
 	private _rosterHistory: object[]; //todo
@@ -396,34 +400,64 @@ export default class Demographic
 		this._phoneComment = value;
 	}
 
-	get mrpProvider(): object
+	get mrpProvider(): SimpleProvider
 	{
 		return this._mrpProvider;
 	}
 
-	set mrpProvider(value: object)
+	set mrpProvider(value: SimpleProvider)
 	{
 		this._mrpProvider = value;
 	}
 
-	get referralDoctor(): object
+	get referralDoctor(): SimpleProvider
 	{
 		return this._referralDoctor;
 	}
 
-	set referralDoctor(value: object)
+	set referralDoctor(value: SimpleProvider)
 	{
 		this._referralDoctor = value;
 	}
 
-	get familyDoctor(): object
+	get familyDoctor(): SimpleProvider
 	{
 		return this._familyDoctor;
 	}
 
-	set familyDoctor(value: object)
+	set familyDoctor(value: SimpleProvider)
 	{
 		this._familyDoctor = value;
+	}
+
+	get nurseProvider(): SimpleProvider
+	{
+		return this._nurseProvider;
+	}
+
+	set nurseProvider(value: SimpleProvider)
+	{
+		this._nurseProvider = value;
+	}
+
+	get midwifeProvider(): SimpleProvider
+	{
+		return this._midwifeProvider;
+	}
+
+	set midwifeProvider(value: SimpleProvider)
+	{
+		this._midwifeProvider = value;
+	}
+
+	get residentProvider(): SimpleProvider
+	{
+		return this._residentProvider;
+	}
+
+	set residentProvider(value: SimpleProvider)
+	{
+		this._residentProvider = value;
 	}
 
 	get rosterHistory(): object[]

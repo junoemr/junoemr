@@ -27,7 +27,7 @@ import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.hrm.HrmComment;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -118,7 +118,7 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 		return observationList;
 	}
 
-	protected HrmComment getNoteAsHrmComment(String note, Provider commentProvider, LocalDateTime dateTime)
+	protected HrmComment getNoteAsHrmComment(String note, ProviderModel commentProvider, LocalDateTime dateTime)
 	{
 		HrmComment comment = null;
 		if(note != null)

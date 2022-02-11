@@ -27,6 +27,9 @@ export default class DemographicToCreateInputConverter extends AbstractConverter
 		createInput.homePhone = phoneConverter.convert(from.homePhone);
 		createInput.workPhone = phoneConverter.convert(from.workPhone);
 
+		// physician info
+		createInput.mrpProviderId = from.mrpProvider?.id;
+
 		return createInput;
 	}
 }

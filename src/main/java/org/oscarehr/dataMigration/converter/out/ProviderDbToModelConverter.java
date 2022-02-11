@@ -27,6 +27,7 @@ import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -37,16 +38,16 @@ import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.COUNTRY_CODE_CA
 // can't extend the base class because the base uses this converter
 @Component
 public class ProviderDbToModelConverter extends
-		AbstractModelConverter<ProviderData, org.oscarehr.dataMigration.model.provider.Provider>
+		AbstractModelConverter<ProviderData, ProviderModel>
 {
 	@Override
-	public org.oscarehr.dataMigration.model.provider.Provider convert(ProviderData input)
+	public ProviderModel convert(ProviderData input)
 	{
 		if(input == null)
 		{
 			return null;
 		}
-		org.oscarehr.dataMigration.model.provider.Provider exportProvider = new org.oscarehr.dataMigration.model.provider.Provider();
+		ProviderModel exportProvider = new ProviderModel();
 		BeanUtils.copyProperties(input, exportProvider, "address", "dob", "sex", "title");
 		exportProvider.setId(input.getId());
 

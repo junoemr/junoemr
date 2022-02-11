@@ -24,7 +24,7 @@ package org.oscarehr.dataMigration.mapper.hrm.out;
 
 import org.oscarehr.dataMigration.mapper.AbstractExportMapper;
 import org.oscarehr.dataMigration.model.common.PartialDate;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 import xml.hrm.v4_3.DateFullOrPartial;
@@ -101,7 +101,7 @@ public abstract class AbstractHRMExportMapper<I, E> extends AbstractExportMapper
 		return dateFullOrPartial;
 	}
 
-	protected PersonNameSimple toPersonNameSimple(Provider provider)
+	protected PersonNameSimple toPersonNameSimple(ProviderModel provider)
 	{
 		PersonNameSimple personNameSimple = null;
 		if(provider != null)

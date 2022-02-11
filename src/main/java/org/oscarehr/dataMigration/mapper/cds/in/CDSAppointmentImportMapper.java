@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.mapper.cds.in;
 import org.oscarehr.dataMigration.exception.InvalidImportDataException;
 import org.oscarehr.dataMigration.model.appointment.Appointment;
 import org.oscarehr.dataMigration.model.appointment.AppointmentStatus;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.service.AppointmentStatusCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -90,9 +90,9 @@ public class CDSAppointmentImportMapper extends AbstractCDSImportMapper<Appointm
 		return appointmentDateTime.plusMinutes(duration.longValue());
 	}
 
-	protected Provider getImportProvider(Appointments importStructure)
+	protected ProviderModel getImportProvider(Appointments importStructure)
 	{
-		Provider provider = null;
+		ProviderModel provider = null;
 		Appointments.Provider importProvider = importStructure.getProvider();
 		if(importProvider != null)
 		{

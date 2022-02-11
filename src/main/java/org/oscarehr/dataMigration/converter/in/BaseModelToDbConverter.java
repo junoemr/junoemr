@@ -27,7 +27,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.model.UserProperty;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
@@ -79,10 +79,10 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 	 * @param nullable - determines if null can be returned in the event that there is insufficient information to create a provider record
 	 * @return - the provider record if possible, otherwise null if nullable is true, and a default if not nullable
 	 */
-	protected ProviderData findOrCreateProviderRecord(Provider provider, boolean nullable)
+	protected ProviderData findOrCreateProviderRecord(ProviderModel provider, boolean nullable)
 	{
 
-		Provider newProvider;
+		ProviderModel newProvider;
 		if(provider == null && nullable)
 		{
 			return null;
@@ -147,9 +147,9 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 		return providerDataDao.criteriaSearch(searchParams);
 	}
 
-	private Provider getDefaultProvider()
+	private ProviderModel getDefaultProvider()
 	{
-		Provider provider = new Provider();
+		ProviderModel provider = new ProviderModel();
 		provider.setFirstName(DEFAULT_PROVIDER_FIRST_NAME);
 		provider.setLastName(DEFAULT_PROVIDER_LAST_NAME);
 		return provider;

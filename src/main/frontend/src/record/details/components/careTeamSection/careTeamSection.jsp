@@ -6,31 +6,35 @@
 	<div class="details-fields">
 
 		<!-- MRP -->
-		<juno-select ng-model="$ctrl.ngModel.providerNo"
-					options="$ctrl.doctors"
-					label="MRP"
-					component-style="$ctrl.componentStyle">
+		<juno-select ng-model="$ctrl.selectedDoctorId"
+		             options="$ctrl.doctors"
+		             label="MRP"
+		             on-change="$ctrl.onDoctorSelected(value)"
+		             component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Nurse -->
-		<juno-select ng-model="$ctrl.ngModel.nurse"
-					options="$ctrl.nurses"
-					label="Nurse"
-					component-style="$ctrl.componentStyle">
+		<juno-select ng-model="$ctrl.selectedNurseId"
+		             options="$ctrl.nurses"
+		             label="Nurse"
+		             on-change="$ctrl.onNurseSelected(value)"
+		             component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Midwife -->
-		<juno-select ng-model="$ctrl.ngModel.midwife"
-					options="$ctrl.midwives"
-					label="Midwife"
-					component-style="$ctrl.componentStyle">
+		<juno-select ng-model="$ctrl.selectedMidwifeId"
+		             options="$ctrl.midwives"
+		             label="Midwife"
+		             on-change="$ctrl.onMidwifeSelected(value)"
+		             component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Resident -->
-		<juno-select ng-model="$ctrl.ngModel.resident"
-					options="$ctrl.doctors"
-					label="Resident"
-					component-style="$ctrl.componentStyle">
+		<juno-select ng-model="$ctrl.selectedResidentId"
+		             options="$ctrl.residents"
+		             label="Resident"
+		             on-change="$ctrl.onResidentSelected(value)"
+		             component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Referral Doctor -->

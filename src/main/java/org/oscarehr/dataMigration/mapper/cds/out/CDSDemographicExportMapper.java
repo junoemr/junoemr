@@ -32,7 +32,7 @@ import org.oscarehr.dataMigration.model.contact.DemographicContact;
 import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.pharmacy.Pharmacy;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.springframework.stereotype.Component;
 import oscar.oscarDemographic.pageUtil.Util;
 import oscar.util.ConversionUtils;
@@ -225,7 +225,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 	protected Demographics.PrimaryPhysician getExportPrimaryPhysician(
 		DemographicModel exportStructure)
 	{
-		Provider provider = exportStructure.getMrpProvider();
+		ProviderModel provider = exportStructure.getMrpProvider();
 		Demographics.PrimaryPhysician primaryPhysician = null;
 		if(provider != null)
 		{
@@ -314,7 +314,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 			}
 		}
 
-		Provider rosterProvider = rosterData.getRosterProvider();
+		ProviderModel rosterProvider = rosterData.getRosterProvider();
 		if(rosterProvider != null)
 		{
 			Demographics.Enrolment.EnrolmentHistory.EnrolledToPhysician enrolledToPhysician =

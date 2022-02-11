@@ -35,7 +35,7 @@ import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.dataMigration.model.dx.DxCodingSystem;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.service.context.PatientExportContext;
 import org.oscarehr.dataMigration.service.context.PatientExportContextService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,7 +163,7 @@ public class CDSExportMapperTest
 		String expectedFirstName = "first";
 		String expectedLastName = "last";
 
-		Provider provider = new Provider();
+		ProviderModel provider = new ProviderModel();
 		provider.setFirstName(expectedFirstName);
 		provider.setLastName(expectedLastName);
 

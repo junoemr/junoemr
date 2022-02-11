@@ -28,6 +28,7 @@ import {
 	LABEL_POSITION
 } from "../../../../common/components/junoComponentConstants";
 import {ProvidersServiceApi} from "../../../../../generated";
+import SimpleProvider from "../../../../lib/provider/model/SimpleProvider";
 
 angular.module('Record.Details').component('careTeamSection', {
 	templateUrl: 'src/record/details/components/careTeamSection/careTeamSection.jsp',
@@ -67,6 +68,11 @@ angular.module('Record.Details').component('careTeamSection', {
 		ctrl.endDateValid = true;
 		ctrl.dateJoinedValid = true;
 
+		ctrl.selectedDoctorId = null;
+		ctrl.selectedNurseId = null;
+		ctrl.selectedMidwifeId = null;
+		ctrl.selectedResidentId = null;
+
 		ctrl.$onInit = () =>
 		{
 			// add date validations
@@ -76,24 +82,31 @@ angular.module('Record.Details').component('careTeamSection', {
 
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
 
-			providersServiceApi.getBySecurityRole("doctor").then(
+			providersServiceApi.getByType("doctor").then(
 					function success(data) {
 						ctrl.doctors = data.data.body.map((doc) => {return {label: doc.name, value: doc.providerNo}});
 						ctrl.doctors.push({label: "Unassigned", value: null})
 					}
 			);
 
-			providersServiceApi.getBySecurityRole("nurse").then(
+			providersServiceApi.getByType("nurse").then(
 					function success(data) {
 						ctrl.nurses = data.data.body.map((doc) => {return {label: doc.name, value: doc.providerNo}});
 						ctrl.nurses.push({label: "Unassigned", value: null})
 					}
 			);
 
-			providersServiceApi.getBySecurityRole("midwife").then(
+			providersServiceApi.getByType("midwife").then(
 					function success(data) {
 						ctrl.midwives = data.data.body.map((doc) => {return {label: doc.name, value: doc.providerNo}});
 						ctrl.midwives.push({label: "Unassigned", value: null})
+					}
+			);
+
+			providersServiceApi.getByType("resident").then(
+					function success(data) {
+						ctrl.residents = data.data.body.map((doc) => {return {label: doc.name, value: doc.providerNo}});
+						ctrl.residents.push({label: "Unassigned", value: null})
 					}
 			);
 
@@ -103,6 +116,28 @@ angular.module('Record.Details').component('careTeamSection', {
 						ctrl.patientStatusList = data;
 					}
 			);
+
+			ctrl.selectedDoctorId = ctrl.ngModel.mrpProvider ? ctrl.ngModel.mrpProvider.id : null;
+			ctrl.selectedNurseId = ctrl.ngModel.nurseProvider ? ctrl.ngModel.nurseProvider.id : null;
+			ctrl.selectedMidwifeId = ctrl.ngModel.midwifeProvider ? ctrl.ngModel.midwifeProvider.id : null;
+			ctrl.selectedResidentId = ctrl.ngModel.residentProvider ? ctrl.ngModel.residentProvider.id : null;
+		}
+
+		ctrl.onDoctorSelected = (value) =>
+		{
+			ctrl.ngModel.mrpProvider = value ? new SimpleProvider(value) : null;
+		}
+		ctrl.onNurseSelected = (value) =>
+		{
+			ctrl.ngModel.nurseProvider = value ? new SimpleProvider(value) : null;
+		}
+		ctrl.onMidwifeSelected = (value) =>
+		{
+			ctrl.ngModel.midwifeProvider = value ? new SimpleProvider(value) : null;
+		}
+		ctrl.onResidentSelected = (value) =>
+		{
+			ctrl.ngModel.residentProvider = value ? new SimpleProvider(value) : null;
 		}
 
 		ctrl.updateReferralDoctors = (docSearchString, docReferralNo) =>

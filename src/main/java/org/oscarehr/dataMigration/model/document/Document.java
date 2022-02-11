@@ -28,7 +28,7 @@ import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.appointment.Appointment;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -61,8 +61,8 @@ public class Document extends AbstractTransientModel
 	private Boolean publicDocument;
 	private Appointment appointment;
 
-	private Provider createdBy;
-	private Provider responsible;
+	private ProviderModel createdBy;
+	private ProviderModel responsible;
 	private Reviewer reviewer;
 
 	private String annotation;

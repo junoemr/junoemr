@@ -31,7 +31,7 @@ import org.mockito.MockitoAnnotations;
 import org.oscarehr.dataMigration.logger.cds.CDSImportLogger;
 import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
 import org.oscarehr.dataMigration.service.context.PatientImportContextService;
 import xml.cds.v5_0.Demographics;
@@ -166,7 +166,7 @@ public class CDSDemographicImportMapperTest
 		RosterData rosterData = new RosterData();
 		rosterData.setRostered(true);
 
-		Provider rosterProvider = new Provider();
+		ProviderModel rosterProvider = new ProviderModel();
 		rosterProvider.setFirstName(enrolledDocFName);
 		rosterProvider.setLastName(enrolledDocLName);
 		rosterProvider.setOhipNumber(enrolledDocOhip);
@@ -202,7 +202,7 @@ public class CDSDemographicImportMapperTest
 		RosterData rosterData = new RosterData();
 		rosterData.setRostered(false);
 
-		Provider rosterProvider = new Provider();
+		ProviderModel rosterProvider = new ProviderModel();
 		rosterProvider.setFirstName(enrolledDocFName);
 		rosterProvider.setLastName(enrolledDocLName);
 		rosterProvider.setOhipNumber(enrolledDocOhip);

@@ -23,7 +23,7 @@
 package org.oscarehr.dataMigration.mapper.cds.out;
 
 import org.oscarehr.dataMigration.model.encounterNote.EncounterNote;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.ClinicalNotes;
@@ -55,17 +55,17 @@ public class CDSEncounterNoteExportMapper extends AbstractCDSNoteExportMapper<Cl
 
 	protected List<ClinicalNotes.ParticipatingProviders> getNoteProviders(EncounterNote exportStructure)
 	{
-		List<Provider> editors = exportStructure.getEditors();
+		List<ProviderModel> editors = exportStructure.getEditors();
 		List<ClinicalNotes.ParticipatingProviders> providers = new ArrayList<>(editors.size());
 
-		for(Provider provider : editors)
+		for(ProviderModel provider : editors)
 		{
 			providers.add(getNoteProvider(exportStructure, provider));
 		}
 
 		return providers;
 	}
-	protected ClinicalNotes.ParticipatingProviders getNoteProvider(EncounterNote exportStructure, Provider provider)
+	protected ClinicalNotes.ParticipatingProviders getNoteProvider(EncounterNote exportStructure, ProviderModel provider)
 	{
 		ClinicalNotes.ParticipatingProviders participatingProvider = null;
 		if(provider != null)

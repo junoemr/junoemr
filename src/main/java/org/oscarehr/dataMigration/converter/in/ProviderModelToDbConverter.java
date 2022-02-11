@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.converter.in;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.dataMigration.model.common.AddressModel;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -35,10 +35,10 @@ import java.util.List;
 
 // can't extend the base class because the base uses this converter
 @Component
-public class ProviderModelToDbConverter extends AbstractModelConverter<Provider, ProviderData>
+public class ProviderModelToDbConverter extends AbstractModelConverter<ProviderModel, ProviderData>
 {
 	@Override
-	public ProviderData convert(Provider input)
+	public ProviderData convert(ProviderModel input)
 	{
 		if(input == null)
 		{

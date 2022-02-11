@@ -27,7 +27,7 @@ import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.entity.Demographic;
@@ -95,15 +95,11 @@ public class DemographicUpdateInputToEntityConverter
 		// if patient status changed, auto update the status date
 		if(!dbDemographic.getPatientStatus().equals(input.getPatientStatus()))
 		{
+			dbDemographic.setPatientStatus(input.getPatientStatus());
 			dbDemographic.setPatientStatusDate(new Date());
 		}
 
-//		ProviderData dbProvider = findOrCreateProviderRecord(input.getMrpProvider(), true);
-//		if(dbProvider != null)
-//		{
-//			dbDemographic.setProviderNo(dbProvider.getId());
-//			dbDemographic.setProvider(dbProvider);
-//		}
+		dbDemographic.setProviderNo(input.getMrpProviderId());
 
 		// TODO how to get current user in converter?
 		dbDemographic.setLastUpdateUser(SYSTEM_PROVIDER_NO);
@@ -249,11 +245,14 @@ public class DemographicUpdateInputToEntityConverter
 		DemographicCust demographicCust = Optional.ofNullable(dbDemographic.getDemographicCust()).orElse(new DemographicCust(dbDemographic.getId()));
 		demographicCust.setParsedNotes(input.getPatientNote());
 		demographicCust.setAlert(input.getPatientAlert());
+		demographicCust.setNurse(input.getNurseProviderId());
+		demographicCust.setMidwife(input.getMidwifeProviderId());
+		demographicCust.setResident(input.getResidentProviderId());
 		demographicCust.setDemographic(dbDemographic);
 		dbDemographic.setDemographicCust(demographicCust);
 
 		// referral doc and family doc are not real providers and need to be handled differently from regular provider lookups
-		Provider referralDoc = input.getReferralDoctor();
+		ProviderModel referralDoc = input.getReferralDoctor();
 		if(referralDoc != null)
 		{
 			dbDemographic.setReferralDoctor("<rdohip>" + StringUtils.trimToEmpty(referralDoc.getOhipNumber()) + "</rdohip><rd>"
@@ -261,7 +260,7 @@ public class DemographicUpdateInputToEntityConverter
 					+ StringUtils.trimToEmpty(referralDoc.getFirstName()) + "</rd>");
 		}
 
-		Provider familyDoc = input.getFamilyDoctor();
+		ProviderModel familyDoc = input.getFamilyDoctor();
 		if(familyDoc != null)
 		{
 			dbDemographic.setFamilyDoctor("<fd>" + StringUtils.trimToEmpty(familyDoc.getOhipNumber()) + "</fd><fdname>"

@@ -30,7 +30,7 @@ import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.dataMigration.model.dx.DxCodingSystem;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 import xml.cds.v5_0.AddressStructured;
@@ -242,7 +242,7 @@ public abstract class AbstractCDSExportMapper<I, E> extends AbstractExportMapper
 		return dateTimeFullOrPartial;
 	}
 
-	protected PersonNameSimple toPersonNameSimple(Provider provider)
+	protected PersonNameSimple toPersonNameSimple(ProviderModel provider)
 	{
 		if(provider == null)
 		{

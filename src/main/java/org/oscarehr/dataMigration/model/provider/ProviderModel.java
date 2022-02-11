@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class Provider extends AbstractTransientModel implements Person, Contact
+public class ProviderModel extends AbstractTransientModel implements Person, Contact
 {
 	private String id;
 	// basic info
@@ -69,9 +69,9 @@ public class Provider extends AbstractTransientModel implements Person, Contact
 	private String lastUpdateUserId;
 	private LocalDateTime lastUpdateDateTime;
 	private LocalDateTime signedConfidentialityDateTime;
-	private Provider supervisor;
+	private ProviderModel supervisor;
 
-	public Provider()
+	public ProviderModel()
 	{
 		this.addressList = new ArrayList<>();
 	}

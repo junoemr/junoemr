@@ -38,7 +38,10 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.phoneComment = from.phoneComment;
 
 		// physician info
-		//todo
+		updateInput.mrpProviderId = from.mrpProvider?.id;
+		updateInput.nurseProviderId = from.nurseProvider?.id;
+		updateInput.midwifeProviderId = from.midwifeProvider?.id;
+		updateInput.residentProviderId = from.residentProvider?.id;
 
 		// other
 		updateInput.officialLanguage = from.officialLanguage as DemographicUpdateInput.OfficialLanguageEnum;

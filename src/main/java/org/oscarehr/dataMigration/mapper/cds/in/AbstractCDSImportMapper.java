@@ -31,7 +31,7 @@ import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 import xml.cds.v5_0.AddressStructured;
@@ -160,25 +160,25 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return null;
 	}
 
-	protected Provider toProvider(PersonNameSimple personNameSimple)
+	protected ProviderModel toProvider(PersonNameSimple personNameSimple)
 	{
-		Provider provider = null;
+		ProviderModel provider = null;
 		if(personNameSimple != null)
 		{
-			provider = new Provider();
+			provider = new ProviderModel();
 			provider.setFirstName(personNameSimple.getFirstName());
 			provider.setLastName(personNameSimple.getLastName());
 		}
 		return provider;
 	}
 
-	protected Provider toProviderNames(String providerNameString)
+	protected ProviderModel toProviderNames(String providerNameString)
 	{
-		Provider provider = null;
+		ProviderModel provider = null;
 		if(providerNameString != null && providerNameString.contains(","))
 		{
 			String[] providerNames = providerNameString.split(",", 2);
-			provider = new Provider();
+			provider = new ProviderModel();
 			provider.setLastName(providerNames[0]);
 			provider.setFirstName(providerNames[1]);
 		}

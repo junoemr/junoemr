@@ -24,7 +24,7 @@ package org.oscarehr.dataMigration.model.dx;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -69,7 +69,7 @@ public class DxRecord extends AbstractTransientModel
 	private Integer id;
 	private Status status;
 	private DxCode dxCode;
-	private Provider provider;
+	private ProviderModel provider;
 	private LocalDate startDate;
 	private LocalDateTime updateDate;
 }

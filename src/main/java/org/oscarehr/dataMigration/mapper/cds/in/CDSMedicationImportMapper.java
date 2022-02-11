@@ -36,7 +36,7 @@ import org.oscarehr.dataMigration.model.common.ResidualInfo;
 import org.oscarehr.dataMigration.model.medication.CustomMedication;
 import org.oscarehr.dataMigration.model.medication.FrequencyCode;
 import org.oscarehr.dataMigration.model.medication.Medication;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.springframework.stereotype.Component;
 import oscar.oscarDemographic.pageUtil.Util;
 import xml.cds.v5_0.DrugMeasure;
@@ -197,9 +197,9 @@ public class CDSMedicationImportMapper extends AbstractCDSImportMapper<Medicatio
 		return null;
 	}
 
-	protected Provider getPrescribingProvider(MedicationsAndTreatments importStructure)
+	protected ProviderModel getPrescribingProvider(MedicationsAndTreatments importStructure)
 	{
-		Provider provider = null;
+		ProviderModel provider = null;
 		MedicationsAndTreatments.PrescribedBy prescribedBy = importStructure.getPrescribedBy();
 		if(prescribedBy != null)
 		{

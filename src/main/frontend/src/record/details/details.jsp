@@ -140,7 +140,7 @@
 				</div>
 		</div>
 		<div id="profile-fields" class="flex-row flex-wrap justify-content-start m-t-8">
-			<div class="flex-item-grow-2">
+			<div class="flex-item-grow-2" ng-if="detailsCtrl.page.demo">
 				<div id="pd1" ng-click="detailsCtrl.checkAction($event)" ng-keypress="detailsCtrl.checkAction($event)">
 
 					<demographic-section ng-model="detailsCtrl.page.demo"
