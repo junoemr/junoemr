@@ -245,6 +245,7 @@ module.exports = {
 			'./src/common/components/junoFileChooser/junoFileChooserComponent.js',
 			'./src/common/components/junoCollapseArea/junoCollapseAreaComponent.js',
 			'./src/common/components/junoInput/junoInputComponent.js',
+			'./src/common/components/junoSelectText/junoSelectTextComponent.ts',
 			'./src/common/components/junoListItemSelector/junoListItemSelectorComponent.js',
 			'./src/common/components/junoInputSave/junoInputSaveComponent.js',
 			'./src/common/components/junoPatientSelect/junoPatientSelectComponent.js',
@@ -331,7 +332,7 @@ module.exports = {
 			...(glob.sync("./src/messaging/inbox/modals/**/*.js", {nosort: true})),
 
 			'./src/patient/module.js',
-			'./src/patient/addDemographicModal/addDemographicModalComponent.js',
+			'./src/patient/addDemographicModal/addDemographicModalComponent.ts',
 			'./src/patient/demographicCardComponent.js',
 			'./src/patient/demographicApi.service.ts',
 

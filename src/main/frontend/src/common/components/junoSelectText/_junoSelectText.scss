@@ -1,0 +1,81 @@
+juno-select-text {
+	--border-width: 1px;
+	--field-height: calc(var(--juno-form-input-height) - calc(var(--border-width) * 2));
+
+	.label-style {
+		padding: var(--juno-input-label-padding);
+		width: var(--juno-input-label-width);
+	}
+
+	.juno-select-text-container {
+		border: var(--border-width) solid var(--theme-color-form-field-border);
+		border-radius: var(--theme-form-field-border-radius);
+		flex: 1 1 0;
+		overflow: hidden;
+
+		&.field-focused {
+			border-color: var(--theme-color-form-field-border-active);
+		}
+
+		@include juno-form-inputs-style(var(--border-width), var(--theme-form-field-border-radius));
+
+		.select-container {
+			position: relative;
+
+			select {
+				-moz-appearance: none;
+				-webkit-appearance: none;
+				appearance: none;
+				background-image: none;
+
+				border-radius: 0;
+				background-color: var(--color-neutral-light);
+				color: var(--color-neutral-dark);
+				border: none;
+				padding: 0 24px 0 8px;
+				width: 60px;	/* Default, override this */
+				outline: none;
+				height: var(--field-height);
+				font-size: 12px;
+
+				&.field-focused {
+					color: var(--theme-color-form-field-text-active);
+				}
+
+				option {
+					background-color: var(--theme-color-form-field-background);
+				}
+			}
+
+			.select-icon {
+				position: absolute;
+				right: 8px;
+				top: calc(50% - 8px);
+				font-size: 16px;
+				pointer-events: none;
+			}
+
+		}
+
+		.divider-border {
+			border-right: var(--border-width) solid var(--theme-color-form-field-border);
+			height: var(field-height);
+
+			&.field-focused {
+				border-color: var(--theme-color-form-field-border-active);
+			}
+		}
+
+		input {
+			width: 100%;
+			display: flex;
+			border: none;
+			border-radius: 0;
+			background-color: var(--theme-color-form-field-background);
+			color: var(--theme-color-form-field-text);
+			padding: 0 8px;
+			height: var(--field-height);
+			outline: none;
+		}
+	}
+}

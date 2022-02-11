@@ -451,6 +451,7 @@ public class DemographicManager {
 	{
 		createDemographic(loggedInInfo.getLoggedInProviderNo(), demographic, programManager.getDefaultProgramId());
 	}
+
 	public void createDemographic(String providerNo, Demographic demographic, Integer admissionProgramId) {
 		checkPrivilege(providerNo, Permission.DEMOGRAPHIC_CREATE);
 		try {
@@ -488,6 +489,7 @@ public class DemographicManager {
 
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {
+				ext.setDemographicNo(demographic.getDemographicNo());
 				createExtension(providerNo, ext);
 			}
 		}

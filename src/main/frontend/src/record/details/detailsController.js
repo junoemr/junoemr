@@ -26,7 +26,11 @@
 
 import {BILLING_TYPE, INSTANCE_TYPE, SYSTEM_PROPERTIES} from "../../common/services/systemPreferenceServiceConstants";
 import {DemographicApi, ProvidersServiceApi, SystemPreferenceApi} from "../../../generated";
-import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
+import {
+	JUNO_BUTTON_COLOR,
+	JUNO_BUTTON_COLOR_PATTERN,
+	JUNO_STYLE
+} from "../../common/components/junoComponentConstants";
 import {SecurityPermissions} from "../../common/security/securityConstants";
 import {BILLING_REGION} from "../../billing/billingConstants";
 
@@ -113,6 +117,8 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		$scope.JUNO_STYLE = JUNO_STYLE;
 		$scope.pageStyle = JUNO_STYLE.GREY;
+		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 		controller.$onInit = () =>
 		{

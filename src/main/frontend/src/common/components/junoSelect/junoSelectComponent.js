@@ -34,16 +34,26 @@ angular.module('Common.Components').component('junoSelect', {
 		componentStyle: "<?",
 		invalid: "<?",
 		disabled: "<?",
-		onChange: "&?"
+		onChange: "&?",
+		// Show a required field indicator to the right of the label.
+		requiredIndicator: "<?",
 	},
 	controller: [function ()
 	{
 		let ctrl = this;
+		ctrl.pristine = true;
 
 		ctrl.$onInit = () =>
 		{
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+			ctrl.requiredIndicator  = ctrl.requiredIndicator || false;
+
+			if (ctrl.showInvalidPristine === undefined)
+			{
+				ctrl.showInvalidPristine = true;
+			}
+
 			ctrl.invalid = ctrl.invalid || false;
 		};
 
@@ -60,12 +70,13 @@ angular.module('Common.Components').component('junoSelect', {
 		ctrl.inputClasses = () =>
 		{
 			return {
-				"field-invalid": ctrl.invalid,
+				"field-invalid": ctrl.invalid && !ctrl.pristine
 			};
 		}
 
 		ctrl.onSelectChange = (value) =>
 		{
+			ctrl.pristine = false;
 			if (ctrl.onChange)
 			{
 				const option = (ctrl.options) ? ctrl.options.find((entry) => entry.value === value) : null;
