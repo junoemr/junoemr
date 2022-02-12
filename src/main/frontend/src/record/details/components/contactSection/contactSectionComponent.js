@@ -24,6 +24,7 @@
 import {JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
 import {ElectronicMessagingConsentStatus} from "../../../../lib/demographic/ElectronicMessagingConsentStatus";
 import {SystemPreferenceApi} from "../../../../../generated";
+import Address from "../../../../lib/common/model/Address";
 
 angular.module('Record.Details').component('contactSection', {
 	templateUrl: 'src/record/details/components/contactSection/contactSection.jsp',
@@ -46,6 +47,8 @@ angular.module('Record.Details').component('contactSection', {
 
 		ctrl.$onInit = () =>
 		{
+			ctrl.address2 = ctrl.ngModel.address2 || new Address();
+
 			systemPreferenceApi.getPreferenceValue("enable_additional_address").then(
 				function success(result)
 				{
@@ -67,6 +70,11 @@ angular.module('Record.Details').component('contactSection', {
 			});
 
 			ctrl.buildElectronicMessagingConsentOptions();
+		}
+
+		ctrl.set2ndAddress = () =>
+		{
+			ctrl.ngModel.addressList[1] = ctrl.address2;
 		}
 
 		ctrl.buildElectronicMessagingConsentOptions = () =>

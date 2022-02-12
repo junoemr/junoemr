@@ -3,6 +3,7 @@ import Demographic from "../model/Demographic";
 import {DemographicUpdateInput} from "../../../../generated";
 import AddressToInputConverter from "../../common/converter/AddressToInputConverter";
 import PhoneNumberToInputConverter from "../../common/converter/PhoneNumberToInputConverter";
+import RosterDataModelToInputConverter from "./RosterDataModelToInputConverter";
 
 export default class DemographicToUpdateInputConverter extends AbstractConverter<Demographic, DemographicUpdateInput>
 {
@@ -61,6 +62,9 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.securityAnswer1 = from.securityAnswer1;
 		updateInput.rxInteractionWarningLevel = from.rxInteractionWarningLevel;
 		updateInput.electronicMessagingConsentStatus = from.electronicMessagingConsentStatus as any as DemographicUpdateInput.ElectronicMessagingConsentStatusEnum;
+
+		// roster data
+		updateInput.currentRosterData = new RosterDataModelToInputConverter().convert(from.rosterData);
 
 		return updateInput;
 	}

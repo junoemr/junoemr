@@ -168,12 +168,12 @@
 					<juno-divider component-style="pageStyle"></juno-divider>
 
 					<roster-display-section ng-if="detailsCtrl.rosteringModuleEnabled"
-                                        ng-model="detailsCtrl.page.demo"
-											validations="detailsCtrl.validations"
-											component-style="pageStyle">
+					                        ng-model="detailsCtrl.page.demo"
+					                        validations="detailsCtrl.validations"
+					                        component-style="pageStyle">
 					</roster-display-section>
-					<juno-divider ng-if="detailsCtrl.rosteringModuleEnabled"
-                              component-style="pageStyle"></juno-divider>
+					<juno-divider ng-if="detailsCtrl.rosteringModuleEnabled" component-style="pageStyle">
+					</juno-divider>
 					<additional-information-section ng-model="detailsCtrl.page.demo"
 													validations="detailsCtrl.validations"
 													component-style="pageStyle">

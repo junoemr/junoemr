@@ -9,10 +9,11 @@ import {OfficialLanguageType} from "../model/OfficialLanguageType";
 import {ElectronicMessagingConsentStatus} from "../ElectronicMessagingConsentStatus";
 import ProviderModelToSimpleProviderConverter from "../../provider/converter/ProviderModelToSimpleProviderConverter";
 import PhoneNumberToModelConverter from "../../common/converter/PhoneNumberToModelConverter";
+import RosterDataTransferToModelConverter from "./RosterDataTransferToModelConverter";
 
 export default class DemographicTransferToModelConverter extends AbstractConverter<DemographicModel, Demographic>
 {
-	convert(from: DemographicModel, args: any): Demographic
+	convert(from: DemographicModel): Demographic
 	{
 		let model = new Demographic();
 
@@ -69,6 +70,13 @@ export default class DemographicTransferToModelConverter extends AbstractConvert
 		model.residentProvider = simpleProviderConverter.convert(from.residentProvider);
 		model.familyDoctor = simpleProviderConverter.convert(from.familyDoctor);
 		model.referralDoctor = simpleProviderConverter.convert(from.referralDoctor);
+
+		if(from.rosterHistory && from.rosterHistory.length > 0)
+		{
+			const rosterConverter = new RosterDataTransferToModelConverter();
+			// roster history is sorted with latest at the end of the list
+			model.rosterData = rosterConverter.convert(from.rosterHistory[from.rosterHistory.length-1]);
+		}
 
 		return model;
 	}

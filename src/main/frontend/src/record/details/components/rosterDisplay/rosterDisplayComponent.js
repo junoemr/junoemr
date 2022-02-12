@@ -1,5 +1,11 @@
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import {
+    JUNO_BUTTON_COLOR,
+    JUNO_BUTTON_COLOR_PATTERN,
+    JUNO_STYLE,
+    LABEL_POSITION
+} from "../../../../common/components/junoComponentConstants";
 import {ReferralDoctorsApi, RosterServiceApi} from "../../../../../generated";
+import RosterStatusData from "../../../../lib/demographic/model/RosterStatusData";
 
 angular.module('Record.Details').component('rosterDisplaySection', {
     templateUrl: 'src/record/details/components/rosterDisplay/rosterDisplay.jsp',
@@ -36,6 +42,8 @@ angular.module('Record.Details').component('rosterDisplaySection', {
 
             ctrl.$onInit = () =>
             {
+                ctrl.rosterStatusData = ctrl.ngModel.rosterData || new RosterStatusData();
+
                 ctrl.validations["rosterDate"] = Juno.Validations.validationCustom(() => ctrl.rosterDateValid);
                 ctrl.validations["terminationDate"] = Juno.Validations.validationCustom(() => ctrl.terminationDateValid);
 
@@ -57,6 +65,11 @@ angular.module('Record.Details').component('rosterDisplaySection', {
                         });
                     }
                 );
+            }
+
+            ctrl.setRosterData = () =>
+            {
+                ctrl.ngModel.rosterData = ctrl.rosterStatusData;
             }
 
             ctrl.updateFamilyDoctors = async (docSearchString, docReferralNo) =>

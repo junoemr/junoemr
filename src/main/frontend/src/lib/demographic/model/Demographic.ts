@@ -6,6 +6,7 @@ import {ElectronicMessagingConsentStatus} from "../ElectronicMessagingConsentSta
 import {TitleType} from "./TitleType";
 import {OfficialLanguageType} from "./OfficialLanguageType";
 import SimpleProvider from "../../provider/model/SimpleProvider";
+import RosterStatusData from "./RosterStatusData";
 
 export default class Demographic
 {
@@ -47,7 +48,7 @@ export default class Demographic
 	private _familyDoctor: SimpleProvider;
 
 	// roster info
-	private _rosterHistory: object[]; //todo
+	private _rosterData: RosterStatusData;
 
 	// other info
 	private _lastUpdateProviderId: string;
@@ -152,6 +153,16 @@ export default class Demographic
 		if(this.addressList && this.addressList.length > 0)
 		{
 			return this.addressList[0];
+		}
+		return null;
+	}
+
+	// helper function for places where a fixed 2nd address is used/supported
+	get address2(): Address
+	{
+		if(this.addressList && this.addressList.length > 1)
+		{
+			return this.addressList[1];
 		}
 		return null;
 	}
@@ -460,14 +471,14 @@ export default class Demographic
 		this._residentProvider = value;
 	}
 
-	get rosterHistory(): object[]
+	get rosterData(): RosterStatusData
 	{
-		return this._rosterHistory;
+		return this._rosterData;
 	}
 
-	set rosterHistory(value: object[])
+	set rosterData(value: RosterStatusData)
 	{
-		this._rosterHistory = value;
+		this._rosterData = value;
 	}
 
 	get lastUpdateProviderId(): string

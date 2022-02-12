@@ -474,6 +474,8 @@ public class DemographicService
 	public DemographicModel updateDemographicRecord(DemographicUpdateInput updateInput, LoggedInInfo loggedInInfo)
 	{
 		Demographic oldDemographic = demographicDao.find(updateInput.getId());
+		demographicDao.detach(oldDemographic); // so it won't update when we set new values
+
 		archiveDemographicRecord(oldDemographic);
 
 		Demographic demographic = demographicUpdateInputToEntityConverter.convert(updateInput);
@@ -487,6 +489,8 @@ public class DemographicService
 			demoCustom.setDemographic(demographic);
 			demographicCustDao.persist(demoCustom);
 		}
+
+		demographicManager.addRosterHistoryEntry(demographic, oldDemographic);
 
 		return demographicDbToModelConverter.convert(demographic);
 	}

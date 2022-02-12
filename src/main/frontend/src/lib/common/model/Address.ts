@@ -14,6 +14,12 @@ export default class Address
 	 * display and formatting helpers
 	 */
 
+	constructor()
+	{
+		this.countryCode = "CA";
+		this.residencyStatus = AddressResidencyStatus.Past;
+	}
+
 	get displayLine1of2(): string
 	{
 		return this.addressLine1 + " " + this.addressLine2;

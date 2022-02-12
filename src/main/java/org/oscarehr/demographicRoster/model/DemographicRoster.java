@@ -116,6 +116,12 @@ public class DemographicRoster extends AbstractModel<Integer> implements Seriali
 		{
 			return BY_CODE.get(terminationCode);
 		}
+
+		@Override
+		public String toString()
+		{
+			return String.valueOf(getTerminationCode());
+		}
 	}
 
 	@Id

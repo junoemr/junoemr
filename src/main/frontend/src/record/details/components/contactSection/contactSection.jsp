@@ -128,29 +128,33 @@
 	</h4>
 
 		<div class="details-fields">
-			<juno-input ng-model="$ctrl.ngModel.address2.address"
+			<juno-input ng-model="$ctrl.address2.addressLine1"
 			            label="Address"
 			            placeholder="Enter Street Address"
+			            ng-change="$ctrl.set2ndAddress()"
 			            component-style="$ctrl.componentStyle">
 			</juno-input>
 
-			<juno-input ng-model="$ctrl.ngModel.address2.city"
+			<juno-input ng-model="$ctrl.address2.city"
 			            label="City"
 			            placeholder="Enter City Here"
+			            ng-change="$ctrl.set2ndAddress()"
 			            component-style="$ctrl.componentStyle">
 			</juno-input>
 
-			<juno-select ng-model="$ctrl.ngModel.address2.province"
+			<juno-select ng-model="$ctrl.address2.regionCode"
 			             placeholder="Select province"
 			             options="$ctrl.provinces"
 			             label="Province"
+			             on-change="$ctrl.set2ndAddress()"
 			             component-style="$ctrl.componentStyle">
 			</juno-select>
 
 
-			<juno-input ng-model="$ctrl.ngModel.address2.postal"
+			<juno-input ng-model="$ctrl.address2.postalCode"
 			            label="Postal code"
 			            placeholder="Enter Postal Code (e.g. K1M 1M4)"
+			            ng-change="$ctrl.set2ndAddress()"
 			            component-style="$ctrl.componentStyle">
 			</juno-input>
 		</div>

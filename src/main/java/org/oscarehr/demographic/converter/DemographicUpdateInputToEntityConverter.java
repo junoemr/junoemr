@@ -27,6 +27,7 @@ import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
 import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
+import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicExtDao;
@@ -35,6 +36,7 @@ import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.transfer.DemographicUpdateInput;
+import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -266,6 +268,17 @@ public class DemographicUpdateInputToEntityConverter
 			dbDemographic.setFamilyDoctor("<fd>" + StringUtils.trimToEmpty(familyDoc.getOhipNumber()) + "</fd><fdname>"
 					+ StringUtils.trimToEmpty(familyDoc.getLastName()) + ", "
 					+ StringUtils.trimToEmpty(familyDoc.getFirstName()) + "</fdname>");
+		}
+
+		RosterData currentRosterData = input.getCurrentRosterData();
+		if(currentRosterData != null)
+		{
+			dbDemographic.setRosterStatus(currentRosterData.getStatusCode());
+			dbDemographic.setRosterDate(ConversionUtils.toNullableLegacyDateTime(currentRosterData.getRosterDateTime()));
+			dbDemographic.setRosterTerminationDate(ConversionUtils.toNullableLegacyDateTime(currentRosterData.getTerminationDateTime()));
+
+			DemographicRoster.ROSTER_TERMINATION_REASON reason = currentRosterData.getTerminationReason();
+			dbDemographic.setRosterTerminationReason((reason != null) ? String.valueOf(reason.getTerminationCode()) : null);
 		}
 
 		return dbDemographic;

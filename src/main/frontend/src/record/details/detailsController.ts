@@ -404,26 +404,26 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			// 	controller.page.demo.countryOfOrigin = null;
 			// }
 
-			phoneNum["C"] = controller.page.demo.scrCellPhone;
-			phoneNum["H"] = controller.page.demo.scrHomePhone;
-			phoneNum["W"] = controller.page.demo.scrWorkPhone;
-			phoneNum["HX"] = controller.page.demo.scrHPhoneExt;
-			phoneNum["WX"] = controller.page.demo.scrWPhoneExt;
-			hin0 = controller.page.demo.hin;
-			ver0 = controller.page.demo.ver;
-			chartNo0 = controller.page.demo.chartNo;
-			cytolNum0 = controller.page.demo.scrCytolNum;
-			referralDocNo0 = controller.page.demo.scrReferralDocNo;
-			sin0 = controller.page.demo.sin;
-			effDate0 = controller.page.demo.effDate;
-			hcRenewDate0 = controller.page.demo.hcRenewDate;
-			rosterDate0 = controller.page.demo.rosterDate;
-			rosterTerminationDate0 = controller.page.demo.rosterTerminationDate;
-			patientStatusDate0 = controller.page.demo.patientStatusDate;
-			dateJoined0 = controller.page.demo.dateJoined;
-			endDate0 = controller.page.demo.endDate;
-			onWaitingListSinceDate0 = controller.page.demo.onWaitingListSinceDate;
-			paperChartArchivedDate0 = controller.page.demo.scrPaperChartArchivedDate;
+			// phoneNum["C"] = controller.page.demo.scrCellPhone;
+			// phoneNum["H"] = controller.page.demo.scrHomePhone;
+			// phoneNum["W"] = controller.page.demo.scrWorkPhone;
+			// phoneNum["HX"] = controller.page.demo.scrHPhoneExt;
+			// phoneNum["WX"] = controller.page.demo.scrWPhoneExt;
+			// hin0 = controller.page.demo.hin;
+			// ver0 = controller.page.demo.ver;
+			// chartNo0 = controller.page.demo.chartNo;
+			// cytolNum0 = controller.page.demo.scrCytolNum;
+			// referralDocNo0 = controller.page.demo.scrReferralDocNo;
+			// sin0 = controller.page.demo.sin;
+			// effDate0 = controller.page.demo.effDate;
+			// hcRenewDate0 = controller.page.demo.hcRenewDate;
+			// rosterDate0 = controller.page.demo.rosterDate;
+			// rosterTerminationDate0 = controller.page.demo.rosterTerminationDate;
+			// patientStatusDate0 = controller.page.demo.patientStatusDate;
+			// dateJoined0 = controller.page.demo.dateJoined;
+			// endDate0 = controller.page.demo.endDate;
+			// onWaitingListSinceDate0 = controller.page.demo.onWaitingListSinceDate;
+			// paperChartArchivedDate0 = controller.page.demo.scrPaperChartArchivedDate;
 		};
 
 		//disable click and keypress if user only has read-access
