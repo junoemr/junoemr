@@ -55,7 +55,7 @@
 				<p>Phone (W): {{consultResponseCtrl.consult.demographic.workPhone.formattedForDisplay}}</p>
 				<p>Phone (C): {{consultResponseCtrl.consult.demographic.cellPhone.formattedForDisplay}}</p>
 				<p>Email: {{consultResponseCtrl.consult.demographic.email}}</p>
-				<p>MRP: {{consultResponseCtrl.consult.demographic.provider.firstName}}, {{consultResponseCtrl.consult.demographic.provider.lastName}}</p>
+				<p>MRP: {{consultRequestCtrl.consult.demographic.mrpProvider.displayName}}</p>
 			</div>
 			<br/>
 			<div id="consult_status">

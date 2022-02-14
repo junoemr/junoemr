@@ -104,18 +104,18 @@ public class DemographicDbToModelConverter extends
 		{
 			String homePhoneExtension = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_H_PHONE_EXT)
 					.map(ext -> StringUtils.trimToNull(ext.getValue())).orElse(null);
-			model.setHomePhone(buildPhoneNumber(input.getPhone(), homePhoneExtension));
+			model.setHomePhone(buildPhoneNumber(input.getPhone(), homePhoneExtension, PhoneNumberModel.PHONE_TYPE.HOME));
 		}
 		if(input.getPhone2() != null)
 		{
 			String workPhoneExtension = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_W_PHONE_EXT)
 					.map(ext -> StringUtils.trimToNull(ext.getValue())).orElse(null);
-			model.setWorkPhone(buildPhoneNumber(input.getPhone2(), workPhoneExtension));
+			model.setWorkPhone(buildPhoneNumber(input.getPhone2(), workPhoneExtension, PhoneNumberModel.PHONE_TYPE.WORK));
 		}
 
 		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_DEMO_CELL)
 				.map(ext -> StringUtils.trimToNull(ext.getValue())).ifPresent(
-						cellPhoneNumber -> model.setCellPhone(buildPhoneNumber(cellPhoneNumber, null))
+						cellPhoneNumber -> model.setCellPhone(buildPhoneNumber(cellPhoneNumber, null, PhoneNumberModel.PHONE_TYPE.CELL))
 				);
 
 		DemographicCust demographicCustom = input.getDemographicCust();
@@ -253,10 +253,10 @@ public class DemographicDbToModelConverter extends
 		}
 	}
 
-	private PhoneNumberModel buildPhoneNumber(String phoneNumber, String extension)
+	private PhoneNumberModel buildPhoneNumber(String phoneNumber, String extension, PhoneNumberModel.PHONE_TYPE type)
 	{
 		boolean primaryPhone = phoneNumber.endsWith("*");
-		return PhoneNumberModel.of(phoneNumber, extension, primaryPhone);
+		return PhoneNumberModel.of(phoneNumber, extension, primaryPhone, type);
 	}
 
 	private ProviderModel getReferralProvider(Demographic input)

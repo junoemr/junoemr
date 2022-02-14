@@ -25,6 +25,7 @@ import {JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComp
 import {ElectronicMessagingConsentStatus} from "../../../../lib/demographic/ElectronicMessagingConsentStatus";
 import {SystemPreferenceApi} from "../../../../../generated";
 import Address from "../../../../lib/common/model/Address";
+import {PhoneType} from "../../../../lib/common/model/PhoneType";
 
 angular.module('Record.Details').component('contactSection', {
 	templateUrl: 'src/record/details/components/contactSection/contactSection.jsp',
@@ -39,6 +40,7 @@ angular.module('Record.Details').component('contactSection', {
 		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
 			'../ws/rs');
 		$scope.LABEL_POSITION = LABEL_POSITION;
+		$scope.PhoneType = PhoneType;
 
 		ctrl.provinces = staticDataService.getProvinces();
 		ctrl.phoneNumberRegex = /^[\d-\s()]*$/;
@@ -48,6 +50,8 @@ angular.module('Record.Details').component('contactSection', {
 		ctrl.$onInit = () =>
 		{
 			ctrl.address2 = ctrl.ngModel.address2 || new Address();
+			console.debug(ctrl.ngModel.primaryPhone, ctrl.ngModel.primaryPhoneType);
+			ctrl.updatePrimaryPhoneValues();
 
 			systemPreferenceApi.getPreferenceValue("enable_additional_address").then(
 				function success(result)
@@ -120,6 +124,26 @@ angular.module('Record.Details').component('contactSection', {
 				return `On, ${Juno.Common.Util.formatMomentTime(moment(eventDate), Juno.Common.Util.settings.date_format)}`;
 			}
 			return "";
+		}
+
+		ctrl.setPrimaryPhone = (value, type) =>
+		{
+			if(value)
+			{
+				ctrl.ngModel.setPrimaryPhoneType(type);
+			}
+			else
+			{
+				ctrl.ngModel.clearPrimaryPhone();
+			}
+			ctrl.updatePrimaryPhoneValues();
+		}
+		ctrl.updatePrimaryPhoneValues = () =>
+		{
+			// check type and the primaryContactNumber flag, since primary phone will still return a default if none specified by the flag
+			ctrl.preferredPhoneH = ctrl.ngModel.primaryPhoneType === PhoneType.Home && ctrl.ngModel.primaryPhone.primaryContactNumber;
+			ctrl.preferredPhoneW = ctrl.ngModel.primaryPhoneType === PhoneType.Work && ctrl.ngModel.primaryPhone.primaryContactNumber;
+			ctrl.preferredPhoneC = ctrl.ngModel.primaryPhoneType === PhoneType.Cell && ctrl.ngModel.primaryPhone.primaryContactNumber;
 		}
 
 	}]

@@ -63,7 +63,7 @@ public class PhoneNumberModelTest
 		String extension = "123";
 		boolean isPrimary = true;
 
-		PhoneNumberModel result = PhoneNumberModel.of(number, extension, isPrimary);
+		PhoneNumberModel result = PhoneNumberModel.of(number, extension, isPrimary, null);
 		assertEquals(number, result.getNumber());
 		assertEquals(extension, result.getExtension());
 		assertEquals(isPrimary, result.isPrimaryContactNumber());

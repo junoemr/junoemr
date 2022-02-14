@@ -22,12 +22,38 @@ export default class Address
 
 	get displayLine1of2(): string
 	{
-		return this.addressLine1 + " " + this.addressLine2;
+		let line = "";
+		if(!Juno.Common.Util.isBlank(this.addressLine1))
+		{
+			line += this.addressLine1;
+		}
+		if(!Juno.Common.Util.isBlank(this.addressLine2))
+		{
+			line += " " + this.addressLine2;
+		}
+		return line;
 	}
 
 	get displayLine2of2(): string
 	{
-		return this.city + ", " + this.regionCode + " " + this.countryCode + " " + this.postalCode;
+		let line = "";
+		if(!Juno.Common.Util.isBlank(this.city))
+		{
+			line += this.city + ", ";
+		}
+		if(!Juno.Common.Util.isBlank(this.regionCode))
+		{
+			line += this.regionCode + " ";
+		}
+		if(!Juno.Common.Util.isBlank(this.countryCode))
+		{
+			line += this.countryCode + " ";
+		}
+		if(!Juno.Common.Util.isBlank(this.postalCode))
+		{
+			line += this.postalCode + " ";
+		}
+		return line;
 	}
 
 	/**

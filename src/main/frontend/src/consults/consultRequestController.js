@@ -80,7 +80,6 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				function success(results)
 				{
 					consult.demographic = results;
-					consult.demographic.cellPhone = results.cellPhone;
 				},
 				function error(errors)
 				{

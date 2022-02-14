@@ -57,9 +57,15 @@ public class PhoneNumberModel extends AbstractTransientModel
 
 	public PhoneNumberModel(String number, String extension, boolean primaryContactNumber)
 	{
+		this(number, extension, primaryContactNumber, null);
+	}
+
+	public PhoneNumberModel(String number, String extension, boolean primaryContactNumber, PHONE_TYPE type)
+	{
 		this.setNumber(number);
 		this.setExtension(extension);
 		this.primaryContactNumber = primaryContactNumber;
+		this.phoneType = type;
 	}
 
 	public void setNumber(String number)
@@ -115,17 +121,17 @@ public class PhoneNumberModel extends AbstractTransientModel
 
 	public static PhoneNumberModel of(String number)
 	{
-		return PhoneNumberModel.of(number, null, false);
+		return PhoneNumberModel.of(number, null, false, null);
 	}
 	public static PhoneNumberModel of(String number, String extension)
 	{
-		return PhoneNumberModel.of(number, extension, false);
+		return PhoneNumberModel.of(number, extension, false, null);
 	}
-	public static PhoneNumberModel of(String number, String extension, boolean primaryContactNumber)
+	public static PhoneNumberModel of(String number, String extension, boolean primaryContactNumber, PHONE_TYPE type)
 	{
 		if(number != null)
 		{
-			return new PhoneNumberModel(number, extension, primaryContactNumber);
+			return new PhoneNumberModel(number, extension, primaryContactNumber, type);
 		}
 		return null;
 	}

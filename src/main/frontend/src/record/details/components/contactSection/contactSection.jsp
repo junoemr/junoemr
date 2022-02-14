@@ -44,9 +44,9 @@
 			            valid-regex="$ctrl.phoneNumberRegex"
 			            component-style="$ctrl.componentStyle">
 			</juno-input>
-			<juno-check-box ng-model="$ctrl.ngModel.scrPreferredPhone"
+			<juno-check-box ng-model="$ctrl.preferredPhoneC"
 			                title="Check to set preferred contact number"
-			                true-value="'C'"
+			                change="$ctrl.setPrimaryPhone(value, PhoneType.Cell)"
 			                component-style="$ctrl.componentStyle">
 			</juno-check-box>
 		</div>
@@ -67,9 +67,9 @@
 			            class="phone-ext">
 			</juno-input>
 
-			<juno-check-box ng-model="$ctrl.ngModel.scrPreferredPhone"
+			<juno-check-box ng-model="$ctrl.preferredPhoneH"
 			                title="Check to set preferred contact number"
-			                true-value="'H'"
+			                change="$ctrl.setPrimaryPhone(value, PhoneType.Home)"
 			                component-style="$ctrl.componentStyle">
 			</juno-check-box>
 		</div>
@@ -93,9 +93,9 @@
 				</juno-input>
 			</div>
 
-			<juno-check-box ng-model="$ctrl.ngModel.scrPreferredPhone"
+			<juno-check-box ng-model="$ctrl.preferredPhoneW"
 			                title="Check to set preferred contact number"
-			                true-value="'W'"
+			                change="$ctrl.setPrimaryPhone(value, PhoneType.Work)"
 			                component-style="$ctrl.componentStyle">
 			</juno-check-box>
 		</div>

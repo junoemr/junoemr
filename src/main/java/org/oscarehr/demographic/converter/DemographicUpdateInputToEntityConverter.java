@@ -141,7 +141,7 @@ public class DemographicUpdateInputToEntityConverter
 		PhoneNumberModel homePhone = input.getHomePhone();
 		if(homePhone != null)
 		{
-			dbDemographic.setPhone(homePhone.getNumber());
+			dbDemographic.setPhone(homePhone.getNumber() + (homePhone.isPrimaryContactNumber() ? "*" : ""));
 
 			String extension = homePhone.getExtension();
 			if(extension != null)
@@ -154,7 +154,7 @@ public class DemographicUpdateInputToEntityConverter
 		PhoneNumberModel workPhone = input.getWorkPhone();
 		if(workPhone != null)
 		{
-			dbDemographic.setPhone2(workPhone.getNumber());
+			dbDemographic.setPhone2(workPhone.getNumber() + (workPhone.isPrimaryContactNumber() ? "*" : ""));
 
 			String extension = workPhone.getExtension();
 			if(extension != null)
@@ -168,7 +168,7 @@ public class DemographicUpdateInputToEntityConverter
 		if(cellPhone != null)
 		{
 			DemographicExt ext = updateOrCreateExtEntity(SYSTEM_PROVIDER_NO, input.getId(),
-					DemographicExt.KEY_DEMO_CELL, cellPhone.getNumber());
+					DemographicExt.KEY_DEMO_CELL, cellPhone.getNumber() + (cellPhone.isPrimaryContactNumber() ? "*" : ""));
 			demographicExtSet.add(ext);
 		}
 

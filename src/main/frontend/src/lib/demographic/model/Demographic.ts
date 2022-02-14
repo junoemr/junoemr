@@ -7,6 +7,7 @@ import {TitleType} from "./TitleType";
 import {OfficialLanguageType} from "./OfficialLanguageType";
 import SimpleProvider from "../../provider/model/SimpleProvider";
 import RosterStatusData from "./RosterStatusData";
+import {PhoneType} from "../../common/model/PhoneType";
 
 export default class Demographic
 {
@@ -82,6 +83,32 @@ export default class Demographic
 
 	}
 
+	public setPrimaryPhoneType(type: PhoneType): void
+	{
+		this.clearPrimaryPhone();
+		switch (type)
+		{
+			case PhoneType.Home: this.homePhone.primaryContactNumber = true; break;
+			case PhoneType.Work: this.workPhone.primaryContactNumber = true; break;
+			case PhoneType.Cell: this.cellPhone.primaryContactNumber = true; break;
+		}
+	}
+	public clearPrimaryPhone(): void
+	{
+		if(this.homePhone)
+		{
+			this.homePhone.primaryContactNumber = false;
+		}
+		if(this.workPhone)
+		{
+			this.workPhone.primaryContactNumber = false;
+		}
+		if(this.cellPhone)
+		{
+			this.cellPhone.primaryContactNumber = false;
+		}
+	}
+
 	/**
 	 * display and formatting helpers
 	 */
@@ -115,6 +142,11 @@ export default class Demographic
 			return this.workPhone;
 		}
 		return null;
+	}
+
+	get primaryPhoneType(): PhoneType
+	{
+		return this.primaryPhone?.phoneType;
 	}
 
 	get displayName(): string
