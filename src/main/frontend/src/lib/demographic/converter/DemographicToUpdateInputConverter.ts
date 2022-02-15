@@ -4,6 +4,7 @@ import {DemographicUpdateInput} from "../../../../generated";
 import AddressToInputConverter from "../../common/converter/AddressToInputConverter";
 import PhoneNumberToInputConverter from "../../common/converter/PhoneNumberToInputConverter";
 import RosterDataModelToInputConverter from "./RosterDataModelToInputConverter";
+import SimpleProviderToInputConverter from "../../provider/converter/SimpleProviderToInputConverter";
 
 export default class DemographicToUpdateInputConverter extends AbstractConverter<Demographic, DemographicUpdateInput>
 {
@@ -43,6 +44,10 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.nurseProviderId = from.nurseProvider?.id;
 		updateInput.midwifeProviderId = from.midwifeProvider?.id;
 		updateInput.residentProviderId = from.residentProvider?.id;
+
+		const referralConverter = new SimpleProviderToInputConverter();
+		updateInput.referralDoctor = referralConverter.convert(from.referralDoctor);
+		updateInput.familyDoctor = referralConverter.convert(from.familyDoctor);
 
 		// other
 		updateInput.officialLanguage = from.officialLanguage as DemographicUpdateInput.OfficialLanguageEnum;

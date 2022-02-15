@@ -6,7 +6,7 @@
     <div class="details-fields">
 
         <!-- Family Doctor -->
-        <juno-typeahead model="$ctrl.ngModel.scrFamilyDoc"
+        <juno-typeahead model="$ctrl.selectedFamilyDoc"
                         options="$ctrl.familyDoctors"
                         filter-options="false"
                         name="FamilyDoctor"
@@ -20,7 +20,7 @@
 
         <!-- Family Doctor Number -->
         <juno-input
-                ng-model="$ctrl.ngModel.scrFamilyDocNo"
+                ng-model="$ctrl.selectedFamilyDocNo"
                 label="Family Doctor #"
                 placeholder="Family Doctor #"
                 valid-regex="$ctrl.numberRegex"

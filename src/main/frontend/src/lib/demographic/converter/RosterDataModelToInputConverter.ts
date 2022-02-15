@@ -1,6 +1,7 @@
 import AbstractConverter from "../../conversion/AbstractConverter";
 import {RosterData} from "../../../../generated";
 import RosterStatusData from "../model/RosterStatusData";
+import SimpleProviderToInputConverter from "../../provider/converter/SimpleProviderToInputConverter";
 
 export default class RosterDataModelToInputConverter extends AbstractConverter<RosterStatusData, RosterData>
 {
@@ -20,7 +21,7 @@ export default class RosterDataModelToInputConverter extends AbstractConverter<R
 		input.rosterDateTime = this.serializeDateTime(from.rosterDateTime);
 		input.terminationDateTime = this.serializeDateTime(from.terminationDateTime);
 		input.terminationReason = from.terminationReason as any as RosterData.TerminationReasonEnum;
-		input.rosterProvider = from.rosterProvider;
+		input.rosterProvider = new SimpleProviderToInputConverter().convert(from.rosterProvider);
 
 		return input;
 	}

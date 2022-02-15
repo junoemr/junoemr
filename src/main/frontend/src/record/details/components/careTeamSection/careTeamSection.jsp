@@ -38,7 +38,7 @@
 		</juno-select>
 
 		<!-- Referral Doctor -->
-		<juno-typeahead model="$ctrl.ngModel.scrReferralDoc"
+		<juno-typeahead model="$ctrl.selectedReferralDoc"
 						options="$ctrl.referralDoctors"
 						filter-options="false"
 						name="ReferralDoctor"
@@ -51,7 +51,7 @@
 		</juno-typeahead>
 
 		<!-- Referral Doctor Number -->
-		<juno-input ng-model="$ctrl.ngModel.scrReferralDocNo"
+		<juno-input ng-model="$ctrl.selectedReferralDocNo"
 					label="Referral Doctor #"
 					placeholder="Referral Doctor #"
 					valid-regex="$ctrl.numberRegex"

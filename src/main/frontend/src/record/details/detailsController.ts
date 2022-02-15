@@ -52,7 +52,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'staticDataService',
 	'referralDoctorsService',
 	'user',
-	'uxService',
 
 	function(
 		$scope,
@@ -71,8 +70,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		securityRolesService,
 		staticDataService,
 		referralDoctorsService,
-		user,
-		uxService)
+		user)
 	{
 
 		const controller = this;
@@ -81,30 +79,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		const demographicApi = new DemographicApi($http, $httpParamSerializer, "../ws/rs");
 
 		controller.toastService = new ToastService();
-
-		// Global variables
-		var posExtras = {};
-		var hcParts = {};
-		var phoneNum = {};
-		var colorAttn = "#ffff99";
-		var defPhTitle = "Check to set preferred contact number";
-		var prefPhTitle = "Preferred contact number";
-		var hin0;
-		var ver0;
-		var chartNo0;
-		var cytolNum0;
-		var referralDocNo0;
-		var familyDocNo0;
 		var sin0;
-		var effDate0;
-		var hcRenewDate0;
-		var rosterDate0;
-		var rosterTerminationDate0;
-		var patientStatusDate0;
-		var dateJoined0;
-		var endDate0;
-		var onWaitingListSinceDate0;
-		var paperChartArchivedDate0;
 
 		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
 				'../ws/rs');
@@ -130,83 +105,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 						controller.page.demo = results;
 						controller.initDemographicVars();
 
-						// retrieve provider types for dropdown selection
-						//TODO-legacy - are roles determined by security role or provider type?
-						providersServiceApi.getBySecurityRole("doctor").then(
-							function success(results) {
-								controller.page.doctors = results.data.body;
-							}
-						);
-						providersServiceApi.getBySecurityRole("nurse").then(
-							function success(results) {
-								controller.page.nurses = results.data.body;
-							}
-						);
-						providersServiceApi.getBySecurityRole("midwife").then(
-							function success(results) {
-								controller.page.midwives = results.data.body;
-							}
-						);
 					demographicApi.getDemographicContacts(controller.page.demo.id, "professional").then(
                     (data) => {
 						controller.page.demoContactPros = data.data.body;
                     	}
                     );
-
-						// show notes
-						// if (controller.page.demo.notes != null)
-						// {
-						// 	controller.page.demo.scrNotes = controller.page.demo.notes;
-						// 	if (/^<unotes>[\s\S]*/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring("<unotes>".length);
-						// 	if (/[\s\S]*<\/unotes>$/.test(controller.page.demo.scrNotes)) controller.page.demo.scrNotes = controller.page.demo.scrNotes.substring(0, controller.page.demo.scrNotes.lastIndexOf("</unotes>"));
-						// }
-
-						// format referral doctor
-						if (controller.page.demo.familyDoctor != null)
-						{
-							const referralDoc = controller.formatReferralDocXMLToJSON(controller.page.demo.familyDoctor);
-							controller.page.demo.scrReferralDocNo = referralDoc.number;
-							controller.page.demo.scrReferralDoc = referralDoc.name;
-						}
-
-						// format family doctor
-						if (controller.page.demo.familyDoctor2 != null)
-						{
-							const familyDoc = controller.formatFamilyDocXMLToJSON(controller.page.demo.familyDoctor2, 'fd', 'fdname');
-							controller.page.demo.scrFamilyDocNo = familyDoc.number;
-							controller.page.demo.scrFamilyDoc = familyDoc.name;
-						}
-
-						// if (controller.page.demo.extras != null)
-						// {
-						// 	controller.page.demo.extras = toArray(controller.page.demo.extras);
-						// 	for (var i = 0; i < controller.page.demo.extras.length; i++)
-						// 	{
-						// 		if (controller.page.demo.extras[i].key == "demo_cell") controller.page.demo.scrDemoCell = controller.page.demo.extras[i].value;
-						// 		else if (controller.page.demo.extras[i].key == "aboriginal") controller.page.demo.scrAboriginal = controller.page.demo.extras[i].value;
-						// 		else if (controller.page.demo.extras[i].key == "hPhoneExt") controller.page.demo.scrHPhoneExt = controller.page.demo.extras[i].value;
-						// 		else if (controller.page.demo.extras[i].key == "wPhoneExt") controller.page.demo.scrWPhoneExt = controller.page.demo.extras[i].value;
-						// 		else if (controller.page.demo.extras[i].key == "cytolNum") controller.page.demo.scrCytolNum = controller.page.demo.extras[i].value;
-						// 		else if (controller.page.demo.extras[i].key == "phoneComment") controller.page.demo.scrPhoneComment = controller.page.demo.extras[i].value;
-						// 		else if (controller.page.demo.extras[i].key == "paper_chart_archived") controller.page.demo.scrPaperChartArchived = controller.page.demo.extras[i].value;
-						// 		else if (controller.page.demo.extras[i].key == "paper_chart_archived_date") controller.page.demo.scrPaperChartArchivedDate = controller.page.demo.extras[i].value;
-						// 		else if (controller.page.demo.extras[i].key == "usSigned") controller.page.demo.scrUsSigned = controller.page.demo.extras[i].value;
-						// 		else if (controller.page.demo.extras[i].key == "privacyConsent") controller.page.demo.scrPrivacyConsent = controller.page.demo.extras[i].value;
-						// 		else if (controller.page.demo.extras[i].key == "informedConsent") controller.page.demo.scrInformedConsent = controller.page.demo.extras[i].value;
-						// 		else if (controller.page.demo.extras[i].key == "securityQuestion1") controller.page.demo.scrSecurityQuestion1 = controller.page.demo.extras[i].value;
-						// 		else if (controller.page.demo.extras[i].key == "securityAnswer1") controller.page.demo.scrSecurityAnswer1 = controller.page.demo.extras[i].value;
-						// 		else if (controller.page.demo.extras[i].key == "rxInteractionWarningLevel") controller.page.demo.scrRxInteractionLevel = controller.page.demo.extras[i].value;
-						//
-						//
-						// 		//record array position of extras by keys - to be used on saving
-						// 		posExtras[controller.page.demo.extras[i].key] = i;
-						// 	}
-						// }
-
-						//show phone numbers with preferred check
-						// controller.page.demo.scrCellPhone = getPhoneNum(controller.page.demo.scrDemoCell);
-						// controller.page.demo.scrHomePhone = getPhoneNum(controller.page.demo.phone);
-						// controller.page.demo.scrWorkPhone = getPhoneNum(controller.page.demo.alternativePhone);
 
 						//show waitingListNames
 						if (controller.page.demo.waitingListNames != null)
@@ -224,36 +127,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 								// todo
 							}
 						}
-
-
-						// controller.page.cellPhonePreferredMsg = defPhTitle;
-						// controller.page.homePhonePreferredMsg = defPhTitle;
-						// controller.page.workPhonePreferredMsg = defPhTitle;
-						// if (isPreferredPhone(controller.page.demo.scrDemoCell))
-						// {
-						// 	controller.page.demo.scrPreferredPhone = "C";
-						// 	controller.page.preferredPhoneNumber = controller.page.demo.scrCellPhone;
-						// 	controller.page.cellPhonePreferredMsg = prefPhTitle;
-						// 	controller.page.cellPhonePreferredColor = colorAttn;
-						// }
-						// else if (isPreferredPhone(controller.page.demo.phone))
-						// {
-						// 	controller.page.demo.scrPreferredPhone = "H";
-						// 	controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
-						// 	controller.page.homePhonePreferredMsg = prefPhTitle;
-						// 	controller.page.homePhonePreferredColor = colorAttn;
-						// }
-						// else if (isPreferredPhone(controller.page.demo.alternativePhone))
-						// {
-						// 	controller.page.demo.scrPreferredPhone = "W";
-						// 	controller.page.preferredPhoneNumber = controller.page.demo.scrWorkPhone;
-						// 	controller.page.workPhonePreferredMsg = prefPhTitle;
-						// 	controller.page.workPhonePreferredColor = colorAttn;
-						// }
-						// else
-						// {
-						// 	controller.page.preferredPhoneNumber = controller.page.demo.scrHomePhone;
-						// }
 
 						controller.page.dataChanged = false;
 
@@ -295,10 +168,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 							{
 								console.log(errors);
 							});
-
-						// controller.page.demo.age = Juno.Common.Util.calcAge(controller.page.demo.dobYear, controller.page.demo.dobMonth, controller.page.demo.dobDay);
-						// controller.formatLastName(); //done on page load
-						// controller.formatFirstName(); //done on page load
 					},
 					function error(errors)
 					{
@@ -363,67 +232,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 
 		controller.initDemographicVars = function initDemographicVars()
 		{
-			// var effDateMoment = moment(controller.page.demo.effDate);
-			// if(effDateMoment.isValid())
-			// {
-			// 	controller.page.demo.effDate = Juno.Common.Util.formatMomentDate(effDateMoment);
-			// }
-			// else
-			// {
-			// 	controller.page.demo.effDate = null;
-			// }
-			// var hcRenewDateMoment = moment(controller.page.demo.hcRenewDate);
-			// if(hcRenewDateMoment.isValid())
-			// {
-			// 	controller.page.demo.hcRenewDate = Juno.Common.Util.formatMomentDate(hcRenewDateMoment);
-			// }
-			// else
-			// {
-			// 	controller.page.demo.hcRenewDate = null;
-			// }
-
-			// convert dates to moment
-			// controller.page.demo.dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.dobYear,
-			// 		controller.page.demo.dobMonth, controller.page.demo.dobDay);
-			// controller.page.demo.effDate = Juno.Common.Util.getDateMoment(controller.page.demo.effDate);
-			// controller.page.demo.hcRenewDate = Juno.Common.Util.getDateMoment(controller.page.demo.hcRenewDate);
-			// controller.page.demo.rosterDate = Juno.Common.Util.getDateMoment(controller.page.demo.rosterDate);
-			// controller.page.demo.rosterTerminationDate = Juno.Common.Util.getDateMoment(controller.page.demo.rosterTerminationDate);
-			// controller.page.demo.dateJoined = moment(controller.page.demo.dateJoined);
-			// controller.page.demo.patientStatusDate = moment(controller.page.demo.patientStatusDate);
-			// controller.page.demo.endDate = Juno.Common.Util.getDateMoment(controller.page.demo.endDate);
 			if (controller.page.demo.onWaitingListSinceDate)
 			{
 				controller.page.demo.onWaitingListSinceDate = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.onWaitingListSinceDate.getFullYear(),
 						controller.page.demo.onWaitingListSinceDate.getMonth(), controller.page.demo.onWaitingListSinceDate.getDate());
 			}
-
-			// oscar stores no country of origin as "-1" because why not.
-			// if (controller.page.demo.countryOfOrigin === "-1")
-			// {
-			// 	controller.page.demo.countryOfOrigin = null;
-			// }
-
-			// phoneNum["C"] = controller.page.demo.scrCellPhone;
-			// phoneNum["H"] = controller.page.demo.scrHomePhone;
-			// phoneNum["W"] = controller.page.demo.scrWorkPhone;
-			// phoneNum["HX"] = controller.page.demo.scrHPhoneExt;
-			// phoneNum["WX"] = controller.page.demo.scrWPhoneExt;
-			// hin0 = controller.page.demo.hin;
-			// ver0 = controller.page.demo.ver;
-			// chartNo0 = controller.page.demo.chartNo;
-			// cytolNum0 = controller.page.demo.scrCytolNum;
-			// referralDocNo0 = controller.page.demo.scrReferralDocNo;
-			// sin0 = controller.page.demo.sin;
-			// effDate0 = controller.page.demo.effDate;
-			// hcRenewDate0 = controller.page.demo.hcRenewDate;
-			// rosterDate0 = controller.page.demo.rosterDate;
-			// rosterTerminationDate0 = controller.page.demo.rosterTerminationDate;
-			// patientStatusDate0 = controller.page.demo.patientStatusDate;
-			// dateJoined0 = controller.page.demo.dateJoined;
-			// endDate0 = controller.page.demo.endDate;
-			// onWaitingListSinceDate0 = controller.page.demo.onWaitingListSinceDate;
-			// paperChartArchivedDate0 = controller.page.demo.scrPaperChartArchivedDate;
 		};
 
 		//disable click and keypress if user only has read-access
@@ -479,16 +292,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				}
 			}
 		});
-
-		//format lastname, firstname
-		// controller.formatLastName = function formatLastName()
-		// {
-		// 	controller.page.demo.lastName = controller.page.demo.lastName.toUpperCase();
-		// };
-		// controller.formatFirstName = function formatFirstName()
-		// {
-		// 	controller.page.demo.firstName = controller.page.demo.firstName.toUpperCase();
-		// };
 
 		controller.openSwipecardModal = function openSwipecardModal()
 		{
@@ -660,125 +463,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 				}
 			}
 			return true;
-		};
-
-		controller.isPostalComplete = function isPostalComplete(postal, province)
-		{
-			// If Canadian province is selected, proceed with validation
-			if (postal && province && province !== "OT" && province.indexOf("US") !== 0)
-			{
-				if (controller.isPostalValidCanadian(postal))
-				{
-					return true;
-				}
-
-				controller.resetEditState();
-				return false;
-			}
-
-			return true;
-		};
-
-		controller.isPostalValidCanadian = function isPostalValidCanadian(postalCode)
-		{
-			const regex = new RegExp(/^[A-Za-z]\d[A-Za-z][ ]?\d[A-Za-z]\d$/); // Match to Canadian postal code standard
-			if (regex.test(postalCode))
-			{
-				return true;
-			}
-			else
-			{
-				Juno.Common.Util.errorAlert($uibModal, "Validation", "Invalid/Incomplete Postal Code");
-				return false;
-			}
-		};
-
-		//check Chart No (length)
-		controller.checkChartNo = function checkChartNo()
-		{
-			if (controller.page.demo.chartNumber == null || controller.page.demo.chartNumber === "")
-			{
-				chartNo0 = controller.page.demo.chartNumber;
-				return;
-			}
-			if (controller.page.demo.chartNumber.length > 10) controller.page.demo.chartNumber = chartNo0;
-			else chartNo0 = controller.page.demo.chartNumber;
-		};
-
-		//check Family Doctor No
-		controller.checkFamilyDocNo = function checkFamilyDocNo()
-		{
-			var isValid = controller.validateDocNo(controller.page.demo.scrFamilyDocNo, true);
-			if (isValid)
-				familyDocNo0 = controller.page.demo.scrFamilyDocNo;
-			else
-				controller.page.demo.scrFamilyDocNo = familyDocNo0;
-		};
-
-		controller.validateDocNo = function validateDocNo(docNo, quiet)
-		{
-			if (docNo == null || docNo === "" || (isNumber(docNo) && docNo.length < 10))
-				return true;
-
-			if (!quiet)
-				alert("Invalid Doctor Number");
-
-			return false;
-		};
-
-		//check SIN
-		controller.checkSin = function checkSin()
-		{
-			if (controller.page.demo.sin == null || controller.page.demo.sin === "")
-			{
-				sin0 = controller.page.demo.sin;
-				return;
-			}
-
-			var sin = controller.page.demo.sin.replace(/\s/g, "");
-			if (!isNumber(sin) || sin.length > 9)
-			{
-				controller.page.demo.sin = sin0;
-			}
-			else
-			{
-				if (sin.length > 6)
-				{
-					controller.page.demo.sin = sin.substring(0, 3) + " " + sin.substring(3, 6) + " " + sin.substring(6);
-				}
-				else if (sin.length > 3)
-				{
-					controller.page.demo.sin = sin.substring(0, 3) + " " + sin.substring(3);
-				}
-				sin0 = controller.page.demo.sin;
-			}
-		};
-
-		controller.validateSin = function validateSin()
-		{
-			if (controller.page.demo.sin == null || controller.page.demo.sin === "") return true;
-
-			var sin = controller.page.demo.sin.replace(/\s/g, "");
-			if (isNumber(sin) && sin.length === 9)
-			{
-				var sinNumber = 0;
-				for (var i = 0; i < sin.length; i++)
-				{
-					var n = Number(sin.charAt(i)) * (i % 2 + 1);
-					sinNumber += n % 10 + Math.floor(n / 10);
-				}
-				if (sinNumber % 10 === 0) return true;
-			}
-			alert("Invalid SIN #");
-			return false;
-		};
-
-		//show/hide items
-		controller.chooseFamilyDoc = function chooseFamilyDoc(item, model, label)
-		{
-			controller.page.demo.scrFamilyDocNo = item.referralNo;
-			controller.page.demo.scrFamilyDoc = item.name;
-			controller.checkFamilyDocNo();
 		};
 
 		//upload photo
@@ -958,100 +642,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			window.open(url, "DemographicExport", "width=960, height=700");
 		};
 
- 		controller.formatFamilyDocXMLToJSON = (familyDocXML) =>
-		{
-		    let number = "";
-		    let name = "";
-
-		    let begin = familyDocXML.indexOf("<fd>") + "<fd>".length;
-		    let end = familyDocXML.indexOf("</fd>");
-
-		    if (end > begin && end >= 0 && begin >= 0)
-		    {
-                number = familyDocXML.substring(begin, end);
-            }
-
-		    begin = familyDocXML.indexOf("<fdname>") + "<fdname>".length;
-		    end = familyDocXML.indexOf("</fdname>");
-
-		    if (end > begin && end >= 0 && begin >= 0)
-            {
-                name = familyDocXML.substring(begin, end)
-            }
-
-            return {number: number, name: name};
-        };
-
-        controller.formatReferralDocXMLToJSON = (referralDocXML) =>
-        {
-            let number = "";
-            let name = "";
-
-            let begin = referralDocXML.indexOf("<rdohip>") + "<rdohip>".length;
-            let end = referralDocXML.indexOf("</rdohip>");
-
-            if (end > begin && end >= 0 && begin >= 0)
-            {
-                number = referralDocXML.substring(begin, end);
-            }
-
-            begin = referralDocXML.indexOf("<rd>") + "<rd>".length;
-            end = referralDocXML.indexOf("</rd>");
-
-            if (end > begin && end >= 0 && begin >= 0)
-            {
-                name = referralDocXML.substring(begin, end)
-            }
-
-            return {number: number, name: name};
-        };
-
-		/**
-		 * Wrap the familyDoctor field in required HTML tags.
-		 * @param name name of the referral doctor
-		 * @param number referral doctor #
-		 * @return {string} name and referral # wrapped appropriately
-		 */
-		controller.formatDocInput = function formatDocInput(name, number)
-		{
-			let docNo = "<rdohip></rdohip>";
-			let doc = "<rd></rd>";
-			if (Juno.Common.Util.exists(number))
-			{
-				docNo = "<rdohip>" + number + "</rdohip>";
-			}
-			if (Juno.Common.Util.exists(name))
-			{
-				doc = "<rd>" + name + "</rd>";
-			}
-			return docNo + doc;
-		};
-
-		/**
-		 * Slightly different from formatDocInput as internally the two expect different wrapping HTML tags.
-		 * @param name name of the doctor
-		 * @param number doctor's referral #
-		 * @return {string} name and referral # for the doctor wrapped in the appropriate <fd / > & <fname /> tags
-		 */
-		controller.formatFamilyDocInput = function formatFamilyDocInput(name, number)
-		{
-			let docNo = "<fd></fd>";
-			let doc = "<fdname></fdname>";
-
-			if (Juno.Common.Util.exists(number))
-			{
-				docNo = "<fd>" + number + "</fd>";
-			}
-
-			if (Juno.Common.Util.exists(name))
-			{
-				doc = "<fdname>" + name + "</fdname>";
-			}
-
-			return docNo + doc;
-
-		};
-
 		//HCValidation on open & save
 		controller.validateHCSave = function validateHCSave(doSave)
 		{
@@ -1139,45 +729,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
                 controller.page.demo.healthNumber = controller.page.demo.healthNumber.replace(/[\W_]/gi, '');
             }
 
-			//save notes
-			// if (controller.page.demo.patientNote != null)
-			// {
-			// 	controller.page.demo.patientNote = "<unotes>" + controller.page.demo.patientNote + "</unotes>";
-			// }
-
-			//save referral doctor (familyDoctor)
-			controller.page.demo.familyDoctor = controller.formatDocInput(controller.page.demo.scrReferralDoc, controller.page.demo.scrReferralDocNo);
-
-			//save family doctor (familyDoctor2)
-			controller.page.demo.familyDoctor2 = controller.formatFamilyDocInput(controller.page.demo.scrFamilyDoc, controller.page.demo.scrFamilyDocNo);
-
-			//save phone numbers
-			// controller.page.demo.scrDemoCell = controller.page.demo.scrCellPhone;
-			// controller.page.demo.phone = controller.page.demo.scrHomePhone;
-			// controller.page.demo.alternativePhone = controller.page.demo.scrWorkPhone;
-
-			// if (controller.page.demo.scrPreferredPhone == "C") controller.page.demo.scrDemoCell += "*";
-			// else if (controller.page.demo.scrPreferredPhone == "H") controller.page.demo.phone += "*";
-			// else if (controller.page.demo.scrPreferredPhone == "W") controller.page.demo.alternativePhone += "*";
-
-			//save extras
-			// var newDemoExtras = [];
-			// newDemoExtras = updateDemoExtras("demo_cell", controller.page.demo.scrDemoCell, posExtras, controller.page.demo.extras, newDemoExtras);
-			// newDemoExtras = updateDemoExtras("aboriginal", controller.page.demo.scrAboriginal, posExtras, controller.page.demo.extras, newDemoExtras);
-			// newDemoExtras = updateDemoExtras("hPhoneExt", controller.page.demo.scrHPhoneExt, posExtras, controller.page.demo.extras, newDemoExtras);
-			// newDemoExtras = updateDemoExtras("wPhoneExt", controller.page.demo.scrWPhoneExt, posExtras, controller.page.demo.extras, newDemoExtras);
-			// newDemoExtras = updateDemoExtras("cytolNum", controller.page.demo.scrCytolNum, posExtras, controller.page.demo.extras, newDemoExtras);
-			// newDemoExtras = updateDemoExtras("phoneComment", controller.page.demo.scrPhoneComment, posExtras, controller.page.demo.extras, newDemoExtras);
-			// newDemoExtras = updateDemoExtras("paper_chart_archived", controller.page.demo.scrPaperChartArchived, posExtras, controller.page.demo.extras, newDemoExtras);
-			// newDemoExtras = updateDemoExtras("paper_chart_archived_date", controller.page.demo.scrPaperChartArchivedDate, posExtras, controller.page.demo.extras, newDemoExtras);
-			// newDemoExtras = updateDemoExtras("usSigned", controller.page.demo.scrUsSigned, posExtras, controller.page.demo.extras, newDemoExtras);
-			// newDemoExtras = updateDemoExtras("privacyConsent", controller.page.demo.scrPrivacyConsent, posExtras, controller.page.demo.extras, newDemoExtras);
-			// newDemoExtras = updateDemoExtras("informedConsent", controller.page.demo.scrInformedConsent, posExtras, controller.page.demo.extras, newDemoExtras);
-			// newDemoExtras = updateDemoExtras("securityQuestion1", controller.page.demo.scrSecurityQuestion1, posExtras, controller.page.demo.extras, newDemoExtras);
-			// newDemoExtras = updateDemoExtras("securityAnswer1", controller.page.demo.scrSecurityAnswer1, posExtras, controller.page.demo.extras, newDemoExtras);
-			// newDemoExtras = updateDemoExtras("rxInteractionWarningLevel", controller.page.demo.scrRxInteractionLevel, posExtras, controller.page.demo.extras, newDemoExtras);
-			// controller.page.demo.extras = newDemoExtras;
-
 			console.debug("pre-save", controller.page.demo);
 
 			//save to database
@@ -1216,82 +767,3 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		}
 	}
 ]);
-
-
-// Move these?
-// function updateDemoExtras(extKey, newVal, posExtras, oldExtras, newExtras)
-// {
-// 	if (newVal == null) return newExtras;
-//
-// 	var pos = posExtras[extKey];
-// 	if (pos != null && oldExtras[pos] != null)
-// 	{ //existing ext
-// 		if (oldExtras[pos].value != newVal)
-// 		{
-// 			newExtras.push(
-// 			{
-// 				id: oldExtras[pos].id,
-// 				key: extKey,
-// 				value: newVal,
-// 				hidden: oldExtras[pos].hidden
-// 			});
-// 		}
-// 	}
-// 	else
-// 	{ //newly added ext
-// 		newExtras.push(
-// 		{
-// 			key: extKey,
-// 			value: newVal
-// 		});
-// 	}
-// 	return newExtras;
-// }
-
-// function dateValid(dateStr)
-// { //valid date format: yyyy-MM-dd
-// 	if (dateStr == null || dateStr == "") return true;
-//
-// 	var datePart = dateStr.toString().split("-");
-// 	if (datePart.length != 3) return false;
-//
-// 	var dateDate = new Date(datePart[0], datePart[1] - 1, datePart[2]);
-// 	if (isNaN(dateDate.getTime())) return false;
-//
-// 	if (dateDate.getFullYear() != datePart[0]) return false;
-// 	if (dateDate.getMonth() != datePart[1] - 1) return false;
-// 	if (dateDate.getDate() != datePart[2]) return false;
-//
-// 	return true;
-// }
-
-function isNumber(s)
-{
-	return /^[0-9]+$/.test(s);
-}
-
-// function isPreferredPhone(phone)
-// {
-// 	phone = String(phone);
-// 	if (phone != null && phone != "")
-// 	{
-// 		if (phone.charAt(phone.length - 1) == "*") return true;
-// 	}
-// 	return false;
-// }
-
-// function getPhoneNum(phone)
-// {
-// 	if (isPreferredPhone(phone))
-// 	{
-// 		phone = phone.substring(0, phone.length - 1);
-// 	}
-// 	return phone;
-// }
-
-// function toArray(obj)
-// { //convert single object to array
-// 	if (obj instanceof Array) return obj;
-// 	else if (obj == null) return [];
-// 	else return [obj];
-// }

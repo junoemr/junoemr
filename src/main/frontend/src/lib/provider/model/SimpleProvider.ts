@@ -13,6 +13,26 @@ export default class SimpleProvider
 		this.id = id;
 	}
 
+	public static fromDisplayNameAndOhip(nameToSplit: string, ohip: string = null): SimpleProvider
+	{
+		if(!nameToSplit)
+		{
+			return null;
+		}
+		let provider = new SimpleProvider();
+		if(!nameToSplit.includes(","))
+		{
+			provider.lastName = nameToSplit;
+		}
+		else
+		{
+			provider.lastName = nameToSplit.split(",")[0];
+			provider.firstName = nameToSplit.split(",")[1];
+		}
+		provider.ohipNumber = ohip;
+		return provider;
+	}
+
 	get displayName(): string
 	{
 		return this.lastName + ', ' + this.firstName;

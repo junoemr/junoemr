@@ -51,9 +51,9 @@ export default class Address
 		}
 		if(!Juno.Common.Util.isBlank(this.postalCode))
 		{
-			line += this.postalCode + " ";
+			line += this.postalCode;
 		}
-		return line;
+		return line.trim();
 	}
 
 	/**

@@ -18,10 +18,22 @@ export default class PhoneNumber
 	get formattedForDisplay(): string
 	{
 		let display = "";
-		if(this.number && this.number.length === 10)
+		if(this.number)
 		{
-			display = "(" + this.number.substring(0,3) + ") " + this.number.substring(3,6) + "-" + this.number.substring(6);
+			if(this.number.length > 3 && this.number.length <= 7)
+			{
+				display = this.number.substring(0,3) + "-" + this.number.substring(3);
+			}
+			else if(this.number.length > 7 && this.number.length <= 10)
+			{
+				display = "(" + this.number.substring(0,3) + ") " + this.number.substring(3,6) + "-" + this.number.substring(6);
+			}
+			else
+			{
+				display = this.number;
+			}
 		}
+
 		if(this.extension && this.extension.length > 0)
 		{
 			display += " Ext: " + this.extension;

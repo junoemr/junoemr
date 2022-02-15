@@ -50,7 +50,6 @@ angular.module('Record.Details').component('contactSection', {
 		ctrl.$onInit = () =>
 		{
 			ctrl.address2 = ctrl.ngModel.address2 || new Address();
-			console.debug(ctrl.ngModel.primaryPhone, ctrl.ngModel.primaryPhoneType);
 			ctrl.updatePrimaryPhoneValues();
 
 			systemPreferenceApi.getPreferenceValue("enable_additional_address").then(

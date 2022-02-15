@@ -121,6 +121,9 @@ angular.module('Record.Details').component('careTeamSection', {
 			ctrl.selectedNurseId = ctrl.ngModel.nurseProvider ? ctrl.ngModel.nurseProvider.id : null;
 			ctrl.selectedMidwifeId = ctrl.ngModel.midwifeProvider ? ctrl.ngModel.midwifeProvider.id : null;
 			ctrl.selectedResidentId = ctrl.ngModel.residentProvider ? ctrl.ngModel.residentProvider.id : null;
+
+			ctrl.selectedReferralDoc = ctrl.ngModel.referralDoctor ? ctrl.ngModel.referralDoctor.displayName : null;
+			ctrl.selectedReferralDocNo = ctrl.ngModel.referralDoctor ? ctrl.ngModel.referralDoctor.ohipNumber : null;
 		}
 
 		ctrl.onDoctorSelected = (value) =>
@@ -170,7 +173,9 @@ angular.module('Record.Details').component('careTeamSection', {
 
 		ctrl.updateReferralNo = (value) =>
 		{
-			ctrl.ngModel.scrReferralDocNo = value.referralNo;
+			let providerName = Juno.Common.Util.isBlank(value.value) ? null : value.value.trim();
+			ctrl.ngModel.referralDoctor = SimpleProvider.fromDisplayNameAndOhip(providerName, value.referralNo);
+			ctrl.selectedReferralDocNo = value.referralNo;
 		}
 
 		ctrl.openAddPatientStatusModal = async () =>
