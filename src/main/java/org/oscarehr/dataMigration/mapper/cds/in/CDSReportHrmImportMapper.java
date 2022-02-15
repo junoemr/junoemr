@@ -87,7 +87,10 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 
 		document.setReportStatus(HrmDocument.ReportStatus.fromValueString(importStructure.getHRMResultStatus()));
 		document.setObservations(getObservations(importStructure.getOBRContent()));
-		document.addComment(getNoteAsHrmComment(importStructure.getNotes(), document.getCreatedBy(), document.getReportDateTime()));
+		if (getNoteAsHrmComment(importStructure.getNotes(), document.getCreatedBy(), document.getReportDateTime()) != null)
+		{
+			document.addComment(getNoteAsHrmComment(importStructure.getNotes(), document.getCreatedBy(), document.getReportDateTime()));
+		}
 		document.setDescription(document.getReportClass().getValue() + " (" + CDSConstants.DEFAULT_HRM_DESCRIPTION + ")");
 
 		// The CDS source facility is the user friendly name of the sending facility.

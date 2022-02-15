@@ -22,8 +22,12 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
-import org.oscarehr.dataMigration.exception.InvalidImportDataException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.oscarehr.dataMigration.exception.InvalidDocumentException;
+import org.oscarehr.dataMigration.exception.InvalidImportDataException;
 import org.oscarehr.dataMigration.model.appointment.Appointment;
 import org.oscarehr.dataMigration.model.document.Document;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
@@ -36,11 +40,6 @@ import xml.cds.v5_0.CareElements;
 import xml.cds.v5_0.OmdCds;
 import xml.cds.v5_0.PatientRecord;
 import xml.cds.v5_0.Reports;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class CDSImportMapper extends AbstractCDSImportMapper<OmdCds, org.oscarehr.dataMigration.model.PatientRecord>

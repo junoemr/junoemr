@@ -160,18 +160,13 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 		List<HRMDocumentComment> hrmDocumentCommentList = new ArrayList<>(comments.size());
 		for(HrmComment comment : comments)
 		{
-			if (comment != null)
-			{
-				HRMDocumentComment hrmDocumentComment = new HRMDocumentComment();
-				hrmDocumentComment.setComment(comment.getText());
-				hrmDocumentComment.setDeleted(false);
-				hrmDocumentComment.setHrmDocument(hrmDocument);
-				hrmDocumentComment.setCommentTime(
-					ConversionUtils.toNullableLegacyDateTime(comment.getObservationDateTime()));
-				hrmDocumentComment
-					.setProvider(findOrCreateProviderRecord(comment.getProvider(), false));
-				hrmDocumentCommentList.add(hrmDocumentComment);
-			}
+			HRMDocumentComment hrmDocumentComment = new HRMDocumentComment();
+			hrmDocumentComment.setComment(comment.getText());
+			hrmDocumentComment.setDeleted(false);
+			hrmDocumentComment.setHrmDocument(hrmDocument);
+			hrmDocumentComment.setCommentTime(ConversionUtils.toNullableLegacyDateTime(comment.getObservationDateTime()));
+			hrmDocumentComment.setProvider(findOrCreateProviderRecord(comment.getProvider(), false));
+			hrmDocumentCommentList.add(hrmDocumentComment);
 		}
 		return hrmDocumentCommentList;
 	}
