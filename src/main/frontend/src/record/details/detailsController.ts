@@ -25,7 +25,7 @@
 */
 
 import {BILLING_TYPE, INSTANCE_TYPE, SYSTEM_PROPERTIES} from "../../common/services/systemPreferenceServiceConstants";
-import {DemographicApi, ProvidersServiceApi, SystemPreferenceApi} from "../../../generated";
+import {DemographicApi, SystemPreferenceApi} from "../../../generated";
 import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
 import {SecurityPermissions} from "../../common/security/securityConstants";
 import {BILLING_REGION} from "../../billing/billingConstants";
@@ -77,14 +77,10 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.page = {};
 		controller.page.demo = null as Demographic;
 		const demographicApi = new DemographicApi($http, $httpParamSerializer, "../ws/rs");
-
+		const systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
 		controller.toastService = new ToastService();
-		var sin0;
 
-		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
-				'../ws/rs');
 
-		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 		controller.eligibilityMsg = $sce.trustAsHtml("...");
 		controller.showEligibility = false;
 		controller.rosteringModuleEnabled = false;

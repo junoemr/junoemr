@@ -161,9 +161,9 @@ public class DemographicService extends AbstractServiceImpl {
 	 * 		Returns data for the demographic provided 
 	 */
 	@GET
-	@Path("/{dataId}")
+	@Path("/{demographicId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicModel> getDemographicData(@PathParam("dataId") Integer id) throws PatientDirectiveException
+	public RestResponse<DemographicModel> getDemographicData(@PathParam("demographicId") Integer id) throws PatientDirectiveException
 	{
 		String loggedInUserId = getLoggedInProviderId();
 		securityInfoManager.requireAllPrivilege(loggedInUserId, id, Permission.DEMOGRAPHIC_READ);

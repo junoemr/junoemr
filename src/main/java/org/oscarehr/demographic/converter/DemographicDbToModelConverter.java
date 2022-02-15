@@ -34,6 +34,7 @@ import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.demographic.model.DemographicModel;
+import org.oscarehr.waitList.service.WaitListService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -50,6 +51,9 @@ public class DemographicDbToModelConverter extends
 {
 	@Autowired
 	private DemographicExtDao demographicExtDao;
+
+	@Autowired
+	private WaitListService waitListService;
 
 	@Autowired
 	private RosterDbToModelConverter rosterDbToModelConverter;
@@ -162,6 +166,9 @@ public class DemographicDbToModelConverter extends
 		demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.KEY_PHONE_COMMENT).ifPresent(
 				demographicExt -> model.setPhoneComment(StringUtils.trimToNull(demographicExt.getValue()))
 		);
+
+		// eventually we should get this through direct association
+		model.setWaitList(waitListService.getCurrentWaitList(input.getDemographicId()));
 
 		return model;
 	}

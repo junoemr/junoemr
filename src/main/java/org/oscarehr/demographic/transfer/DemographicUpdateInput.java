@@ -27,6 +27,7 @@ import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographic.entity.ElectronicMessagingConsentStatus;
 import org.oscarehr.demographic.model.DemographicModel;
+import org.oscarehr.waitList.transfer.DemographicWaitListUpdateInput;
 
 import java.time.LocalDate;
 
@@ -81,6 +82,7 @@ public class DemographicUpdateInput extends DemographicCreateInput
 	private String rxInteractionWarningLevel;
 
 	private ElectronicMessagingConsentStatus electronicMessagingConsentStatus;
+	private DemographicWaitListUpdateInput waitList;
 
 	public DemographicUpdateInput()
 	{

@@ -50,6 +50,7 @@ import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.waitList.service.WaitListService;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
@@ -116,6 +117,9 @@ public class DemographicService
 
 	@Autowired
 	private DemographicUpdateInputToEntityConverter demographicUpdateInputToEntityConverter;
+
+	@Autowired
+	private WaitListService waitListService;
 
 	public enum SEARCH_MODE
 	{
@@ -491,6 +495,10 @@ public class DemographicService
 		}
 
 		demographicManager.addRosterHistoryEntry(demographic, oldDemographic);
+		if( updateInput.getWaitList() != null)
+		{
+			waitListService.updateDemographicWaitList(demographic.getId(), updateInput.getWaitList());
+		}
 
 		return demographicDbToModelConverter.convert(demographic);
 	}
