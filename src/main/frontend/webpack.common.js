@@ -181,6 +181,7 @@ module.exports = {
 			'./src/common/services/uxService.js',
 			'./src/common/services/specialistsService.js',
 			'./src/common/services/referralDoctorsService.js',
+			'./src/common/services/waitingListService.ts',
 
 			'./src/common/filters/module.js',
 			'./src/common/filters/age.js',

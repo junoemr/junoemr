@@ -167,9 +167,6 @@ public class DemographicDbToModelConverter extends
 				demographicExt -> model.setPhoneComment(StringUtils.trimToNull(demographicExt.getValue()))
 		);
 
-		// eventually we should get this through direct association
-		model.setWaitList(waitListService.getCurrentWaitList(input.getDemographicId()));
-
 		return model;
 	}
 

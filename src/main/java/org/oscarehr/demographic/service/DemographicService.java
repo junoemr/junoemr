@@ -495,7 +495,7 @@ public class DemographicService
 		}
 
 		demographicManager.addRosterHistoryEntry(demographic, oldDemographic);
-		if( updateInput.getWaitList() != null)
+		if(updateInput.getWaitList() != null)
 		{
 			waitListService.updateDemographicWaitList(demographic.getId(), updateInput.getWaitList());
 		}

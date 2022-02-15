@@ -29,7 +29,6 @@ import java.time.LocalDate;
 @Data
 public class DemographicWaitListUpdateInput
 {
-	private Integer id;
 	private Integer waitListId;
 	private Long position;
 	private LocalDate dateAddedToWaitList;

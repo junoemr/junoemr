@@ -5,6 +5,7 @@ import AddressToInputConverter from "../../common/converter/AddressToInputConver
 import PhoneNumberToInputConverter from "../../common/converter/PhoneNumberToInputConverter";
 import RosterDataModelToInputConverter from "./RosterDataModelToInputConverter";
 import SimpleProviderToInputConverter from "../../provider/converter/SimpleProviderToInputConverter";
+import DemographicWaitingListInputConverter from "../../waitingList/converter/DemographicWaitingListInputConverter";
 
 export default class DemographicToUpdateInputConverter extends AbstractConverter<Demographic, DemographicUpdateInput>
 {
@@ -70,6 +71,9 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 
 		// roster data
 		updateInput.currentRosterData = new RosterDataModelToInputConverter().convert(from.rosterData);
+
+		// waitlist data
+		updateInput.waitList = new DemographicWaitingListInputConverter().convert(from.waitList);
 
 		return updateInput;
 	}

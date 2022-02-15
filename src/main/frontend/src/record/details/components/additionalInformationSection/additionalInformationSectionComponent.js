@@ -22,6 +22,7 @@
 */
 
 import {JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import DemographicWaitingList from "../../../../lib/waitingList/model/DemographicWaitingList";
 
 angular.module('Record.Details').component('additionalInformationSection', {
 	templateUrl: 'src/record/details/components/additionalInformationSection/additionalInformationSection.jsp',
@@ -30,7 +31,11 @@ angular.module('Record.Details').component('additionalInformationSection', {
 		validations: "=",
 		componentStyle: "<?"
 	},
-	controller: [ "staticDataService", "$scope", function (staticDataService, $scope)
+	controller: [
+		"$scope",
+		"staticDataService",
+		"waitingListService",
+		function ($scope, staticDataService, waitingListService)
 	{
 		let ctrl = this;
 
@@ -43,21 +48,45 @@ angular.module('Record.Details').component('additionalInformationSection', {
 		ctrl.rxInteractionLevels = staticDataService.getRxInteractionLevels();
 
 		ctrl.dateOfRequestValid = true;
+		ctrl.waitingListOptions = [];
+		ctrl.demographicWaitList = null;
 
-		ctrl.$onInit = () =>
+		ctrl.$onInit = async () =>
 		{
 			ctrl.validations["dateOfRequest"] = Juno.Validations.validationCustom(() => ctrl.dateOfRequestValid);
-			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
+			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+
+			const results = await Promise.all([
+				waitingListService.getActiveWaitingLists(),
+				waitingListService.getActiveDemographicWaitList(ctrl.ngModel.id),
+				]);
+			ctrl.waitingListOptions = results[0].map((waitList) =>
+			{
+				return {
+					label: waitList.name,
+					value: waitList.id,
+				};
+			});
+
+			ctrl.demographicWaitList = results[1] || new DemographicWaitingList();
+			ctrl.updateDemographicWaitingList(ctrl.demographicWaitList.waitListId);
 		}
 
-		ctrl.$doCheck = () =>
+		// ensure the model is in sync with the local waitList object
+		ctrl.updateDemographicWaitingList = (value) =>
 		{
-			// if (ctrl.ngModel && (!ctrl.waitingListNames || ctrl.waitingListNames.length !== ctrl.ngModel.waitingListNames.length))
-			// {
-			// 	ctrl.waitingListNames =
-			// 			ctrl.ngModel.waitingListNames.map((item) => Object.assign({}, item, {label: item.name, value: item.id}));
-			// }
-			// TODO re-implement before release
+			if (value)
+			{
+				if(!ctrl.demographicWaitList.dateAddedToWaitList)
+				{
+					ctrl.demographicWaitList.dateAddedToWaitList = moment();
+				}
+				ctrl.ngModel.waitList = ctrl.demographicWaitList;
+			}
+			else
+			{
+				ctrl.ngModel.waitList = null;
+			}
 		}
 	}
 

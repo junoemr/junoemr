@@ -6,15 +6,16 @@
 	<div class="details-fields">
 
 		<!-- Waiting List -->
-		<juno-select ng-model="$ctrl.ngModel.waitingListID"
-						options="$ctrl.waitingListNames"
-						label="Waiting List"
-						placeholder="Waiting List"
-						component-style="$ctrl.componentStyle">
+		<juno-select ng-model="$ctrl.demographicWaitList.waitListId"
+		             options="$ctrl.waitingListOptions"
+		             label="Waiting List"
+		             placeholder="Waiting List"
+		             on-change="$ctrl.updateDemographicWaitingList(value)"
+		             component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Waiting list date -->
-		<juno-date-select ng-model="$ctrl.ngModel.onWaitingListSinceDate"
+		<juno-date-select ng-model="$ctrl.demographicWaitList.dateAddedToWaitList"
 		                  label="Date of request"
 		                  on-validity-change="$ctrl.dateOfRequestValid = valid"
 		                  component-style="$ctrl.componentStyle">
@@ -28,7 +29,7 @@
 		</juno-select>
 
 		<!-- Waiting List Note -->
-		<juno-input ng-model="$ctrl.ngModel.waitingListNote"
+		<juno-input ng-model="$ctrl.demographicWaitList.note"
 		            label="Waiting List Note"
 		            placeholder="Waiting List Note"
 		            component-style="$ctrl.componentStyle">

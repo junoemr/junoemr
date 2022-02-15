@@ -20,36 +20,39 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.waitList.converter;
+package org.oscarehr.ws.rest.demographic;
 
-import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.common.model.WaitingList;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.waitList.model.DemographicWaitListModel;
+import org.oscarehr.waitList.service.WaitListService;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
+import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.util.ConversionUtils;
 
-@Component
-public class DemographicWaitListToModelConverter extends AbstractModelConverter<WaitingList, DemographicWaitListModel>
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+@Path("demographic/{demographicNo}/waitList")
+@Component("demographicWaitListWebService")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+@Tag(name = "demographic")
+public class DemographicWaitListWebService extends AbstractServiceImpl
 {
 	@Autowired
-	private WaitListNameToModelConverter waitListNameToModelConverter;
+	private WaitListService waitListService;
 
-	@Override
-	public DemographicWaitListModel convert(WaitingList input)
+	@GET
+	@Path("/active")
+	public RestResponse<DemographicWaitListModel> getActiveWaitList(@PathParam("demographicNo") Integer demographicId)
 	{
-		if(input == null)
-		{
-			return null;
-		}
-		DemographicWaitListModel model = new DemographicWaitListModel();
-		model.setId(input.getId());
-		model.setWaitListModel(waitListNameToModelConverter.convert(input.getWaitingListName()));
-		model.setDateAddedToWaitList(ConversionUtils.toNullableLocalDate(input.getOnListSince()));
-		model.setNote(input.getNote());
-		model.setPosition(input.getPosition());
-		model.setArchived(input.getIsHistory().equals("Y"));
-
-		return model;
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.DEMOGRAPHIC_READ);
+		return RestResponse.successResponse(waitListService.getCurrentWaitList(demographicId));
 	}
 }

@@ -49,7 +49,6 @@ angular.module("Common.Services").service("demographicService", [
 		service.getDemographic = async (demographicId: number): Promise<Demographic> =>
 		{
 			let transfer = (await service.demographicApi.getDemographicData(demographicId));
-			console.debug(service.demographicTransferToModelConverter.convert(transfer.data.body));
 			return service.demographicTransferToModelConverter.convert(transfer.data.body);
 		}
 

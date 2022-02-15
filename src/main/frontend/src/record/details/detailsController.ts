@@ -725,8 +725,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
                 controller.page.demo.healthNumber = controller.page.demo.healthNumber.replace(/[\W_]/gi, '');
             }
 
-			console.debug("pre-save", controller.page.demo);
-
 			//save to database
 			demographicService.updateDemographic(controller.page.demo).then(
 				function success()

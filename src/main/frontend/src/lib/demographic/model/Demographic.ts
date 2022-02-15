@@ -8,6 +8,7 @@ import {OfficialLanguageType} from "./OfficialLanguageType";
 import SimpleProvider from "../../provider/model/SimpleProvider";
 import RosterStatusData from "./RosterStatusData";
 import {PhoneType} from "../../common/model/PhoneType";
+import DemographicWaitingList from "../../waitingList/model/DemographicWaitingList";
 
 export default class Demographic
 {
@@ -77,6 +78,8 @@ export default class Demographic
 	private _securityQuestion1: string;
 	private _securityAnswer1: string;
 	private _rxInteractionWarningLevel: string;
+
+	private _waitList: DemographicWaitingList;
 
 	constructor()
 	{
@@ -731,5 +734,15 @@ export default class Demographic
 	set rxInteractionWarningLevel(value: string)
 	{
 		this._rxInteractionWarningLevel = value;
+	}
+
+	get waitList(): DemographicWaitingList
+	{
+		return this._waitList;
+	}
+
+	set waitList(value: DemographicWaitingList)
+	{
+		this._waitList = value;
 	}
 }

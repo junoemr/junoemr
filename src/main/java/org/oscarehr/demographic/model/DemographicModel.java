@@ -33,7 +33,6 @@ import org.oscarehr.dataMigration.model.contact.Contact;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographic.entity.ElectronicMessagingConsentStatus;
-import org.oscarehr.waitList.model.DemographicWaitListModel;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -144,7 +143,6 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 	private ElectronicMessagingConsentStatus electronicMessagingConsentStatus;
 	private LocalDate electronicMessagingConsentGivenAt;
 	private LocalDate electronicMessagingConsentRejectedAt;
-	private DemographicWaitListModel waitList;
 
 	public DemographicModel()
 	{
