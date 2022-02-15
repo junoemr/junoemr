@@ -333,6 +333,12 @@ public class ClinicaidAPIService
 				provider_uli = "";
 			}
 
+			String formattedSex = demo.getSex();
+			if (!formattedSex.equalsIgnoreCase("M") && !formattedSex.equalsIgnoreCase("F"))
+			{
+				formattedSex = "";
+			}
+
 			HashMap<String, String> data = new HashMap<>();
 			data.put("service_recipient_uli", StringUtils.trimToEmpty(demo.getHin()));
 			data.put("service_recipient_ver", StringUtils.trimToEmpty(demo.getVer()));
@@ -341,7 +347,7 @@ public class ClinicaidAPIService
 			data.put("service_recipient_oscar_number", StringUtils.trimToEmpty(service_recipient_oscar_number));
 			data.put("service_recipient_status", StringUtils.trimToEmpty(demo.getPatientStatus()));
 			data.put("service_recipient_age", StringUtils.trimToEmpty(demo.getAge()));
-			data.put("service_recipient_gender", StringUtils.trimToEmpty(demo.getSex()));
+			data.put("service_recipient_gender", StringUtils.trimToEmpty(formattedSex));
 			data.put("service_provider_oscar_number", StringUtils.trimToEmpty(provider_no));
 			data.put("service_provider_first_name", StringUtils.trimToEmpty(provider_first_name));
 			data.put("service_provider_last_name", StringUtils.trimToEmpty(provider_last_name));
