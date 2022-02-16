@@ -30,10 +30,10 @@ SET template = '<?xml version="1.0" encoding="UTF-8"?>
             SUM(fin.NONE)      AS "% Active, no documented encounter"
             FROM (
             SELECT
-            IF(DATE_SUB(CURDATE(), INTERVAL 3 YEAR) &lt;= DATE(MAX(cmn.observation_date)), 1, 0) AS THREE,
-            IF(DATE_SUB(CURDATE(), INTERVAL 5 YEAR) &lt;= DATE(MAX(cmn.observation_date)) AND
-            DATE(MAX(cmn.observation_date)) &lt; DATE_SUB(CURDATE(), INTERVAL 3 YEAR), 1, 0)  AS FIVETHREE,
-            IF(DATE(MAX(cmn.observation_date)) &lt; DATE_SUB(CURDATE(), INTERVAL 5 YEAR), 1, 0)  AS FIVEPLUS,
+            IF(DATE_SUB(CURDATE(), INTERVAL 3 YEAR) &lt;= DATE(cmn.observation_date), 1, 0) AS THREE,
+            IF(DATE_SUB(CURDATE(), INTERVAL 5 YEAR) &lt;= DATE(cmn.observation_date) AND
+            DATE(cmn.observation_date) &lt; DATE_SUB(CURDATE(), INTERVAL 3 YEAR), 1, 0)  AS FIVETHREE,
+            IF(DATE(cmn.observation_date) &lt; DATE_SUB(CURDATE(), INTERVAL 5 YEAR), 1, 0)  AS FIVEPLUS,
             IF(cmn.observation_date IS NULL, 1, 0)                                       AS NONE
             FROM demographic dem
             LEFT JOIN (
