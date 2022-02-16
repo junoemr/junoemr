@@ -43,7 +43,7 @@ angular.module('Record.Details').component('demographicSection', {
 			ctrl.spokenLanguages = staticDataService.getSpokenLanguages();
 			ctrl.languages =  staticDataService.getEngFre();
 			ctrl.titles = staticDataService.getTitles();
-			ctrl.titles.push({"label": "--", "value": ''})
+			ctrl.titles.push({"label": "--", "value": null})
 			ctrl.aboriginalStatuses = staticDataService.getAboriginalStatuses();
 			ctrl.countries = staticDataService.getCountries();
 

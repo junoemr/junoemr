@@ -332,7 +332,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			if (!Juno.Common.Util.isBlank(cardData.province))
 			{
 				controller.page.demo.address.province = cardData.province;
-				controller.page.demo.hcType = cardData.province;
+				controller.page.demo.healthNumberProvinceCode = cardData.province;
 				controller.displayMessages.add_field_warning('province', "Province Changed");
 				controller.displayMessages.add_field_warning('hcType', "Health Card Type Changed");
 			}
@@ -340,13 +340,11 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			{
 				controller.page.demo.lastName = cardData.lastName;
 				controller.displayMessages.add_field_warning('lastName', "Last Name Changed");
-				controller.formatLastName();
 			}
 			if (!Juno.Common.Util.isBlank(cardData.firstName))
 			{
 				controller.page.demo.firstName = cardData.firstName;
 				controller.displayMessages.add_field_warning('firstName', "First Name Changed");
-				controller.formatFirstName();
 			}
 			if (!Juno.Common.Util.isBlank(cardData.hin))
 			{
@@ -381,7 +379,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			{
 				let expireDate = Juno.Common.Util.getDateMomentFromComponents(cardData.endYear, cardData.endMonth, cardData.endDay);
 
-				controller.page.demo.healthNumberRenewDate = Juno.Common.Util.formatMomentDate(expireDate);
+				controller.page.demo.healthNumberRenewDate = expireDate;
 				controller.displayMessages.add_field_warning('endDate', "Hin End Date Changed");
 
 				let now = moment();
