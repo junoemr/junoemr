@@ -19,6 +19,7 @@ export default class DemographicTransferToModelConverter extends AbstractConvert
 
 		model.id = from.id;
 		model.firstName = from.firstName;
+		model.middleName = from.middleName;
 		model.lastName = from.lastName;
 		model.alias = from.alias;
 		model.title = from.title as any as TitleType;

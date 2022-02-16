@@ -16,6 +16,7 @@ export default class Demographic
 
 	// base info
 	private _firstName: string;
+	private _middleName: string;
 	private _lastName: string;
 	private _title: TitleType;
 	private _dateOfBirth: Moment;
@@ -224,6 +225,16 @@ export default class Demographic
 	set firstName(value: string)
 	{
 		this._firstName = value;
+	}
+
+	get middleName(): string
+	{
+		return this._middleName;
+	}
+
+	set middleName(value: string)
+	{
+		this._middleName = value;
 	}
 
 	get lastName(): string

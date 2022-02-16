@@ -14,6 +14,7 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		let updateInput = {} as DemographicUpdateInput;
 		updateInput.id = from.id;
 		updateInput.firstName = from.firstName;
+		updateInput.middleName = from.middleName;
 		updateInput.lastName = from.lastName;
 		updateInput.alias = from.alias;
 		updateInput.title = from.title as DemographicUpdateInput.TitleEnum;

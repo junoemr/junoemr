@@ -10,6 +10,7 @@ export default class DemographicToCreateInputConverter extends AbstractConverter
 	{
 		let createInput = {} as DemographicCreateInput;
 		createInput.firstName = from.firstName;
+		createInput.middleName = from.middleName;
 		createInput.lastName = from.lastName;
 		createInput.dateOfBirth = this.serializeDateTime(from.dateOfBirth);
 		createInput.sex = DemographicCreateInput.SexEnum[from.sex];

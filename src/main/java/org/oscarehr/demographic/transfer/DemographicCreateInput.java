@@ -37,6 +37,7 @@ public class DemographicCreateInput extends AbstractTransientModel
 {
 	// base info
 	private String firstName;
+	private String middleName;
 	private String lastName;
 	private Person.TITLE title;
 	private LocalDate dateOfBirth;
