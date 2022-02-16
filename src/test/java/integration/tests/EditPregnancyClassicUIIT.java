@@ -62,29 +62,31 @@ public class EditPregnancyClassicUIIT extends SeleniumTestBase
 		databaseUtil.createTestDemographic();
 	}
 
+	String pregnancyType = "Normal";
+	String statusComplete = "Complete";
+	String statusDelete = "Deleted";
+
+	@Test
+	public void AddPregnancyTest()
+	{
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
+
+		//Add Normal Pregnancy
+		AddPregnancy();
+		Assert.assertTrue(pregnancyType + " is NOT added successfully",
+			PageUtil.isExistsBy(By.partialLinkText(pregnancyType), driver));
+	}
+
 	@Test
 	public void EditPregnancyTest()
 	{
-		String pregnancyType = "Normal";
-		String statusComplete = "Complete";
-		String statusDelete = "Deleted";
-
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String eChartWindowHandle = driver.getWindowHandle();
-		PageUtil.switchToLastWindow(driver);
-		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuTitlepregnancy")));
 
 		//Add Normal Pregnancy
-		Actions action = new Actions(driver);
-		WebElement plusButton = driver.findElement(
-			By.xpath("//div[@id='menuTitlepregnancy']//descendant::a[contains(., '+')]"));
-		action.moveToElement(plusButton).perform();
-		driver.findElement(By.linkText(pregnancyType)).click();
-		driver.navigate().refresh();
-		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.partialLinkText(pregnancyType)));
-		String pregnancyXpath = "//ul[@id='pregnancylist']//descendant::a[contains(.,'" + pregnancyType + "')]";
-		Assert.assertTrue(pregnancyType + " is NOT added successfully",
-			PageUtil.isExistsBy(By.partialLinkText(pregnancyType), driver));
+		AddPregnancy();
+		String pregnancyXpath =
+			"//ul[@id='pregnancylist']//descendant::a[contains(.,'" + pregnancyType + "')]";
 
 		//Change Status to Complete by clicking the link of the added pregnancy type
 		driver.findElement(By.xpath(pregnancyXpath)).click();
@@ -96,20 +98,34 @@ public class EditPregnancyClassicUIIT extends SeleniumTestBase
 		String submitXpath = "//h5[contains(., 'Set the date of completion to close this episode')]//parent::fieldset//descendant::input[@type='submit']";
 		driver.findElement(By.xpath(noteXpath)).sendKeys(statusComplete);
 		driver.findElement(By.xpath(submitXpath)).click();
+
+		//Verify the color change on Echart page.
 		PageUtil.switchToWindow(eChartWindowHandle, driver);
 		driver.navigate().refresh();
-		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.partialLinkText(pregnancyType)));
+		webDriverWait.until(
+			ExpectedConditions.presenceOfElementLocated(By.partialLinkText(pregnancyType)));
 		String styleColor = driver.findElement(By.xpath(pregnancyXpath)).getAttribute("style");
 		String styleColorExpected = "color: red;";
-		Assert.assertEquals(pregnancyType + " is NOT Completed successfully.", styleColorExpected, styleColor);
+		Assert.assertEquals(pregnancyType + " is NOT Completed successfully.", styleColorExpected,
+			styleColor);
 
-		driver.findElement(By.linkText("Pregnancies")).click();
-		PageUtil.switchToLastWindow(driver);
-		driver.findElement(By.partialLinkText(pregnancyType)).click();
-		PageUtil.switchToLastWindow(driver);
-		String status = driver.findElement(By.xpath("//option[@selected='selected']")).getAttribute("value");
+		//Verify the status change on Pregnancy Management page
+		AccessPregnancyManagementPage();
+		String status = driver.findElement(By.xpath("//option[@selected='selected']"))
+			.getAttribute("value");
 		String statusExpected = statusComplete;
 		Assert.assertEquals("Status is NOT Completed.", statusExpected, status);
+	}
+
+	@Test
+	public void DeletePregnancyTest()
+	{
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
+		String eChartWindowHandle = driver.getWindowHandle();
+
+		//Add Normal Pregnancy
+		AddPregnancy();
+		AccessPregnancyManagementPage();
 
 		//Delete the Pregnancy
 		dropdownSelectByVisibleText(driver, webDriverWait, By.id("episode.status"), statusDelete);
@@ -118,5 +134,25 @@ public class EditPregnancyClassicUIIT extends SeleniumTestBase
 		driver.navigate().refresh();
 		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.linkText("Pregnancies")));
 		Assert.assertFalse(pregnancyType + " is Not delted successfully.", PageUtil.isExistsBy(By.partialLinkText(pregnancyType), driver));
+	}
+
+	private void AddPregnancy()
+	{
+		Actions action = new Actions(driver);
+		WebElement plusButton = driver.findElement(
+			By.xpath("//div[@id='menuTitlepregnancy']//descendant::a[contains(., '+')]"));
+		action.moveToElement(plusButton).perform();
+		driver.findElement(By.linkText(pregnancyType)).click();
+		driver.navigate().refresh();
+		webDriverWait.until(
+			ExpectedConditions.presenceOfElementLocated(By.partialLinkText(pregnancyType)));
+	}
+
+	private void AccessPregnancyManagementPage()
+	{
+		driver.findElement(By.linkText("Pregnancies")).click();
+		PageUtil.switchToLastWindow(driver);
+		driver.findElement(By.partialLinkText(pregnancyType)).click();
+		PageUtil.switchToLastWindow(driver);
 	}
 }
