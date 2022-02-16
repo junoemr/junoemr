@@ -127,6 +127,7 @@ public class LabDbToModelConverter extends
 		{
 			observation.addComment(labHandler.getOBRComment(obrIndex, i));
 		}
+		observation.setBlockedResult(labHandler.isOBRBlocked(obrIndex));
 
 		return observation;
 	}

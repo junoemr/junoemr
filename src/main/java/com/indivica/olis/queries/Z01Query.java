@@ -9,9 +9,6 @@
 
 package com.indivica.olis.queries;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.indivica.olis.parameters.OBR16;
 import com.indivica.olis.parameters.OBR22;
 import com.indivica.olis.parameters.OBR25;
@@ -33,19 +30,26 @@ import com.indivica.olis.parameters.ZBR6;
 import com.indivica.olis.parameters.ZPD1;
 import com.indivica.olis.parameters.ZPD3;
 import com.indivica.olis.parameters.ZRP1;
+import com.indivica.olis.parameters.ZSD;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static com.indivica.olis.parameters.ZPD1.CONSENT_MARKER_SUBSTITUTE;
 
 /**
  * Z01 - Retrieve Laboratory Information for Patient
  * @author jen
  *
  */
-public class Z01Query extends Query {
-
+public class Z01Query extends DateRangeQuery
+{
 	private OBR22 startEndTimestamp = null;
 	private OBR7 earliestLatestObservationDateTime = null;
 	private QRD7 quantityLimitedRequest = null;
 	private ZRP1 requestingHic = new ZRP1(); // mandatory
 	private ZPD1 consentToViewBlockedInformation = null;
+	private ZSD substituteDecisionMakerInfo = null;
 	private ZPD3 patientConsentBlockAllIndicator = null;
 	private ZBR3 specimenCollector = null;
 	private ZBR6 performingLaboratory = null;
@@ -80,7 +84,13 @@ public class Z01Query extends Query {
 			query += requestingHic.toOlisString() + "~";
 		
 		if (consentToViewBlockedInformation != null)
+		{
 			query += consentToViewBlockedInformation.toOlisString() + "~";
+			if(CONSENT_MARKER_SUBSTITUTE.equals(consentToViewBlockedInformation.getValue()))
+			{
+				query += substituteDecisionMakerInfo.toOlisString() + "~";
+			}
+		}
 		
 		if (patientConsentBlockAllIndicator != null)
 			query += patientConsentBlockAllIndicator.toOlisString() + "~";
@@ -141,6 +151,7 @@ public class Z01Query extends Query {
 		
 	}
 
+	@Override
 	public void setStartEndTimestamp(OBR22 startEndTimestamp) {
     	this.startEndTimestamp = startEndTimestamp;
     }
@@ -160,6 +171,12 @@ public class Z01Query extends Query {
 	public void setConsentToViewBlockedInformation(ZPD1 consentToViewBlockedInformation) {
     	this.consentToViewBlockedInformation = consentToViewBlockedInformation;
     }
+
+	@Override
+	public void setSubstituteDecisionMakerInfo(ZSD substituteDecisionMakerInfo)
+	{
+		this.substituteDecisionMakerInfo = substituteDecisionMakerInfo;
+	}
 
 	public void setPatientConsentBlockAllIndicator(ZPD3 patientConsentBlockAllIndicator) {
     	this.patientConsentBlockAllIndicator = patientConsentBlockAllIndicator;

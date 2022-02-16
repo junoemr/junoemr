@@ -370,4 +370,12 @@ public class ProviderDataDao extends AbstractDao<ProviderData>
 		query.setParameter("uuid", noteUuid);
 		return query.getResultList();
 	}
+
+	@SuppressWarnings("unchecked")
+	public List<ProviderData> wherePractitionerNoFilled()
+	{
+		Query query = entityManager.createQuery("SELECT p FROM ProviderData p WHERE p.practitionerNo IS NOT NULL AND p.practitionerNo <> :emptyStr");
+		query.setParameter("emptyStr", "");
+		return query.getResultList();
+	}
 }

@@ -44,7 +44,7 @@ TH {
 }
 
 A IMG {
-	border: 0px;
+	border: 0;
 }
 
 H3 {
@@ -247,7 +247,7 @@ TH {
 }
 
 .fieldBox {
-	font-family: tahoma, helvetica;
+	font-family: tahoma, helvetica, sans-serif;
 	background-color: #ddddff;
 }
 

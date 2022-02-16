@@ -96,7 +96,7 @@ public class dxResearchAction extends Action {
             xml_research[3] = frm.getXml_research4();
             xml_research[4] = frm.getXml_research5();
         }
-        boolean valid = true;
+
         ActionMessages errors = new ActionMessages();  
         DxresearchDAO dao = (DxresearchDAO) SpringUtils.getBean("DxresearchDAO");
         
@@ -129,10 +129,18 @@ public class dxResearchAction extends Action {
 					boolean isCodingSystemAvailable = codingSystemEntity == null;
 
 					if (!isCodingSystemAvailable) {
-						valid = false;
 						errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.codeNotFound", xml_research[i], codingSystem));
 						saveErrors(request, errors);
-					} else {
+					}
+					else if (csDao.findByCode(xml_research[i]) == null)
+					{
+						errors.add(ActionMessages.GLOBAL_MESSAGE,
+							new ActionMessage("errors.codeNotFound", xml_research[i],
+								codingSystem));
+						saveErrors(request, errors);
+					}
+					else
+					{
 						Dxresearch dr = new Dxresearch();
 						dr.setDemographicNo(Integer.valueOf(demographicNo));
 						dr.setStartDate(new Date());
@@ -151,10 +159,7 @@ public class dxResearchAction extends Action {
 			}
 
 		}
-            
-        if(!valid)
-            return (new ActionForward(mapping.getInput()));
-        
+
         String forwardTo = "success";
         if (request.getParameter("forwardTo") != null){
             forwardTo = request.getParameter("forwardTo");

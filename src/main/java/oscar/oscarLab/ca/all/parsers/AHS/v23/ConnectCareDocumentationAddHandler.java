@@ -81,7 +81,7 @@ public class ConnectCareDocumentationAddHandler extends MDM_T08_T02ConnectCareHa
 	}
 
 	@Override
-	public boolean isSupportEmbeddedPdf()
+	public boolean supportsEmbeddedDocuments()
 	{
 		return true;
 	}

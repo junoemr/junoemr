@@ -15,17 +15,18 @@ package com.indivica.olis.segments;
  * @author jen
  *
  */
-public class DSCSegment implements Segment {
+public class DSCSegment implements Segment
+{
+	private final String continuationPointer;
 
-	private String continuationPointer;
-	
-	public DSCSegment(String continuationPointer) {
+	public DSCSegment(String continuationPointer)
+	{
 		this.continuationPointer = continuationPointer;
 	}
-	
+
 	@Override
-	public String getSegmentHL7String() {
+	public String getSegmentHL7String()
+	{
 		return "DSC|" + continuationPointer;
 	}
-
 }

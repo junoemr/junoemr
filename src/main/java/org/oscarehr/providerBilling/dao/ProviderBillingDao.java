@@ -44,10 +44,10 @@ public class ProviderBillingDao  extends AbstractDao<ProviderBilling>
 	 * @param providerNo - id of the Provider linked to the billing record.
 	 * @return - the billing record.
 	 */
-	public ProviderBilling getByProvider(Integer providerNo)
+	public ProviderBilling findByProviderId(String providerNo)
 	{
 		Query query = entityManager.createQuery("SELECT p.billingOpts FROM ProviderData p WHERE p.id = :providerNo");
-		query.setParameter("providerNo", providerNo.toString());
+		query.setParameter("providerNo", providerNo);
 		return getSingleResultOrNull(query);
 	}
 }

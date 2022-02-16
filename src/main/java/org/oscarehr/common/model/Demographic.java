@@ -100,6 +100,7 @@ public class Demographic implements Serializable
 	private String familyDoctor2;
 	private String city;
 	private String firstName;
+	private String middleName;
 	private String postal;
 	private Date hcRenewDate;
 	private String phone2;
@@ -735,6 +736,18 @@ public class Demographic implements Serializable
 	{
 		this.firstName = firstName;
 	}
+
+
+	public String getMiddleName()
+	{
+		return middleName;
+	}
+
+	public void setMiddleName(String middleName)
+	{
+		this.middleName = middleName;
+	}
+
 
 	/**
 	 * Return the value associated with the column: postal

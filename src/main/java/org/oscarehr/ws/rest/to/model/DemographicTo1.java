@@ -67,6 +67,7 @@ public class DemographicTo1 implements Serializable {
 	private String familyDoctor;
 	private String familyDoctor2;
 	private String firstName;
+	private String middleName;
 	private String lastName;
 	@JsonDeserialize(using = DateDeserializer.class)
 	private Date hcRenewDate;
@@ -286,6 +287,16 @@ public class DemographicTo1 implements Serializable {
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
+	}
+
+	public String getMiddleName()
+	{
+		return middleName;
+	}
+
+	public void setMiddleName(String middleName)
+	{
+		this.middleName = middleName;
 	}
 
 	public String getLastName() {

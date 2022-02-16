@@ -9,6 +9,8 @@
 
 package com.indivica.olis.parameters;
 
+import static org.oscarehr.olis.OLISUtils.PROVINCIAL_LAB_ON;
+
 /**
  * Exclude Reporting Laboratory
  * @author jen
@@ -25,8 +27,8 @@ public class ZBE4 implements Parameter {
 
 	@Override
     public String toOlisString() {
-	    return getQueryCode() + ".6.2" + (universalId != null ? universalId : "") + "~" +
-	    	getQueryCode() + ".6.3" + (universalIdType != null ? universalIdType : "");
+	    return getQueryCode() + ".6.2^" + (universalId != null ? PROVINCIAL_LAB_ON + ":" + universalId : "") + "~" +
+	    	getQueryCode() + ".6.3^" + (universalIdType != null ? universalIdType : "");
     }
 
 	@Override

@@ -24,18 +24,35 @@
 package org.oscarehr.config.modules;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.config.scheduling.FixedPeriodicAdjustableTrigger;
+import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
+import org.oscarehr.olis.model.OLISSystemPreferences;
+import org.oscarehr.olis.service.OLISPollingService;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import oscar.OscarProperties;
+
+import java.time.Duration;
 
 @Configuration
 @Conditional(OlisModuleConfig.Condition.class)
-@ImportResource({"classpath*:applicationContextOLIS.xml"})
-public class OlisModuleConfig
+public class OlisModuleConfig implements SchedulingConfigurer
 {
 	private static final Logger logger = MiscUtils.getLogger();
+
+	@Autowired
+	protected OLISPollingService olisPollingService;
+
+	@Autowired
+	protected TaskScheduler scheduler;
+
+	@Autowired
+	private OLISSystemPreferencesDao olisSystemPrefDao;
 
 	public OlisModuleConfig()
 	{
@@ -48,5 +65,17 @@ public class OlisModuleConfig
 		{
 			return OscarProperties.Module.MODULE_OLIS;
 		}
+	}
+
+	@Override
+	public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar)
+	{
+		scheduledTaskRegistrar.setScheduler(scheduler);
+		scheduledTaskRegistrar.addTriggerTask(olisPollingService, new FixedPeriodicAdjustableTrigger(() ->
+		{
+			OLISSystemPreferences olisPrefs = olisSystemPrefDao.getPreferences();
+			Integer frequency = olisPrefs.getPollFrequency().orElse(OLISSystemPreferences.DEFAULT_POLLING_FREQUENCY_MIN);
+			return Duration.ofMinutes(frequency);
+		}));
 	}
 }

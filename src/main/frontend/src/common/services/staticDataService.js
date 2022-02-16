@@ -477,67 +477,67 @@ angular.module("Common.Services").service("staticDataService", [
 			provinces.push(
 			{
 				"value": "AB",
-				"label": "AB-Alberta"
+				"label": "Alberta"
 			});
 			provinces.push(
 			{
 				"value": "BC",
-				"label": "BC-British Columbia"
+				"label": "British Columbia"
 			});
 			provinces.push(
 			{
 				"value": "MB",
-				"label": "MB-Manitoba"
+				"label": "Manitoba"
 			});
 			provinces.push(
 			{
 				"value": "NB",
-				"label": "NB-New Brunswick"
+				"label": "New Brunswick"
 			});
 			provinces.push(
 			{
 				"value": "NL",
-				"label": "NL-Newfoundland Labrador"
+				"label": "Newfoundland & Labrador"
 			});
 			provinces.push(
 			{
 				"value": "NT",
-				"label": "NT-Northwest Territory"
+				"label": "Northwest Territories"
 			});
 			provinces.push(
 			{
 				"value": "NS",
-				"label": "NS-Nova Scotia"
+				"label": "Nova Scotia"
 			});
 			provinces.push(
 			{
 				"value": "NU",
-				"label": "NU-Nunavut"
+				"label": "Nunavut"
 			});
 			provinces.push(
 			{
 				"value": "ON",
-				"label": "ON-Ontario"
+				"label": "Ontario"
 			});
 			provinces.push(
 			{
 				"value": "PE",
-				"label": "PE-Prince Edward Island"
+				"label": "Prince Edward Island"
 			});
 			provinces.push(
 			{
 				"value": "QC",
-				"label": "QC-Quebec"
+				"label": "Quebec"
 			});
 			provinces.push(
 			{
 				"value": "SK",
-				"label": "SK-Saskatchewan"
+				"label": "Saskatchewan"
 			});
 			provinces.push(
 			{
 				"value": "YT",
-				"label": "YT-Yukon"
+				"label": "Yukon"
 			});
 			return provinces;
 		};

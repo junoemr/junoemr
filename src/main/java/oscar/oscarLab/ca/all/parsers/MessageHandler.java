@@ -40,6 +40,7 @@ import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.labs.service.Hl7TextInfoService;
 import org.oscarehr.util.SpringUtils;
+import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
@@ -53,6 +54,7 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public abstract class MessageHandler
 {
@@ -64,6 +66,9 @@ public abstract class MessageHandler
 	protected Message message;
 	protected boolean legacyHandler = false;
 
+	// Embedded PDF strings that show up in OBX messages
+	public static final String embeddedPdfPrefix = "JVBERi0xLj";
+	public static final String pdfReplacement = "embedded_doc_id_";
 
 	public enum OBX_CONTENT_TYPE {
 		UNKNOWN,
@@ -173,12 +178,17 @@ public abstract class MessageHandler
 	public abstract void init(String hl7Body) throws HL7Exception;
 
 	/**
-	 * true if the hl7 spec referenced by this message handler supports embedded pdfs
-	 * @return true if embedded pdfs are supported.
+	 * true if the hl7 spec referenced by this message handler supports embedded documents
+	 * @return true if embedded documents are supported.
 	 */
-	public boolean isSupportEmbeddedPdf()
+	public boolean supportsEmbeddedDocuments()
 	{
 		return false;
+	}
+
+	public List<EmbeddedDocument> getEmbeddedDocuments()
+	{
+		return new ArrayList<>(0);
 	}
 
 	/* ===================================== MSH ====================================== */
@@ -631,6 +641,34 @@ public abstract class MessageHandler
 		}
 
 		return (docNums);
+	}
+
+	/**
+	 * check if the report is marked as blocked. mostly related to OLIS and custom lab imports
+	 * @return true if blocked
+	 */
+	public boolean isReportBlocked()
+	{
+		boolean isBlocked = false;
+		for(int i = 0; i < getOBRCount(); i++)
+		{
+			if(isOBRBlocked(i))
+			{
+				isBlocked = true;
+				break;
+			}
+		}
+		return isBlocked;
+	}
+
+	/**
+	 * check for a blocked marker on an OBR segment
+	 * @param obr segment index
+	 * @return true if blocked
+	 */
+	public boolean isOBRBlocked(int obr)
+	{
+		return false;
 	}
 
 	/* ===================================== OBX ====================================== */
@@ -1275,9 +1313,12 @@ public abstract class MessageHandler
 		try
 		{
 			// Some examples
-			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			java.util.Date date = formatter.parse(dob);
-			age = UtilDateUtilities.calcAge(date);
+			if(StringUtils.isNotBlank(dob))
+			{
+				DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+				java.util.Date date = formatter.parse(dob);
+				age = UtilDateUtilities.calcAge(date);
+			}
 		}
 		catch(ParseException e)
 		{

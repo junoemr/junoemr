@@ -8,7 +8,7 @@
  */
 package org.oscarehr.olis.model;
 
-import java.util.Date;
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,10 +16,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.oscarehr.common.model.AbstractModel;
+import java.util.Date;
+import java.util.Optional;
 @Entity
-public class OLISSystemPreferences extends AbstractModel<Integer> {
+public class OLISSystemPreferences extends AbstractModel<Integer>
+{
+	// olis recommends 30 minute polling interval
+	public static final int DEFAULT_POLLING_FREQUENCY_MIN = 30; // minutes
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,6 +46,11 @@ public class OLISSystemPreferences extends AbstractModel<Integer> {
     	return startTime;
     }
 
+	public Optional<String> getOptionalStartTime()
+	{
+		return Optional.ofNullable(startTime);
+	}
+
 	public void setStartTime(String startTime) {
     	this.startTime = startTime;
     }
@@ -54,10 +62,11 @@ public class OLISSystemPreferences extends AbstractModel<Integer> {
 	public void setEndTime(String endTime) {
     	this.endTime = endTime;
     }
-	
-	public Integer getPollFrequency() {
-    	return pollFrequency;
-    }
+
+	public Optional<Integer> getPollFrequency()
+	{
+		return Optional.ofNullable(pollFrequency);
+	}
 
 	public void setPollFrequency(Integer pollFrequency) {
     	this.pollFrequency = pollFrequency;
@@ -69,8 +78,12 @@ public class OLISSystemPreferences extends AbstractModel<Integer> {
 
 	public void setLastRun(Date lastRun) {
 		this.lastRun = lastRun;
-	}	
-	
+	}
+
+	public Optional<Date> getOptionalLastRunTime()
+	{
+		return Optional.ofNullable(lastRun);
+	}
 	
 
 	public boolean isFilterPatients() {

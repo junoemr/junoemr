@@ -268,7 +268,7 @@ public class ProviderService extends AbstractServiceImpl {
 	@GET
 	@Path("/provider/{id}/edit_form")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<ProviderEditFormTo1> getProviderEditForm(@PathParam("id") Integer id)
+	public RestResponse<ProviderEditFormTo1> getProviderEditForm(@PathParam("id") String id)
 	{
 		return RestResponse.successResponse(providerService.getEditFormForProvider(id, getLoggedInInfo().getLoggedInSecurity()));
 	}

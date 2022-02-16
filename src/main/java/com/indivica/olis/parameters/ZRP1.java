@@ -14,7 +14,10 @@ package com.indivica.olis.parameters;
  * @author jen
  *
  */
-public class ZRP1 implements Parameter {
+public class ZRP1 implements Parameter
+{
+
+	public static final String ID_TYPE_CODE_MDL = "MDL";
 
 	private String idNumber;
 	private String idTypeCode;
@@ -42,9 +45,9 @@ public class ZRP1 implements Parameter {
 		return getQueryCode() + ".1^" + idNumber + "~" + getQueryCode() + ".13^" + idTypeCode + "~" +
 			getQueryCode() + ".22.1^" + (assigningJurisdiction != null ? assigningJurisdiction : "") + "~" +
 			getQueryCode() + ".22.3^" + (assigningJurisdictionCodingSystem != null ? assigningJurisdictionCodingSystem : "") + "~" +
-			getQueryCode() + ".2^" + (name != null ? name : "") + "~" +
-			getQueryCode() + ".3" + (firstName != null ? "^"+firstName : "") + "~" +
-			getQueryCode() + ".4" + (secondName != null ? "^"+secondName : "");
+			getQueryCode() + ".2^" + (name != null ? name : "^") + "~" +
+			getQueryCode() + ".3" + (firstName != null ? "^"+firstName : "^") + "~" +
+			getQueryCode() + ".4" + (secondName != null ? "^"+secondName : "^");
 	}
 
 	@Override
@@ -80,4 +83,8 @@ public class ZRP1 implements Parameter {
 		return "@ZRP.1";
 	}
 
+	public String getIdNumber()
+	{
+		return this.idNumber;
+	}
 }

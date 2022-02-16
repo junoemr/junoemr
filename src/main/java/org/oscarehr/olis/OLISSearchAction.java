@@ -8,34 +8,8 @@
  */
 package org.oscarehr.olis;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.time.DateUtils;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
-import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.common.dao.OscarLogDao;
-import org.oscarehr.common.dao.UserPropertyDAO;
-import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.OscarLog;
-import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.UserProperty;
-import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.MiscUtils;
-import org.oscarehr.util.SpringUtils;
-
 import com.indivica.olis.Driver;
+import com.indivica.olis.DriverResponse;
 import com.indivica.olis.parameters.OBR16;
 import com.indivica.olis.parameters.OBR22;
 import com.indivica.olis.parameters.OBR25;
@@ -44,6 +18,7 @@ import com.indivica.olis.parameters.OBR4;
 import com.indivica.olis.parameters.OBR7;
 import com.indivica.olis.parameters.OBX3;
 import com.indivica.olis.parameters.ORC21;
+import com.indivica.olis.parameters.ORC4;
 import com.indivica.olis.parameters.PID3;
 import com.indivica.olis.parameters.PID51;
 import com.indivica.olis.parameters.PID52;
@@ -54,6 +29,7 @@ import com.indivica.olis.parameters.PV17;
 import com.indivica.olis.parameters.QRD7;
 import com.indivica.olis.parameters.ZBE4;
 import com.indivica.olis.parameters.ZBE6;
+import com.indivica.olis.parameters.ZBR2;
 import com.indivica.olis.parameters.ZBR3;
 import com.indivica.olis.parameters.ZBR4;
 import com.indivica.olis.parameters.ZBR6;
@@ -62,6 +38,7 @@ import com.indivica.olis.parameters.ZBX1;
 import com.indivica.olis.parameters.ZPD1;
 import com.indivica.olis.parameters.ZPD3;
 import com.indivica.olis.parameters.ZRP1;
+import com.indivica.olis.parameters.ZSD;
 import com.indivica.olis.queries.Query;
 import com.indivica.olis.queries.Z01Query;
 import com.indivica.olis.queries.Z02Query;
@@ -71,52 +48,80 @@ import com.indivica.olis.queries.Z06Query;
 import com.indivica.olis.queries.Z07Query;
 import com.indivica.olis.queries.Z08Query;
 import com.indivica.olis.queries.Z50Query;
+import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.common.dao.UserPropertyDAO;
+import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.demographic.model.DemographicModel;
+import org.oscarehr.demographic.service.DemographicService;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
+import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
+import oscar.util.ConversionUtils;
 
-public class OLISSearchAction extends DispatchAction {
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-	private DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
-	private ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
-	
-	public static HashMap<String, Query> searchQueryMap = new HashMap<String, Query>();
+import static com.indivica.olis.parameters.ZPD1.CONSENT_MARKER_SUBSTITUTE;
 
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+public class OLISSearchAction extends DispatchAction
+{
+	private final DemographicService demographicService = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
+	private final ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
+	private final UserPropertyDAO userPropertyDAO = SpringUtils.getBean(UserPropertyDAO.class);
+
+	public static Map<String, Query> searchQueryMap = new HashMap<>();
+
+	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+	{
 
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+		DriverResponse driverResponse = null;
 		
 		String queryType = request.getParameter("queryType");
 		boolean redo = "true".equals(request.getParameter("redo"));
-		if (redo) {
+		if (redo)
+		{
 			String uuid = request.getParameter("uuid");
 			request.setAttribute("searchUuid", uuid);
 			boolean force = "true".equals(request.getParameter("force"));
-			Query q = (Query)searchQueryMap.get(uuid).clone();
-			if (force) { 
-				q.setConsentToViewBlockedInformation(new ZPD1("Z"));
+			String continuationPointer = StringUtils.trimToNull(request.getParameter("continuationPointer"));
 
-				String blockedInfoIndividual = request.getParameter("blockedInformationIndividual");
+			Query query = (Query) searchQueryMap.get(uuid).clone();
+			if(force)
+			{
+				fillConsentOverrideSegments(request, query);
+
 				// Log the consent override
-				OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
-				OscarLog logItem = new OscarLog();
-				logItem.setAction("OLIS search");
-				logItem.setContent("consent override");
-				logItem.setContentId("demographicNo=" + q.getDemographicNo() + ",givenby=" + blockedInfoIndividual);					
-				if (loggedInInfo.getLoggedInProvider() != null) {
-					logItem.setProviderNo(loggedInInfo.getLoggedInProviderNo());
-				}
-				else {
-					logItem.setProviderNo("-1");
-				}
-
-				logItem.setIp(request.getRemoteAddr());
-
-				logDao.persist(logItem);
-
+				logConsentGiven(loggedInInfo.getLoggedInProviderNo(), query.getDemographicNo(), request);
 			}
-			Driver.submitOLISQuery(request, q);
-			
+
+			// ensure the demographic carries through to results when re-submitting queries
+			String demographicNo = StringUtils.trimToNull(request.getParameter("demographic"));
+			if(demographicNo != null)
+			{
+				DemographicModel demo = demographicService.getDemographicModel(Integer.parseInt(demographicNo));
+				request.setAttribute("demographic", demo);
+			}
+
+			driverResponse = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), query, continuationPointer);
 		}
 		else if (queryType != null) {
-			UserPropertyDAO userPropertyDAO = (UserPropertyDAO)SpringUtils.getBean("UserPropertyDAO");
 			Query query = null;
 
 			String[] dateFormat = new String[] {
@@ -198,64 +203,75 @@ public class OLISSearchAction extends DispatchAction {
 				}
 
 
-				String blockedInformationConsent = request.getParameter("blockedInformationConsent");
-
-				if (blockedInformationConsent != null && blockedInformationConsent.trim().length() > 0) {
-					((Z01Query) query).setConsentToViewBlockedInformation(new ZPD1(blockedInformationConsent));
-				}
-
+				fillConsentOverrideSegments(request, query);
 
 				String consentBlockAllIndicator = request.getParameter("consentBlockAllIndicator");
-
-				if (consentBlockAllIndicator != null && consentBlockAllIndicator.trim().length() > 0) {
+				if(StringUtils.isNotBlank(consentBlockAllIndicator))
+				{
 					((Z01Query) query).setPatientConsentBlockAllIndicator(new ZPD3("Y"));
 				}
 
 
 				String specimenCollector = request.getParameter("specimenCollector");
-
-				if (specimenCollector != null && specimenCollector.trim().length() > 0) {
-					((Z01Query) query).setSpecimenCollector(new ZBR3(specimenCollector, "ISO"));
+				if(StringUtils.isNotBlank(specimenCollector))
+				{
+					((Z01Query) query).setSpecimenCollector(new ZBR3(specimenCollector, ZBR3.UNIVERSAL_ID_ISO));
 				}
 
 
 				String performingLaboratory = request.getParameter("performingLaboratory");
-
-				if (performingLaboratory != null && performingLaboratory.trim().length() > 0) {
-					((Z01Query) query).setPerformingLaboratory(new ZBR6(performingLaboratory, "ISO"));
+				if(StringUtils.isNotBlank(performingLaboratory))
+				{
+					((Z01Query) query).setPerformingLaboratory(new ZBR6(performingLaboratory, ZBR6.UNIVERSAL_ID_ISO));
 				}
 
 
 				String excludePerformingLaboratory = request.getParameter("excludePerformingLaboratory");
-
-				if (excludePerformingLaboratory != null && excludePerformingLaboratory.trim().length() > 0) {
-					((Z01Query) query).setExcludePerformingLaboratory(new ZBE6(excludePerformingLaboratory, "ISO"));
+				if(StringUtils.isNotBlank(excludePerformingLaboratory))
+				{
+					((Z01Query) query).setExcludePerformingLaboratory(new ZBE6(excludePerformingLaboratory, ZBE6.UNIVERSAL_ID_ISO));
 				}
 
 
 				String reportingLaboratory = request.getParameter("reportingLaboratory");
-
-				if (reportingLaboratory != null && reportingLaboratory.trim().length() > 0) {
-					((Z01Query) query).setReportingLaboratory(new ZBR4(reportingLaboratory, "ISO"));
+				if(StringUtils.isNotBlank(reportingLaboratory))
+				{
+					((Z01Query) query).setReportingLaboratory(new ZBR4(reportingLaboratory, ZBR4.UNIVERSAL_ID_ISO));
 				}
 
 
 				String excludeReportingLaboratory = request.getParameter("excludeReportingLaboratory");
 
-				if (excludeReportingLaboratory != null && excludeReportingLaboratory.trim().length() > 0) {
-					((Z01Query) query).setExcludeReportingLaboratory(new ZBE4(excludeReportingLaboratory, "ISO"));
+				if(StringUtils.isNotBlank(excludeReportingLaboratory))
+				{
+					((Z01Query) query).setExcludeReportingLaboratory(new ZBE4(excludeReportingLaboratory, ZBE4.UNIVERSAL_ID_ISO));
+				}
+
+				String testRequestPlacer = request.getParameter("testRequestPlacer");
+				if(StringUtils.isNotBlank(testRequestPlacer))
+				{
+					((Z01Query) query).setTestResultPlacer(new ZBR2(testRequestPlacer, ZBR2.UNIVERSAL_ID_ISO));
 				}
 
 
 				// Patient Identifier (PID.3 -- pull data from db and add to query)
 				String demographicNo = request.getParameter("demographic");
 				query.setDemographicNo(demographicNo);
+
 				try {
 					if (demographicNo != null && demographicNo.trim().length() > 0) {
-						Demographic demo = demographicDao.getDemographic(demographicNo);
+						DemographicModel demo = demographicService.getDemographicModel(Integer.parseInt(demographicNo));
+						request.setAttribute("demographic", demo);
 
-						PID3 pid3 = new PID3(demo.getHin(), null, null, "JHN", demo.getHcType(), "HL70347", demo.getSex(), null);
-						pid3.setValue(7, DateUtils.parseDate(demo.getYearOfBirth() + "-" + demo.getMonthOfBirth() + "-" + demo.getDateOfBirth(), dateFormat));
+						PID3 pid3 = new PID3(demo.getHealthNumber(),
+								null,
+								null,
+								PID3.ID_TYPE_CODE_JHN,
+								demo.getHealthNumberProvinceCode(),
+								PID3.ASSIGNING_JURISDICTION_CODING_SYSTEM,
+								demo.getSexString(),
+								null);
+						pid3.setValue(7, ConversionUtils.toLegacyDate(demo.getDateOfBirth()));
 
 						((Z01Query) query).setPatientIdentifier(pid3);
 					}
@@ -267,18 +283,25 @@ public class OLISSearchAction extends DispatchAction {
 				// Requesting HIC (ZRP.1 -- pull data from db and add to query)
 				String requestingHicProviderNo = request.getParameter("requestingHic");
 
-				try {
-					if (requestingHicProviderNo != null && requestingHicProviderNo.trim().length() > 0) {
-						Provider provider = providerDao.getProvider(requestingHicProviderNo);
-						
-						ZRP1 zrp1 = new ZRP1(provider.getPractitionerNo(), userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_OLIS_IDTYPE), "ON", "HL70347", 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_LAST_NAME), 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_FIRST_NAME), 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_SECOND_NAME));
+				try
+				{
+					if(StringUtils.isNotBlank(requestingHicProviderNo))
+					{
+						ProviderData provider = providerDao.find(requestingHicProviderNo);
+
+						ZRP1 zrp1 = new ZRP1(provider.getOlisPractitionerNo(),
+								userPropertyDAO.getStringValue(provider.getId(), UserProperty.OFFICIAL_OLIS_IDTYPE),
+								ZRP1.ASSIGNING_JURISDICTION,
+								ZRP1.ASSIGNING_JURISDICTION_CODING_SYSTEM,
+								userPropertyDAO.getStringValue(provider.getId(), UserProperty.OFFICIAL_LAST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(), UserProperty.OFFICIAL_FIRST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(), UserProperty.OFFICIAL_SECOND_NAME));
 
 						((Z01Query) query).setRequestingHic(zrp1);
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't add requested requesting HIC data to OLIS query", e);
 				}
 
@@ -286,103 +309,128 @@ public class OLISSearchAction extends DispatchAction {
 				// OBR.16
 				String orderingPractitionerProviderNo = request.getParameter("orderingPractitioner");
 
-				try {
-					if (orderingPractitionerProviderNo != null && orderingPractitionerProviderNo.trim().length() > 0) {
-						OBR16 obr16 = new OBR16(orderingPractitionerProviderNo, "MDL", "ON", "HL70347");
+				try
+				{
+					if(StringUtils.isNotBlank(orderingPractitionerProviderNo))
+					{
+						ProviderData orderingProvider = providerDao.find(orderingPractitionerProviderNo);
+						OBR16 obr16 = new OBR16(
+								orderingProvider.getOlisPractitionerNo(),
+								userPropertyDAO.getStringValue(orderingProvider.getId(), UserProperty.OFFICIAL_OLIS_IDTYPE),
+								OBR16.ASSIGNING_JURISDICTION,
+								OBR16.ASSIGNING_JURISDICTION_CODING_SYSTEM);
 
 						((Z01Query) query).setOrderingPractitioner(obr16);
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't add requested ordering practitioner data to OLIS query", e);
 				}
 
 
 				String copiedToPractitionerProviderNo = request.getParameter("copiedToPractitioner");
 
-				try {
-					if (copiedToPractitionerProviderNo != null && copiedToPractitionerProviderNo.trim().length() > 0) {
-						OBR28 obr28 = new OBR28(copiedToPractitionerProviderNo, "MDL", "ON", "HL70347");
+				try
+				{
+					if(StringUtils.isNotBlank(copiedToPractitionerProviderNo))
+					{
+						ProviderData ccProvider = providerDao.find(copiedToPractitionerProviderNo);
+						OBR28 obr28 = new OBR28(
+								ccProvider.getOlisPractitionerNo(),
+								userPropertyDAO.getStringValue(ccProvider.getId(), UserProperty.OFFICIAL_OLIS_IDTYPE),
+								OBR28.ASSIGNING_JURISDICTION,
+								OBR28.ASSIGNING_JURISDICTION_CODING_SYSTEM);
 
 						((Z01Query) query).setCopiedToPractitioner(obr28);
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't add requested copied to practitioner data to OLIS query", e);
 				}
 
 
 				String attendingPractitionerProviderNo = request.getParameter("attendingPractitioner");
 
-				try {
-					if (attendingPractitionerProviderNo != null && attendingPractitionerProviderNo.trim().length() > 0) {
-						PV17 pv17 = new PV17(attendingPractitionerProviderNo, "MDL", "ON", "HL70347");
+				try
+				{
+					if(StringUtils.isNotBlank(attendingPractitionerProviderNo))
+					{
+						ProviderData attendingProvider = providerDao.find(attendingPractitionerProviderNo);
+						PV17 pv17 = new PV17(
+								attendingProvider.getOlisPractitionerNo(),
+								userPropertyDAO.getStringValue(attendingProvider.getId(), UserProperty.OFFICIAL_OLIS_IDTYPE),
+								PV17.ASSIGNING_JURISDICTION,
+								PV17.ASSIGNING_JURISDICTION_CODING_SYSTEM
+						);
 
 						((Z01Query) query).setAttendingPractitioner(pv17);
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't add requested attending practitioner data to OLIS query", e);
 				}
 
 
 				String admittingPractitionerProviderNo = request.getParameter("admittingPractitioner");
 
-				try {
-					if (admittingPractitionerProviderNo != null && admittingPractitionerProviderNo.trim().length() > 0) {
-						PV117 pv117 = new PV117(admittingPractitionerProviderNo, "MDL", "ON", "HL70347");
+				try
+				{
+					if(StringUtils.isNotBlank(admittingPractitionerProviderNo))
+					{
+						ProviderData admittingProvider = providerDao.find(admittingPractitionerProviderNo);
+						PV117 pv117 = new PV117(
+								admittingProvider.getOlisPractitionerNo(),
+								userPropertyDAO.getStringValue(admittingProvider.getId(), UserProperty.OFFICIAL_OLIS_IDTYPE),
+								PV117.ASSIGNING_JURISDICTION,
+								PV117.ASSIGNING_JURISDICTION_CODING_SYSTEM);
 
 						((Z01Query) query).setAdmittingPractitioner(pv117);
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't add requested admitting practitioner data to OLIS query", e);
 				}
 
-
-				// TODO-legacy: Add placer group number
+				String orderingFacilityId = request.getParameter("orderingFacility");
+				String placeGroupNumber = request.getParameter("placerGroupNumber");
+				if(StringUtils.isNotBlank(orderingFacilityId) && StringUtils.isNotBlank(placeGroupNumber))
+				{
+					((Z01Query) query).setPlacerGroupNumber(new ORC4(placeGroupNumber, orderingFacilityId, ORC4.UNIVERSAL_ID_ISO));
+				}
 
 				String[] testRequestStatusList = request.getParameterValues("testRequestStatus");
-
-				if (testRequestStatusList != null) {
-					for (String testRequestStatus : testRequestStatusList) {
+				if(testRequestStatusList != null)
+				{
+					for(String testRequestStatus : testRequestStatusList)
+					{
 						((Z01Query) query).addToTestRequestStatusList(new OBR25(testRequestStatus));
 					}
 				}
 
 				String[] testResultCodeList = request.getParameterValues("testResultCode");
-
-				if (testResultCodeList != null) {
-					for (String testResultCode : testResultCodeList) {
-						((Z01Query) query).addToTestResultCodeList(new OBX3(testResultCode, "HL79902"));
+				if(testResultCodeList != null)
+				{
+					for(String testResultCode : testResultCodeList)
+					{
+						((Z01Query) query).addToTestResultCodeList(new OBX3(testResultCode, OBX3.ASSIGNING_JURISDICTION_CODING_SYSTEM));
 					}
 				}
-
 
 				String[] testRequestCodeList = request.getParameterValues("testRequestCode");
-
-				if (testRequestCodeList != null) {
-					for (String testRequestCode : testRequestCodeList) {
-						((Z01Query) query).addToTestRequestCodeList(new OBR4(testRequestCode, "HL79901"));
+				if(testRequestCodeList != null)
+				{
+					for(String testRequestCode : testRequestCodeList)
+					{
+						((Z01Query) query).addToTestRequestCodeList(new OBR4(testRequestCode, OBR4.ASSIGNING_JURISDICTION_CODING_SYSTEM));
 					}
 				}
 
-				String blockedInfoConsent = request.getParameter("blockedInformationConsent");
-				String blockedInfoIndividual = request.getParameter("blockedInformationIndividual");
-
-				if (blockedInfoConsent != null && blockedInfoConsent.equalsIgnoreCase("Z")) {
-					// Log the consent override
-					OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
-					OscarLog logItem = new OscarLog();
-					logItem.setAction("OLIS search");
-					logItem.setContent("consent override");
-					logItem.setContentId("demographicNo=" + demographicNo + ",givenby=" + blockedInfoIndividual);					
-					if (loggedInInfo.getLoggedInProvider() != null)
-						logItem.setProviderNo(loggedInInfo.getLoggedInProviderNo());
-					else
-						logItem.setProviderNo("-1");
-
-					logItem.setIp(request.getRemoteAddr());
-					
-					logDao.persist(logItem);
-
-				}
+				// Log the consent override
+				logConsentGiven(loggedInInfo.getLoggedInProviderNo(), demographicNo, request);
 
 			} else if (queryType.equalsIgnoreCase("Z02")) {
 				query = new Z02Query();
@@ -398,13 +446,7 @@ public class OLISSearchAction extends DispatchAction {
 					MiscUtils.getLogger().error("Can't set retrieve all results option on OLIS query", e);
 				}
 
-
-				String blockedInformationConsent = request.getParameter("blockedInformationConsent");
-
-				if (blockedInformationConsent != null && blockedInformationConsent.trim().length() > 0) {
-					((Z02Query) query).setConsentToViewBlockedInformation(new ZPD1(blockedInformationConsent));
-				}
-
+				fillConsentOverrideSegments(request, query);
 
 				String consentBlockAllIndicator = request.getParameter("consentBlockAllIndicator");
 
@@ -418,12 +460,15 @@ public class OLISSearchAction extends DispatchAction {
 
 				try {
 					if (requestingHicProviderNo != null && requestingHicProviderNo.trim().length() > 0) {
-						Provider provider = providerDao.getProvider(requestingHicProviderNo);
+						ProviderData provider = providerDao.find(requestingHicProviderNo);
 
-						ZRP1 zrp1 = new ZRP1(provider.getPractitionerNo(), "MDL", "ON", "HL70347", 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_LAST_NAME), 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_FIRST_NAME), 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_SECOND_NAME));
+						ZRP1 zrp1 = new ZRP1(provider.getOlisPractitionerNo(),
+								ZRP1.ID_TYPE_CODE_MDL,
+								ZRP1.ASSIGNING_JURISDICTION,
+								ZRP1.ASSIGNING_JURISDICTION_CODING_SYSTEM,
+								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_LAST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_FIRST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(),UserProperty.OFFICIAL_SECOND_NAME));
 
 						((Z02Query) query).setRequestingHic(zrp1);
 					}
@@ -438,10 +483,19 @@ public class OLISSearchAction extends DispatchAction {
 
 				try {
 					if (demographicNo != null && demographicNo.trim().length() > 0) {
-						Demographic demo = demographicDao.getDemographic(demographicNo);
 
-						PID3 pid3 = new PID3(demo.getHin(), null, null, "JHN", demo.getHcType(), "HL70347", demo.getSex(), null);
-						pid3.setValue(7, DateUtils.parseDate(demo.getYearOfBirth() + "-" + demo.getMonthOfBirth() + "-" + demo.getDateOfBirth(), dateFormat));
+						DemographicModel demo = demographicService.getDemographicModel(Integer.parseInt(demographicNo));
+						request.setAttribute("demographic", demo);
+
+						PID3 pid3 = new PID3(demo.getHealthNumber(),
+								null,
+								null,
+								PID3.ID_TYPE_CODE_JHN,
+								demo.getHealthNumberProvinceCode(),
+								PID3.ASSIGNING_JURISDICTION_CODING_SYSTEM,
+								demo.getSexString(),
+								null);
+						pid3.setValue(7, ConversionUtils.toLegacyDate(demo.getDateOfBirth()));
 
 						((Z02Query) query).setPatientIdentifier(pid3);
 					}
@@ -449,59 +503,46 @@ public class OLISSearchAction extends DispatchAction {
 					MiscUtils.getLogger().error("Can't add requested patient data to OLIS query", e);
 				}
 
+				String orderingFacilityId = request.getParameter("orderingFacility");
+				String placeGroupNumber = request.getParameter("placerGroupNumber");
+				((Z02Query) query).setPlacerGroupNumber(new ORC4(placeGroupNumber, orderingFacilityId, ORC4.UNIVERSAL_ID_ISO));
 
-				// TODO-legacy: Add placer group number
-
-
-				String blockedInfoConsent = request.getParameter("blockedInformationConsent");
-				String blockedInfoIndividual = request.getParameter("blockedInformationIndividual");
-
-				if (blockedInfoConsent != null && blockedInfoConsent.equalsIgnoreCase("Z")) {
-					// Log the consent override
-					OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
-					OscarLog logItem = new OscarLog();
-					logItem.setAction("OLIS search");
-					logItem.setContent("consent override");
-					logItem.setContentId("demographicNo=" + demographicNo + ",givenby=" + blockedInfoIndividual);					
-					if (loggedInInfo.getLoggedInProvider() != null)
-						logItem.setProviderNo(loggedInInfo.getLoggedInProviderNo());
-					else
-						logItem.setProviderNo("-1");
-
-					logItem.setIp(request.getRemoteAddr());
-
-					logDao.persist(logItem);
-				}
+				// Log the consent override
+				logConsentGiven(loggedInInfo.getLoggedInProviderNo(), demographicNo, request);
 
 
-			} else if (queryType.equalsIgnoreCase("Z04")) {
+			}
+			else if (queryType.equalsIgnoreCase("Z04"))
+			{
 				query = new Z04Query();
 
 				String startTimePeriod = request.getParameter("startTimePeriod");
 				String endTimePeriod = request.getParameter("endTimePeriod");
 
-				try {
-					if (startTimePeriod != null && startTimePeriod.trim().length() > 0) {
+				try
+				{
+					OBR22 obr22 = new OBR22();
+					if(StringUtils.isNotBlank(startTimePeriod))
+					{
 						Date startTime = DateUtils.parseDate(startTimePeriod, dateFormat);
-						if (endTimePeriod != null && endTimePeriod.trim().length() > 0) {
+						if(StringUtils.isNotBlank(endTimePeriod))
+						{
 							Date endTime = changeToEndOfDay(DateUtils.parseDate(endTimePeriod, dateFormat));
 
-							List<Date> dateList = new LinkedList<Date>();
+							List<Date> dateList = new LinkedList<>();
 							dateList.add(startTime);
 							dateList.add(endTime);
-
-							OBR22 obr22 = new OBR22();
 							obr22.setValue(dateList);
-
-							((Z04Query) query).setStartEndTimestamp(obr22);
-						} else {
-							OBR22 obr22 = new OBR22();
-							obr22.setValue(startTime);
-
-							((Z04Query) query).setStartEndTimestamp(obr22);
 						}
+						else
+						{
+							obr22.setValue(startTime);
+						}
+						((Z04Query) query).setStartEndTimestamp(obr22);
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't parse date given for OLIS query", e);
 				}
 
@@ -509,12 +550,16 @@ public class OLISSearchAction extends DispatchAction {
 				String quantityLimitedQuery = request.getParameter("quantityLimitedQuery");
 				String quantityLimit = request.getParameter("quantityLimit");
 
-				try {
-					if (quantityLimitedQuery != null && quantityLimitedQuery.trim().length() > 0) {
+				try
+				{
+					if(quantityLimitedQuery != null && quantityLimitedQuery.trim().length() > 0)
+					{
 						// Checked
 						((Z04Query) query).setQuantityLimitedRequest(new QRD7(Integer.parseInt(quantityLimit)));
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't parse the number given for quantity limit in OLIS query", e);
 				}
 
@@ -522,18 +567,25 @@ public class OLISSearchAction extends DispatchAction {
 				// Requesting HIC (ZRP.1 -- pull data from db and add to query)
 				String requestingHicProviderNo = request.getParameter("requestingHic");
 
-				try {
-					if (requestingHicProviderNo != null && requestingHicProviderNo.trim().length() > 0) {
-						Provider provider = providerDao.getProvider(requestingHicProviderNo);
+				try
+				{
+					if(StringUtils.isNotBlank(requestingHicProviderNo))
+					{
+						ProviderData provider = providerDao.find(requestingHicProviderNo);
 
-						ZRP1 zrp1 = new ZRP1(provider.getPractitionerNo(), "MDL", "ON", "HL70347", 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_LAST_NAME), 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_FIRST_NAME), 
-								userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_SECOND_NAME));
+						ZRP1 zrp1 = new ZRP1(provider.getOlisPractitionerNo(),
+								ZRP1.ID_TYPE_CODE_MDL,
+								ZRP1.ASSIGNING_JURISDICTION,
+								ZRP1.ASSIGNING_JURISDICTION_CODING_SYSTEM,
+								userPropertyDAO.getStringValue(provider.getId(), UserProperty.OFFICIAL_LAST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(), UserProperty.OFFICIAL_FIRST_NAME),
+								userPropertyDAO.getStringValue(provider.getId(), UserProperty.OFFICIAL_SECOND_NAME));
 
 						((Z04Query) query).setRequestingHic(zrp1);
 					}
-				} catch (Exception e) {
+				}
+				catch(Exception e)
+				{
 					MiscUtils.getLogger().error("Can't add requested requesting HIC data to OLIS query", e);
 				}
 
@@ -542,7 +594,7 @@ public class OLISSearchAction extends DispatchAction {
 
 				if (testResultCodeList != null) {
 					for (String testResultCode : testResultCodeList) {
-						((Z04Query) query).addToTestResultCodeList(new OBX3(testResultCode, "HL79902"));
+						((Z04Query) query).addToTestResultCodeList(new OBX3(testResultCode, OBX3.ASSIGNING_JURISDICTION_CODING_SYSTEM));
 					}
 				}
 
@@ -551,7 +603,7 @@ public class OLISSearchAction extends DispatchAction {
 
 				if (testRequestCodeList != null) {
 					for (String testRequestCode : testRequestCodeList) {
-						((Z04Query) query).addToTestRequestCodeList(new OBR4(testRequestCode, "HL79901"));
+						((Z04Query) query).addToTestRequestCodeList(new OBR4(testRequestCode, OBR4.ASSIGNING_JURISDICTION_CODING_SYSTEM));
 					}
 				}
 
@@ -604,8 +656,9 @@ public class OLISSearchAction extends DispatchAction {
 
 				String destinationLaboratory = request.getParameter("destinationLaboratory");
 
-				if (destinationLaboratory != null && destinationLaboratory.trim().length() > 0) {
-					((Z05Query) query).setDestinationLaboratory(new ZBR8(destinationLaboratory, "ISO"));
+				if(StringUtils.isNotBlank(destinationLaboratory))
+				{
+					((Z05Query) query).setDestinationLaboratory(new ZBR8(destinationLaboratory, ZBR8.UNIVERSAL_ID_ISO));
 				}
 
 			} else if (queryType.equalsIgnoreCase("Z06")) {
@@ -657,7 +710,7 @@ public class OLISSearchAction extends DispatchAction {
 				String orderingFacility = request.getParameter("orderingFacility");
 
 				if (orderingFacility != null && orderingFacility.trim().length() > 0) {
-					((Z06Query) query).setOrderingFacilityId(new ORC21(orderingFacility, "^ISO"));
+					((Z06Query) query).setOrderingFacilityId(new ORC21(orderingFacility, ORC21.UNIVERSAL_ID_ISO));
 				}
 
 			} else if (queryType.equalsIgnoreCase("Z07")) {
@@ -790,24 +843,64 @@ public class OLISSearchAction extends DispatchAction {
 			String searchUuid = UUID.randomUUID().toString();
 			searchQueryMap.put(searchUuid, query);
 			request.setAttribute("searchUuid", searchUuid);
-			if(queryType.equals("Z04") && request.getParameterValues("requestingHic") != null && request.getParameterValues("requestingHic").length>1) {
-				for(String providerNo:request.getParameterValues("requestingHic")) {
-					Provider provider = providerDao.getProvider(providerNo);
-					ZRP1 zrp1 = new ZRP1(provider.getPractitionerNo(), "MDL", "ON", "HL70347", 
-							userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_LAST_NAME), 
-							userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_FIRST_NAME), 
-							userPropertyDAO.getStringValue(provider.getProviderNo(),UserProperty.OFFICIAL_SECOND_NAME));
-					((Z04Query) query).setRequestingHic(zrp1);
-					Driver.submitOLISQuery(request, query);
-				}
-			} else {
-				Driver.submitOLISQuery(request, query);
-			}
 
+			driverResponse = Driver.submitOLISQuery(loggedInInfo.getLoggedInProvider(), query);
+		}
+
+		if(driverResponse != null)
+		{
+			request.setAttribute("olisResponseContent", driverResponse.getHl7Response());
+			request.setAttribute("errors", driverResponse.getErrors());
+			request.setAttribute("searchException", driverResponse.getSearchException());
+
+			driverResponse.getContinuationPointer().ifPresent(s -> request.setAttribute("continuationPointer", s));
 		}
 		
 		return mapping.findForward("results");
 	
+	}
+
+	private void fillConsentOverrideSegments(HttpServletRequest request, Query query)
+	{
+		String blockedInformationConsent = StringUtils.trimToNull(request.getParameter("blockedInformationConsent"));
+		String blockedInfoIndividual = StringUtils.trimToNull(request.getParameter("blockedInformationIndividual"));
+
+		if(StringUtils.isNotBlank(blockedInformationConsent))
+		{
+			query.setConsentToViewBlockedInformation(new ZPD1(blockedInfoIndividual));
+
+			if(CONSENT_MARKER_SUBSTITUTE.equals(blockedInfoIndividual))
+			{
+				String substituteGivenName = StringUtils.trimToNull(request.getParameter("substituteGivenName"));
+				String substituteLastName = StringUtils.trimToNull(request.getParameter("substituteLastName"));
+				String substituteRelationship = StringUtils.trimToNull(request.getParameter("substituteRelationship"));
+
+				query.setSubstituteDecisionMakerInfo(
+						new ZSD(substituteGivenName, substituteLastName, ZSD.RelationshipToPatient.valueOf(substituteRelationship)));
+			}
+		}
+	}
+
+	private void logConsentGiven(String loggedInProviderId, String demographicIdStr, HttpServletRequest request)
+	{
+		String providerNo = StringUtils.isBlank(loggedInProviderId) ? ProviderData.SYSTEM_PROVIDER_NO : loggedInProviderId;
+		Integer demographicId = StringUtils.isBlank(demographicIdStr) ? null : Integer.parseInt(demographicIdStr);
+
+		String blockedInformationConsent = StringUtils.trimToNull(request.getParameter("blockedInformationConsent"));
+		String blockedInfoIndividual = StringUtils.trimToNull(request.getParameter("blockedInformationIndividual"));
+		if(StringUtils.isNotBlank(blockedInformationConsent))
+		{
+			String givenBy = "patient";
+			if(CONSENT_MARKER_SUBSTITUTE.equals(blockedInfoIndividual))
+			{
+				String substituteGivenName = StringUtils.trimToNull(request.getParameter("substituteGivenName"));
+				String substituteLastName = StringUtils.trimToNull(request.getParameter("substituteLastName"));
+				givenBy = substituteLastName + ", " + substituteGivenName;
+			}
+
+			LogAction.addLogEntry(providerNo, demographicId, LogConst.ACTION_READ, LogConst.CON_OLIS_LAB, LogConst.STATUS_SUCCESS, null, request.getRemoteAddr(),
+					"consent override given by: " + givenBy);
+		}
 	}
 	
 	private Date changeToEndOfDay(Date d) {

@@ -53,6 +53,11 @@
 		color: #333333;
 	}
 
+	#swipe-health-card-button {
+		button {
+			border-color: var(--theme-color-primary-base);
+		}
+	}
 
 	#save-button {
 		width: 100%;

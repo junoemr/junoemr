@@ -14,78 +14,132 @@
  */
 package oscar.oscarLab.ca.all.upload.handlers;
 
-import java.util.ArrayList;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.Hl7TextInfoDao;
+import org.oscarehr.common.model.ProviderLabRoutingModel;
 import org.oscarehr.olis.OLISUtils;
+import org.oscarehr.olis.exception.OLISAckFailedException;
 import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.util.SpringUtils;
-
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.upload.MessageUploader;
 import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 import oscar.oscarLab.ca.all.upload.RouteReportResults;
 import oscar.oscarLab.ca.all.util.Utilities;
+import oscar.util.ConversionUtils;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+
+import static org.oscarehr.olis.service.OLISPollingService.OLIS_DATE_FORMAT;
+import static oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler.OLIS_MESSAGE_TYPE;
 
 /**
  * 
  */
-public class OLISHL7Handler implements MessageHandler {
-
-	Logger logger = Logger.getLogger(OLISHL7Handler.class);
-	Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
-	
+public class OLISHL7Handler implements MessageHandler
+{
+	public static final String ALL_DUPLICATES_MARKER = "All Labs Duplicates";
+	private static final Logger logger = Logger.getLogger(OLISHL7Handler.class);
 	private int lastSegmentId = 0;
 	
-	public OLISHL7Handler() {
+	public OLISHL7Handler()
+	{
 		logger.info("NEW OLISHL7Handler UPLOAD HANDLER instance just instantiated. ");
 	}
 
-	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, String ipAddr) {
-		return parse(loggedInInfo, serviceName,fileName,fileId, false);
+	@Override
+	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, String ipAddr) throws Exception
+	{
+		return parse(loggedInInfo, serviceName, fileName, fileId, false, true);
 	}
-	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, boolean routeToCurrentProvider) {		
-		int i = 0;
-		String lastTimeStampAccessed = null;
+
+	public String parse(LoggedInInfo loggedInInfo, String serviceName, String fileName, int fileId, boolean routeToCurrentProvider, boolean checkQAKStatus) throws Exception
+	{
+		String lastTimeStampAccessed = ALL_DUPLICATES_MARKER;
 		RouteReportResults results = new RouteReportResults();
-		
-				try {
-			ArrayList<String> messages = Utilities.separateMessages(fileName);
-			
-			for (i = 0; i < messages.size(); i++) {
-				String msg = messages.get(i);
-				logger.info(msg);
-				
-				lastTimeStampAccessed = getLastUpdateInOLIS(msg) ;
-				
-				if(OLISUtils.isDuplicate(loggedInInfo, msg)) {
-					continue; 
-				}
-				MessageUploader.routeReport(loggedInInfo, serviceName,"OLIS_HL7", msg.replace("\\E\\", "\\SLASHHACK\\").replace("µ", "\\MUHACK\\").replace("\\H\\", "\\.H\\").replace("\\N\\", "\\.N\\"), fileId, results);
-				if (routeToCurrentProvider) {
-					ProviderLabRouting routing = new ProviderLabRouting();
-					routing.route(results.segmentId, loggedInInfo.getLoggedInProviderNo(), DbConnectionFilter.getThreadLocalDbConnection(), "HL7");
-					this.lastSegmentId = results.segmentId;
-				}
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(OLIS_DATE_FORMAT);
+
+		ArrayList<String> messages = Utilities.separateMessages(fileName);
+
+		// Only the first olis message in a batch will have a QAK acknowledge segment.
+		// The message is spit up so that each PID becomes its own message in the system,
+		// with a copy of the initial MSH segment (OLIS only sends 1 in the results batch).
+		// so if the ack is bad fail the batch.
+		if(checkQAKStatus && !messages.isEmpty())
+		{
+			String messageWithQAK = Utilities.fixLineBreaks(messages.get(0), "\\.br\\");
+			oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler parser = (oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler) Factory.getHandler(OLIS_MESSAGE_TYPE, messageWithQAK);
+
+			if(!parser.canUpload())
+			{
+				throw new OLISAckFailedException("OLIS QAK status is not OK", parser.getAckStatus(), parser.getReportErrors());
 			}
-			logger.info("Parsed OK");
-		} catch (Exception e) {
-			logger.error("Could not upload message", e);
-			return null;
 		}
+
+		// process all messages
+		for(String msg : messages)
+		{
+			msg = Utilities.fixLineBreaks(msg, "\\.br\\");
+			oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler parser = (oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler) Factory.getHandler(OLIS_MESSAGE_TYPE, msg);
+
+			// skip uploading duplicates
+			if(OLISUtils.isDuplicate(loggedInInfo, parser, msg))
+			{
+				logger.warn("Duplicate OLIS lab detected (AccessionNo: " + parser.getAccessionNum() + "). Upload skipped.");
+				continue;
+			}
+			// always use the last obr date as the latest timestamp seen
+			lastTimeStampAccessed = getLatest(dateTimeFormatter, lastTimeStampAccessed, StringUtils.trimToNull(parser.getLastUpdateInOLISUnformatted()));
+
+			MessageUploader.routeReport(
+					loggedInInfo.getLoggedInProviderNo(),
+					serviceName,
+					parser,
+					OLIS_MESSAGE_TYPE,
+					msg,
+					fileId,
+					results);
+			if(routeToCurrentProvider)
+			{
+				ProviderLabRouting routing = new ProviderLabRouting();
+				routing.route(results.segmentId, loggedInInfo.getLoggedInProviderNo(), DbConnectionFilter.getThreadLocalDbConnection(), ProviderLabRoutingModel.LAB_TYPE_LABS);
+				this.lastSegmentId = results.segmentId;
+			}
+		}
+		logger.info("Parsed OK");
 		return lastTimeStampAccessed;
 	}
-	
-	public int getLastSegmentId() {
+
+	public int getLastSegmentId()
+	{
 		return this.lastSegmentId;
 	}
-	//TODO-legacy: check HIN
-	//TODO-legacy: check # of results
-	
-	private String getLastUpdateInOLIS(String msg) {
-		oscar.oscarLab.ca.all.parsers.OLISHL7Handler h = (oscar.oscarLab.ca.all.parsers.OLISHL7Handler) Factory.getHandler("OLIS_HL7", msg);
-		return h.getLastUpdateInOLISUnformated();	
+
+	private String getLatest(DateTimeFormatter dateTimeFormatter, String timeStamp1, String timeStamp2)
+	{
+		timeStamp1 = (ALL_DUPLICATES_MARKER.equals(timeStamp1)) ? null : timeStamp1;
+		timeStamp2 = (ALL_DUPLICATES_MARKER.equals(timeStamp2)) ? null : timeStamp2;
+
+		if(timeStamp1 == null && timeStamp2 == null)
+		{
+			return null;
+		}
+		else if (timeStamp1 == null)
+		{
+			return timeStamp2;
+		}
+		else if (timeStamp2 == null)
+		{
+			return timeStamp1;
+		}
+		else
+		{
+			ZonedDateTime zonedTime1 = ConversionUtils.toZonedDateTime(timeStamp1, dateTimeFormatter);
+			ZonedDateTime zonedTime2 = ConversionUtils.toZonedDateTime(timeStamp2, dateTimeFormatter);
+			ZonedDateTime latest = (zonedTime1.isAfter(zonedTime2)) ? zonedTime1 : zonedTime2;
+			return ConversionUtils.toDateTimeString(latest, dateTimeFormatter);
+		}
 	}
 }

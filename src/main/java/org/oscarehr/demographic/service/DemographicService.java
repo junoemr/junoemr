@@ -141,6 +141,11 @@ public class DemographicService
 		return DemographicConverter.getAsTransferObject(demographic, demographicExtList, demoCustom);
 	}
 
+	public DemographicModel getDemographicModel(Integer demographicId)
+	{
+		return demographicDbToModelConverter.convert(demographicDao.find(demographicId));
+	}
+
 	public SEARCH_MODE searchModeStringToEnum(String searchMode)
 	{
 		switch(searchMode)

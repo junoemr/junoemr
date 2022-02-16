@@ -7,6 +7,10 @@
 		width: var(--juno-select-label-width);
 	}
 
+	span.required-icon {
+		color: var(--color-red-base);
+	}
+
 	.select-container {
 		@include juno-form-inputs-style(1px, var(--theme-form-field-border-radius));
 		@include juno-form-inputs-colors-default();
@@ -20,6 +24,7 @@
 			appearance: none;
 			cursor: pointer;
 			background-image: none;
+			outline: none;
 
 			width: 100%;
 			padding: 0 32px 0 16px;

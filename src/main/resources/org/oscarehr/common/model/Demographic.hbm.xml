@@ -15,6 +15,7 @@
 		</id>
 		<property column="title" name="title" type="string" />
 		<property column="first_name" length="30" name="FirstName" not-null="true" type="string" />
+		<property column="middle_name" length="30" name="MiddleName" not-null="false" type="string" />
 		<property column="last_name" length="30" name="LastName" not-null="true" type="string" />
 		<property column="sex" length="1" name="Sex" not-null="true" type="string" />
 		<property name="SexDesc" not-null="true" type="string" formula="(select lst.description from lst_gender lst where lst.code=sex)" />

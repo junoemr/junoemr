@@ -121,10 +121,14 @@
 								Check Eligibility
 							</button>
 							<div class="btn-group">
-								<button type="button" class="btn btn-success"
-								        ng-disabled="!detailsCtrl.canEdit()"
-								        ng-click="detailsCtrl.openSwipecardModal()">
-									Swipe Health Card</button>
+								<juno-button
+										id="swipe-health-card-button"
+										button-color="JUNO_BUTTON_COLOR.PRIMARY"
+										button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.COLORED"
+										click="detailsCtrl.openSwipecardModal()"
+										disabled="!detailsCtrl.canEdit()">
+									Swipe Health Card
+								</juno-button>
 							</div>
 						</div>
 						<div class=" col-sm-2 col-xs-12 pull-right">

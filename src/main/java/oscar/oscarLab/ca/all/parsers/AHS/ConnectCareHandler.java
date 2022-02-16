@@ -217,7 +217,7 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 
 	// connect care labs support embedded PDFs
 	@Override
-	public boolean isSupportEmbeddedPdf()
+	public boolean supportsEmbeddedDocuments()
 	{
 		return true;
 	}

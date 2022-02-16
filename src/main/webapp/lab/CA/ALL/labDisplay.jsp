@@ -67,6 +67,7 @@
 <%@ page import="org.apache.commons.lang3.tuple.Pair" %>
 <%@ page import="oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler" %>
 <%@ page import="org.oscarehr.labs.service.Hl7TextInfoService" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -125,6 +126,14 @@
 		java.util.Date date = hl7TextMessage.getCreated();
 		String stringFormat = "yyyy-MM-dd HH:mm";
 		dateLabReceived = UtilDateUtilities.DateToString(date, stringFormat);
+
+		if(OLISHL7Handler.OLIS_MESSAGE_TYPE.equals(hl7TextMessage.getType()))
+		{
+			%>
+			<jsp:forward page="labDisplayOLIS.jsp" />
+			<%
+			return;
+		}
 	}
 
 	boolean isLinkedToDemographic = false;
@@ -1270,6 +1279,16 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                             </div>
                                                         </td>
                                                     </tr>
+													<% if (handler.isReportBlocked()) {
+													%>
+													<tr>
+														<td align="center" bgcolor="white">
+															<div class="FieldData" style="text-align: center;">
+																<span style="color:red; font-weight:bold;">Do Not Disclose Without Explicit Patient Consent</span>
+															</div>
+														</td>
+													</tr>
+													<% } %>
                                                 </table>
 
                                             <%//}
@@ -1371,6 +1390,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	                               <td bgcolor="#FFCC00" width="300" valign="bottom">
 	                                   <div class="Title2">
 	                                       <%=headers.get(i)%>
+									   <% if (handler.isOBRBlocked(i))
+									   {%>
+										   <br/>
+										   <span style="font-size:8px; color:red;">(Do Not Disclose Without Explicit Patient Consent)</span>
+									   <% } %>
 	                                   </div>
 	                               </td>
 	                               <%--<td align="right" bgcolor="#FFCC00" width="100">&nbsp;</td>--%>

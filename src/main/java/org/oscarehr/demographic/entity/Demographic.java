@@ -71,6 +71,7 @@ import static oscar.util.StringUtils.filterControlCharacters;
 public class Demographic extends AbstractModel<Integer> implements Serializable
 {
 	public static final int FIRST_NAME_MAX_LENGTH = 30;
+	public static final int MIDDLE_NAME_MAX_LENGTH = 30;
 	public static final int LAST_NAME_MAX_LENGTH = 30;
 
 	public static final String GENDER_MALE = "M";
@@ -93,6 +94,9 @@ public class Demographic extends AbstractModel<Integer> implements Serializable
 	@Column(name = "first_name")
 	@Size(max = FIRST_NAME_MAX_LENGTH)
 	private String firstName;
+	@Column(name = "middle_name")
+	@Size(max = MIDDLE_NAME_MAX_LENGTH)
+	private String middleName;
 	@Column(name = "last_name")
 	@Size(max = LAST_NAME_MAX_LENGTH)
 	private String lastName;

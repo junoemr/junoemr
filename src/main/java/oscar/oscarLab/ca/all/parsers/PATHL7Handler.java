@@ -62,6 +62,7 @@ import java.util.Map;
  */
 public class PATHL7Handler extends ORU_R01MessageHandler
 {
+	public static final String LIFELABS_MESSAGE_TYPE = "PATHL7";
 
     Logger logger = Logger.getLogger(PATHL7Handler.class);
     protected ORU_R01 msg;
@@ -84,13 +85,6 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 	);
 
 	public static final String VIHARTF = "CELLPATHR";
-
-	// Embedded PDF strings that show up in OBX messages
-	public static final String embeddedPdfPrefix = "JVBERi0xLj";
-	// TEMPORARY: labs have been uploaded with both of these prefixes. Need to support both as it's in a diverging state
-	public static final List<String> pdfReplacements = Arrays.asList("embedded_doc_id_", "embedded_doc_id");
-
-	public static final String pdfReplacement = "embedded_doc_id_";
 
     /**
      * Map Excelleris status codes to ones that we want to display to the user.
@@ -140,12 +134,13 @@ public class PATHL7Handler extends ORU_R01MessageHandler
     @Override
     public void postUpload() {}
 
-    public String getMsgType(){
-        return("PATHL7");
-    }
+	public String getMsgType()
+	{
+		return (LIFELABS_MESSAGE_TYPE);
+	}
 
     @Override
-    public boolean isSupportEmbeddedPdf()
+    public boolean supportsEmbeddedDocuments()
     {
         return true;
     }

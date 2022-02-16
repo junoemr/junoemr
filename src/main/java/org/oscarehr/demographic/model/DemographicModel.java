@@ -24,6 +24,7 @@ package org.oscarehr.demographic.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.common.AddressModel;
@@ -38,6 +39,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Data
 public class DemographicModel extends AbstractTransientModel implements Person, Contact
@@ -77,6 +79,7 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 
 	// base info
 	private String firstName;
+	private String middleName;
 	private String lastName;
 	private TITLE title;
 	private LocalDate dateOfBirth;
@@ -221,6 +224,33 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 	public TYPE getContactType()
 	{
 		return TYPE.DEMOGRAPHIC;
+	}
+
+	public String getDisplayName()
+	{
+		return this.getLastName() + ", " + this.getFirstName() + (StringUtils.isBlank(this.getMiddleName()) ? "" : " " + this.getMiddleName());
+	}
+
+	public String getDisplayHealthNumber()
+	{
+		return StringUtils.trimToEmpty(this.getHealthNumber()) +
+				(StringUtils.isBlank(this.getHealthNumberVersion()) ? "" : " " + this.getHealthNumberVersion()) +
+				(StringUtils.isBlank(this.getHealthNumberProvinceCode()) ? "" : " " + this.getHealthNumberProvinceCode());
+	}
+
+	public Optional<PhoneNumberModel> getPreferredPhone()
+	{
+		PhoneNumberModel cellPhone = this.getCellPhone();
+		if(cellPhone != null && cellPhone.isPrimaryContactNumber())
+		{
+			return Optional.of(cellPhone);
+		}
+		PhoneNumberModel workPhone = this.getWorkPhone();
+		if(workPhone != null && workPhone.isPrimaryContactNumber())
+		{
+			return Optional.of(workPhone);
+		}
+		return Optional.ofNullable(this.getHomePhone());
 	}
 
 	@Override

@@ -44,9 +44,9 @@ export default class ToastFactory
 	 * @param message - message to display
 	 * @param requireDismiss - [default true] if ture notification will not auto dismiss. Requires user to click to dismiss.
 	 */
-	public static buildErrorToast(message: string, requireDismiss= true): Toast
+	public static buildErrorToast(message: string, requireDismiss= false): Toast
 	{
-		return this.buildToast(message, ToastStyle.Error, requireDismiss, "icon-cancel");
+		return this.buildToast(message, ToastStyle.Error, requireDismiss, "icon-cancel", BasicToast.ERROR_TOAST_DEFAULT_DURATION);
 	}
 
 	/**
@@ -55,8 +55,9 @@ export default class ToastFactory
 	 * @param style - the style of the toast
 	 * @param requireDismiss - if ture notification will not auto dismiss. Requires user to click to dismiss.
 	 * @param icon - icon to show
+	 * @param duration - how long the toast remains visible, if not required to dismiss.
 	 */
-	public static buildToast(message: string, style: ToastStyle, requireDismiss, icon)
+	public static buildToast(message: string, style: ToastStyle, requireDismiss, icon, duration = BasicToast.BASIC_TOAST_DEFAULT_DURATION)
 	{
 		if (requireDismiss)
 		{
@@ -64,7 +65,7 @@ export default class ToastFactory
 		}
 		else
 		{
-			return new BasicToast(message, style, icon);
+			return new BasicToast(message, style, icon, duration);
 		}
 	}
 }
