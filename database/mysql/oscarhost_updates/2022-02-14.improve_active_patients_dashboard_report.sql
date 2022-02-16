@@ -36,8 +36,10 @@ SET template = '<?xml version="1.0" encoding="UTF-8"?>
             IF(DATE(MAX(cmn.observation_date)) &lt; DATE_SUB(CURDATE(), INTERVAL 5 YEAR), 1, 0)  AS FIVEPLUS,
             IF(cmn.observation_date IS NULL, 1, 0)                                       AS NONE
             FROM demographic dem
-            LEFT JOIN casemgmt_note cmn ON (dem.demographic_no = cmn.demographic_no AND cmn.signed = 1
-            AND cmn.provider_no != \'-1\')
+            LEFT JOIN (
+               SELECT demographic_no, MAX(observation_date) AS observation_date FROM casemgmt_note
+               WHERE signed = 1 AND provider_no != \'-1\'
+               GROUP BY demographic_no) cmn ON dem.demographic_no = cmn.demographic_no
             WHERE dem.provider_no = \'${provider}\'
             AND dem.patient_status = ${pstatus}
             group by dem.demographic_no
