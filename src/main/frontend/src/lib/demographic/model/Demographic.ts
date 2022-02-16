@@ -9,6 +9,7 @@ import SimpleProvider from "../../provider/model/SimpleProvider";
 import RosterStatusData from "./RosterStatusData";
 import {PhoneType} from "../../common/model/PhoneType";
 import DemographicWaitingList from "../../waitingList/model/DemographicWaitingList";
+import {AddressResidencyStatus} from "../../common/model/AddressResidencyStatus";
 
 export default class Demographic
 {
@@ -84,9 +85,22 @@ export default class Demographic
 
 	constructor()
 	{
-
+		this.addressList = [
+			new Address(AddressResidencyStatus.Current),
+		];
 	}
 
+	public setPrimaryPhone(phoneNumber: PhoneNumber): void
+	{
+		this.clearPrimaryPhone();
+		phoneNumber.primaryContactNumber = true;
+		switch (phoneNumber.phoneType)
+		{
+			case PhoneType.Home: this.homePhone = phoneNumber; break;
+			case PhoneType.Work: this.workPhone = phoneNumber; break;
+			case PhoneType.Cell: this.cellPhone = phoneNumber; break;
+		}
+	}
 	public setPrimaryPhoneType(type: PhoneType): void
 	{
 		this.clearPrimaryPhone();

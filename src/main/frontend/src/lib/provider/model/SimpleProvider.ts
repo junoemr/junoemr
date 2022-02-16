@@ -8,9 +8,12 @@ export default class SimpleProvider
 	private _lastName: string;
 	private _ohipNumber: string;
 
-	constructor(id: string = null)
+	constructor(id: string = null, lastName: string = null, firstName: string = null, ohip: string = null)
 	{
 		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.ohipNumber = ohip;
 	}
 
 	public static fromDisplayNameAndOhip(nameToSplit: string, ohip: string = null): SimpleProvider

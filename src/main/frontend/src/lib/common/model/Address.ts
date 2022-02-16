@@ -1,4 +1,6 @@
 import {AddressResidencyStatus} from "./AddressResidencyStatus";
+import {AddressModel} from "../../../../generated";
+import ResidencyStatusEnum = AddressModel.ResidencyStatusEnum;
 
 export default class Address
 {
@@ -14,10 +16,10 @@ export default class Address
 	 * display and formatting helpers
 	 */
 
-	constructor()
+	constructor(residencyStatus: ResidencyStatusEnum = AddressResidencyStatus.Past)
 	{
 		this.countryCode = "CA";
-		this.residencyStatus = AddressResidencyStatus.Past;
+		this.residencyStatus = residencyStatus;
 	}
 
 	get displayLine1of2(): string
