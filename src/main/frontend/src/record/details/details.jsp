@@ -25,8 +25,8 @@
 --%>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 
-<juno-security-check show-placeholder="true" permissions="detailsCtrl.SecurityPermissions.DemographicRead">
-	<div class="col-xs-12" id="patient-details-page" ng-class="detailsCtrl.pageClasses()">
+<juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.DemographicRead">
+	<div class="col-xs-12" id="patient-details-page" ng-class="$ctrl.pageClasses()">
 		<div class="row">
 				<div class="col-md-10 col-lg-8">
 					<div class="row">
@@ -37,87 +37,87 @@
 										<bean:message key="demographic.demographicprintdemographic.btnPrint"/> <span class="caret"></span>
 									</button>
 									<ul class="dropdown-menu">
-										<li><a href="../report/GenerateEnvelopes.do?demos={{detailsCtrl.page.demo.id}}">PDF Envelope</a></li>
-										<li><a class="hand-hover" ng-click="detailsCtrl.printLabel('PDFLabel')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFLabel"/></a></li>
-										<li><a class="hand-hover" ng-click="detailsCtrl.printLabel('PDFAddress')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFAddressLabel"/></a></li>
-										<li><a class="hand-hover" ng-click="detailsCtrl.printLabel('PDFChart')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFChartLabel"/></a></li>
-										<li><a class="hand-hover" ng-click="detailsCtrl.printLabel('PrintLabel')"><bean:message key="demographic.demographiceditdemographic.btnPrintLabel"/></a></li>
-										<li><a class="hand-hover" ng-click="detailsCtrl.printLabel('ClientLab')"><bean:message key="demographic.demographiceditdemographic.btnClientLabLabel"/></a></li>
+										<li><a href="../report/GenerateEnvelopes.do?demos={{$ctrl.page.demo.id}}">PDF Envelope</a></li>
+										<li><a class="hand-hover" ng-click="$ctrl.printLabel('PDFLabel')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFLabel"/></a></li>
+										<li><a class="hand-hover" ng-click="$ctrl.printLabel('PDFAddress')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFAddressLabel"/></a></li>
+										<li><a class="hand-hover" ng-click="$ctrl.printLabel('PDFChart')"><bean:message key="demographic.demographiceditdemographic.btnCreatePDFChartLabel"/></a></li>
+										<li><a class="hand-hover" ng-click="$ctrl.printLabel('PrintLabel')"><bean:message key="demographic.demographiceditdemographic.btnPrintLabel"/></a></li>
+										<li><a class="hand-hover" ng-click="$ctrl.printLabel('ClientLab')"><bean:message key="demographic.demographiceditdemographic.btnClientLabLabel"/></a></li>
 									</ul>
 								</div>
 								<div class="btn-group">
 									<button type="button" class="btn btn-primary dropdown-toggle"
 											data-toggle="dropdown"
-											ng-show="detailsCtrl.page.integratorEnabled"
-											style="color:{{detailsCtrl.page.integratorStatusColor}}"
-											title="{{detailsCtrl.page.integratorStatusMsg}}">
+											ng-show="$ctrl.page.integratorEnabled"
+											style="color:{{$ctrl.page.integratorStatusColor}}"
+											title="{{$ctrl.page.integratorStatusMsg}}">
 										<bean:message key="web.record.details.integrator"/> <span class="caret"></span>
 									</button>
 									<ul class="dropdown-menu">
-										<li ng-show="detailsCtrl.page.integratorOffline"><a style="color:#FF5500">{{detailsCtrl.page.integratorStatusMsg}}</a></li>
-										<li ng-hide="detailsCtrl.page.integratorOffline" title="{{detailsCtrl.page.integratorStatusMsg}}">
-											<a style="color:{{detailsCtrl.page.integratorStatusColor}}"
-											   ng-click="detailsCtrl.integratorDo('ViewCommunity')">
+										<li ng-show="$ctrl.page.integratorOffline"><a style="color:#FF5500">{{$ctrl.page.integratorStatusMsg}}</a></li>
+										<li ng-hide="$ctrl.page.integratorOffline" title="{{$ctrl.page.integratorStatusMsg}}">
+											<a style="color:{{$ctrl.page.integratorStatusColor}}"
+											   ng-click="$ctrl.integratorDo('ViewCommunity')">
 												<bean:message key="web.record.details.viewIntegratedCommunity"/>
 											</a>
 										</li>
-										<li><a ng-click="detailsCtrl.integratorDo('Linking')"><bean:message key="web.record.details.manageLinkedClients"/></a></li>
-										<div ng-show="!detailsCtrl.page.integratorOffline">
-											<li><a ng-click="detailsCtrl.integratorDo('Compare')"><bean:message key="web.record.details.compareWithIntegrator"/></a></li>
-											<li><a ng-click="detailsCtrl.integratorDo('Update')"><bean:message key="web.record.details.updateFromIntegrator"/></a></li>
-											<li><a ng-click="detailsCtrl.integratorDo('SendNote')"><bean:message key="web.record.details.sendNoteIntegrator"/></a></li>
+										<li><a ng-click="$ctrl.integratorDo('Linking')"><bean:message key="web.record.details.manageLinkedClients"/></a></li>
+										<div ng-show="!$ctrl.page.integratorOffline">
+											<li><a ng-click="$ctrl.integratorDo('Compare')"><bean:message key="web.record.details.compareWithIntegrator"/></a></li>
+											<li><a ng-click="$ctrl.integratorDo('Update')"><bean:message key="web.record.details.updateFromIntegrator"/></a></li>
+											<li><a ng-click="$ctrl.integratorDo('SendNote')"><bean:message key="web.record.details.sendNoteIntegrator"/></a></li>
 										</div>
 									</ul>
 								</div>
 								<div class="btn-group">
 									<button type="button"
 									        class="btn btn-default dropdown-toggle"
-									        ng-disabled="!detailsCtrl.canAccessAppointments()"
+									        ng-disabled="!$ctrl.canAccessAppointments()"
 									        data-toggle="dropdown">
 										<bean:message key="demographic.demographiceditdemographic.msgAppt"/> <span class="caret"></span>
 									</button>
 									<ul class="dropdown-menu">
-										<li><a class="hand-hover" ng-click="detailsCtrl.appointmentDo('ApptHistory')"><bean:message key="demographic.demographiceditdemographic.btnApptHist"/></a></li>
-										<li><a class="hand-hover" ng-click="detailsCtrl.appointmentDo('WaitingList')"><bean:message key="demographic.demographiceditdemographic.msgWaitList"/></a></li>
+										<li><a class="hand-hover" ng-click="$ctrl.appointmentDo('ApptHistory')"><bean:message key="demographic.demographiceditdemographic.btnApptHist"/></a></li>
+										<li><a class="hand-hover" ng-click="$ctrl.appointmentDo('WaitingList')"><bean:message key="demographic.demographiceditdemographic.msgWaitList"/></a></li>
 									</ul>
 								</div>
 								<div class="btn-group">
 									<button type="button"
 									        class="btn btn-default dropdown-toggle"
-									        ng-disabled="!detailsCtrl.canAccessBilling()"
+									        ng-disabled="!$ctrl.canAccessBilling()"
 									        data-toggle="dropdown">
 										<bean:message key="admin.admin.billing" /> <span class="caret"></span>
 									</button>
 									<ul class="dropdown-menu">
-										<li><a class="hand-hover" ng-click="detailsCtrl.billingDo('BillingHistory')">{{detailsCtrl.page.billingHistoryLabel}}</a></li>
-										<li><a class="hand-hover" ng-click="detailsCtrl.billingDo('CreateInvoice')"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></li>
-										<li ng-hide="detailsCtrl.isClinicaidBilling()"><a class="hand-hover" ng-click="detailsCtrl.billingDo('FluBilling')"><bean:message key="demographic.demographiceditdemographic.msgFluBilling"/></a></li>
-										<li ng-hide="detailsCtrl.isClinicaidBilling()"><a class="hand-hover" ng-click="detailsCtrl.billingDo('HospitalBilling')"><bean:message key="demographic.demographiceditdemographic.msgHospitalBilling"/></a></li>
-										<li ng-hide="detailsCtrl.isClinicaidBilling()"><a class="hand-hover" ng-click="detailsCtrl.billingDo('AddBatchBilling')"><bean:message key="demographic.demographiceditdemographic.msgAddBatchBilling"/></a></li>
-										<li ng-hide="detailsCtrl.isClinicaidBilling()"><a class="hand-hover" ng-click="detailsCtrl.billingDo('AddINR')"><bean:message key="demographic.demographiceditdemographic.msgAddINR"/></a></li>
-										<li ng-hide="detailsCtrl.isClinicaidBilling()"><a class="hand-hover" ng-click="detailsCtrl.billingDo('BillINR')"><bean:message key="demographic.demographiceditdemographic.msgINRBill"/></a></li>
+										<li><a class="hand-hover" ng-click="$ctrl.billingDo('BillingHistory')">{{$ctrl.page.billingHistoryLabel}}</a></li>
+										<li><a class="hand-hover" ng-click="$ctrl.billingDo('CreateInvoice')"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></li>
+										<li ng-hide="$ctrl.isClinicaidBilling()"><a class="hand-hover" ng-click="$ctrl.billingDo('FluBilling')"><bean:message key="demographic.demographiceditdemographic.msgFluBilling"/></a></li>
+										<li ng-hide="$ctrl.isClinicaidBilling()"><a class="hand-hover" ng-click="$ctrl.billingDo('HospitalBilling')"><bean:message key="demographic.demographiceditdemographic.msgHospitalBilling"/></a></li>
+										<li ng-hide="$ctrl.isClinicaidBilling()"><a class="hand-hover" ng-click="$ctrl.billingDo('AddBatchBilling')"><bean:message key="demographic.demographiceditdemographic.msgAddBatchBilling"/></a></li>
+										<li ng-hide="$ctrl.isClinicaidBilling()"><a class="hand-hover" ng-click="$ctrl.billingDo('AddINR')"><bean:message key="demographic.demographiceditdemographic.msgAddINR"/></a></li>
+										<li ng-hide="$ctrl.isClinicaidBilling()"><a class="hand-hover" ng-click="$ctrl.billingDo('BillINR')"><bean:message key="demographic.demographiceditdemographic.msgINRBill"/></a></li>
 									</ul>
 								</div>
-								<div class="btn-group" ng-show="detailsCtrl.page.macPHRIdsSet">
+								<div class="btn-group" ng-show="$ctrl.page.macPHRIdsSet">
 									<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
 										<bean:message key="global.personalHealthRecord"/> <span class="caret"></span>
 									</button>
 									<ul class="dropdown-menu">
-										<li><a class="hand-hover" ng-click="detailsCtrl.macPHRDo('SendMessage')"><bean:message key="demographic.demographiceditdemographic.msgSendMsgPHR"/></a></li>
-										<li><a class="hand-hover" ng-click="detailsCtrl.macPHRDo('ViewRecord')"><bean:message key="web.record.details.viewPhrRecord"/></a></li>
+										<li><a class="hand-hover" ng-click="$ctrl.macPHRDo('SendMessage')"><bean:message key="demographic.demographiceditdemographic.msgSendMsgPHR"/></a></li>
+										<li><a class="hand-hover" ng-click="$ctrl.macPHRDo('ViewRecord')"><bean:message key="web.record.details.viewPhrRecord"/></a></li>
 									</ul>
 								</div>
 								<div class="btn-group">
 									<button type="button"
 									        class="btn btn-default"
-									        ng-disabled="!detailsCtrl.canAccessExport()"
-									        ng-click="detailsCtrl.exportDemographic()">
+									        ng-disabled="!$ctrl.canAccessExport()"
+									        ng-click="$ctrl.exportDemographic()">
 										<bean:message key="export"/>
 									</button>
 								</div>
 
 							</div>
-							<button class="btn btn-primary" ng-if="detailsCtrl.showEligibility" uib-popover-html="detailsCtrl.eligibilityMsg" popover-placement="bottom" popover-trigger="'outsideClick'" ng-click="detailsCtrl.checkEligibility()">
+							<button class="btn btn-primary" ng-if="$ctrl.showEligibility" uib-popover-html="$ctrl.eligibilityMsg" popover-placement="bottom" popover-trigger="'outsideClick'" ng-click="$ctrl.checkEligibility()">
 								Check Eligibility
 							</button>
 							<div class="btn-group">
@@ -125,8 +125,8 @@
 										id="swipe-health-card-button"
 										button-color="JUNO_BUTTON_COLOR.PRIMARY"
 										button-color-pattern="JUNO_BUTTON_COLOR_PATTERN.COLORED"
-										click="detailsCtrl.openSwipecardModal()"
-										disabled="!detailsCtrl.canEdit()">
+										click="$ctrl.openSwipecardModal()"
+										disabled="!$ctrl.canEdit()">
 									Swipe Health Card
 								</juno-button>
 							</div>
@@ -135,8 +135,8 @@
 							<button id="save-button-top"
 									type="button"
 									class="btn btn-success"
-									ng-click="detailsCtrl.validateHCSave(true)"
-									ng-disabled="!detailsCtrl.canEdit() || detailsCtrl.page.dataChanged === false">
+									ng-click="$ctrl.validateHCSave(true)"
+									ng-disabled="!$ctrl.canEdit() || $ctrl.page.dataChanged === false">
 								Save
 							</button>
 						</div>
@@ -144,42 +144,42 @@
 				</div>
 		</div>
 		<div id="profile-fields" class="flex-row flex-wrap justify-content-start m-t-8">
-			<div class="flex-item-grow-2" ng-if="detailsCtrl.page.demo">
-				<div id="pd1" ng-click="detailsCtrl.checkAction($event)" ng-keypress="detailsCtrl.checkAction($event)">
+			<div class="flex-item-grow-2" ng-if="$ctrl.page.demo">
+				<div id="pd1" ng-click="$ctrl.checkAction($event)" ng-keypress="$ctrl.checkAction($event)">
 
-					<demographic-section ng-model="detailsCtrl.page.demo"
-					                     validations="detailsCtrl.validations"
+					<demographic-section ng-model="$ctrl.page.demo"
+					                     validations="$ctrl.validations"
 					                     component-style="pageStyle">
 					</demographic-section>
 					<juno-divider component-style="pageStyle"></juno-divider>
 
-					<contact-section ng-model="detailsCtrl.page.demo"
-					                 validations="detailsCtrl.validations"
+					<contact-section ng-model="$ctrl.page.demo"
+					                 validations="$ctrl.validations"
 					                 component-style="pageStyle">
 					</contact-section>
 					<juno-divider component-style="pageStyle"></juno-divider>
 
-					<health-insurance-section ng-model="detailsCtrl.page.demo"
-					                          validations="detailsCtrl.validations"
+					<health-insurance-section ng-model="$ctrl.page.demo"
+					                          validations="$ctrl.validations"
 					                          component-style="pageStyle">
 					</health-insurance-section>
 					<juno-divider component-style="pageStyle"></juno-divider>
 
-					<care-team-section ng-model="detailsCtrl.page.demo"
-					                   validations="detailsCtrl.validations"
+					<care-team-section ng-model="$ctrl.page.demo"
+					                   validations="$ctrl.validations"
 					                   component-style="pageStyle">
 					</care-team-section>
 					<juno-divider component-style="pageStyle"></juno-divider>
 
-					<roster-display-section ng-if="detailsCtrl.rosteringModuleEnabled"
-					                        ng-model="detailsCtrl.page.demo"
-					                        validations="detailsCtrl.validations"
+					<roster-display-section ng-if="$ctrl.rosteringModuleEnabled"
+					                        ng-model="$ctrl.page.demo"
+					                        validations="$ctrl.validations"
 					                        component-style="pageStyle">
 					</roster-display-section>
-					<juno-divider ng-if="detailsCtrl.rosteringModuleEnabled" component-style="pageStyle">
+					<juno-divider ng-if="$ctrl.rosteringModuleEnabled" component-style="pageStyle">
 					</juno-divider>
-					<additional-information-section ng-model="detailsCtrl.page.demo"
-													validations="detailsCtrl.validations"
+					<additional-information-section ng-model="$ctrl.page.demo"
+													validations="$ctrl.validations"
 													component-style="pageStyle">
 					</additional-information-section>
 					<juno-divider component-style="pageStyle"></juno-divider>
@@ -190,30 +190,30 @@
 				<div class="clearfix col-md-12">
 					<img class="pull-left" id="photo"
 						 title="Click to upload photo"
-						 ng-click="detailsCtrl.launchPhoto()"
-						 ng-src="../imageRenderingServlet?source=local_client&clientId={{detailsCtrl.page.demo.id}}"
+						 ng-click="$ctrl.launchPhoto()"
+						 ng-src="../imageRenderingServlet?source=local_client&clientId={{$ctrl.page.demo.id}}"
 					/>
 				</div>
-				<div id="pd2" ng-click="detailsCtrl.checkAction($event)" ng-keypress="detailsCtrl.checkAction($event)">
+				<div id="pd2" ng-click="$ctrl.checkAction($event)" ng-keypress="$ctrl.checkAction($event)">
 					<div class="col-md-12">
 						<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formAlert"/></h3>
-						<textarea id="alert-text-box" ng-model="detailsCtrl.page.demo.patientAlert" class="form-control form-control-details"></textarea>
+						<textarea id="alert-text-box" ng-model="$ctrl.page.demo.patientAlert" class="form-control form-control-details"></textarea>
 					</div>
 					<br/>
 					<div class="col-md-12">
 						<h3 class="form-heading"><bean:message key="demographic.demographiceditdemographic.formNotes"/></h3>
-						<textarea id="notes-text-box" ng-model="detailsCtrl.page.demo.patientNote" class="form-control form-control-details"></textarea>
+						<textarea id="notes-text-box" ng-model="$ctrl.page.demo.patientNote" class="form-control form-control-details"></textarea>
 					</div>
 				</div>
 				<hr>
 				<div class="col-md-12">
 					<h3 class="form-heading">
 						<bean:message key="web.record.details.proContacts"/>
-							<button type="button" class="btn btn-primary pull-right manage-button-padding"  ng-click="detailsCtrl.manageContacts()">
+							<button type="button" class="btn btn-primary pull-right manage-button-padding"  ng-click="$ctrl.manageContacts()">
 								<bean:message key="web.record.details.manage"/>
 							</button>
 					</h3>
-					<div class="form-group" ng-repeat="dc in detailsCtrl.page.demoContactPros">
+					<div class="form-group" ng-repeat="dc in $ctrl.page.demoContactPros">
 						<div class="col-md-12 special-indent" style="font-weight:bold">{{dc.role}}</div>
 						<div class="col-md-7 special-indent-extra" style="white-space:nowrap">{{dc.lastName}}, {{dc.firstName}}</div>
 						<div class="col-md-7 special-indent-extra2">Work Phone: {{dc.workPhone}}</div>
@@ -222,7 +222,7 @@
 
 				<div class="col-md-12">
 					<demographic-contacts-section
-							ng-model="detailsCtrl.page.demoContacts"
+							ng-model="$ctrl.page.demoContacts"
 							component-style="pageStyle">
 					</demographic-contacts-section>
 				</div>
@@ -230,14 +230,14 @@
 		</div>
 		<div class="row">
 			<div class="col-lg-8 col-md-10">
-				<div class="alert alert-success" ng-show="detailsCtrl.page.saving">
+				<div class="alert alert-success" ng-show="$ctrl.page.saving">
 					<bean:message key="web.record.details.saving"/>
 				</div>
 
 				<button id="save-button" type="button"
 					class="btn btn-success"
-					ng-click="detailsCtrl.validateHCSave(true)"
-					ng-disabled="!detailsCtrl.canEdit() || detailsCtrl.page.dataChanged === false">
+					ng-click="$ctrl.validateHCSave(true)"
+					ng-disabled="!$ctrl.canEdit() || $ctrl.page.dataChanged === false">
 					Save
 				</button>
 			</div>

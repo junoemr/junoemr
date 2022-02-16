@@ -240,7 +240,7 @@ angular.module('Patient').component('addDemographicModal', {
 				ctrl.newDemographicData.healthNumberType = value;
 			}
 
-			ctrl.onMRPChange = (value :object, option: object) :void =>
+			ctrl.onMRPChange = (value :object, option: any) :void =>
 			{
 				ctrl.newDemographicData.mrpProvider = option.data;
 			}
@@ -381,7 +381,6 @@ angular.module('Patient').component('addDemographicModal', {
 				{
 					// make dob a moment before save
 					ctrl.newDemographicData.dateOfBirth = Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth);
-					console.debug(ctrl.newDemographicData);
 					demographicService.createDemographic(ctrl.newDemographicData)
 					.then((results) =>
 					{

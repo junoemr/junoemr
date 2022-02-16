@@ -33,8 +33,14 @@ import Demographic from "../../lib/demographic/model/Demographic";
 import ToastService from "../../lib/alerts/service/ToastService";
 import moment from "moment";
 
-angular.module('Record.Details').controller('Record.Details.DetailsController', [
-
+angular.module('Record.Details').component('detailsCtrl', {
+	// note 'details' is a reserved html tag name
+	bindings: {
+		componentStyle: "<?",
+		user: "<?",
+	},
+	templateUrl: "src/record/details/details.jsp",
+	controller: [
 	'$scope',
 	'$http',
 	'$location',
@@ -44,14 +50,12 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 	'$uibModal',
 	'$httpParamSerializer',
 	'$sce',
+	'$timeout',
 	'demographicService',
 	'demographicsService',
 	'errorsService',
 	'patientDetailStatusService',
 	'securityRolesService',
-	'staticDataService',
-	'referralDoctorsService',
-	'user',
 
 	function(
 		$scope,
@@ -63,14 +67,12 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		$uibModal,
 		$httpParamSerializer,
 		$sce,
+		$timeout,
 		demographicService,
 		demographicsService,
 		messagesFactory,
 		patientDetailStatusService,
-		securityRolesService,
-		staticDataService,
-		referralDoctorsService,
-		user)
+		securityRolesService)
 	{
 
 		const controller = this;
@@ -91,123 +93,100 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		$scope.JUNO_STYLE = JUNO_STYLE;
 		$scope.pageStyle = JUNO_STYLE.GREY;
 
-		controller.$onInit = () =>
+		controller.$onInit = async () =>
 		{
 			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead))
 			{
-				demographicService.getDemographic($stateParams.demographicNo).then(
-					function success(results: Demographic)
-					{
-						controller.page.demo = results;
-						controller.initDemographicVars();
+				try
+				{
+					let results = await Promise.all([
+						demographicService.getDemographic($stateParams.demographicNo),
+						demographicApi.getDemographicContacts($stateParams.demographicNo, "professional"),
+						patientDetailStatusService.getStatus($stateParams.demographicNo),
+						systemPreferenceApi.getPropertyValue(SYSTEM_PROPERTIES.INSTANCE_TYPE, INSTANCE_TYPE.BC),
+						systemPreferenceApi.getPreferenceEnabled(SYSTEM_PROPERTIES.ROSTERING_MODULE, false),
+					]);
 
-					demographicApi.getDemographicContacts(controller.page.demo.id, "professional").then(
-                    (data) => {
-						controller.page.demoContactPros = data.data.body;
-                    	}
-                    );
+					controller.page.demo = results[0];
+					controller.page.demoContactPros = results[1].data.body;
+					controller.initPageDetails(results[2]);
+					await controller.initShowEligibilityState(results[3].data.body);
+					controller.rosteringModuleEnabled = results[4].data.body;
 
-						//show waitingListNames
-						if (controller.page.demo.waitingListNames != null)
-						{
-							if (controller.page.demo.waitingListNames.id != null)
-							{ //only 1 entry, convert to array
-								// var tmp = {};
-								// tmp.id = controller.page.demo.waitingListNames.id;
-								// tmp.name = controller.page.demo.waitingListNames.name;
-								// tmp.groupNo = controller.page.demo.waitingListNames.groupNo;
-								// tmp.providerNo = controller.page.demo.waitingListNames.providerNo;
-								// tmp.createDate = controller.page.demo.waitingListNames.createDate;
-								// tmp.isHistory = controller.page.demo.waitingListNames.isHistory;
-								// controller.page.demo.waitingListNames = [tmp];
-								// todo
-							}
-						}
+					controller.page.dataChanged = false;
 
-						controller.page.dataChanged = false;
-
-						//get patient detail status
-						patientDetailStatusService.getStatus($stateParams.demographicNo).then(
-							function success(results)
-							{
-								controller.page.macPHRLoggedIn = results.macPHRLoggedIn;
-								controller.page.macPHRIdsSet = results.macPHRIdsSet;
-								controller.page.macPHRVerificationLevel = results.macPHRVerificationLevel;
-
-								controller.page.integratorEnabled = results.integratorEnabled;
-								controller.page.integratorOffline = results.integratorOffline;
-								controller.page.integratorAllSynced = results.integratorAllSynced;
-
-								controller.page.workflowEnhance = results.workflowEnhance;
-								controller.page.billregion = results.billregion;
-								controller.page.defaultView = results.defaultView;
-								controller.page.hospitalView = results.hospitalView;
-
-								if (controller.page.integratorEnabled)
-								{
-									if (controller.page.integratorOffline)
-									{
-										controller.page.integratorStatusColor = "#ff5500";
-										controller.page.integratorStatusMsg = "NOTE: Integrator is not available at this time";
-									}
-									else if (!controller.page.integratorAllSynced)
-									{
-										controller.page.integratorStatusColor = "#ff5500";
-										controller.page.integratorStatusMsg = "NOTE: Integrated Community is not synced";
-									}
-								}
-
-								controller.page.billingHistoryLabel = "Invoice List";
-								if (controller.page.billregion == "ON") controller.page.billingHistoryLabel = "Billing History";
-							},
-							function error(errors)
-							{
-								console.log(errors);
-							});
-					},
-					function error(errors)
-					{
-						controller.toastService.errorToast("Error loading demographic");
-						console.error(errors);
-					}
-				);
+					// controller.loadWatches();
+				}
+				catch (errors)
+				{
+					controller.toastService.errorToast("Error loading demographic");
+					console.error(errors);
+				}
 			}
-			// show eligibility check button only if instance is BC OR (ON AND billing type CLINICAID)
-			systemPreferenceApi.getPropertyValue(SYSTEM_PROPERTIES.INSTANCE_TYPE, INSTANCE_TYPE.BC).then(
-					function success(result)
-					{
-						if (result.data.body === INSTANCE_TYPE.BC)
-						{
-							controller.showEligibility = true;
-						}
-						else if (result.data.body === INSTANCE_TYPE.ON)
-						{
-							systemPreferenceApi.getPropertyValue(SYSTEM_PROPERTIES.BILLING_TYPE, BILLING_TYPE.CLINICAID).then(
-									function success(result)
-									{
-										if (result.data.body === BILLING_TYPE.CLINICAID)
-										{
-											controller.showEligibility = true;
-										}
-									},
-									function error(result)
-									{
-										console.error("Failed to fetch instance billing type with error: " + result);
-									}
-							)
-						}
-					},
-					function error(result)
-					{
-						console.error("Failed to fetch instance type with error: " + result);
-					}
-			);
-
-			systemPreferenceApi.getPreferenceEnabled(SYSTEM_PROPERTIES.ROSTERING_MODULE, false).then((result) =>
-			{
-				controller.rosteringModuleEnabled = result.data.body;
-			});
 		};
+
+		controller.initShowEligibilityState = async (type: INSTANCE_TYPE) =>
+		{
+			switch (type)
+			{
+				case INSTANCE_TYPE.BC:
+				{
+					controller.showEligibility = true; break;
+				}
+				case INSTANCE_TYPE.ON:
+				{
+					controller.showEligibility = true;
+					let billingType = (
+						await systemPreferenceApi.getPropertyValue(SYSTEM_PROPERTIES.BILLING_TYPE, BILLING_TYPE.CLINICAID)
+					).data.body;
+					if (billingType === BILLING_TYPE.CLINICAID)
+					{
+						controller.showEligibility = true;
+					}
+				}
+			}
+		}
+		controller.initPageDetails = (results: any) =>
+		{
+			controller.page.macPHRLoggedIn = results.macPHRLoggedIn;
+			controller.page.macPHRIdsSet = results.macPHRIdsSet;
+			controller.page.macPHRVerificationLevel = results.macPHRVerificationLevel;
+
+			controller.page.integratorEnabled = results.integratorEnabled;
+			controller.page.integratorOffline = results.integratorOffline;
+			controller.page.integratorAllSynced = results.integratorAllSynced;
+
+			controller.page.workflowEnhance = results.workflowEnhance;
+			controller.page.billregion = results.billregion;
+			controller.page.defaultView = results.defaultView;
+			controller.page.hospitalView = results.hospitalView;
+
+			if (controller.page.integratorEnabled)
+			{
+				if (controller.page.integratorOffline)
+				{
+					controller.page.integratorStatusColor = "#ff5500";
+					controller.page.integratorStatusMsg = "NOTE: Integrator is not available at this time";
+				}
+				else if (!controller.page.integratorAllSynced)
+				{
+					controller.page.integratorStatusColor = "#ff5500";
+					controller.page.integratorStatusMsg = "NOTE: Integrated Community is not synced";
+				}
+			}
+
+			controller.page.billingHistoryLabel = "Invoice List";
+			if (controller.page.billregion == "ON") controller.page.billingHistoryLabel = "Billing History";
+		}
+
+		controller.$postLink = () =>
+		{
+			// hack to prevent a change event on load flagging triggering the watch
+			$timeout(() =>
+			{
+				controller.loadWatches(); // done once everything initialized
+			}, 2000);
+		}
 
 		controller.canAccessAppointments = () =>
 		{
@@ -226,15 +205,6 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			return securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicUpdate);
 		}
 
-		controller.initDemographicVars = function initDemographicVars()
-		{
-			if (controller.page.demo.onWaitingListSinceDate)
-			{
-				controller.page.demo.onWaitingListSinceDate = Juno.Common.Util.getDateMomentFromComponents(controller.page.demo.onWaitingListSinceDate.getFullYear(),
-						controller.page.demo.onWaitingListSinceDate.getMonth(), controller.page.demo.onWaitingListSinceDate.getDate());
-			}
-		};
-
 		//disable click and keypress if user only has read-access
 		controller.checkAction = function checkAction(event)
 		{
@@ -249,17 +219,19 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		// on-screen operations //
 		//----------------------//
 		//monitor data changed
-		$scope.$watch(function()
+		controller.loadWatches = () =>
 		{
-			return controller.page.demo;
-		}, function(newValue, oldValue)
-		{
-			if (newValue !== oldValue && angular.isDefined(oldValue) && angular.isDefined(newValue))
+			$scope.$watch(function()
 			{
-				controller.page.dataChanged = true;
-			}
-
-		}, true);
+				return controller.page.demo;
+			}, function(newValue, oldValue)
+			{
+				if (newValue !== oldValue && angular.isDefined(oldValue) && angular.isDefined(newValue))
+				{
+					controller.page.dataChanged = true;
+				}
+			}, true);
+		};
 
 		$window.onbeforeunload = function ()
 		{
@@ -470,7 +442,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 		controller.manageContacts = function manageContacts()
 		{
 			var discard = true;
-			if (controller.page.dataChanged > 0)
+			if (controller.page.dataChanged)
 			{
 				discard = confirm("You may have unsaved data. Are you sure to leave?");
 			}
@@ -520,7 +492,7 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			}
 			else if (func === "SendMessage")
 			{
-				url = "../phr/PhrMessage.do?method=createMessage&providerNo=" + user.providerNo + "&demographicNo=" + controller.page.demo.id;
+				url = "../phr/PhrMessage.do?method=createMessage&providerNo=" + controller.user.providerNo + "&demographicNo=" + controller.page.demo.id;
 			}
 			else if (func === "ViewRecord")
 			{
@@ -578,14 +550,14 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					"&hotclick=&appointment_no=0&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
 					"&demographic_no=" + controller.page.demo.id +
 					"&providerview=" + controller.page.demo.providerNo +
-					"&user_no=" + user.providerNo +
+					"&user_no=" + controller.user.providerNo +
 					"&apptProvider_no=none&appointment_date=" + now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() +
 					"&start_time=00:00:00&bNewForm=1&status=t";
 			}
 			else if (func === "FluBilling")
 			{
 				url = "../billing/CA/ON/specialtyBilling/fluBilling/addFluBilling.jsp?function=demographic&functionid=" + controller.page.demo.id +
-					"&creator=" + user.providerNo +
+					"&creator=" + controller.user.providerNo +
 					"&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
 					"&hin=" + controller.page.demo.healthNumber + controller.page.demo.healthNumberVersion +
 					"&demo_sex=" + controller.page.demo.sex +
@@ -602,14 +574,14 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 					"&hotclick=&appointment_no=0&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
 					"&demographic_no=" + controller.page.demo.id +
 					"&providerview=" + controller.page.demo.providerNo +
-					"&user_no=" + user.providerNo +
+					"&user_no=" + controller.user.providerNo +
 					"&apptProvider_no=none&appointment_date=" + now.getFullYear + "-" + (now.getMonth() + 1) + "-" + now.getDate() +
 					"&start_time=00:00:00&bNewForm=1&status=t";
 			}
 			else if (func === "AddBatchBilling")
 			{
 				url = "../billing/CA/ON/addBatchBilling.jsp?demographic_no=" + controller.page.demo.id +
-					"&creator=" + user.providerNo +
+					"&creator=" + controller.user.providerNo +
 					"&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
 					"&hin=" + controller.page.demo.healthNumber + controller.page.demo.healthNumberVersion +
 					"&dob=" + controller.page.demo.dobYear + controller.page.demo.dobMonth + controller.page.demo.dobDay;
@@ -617,14 +589,14 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			else if (func === "AddINR")
 			{
 				url = "../billing/CA/ON/inr/addINRbilling.jsp?function=demographic&functionid=" + controller.page.demo.id +
-					"&creator=" + user.providerNo +
+					"&creator=" + controller.user.providerNo +
 					"&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
 					"&hin=" + controller.page.demo.healthNumber + controller.page.demo.healthNumberVersion +
 					"&dob=" + encodeURI(Juno.Common.Util.formatMomentDate(controller.page.demo.dateOfBirth));
 			}
 			else if (func === "BillINR")
 			{
-				url = "../billing/CA/ON/inr/reportINR.jsp?provider_no=" + user.providerNo;
+				url = "../billing/CA/ON/inr/reportINR.jsp?provider_no=" + controller.user.providerNo;
 			}
 			window.open(url, "Billing", "width=960, height=700");
 		};
@@ -758,4 +730,5 @@ angular.module('Record.Details').controller('Record.Details.DetailsController', 
 			$scope.pageStyle = style;
 		}
 	}
-]);
+	]
+});

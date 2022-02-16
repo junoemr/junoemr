@@ -360,7 +360,7 @@ module.exports = {
 			'./src/record/forms/components/modeSelector/modeSelectorComponent.js',
 			'./src/record/forms/components/groupSelector/groupSelectorComponent.js',
 			'./src/record/details/module.js',
-			'./src/record/details/detailsController.ts',
+			'./src/record/details/detailsComponent.ts',
 			'./src/record/details/swipecardController.js',
 			'./src/record/details/components/mhaPatientConnection/mhaPatientConnectionComponent.js',
 			'./src/record/details/components/demographicSection/demographicSectionComponent.js',
