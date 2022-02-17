@@ -138,13 +138,16 @@ public class HRMModifyDocumentAction extends DispatchAction {
 
 			HRMDocumentToProvider providerMapping = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(Integer.parseInt(reportId), providerNo);
 			if(providerMapping == null) {
-				//check for unclaimed record, if that exists..update that one
+				// No longer required for Juno data, but keeping this in for now in case removing it does something
+				// weird to input data.
+
+				// Check for unclaimed record, if that exists..update that one
 				providerMapping = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(Integer.parseInt(reportId), "-1");
 				if(providerMapping != null) {
 					providerMapping.setProviderNo(providerNo);
 				}
 			}
-			
+
 			if (providerMapping != null) {
 				providerMapping.setSignedOff(Integer.parseInt(signedOff) == 1);
 				providerMapping.setSignedOffTimestamp(new Date());
@@ -170,26 +173,41 @@ public class HRMModifyDocumentAction extends DispatchAction {
 	}
 
 	public ActionForward assignProvider(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-		String assignee = request.getParameter("providerNo");
-		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromRequest(request).getLoggedInProviderNo(), Permission.HRM_UPDATE);
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromRequest(request);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.HRM_UPDATE);
 
 		try {
-			String hrmDocumentId = request.getParameter("reportId");
-			HRMDocumentToProvider providerMapping = new HRMDocumentToProvider();
+			String assignee = request.getParameter("providerNo");
+			Integer hrmDocumentId = Integer.parseInt(request.getParameter("reportId"));
+			HRMDocumentToProvider existing = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(hrmDocumentId, assignee);
 
-			providerMapping.setHrmDocument(hrmDocumentDao.find(Integer.parseInt(hrmDocumentId)));
-			providerMapping.setProviderNo(assignee);
-			providerMapping.setSignedOff(false);
+			if (existing == null)
+			{
+				HRMDocumentToProvider providerMapping = new HRMDocumentToProvider();
 
-			hrmDocumentToProviderDao.merge(providerMapping);
+				providerMapping.setHrmDocument(hrmDocumentDao.find(hrmDocumentId));
+				providerMapping.setProviderNo(assignee);
+				providerMapping.setSignedOff(false);
 
-			//we want to remove any unmatched entries when we do a manual match like this. -1 means unclaimed in this table.
-			HRMDocumentToProvider existingUnmatched = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(Integer.parseInt(hrmDocumentId), "-1");
-			if(existingUnmatched != null) {
-				hrmDocumentToProviderDao.remove(existingUnmatched.getId());
+				hrmDocumentToProviderDao.merge(providerMapping);
+
+				// Pretty sure this is no longer required...  Keeping it in for now in case removing it does something
+				// weird to import data.
+
+				//we want to remove any unmatched entries when we do a manual match like this. -1 means unclaimed in this table.
+				HRMDocumentToProvider existingUnmatched = hrmDocumentToProviderDao
+					.findByHrmDocumentIdAndProviderNo(hrmDocumentId, "-1");
+				if (existingUnmatched != null)
+				{
+					hrmDocumentToProviderDao.remove(existingUnmatched.getId());
+				}
+
+				request.setAttribute("success", true);
 			}
-			
-			request.setAttribute("success", true);
+			else
+			{
+				request.setAttribute("success", false);
+			}
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("Tried to assign HRM document to provider but failed.", e); 
 			request.setAttribute("success", false);
