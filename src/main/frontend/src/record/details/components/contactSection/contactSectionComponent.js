@@ -133,7 +133,7 @@ angular.module('Record.Details').component('contactSection', {
 			}
 			else
 			{
-				ctrl.ngModel.clearPrimaryPhone();
+				ctrl.ngModel.clearPrimaryPhoneType();
 			}
 			ctrl.updatePrimaryPhoneValues();
 		}

@@ -92,7 +92,7 @@ export default class Demographic
 
 	public setPrimaryPhone(phoneNumber: PhoneNumber): void
 	{
-		this.clearPrimaryPhone();
+		this.clearPrimaryPhoneType();
 		phoneNumber.primaryContactNumber = true;
 		switch (phoneNumber.phoneType)
 		{
@@ -103,7 +103,7 @@ export default class Demographic
 	}
 	public setPrimaryPhoneType(type: PhoneType): void
 	{
-		this.clearPrimaryPhone();
+		this.clearPrimaryPhoneType();
 		switch (type)
 		{
 			case PhoneType.Home: this.homePhone.primaryContactNumber = true; break;
@@ -111,7 +111,7 @@ export default class Demographic
 			case PhoneType.Cell: this.cellPhone.primaryContactNumber = true; break;
 		}
 	}
-	public clearPrimaryPhone(): void
+	public clearPrimaryPhoneType(): void
 	{
 		if(this.homePhone)
 		{

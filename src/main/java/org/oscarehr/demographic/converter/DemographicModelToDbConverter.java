@@ -141,7 +141,7 @@ public class DemographicModelToDbConverter
 		PhoneNumberModel homePhone = input.getHomePhone();
 		if(homePhone != null)
 		{
-			dbDemographic.setPhone(homePhone.getNumber());
+			dbDemographic.setPhone(homePhone.getNumber() + (homePhone.isPrimaryContactNumber() ? "*" : ""));
 
 			String extension = homePhone.getExtension();
 			if(extension != null)
@@ -154,7 +154,7 @@ public class DemographicModelToDbConverter
 		PhoneNumberModel workPhone = input.getWorkPhone();
 		if(workPhone != null)
 		{
-			dbDemographic.setPhone2(workPhone.getNumber());
+			dbDemographic.setPhone2(workPhone.getNumber() + (workPhone.isPrimaryContactNumber() ? "*" : ""));
 
 			String extension = workPhone.getExtension();
 			if(extension != null)
@@ -167,7 +167,8 @@ public class DemographicModelToDbConverter
 		PhoneNumberModel cellPhone = input.getCellPhone();
 		if(cellPhone != null)
 		{
-			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_CELL, cellPhone.getNumber());
+			DemographicExt ext = new DemographicExt(SYSTEM_PROVIDER_NO, input.getId(), DemographicExt.KEY_DEMO_CELL,
+					cellPhone.getNumber() + (cellPhone.isPrimaryContactNumber() ? "*" : ""));
 			demographicExtSet.add(ext);
 		}
 		dbDemographic.setDemographicExtSet(demographicExtSet);

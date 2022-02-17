@@ -245,7 +245,7 @@ angular.module('Patient').component('addDemographicModal', {
 				ctrl.newDemographicData.mrpProvider = option.data;
 			}
 
-			ctrl.onPreferredPhoneTypeChange = (value :object) :void =>
+			ctrl.onPreferredPhoneTypeChange = (value: PhoneType): void =>
 			{
 				ctrl.preferredPhoneType = value;
 			}
@@ -262,7 +262,7 @@ angular.module('Patient').component('addDemographicModal', {
 				ctrl.newDemographicData.workPhone = null;
 				ctrl.newDemographicData.cellPhone = null;
 
-				const preferredPhone = new PhoneNumber(ctrl.preferredPhoneNumber, null, null, true);
+				const preferredPhone = new PhoneNumber(ctrl.preferredPhoneNumber, null, ctrl.preferredPhoneType, true);
 				ctrl.newDemographicData.setPrimaryPhone(preferredPhone);
 			}
 

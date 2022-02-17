@@ -90,6 +90,7 @@ public class PhoneNumberModel extends AbstractTransientModel
 		return null;
 	}
 
+	@JsonIgnore
 	public String getNumberFormattedDisplay()
 	{
 		if(number != null && number.length() == 10)
