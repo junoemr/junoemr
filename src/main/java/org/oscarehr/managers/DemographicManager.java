@@ -26,25 +26,27 @@ package org.oscarehr.managers;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTimeComparator;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.dao.AdmissionDao;
-import org.oscarehr.contact.dao.ContactDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
-import org.oscarehr.contact.dao.DemographicContactDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.PHRVerificationDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Admission;
-import org.oscarehr.contact.entity.Contact;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Demographic.PatientStatus;
-import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.contact.dao.ContactDao;
+import org.oscarehr.contact.dao.DemographicContactDao;
+import org.oscarehr.contact.entity.Contact;
+import org.oscarehr.contact.entity.DemographicContact;
+import org.oscarehr.contact.transfer.DemographicContactFewTo1;
 import org.oscarehr.demographic.dao.DemographicCustArchiveDao;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicExtArchiveDao;
@@ -66,7 +68,6 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.to.model.AddressTo1;
-import org.oscarehr.contact.transfer.DemographicContactFewTo1;
 import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -674,10 +675,12 @@ public class DemographicManager {
 		// If the roster status is valid, check if any fields changed from last time we edited
 		if (ConversionUtils.hasContent(currentDemo.getRosterStatus()))
 		{
+			DateTimeComparator dateComparator = DateTimeComparator.getDateOnlyInstance();
+
 			hasChanged = currentDemo.getFamilyDoctor() != null && !currentDemo.getFamilyDoctor().equals(previousDemo.getFamilyDoctor());
-			hasChanged |= currentDemo.getRosterDate() != null && currentDemo.getRosterDate() != previousDemo.getRosterDate();
+			hasChanged |= currentDemo.getRosterDate() != null && dateComparator.compare(currentDemo.getRosterDate(), previousDemo.getRosterDate()) != 0;
 			hasChanged |= currentDemo.getRosterStatus() != null && !currentDemo.getRosterStatus().equals(previousDemo.getRosterStatus());
-			hasChanged |= currentDemo.getRosterTerminationDate() != null && currentDemo.getRosterTerminationDate() != previousDemo.getRosterTerminationDate();
+			hasChanged |= currentDemo.getRosterTerminationDate() != null && dateComparator.compare(currentDemo.getRosterTerminationDate(), previousDemo.getRosterTerminationDate()) != 0;
 			hasChanged |= currentDemo.getRosterTerminationReason() != null && !currentDemo.getRosterTerminationReason().equals(previousDemo.getRosterTerminationReason());
 		}
 

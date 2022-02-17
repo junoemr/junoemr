@@ -35,7 +35,7 @@ angular.module('Record.Details').component('rosterDisplaySection', {
             $scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
             ctrl.numberRegex=/^\d*$/
-            ctrl.familyDoctors = [{value: "", label: "--"}];
+            ctrl.familyDoctors = [{value: null, label: "--"}];
             ctrl.rosterTermReasons = staticDataService.getRosterTerminationReasons();
 
             ctrl.rosterDateValid = true;
@@ -83,7 +83,7 @@ angular.module('Record.Details').component('rosterDisplaySection', {
                         let familyDoctors = [];
                         if (!results.data.body || results.data.body.length === 0)
                         {
-                            familyDoctors.push({value: "", label: "--"})
+                            familyDoctors.push({value: null, label: "--"})
                         }
 
                         for (let i = 0; i < results.data.body.length; i++)
