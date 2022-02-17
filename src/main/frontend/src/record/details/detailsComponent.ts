@@ -431,6 +431,37 @@ angular.module('Record.Details').component('detailsCtrl', {
 			return true;
 		};
 
+		controller.isPostalComplete = function isPostalComplete(postal, province)
+		{
+			// If Canadian province is selected, proceed with validation
+			if (postal && province && province !== "OT" && province.indexOf("US") !== 0)
+			{
+				if (controller.isPostalValidCanadian(postal))
+				{
+					return true;
+				}
+
+				controller.resetEditState();
+				return false;
+			}
+
+			return true;
+		};
+
+		controller.isPostalValidCanadian = function isPostalValidCanadian(postalCode)
+		{
+			const regex = new RegExp(/^[A-Za-z]\d[A-Za-z][ ]?\d[A-Za-z]\d$/); // Match to Canadian postal code standard
+			if (regex.test(postalCode))
+			{
+				return true;
+			}
+			else
+			{
+				Juno.Common.Util.errorAlert($uibModal, "Validation", "Invalid/Incomplete Postal Code");
+				return false;
+			}
+		};
+
 		//upload photo
 		controller.launchPhoto = function launchPhoto()
 		{
@@ -549,7 +580,7 @@ angular.module('Record.Details').component('detailsCtrl', {
 				url = "../billing.do?billRegion=" + controller.page.billregion + "&billForm=" + controller.page.defaultView +
 					"&hotclick=&appointment_no=0&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
 					"&demographic_no=" + controller.page.demo.id +
-					"&providerview=" + controller.page.demo.providerNo +
+					"&providerview=" + controller.page.demo.mrpProvider?.id +
 					"&user_no=" + controller.user.providerNo +
 					"&apptProvider_no=none&appointment_date=" + now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() +
 					"&start_time=00:00:00&bNewForm=1&status=t";
@@ -562,10 +593,10 @@ angular.module('Record.Details').component('detailsCtrl', {
 					"&hin=" + controller.page.demo.healthNumber + controller.page.demo.healthNumberVersion +
 					"&demo_sex=" + controller.page.demo.sex +
 					"&demo_hctype=" + controller.page.demo.healthNumberProvinceCode +
-					"&rd=" + encodeURI(controller.page.demo.scrReferralDoc) +
-					"&rdohip=" + controller.page.demo.scrReferralDocNo +
+					"&rd=" + encodeURI(controller.page.demo.referralDoctor?.displayName) +
+					"&rdohip=" + controller.page.demo.referralDoctor?.ohipNumber +
 					"&dob=" + encodeURI(Juno.Common.Util.formatMomentDate(controller.page.demo.dateOfBirth)) +
-					"&mrp=" + controller.page.demo.providerNo;
+					"&mrp=" + controller.page.demo.mrpProvider?.id;
 			}
 			else if (func === "HospitalBilling")
 			{
@@ -573,7 +604,7 @@ angular.module('Record.Details').component('detailsCtrl', {
 					"&billForm=" + encodeURI(controller.page.hospitalView) +
 					"&hotclick=&appointment_no=0&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
 					"&demographic_no=" + controller.page.demo.id +
-					"&providerview=" + controller.page.demo.providerNo +
+					"&providerview=" + controller.page.demo.mrpProvider?.id +
 					"&user_no=" + controller.user.providerNo +
 					"&apptProvider_no=none&appointment_date=" + now.getFullYear + "-" + (now.getMonth() + 1) + "-" + now.getDate() +
 					"&start_time=00:00:00&bNewForm=1&status=t";
@@ -684,11 +715,9 @@ angular.module('Record.Details').component('detailsCtrl', {
 			}
 
 			if (!controller.checkPatientStatus()) return;
-			// if (!controller.isPostalComplete(controller.page.demo.address.postal, controller.page.demo.address.province)) return;
-			// if (!controller.isPostalComplete(controller.page.demo.address2.postal, controller.page.demo.address2.province)) return;
-			// if (!controller.validateDocNo(controller.page.demo.scrReferralDocNo)) return;
-			// if (!controller.validateDocNo(controller.page.demo.scrFamilyDocNo)) return;
-			//todo
+			if (!controller.isPostalComplete(controller.page.demo.address.postalCode, controller.page.demo.address.regionCode)) return;
+			if (controller.page.demo.address2 &&
+				!controller.isPostalComplete(controller.page.demo.address2.postalCode, controller.page.demo.address2.regionCode)) return;
 
 			if (Juno.Common.Util.exists(controller.page.demo.healthNumber))
             {

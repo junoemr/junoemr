@@ -29,6 +29,7 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.healthNumberEffectiveDate = this.serializeDateTime(from.healthNumberEffectiveDate);
 		updateInput.healthNumberRenewDate = this.serializeDateTime(from.healthNumberRenewDate);
 		updateInput.dateJoined = this.serializeDateTime(from.dateJoined);
+		updateInput.dateEnded = this.serializeDateTime(from.dateEnded);
 		updateInput.patientStatus = from.patientStatus;
 
 		// contact info
