@@ -540,8 +540,23 @@ angular.module('Record.Details').component('detailsCtrl', {
 		controller.appointmentDo = function appointmentDo(func)
 		{
 			var url = null;
-			if (func === "ApptHistory") url = "../demographic/demographiccontrol.jsp?displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=25&orderby=appttime&demographic_no=" + controller.page.demo.id + "&last_name=" + encodeURI(controller.page.demo.lastName) + "&first_name=" + encodeURI(controller.page.demo.firstName);
-			else if (func === "WaitingList") url = "../oscarWaitingList/SetupDisplayPatientWaitingList.do?demographic_no=" + controller.page.demo.id;
+			if (func === "ApptHistory")
+			{
+				url = "../demographic/demographiccontrol.jsp" +
+					"?displaymode=appt_history" +
+					"&dboperation=appt_history" +
+					"&limit1=0" +
+					"&limit2=25" +
+					"&orderby=appttime" +
+					"&demographic_no=" + controller.page.demo.id +
+					"&last_name=" + encodeURIComponent(controller.page.demo.lastName) +
+					"&first_name=" + encodeURIComponent(controller.page.demo.firstName);
+			}
+			else if (func === "WaitingList")
+			{
+				url = "../oscarWaitingList/SetupDisplayPatientWaitingList.do" +
+					"?demographic_no=" + controller.page.demo.id;
+			}
 			window.open(url, "Appointment", "width=960, height=700");
 		};
 
@@ -564,21 +579,21 @@ angular.module('Record.Details').component('detailsCtrl', {
 				else if (controller.page.billregion === BILLING_REGION.ON)
 				{
 					url = "../billing/CA/ON/billinghistory.jsp?demographic_no=" + controller.page.demo.id +
-						"&last_name=" + encodeURI(controller.page.demo.lastName) +
-						"&first_name=" + encodeURI(controller.page.demo.firstName) +
+						"&last_name=" + encodeURIComponent(controller.page.demo.lastName) +
+						"&first_name=" + encodeURIComponent(controller.page.demo.firstName) +
 						"&orderby=appointment_date&displaymode=appt_history&dboperation=appt_history&limit1=0&limit2=10";
 				}
 				else
 				{
-					url = "../billing/CA/BC/billStatus.jsp?lastName=" + encodeURI(controller.page.demo.lastName) +
-						"&firstName=" + encodeURI(controller.page.demo.firstName) +
+					url = "../billing/CA/BC/billStatus.jsp?lastName=" + encodeURIComponent(controller.page.demo.lastName) +
+						"&firstName=" + encodeURIComponent(controller.page.demo.firstName) +
 						"&filterPatient=true&demographicNo=" + controller.page.demo.id;
 				}
 			}
 			else if (func === "CreateInvoice")
 			{
 				url = "../billing.do?billRegion=" + controller.page.billregion + "&billForm=" + controller.page.defaultView +
-					"&hotclick=&appointment_no=0&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
+					"&hotclick=&appointment_no=0&demographic_name=" + encodeURIComponent(controller.page.demo.lastName + "," + controller.page.demo.firstName) +
 					"&demographic_no=" + controller.page.demo.id +
 					"&providerview=" + controller.page.demo.mrpProvider?.id +
 					"&user_no=" + controller.user.providerNo +
@@ -589,20 +604,20 @@ angular.module('Record.Details').component('detailsCtrl', {
 			{
 				url = "../billing/CA/ON/specialtyBilling/fluBilling/addFluBilling.jsp?function=demographic&functionid=" + controller.page.demo.id +
 					"&creator=" + controller.user.providerNo +
-					"&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
+					"&demographic_name=" + encodeURIComponent(controller.page.demo.lastName + "," + controller.page.demo.firstName) +
 					"&hin=" + controller.page.demo.healthNumber + controller.page.demo.healthNumberVersion +
 					"&demo_sex=" + controller.page.demo.sex +
 					"&demo_hctype=" + controller.page.demo.healthNumberProvinceCode +
-					"&rd=" + encodeURI(controller.page.demo.referralDoctor?.displayName) +
+					"&rd=" + encodeURIComponent(controller.page.demo.referralDoctor?.displayName) +
 					"&rdohip=" + controller.page.demo.referralDoctor?.ohipNumber +
-					"&dob=" + encodeURI(Juno.Common.Util.formatMomentDate(controller.page.demo.dateOfBirth)) +
+					"&dob=" + encodeURIComponent(Juno.Common.Util.formatMomentDate(controller.page.demo.dateOfBirth)) +
 					"&mrp=" + controller.page.demo.mrpProvider?.id;
 			}
 			else if (func === "HospitalBilling")
 			{
 				url = "../billing/CA/ON/billingShortcutPg1.jsp?billRegion=" + controller.page.billregion +
-					"&billForm=" + encodeURI(controller.page.hospitalView) +
-					"&hotclick=&appointment_no=0&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
+					"&billForm=" + encodeURIComponent(controller.page.hospitalView) +
+					"&hotclick=&appointment_no=0&demographic_name=" + encodeURIComponent(controller.page.demo.lastName + "," + controller.page.demo.firstName) +
 					"&demographic_no=" + controller.page.demo.id +
 					"&providerview=" + controller.page.demo.mrpProvider?.id +
 					"&user_no=" + controller.user.providerNo +
@@ -613,7 +628,7 @@ angular.module('Record.Details').component('detailsCtrl', {
 			{
 				url = "../billing/CA/ON/addBatchBilling.jsp?demographic_no=" + controller.page.demo.id +
 					"&creator=" + controller.user.providerNo +
-					"&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
+					"&demographic_name=" + encodeURIComponent(controller.page.demo.lastName + "," + controller.page.demo.firstName) +
 					"&hin=" + controller.page.demo.healthNumber + controller.page.demo.healthNumberVersion +
 					"&dob=" + controller.page.demo.dobYear + controller.page.demo.dobMonth + controller.page.demo.dobDay;
 			}
@@ -621,9 +636,9 @@ angular.module('Record.Details').component('detailsCtrl', {
 			{
 				url = "../billing/CA/ON/inr/addINRbilling.jsp?function=demographic&functionid=" + controller.page.demo.id +
 					"&creator=" + controller.user.providerNo +
-					"&demographic_name=" + encodeURI(controller.page.demo.lastName) + encodeURI(",") + encodeURI(controller.page.demo.firstName) +
+					"&demographic_name=" + encodeURIComponent(controller.page.demo.lastName + "," + controller.page.demo.firstName) +
 					"&hin=" + controller.page.demo.healthNumber + controller.page.demo.healthNumberVersion +
-					"&dob=" + encodeURI(Juno.Common.Util.formatMomentDate(controller.page.demo.dateOfBirth));
+					"&dob=" + encodeURIComponent(Juno.Common.Util.formatMomentDate(controller.page.demo.dateOfBirth));
 			}
 			else if (func === "BillINR")
 			{
