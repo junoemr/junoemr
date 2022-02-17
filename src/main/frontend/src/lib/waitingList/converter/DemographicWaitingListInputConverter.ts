@@ -14,7 +14,7 @@ export default class DemographicWaitingListInputConverter extends AbstractConver
 		transfer.waitListId = from.waitListId;
 		transfer.note = from.note;
 		transfer.position = from.position;
-		transfer.dateAddedToWaitList = this.serializeDateTime(from.dateAddedToWaitList);
+		transfer.dateAddedToWaitList = this.serializeLocalDateTime(from.dateAddedToWaitList);
 		return transfer;
 	}
 }

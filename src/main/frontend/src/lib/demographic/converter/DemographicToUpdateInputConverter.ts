@@ -18,7 +18,7 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.lastName = from.lastName;
 		updateInput.alias = from.alias;
 		updateInput.title = from.title as DemographicUpdateInput.TitleEnum;
-		updateInput.dateOfBirth = this.serializeDateTime(from.dateOfBirth);
+		updateInput.dateOfBirth = this.serializeLocalDateTime(from.dateOfBirth);
 		updateInput.sex = DemographicUpdateInput.SexEnum[from.sex];
 		updateInput.chartNumber = from.chartNumber;
 		updateInput.healthNumber = from.healthNumber;
@@ -26,10 +26,10 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.healthNumberVersion = from.healthNumberVersion;
 		updateInput.healthNumberProvinceCode = from.healthNumberProvinceCode;
 		updateInput.healthNumberCountryCode = from.healthNumberCountryCode;
-		updateInput.healthNumberEffectiveDate = this.serializeDateTime(from.healthNumberEffectiveDate);
-		updateInput.healthNumberRenewDate = this.serializeDateTime(from.healthNumberRenewDate);
-		updateInput.dateJoined = this.serializeDateTime(from.dateJoined);
-		updateInput.dateEnded = this.serializeDateTime(from.dateEnded);
+		updateInput.healthNumberEffectiveDate = this.serializeLocalDateTime(from.healthNumberEffectiveDate);
+		updateInput.healthNumberRenewDate = this.serializeLocalDateTime(from.healthNumberRenewDate);
+		updateInput.dateJoined = this.serializeLocalDateTime(from.dateJoined);
+		updateInput.dateEnded = this.serializeLocalDateTime(from.dateEnded);
 		updateInput.patientStatus = from.patientStatus;
 
 		// contact info
@@ -62,7 +62,7 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.aboriginal = from.aboriginal;
 		updateInput.cytolNum = from.cytolNum;
 		updateInput.paperChartArchived = from.paperChartArchived;
-		updateInput.paperChartArchivedDate = this.serializeDateTime(from.paperChartArchivedDate);
+		updateInput.paperChartArchivedDate = this.serializeLocalDateTime(from.paperChartArchivedDate);
 		updateInput.usSigned = from.usSigned;
 		updateInput.privacyConsent = from.privacyConsent;
 		updateInput.informedConsent = from.informedConsent;

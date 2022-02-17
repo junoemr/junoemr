@@ -12,14 +12,14 @@ export default class DemographicToCreateInputConverter extends AbstractConverter
 		createInput.firstName = from.firstName;
 		createInput.middleName = from.middleName;
 		createInput.lastName = from.lastName;
-		createInput.dateOfBirth = this.serializeDateTime(from.dateOfBirth);
+		createInput.dateOfBirth = this.serializeLocalDateTime(from.dateOfBirth);
 		createInput.sex = DemographicCreateInput.SexEnum[from.sex];
 		createInput.healthNumber = from.healthNumber;
 		createInput.healthNumberVersion = from.healthNumberVersion;
 		createInput.healthNumberProvinceCode = from.healthNumberProvinceCode;
 		createInput.healthNumberCountryCode = from.healthNumberCountryCode;
-		createInput.healthNumberEffectiveDate = this.serializeDateTime(from.healthNumberEffectiveDate);
-		createInput.healthNumberRenewDate = this.serializeDateTime(from.healthNumberRenewDate);
+		createInput.healthNumberEffectiveDate = this.serializeLocalDateTime(from.healthNumberEffectiveDate);
+		createInput.healthNumberRenewDate = this.serializeLocalDateTime(from.healthNumberRenewDate);
 		createInput.addressList = new AddressToInputConverter().convertList(from.addressList);
 		createInput.email = from.email;
 

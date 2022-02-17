@@ -53,22 +53,22 @@ export default class RosterStatusData
 		this._isRostered = value;
 	}
 
-	get rosterDateTime(): moment.Moment
+	get rosterDateTime(): Moment
 	{
 		return this._rosterDateTime;
 	}
 
-	set rosterDateTime(value: moment.Moment)
+	set rosterDateTime(value: Moment)
 	{
 		this._rosterDateTime = value;
 	}
 
-	get terminationDateTime(): moment.Moment
+	get terminationDateTime(): Moment
 	{
 		return this._terminationDateTime;
 	}
 
-	set terminationDateTime(value: moment.Moment)
+	set terminationDateTime(value: Moment)
 	{
 		this._terminationDateTime = value;
 	}

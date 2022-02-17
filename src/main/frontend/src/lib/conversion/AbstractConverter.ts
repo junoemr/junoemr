@@ -17,7 +17,11 @@ export default abstract class AbstractConverter<F, T>
 		return [];
 	}
 
-	protected serializeDateTime(moment: Moment)
+	// ==========================================================================
+	// Common Conversion Methods
+	// ==========================================================================
+
+	protected serializeLocalDateTime(moment: Moment): string
 	{
 		if(moment && moment.isValid())
 		{

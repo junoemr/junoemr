@@ -18,8 +18,8 @@ export default class RosterDataModelToInputConverter extends AbstractConverter<R
 		input.rostered = from.isRostered;
 		input.statusCode = from.statusCode;
 		input.statusDescription = from.statusDescription;
-		input.rosterDateTime = this.serializeDateTime(from.rosterDateTime);
-		input.terminationDateTime = this.serializeDateTime(from.terminationDateTime);
+		input.rosterDateTime = this.serializeLocalDateTime(from.rosterDateTime);
+		input.terminationDateTime = this.serializeLocalDateTime(from.terminationDateTime);
 		input.terminationReason = from.terminationReason as any as RosterData.TerminationReasonEnum;
 		input.rosterProvider = new SimpleProviderToInputConverter().convert(from.rosterProvider);
 
