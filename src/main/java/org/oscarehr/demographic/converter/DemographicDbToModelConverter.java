@@ -34,7 +34,6 @@ import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.demographic.model.DemographicModel;
-import org.oscarehr.waitList.service.WaitListService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -51,9 +50,6 @@ public class DemographicDbToModelConverter extends
 {
 	@Autowired
 	private DemographicExtDao demographicExtDao;
-
-	@Autowired
-	private WaitListService waitListService;
 
 	@Autowired
 	private RosterDbToModelConverter rosterDbToModelConverter;
@@ -78,8 +74,8 @@ public class DemographicDbToModelConverter extends
 
 		model.setHealthNumber(StringUtils.trimToNull(input.getHin()));
 		model.setHealthNumberVersion(StringUtils.trimToNull(input.getVer()));
-		model.setHealthNumberProvinceCode(findRegionCodeValue(StringUtils.trimToNull(input.getHcType())));
-		model.setHealthNumberCountryCode(findCountryCodeValue(StringUtils.trimToNull(input.getHcType()), COUNTRY_CODE_CANADA));
+		model.setHealthNumberProvinceCode(AddressModel.parseRegionCodeValue(StringUtils.trimToNull(input.getHcType())));
+		model.setHealthNumberCountryCode(AddressModel.parseCountryCodeValue(StringUtils.trimToNull(input.getHcType()), COUNTRY_CODE_CANADA));
 		model.setHealthNumberRenewDate(ConversionUtils.toNullableLocalDate(input.getHcRenewDate()));
 		model.setHealthNumberEffectiveDate(ConversionUtils.toNullableLocalDate(input.getHcEffectiveDate()));
 		model.setDateJoined(ConversionUtils.toNullableLocalDate(input.getDateJoined()));
@@ -178,8 +174,8 @@ public class DemographicDbToModelConverter extends
 
 		// non canadian regions (ie US states) are stored in the province field like 'US-NY' etc.
 		String provinceCode = StringUtils.trimToNull(input.getProvince());
-		address.setRegionCode(findRegionCodeValue(provinceCode));
-		address.setCountryCode(findCountryCodeValue(provinceCode, COUNTRY_CODE_CANADA));
+		address.setRegionCode(AddressModel.parseRegionCodeValue(provinceCode));
+		address.setCountryCode(AddressModel.parseCountryCodeValue(provinceCode, COUNTRY_CODE_CANADA));
 		address.setPostalCode(StringUtils.deleteWhitespace(input.getPostal()));
 		address.setResidencyStatusCurrent();
 
@@ -193,23 +189,14 @@ public class DemographicDbToModelConverter extends
 		Optional<DemographicExt> altPostalExt = demographicExtDao.getLatestDemographicExt(input.getDemographicId(), DemographicExt.ALTERNATE_POSTAL);
 
 		AddressModel address = new AddressModel();
-		if (altAddressExt.isPresent())
-		{
-			address.setAddressLine1(altAddressExt.get().getValue());
-		}
-		if (altCityExt.isPresent())
-		{
-			address.setCity(altCityExt.get().getValue());
-		}
+		altAddressExt.ifPresent(demographicExt -> address.setAddressLine1(demographicExt.getValue()));
+		altCityExt.ifPresent(demographicExt -> address.setCity(demographicExt.getValue()));
 		if (altProvinceExt.isPresent())
 		{
-			address.setRegionCode(findRegionCodeValue(altProvinceExt.get().getValue()));
-			address.setCountryCode(findCountryCodeValue(altProvinceExt.get().getValue(), COUNTRY_CODE_CANADA));
+			address.setRegionCode(AddressModel.parseRegionCodeValue(altProvinceExt.get().getValue()));
+			address.setCountryCode(AddressModel.parseCountryCodeValue(altProvinceExt.get().getValue(), COUNTRY_CODE_CANADA));
 		}
-		if (altPostalExt.isPresent())
-		{
-			address.setPostalCode(StringUtils.deleteWhitespace(altPostalExt.get().getValue()));
-		}
+		altPostalExt.ifPresent(demographicExt -> address.setPostalCode(StringUtils.deleteWhitespace(demographicExt.getValue())));
 
 		if (address.getAddressLine1() == null && address.getCity() == null && address.getRegionCode() == null
 			&& address.getCountryCode() == null && address.getPostalCode() == null)
@@ -218,43 +205,6 @@ public class DemographicDbToModelConverter extends
 		}
 		address.setResidencyStatusPast();
 		return address;
-	}
-
-	/**
-	 * parse out the province code from the province value
-	 * @param provinceCode to be parsed
-	 * @return the province code
-	 */
-	private String findRegionCodeValue(String provinceCode)
-	{
-		if(provinceCode != null && provinceCode.contains("-"))
-		{
-			String[] provinceCodeSplit = provinceCode.split("-");
-			return provinceCodeSplit[1];
-		}
-		else
-		{
-			return provinceCode;
-		}
-	}
-
-	/**
-	 * parse out the country code from the province value, or return the default.
-	 * @param provinceCode to be parsed
-	 * @param defaultCountry to be used in case province code has no country code part
-	 * @return the country code
-	 */
-	private String findCountryCodeValue(String provinceCode, String defaultCountry)
-	{
-		if(provinceCode != null && provinceCode.contains("-"))
-		{
-			String[] provinceCodeSplit = provinceCode.split("-");
-			return provinceCodeSplit[0];
-		}
-		else
-		{
-			return defaultCountry;
-		}
 	}
 
 	private PhoneNumberModel buildPhoneNumber(String phoneNumber, String extension, PhoneNumberModel.PHONE_TYPE type)

@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.COUNTRY_CODE_USA;
+import static org.oscarehr.dataMigration.model.common.AddressModel.US_REGION_CODE_RESIDENT;
 import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
 import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_ROSTERED;
 import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_TERMINATED;
@@ -208,6 +209,10 @@ public class DemographicModelToDbConverter
 	{
 		if(COUNTRY_CODE_USA.equals(countryCode))
 		{
+			if(provinceCode.equals(US_REGION_CODE_RESIDENT))
+			{
+				provinceCode = ""; // for legacy reasons, empty string indicates unknown us region code
+			}
 			return countryCode + "-" + provinceCode;
 		}
 		else

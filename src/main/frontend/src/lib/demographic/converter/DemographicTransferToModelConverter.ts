@@ -10,6 +10,9 @@ import {ElectronicMessagingConsentStatus} from "../ElectronicMessagingConsentSta
 import ProviderModelToSimpleProviderConverter from "../../provider/converter/ProviderModelToSimpleProviderConverter";
 import PhoneNumberToModelConverter from "../../common/converter/PhoneNumberToModelConverter";
 import RosterDataTransferToModelConverter from "./RosterDataTransferToModelConverter";
+import {Province} from "../../constants/Province";
+import {CountryCode} from "../../constants/CountryCode";
+import {USStateCode} from "../../constants/USStateCode";
 
 export default class DemographicTransferToModelConverter extends AbstractConverter<DemographicModel, Demographic>
 {
@@ -28,7 +31,16 @@ export default class DemographicTransferToModelConverter extends AbstractConvert
 		model.chartNumber = from.chartNumber;
 		model.healthNumber = from.healthNumber;
 		model.healthNumberVersion = from.healthNumberVersion;
-		model.healthNumberProvinceCode = from.healthNumberProvinceCode;
+
+		model.healthNumberCountryCode = from.healthNumberCountryCode as any as CountryCode;
+		if(model.healthNumberCountryCode === CountryCode.US)
+		{
+			model.healthNumberProvinceCode = from.healthNumberProvinceCode as any as USStateCode;
+		}
+		else
+		{
+			model.healthNumberProvinceCode = Province[from.healthNumberProvinceCode];
+		}
 		model.healthNumberEffectiveDate = moment(from.healthNumberEffectiveDate);
 		model.healthNumberRenewDate = moment(from.healthNumberRenewDate);
 		model.patientStatus = from.patientStatus;

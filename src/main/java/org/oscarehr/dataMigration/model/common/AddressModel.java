@@ -30,7 +30,8 @@ import org.oscarehr.dataMigration.model.AbstractTransientModel;
 @Data
 public class AddressModel extends AbstractTransientModel
 {
-	public static String REGION_CODE_OTHER = "OT";
+	public static String US_REGION_CODE_OTHER = "OT";
+	public static String US_REGION_CODE_RESIDENT = "**"; // basically unknown state, appears in UI sometimes
 
 	public enum RESIDENCY_STATUS
 	{
@@ -83,10 +84,62 @@ public class AddressModel extends AbstractTransientModel
 	public static String getSubdivisionCodeCT013Format(String regionCode, String countryCode)
 	{
 		String code = null;
-		if(regionCode != null && !regionCode.equals(REGION_CODE_OTHER))
+		if(regionCode != null && !regionCode.equals(US_REGION_CODE_OTHER))
 		{
 			code = countryCode + "-" + regionCode;
 		}
 		return code;
+	}
+
+
+	/**
+	 * parse out the region code from the region string value
+	 * this is usually in the form of a 2 digit province code: ie: AB, ON, BC, etc.
+	 * or in the case of non-canadian residents, a country code followed by the region code, US-WA, US-NY, etc.
+	 * @param provinceCode to be parsed
+	 * @return the province code
+	 */
+	@JsonIgnore
+	public static String parseRegionCodeValue(String provinceCode)
+	{
+		if(provinceCode != null && provinceCode.contains("-"))
+		{
+			String[] provinceCodeSplit = provinceCode.split("-", -1);
+
+			// empty string is allowed, sometimes indicates US resident (state unknown) in old system
+			// in that case use the new marker instead
+			String regionCode = provinceCodeSplit[1];
+			if(regionCode.isEmpty())
+			{
+				regionCode = US_REGION_CODE_RESIDENT;
+			}
+			return regionCode;
+		}
+		else
+		{
+			return provinceCode;
+		}
+	}
+
+	/**
+	 * parse out the country code from the province value, or return the default.
+	 * this is usually in the form of a 2 digit province code: ie: AB, ON, BC, etc.
+	 * or in the case of non-canadian residents, a country code followed by the region code, US-WA, US-NY, etc.
+	 * @param provinceCode to be parsed
+	 * @param defaultCountry to be used in case province code has no country code part
+	 * @return the country code
+	 */
+	@JsonIgnore
+	public static String parseCountryCodeValue(String provinceCode, String defaultCountry)
+	{
+		if(provinceCode != null && provinceCode.contains("-"))
+		{
+			String[] provinceCodeSplit = provinceCode.split("-");
+			return provinceCodeSplit[0];
+		}
+		else
+		{
+			return defaultCountry;
+		}
 	}
 }

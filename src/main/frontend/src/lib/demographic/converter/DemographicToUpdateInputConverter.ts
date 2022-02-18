@@ -22,7 +22,6 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.sex = DemographicUpdateInput.SexEnum[from.sex];
 		updateInput.chartNumber = from.chartNumber;
 		updateInput.healthNumber = from.healthNumber;
-		updateInput.healthNumber = from.healthNumber;
 		updateInput.healthNumberVersion = from.healthNumberVersion;
 		updateInput.healthNumberProvinceCode = from.healthNumberProvinceCode;
 		updateInput.healthNumberCountryCode = from.healthNumberCountryCode;

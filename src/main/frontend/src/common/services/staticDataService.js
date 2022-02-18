@@ -28,6 +28,8 @@
 import {Sex} from "../../lib/demographic/model/Sex";
 import {OfficialLanguageType} from "../../lib/demographic/model/OfficialLanguageType";
 import {RosterTerminationReasonType} from "../../lib/demographic/model/RosterTerminationReasonType";
+import {Province} from "../../lib/constants/Province";
+import {USStateCode} from "../../lib/constants/USStateCode";
 
 angular.module("Common.Services").service("staticDataService", [
 	function()
@@ -476,67 +478,67 @@ angular.module("Common.Services").service("staticDataService", [
 			var provinces = [];
 			provinces.push(
 			{
-				"value": "AB",
+				"value": Province.AB,
 				"label": "Alberta"
 			});
 			provinces.push(
 			{
-				"value": "BC",
+				"value": Province.BC,
 				"label": "British Columbia"
 			});
 			provinces.push(
 			{
-				"value": "MB",
+				"value": Province.MB,
 				"label": "Manitoba"
 			});
 			provinces.push(
 			{
-				"value": "NB",
+				"value": Province.NB,
 				"label": "New Brunswick"
 			});
 			provinces.push(
 			{
-				"value": "NL",
+				"value": Province.NL,
 				"label": "Newfoundland & Labrador"
 			});
 			provinces.push(
 			{
-				"value": "NT",
+				"value": Province.NT,
 				"label": "Northwest Territories"
 			});
 			provinces.push(
 			{
-				"value": "NS",
+				"value": Province.NS,
 				"label": "Nova Scotia"
 			});
 			provinces.push(
 			{
-				"value": "NU",
+				"value": Province.NU,
 				"label": "Nunavut"
 			});
 			provinces.push(
 			{
-				"value": "ON",
+				"value": Province.ON,
 				"label": "Ontario"
 			});
 			provinces.push(
 			{
-				"value": "PE",
+				"value": Province.PE,
 				"label": "Prince Edward Island"
 			});
 			provinces.push(
 			{
-				"value": "QC",
+				"value": Province.QC,
 				"label": "Quebec"
 			});
 			provinces.push(
 			{
-				"value": "SK",
+				"value": Province.SK,
 				"label": "Saskatchewan"
 			});
 			provinces.push(
 			{
-				"value": "YT",
+				"value": Province.YT,
 				"label": "Yukon"
 			});
 			return provinces;
@@ -547,357 +549,357 @@ angular.module("Common.Services").service("staticDataService", [
 			var provinces = [];
 			provinces.push(
 			{
-				"value": "AB",
+				"value": Province.AB,
 				"label": "AB-Alberta"
 			});
 			provinces.push(
 			{
-				"value": "BC",
+				"value": Province.BC,
 				"label": "BC-British Columbia"
 			});
 			provinces.push(
 			{
-				"value": "MB",
+				"value": Province.MB,
 				"label": "MB-Manitoba"
 			});
 			provinces.push(
 			{
-				"value": "NB",
+				"value": Province.NB,
 				"label": "NB-New Brunswick"
 			});
 			provinces.push(
 			{
-				"value": "NL",
+				"value": Province.NL,
 				"label": "NL-Newfoundland Labrador"
 			});
 			provinces.push(
 			{
-				"value": "NT",
+				"value": Province.NT,
 				"label": "NT-Northwest Territory"
 			});
 			provinces.push(
 			{
-				"value": "NS",
+				"value": Province.NS,
 				"label": "NS-Nova Scotia"
 			});
 			provinces.push(
 			{
-				"value": "NU",
+				"value": Province.NU,
 				"label": "NU-Nunavut"
 			});
 			provinces.push(
 			{
-				"value": "ON",
+				"value": Province.ON,
 				"label": "ON-Ontario"
 			});
 			provinces.push(
 			{
-				"value": "PE",
+				"value": Province.PE,
 				"label": "PE-Prince Edward Island"
 			});
 			provinces.push(
 			{
-				"value": "QC",
+				"value": Province.QC,
 				"label": "QC-Quebec"
 			});
 			provinces.push(
 			{
-				"value": "SK",
+				"value": Province.SK,
 				"label": "SK-Saskatchewan"
 			});
 			provinces.push(
 			{
-				"value": "YT",
+				"value": Province.YT,
 				"label": "YT-Yukon"
 			});
 			provinces.push(
 			{
-				"value": "US",
+				"value": USStateCode.RESIDENT,
 				"label": "US resident"
 			});
 			provinces.push(
 			{
-				"value": "US-AK",
+				"value": USStateCode.AK,
 				"label": "US-AK-Alaska"
 			});
 			provinces.push(
 			{
-				"value": "US-AL",
+				"value": USStateCode.AL,
 				"label": "US-AL-Alabama"
 			});
 			provinces.push(
 			{
-				"value": "US-AR",
+				"value": USStateCode.AR,
 				"label": "US-AR-Arkansas"
 			});
 			provinces.push(
 			{
-				"value": "US-AZ",
+				"value": USStateCode.AZ,
 				"label": "US-AZ-Arizona"
 			});
 			provinces.push(
 			{
-				"value": "US-CA",
+				"value": USStateCode.CA,
 				"label": "US-CA-California"
 			});
 			provinces.push(
 			{
-				"value": "US-CO",
+				"value": USStateCode.CO,
 				"label": "US-CO-Colorado"
 			});
 			provinces.push(
 			{
-				"value": "US-CT",
+				"value": USStateCode.CT,
 				"label": "US-CT-Connecticut"
 			});
 			provinces.push(
 			{
-				"value": "US-CZ",
+				"value": USStateCode.CZ,
 				"label": "US-CZ-Canal Zone"
 			});
 			provinces.push(
 			{
-				"value": "US-DC",
+				"value": USStateCode.DC,
 				"label": "US-DC-District Of Columbia"
 			});
 			provinces.push(
 			{
-				"value": "US-DE",
+				"value": USStateCode.DE,
 				"label": "US-DE-Delaware"
 			});
 			provinces.push(
 			{
-				"value": "US-FL",
+				"value": USStateCode.FL,
 				"label": "US-FL-Florida"
 			});
 			provinces.push(
 			{
-				"value": "US-GA",
+				"value": USStateCode.GA,
 				"label": "US-GA-Georgia"
 			});
 			provinces.push(
 			{
-				"value": "US-GU",
+				"value": USStateCode.GU,
 				"label": "US-GU-Guam"
 			});
 			provinces.push(
 			{
-				"value": "US-HI",
+				"value": USStateCode.HI,
 				"label": "US-HI-Hawaii"
 			});
 			provinces.push(
 			{
-				"value": "US-IA",
+				"value": USStateCode.IA,
 				"label": "US-IA-Iowa"
 			});
 			provinces.push(
 			{
-				"value": "US-ID",
+				"value": USStateCode.ID,
 				"label": "US-ID-Idaho"
 			});
 			provinces.push(
 			{
-				"value": "US-IL",
+				"value": USStateCode.IL,
 				"label": "US-IL-Illinois"
 			});
 			provinces.push(
 			{
-				"value": "US-IN",
+				"value": USStateCode.IN,
 				"label": "US-IN-Indiana"
 			});
 			provinces.push(
 			{
-				"value": "US-KS",
+				"value": USStateCode.KS,
 				"label": "US-KS-Kansas"
 			});
 			provinces.push(
 			{
-				"value": "US-KY",
+				"value": USStateCode.KY,
 				"label": "US-KY-Kentucky"
 			});
 			provinces.push(
 			{
-				"value": "US-LA",
+				"value": USStateCode.LA,
 				"label": "US-LA-Louisiana"
 			});
 			provinces.push(
 			{
-				"value": "US-MA",
+				"value": USStateCode.MA,
 				"label": "US-MA-Massachusetts"
 			});
 			provinces.push(
 			{
-				"value": "US-MD",
+				"value": USStateCode.MD,
 				"label": "US-MD-Maryland"
 			});
 			provinces.push(
 			{
-				"value": "US-ME",
+				"value": USStateCode.ME,
 				"label": "US-ME-Maine"
 			});
 			provinces.push(
 			{
-				"value": "US-MI",
+				"value": USStateCode.MI,
 				"label": "US-MI-Michigan"
 			});
 			provinces.push(
 			{
-				"value": "US-MN",
+				"value": USStateCode.MN,
 				"label": "US-MN-Minnesota"
 			});
 			provinces.push(
 			{
-				"value": "US-MO",
+				"value": USStateCode.MO,
 				"label": "US-MO-Missouri"
 			});
 			provinces.push(
 			{
-				"value": "US-MS",
+				"value": USStateCode.MS,
 				"label": "US-MS-Mississippi"
 			});
 			provinces.push(
 			{
-				"value": "US-MT",
+				"value": USStateCode.MT,
 				"label": "US-MT-Montana"
 			});
 			provinces.push(
 			{
-				"value": "US-NC",
+				"value": USStateCode.NC,
 				"label": "US-NC-North Carolina"
 			});
 			provinces.push(
 			{
-				"value": "US-ND",
+				"value": USStateCode.ND,
 				"label": "US-ND-North Dakota"
 			});
 			provinces.push(
 			{
-				"value": "US-NE",
+				"value": USStateCode.NE,
 				"label": "US-NE-Nebraska"
 			});
 			provinces.push(
 			{
-				"value": "US-NH",
+				"value": USStateCode.NH,
 				"label": "US-NH-New Hampshire"
 			});
 			provinces.push(
 			{
-				"value": "US-NJ",
+				"value": USStateCode.NJ,
 				"label": "US-NJ-New Jersey"
 			});
 			provinces.push(
 			{
-				"value": "US-NM",
+				"value": USStateCode.NM,
 				"label": "US-NM-New Mexico"
 			});
 			provinces.push(
 			{
-				"value": "US-NU",
+				"value": USStateCode.NU,
 				"label": "US-NU-Nunavut"
 			});
 			provinces.push(
 			{
-				"value": "US-NV",
+				"value": USStateCode.NV,
 				"label": "US-NV-Nevada"
 			});
 			provinces.push(
 			{
-				"value": "US-NY",
+				"value": USStateCode.NY,
 				"label": "US-NY-New York"
 			});
 			provinces.push(
 			{
-				"value": "US-OH",
+				"value": USStateCode.OH,
 				"label": "US-OH-Ohio"
 			});
 			provinces.push(
 			{
-				"value": "US-OK",
+				"value": USStateCode.OK,
 				"label": "US-OK-Oklahoma"
 			});
 			provinces.push(
 			{
-				"value": "US-OR",
+				"value": USStateCode.OR,
 				"label": "US-OR-Oregon"
 			});
 			provinces.push(
 			{
-				"value": "US-PA",
+				"value": USStateCode.PA,
 				"label": "US-PA-Pennsylvania"
 			});
 			provinces.push(
 			{
-				"value": "US-PR",
+				"value": USStateCode.PR,
 				"label": "US-PR-Puerto Rico"
 			});
 			provinces.push(
 			{
-				"value": "US-RI",
+				"value": USStateCode.RI,
 				"label": "US-RI-Rhode Island"
 			});
 			provinces.push(
 			{
-				"value": "US-SC",
+				"value": USStateCode.SC,
 				"label": "US-SC-South Carolina"
 			});
 			provinces.push(
 			{
-				"value": "US-SD",
+				"value": USStateCode.SD,
 				"label": "US-SD-South Dakota"
 			});
 			provinces.push(
 			{
-				"value": "US-TN",
+				"value": USStateCode.TN,
 				"label": "US-TN-Tennessee"
 			});
 			provinces.push(
 			{
-				"value": "US-TX",
+				"value": USStateCode.TX,
 				"label": "US-TX-Texas"
 			});
 			provinces.push(
 			{
-				"value": "US-UT",
+				"value": USStateCode.UT,
 				"label": "US-UT-Utah"
 			});
 			provinces.push(
 			{
-				"value": "US-VA",
+				"value": USStateCode.VA,
 				"label": "US-VA-Virginia"
 			});
 			provinces.push(
 			{
-				"value": "US-VI",
+				"value": USStateCode.VI,
 				"label": "US-VI-Virgin Islands"
 			});
 			provinces.push(
 			{
-				"value": "US-VT",
+				"value": USStateCode.VT,
 				"label": "US-VT-Vermont"
 			});
 			provinces.push(
 			{
-				"value": "US-WA",
+				"value": USStateCode.WA,
 				"label": "US-WA-Washington"
 			});
 			provinces.push(
 			{
-				"value": "US-WI",
+				"value": USStateCode.WI,
 				"label": "US-WI-Wisconsin"
 			});
 			provinces.push(
 			{
-				"value": "US-WV",
+				"value": USStateCode.WV,
 				"label": "US-WV-West Virginia"
 			});
 			provinces.push(
 			{
-				"value": "US-WY",
+				"value": USStateCode.WY,
 				"label": "US-WY-Wyoming"
 			});
 			provinces.push(
 			{
-				"value": "OT",
+				"value": USStateCode.OTHER,
 				"label": "Other"
 			});
 			return provinces;

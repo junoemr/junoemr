@@ -1,6 +1,9 @@
 import {AddressResidencyStatus} from "./AddressResidencyStatus";
 import {AddressModel} from "../../../../generated";
 import ResidencyStatusEnum = AddressModel.ResidencyStatusEnum;
+import {CountryCode} from "../../constants/CountryCode";
+import {Province} from "../../constants/Province";
+import {USStateCode} from "../../constants/USStateCode";
 
 export default class Address
 {
@@ -8,8 +11,8 @@ export default class Address
 	private _addressLine2: string;
 	private _city: string;
 	private _postalCode: string;
-	private _regionCode: string;
-	private _countryCode: string;
+	private _regionCode: Province | USStateCode; // changes based on country code
+	private _countryCode: CountryCode;
 	private _residencyStatus: AddressResidencyStatus;
 
 	/**
@@ -18,7 +21,7 @@ export default class Address
 
 	constructor(residencyStatus: ResidencyStatusEnum = AddressResidencyStatus.Past)
 	{
-		this.countryCode = "CA";
+		this.countryCode = CountryCode.CA;
 		this.residencyStatus = residencyStatus;
 	}
 
@@ -102,22 +105,32 @@ export default class Address
 		this._postalCode = value;
 	}
 
-	get regionCode(): string
+	get regionCode(): Province | USStateCode
 	{
 		return this._regionCode;
 	}
 
-	set regionCode(value: string)
+	set regionCode(value: Province | USStateCode)
 	{
 		this._regionCode = value;
+
+		// set the country based on incoming region code for now, as country code not really supported in ui
+		if ((<any>Object).values(USStateCode).includes(value))
+		{
+			this.countryCode = CountryCode.US;
+		}
+		else
+		{
+			this.countryCode = CountryCode.CA;
+		}
 	}
 
-	get countryCode(): string
+	get countryCode(): CountryCode
 	{
 		return this._countryCode;
 	}
 
-	set countryCode(value: string)
+	set countryCode(value: CountryCode)
 	{
 		this._countryCode = value;
 	}

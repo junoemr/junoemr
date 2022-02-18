@@ -31,6 +31,7 @@ import Demographic from "../../lib/demographic/model/Demographic";
 import DemographicTransferToModelConverter from "../../lib/demographic/converter/DemographicTransferToModelConverter";
 import DemographicToCreateInputConverter from "../../lib/demographic/converter/DemographicToCreateInputConverter";
 import DemographicToUpdateInputConverter from "../../lib/demographic/converter/DemographicToUpdateInputConverter";
+import {API_BASE_PATH} from "../../lib/constants/ApiConstants";
 
 angular.module("Common.Services").service("demographicService", [
 	'$http',
@@ -40,7 +41,7 @@ angular.module("Common.Services").service("demographicService", [
 		$httpParamSerializer)
 	{
 		const service = this;
-		service.demographicApi = new DemographicApi($http, $httpParamSerializer, '../ws/rs');
+		service.demographicApi = new DemographicApi($http, $httpParamSerializer, API_BASE_PATH);
 
 		service.demographicTransferToModelConverter = new DemographicTransferToModelConverter();
 		service.demographicToCreateInputConverter = new DemographicToCreateInputConverter();

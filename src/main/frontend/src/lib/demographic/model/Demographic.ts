@@ -10,6 +10,9 @@ import RosterStatusData from "./RosterStatusData";
 import {PhoneType} from "../../common/model/PhoneType";
 import DemographicWaitingList from "../../waitingList/model/DemographicWaitingList";
 import {AddressResidencyStatus} from "../../common/model/AddressResidencyStatus";
+import {CountryCode} from "../../constants/CountryCode";
+import {Province} from "../../constants/Province";
+import {USStateCode} from "../../constants/USStateCode";
 
 export default class Demographic
 {
@@ -24,8 +27,8 @@ export default class Demographic
 	private _sex: Sex;
 	private _healthNumber: string;
 	private _healthNumberVersion: string;
-	private _healthNumberProvinceCode: string;
-	private _healthNumberCountryCode: string;
+	private _healthNumberProvinceCode: Province | USStateCode;
+	private _healthNumberCountryCode: CountryCode;
 	private _healthNumberEffectiveDate: Moment;
 	private _healthNumberRenewDate: Moment;
 	private _chartNumber: string;
@@ -311,22 +314,32 @@ export default class Demographic
 		this._healthNumberVersion = value;
 	}
 
-	get healthNumberProvinceCode(): string
+	get healthNumberProvinceCode(): Province | USStateCode
 	{
 		return this._healthNumberProvinceCode;
 	}
 
-	set healthNumberProvinceCode(value: string)
+	set healthNumberProvinceCode(value: Province | USStateCode)
 	{
 		this._healthNumberProvinceCode = value;
+
+		// set the country based on incoming region code for now, as country code not really supported in ui
+		if ((<any>Object).values(USStateCode).includes(value))
+		{
+			this.healthNumberCountryCode = CountryCode.US;
+		}
+		else
+		{
+			this.healthNumberCountryCode = CountryCode.CA;
+		}
 	}
 
-	get healthNumberCountryCode(): string
+	get healthNumberCountryCode(): CountryCode
 	{
 		return this._healthNumberCountryCode;
 	}
 
-	set healthNumberCountryCode(value: string)
+	set healthNumberCountryCode(value: CountryCode)
 	{
 		this._healthNumberCountryCode = value;
 	}
