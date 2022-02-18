@@ -243,6 +243,7 @@ angular.module('Patient').component('addDemographicModal', {
 			ctrl.onMRPChange = (value :object, option: any) :void =>
 			{
 				ctrl.newDemographicData.mrpProvider = option.data;
+				console.info(option.data, ctrl.newDemographicData);
 			}
 
 			ctrl.onPreferredPhoneTypeChange = (value: PhoneType): void =>

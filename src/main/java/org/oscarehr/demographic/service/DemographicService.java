@@ -28,7 +28,7 @@ import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.DemographicArchive;
-import org.oscarehr.demographic.converter.DemographicCreateInputToModelConverter;
+import org.oscarehr.demographic.converter.DemographicCreateInputToEntityConverter;
 import org.oscarehr.demographic.converter.DemographicDbToModelConverter;
 import org.oscarehr.demographic.converter.DemographicModelToDbConverter;
 import org.oscarehr.demographic.converter.DemographicUpdateInputToEntityConverter;
@@ -113,7 +113,7 @@ public class DemographicService
 	private DemographicDbToModelConverter demographicDbToModelConverter;
 
 	@Autowired
-	private DemographicCreateInputToModelConverter demographicCreateInputToModelConverter;
+	private DemographicCreateInputToEntityConverter demographicCreateInputToEntityConverter;
 
 	@Autowired
 	private DemographicUpdateInputToEntityConverter demographicUpdateInputToEntityConverter;
@@ -379,8 +379,11 @@ public class DemographicService
 	}
 	public DemographicModel addNewDemographicRecord(String providerNoStr, DemographicCreateInput demographicInput)
 	{
-		DemographicModel model = demographicCreateInputToModelConverter.convert(demographicInput);
-		return demographicDbToModelConverter.convert(addNewDemographicRecord(providerNoStr, model));
+		Demographic demographic = demographicCreateInputToEntityConverter.convert(demographicInput);
+		Set<DemographicExt> demographicExtSet = demographic.getDemographicExtSet();
+		DemographicCust demoCustom = demographic.getDemographicCust();
+
+		return demographicDbToModelConverter.convert(addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtSet));
 	}
 	public Demographic addNewDemographicRecord(String providerNoStr, DemographicModel demographicModel)
 	{

@@ -22,10 +22,14 @@
  */
 package org.oscarehr.demographic.converter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.transfer.DemographicCreateInput;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -33,11 +37,14 @@ import java.time.LocalDate;
 import static org.oscarehr.demographic.entity.Demographic.STATUS_ACTIVE;
 
 @Component
-public class DemographicCreateInputToModelConverter
-		extends BaseModelToDbConverter<DemographicCreateInput, DemographicModel>
+public class DemographicCreateInputToEntityConverter
+		extends BaseModelToDbConverter<DemographicCreateInput, Demographic>
 {
+	@Autowired
+	protected DemographicModelToDbConverter demographicModelToDbConverter;
+
 	@Override
-	public DemographicModel convert(DemographicCreateInput input)
+	public Demographic convert(DemographicCreateInput input)
 	{
 		if (input == null)
 		{
@@ -51,6 +58,16 @@ public class DemographicCreateInputToModelConverter
 		model.setPatientStatusDate(LocalDate.now());
 		model.setDateJoined(LocalDate.now());
 
-		return model;
+		if(StringUtils.isNotBlank(input.getMrpProviderId()))
+		{
+			ProviderModel mrpProvider = new ProviderModel();
+			mrpProvider.setId(input.getMrpProviderId());
+			model.setMrpProvider(mrpProvider);
+		}
+
+		//TODO direct conversion
+		Demographic entity = demographicModelToDbConverter.convert(model);
+		BaseModelToDbConverter.clearProviderCache(); // don't keep the provider cache for simple demographic creation
+		return entity;
 	}
 }

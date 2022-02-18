@@ -22,8 +22,6 @@
  */
 package org.oscarehr.dataMigration.converter.in;
 
-import java.util.HashMap;
-import java.util.List;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.model.UserProperty;
@@ -39,6 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
 import oscar.util.StringUtils;
+
+import java.util.HashMap;
+import java.util.List;
 
 @Component
 public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverter<I, E>
@@ -87,9 +88,10 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 		{
 			return null;
 		}
-		else if(provider == null || StringUtils.isNullOrEmpty(provider.getFirstName()) || StringUtils.isNullOrEmpty(provider.getLastName()))
+		else if(provider == null
+				|| ((StringUtils.isNullOrEmpty(provider.getFirstName()) || StringUtils.isNullOrEmpty(provider.getLastName())) && provider.getId() == null))
 		{
-			logger.warn("Not enough provider info found to link or create provider record (first and last name are required). \n" +
+			logger.warn("Not enough provider info found to link or create provider record (first and last name, or id are required). \n" +
 					"Default provider (" + DEFAULT_PROVIDER_LAST_NAME + "," + DEFAULT_PROVIDER_FIRST_NAME + ") will be assigned.");
 			newProvider = getDefaultProvider();
 		}
@@ -105,6 +107,13 @@ public abstract class BaseModelToDbConverter<I, E> extends AbstractModelConverte
 		{
 			dbProvider = providerLookupCache.get(cacheKey);
 			logger.info("Use existing cached Provider record " + dbProvider.getId() + " (" + dbProvider.getLastName() + "," + dbProvider.getFirstName() + ")");
+		}
+		else if (newProvider.getId() != null)
+		{
+			dbProvider = providerDataDao.find(newProvider.getId());
+			logger.info("Use existing uncached Provider record " + dbProvider.getId() + " (" + dbProvider.getLastName() + "," + dbProvider.getFirstName() + ")");
+			cacheKey = dbProvider.getFirstName() + dbProvider.getLastName();
+			providerLookupCache.put(cacheKey, dbProvider);
 		}
 		else
 		{

@@ -31,6 +31,7 @@ export default class DemographicToCreateInputConverter extends AbstractConverter
 		// physician info
 		createInput.mrpProviderId = from.mrpProvider?.id;
 
+		console.info("create conversion", from, createInput);
 		return createInput;
 	}
 }
