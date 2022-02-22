@@ -32,6 +32,7 @@ import {BILLING_REGION} from "../../billing/billingConstants";
 import Demographic from "../../lib/demographic/model/Demographic";
 import ToastService from "../../lib/alerts/service/ToastService";
 import moment from "moment";
+import Address from "../../lib/common/model/Address";
 
 angular.module('Record.Details').component('detailsCtrl', {
 	// note 'details' is a reserved html tag name
@@ -431,35 +432,18 @@ angular.module('Record.Details').component('detailsCtrl', {
 			return true;
 		};
 
-		controller.isPostalComplete = function isPostalComplete(postal, province)
+		controller.isPostalComplete = function isPostalComplete(address: Address)
 		{
-			// If Canadian province is selected, proceed with validation
-			if (postal && province && province !== "OT" && province.indexOf("US") !== 0)
+			if(address)
 			{
-				if (controller.isPostalValidCanadian(postal))
+				if(!address.isValidPostalOrZip())
 				{
-					return true;
+					Juno.Common.Util.errorAlert($uibModal, "Validation", "Invalid/Incomplete Postal Code");
+					controller.resetEditState();
+					return false;
 				}
-
-				controller.resetEditState();
-				return false;
 			}
-
 			return true;
-		};
-
-		controller.isPostalValidCanadian = function isPostalValidCanadian(postalCode)
-		{
-			const regex = new RegExp(/^[A-Za-z]\d[A-Za-z][ ]?\d[A-Za-z]\d$/); // Match to Canadian postal code standard
-			if (regex.test(postalCode))
-			{
-				return true;
-			}
-			else
-			{
-				Juno.Common.Util.errorAlert($uibModal, "Validation", "Invalid/Incomplete Postal Code");
-				return false;
-			}
 		};
 
 		//upload photo
@@ -730,9 +714,8 @@ angular.module('Record.Details').component('detailsCtrl', {
 			}
 
 			if (!controller.checkPatientStatus()) return;
-			if (!controller.isPostalComplete(controller.page.demo.address.postalCode, controller.page.demo.address.regionCode)) return;
-			if (controller.page.demo.address2 &&
-				!controller.isPostalComplete(controller.page.demo.address2.postalCode, controller.page.demo.address2.regionCode)) return;
+			if (!controller.isPostalComplete(controller.page.demo.address)) return;
+			if (controller.page.demo.address2 && !controller.isPostalComplete(controller.page.demo.address2)) return;
 
 			if (Juno.Common.Util.exists(controller.page.demo.healthNumber))
             {

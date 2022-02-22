@@ -27,8 +27,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.service.CaseManagementIssueService;
-import org.oscarehr.common.dao.WaitingListDao;
-import org.oscarehr.common.dao.WaitingListNameDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.demographic.model.DemographicModel;
@@ -91,12 +89,6 @@ public class DemographicService extends AbstractServiceImpl {
 
 	@Autowired
 	private DemographicManager demographicManager;
-
-	@Autowired
-	private WaitingListDao waitingListDao;
-	
-	@Autowired
-	private WaitingListNameDao waitingListNameDao;
 
 	@Autowired
 	private RecentDemographicAccessService recentDemographicAccessService;
@@ -174,70 +166,6 @@ public class DemographicService extends AbstractServiceImpl {
 		recentDemographicAccessService.updateAccessRecord(loggedInUserId, demo.getId());
 
 		return RestResponse.successResponse(demo);
-
-//		try
-//		{
-//			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
-//			int providerNo = Integer.parseInt(providerNoStr);
-//
-//			Demographic demo = demographicManager.getDemographic(getLoggedInInfo(), id);
-//			if (demo == null)
-//			{
-//				return RestResponse.errorResponse("No demographic found with id " + id);
-//			}
-//
-//			List<DemographicExt> demoExts = demographicManager.getDemographicExts(getLoggedInInfo(), id);
-//			if (demoExts != null && !demoExts.isEmpty())
-//			{
-//				DemographicExt[] demoExtArray = demoExts.toArray(new DemographicExt[demoExts.size()]);
-//				demo.setExtras(demoExtArray);
-//			}
-//
-//			DemographicTo1 result = demoConverter.getAsTransferObject(getLoggedInInfo(), demo);
-//			AddressTo1 extraAddress = demographicManager.getExtraAddress(result);
-//			result.setAddress2(extraAddress);
-//
-//			DemographicCust demoCust = demographicManager.getDemographicCust(getLoggedInInfo(), id);
-//			if (demoCust != null)
-//			{
-//				result.setNurse(demoCust.getNurse());
-//				result.setResident(demoCust.getResident());
-//				result.setAlert(demoCust.getAlert());
-//				result.setMidwife(demoCust.getMidwife());
-//				result.setNotes(demoCust.getNotes());
-//			}
-//
-//			List<WaitingList> waitingList = waitingListDao.search_wlstatus(id);
-//			if (waitingList != null && !waitingList.isEmpty())
-//			{
-//				WaitingList wl = waitingList.get(0);
-//				result.setWaitingListID(wl.getListId());
-//				result.setWaitingListNote(wl.getNote());
-//				result.setOnWaitingListSinceDate(wl.getOnListSince());
-//			}
-//
-//			List<WaitingListName> waitingListNames = waitingListNameDao.findAll(null, null);
-//			if (waitingListNames != null)
-//			{
-//				for (WaitingListName waitingListName : waitingListNames)
-//				{
-//					if (waitingListName.getIsHistory().equals("Y")) continue;
-//
-//					WaitingListNameTo1 waitingListNameTo1 = waitingListNameConverter.getAsTransferObject(getLoggedInInfo(), waitingListName);
-//					result.getWaitingListNames().add(waitingListNameTo1);
-//				}
-//			}
-//
-//			LogAction.addLogEntry(providerNoStr, demo.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
-//			recentDemographicAccessService.updateAccessRecord(providerNo, demo.getDemographicNo());
-//
-//			return RestResponse.successResponse(result);
-//		}
-//		catch (Exception e)
-//		{
-//			logger.error("Error",e);
-//		}
-//		return RestResponse.errorResponse("Error");
 	}
 
 	/**
@@ -303,58 +231,6 @@ public class DemographicService extends AbstractServiceImpl {
 		recentDemographicAccessService.updateAccessRecord(getLoggedInInfo().getLoggedInProviderNo(), updatedModel.getId());
 
 		return RestResponse.successResponse(updatedModel);
-
-//		try
-//		{
-//			if (data.getAddress2().getAddress() != null || data.getAddress2().getCity() != null ||
-//					 data.getAddress2().getPostal() != null || data.getAddress2().getProvince() != null)
-//			{
-//				List<DemographicExtTo1> extraAddress = demographicManager.setExtraAddress(data);
-//				data.setExtras(extraAddress);
-//			}
-//			//update demographiccust
-//			if (data.getNurse() != null || data.getResident() != null || data.getAlert() != null || data.getMidwife() != null || data.getNotes() != null)
-//			{
-//				DemographicCust demoCust = demographicManager.getDemographicCust(getLoggedInInfo(), data.getDemographicNo());
-//				if (demoCust == null)
-//				{
-//					demoCust = new DemographicCust();
-//					demoCust.setId(data.getDemographicNo());
-//				}
-//				demoCust.setNurse(data.getNurse());
-//				demoCust.setResident(data.getResident());
-//				demoCust.setAlert(data.getAlert());
-//				demoCust.setMidwife(data.getMidwife());
-//				demoCust.setNotes(data.getNotes());
-//				demographicManager.createUpdateDemographicCust(getLoggedInInfo(), demoCust);
-//			}
-//
-//			//update waitingList
-//			if (data.getWaitingListID() != null)
-//			{
-//				WLWaitingListUtil.updateWaitingListRecord(data.getWaitingListID().toString(), data.getWaitingListNote(), data.getDemographicNo().toString(), null);
-//			}
-//
-//			org.oscarehr.demographic.entity.Demographic demographic = demographicToDomainConverter.convert(data);
-//			demographicManager.updateDemographic(loggedInInfo, demographic);
-//
-//			LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), demographic.getDemographicId(),
-//					LogConst.ACTION_UPDATE,
-//					LogConst.CON_DEMOGRAPHIC,
-//					LogConst.STATUS_SUCCESS,
-//					null,
-//					loggedInInfo.getIp());
-//
-//			Integer providerNo = Integer.parseInt(loggedInInfo.getLoggedInProviderNo());
-//			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getId());
-//
-//			return RestResponse.successResponse(demographicService.getDemographic(demographic.getId()));
-//		}
-//		catch (Exception e)
-//		{
-//			logger.error("Error",e);
-//		}
-//		return RestResponse.errorResponse("Error");
 	}
 
 	/**

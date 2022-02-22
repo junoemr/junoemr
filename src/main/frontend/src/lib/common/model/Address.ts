@@ -1,9 +1,9 @@
 import {AddressResidencyStatus} from "./AddressResidencyStatus";
 import {AddressModel} from "../../../../generated";
-import ResidencyStatusEnum = AddressModel.ResidencyStatusEnum;
 import {CountryCode} from "../../constants/CountryCode";
 import {Province} from "../../constants/Province";
 import {USStateCode} from "../../constants/USStateCode";
+import ResidencyStatusEnum = AddressModel.ResidencyStatusEnum;
 
 export default class Address
 {
@@ -59,6 +59,28 @@ export default class Address
 			line += this.postalCode;
 		}
 		return line.trim();
+	}
+
+	/**
+	 * validation helpers
+	 */
+
+	public isValidPostalOrZip(nullable: boolean = true): boolean
+	{
+		if (!this.postalCode)
+		{
+			return nullable;
+		}
+		if(this.countryCode === CountryCode.CA)
+		{
+			const regex = new RegExp(/^[A-Za-z]\d[A-Za-z][ ]?\d[A-Za-z]\d$/); // Match to Canadian postal code standard
+			return (regex.test(this.postalCode));
+		}
+		else
+		{
+			// todo US zip code validation?
+			return true;
+		}
 	}
 
 	/**
