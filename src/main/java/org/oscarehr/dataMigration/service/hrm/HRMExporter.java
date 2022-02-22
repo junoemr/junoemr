@@ -68,7 +68,6 @@ public class HRMExporter implements DemographicExporter
 		HrmDocument firstDocument = patientRecord.getHrmDocumentList().get(0);
 
 		String name = "-HRM_" + StringUtils.trimToEmpty(firstDocument.getSendingFacilityId()) + "-" +
-				StringUtils.trimToEmpty(firstDocument.getSendingFacilityReport()) + "_" +
 				StringUtils.trimToEmpty(firstDocument.getMessageUniqueId()) + ".xml";
 
 		return GenericFile.getFormattedFileName(name);
