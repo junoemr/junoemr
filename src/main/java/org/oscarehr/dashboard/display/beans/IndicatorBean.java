@@ -78,6 +78,27 @@ public class IndicatorBean extends AbstractDataDisplayBean {
 		this.stringArrayTooltips = stringArrayTooltips;
 	}
 
+	/**
+	 * Determine if at least one pie chart section is plottable.
+	 * @return true if plottable
+	 */
+	public boolean isPlottable()
+	{
+		for (GraphPlot[] graph : graphPlots)
+		{
+			for (GraphPlot point : graph)
+			{
+				Double result = point.getNumerator() / point.getDenominator();
+				if (!result.equals(0D) && !result.isInfinite() && !result.isNaN())
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	@Override
 	public String toString() {
 		return ReflectionToStringBuilder.toString(this);
