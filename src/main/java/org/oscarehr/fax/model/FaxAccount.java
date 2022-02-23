@@ -29,6 +29,8 @@ import org.oscarehr.fax.provider.FaxProvider;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -61,7 +63,8 @@ public class FaxAccount extends AbstractModel<Long>
 	private String loginPassword;
 
 	@Column(name="integration_type")
-	private String integrationType;
+	@Enumerated(EnumType.STRING)
+	private FaxProvider integrationType;
 
 	@Column(name="integration_enabled")
 	private Boolean integrationEnabled;
@@ -119,17 +122,12 @@ public class FaxAccount extends AbstractModel<Long>
 		this.loginPassword = (loginPassword == null) ? null : StringEncryptor.encrypt(loginPassword);
 	}
 
-	public String getIntegrationType()
+	public FaxProvider getIntegrationType()
 	{
 		return integrationType;
 	}
 
-	public FaxProvider getIntegrationTypeEnum()
-	{
-		return FaxProvider.valueOf(integrationType);
-	}
-
-	public void setIntegrationType(String integrationType)
+	public void setIntegrationType(FaxProvider integrationType)
 	{
 		this.integrationType = integrationType;
 	}

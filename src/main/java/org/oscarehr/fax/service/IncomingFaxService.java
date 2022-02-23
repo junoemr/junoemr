@@ -60,7 +60,7 @@ public class IncomingFaxService
 
 		// upload a new document through document service
 		Document document = new Document();
-		document.setSource(faxAccount.getIntegrationType());
+		document.setSource(faxAccount.getIntegrationType().name());
 		document.setDocCreator(ProviderData.SYSTEM_PROVIDER_NO);
 		document.setResponsible(ProviderData.SYSTEM_PROVIDER_NO);
 		document.setDocdesc("");
