@@ -20,29 +20,28 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.conversion;
+package org.oscarehr.fax.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
+import org.oscarehr.fax.model.FaxInbound;
+import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
 
 @Component
-public class FaxAccountToModelConverter extends AbstractModelConverter<FaxAccount, FaxAccountTransferOutbound>
+public class FaxInboundToModelConverter extends AbstractModelConverter<FaxInbound, FaxInboxTransferOutbound>
 {
 	@Override
-	public FaxAccountTransferOutbound convert(FaxAccount entity)
+	public FaxInboxTransferOutbound convert(FaxInbound entity)
 	{
-		FaxAccountTransferOutbound model = new FaxAccountTransferOutbound();
+		FaxInboxTransferOutbound model = new FaxInboxTransferOutbound();
 		model.setId(entity.getId());
-		model.setAccountLogin(entity.getLoginId());
-		model.setEnabled(entity.isIntegrationEnabled());
-		model.setEnableInbound(entity.isInboundEnabled());
-		model.setEnableOutbound(entity.isOutoundEnabled());
-		model.setDisplayName(entity.getDisplayName());
-		model.setCoverLetterOption(entity.getCoverLetterOption());
-		model.setAccountEmail(entity.getEmail());
-		model.setFaxNumber(entity.getReplyFaxNumber());
+		model.setDocumentId(entity.getDocument().getDocumentNo());
+		model.setFaxAccountId(entity.getFaxAccount().getId());
+		model.setSystemDateReceived(ConversionUtils.toTimestampString(entity.getCreatedAt()));
+		model.setExternalReferenceId(entity.getExternalReferenceId());
+		model.setSentFrom(entity.getSentFrom());
+
 		return model;
 	}
 }

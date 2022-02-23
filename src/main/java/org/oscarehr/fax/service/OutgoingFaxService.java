@@ -29,6 +29,7 @@ import org.hibernate.cfg.NotYetImplementedException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.FaxStatus;
+import org.oscarehr.fax.converter.FaxOutboundToModelConverter;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
@@ -42,12 +43,11 @@ import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
+import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import org.oscarehr.integration.SRFax.SRFaxUploadProvider;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
-import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -92,6 +92,9 @@ public class OutgoingFaxService
 
 	@Autowired
 	private FaxStatus faxStatus;
+
+	@Autowired
+	private FaxOutboundToModelConverter faxOutboundToModelConverter;
 
 	public boolean isOutboundFaxEnabled()
 	{
@@ -144,7 +147,7 @@ public class OutgoingFaxService
 		{
 			FaxOutbound faxOutbound = queueNewFax(providerId, demographicId, faxAccount, faxNumber, fileType, fileToFax);
 			sendQueuedFax(faxOutbound, fileToFax);
-			transfer = FaxTransferConverter.getAsOutboxTransferObject(faxAccount, faxOutbound);
+			transfer = faxOutboundToModelConverter.convert(faxOutbound);
 		}
 		// if legacy faxing is enabled, write to the outgoing folder.
 		else if(isLegacyFaxEnabled())
@@ -220,7 +223,7 @@ public class OutgoingFaxService
 		}
 
 		sendQueuedFax(faxOutbound, fileToResend);
-		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
+		return faxOutboundToModelConverter.convert(faxOutbound);
 	}
 
 
@@ -260,14 +263,14 @@ public class OutgoingFaxService
 		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
 		faxOutbound.setNotificationStatus(FaxOutbound.NotificationStatus.valueOf(status));
 		faxOutboundDao.persist(faxOutbound);
-		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
+		return faxOutboundToModelConverter.convert(faxOutbound);
 	}
 	public FaxOutboxTransferOutbound setArchived(Long faxOutId, boolean isArchived)
 	{
 		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
 		faxOutbound.setArchived(isArchived);
 		faxOutboundDao.persist(faxOutbound);
-		return FaxTransferConverter.getAsOutboxTransferObject(faxOutbound.getFaxAccount(), faxOutbound);
+		return faxOutboundToModelConverter.convert(faxOutbound);
 	}
 
 	/**

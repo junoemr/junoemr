@@ -24,6 +24,7 @@ package org.oscarehr.fax.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import org.oscarehr.fax.provider.FaxProvider;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -34,4 +35,5 @@ public class FaxAccountTransferOutbound extends FaxAccountTransferBasic
 {
 	private Long id;
 	private String accountLogin;
+	private FaxProvider accountType;
 }

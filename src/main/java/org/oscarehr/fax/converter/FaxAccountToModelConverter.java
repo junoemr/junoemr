@@ -20,30 +20,30 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.conversion;
+package org.oscarehr.fax.converter;
 
-import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.transfer.FaxAccountCreateInput;
+import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FaxAccountCreateToEntityConverter extends AbstractModelConverter<FaxAccountCreateInput, FaxAccount>
+public class FaxAccountToModelConverter extends AbstractModelConverter<FaxAccount, FaxAccountTransferOutbound>
 {
 	@Override
-	public FaxAccount convert(FaxAccountCreateInput input)
+	public FaxAccountTransferOutbound convert(FaxAccount entity)
 	{
-		FaxAccount entity = new FaxAccount();
-		entity.setLoginId(StringUtils.trimToNull(input.getAccountLogin()));
-		entity.setLoginPassword(StringUtils.trimToNull(input.getPassword()));
-		entity.setIntegrationEnabled(input.isEnabled());
-		entity.setInboundEnabled(input.isEnableInbound());
-		entity.setOutboundEnabled(input.isEnableOutbound());
-		entity.setDisplayName(StringUtils.trimToNull(input.getDisplayName()));
-		entity.setCoverLetterOption(input.getCoverLetterOption());
-		entity.setEmail(StringUtils.trimToNull(input.getAccountEmail()));
-		entity.setReplyFaxNumber(StringUtils.trimToNull(input.getFaxNumber()));
-		return entity;
+		FaxAccountTransferOutbound model = new FaxAccountTransferOutbound();
+		model.setId(entity.getId());
+		model.setAccountLogin(entity.getLoginId());
+		model.setAccountType(entity.getIntegrationType());
+		model.setEnabled(entity.isIntegrationEnabled());
+		model.setEnableInbound(entity.isInboundEnabled());
+		model.setEnableOutbound(entity.isOutoundEnabled());
+		model.setDisplayName(entity.getDisplayName());
+		model.setCoverLetterOption(entity.getCoverLetterOption());
+		model.setAccountEmail(entity.getEmail());
+		model.setFaxNumber(entity.getReplyFaxNumber());
+		return model;
 	}
 }

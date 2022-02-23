@@ -24,13 +24,9 @@ package org.oscarehr.ws.rest.fax;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.velocity.exception.ResourceNotFoundException;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
-import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
@@ -38,15 +34,14 @@ import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.fax.transfer.FaxAccountCreateInput;
 import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.fax.transfer.FaxAccountUpdateInput;
+import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
+import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
-import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
-import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
-import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -68,8 +63,6 @@ import java.util.List;
 @Tag(name = "faxAccount")
 public class FaxAccountWebService extends AbstractServiceImpl
 {
-	private static final Logger logger = Logger.getLogger(FaxAccountWebService.class);
-
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
 
@@ -117,9 +110,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> isEnabled(@PathParam("id") Long id)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
-
-		FaxAccount faxSettings = faxAccountDao.find(id);
-		return RestResponse.successResponse(faxSettings.isIntegrationEnabled());
+		return RestResponse.successResponse(faxAccountService.isFaxAccountEnabled(id));
 	}
 
 	@GET
@@ -128,9 +119,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	public RestResponse<FaxAccountTransferOutbound> getAccountSettings(@PathParam("id") Long id)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
-
-		FaxAccountTransferOutbound accountSettingsTo1 = FaxTransferConverter.getAsOutboundTransferObject(faxAccountDao.find(id));
-		return RestResponse.successResponse(accountSettingsTo1);
+		return RestResponse.successResponse(faxAccountService.getFaxAccount(id));
 	}
 
 	@POST
@@ -138,15 +127,10 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@MaskParameter
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<FaxAccountTransferOutbound> addAccountSettings(FaxAccountCreateInput accountSettingsTo1)
+	public RestResponse<FaxAccountTransferOutbound> createAccountSettings(FaxAccountCreateInput createInput)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_CREATE);
-
-		FaxAccount faxAccount = FaxTransferConverter.getAsDomainObject(accountSettingsTo1);
-		faxAccount.setIntegrationType(FaxProvider.SRFAX);
-		faxAccountDao.persist(faxAccount);
-
-		return RestResponse.successResponse(FaxTransferConverter.getAsOutboundTransferObject(faxAccount));
+		return RestResponse.successResponse(faxAccountService.createFaxAccount(createInput));
 	}
 
 	@PUT
@@ -155,27 +139,10 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxAccountTransferOutbound> updateAccountSettings(@PathParam("id") Long id,
-																		  FaxAccountCreateInput accountSettingsTo1)
+	                                                                      FaxAccountUpdateInput updateInput)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_UPDATE);
-
-		FaxAccount faxAccount = faxAccountDao.find(id);
-		if (faxAccount == null)
-		{
-			throw new ResourceNotFoundException("Invalid Fax Config Id: " + id);
-		}
-
-		// keep current password if a new one is not set
-		if (accountSettingsTo1.getPassword() == null || accountSettingsTo1.getPassword().trim().isEmpty())
-		{
-			accountSettingsTo1.setPassword(faxAccount.getLoginPassword());
-		}
-		faxAccount = FaxTransferConverter.getAsDomainObject(accountSettingsTo1);
-		faxAccount.setIntegrationType(FaxProvider.SRFAX);// hardcoded until more than one type exists
-		faxAccount.setId(id);
-		faxAccountDao.merge(faxAccount);
-
-		return RestResponse.successResponse(FaxTransferConverter.getAsOutboundTransferObject(faxAccount));
+		return RestResponse.successResponse(faxAccountService.updateFaxAccount(updateInput));
 	}
 
 	@POST
@@ -278,10 +245,9 @@ public class FaxAccountWebService extends AbstractServiceImpl
 			criteriaSearch.setArchived(Boolean.parseBoolean(archived));
 		}
 		criteriaSearch.setOffset(offset);
-		int total = faxOutboundDao.criteriaSearchCount(criteriaSearch);
 
-		FaxAccount faxAccount = faxAccountDao.find(id);
-		List<FaxOutboxTransferOutbound> transferList = faxAccountService.getOutboxResults(faxAccount, criteriaSearch);
+		List<FaxOutboxTransferOutbound> transferList = faxAccountService.getOutboxResults(criteriaSearch);
+		int total = faxOutboundDao.criteriaSearchCount(criteriaSearch);
 
 		return RestSearchResponse.successResponse(transferList, page, perPage, total);
 	}

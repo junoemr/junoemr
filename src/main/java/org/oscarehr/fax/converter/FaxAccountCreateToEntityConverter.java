@@ -20,27 +20,24 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.conversion;
+package org.oscarehr.fax.converter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.transfer.FaxAccountUpdateInput;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.oscarehr.fax.transfer.FaxAccountCreateInput;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FaxAccountUpdateToEntityConverter extends AbstractModelConverter<FaxAccountUpdateInput, FaxAccount>
+public class FaxAccountCreateToEntityConverter extends AbstractModelConverter<FaxAccountCreateInput, FaxAccount>
 {
-	@Autowired
-	private FaxAccountDao faxAccountDao;
-
 	@Override
-	public FaxAccount convert(FaxAccountUpdateInput input)
+	public FaxAccount convert(FaxAccountCreateInput input)
 	{
-		FaxAccount entity = faxAccountDao.find(input.getId());
+		FaxAccount entity = new FaxAccount();
+		entity.setLoginId(StringUtils.trimToNull(input.getAccountLogin()));
 		entity.setLoginPassword(StringUtils.trimToNull(input.getPassword()));
+		entity.setIntegrationType(input.getAccountType());
 		entity.setIntegrationEnabled(input.isEnabled());
 		entity.setInboundEnabled(input.isEnableInbound());
 		entity.setOutboundEnabled(input.isEnableOutbound());
