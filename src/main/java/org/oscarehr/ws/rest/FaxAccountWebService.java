@@ -181,9 +181,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	public RestResponse<Boolean> testConnection(FaxAccountTransferInbound accountSettingsTo1)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
-
-		boolean success = faxAccountService.testConnectionStatus(accountSettingsTo1.getAccountLogin(), accountSettingsTo1.getPassword());
-		return RestResponse.successResponse(success);
+		return RestResponse.successResponse(faxAccountService.testConnectionStatus(accountSettingsTo1));
 	}
 
 	@POST

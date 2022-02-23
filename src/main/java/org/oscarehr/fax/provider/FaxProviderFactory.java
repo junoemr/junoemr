@@ -23,6 +23,7 @@
 
 package org.oscarehr.fax.provider;
 
+import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.integration.SRFax.SRFaxAccountProvider;
 import org.oscarehr.integration.SRFax.SRFaxDownloadProvider;
 import org.oscarehr.integration.SRFax.SRFaxUploadProvider;
@@ -34,12 +35,12 @@ public class FaxProviderFactory
 		return FaxProvider.SRFAX;
 	}
 
-	public FaxAccountProvider createFaxAccountProvider()
+	public FaxAccountProvider createFaxAccountProvider(FaxAccount faxAccount)
 	{
 		switch (getSystemFaxProvider())
 		{
 			case SRFAX:
-				return new SRFaxAccountProvider();
+				return new SRFaxAccountProvider(faxAccount);
 			case RINGCENTRAL:
 			case NONE:
 			default:

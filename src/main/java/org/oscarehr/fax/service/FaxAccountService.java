@@ -31,10 +31,13 @@ import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.provider.FaxAccountProvider;
+import org.oscarehr.fax.provider.FaxProviderFactory;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
+import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferInbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
@@ -69,6 +72,7 @@ public class FaxAccountService
 	 *
 	 * @return true if the connection succeeded, false otherwise
 	 */
+	@Deprecated // TODO remove
 	public boolean testConnectionStatus(String accountId, String password)
 	{
 		// don't hit the api if username or password are empty/missing
@@ -84,6 +88,13 @@ public class FaxAccountService
 		logger.debug(String.valueOf(result));
 
 		return (result != null && result.isSuccess());
+	}
+
+	public boolean testConnectionStatus(FaxAccountTransferInbound faxAccountTransferInbound)
+	{
+		FaxAccount faxAccount = FaxTransferConverter.getAsDomainObject(faxAccountTransferInbound);
+		FaxAccountProvider faxAccountProvider = new FaxProviderFactory().createFaxAccountProvider(faxAccount);
+		return faxAccountProvider.testConnectionStatus();
 	}
 
 	/**

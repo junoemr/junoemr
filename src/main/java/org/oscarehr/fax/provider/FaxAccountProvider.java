@@ -25,7 +25,7 @@ package org.oscarehr.fax.provider;
 public interface FaxAccountProvider
 {
 	// STUB, fill in params on implementation
-	void testConnectionStatus();
+	boolean testConnectionStatus();
 	// STUB, fill in params on implementation
 	void getOutBoxStatus();
 	// STUB, fill in params on implementation

@@ -23,15 +23,41 @@
 
 package org.oscarehr.integration.SRFax;
 
+import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
+import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
+import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
+import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxAccountProvider;
+import oscar.util.ConversionUtils;
+
+import java.time.LocalDate;
 
 public class SRFaxAccountProvider implements FaxAccountProvider
 {
+	protected FaxAccount faxAccount;
+
+	public SRFaxAccountProvider(FaxAccount faxAccount)
+	{
+		this.faxAccount = faxAccount;
+	}
 
 	@Override
-	public void testConnectionStatus()
+	public boolean testConnectionStatus()
 	{
+		String accountId = faxAccount.getLoginId();
+		String password = faxAccount.getLoginPassword();
 
+		// don't hit the api if username or password are not set
+		if(accountId == null || password == null)
+		{
+			return false;
+		}
+
+		SRFaxApiConnector apiConnector = new SRFaxApiConnector(accountId, password);
+		String currentDateStr = ConversionUtils.toDateString(LocalDate.now(), SRFaxApiConnector.DATE_FORMAT);
+
+		ListWrapper<GetUsageResult> result = apiConnector.getFaxUsageByRange(currentDateStr, currentDateStr, null);
+		return (result != null && result.isSuccess());
 	}
 
 	@Override
