@@ -33,14 +33,15 @@ import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.fax.service.FaxAccountService;
+import org.oscarehr.fax.transfer.FaxAccountCreateInput;
+import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
+import org.oscarehr.fax.transfer.FaxAccountUpdateInput;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
-import org.oscarehr.fax.transfer.FaxAccountCreateInput;
-import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,10 +179,10 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@MaskParameter
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> testConnection(FaxAccountCreateInput accountSettingsTo1)
+	public RestResponse<Boolean> testConnection(FaxAccountCreateInput createInput)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
-		return RestResponse.successResponse(faxAccountService.testConnectionStatus(accountSettingsTo1));
+		return RestResponse.successResponse(faxAccountService.testConnectionStatus(createInput));
 	}
 
 	@POST
@@ -190,20 +191,10 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> testConnection(@PathParam("id") Long id,
-												FaxAccountCreateInput accountSettingsTo1)
+												FaxAccountUpdateInput updateInput)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
-
-		// if the password is not changed, use the saved one
-		String password = accountSettingsTo1.getPassword();
-		String username = accountSettingsTo1.getAccountLogin();
-		if (password == null || password.isEmpty())
-		{
-			FaxAccount faxAccount = faxAccountDao.find(id);
-			password = faxAccount.getLoginPassword();
-		}
-		boolean success = faxAccountService.testConnectionStatus(username, password);
-		return RestResponse.successResponse(success);
+		return RestResponse.successResponse(faxAccountService.testConnectionStatus(updateInput));
 	}
 
 	@GET

@@ -24,6 +24,9 @@ package org.oscarehr.fax.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.fax.conversion.FaxAccountCreateToEntityConverter;
+import org.oscarehr.fax.conversion.FaxAccountToModelConverter;
+import org.oscarehr.fax.conversion.FaxAccountUpdateToEntityConverter;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
@@ -36,9 +39,10 @@ import org.oscarehr.fax.provider.FaxProviderFactory;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
-import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
 import org.oscarehr.fax.transfer.FaxAccountCreateInput;
 import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
+import org.oscarehr.fax.transfer.FaxAccountUpdateInput;
+import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
 import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +71,15 @@ public class FaxAccountService
 	@Autowired
 	private FaxAccountDao faxAccountDao;
 
+	@Autowired
+	private FaxAccountCreateToEntityConverter faxAccountCreateToEntityConverter;
+
+	@Autowired
+	private FaxAccountUpdateToEntityConverter faxAccountUpdateToEntityConverter;
+
+	@Autowired
+	private FaxAccountToModelConverter faxAccountToModelConverter;
+
 	/**
 	 * Test the connection to the fax service based on the configuration settings
 	 *
@@ -90,9 +103,24 @@ public class FaxAccountService
 		return (result != null && result.isSuccess());
 	}
 
-	public boolean testConnectionStatus(FaxAccountCreateInput faxAccountCreateInput)
+	public boolean testConnectionStatus(FaxAccountCreateInput createInput)
 	{
-		FaxAccount faxAccount = FaxTransferConverter.getAsDomainObject(faxAccountCreateInput);
+		FaxAccount faxAccount = faxAccountCreateToEntityConverter.convert(createInput);
+		FaxAccountProvider faxAccountProvider = new FaxProviderFactory().createFaxAccountProvider(faxAccount);
+		return faxAccountProvider.testConnectionStatus();
+	}
+
+	public boolean testConnectionStatus(FaxAccountUpdateInput updateInput)
+	{
+		FaxAccount faxAccount = faxAccountDao.find(updateInput.getId());// todo detatch entity to prevent auto saving it
+
+		// if the password is not changed, use the saved one
+		String password = updateInput.getPassword();
+		if (StringUtils.isBlank(password))
+		{
+			password = faxAccount.getLoginPassword();
+		}
+		faxAccount.setLoginPassword(password);
 		FaxAccountProvider faxAccountProvider = new FaxProviderFactory().createFaxAccountProvider(faxAccount);
 		return faxAccountProvider.testConnectionStatus();
 	}
@@ -115,7 +143,7 @@ public class FaxAccountService
 
 	public List<FaxAccountTransferOutbound> listAccounts(FaxAccountCriteriaSearch criteriaSearch)
 	{
-		return FaxTransferConverter.getAllAsOutboundTransferObject(faxAccountDao.criteriaSearch(criteriaSearch));
+		return faxAccountToModelConverter.convert(faxAccountDao.criteriaSearch(criteriaSearch));
 	}
 
 	public List<FaxOutboxTransferOutbound> getOutboxResults(FaxAccount faxAccount, FaxOutboundCriteriaSearch criteriaSearch)
