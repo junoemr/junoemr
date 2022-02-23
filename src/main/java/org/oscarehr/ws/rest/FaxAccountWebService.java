@@ -29,6 +29,7 @@ import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
@@ -138,7 +139,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_CREATE);
 
 		FaxAccount faxAccount = FaxTransferConverter.getAsDomainObject(accountSettingsTo1);
-		faxAccount.setIntegrationType(FaxAccount.INTEGRATION_TYPE_SRFAX);// hardcoded until more than one type exists
+		faxAccount.setIntegrationType(FaxProvider.SRFAX);
 		faxAccountDao.persist(faxAccount);
 
 		return RestResponse.successResponse(FaxTransferConverter.getAsOutboundTransferObject(faxAccount));
@@ -166,7 +167,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 			accountSettingsTo1.setPassword(faxAccount.getLoginPassword());
 		}
 		faxAccount = FaxTransferConverter.getAsDomainObject(accountSettingsTo1);
-		faxAccount.setIntegrationType(FaxAccount.INTEGRATION_TYPE_SRFAX);// hardcoded until more than one type exists
+		faxAccount.setIntegrationType(FaxProvider.SRFAX);// hardcoded until more than one type exists
 		faxAccount.setId(id);
 		faxAccountDao.merge(faxAccount);
 

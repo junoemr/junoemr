@@ -21,12 +21,13 @@
  * Canada
  */
 
-package org.oscarehr.fax.provider;
+package org.oscarehr.fax.exception;
 
-public enum FaxProvider
+public class FaxIntegrationException extends FaxException
 {
-	NONE,
-	LEGACY,
-	SRFAX,
-	RINGCENTRAL
+
+	public FaxIntegrationException(String message)
+	{
+		super(message);
+	}
 }
