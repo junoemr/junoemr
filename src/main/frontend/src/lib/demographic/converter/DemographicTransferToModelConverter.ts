@@ -74,7 +74,7 @@ export default class DemographicTransferToModelConverter extends AbstractConvert
 		model.rxInteractionWarningLevel = from.rxInteractionWarningLevel;
 		model.electronicMessagingConsentStatus = from.electronicMessagingConsentStatus as any as ElectronicMessagingConsentStatus;
 		model.electronicMessagingConsentGivenAt = moment(from.electronicMessagingConsentGivenAt);
-		model.electronicMessagingConsentRejectedAt = moment(from.electronicMessagingConsentGivenAt);
+		model.electronicMessagingConsentRejectedAt = moment(from.electronicMessagingConsentRejectedAt);
 
 		const simpleProviderConverter = new ProviderModelToSimpleProviderConverter();
 		model.mrpProvider = simpleProviderConverter.convert(from.mrpProvider);

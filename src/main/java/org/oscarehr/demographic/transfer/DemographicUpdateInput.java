@@ -39,6 +39,7 @@ public class DemographicUpdateInput extends DemographicCreateInput
 	// base info
 	private String sin;
 	private String patientStatus;
+	private LocalDate patientStatusDate;
 	private LocalDate dateJoined;
 	private LocalDate dateEnded;
 

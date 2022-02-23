@@ -95,11 +95,16 @@ public class DemographicUpdateInputToEntityConverter
 				.map(DemographicModel.OFFICIAL_LANGUAGE::getValue).orElse(null));
 		dbDemographic.updateElectronicMessagingConsentStatus(input.getElectronicMessagingConsentStatus());
 
-		// if patient status changed, auto update the status date
+		dbDemographic.setPatientStatusDate(ConversionUtils.toNullableLegacyDate(input.getPatientStatusDate()));
 		if(!dbDemographic.getPatientStatus().equals(input.getPatientStatus()))
 		{
 			dbDemographic.setPatientStatus(input.getPatientStatus());
-			dbDemographic.setPatientStatusDate(new Date());
+
+			if(dbDemographic.getPatientStatusDate() == null)
+			{
+				// if patient status changed (and date not explicitly set), auto update the status date
+				dbDemographic.setPatientStatusDate(new Date());
+			}
 		}
 
 		dbDemographic.setProviderNo(input.getMrpProviderId());

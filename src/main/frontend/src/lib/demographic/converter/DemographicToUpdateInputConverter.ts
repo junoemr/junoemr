@@ -30,6 +30,7 @@ export default class DemographicToUpdateInputConverter extends AbstractConverter
 		updateInput.dateJoined = this.serializeLocalDateTime(from.dateJoined);
 		updateInput.dateEnded = this.serializeLocalDateTime(from.dateEnded);
 		updateInput.patientStatus = from.patientStatus;
+		updateInput.patientStatusDate = this.serializeLocalDateTime(from.patientStatusDate);
 
 		// contact info
 		updateInput.addressList = new AddressToInputConverter().convertList(from.addressList);
