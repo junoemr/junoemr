@@ -24,9 +24,9 @@
 package org.oscarehr.fax.provider;
 
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.fax.model.FaxOutbound;
 
 public interface FaxUploadProvider
 {
-	void sendFax(GenericFile file);
-	void sendFax(int faxOutId);
+	boolean sendQueuedFax(FaxOutbound faxOutbound, GenericFile file) throws Exception;
 }

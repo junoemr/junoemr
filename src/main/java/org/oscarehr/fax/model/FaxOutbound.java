@@ -23,6 +23,7 @@
 package org.oscarehr.fax.model;
 
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.provider.model.ProviderData;
 
 import javax.persistence.Column;
@@ -108,7 +109,8 @@ public class FaxOutbound extends AbstractModel<Long>
 	private String externalAccountId;
 
 	@Column(name= "external_account_type")
-	private String externalAccountType;
+	@Enumerated(EnumType.STRING)
+	private FaxProvider externalAccountType;
 
 	@Column(name= "external_reference_id")
 	private Long externalReferenceId;
@@ -290,12 +292,12 @@ public class FaxOutbound extends AbstractModel<Long>
 		this.externalAccountId = externalAccountId;
 	}
 
-	public String getExternalAccountType()
+	public FaxProvider getExternalAccountType()
 	{
 		return externalAccountType;
 	}
 
-	public void setExternalAccountType(String externalAccountType)
+	public void setExternalAccountType(FaxProvider externalAccountType)
 	{
 		this.externalAccountType = externalAccountType;
 	}

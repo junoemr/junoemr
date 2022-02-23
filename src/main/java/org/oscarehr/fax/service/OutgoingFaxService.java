@@ -22,11 +22,10 @@
  */
 package org.oscarehr.fax.service;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.cfg.NotYetImplementedException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.FaxStatus;
@@ -40,7 +39,10 @@ import org.oscarehr.fax.externalApi.srfax.result.GetFaxStatusResult;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.provider.FaxProvider;
+import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
+import org.oscarehr.integration.SRFax.SRFaxUploadProvider;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
@@ -57,7 +59,6 @@ import oscar.util.ConversionUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -70,7 +71,7 @@ import java.util.List;
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class OutgoingFaxService
 {
-	private static final String STATUS_MESSAGE_IN_TRANSIT = "Sending";
+	public static final String STATUS_MESSAGE_IN_TRANSIT = "Sending";
 	private static final String STATUS_MESSAGE_COMPLETED = "Success";
 	private static final String DEFAULT_MAX_SEND_COUNT = "5";
 
@@ -419,50 +420,35 @@ public class OutgoingFaxService
 		String logData = null;
 		try
 		{
-			FaxAccount faxAccount = faxOutbound.getFaxAccount();
-			SRFaxApiConnector apiConnector = new SRFaxApiConnector(faxAccount.getLoginId(), faxAccount.getLoginPassword());
+			FaxProvider faxType = faxOutbound.getExternalAccountType();
+			FaxUploadProvider uploadProvider = null;
 
-			String coverLetterOption = faxAccount.getCoverLetterOption();
-			if(coverLetterOption == null || !SRFaxApiConnector.validCoverLetterNames.contains(coverLetterOption))
+			switch (faxType)
 			{
-				coverLetterOption = null;
+				case SRFAX:
+					uploadProvider = new SRFaxUploadProvider();
+					break;
+				case LEGACY:
+				case RINGCENTRAL:
+					throw new NotYetImplementedException();
+				case NONE:
+				default:
+					throw new UnsupportedOperationException("No fax provider is set");
 			}
-
-			HashMap<String, String> fileMap = new HashMap<>(1);
-			fileMap.put(fileToFax.getName(), toBase64String(fileToFax));
-
-			// external api call
-			SingleWrapper<Integer> resultWrapper = apiConnector.queueFax(
-					faxAccount.getReplyFaxNumber(),
-					faxAccount.getEmail(),
-					faxOutbound.getSentTo(),
-					fileMap,
-					coverLetterOption
-			);
-			boolean sendSuccess = resultWrapper.isSuccess();
 
 			try
 			{
-				faxOutbound.setExternalAccountId(faxAccount.getLoginId());
-				faxOutbound.setExternalAccountType(faxAccount.getIntegrationType());
-				faxOutbound.setFaxAccount(faxAccount);
-
-				if(sendSuccess)
+				boolean success = uploadProvider.sendQueuedFax(faxOutbound, fileToFax);
+				if (success)
 				{
-					logger.info("Fax send success " + String.valueOf(resultWrapper.getResult()));
-					faxOutbound.setStatusSent();
-					faxOutbound.setStatusMessage(STATUS_MESSAGE_IN_TRANSIT);
-					faxOutbound.setExternalReferenceId(resultWrapper.getResult().longValue());
 					logStatus = LogConst.STATUS_SUCCESS;
 					logData = "Faxed To: " + faxOutbound.getSentTo();
 					fileToFax.moveToOutgoingFaxSent();
 				}
 				else
 				{
-					logger.warn("Fax send failure " + resultWrapper.getError());
-					faxOutbound.setStatusError();
-					faxOutbound.setStatusMessage(resultWrapper.getError());
-					logData = resultWrapper.getError();
+					logger.warn("Fax send failure " + faxOutbound.getStatusMessage());
+					logData = faxOutbound.getStatusMessage();
 					fileToFax.moveToOutgoingFaxUnsent();
 				}
 			}
@@ -538,11 +524,5 @@ public class OutgoingFaxService
 			// clear out the map value if the fax is no longer queued
 			faxAttemptCounterMap.remove(faxId);
 		}
-	}
-
-	private String toBase64String(GenericFile file) throws IOException
-	{
-		byte[] encoded = Base64.encodeBase64(FileUtils.readFileToByteArray(file.getFileObject()));
-		return new String(encoded, StandardCharsets.UTF_8);
 	}
 }

@@ -24,19 +24,61 @@
 package org.oscarehr.integration.SRFax;
 
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.fax.exception.FaxIntegrationException;
+import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
+import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
+import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.fax.provider.FaxUploadProvider;
+import org.oscarehr.fax.service.OutgoingFaxService;
+import java.util.HashMap;
 
 public class SRFaxUploadProvider implements FaxUploadProvider
 {
 	@Override
-	public void sendFax(GenericFile file)
+	public boolean sendQueuedFax(FaxOutbound faxOutbound, GenericFile file) throws Exception
 	{
+		FaxAccount faxAccount = faxOutbound.getFaxAccount();
 
-	}
+		if (!faxAccount.getIntegrationType().equals(FaxProvider.SRFAX))
+		{
+			throw new FaxIntegrationException("SRFax provider is processing non-SRFAX outbound fax");
+		}
 
-	@Override
-	public void sendFax(int faxOutId)
-	{
+		SRFaxApiConnector apiConnector = new SRFaxApiConnector(faxAccount.getLoginId(), faxAccount.getLoginPassword());
 
+		String coverLetterOption = faxAccount.getCoverLetterOption();
+		if(coverLetterOption == null || !SRFaxApiConnector.validCoverLetterNames.contains(coverLetterOption))
+		{
+			coverLetterOption = null;
+		}
+
+		HashMap<String, String> fileMap = new HashMap<>(1);
+		fileMap.put(file.getName(), file.toBase64());
+
+		// external api call
+		SingleWrapper<Integer> resultWrapper = apiConnector.queueFax(
+			faxAccount.getReplyFaxNumber(),
+			faxAccount.getEmail(),
+			faxOutbound.getSentTo(),
+			fileMap,
+			coverLetterOption
+		);
+
+		boolean success = resultWrapper.isSuccess();
+		if (success)
+		{
+			faxOutbound.setStatusSent();
+			faxOutbound.setStatusMessage(OutgoingFaxService.STATUS_MESSAGE_IN_TRANSIT);
+			faxOutbound.setExternalReferenceId(resultWrapper.getResult().longValue());
+		}
+		else
+		{
+			faxOutbound.setStatusError();
+			faxOutbound.setStatusMessage(resultWrapper.getError());
+		}
+
+		return success;
 	}
 }
