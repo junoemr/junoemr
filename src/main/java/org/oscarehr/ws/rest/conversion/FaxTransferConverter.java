@@ -28,8 +28,8 @@ import org.oscarehr.fax.model.FaxInbound;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.transfer.FaxAccountCreateInput;
 import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
+import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
+import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;

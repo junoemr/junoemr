@@ -16,7 +16,7 @@
 
 <%@page import="org.oscarehr.fax.model.FaxOutbound"%>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
-<%@ page import="org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound" %>
+<%@ page import="org.oscarehr.fax.transfer.FaxOutboxTransferOutbound" %>
 <%@ page import="oscar.eform.actions.FaxAction" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>

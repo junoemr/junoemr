@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.transfer.fax;
+package org.oscarehr.fax.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

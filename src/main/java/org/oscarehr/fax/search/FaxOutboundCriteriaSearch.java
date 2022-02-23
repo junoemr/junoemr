@@ -28,7 +28,7 @@ import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.model.FaxOutbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
+import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;

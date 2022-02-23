@@ -47,7 +47,7 @@ import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
-import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
+import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;

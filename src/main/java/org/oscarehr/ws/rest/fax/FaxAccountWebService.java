@@ -20,8 +20,9 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest;
+package org.oscarehr.ws.rest.fax;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.exception.ResourceNotFoundException;
@@ -40,11 +41,12 @@ import org.oscarehr.fax.transfer.FaxAccountUpdateInput;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.common.annotation.MaskParameter;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
-import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
+import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
+import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -63,24 +65,25 @@ import java.util.List;
 
 @Path("/faxAccount")
 @Component("FaxAccountWebService")
+@Tag(name = "faxAccount")
 public class FaxAccountWebService extends AbstractServiceImpl
 {
-	private static Logger logger = Logger.getLogger(FaxAccountWebService.class);
+	private static final Logger logger = Logger.getLogger(FaxAccountWebService.class);
 
 	@Autowired
-	SecurityInfoManager securityInfoManager;
+	private SecurityInfoManager securityInfoManager;
 
 	@Autowired
-	FaxAccountDao faxAccountDao;
+	private FaxAccountDao faxAccountDao;
 
 	@Autowired
-	FaxOutboundDao faxOutboundDao;
+	private FaxOutboundDao faxOutboundDao;
 
 	@Autowired
-	FaxInboundDao faxInboundDao;
+	private FaxInboundDao faxInboundDao;
 
 	@Autowired
-	FaxAccountService faxAccountService;
+	private FaxAccountService faxAccountService;
 
 	@GET
 	@Path("/search")
@@ -180,7 +183,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@MaskParameter
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> testConnection(FaxAccountCreateInput createInput)
+	public RestResponse<Boolean> testFaxConnection(FaxAccountCreateInput createInput)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
 		return RestResponse.successResponse(faxAccountService.testConnectionStatus(createInput));
@@ -191,8 +194,8 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@MaskParameter
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> testConnection(@PathParam("id") Long id,
-												FaxAccountUpdateInput updateInput)
+	public RestResponse<Boolean> testExistingFaxConnection(@PathParam("id") Long id,
+	                                                       FaxAccountUpdateInput updateInput)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
 		return RestResponse.successResponse(faxAccountService.testConnectionStatus(updateInput));

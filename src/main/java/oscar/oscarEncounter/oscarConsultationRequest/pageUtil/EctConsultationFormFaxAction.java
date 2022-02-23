@@ -32,7 +32,7 @@ import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
+import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import oscar.OscarProperties;
 import oscar.dms.EDoc;
 import oscar.dms.EDocUtil;

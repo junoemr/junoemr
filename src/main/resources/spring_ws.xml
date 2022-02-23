@@ -382,9 +382,9 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EncounterSectionsService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxAccountWebService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxInboundWebService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxOutboundWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.fax.FaxAccountWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.fax.FaxInboundWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.fax.FaxOutboundWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FormsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.InboxService"/>
 			<!-- AQS (Appointment Queue Service) -->

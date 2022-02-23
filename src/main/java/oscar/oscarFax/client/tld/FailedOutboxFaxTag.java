@@ -28,7 +28,7 @@ import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
+import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
