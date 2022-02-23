@@ -37,8 +37,8 @@ import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
-import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferInbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
+import org.oscarehr.fax.transfer.FaxAccountCreateInput;
+import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,9 +90,9 @@ public class FaxAccountService
 		return (result != null && result.isSuccess());
 	}
 
-	public boolean testConnectionStatus(FaxAccountTransferInbound faxAccountTransferInbound)
+	public boolean testConnectionStatus(FaxAccountCreateInput faxAccountCreateInput)
 	{
-		FaxAccount faxAccount = FaxTransferConverter.getAsDomainObject(faxAccountTransferInbound);
+		FaxAccount faxAccount = FaxTransferConverter.getAsDomainObject(faxAccountCreateInput);
 		FaxAccountProvider faxAccountProvider = new FaxProviderFactory().createFaxAccountProvider(faxAccount);
 		return faxAccountProvider.testConnectionStatus();
 	}

@@ -25,6 +25,7 @@ package org.oscarehr.fax.model;
 import org.hibernate.annotations.Where;
 import org.oscarehr.common.encryption.StringEncryptor;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.fax.provider.FaxProvider;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -121,6 +122,11 @@ public class FaxAccount extends AbstractModel<Long>
 	public String getIntegrationType()
 	{
 		return integrationType;
+	}
+
+	public FaxProvider getIntegrationTypeEnum()
+	{
+		return FaxProvider.valueOf(integrationType);
 	}
 
 	public void setIntegrationType(String integrationType)

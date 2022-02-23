@@ -39,8 +39,8 @@ import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
-import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferInbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
+import org.oscarehr.fax.transfer.FaxAccountCreateInput;
+import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,7 +133,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@MaskParameter
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<FaxAccountTransferOutbound> addAccountSettings(FaxAccountTransferInbound accountSettingsTo1)
+	public RestResponse<FaxAccountTransferOutbound> addAccountSettings(FaxAccountCreateInput accountSettingsTo1)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_CREATE);
 
@@ -150,7 +150,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxAccountTransferOutbound> updateAccountSettings(@PathParam("id") Long id,
-																		  FaxAccountTransferInbound accountSettingsTo1)
+																		  FaxAccountCreateInput accountSettingsTo1)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_UPDATE);
 
@@ -178,7 +178,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@MaskParameter
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> testConnection(FaxAccountTransferInbound accountSettingsTo1)
+	public RestResponse<Boolean> testConnection(FaxAccountCreateInput accountSettingsTo1)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
 		return RestResponse.successResponse(faxAccountService.testConnectionStatus(accountSettingsTo1));
@@ -190,7 +190,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<Boolean> testConnection(@PathParam("id") Long id,
-												FaxAccountTransferInbound accountSettingsTo1)
+												FaxAccountCreateInput accountSettingsTo1)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
 

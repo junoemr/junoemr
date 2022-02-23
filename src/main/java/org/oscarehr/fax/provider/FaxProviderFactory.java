@@ -37,7 +37,7 @@ public class FaxProviderFactory
 
 	public FaxAccountProvider createFaxAccountProvider(FaxAccount faxAccount)
 	{
-		switch (getSystemFaxProvider())
+		switch (faxAccount.getIntegrationTypeEnum())
 		{
 			case SRFAX:
 				return new SRFaxAccountProvider(faxAccount);

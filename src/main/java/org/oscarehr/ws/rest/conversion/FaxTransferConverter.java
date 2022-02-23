@@ -26,8 +26,8 @@ import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxInbound;
 import org.oscarehr.fax.model.FaxOutbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferInbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
+import org.oscarehr.fax.transfer.FaxAccountCreateInput;
+import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
 import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 import oscar.util.ConversionUtils;
@@ -37,7 +37,7 @@ import java.util.List;
 
 public class FaxTransferConverter
 {
-	public static FaxAccount getAsDomainObject(FaxAccountTransferInbound transfer)
+	public static FaxAccount getAsDomainObject(FaxAccountCreateInput transfer)
 	{
 		FaxAccount config = new FaxAccount();
 		config.setIntegrationEnabled(transfer.isEnabled());

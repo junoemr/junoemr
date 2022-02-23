@@ -20,25 +20,18 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.transfer.fax;
+package org.oscarehr.fax.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+@Data
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class FaxAccountTransferOutbound extends FaxAccountTransferBasic
+public class FaxAccountCreateInput extends FaxAccountTransferBasic
 {
-	private Long id;
-
-	public Long getId()
-	{
-		return id;
-	}
-
-	public void setId(Long id)
-	{
-		this.id = id;
-	}
+	private String password;
+	private String accountLogin;
 }
