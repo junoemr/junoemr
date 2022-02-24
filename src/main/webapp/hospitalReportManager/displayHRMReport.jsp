@@ -340,8 +340,7 @@
 			font-size: 12px;
 			line-height: 12px;
 			height: 24px;
-			width: 128px;
-			padding: 0 16px;
+			width: 94px;
 			margin-right: 4px;
 		}
 

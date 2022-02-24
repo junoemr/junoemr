@@ -26,8 +26,8 @@ package org.oscarehr.hospitalReportManager.service;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import lombok.Synchronized;
 import org.apache.log4j.Logger;
@@ -57,6 +57,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
@@ -286,38 +287,39 @@ public class HRMService
 		}
 	}
 
-	public Map<String, HRMDemographicDocument> getHrmDocumentsForDemographic(Integer demographicNo)
+	public List<HRMDemographicDocument> getHrmDocumentsForDemographic(Integer demographicNo)
 	{
-		Map<String, HRMDemographicDocument> out = new HashMap<>();
-
+		Set<String> uniqueDocumentKeys = new HashSet<>();
 		List<HRMDocument> allHrmDocsForDemo = hrmDocumentDao.findByDemographicId(demographicNo);
+		List<HRMDemographicDocument> uniqueHrmDocsForDemo = new ArrayList<>();
 
 		for (HRMDocument doc : allHrmDocsForDemo)
 		{
 			// filter duplicate reports
-			String duplicateKey;
+			String key;
 
 			// A duplicate is simply an exact match on the contents of the message, minus the transactional segment
 			// and there is no versioning system.
 			if (ConversionUtils.hasContent(doc.getReportLessTransactionInfoHash()))
 			{
-				duplicateKey = doc.getReportLessTransactionInfoHash();
+				key = doc.getReportLessTransactionInfoHash();
 			}
 			else
 			{
 				// if we are missing too much data (cds imports can cause this), we don't want to filter the reports, just choose a unique key
-				duplicateKey = String.valueOf(doc.getId());
+				key = String.valueOf(doc.getId());
 			}
 
-			if (!out.containsKey(duplicateKey))
+			if (!uniqueDocumentKeys.contains(key))
 			{
 				HRMDemographicDocument demographicDocument = new HRMDemographicDocument();
 				demographicDocument.setHrmDocument(doc);
-				out.put(duplicateKey, demographicDocument);
+				uniqueHrmDocsForDemo.add(demographicDocument);
+				uniqueDocumentKeys.add(key);
 			}
 		}
 
-		return out;
+		return uniqueHrmDocsForDemo;
 	}
 	
 	public void handleDuplicateDocument(HRMDocument duplicate)

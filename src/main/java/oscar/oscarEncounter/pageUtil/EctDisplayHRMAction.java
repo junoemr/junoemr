@@ -11,10 +11,8 @@
 package oscar.oscarEncounter.pageUtil;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
 import org.apache.struts.util.MessageResources;
 import org.oscarehr.common.dao.OscarLogDao;
-import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dto.HRMDemographicDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.service.HRMService;
@@ -33,13 +31,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class EctDisplayHRMAction extends EctDisplayAction {
 
-	private static final Logger logger = MiscUtils.getLogger();
 	private static final String cmd = "HRM";
-	private final HRMDocumentDao hrmDocumentDao = (HRMDocumentDao) SpringUtils.getBean("HRMDocumentDao");
 	private final HRMService hrmService = (HRMService) SpringUtils.getBean("HRMService");
 	private final OscarLogDao oscarLogDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
 	
@@ -72,13 +67,11 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 			String BGCOLOUR = request.getParameter("hC");
 			Date date;
 
-			Map<String, HRMDemographicDocument> demographicDocuments =
-				hrmService.getHrmDocumentsForDemographic(demographicNo);
+			List<HRMDemographicDocument> demographicDocuments = hrmService.getHrmDocumentsForDemographic(demographicNo);
 
-			for (Map.Entry<String, HRMDemographicDocument> entry : demographicDocuments.entrySet()) {
+			for (HRMDemographicDocument entry : demographicDocuments) {
 				
-				HRMDocument hrmDocument = entry.getValue().getHrmDocument();
-				List<Integer> duplicateIdList = entry.getValue().getDuplicateIds();
+				HRMDocument hrmDocument = entry.getHrmDocument();
 
 				String reportStatus = hrmDocument.getReportStatus().toValueString();
 				String dispFilename = hrmDocument.getReportType();
@@ -108,17 +101,7 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 				item.setDate(date);
 				hash = Math.abs(winName.hashCode());
 
-				StringBuilder duplicateLabIdQueryString=new StringBuilder();
-            	if (duplicateIdList!=null)
-            	{
-					for (Integer duplicateLabIdTemp : duplicateIdList)
-	            	{
-	            		if (duplicateLabIdQueryString.length()>0) duplicateLabIdQueryString.append(',');
-	            		duplicateLabIdQueryString.append(duplicateLabIdTemp);
-	            	}
-				}
-
-				url = "popupPage(700,800,'" + hash + "', '" + request.getContextPath() + "/hospitalReportManager/Display.do?id="+dispDocNo+"&duplicateLabIds="+duplicateLabIdQueryString+"');";
+				url = "popupPage(700,800,'" + hash + "', '" + request.getContextPath() + "/hospitalReportManager/Display.do?id=" + dispDocNo + "')";
 
 				String labRead = "";
 				if(!oscarLogDao.hasRead(( (String) request.getSession().getAttribute("user")   ),"hrm",dispDocNo)){
