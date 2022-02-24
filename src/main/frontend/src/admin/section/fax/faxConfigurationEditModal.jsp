@@ -27,7 +27,7 @@
 	<form name="form">
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-label="<bean:message key="global.close"/>"
-			        ng-click="faxConfigEditController.cancel()">
+			        ng-click="$ctrl.cancel()">
 				<span aria-hidden="true" >&times;</span>
 			</button>
 			<h3 class="modal-title"><bean:message bundle="ui" key="admin.fax.acct.edit.header"/></h3>
@@ -37,21 +37,21 @@
 				<label class="flex-row-label" for="input-fax-enabled"><bean:message bundle="ui" key="admin.fax.acct.edit.acctEnabled"/></label>
 				<label class="flex-row-content switch">
 					<input id="input-fax-enabled" type="checkbox"
-					       ng-model="faxConfigEditController.faxAccount.enabled"/>
+					       ng-model="$ctrl.faxAccount.enabled"/>
 					<span class="slider"></span>
 				</label>
 			</div>
 			<div class="flex-row">
 				<label class="flex-row-label" for="input-fax-account-id"><bean:message bundle="ui" key="admin.fax.acct.edit.accountLogin"/></label>
 				<input class="flex-row-content" id="input-fax-account-id" type="text"
-				       ng-change="faxConfigEditController.setDefaultConnectionStatus()"
-				       ng-model="faxConfigEditController.faxAccount.accountLogin">
+				       ng-change="$ctrl.setDefaultConnectionStatus()"
+				       ng-model="$ctrl.faxAccount.accountLogin">
 			</div>
 			<div class="flex-row">
 				<label class="flex-row-label" for="input-fax-account-pw"><bean:message bundle="ui" key="admin.fax.acct.edit.password"/></label>
 				<input class="flex-row-content" id="input-fax-account-pw" type="password"
-				       ng-change="faxConfigEditController.setDefaultConnectionStatus()"
-				       ng-model="faxConfigEditController.faxAccount.password">
+				       ng-change="$ctrl.setDefaultConnectionStatus()"
+				       ng-model="$ctrl.faxAccount.password">
 			</div>
 			<div class="flex-row">
 				<label class="flex-row-label" for="input-fax-account-name"
@@ -59,11 +59,11 @@
 					<bean:message bundle="ui" key="admin.fax.acct.edit.displayName"/>
 				</label>
 				<input class="flex-row-content" id="input-fax-account-name" type="text"
-				       ng-model="faxConfigEditController.faxAccount.displayName">
+				       ng-model="$ctrl.faxAccount.displayName">
 			</div>
 			<hr>
-			<fieldset ng-disabled="!faxConfigEditController.masterFaxEnabledOutbound">
-				<span ng-show="!faxConfigEditController.masterFaxEnabledOutbound"><bean:message bundle="ui" key="admin.fax.acct.edit.outboundDisabledMessage"/></span>
+			<fieldset ng-disabled="!$ctrl.masterFaxEnabledOutbound">
+				<span ng-show="!$ctrl.masterFaxEnabledOutbound"><bean:message bundle="ui" key="admin.fax.acct.edit.outboundDisabledMessage"/></span>
 				<div class="flex-row content-end info-section">
 					<span class="glyphicon info-icon glyphicon-info-sign"
 					      title="<bean:message bundle="ui" key="admin.fax.acct.edit.outboundInfoMessage"/>">
@@ -73,7 +73,7 @@
 					<label class="flex-row-label" for="input-fax-enabled-outbound"><bean:message bundle="ui" key="admin.fax.acct.edit.enableOutbound"/></label>
 					<label class="flex-row-content switch">
 						<input id="input-fax-enabled-outbound" type="checkbox"
-						       ng-model="faxConfigEditController.faxAccount.enableOutbound"/>
+						       ng-model="$ctrl.faxAccount.enableOutbound"/>
 						<span class="slider"></span>
 					</label>
 				</div>
@@ -84,8 +84,8 @@
 							<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail"/>
 						</label>
 						<input class="flex-row-content" id="input-fax-account-email" name="input-fax-account-email" type="email"
-						       ng-model="faxConfigEditController.faxAccount.accountEmail"
-						       ng-required="faxConfigEditController.faxAccount.enableOutbound">
+						       ng-model="$ctrl.faxAccount.accountEmail"
+						       ng-required="$ctrl.faxAccount.enableOutbound">
 					</div>
 					<div class="flex-row input-validation" ng-show="!form['input-fax-account-email'].$valid">
 						<label class="flex-row-label">*</label>
@@ -99,8 +99,8 @@
 							<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber"/>
 						</label>
 						<input class="flex-row-content" id="input-fax-account-fax-no" name="input-fax-account-fax-no" type="text"
-						       ng-model="faxConfigEditController.faxAccount.faxNumber"
-						       ng-minlength="10" ng-maxlength="10" ng-pattern="/\d{10}/" ng-required="faxConfigEditController.faxAccount.enableOutbound">
+						       ng-model="$ctrl.faxAccount.faxNumber"
+						       ng-minlength="10" ng-maxlength="10" ng-pattern="/\d{10}/" ng-required="$ctrl.faxAccount.enableOutbound">
 					</div>
 					<div class="flex-row input-validation" ng-show="!form['input-fax-account-fax-no'].$valid">
 						<label class="flex-row-label">*</label>
@@ -113,14 +113,14 @@
 						<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption"/>
 					</label>
 					<select class="flex-row-content" id="input-fax-account-cover-letter-type"
-					        ng-model="faxConfigEditController.faxAccount.coverLetterOption"
-					        ng-options="coverLetter for coverLetter in faxConfigEditController.coverLetterOptions">
+					        ng-model="$ctrl.faxAccount.coverLetterOption"
+					        ng-options="coverLetter for coverLetter in $ctrl.coverLetterOptions">
 					</select>
 				</div>
 			</fieldset>
 			<hr>
-			<fieldset ng-disabled="!faxConfigEditController.masterFaxEnabledInbound">
-				<span ng-show="!faxConfigEditController.masterFaxEnabledInbound"><bean:message bundle="ui" key="admin.fax.acct.edit.inboundDisabledMessage"/></span>
+			<fieldset ng-disabled="!$ctrl.masterFaxEnabledInbound">
+				<span ng-show="!$ctrl.masterFaxEnabledInbound"><bean:message bundle="ui" key="admin.fax.acct.edit.inboundDisabledMessage"/></span>
 				<div class="flex-row content-end info-section">
 					<span class="glyphicon info-icon glyphicon-info-sign"
 					      title="<bean:message bundle="ui" key="admin.fax.acct.edit.inboundInfoMessage"/>">
@@ -130,7 +130,7 @@
 					<label class="flex-row-label" for="input-fax-enabled-inbound"><bean:message bundle="ui" key="admin.fax.acct.edit.enableInbound"/></label>
 					<label class="flex-row-content switch">
 						<input id="input-fax-enabled-inbound" type="checkbox"
-						       ng-model="faxConfigEditController.faxAccount.enableInbound"/>
+						       ng-model="$ctrl.faxAccount.enableInbound"/>
 						<span class="slider"></span>
 					</label>
 				</div>
@@ -139,29 +139,29 @@
 			<div class="flex-row">
 				<label class="flex-row-label"><bean:message bundle="ui" key="admin.fax.acct.edit.connectionStatus"/></label>
 				<div class="flex-row-content">
-					<span ng-show="faxConfigEditController.faxAccount.connectionStatus == faxConfigEditController.connectionStatusEnum.unknown"
+					<span ng-show="$ctrl.faxAccount.connectionStatus == $ctrl.connectionStatusEnum.unknown"
 					      class="glyphicon unknown glyphicon-question-sign"></span>
-					<span ng-show="faxConfigEditController.faxAccount.connectionStatus == faxConfigEditController.connectionStatusEnum.success"
+					<span ng-show="$ctrl.faxAccount.connectionStatus == $ctrl.connectionStatusEnum.success"
 					      class="glyphicon success glyphicon-ok-sign"></span>
-					<span ng-show="faxConfigEditController.faxAccount.connectionStatus == faxConfigEditController.connectionStatusEnum.failure"
+					<span ng-show="$ctrl.faxAccount.connectionStatus == $ctrl.connectionStatusEnum.failure"
 					      class="glyphicon failure glyphicon-remove-sign"></span>
 				</div>
 			</div>
 			<div class="flex-row">
 				<div class="flex-row-label">
 					<button type="button" class="btn input-content"
-					        ng-click="faxConfigEditController.testConnection(faxConfigEditController.faxAccount)">
+					        ng-click="$ctrl.testConnection($ctrl.faxAccount)">
 						<bean:message bundle="ui" key="admin.fax.acct.edit.btn-testConnection"/>
 					</button>
 				</div>
 			</div>
 		</div>
 		<div class="modal-footer">
-			<button ng-click="faxConfigEditController.cancel()" type="button" class="btn" data-dismiss="modal">
+			<button ng-click="$ctrl.cancel()" type="button" class="btn" data-dismiss="modal">
 				<bean:message key="modal.newPatient.cancel" bundle="ui"/>
 			</button>
-			<button ng-click="faxConfigEditController.saveSettings(form)"
-					ng-disabled="faxConfigEditController.submitDisabled"
+			<button ng-click="$ctrl.saveSettings(form)"
+					ng-disabled="$ctrl.submitDisabled"
 					data-dismiss="modal"
 					type="button"
 					class="btn btn-success">

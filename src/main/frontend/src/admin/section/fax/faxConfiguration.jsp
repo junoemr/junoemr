@@ -29,17 +29,17 @@
 	<div class="fax-config-header">
 		<h1><bean:message bundle="ui" key="admin.fax.acct.header"/></h1>
 
-		<span ng-show="!faxController.loggedInProvider.superAdmin && faxController.masterFaxDisabled">
+		<span ng-show="!$ctrl.loggedInProvider.superAdmin && $ctrl.masterFaxDisabled">
 			<bean:message bundle="ui" key="admin.fax.acct.accessDisabledMessage"/>
 		</span>
-		<div ng-show="faxController.loggedInProvider.superAdmin">
+		<div ng-show="$ctrl.loggedInProvider.superAdmin">
 			<!-- let super admin enable/disable faxing -->
 			<div>
 				<div>
 					<label class="switch">
 						<input id="input-master-fax-integration-enabled-inbound" type="checkbox"
-						       ng-model="faxController.masterFaxEnabledInbound"
-						       ng-change="faxController.saveMasterFaxEnabledStateInbound();"/>
+						       ng-model="$ctrl.masterFaxEnabledInbound"
+						       ng-change="$ctrl.saveMasterFaxEnabledStateInbound();"/>
 						<span class="slider"></span>
 					</label>
 					<label for="input-master-fax-integration-enabled-inbound"><bean:message bundle="ui" key="admin.fax.acct.masterFaxEnabledInbound"/></label>
@@ -47,8 +47,8 @@
 				<div>
 					<label class="switch">
 						<input id="input-master-fax-integration-enabled-outbound" type="checkbox"
-						       ng-model="faxController.masterFaxEnabledOutbound"
-						       ng-change="faxController.saveMasterFaxEnabledStateOutbound();"/>
+						       ng-model="$ctrl.masterFaxEnabledOutbound"
+						       ng-change="$ctrl.saveMasterFaxEnabledStateOutbound();"/>
 						<span class="slider"></span>
 					</label>
 					<label for="input-master-fax-integration-enabled-outbound"><bean:message bundle="ui" key="admin.fax.acct.masterFaxEnabledOutbound"/></label>
@@ -56,13 +56,13 @@
 			</div>
 		</div>
 		<button type="button" class="btn btn-primary"
-		        ng-show="faxController.faxAccountList.length == 0 && !faxController.masterFaxDisabled"
-		        ng-click="faxController.editNewFaxAccount()">
+		        ng-show="$ctrl.faxAccountList.length == 0 && !$ctrl.masterFaxDisabled"
+		        ng-click="$ctrl.editNewFaxAccount()">
 			<bean:message bundle="ui" key="admin.fax.acct.btn-addNew"/>
 		</button>
 	</div>
 	<div class="fax-config-body">
-		<div class="account-list" ng-repeat="faxAccount in faxController.faxAccountList">
+		<div class="account-list" ng-repeat="faxAccount in $ctrl.faxAccountList">
 			<div class="account-item">
 				<div>
 					<span class="glyphicon enabled glyphicon-ok glyphicon-lrg" ng-show="faxAccount.enabled"
@@ -92,8 +92,8 @@
 				</div>
 				<button type="button" class="btn btn-default"
 				        <%-- TODO disable button for non-admin users? --%>
-				        ng-click="faxController.editFaxAccount(faxAccount)"
-						ng-disabled="faxController.masterFaxDisabled">
+				        ng-click="$ctrl.editFaxAccount(faxAccount)"
+						ng-disabled="$ctrl.masterFaxDisabled">
 					<bean:message bundle="ui" key="admin.fax.acct.btn-EditAccount"/>
 				</button>
 			</div>
