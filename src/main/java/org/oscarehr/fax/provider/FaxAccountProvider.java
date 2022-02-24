@@ -24,10 +24,9 @@ package org.oscarehr.fax.provider;
 
 public interface FaxAccountProvider
 {
-	// STUB, fill in params on implementation
+	/**
+	 * Test the connection status of the current account.
+	 * @return true if the account is able to make a successful connection to the external api. false otherwise.
+	 */
 	boolean testConnectionStatus();
-	// STUB, fill in params on implementation
-	void getOutBoxStatus();
-	// STUB, fill in params on implementation
-	void getInboxStatus();
 }
