@@ -24,11 +24,12 @@ package org.oscarehr.fax.externalApi.srfax.resultWrapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.oscarehr.fax.result.ListResultInterface;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ListWrapper<T>
+public class ListWrapper<T> implements ListResultInterface<T>
 {
 	public static final String STATUS_SUCCESS = "Success";
 

@@ -20,20 +20,16 @@
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.fax.result;
 
-package org.oscarehr.fax.provider;
+import java.util.List;
 
-
-import org.oscarehr.fax.result.GenericGetFaxInboxResult;
-import org.oscarehr.fax.result.ListResultInterface;
-import org.oscarehr.fax.result.SingleResultInterface;
-
-public interface FaxDownloadProvider
+public interface ListResultInterface<T>
 {
 
-	ListResultInterface<GenericGetFaxInboxResult> getFaxInbox(int faxDaysPast);
+	boolean isSuccess();
 
-	SingleResultInterface<String> retrieveFax(String referenceIdStr);
+	List<T> getResult();
 
-	SingleResultInterface<String> updateViewedStatus(String referenceIdStr);
+	String getError();
 }

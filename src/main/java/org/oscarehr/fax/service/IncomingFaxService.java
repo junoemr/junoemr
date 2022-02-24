@@ -26,7 +26,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.fax.dao.FaxInboundDao;
-import org.oscarehr.fax.externalApi.srfax.result.GenericGetFaxInboxResult;
+import org.oscarehr.fax.result.GenericGetFaxInboxResult;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxInbound;
 import org.oscarehr.provider.model.ProviderData;

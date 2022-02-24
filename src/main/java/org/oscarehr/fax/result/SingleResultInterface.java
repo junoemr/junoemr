@@ -20,11 +20,13 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.externalApi.srfax.result;
+package org.oscarehr.fax.result;
 
-public interface GenericGetFaxInboxResult
+public interface SingleResultInterface<T>
 {
-	String getDetailsId();
+	boolean isSuccess();
+	
+	String getError();
 
-	String getCallerId();
+	T getResult();
 }

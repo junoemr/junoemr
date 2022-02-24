@@ -27,13 +27,13 @@ import org.oscarehr.fax.FaxStatus;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
-import org.oscarehr.fax.externalApi.srfax.result.GenericGetFaxInboxResult;
-import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
-import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
+import org.oscarehr.fax.result.ListResultInterface;
+import org.oscarehr.fax.result.GenericGetFaxInboxResult;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxInbound;
 import org.oscarehr.fax.provider.FaxDownloadProvider;
 import org.oscarehr.fax.provider.FaxProviderFactory;
+import org.oscarehr.fax.result.SingleResultInterface;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
@@ -77,15 +77,17 @@ public class FaxDownloadService
 			criteriaSearch.setIntegrationEnabledStatus(true);
 			criteriaSearch.setInboundEnabledStatus(true);
 			List<FaxAccount> faxAccountList = faxAccountDao.criteriaSearch(criteriaSearch);
+			FaxProviderFactory faxProviderFactory = new FaxProviderFactory();
+			FaxDownloadProvider faxDownloadProvider;
 
 			for(FaxAccount faxAccount : faxAccountList)
 			{
 				try
 				{
-					FaxDownloadProvider faxDownloadProvider = new FaxProviderFactory().createFaxDownloadProvider(faxAccount);
+					faxDownloadProvider = faxProviderFactory.createFaxDownloadProvider(faxAccount);
 					
 					// get list of un-downloaded faxes from external api
-					ListWrapper<GenericGetFaxInboxResult> listResultWrapper = faxDownloadProvider.getFaxInbox(faxDaysPast);
+					ListResultInterface<GenericGetFaxInboxResult> listResultWrapper = faxDownloadProvider.getFaxInbox(faxDaysPast);
 					if(listResultWrapper.isSuccess())
 					{
 						handleResults(faxAccount, listResultWrapper);
@@ -111,7 +113,7 @@ public class FaxDownloadService
 		}
 	}
 
-	private void handleResults(FaxAccount faxAccount, ListWrapper<GenericGetFaxInboxResult> listResultWrapper)
+	private void handleResults(FaxAccount faxAccount, ListResultInterface<GenericGetFaxInboxResult> listResultWrapper)
 	{
 		for(GenericGetFaxInboxResult result : listResultWrapper.getResult())
 		{
@@ -124,7 +126,7 @@ public class FaxDownloadService
 				FaxDownloadProvider faxDownloadProvider = new FaxProviderFactory().createFaxDownloadProvider(faxAccount);
 
 				// for each new fax to get, call api and request document.
-				SingleWrapper<String> getDocResultWrapper = faxDownloadProvider.retrieveFax(referenceIdStr);
+				SingleResultInterface<String> getDocResultWrapper = faxDownloadProvider.retrieveFax(referenceIdStr);
 
 				if(getDocResultWrapper.isSuccess())
 				{
@@ -134,7 +136,7 @@ public class FaxDownloadService
 					logStatus = LogConst.STATUS_SUCCESS;
 
 					// mark the fax as downloaded if the download/save is successful
-					SingleWrapper<String> markReadResultWrapper = faxDownloadProvider.updateViewedStatus(referenceIdStr);
+					SingleResultInterface<String> markReadResultWrapper = faxDownloadProvider.updateViewedStatus(referenceIdStr);
 					
 					if(!markReadResultWrapper.isSuccess())
 					{

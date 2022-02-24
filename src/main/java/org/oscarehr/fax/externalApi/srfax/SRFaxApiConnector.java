@@ -40,7 +40,7 @@ import org.oscarehr.fax.exception.FaxApiValidationException;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxInboxResult;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxOutboxResult;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxStatusResult;
-import org.oscarehr.fax.externalApi.srfax.result.GenericGetFaxInboxResult;
+import org.oscarehr.fax.result.GenericGetFaxInboxResult;
 import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
@@ -48,6 +48,7 @@ import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -560,7 +561,7 @@ public class SRFaxApiConnector
 			{
 				try(InputStream inputStream = entity.getContent())
 				{
-					result = IOUtils.toString(inputStream, "UTF-8");
+					result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
 				}
 			}
 		}

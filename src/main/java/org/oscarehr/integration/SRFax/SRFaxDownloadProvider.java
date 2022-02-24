@@ -24,11 +24,11 @@
 package org.oscarehr.integration.SRFax;
 
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
-import org.oscarehr.fax.externalApi.srfax.result.GenericGetFaxInboxResult;
-import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
-import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
+import org.oscarehr.fax.result.GenericGetFaxInboxResult;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxDownloadProvider;
+import org.oscarehr.fax.result.ListResultInterface;
+import org.oscarehr.fax.result.SingleResultInterface;
 import oscar.util.ConversionUtils;
 import java.time.LocalDate;
 
@@ -42,7 +42,7 @@ public class SRFaxDownloadProvider implements FaxDownloadProvider
 	}
 
 	@Override
-	public ListWrapper<GenericGetFaxInboxResult> getFaxInbox(int faxDaysPast)
+	public ListResultInterface<GenericGetFaxInboxResult> getFaxInbox(int faxDaysPast)
 	{
 		String startDate = ConversionUtils.toDateString(LocalDate.now().minusDays(faxDaysPast), SRFaxApiConnector.DATE_FORMAT);
 		String endDate = ConversionUtils.toDateString(LocalDate.now(), SRFaxApiConnector.DATE_FORMAT);
@@ -55,7 +55,7 @@ public class SRFaxDownloadProvider implements FaxDownloadProvider
 	}
 
 	@Override
-	public SingleWrapper<String> retrieveFax(String referenceIdStr)
+	public SingleResultInterface<String> retrieveFax(String referenceIdStr)
 	{
 		return srFaxApiConnector.retrieveFax(null,
 			referenceIdStr, SRFaxApiConnector.RETRIEVE_DIRECTION_IN);
@@ -63,7 +63,7 @@ public class SRFaxDownloadProvider implements FaxDownloadProvider
 	
 
 	@Override
-	public SingleWrapper<String> updateViewedStatus(String referenceIdStr)
+	public SingleResultInterface<String> updateViewedStatus(String referenceIdStr)
 	{
 		return srFaxApiConnector.updateViewedStatus(null,
 			referenceIdStr,
