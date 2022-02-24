@@ -40,6 +40,7 @@ import org.oscarehr.fax.exception.FaxApiValidationException;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxInboxResult;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxOutboxResult;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxStatusResult;
+import org.oscarehr.fax.externalApi.srfax.result.GenericGetFaxInboxResult;
 import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
@@ -277,14 +278,14 @@ public class SRFaxApiConnector
 		return getMultiFaxStatus(sFaxDetailsIDList, RESPONSE_FORMAT_JSON);
 	}
 
-	private ListWrapper<GetFaxInboxResult> getFaxInbox(Map<String, String> parameters)
+	private ListWrapper<GenericGetFaxInboxResult> getFaxInbox(Map<String, String> parameters)
 	{
 		String[] requiredFields = {};
 		String[] optionalFields = {S_RESPONSE_FORMAT, S_PERIOD, S_START_DATE, S_END_DATE, S_VIEWED_STATUS, S_INCLUDE_SUB_USERS};
 		String result = processRequest(ACTION_GET_FAX_INBOX, requiredFields, optionalFields, parameters);
 		return processListResponse(result, new TypeReference<ListWrapper<GetFaxInboxResult>>(){});
 	}
-	public ListWrapper<GetFaxInboxResult> getFaxInbox(String sResponseFormat, String sPeriod,
+	public ListWrapper<GenericGetFaxInboxResult> getFaxInbox(String sResponseFormat, String sPeriod,
 	                                                  String sStartDate, String sEndDate, String sViewedStatus,
 	                                                  String sIncludeSubUsers)
 	{
@@ -298,7 +299,7 @@ public class SRFaxApiConnector
 		return getFaxInbox(parameters);
 	}
 
-	public ListWrapper<GetFaxInboxResult> getFaxInbox(String sPeriod, String sStartDate, String sEndDate, String sViewedStatus,
+	public ListWrapper<GenericGetFaxInboxResult> getFaxInbox(String sPeriod, String sStartDate, String sEndDate, String sViewedStatus,
 	                                                  String sIncludeSubUsers)
 	{
 		return getFaxInbox(RESPONSE_FORMAT_JSON, sPeriod, sStartDate, sEndDate, sViewedStatus, sIncludeSubUsers);

@@ -61,12 +61,12 @@ public class FaxProviderFactory
 		}
 	}
 
-	public FaxDownloadProvider createFaxDownloadProvider()
+	public FaxDownloadProvider createFaxDownloadProvider(FaxAccount faxAccount)
 	{
 		switch (getSystemFaxProvider())
 		{
 			case SRFAX:
-				return new SRFaxDownloadProvider();
+				return new SRFaxDownloadProvider(faxAccount);
 			case RINGCENTRAL:
 			case NONE:
 			default:

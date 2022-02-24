@@ -28,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GetFaxInboxResult
+public class GetFaxInboxResult implements GenericGetFaxInboxResult
 {
 	@JsonProperty("FileName")
 	private String rawFileName;
