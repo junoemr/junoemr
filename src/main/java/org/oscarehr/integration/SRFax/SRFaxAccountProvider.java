@@ -59,16 +59,4 @@ public class SRFaxAccountProvider implements FaxAccountProvider
 		ListWrapper<GetUsageResult> result = apiConnector.getFaxUsageByRange(currentDateStr, currentDateStr, null);
 		return (result != null && result.isSuccess());
 	}
-
-	@Override
-	public void getOutBoxStatus()
-	{
-
-	}
-
-	@Override
-	public void getInboxStatus()
-	{
-
-	}
 }
