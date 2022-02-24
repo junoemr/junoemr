@@ -9,10 +9,10 @@ Version 1.5.7
 */
 
 /* You can change these values */
-var image_path = "";
-var image_up = "";
-var image_down = "";
-var image_none = "";
+var image_path = "../images/";
+var image_up = "arrow_up.png";
+var image_down = "arrow_down.png";
+var image_none = "arrow_off.png";
 var europeandate = false;
 var alternate_row_colors = true;
 

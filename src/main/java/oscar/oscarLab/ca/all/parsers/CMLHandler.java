@@ -56,6 +56,7 @@ import java.util.ArrayList;
  */
 public class CMLHandler extends ORU_R01MessageHandler
 {
+    public static final String CML_MESSAGE_TYPE = "CML";
 
     Logger logger = Logger.getLogger(CMLHandler.class);
     protected ORU_R01 msg;
@@ -85,8 +86,9 @@ public class CMLHandler extends ORU_R01MessageHandler
     @Override
     public void postUpload() {}
 
-    public String getMsgType(){
-        return("CML");
+    public String getMsgType()
+    {
+        return (CML_MESSAGE_TYPE);
     }
 
     public String getMsgDate(){

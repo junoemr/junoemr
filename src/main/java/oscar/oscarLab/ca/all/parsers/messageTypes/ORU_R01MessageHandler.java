@@ -28,10 +28,13 @@ package oscar.oscarLab.ca.all.parsers.messageTypes;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
+import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This is the main class for parsing hl7 text values.
@@ -654,5 +657,46 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 	public String getSpecimenOBXObservationValue(int i, int j, int k)
 	{
 		return get("/.ORDER_OBSERVATION(" + i + ")/SPECIMEN(" + j + ")/OBX(" + k + ")-5");
+	}
+
+	@Override
+	public List<EmbeddedDocument> getEmbeddedDocuments()
+	{
+		List<EmbeddedDocument> embeddedDocuments = new LinkedList<>();
+		String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
+		// Every PDF should be prefixed with this due to b64 encoding of PDF header
+
+		int count = 0;
+		for (int i = 0; i < getOBRCount(); i++)
+		{
+			for (int j =0; j < getOBXCount(i); j ++)
+			{
+				if (getOBXValueType(i, j).equals("ED"))
+				{
+					// Some embedded PDFs simply have the lab as-is, some have it split up like above
+					for (int k = 1; k <= referenceStrings.length; k++)
+					{
+						String embeddedPdf = getOBXResult(i, j, k);
+						if (embeddedPdf.startsWith(MessageHandler.embeddedPdfPrefix))
+						{
+							logger.info("Found embedded PDF in lab upload, pulling it out");
+							EmbeddedDocument embeddedDocument = new EmbeddedDocument();
+							embeddedDocument.setBase64Data(embeddedPdf);
+							embeddedDocument.setMimeType("application/pdf");
+
+							String fileName = "-" + getAccessionNum() + "-" + getFillerOrderNumber() + "-" + count + "-" + (int)(Math.random()*1000000000) + ".pdf";
+							embeddedDocument.setFileName(fileName);
+							embeddedDocument.setDescription("embedded_pdf");
+							embeddedDocument.setSourceFacility("HL7Upload");
+							embeddedDocument.setSource("Embedded Lab Data");
+
+							embeddedDocuments.add(embeddedDocument);
+							count++;
+						}
+					}
+				}
+			}
+		}
+		return embeddedDocuments;
 	}
 }

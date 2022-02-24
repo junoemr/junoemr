@@ -9,6 +9,8 @@
 
 package com.indivica.olis.parameters;
 
+import static org.oscarehr.olis.OLISUtils.PROVINCIAL_LAB_ON;
+
 /**
  * Performing Laboratory
  * @author jen
@@ -24,10 +26,11 @@ public class ZBR6 implements Parameter {
     }
 
 	@Override
-    public String toOlisString() {
-	    return getQueryCode() + ".6.2" + (universalId != null ? universalId : "") + "~" +
-	    	getQueryCode() + ".6.3" + (universalIdType != null ? universalIdType : "");
-    }
+	public String toOlisString()
+	{
+		return getQueryCode() + ".6.2^" + (universalId != null ? PROVINCIAL_LAB_ON + ":" + universalId : "") + "~" +
+				getQueryCode() + ".6.3^" + (universalIdType != null ? universalIdType : "");
+	}
 
 	@Override
     public void setValue(Object value) {

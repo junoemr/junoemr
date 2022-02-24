@@ -48,15 +48,21 @@ angular.module('Common.Components').component('junoInput', {
 		// if true do not draw the input "box" just draw its contents
 		noBox: "<?",
 		componentStyle: "<?",
+		// Display an icon inside the text input
 		icon: "@?",
 		allowAutocomplete: "<?",
+		// This component should have focus set on it when rendered
+		autoFocus: "<",
+		// Display a required icon to the right of this component's label
+		requiredIndicator: "<?"
 	},
-	controller: [ "$scope", function ($scope) {
+	controller: [ "$scope", "$timeout", function ($scope, $timeout) {
 		let ctrl = this;
 
 		$scope.LABEL_POSITION = LABEL_POSITION;
 		ctrl.oldNgModel = null;
 		ctrl.isFocused = false;
+		ctrl.pristine = true;
 
 		ctrl.$onInit = () =>
 		{
@@ -70,16 +76,25 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.hideCharacterLimit = ctrl.hideCharacterLimit || true;
 			ctrl.allowAutocomplete = ctrl.allowAutocomplete || false;
 
-			if (ctrl.showInvalidFocus === undefined)
-			{
-				ctrl.showInvalidFocus = false;
-			}
+			ctrl.showInvalidFocus = ctrl.showInvalidFocus  || false;
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.oldNgModel = ctrl.ngModel;
-
 			ctrl.deviceInfo = new DeviceInfo();
+			ctrl.autoFocus = ctrl.autoFocus || false;
+			ctrl.requiredIndicator = ctrl.requiredIndicator || false;
 		};
+
+		ctrl.$postLink = () =>
+		{
+			if (ctrl.autoFocus && !ctrl.disabled)
+			{
+				$timeout(() =>
+				{
+					ctrl.inputRef.focus();
+				});
+			}
+		}
 
 		$scope.$watch("$ctrl.ngModel", () =>
 		{
@@ -95,11 +110,27 @@ angular.module('Common.Components').component('junoInput', {
 		{
 			return {
 				uppercase: ctrl.uppercase,
-				"field-invalid": ctrl.invalid && (ctrl.showInvalidFocus || !ctrl.isFocused),
+				"field-invalid": ctrl.invalid && ctrl.calcShowInvalid(),
 				"field-no-border": ctrl.noBox,
 				"field-disabled": ctrl.disabled,
 				"shift-right-for-icon": ctrl.icon,
 			};
+		}
+
+		// Function assumes that ctrl.invalid is true, is determining edge cases
+		ctrl.calcShowInvalid = () =>
+		{
+			if (ctrl.pristine)
+			{
+				return false;
+			}
+
+			if (!ctrl.showInvalidFocus && ctrl.isFocused)
+			{
+				return false;
+			}
+
+			return true;
 		}
 
 		ctrl.labelClasses = () =>
@@ -121,6 +152,7 @@ angular.module('Common.Components').component('junoInput', {
 			// update the old value
 			ctrl.oldNgModel = ctrl.ngModel;
 
+			ctrl.pristine = false;
 			if (ctrl.ngChange)
 			{
 				ctrl.ngChange({});

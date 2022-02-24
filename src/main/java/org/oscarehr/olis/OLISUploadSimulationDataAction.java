@@ -8,13 +8,8 @@
  */
 package org.oscarehr.olis;
 
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.indivica.olis.Driver;
+import com.indivica.olis.DriverResponse;
 import org.apache.commons.fileupload.DefaultFileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUpload;
@@ -24,9 +19,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 
-import com.indivica.olis.Driver;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.List;
 
 public class OLISUploadSimulationDataAction extends DispatchAction {
 	
@@ -59,11 +59,13 @@ public class OLISUploadSimulationDataAction extends DispatchAction {
 		    }
 		    
 		    if(simulationData != null && simulationData.length()>0) {
-		    	if(simulationError) {
-		    		Driver.readResponseFromXML(request, simulationData);
-		    		simulationData = (String)request.getAttribute("olisResponseContent");
-		    		request.getSession().setAttribute("errors",request.getAttribute("errors"));
-		    	}
+			    if(simulationError)
+			    {
+				    String loggedInProviderNo = LoggedInInfo.getLoggedInInfoFromRequest(request).getLoggedInProviderNo();
+				    DriverResponse driverResponse = Driver.readResponseFromXML(loggedInProviderNo, simulationData);
+				    simulationData = driverResponse.getHl7Response();
+				    request.getSession().setAttribute("errors", driverResponse.getErrors());
+			    }
 		    	request.getSession().setAttribute("olisResponseContent", simulationData);
 		    	request.setAttribute("result", "File successfully uploaded");
 		    }

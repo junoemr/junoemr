@@ -9,6 +9,8 @@
 
 package com.indivica.olis.parameters;
 
+import lombok.Getter;
+
 /**
  * Consent to view blocked information
  * @author jen
@@ -16,6 +18,10 @@ package com.indivica.olis.parameters;
  */
 public class ZPD1 implements Parameter {
 
+	public static final String CONSENT_MARKER_PATIENT = "Z";
+	public static final String CONSENT_MARKER_SUBSTITUTE = "X";
+
+	@Getter
 	private String value;
 	
 	public ZPD1(String value) {

@@ -53,7 +53,7 @@ export default class ToastService
 	 * @param requireDismiss - [optional] [default true] if true message will not expire by its self. The user must click it to dismiss.
 	 * @return the newly added toast
 	 */
-	public errorToast(message: string, requireDismiss = true): Toast
+	public errorToast(message: string, requireDismiss = false): Toast
 	{
 		const toast = ToastFactory.buildErrorToast(message, requireDismiss);
 		toastStore.addToast(toast);

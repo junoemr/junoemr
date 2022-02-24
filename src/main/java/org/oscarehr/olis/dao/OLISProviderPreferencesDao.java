@@ -9,6 +9,7 @@
 package org.oscarehr.olis.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.Query;
 
@@ -24,15 +25,16 @@ public class OLISProviderPreferencesDao extends AbstractDao<OLISProviderPreferen
 	    super(OLISProviderPreferences.class);
     }
 
-	public OLISProviderPreferences findById(String id) {
+	public Optional<OLISProviderPreferences> findById(String id)
+	{
 		try {
 			String sql = "select x from "+ this.modelClass.getName() + " x where x.providerId=?1";
 			Query query = entityManager.createQuery(sql);
 			query.setParameter(1, id);		
-			return (OLISProviderPreferences)query.getSingleResult();
+			return Optional.of((OLISProviderPreferences)query.getSingleResult());
 		}
 		catch (javax.persistence.NoResultException nre) {
-			return null;
+			return Optional.empty();
 		}
 	}
 	

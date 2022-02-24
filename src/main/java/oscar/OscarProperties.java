@@ -25,14 +25,20 @@
 
 package oscar;
 
+import org.apache.commons.lang.math.NumberUtils;
+import org.oscarehr.util.MiscUtils;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
-import org.apache.commons.lang.math.NumberUtils;
-import org.oscarehr.util.MiscUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * This class will hold OSCAR &amp; CAISI properties. It is a singleton class. Do not instantiate it, use the method getInstance(). Every time the properties file changes, tomcat must be restarted.
@@ -327,7 +333,7 @@ public class OscarProperties extends Properties {
 	 * @param defaultProviderNumbers The requested providers to route the labs to. Returned by default
 	 * @return ArrayList of the providers to route the labs to
 	 */
-	public ArrayList<String> getRouteLabsToProviders(ArrayList<String> defaultProviderNumbers)
+	public List<String> getRouteLabsToProviders(List<String> defaultProviderNumbers)
 	{
 		String property = getProperty("route_labs_to_provider", "");
 

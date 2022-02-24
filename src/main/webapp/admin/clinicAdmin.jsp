@@ -146,6 +146,14 @@
                                         </c:forEach>
                                     </html:select>
                                 </div>
+								<div class="input-field">
+									<label for="clinicVisitLocationCode">Visit Location Code</label>
+									<html:select property="clinicVisitLocationCode">
+										<c:forEach items="${visitLocationCodes}" var="code">
+											<html:option value="${code.billingLocation}|${code.description}">(${code.billingLocation}) ${code.description}</html:option>
+										</c:forEach>
+									</html:select>
+								</div>
                             </oscarprop:oscarPropertiesCheck>
                             <div class="input-field">
                                 <label for="clinic.clinicDelimPhone">

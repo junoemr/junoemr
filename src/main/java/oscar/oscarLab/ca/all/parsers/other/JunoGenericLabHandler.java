@@ -28,6 +28,7 @@ import ca.uhn.hl7v2.model.v24.message.ORU_R01;
 import ca.uhn.hl7v2.model.v24.segment.MSH;
 import org.oscarehr.common.hl7.copd.writer.JunoCoPDLabWriter;
 import org.oscarehr.common.hl7.copd.writer.JunoGenericImportLabWriter;
+import org.oscarehr.common.hl7.copd.writer.JunoLabCode;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
 public class JunoGenericLabHandler extends ORU_R01MessageHandler
@@ -128,6 +129,32 @@ public class JunoGenericLabHandler extends ORU_R01MessageHandler
 	@Override
 	public boolean isUnstructured()
 	{
+		return false;
+	}
+
+	@Override
+	public boolean isOBRBlocked(int obr)
+	{
+		try
+		{
+			ORU_R01 msg = (ORU_R01) message;
+			int obr47Reps = msg.getPATIENT_RESULT().getORDER_OBSERVATION(obr).getOBR()
+				.getObr47_FillerSupplementalServiceInformationReps();
+
+			for (int k = 0; k < obr47Reps; k++)
+			{
+				String codingSystem = get("/.ORDER_OBSERVATION(" + obr + ")/OBR-47(" + k + ")-3");
+				String indicator = get("/.ORDER_OBSERVATION(" + obr + ")/OBR-47(" + k + ")-1");
+				if (JunoLabCode.CODING_SYSTEM.equals(codingSystem) && JunoLabCode.BLOCKED.name().equals(indicator))
+				{
+					return true;
+				}
+			}
+		}
+		catch (HL7Exception e)
+		{
+			logger.error("HL7 Parsing Error", e);
+		}
 		return false;
 	}
 

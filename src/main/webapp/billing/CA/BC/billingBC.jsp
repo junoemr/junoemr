@@ -1008,10 +1008,12 @@ if(wcbneeds != null){%>
 
 		if(sxml_location.compareTo("") == 0)
 		{
+			SystemPreferenceService systemPreferences = SpringUtils.getBean(SystemPreferenceService.class);
+			
             sxml_provider = getDefaultProvider(bean, OscarProperties.getInstance(), demo);
             thisForm.setXml_provider(sxml_provider);
-
-			sxml_location = OscarProperties.getInstance().getProperty("visitlocation");
+			
+			sxml_location = systemPreferences.getPreferenceValue("visit_location", "");
 			thisForm.setXml_location(sxml_location);
 
 			LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request.getSession());

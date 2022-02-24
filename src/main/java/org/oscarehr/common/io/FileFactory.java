@@ -275,6 +275,18 @@ public class FileFactory
 	}
 
 	/**
+	 * Write the input stream to a resource file
+	 * @param fileInputStream - input stream of the new file
+	 * @param fileName - name of the new file
+	 * @return the file
+	 * @throws IOException - if an error occurs
+	 */
+	public static GenericFile createLabFile(InputStream fileInputStream, String fileName) throws IOException, InterruptedException
+	{
+		return createNewSanitizedFile(fileInputStream, fileName, GenericFile.LAB_BASE_DIR);
+	}
+
+	/**
 	 * load an existing document with the given name
 	 * @param fileName - name of the file to load
 	 * @return - the file

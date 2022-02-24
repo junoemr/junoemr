@@ -366,14 +366,14 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 			{
 				// add a second purpose to indicate emergency contact designation
 				PurposeEnumOrPlainText purposeText = objectFactory.createPurposeEnumOrPlainText();
-				purposeEnumOrPlainText.setPurposeAsPlainText(DEMOGRAPHIC_CONTACT_EMERGENCY_CONTACT_CODE);
+				purposeText.setPurposeAsPlainText(DEMOGRAPHIC_CONTACT_EMERGENCY_CONTACT_CODE);
 				contact.getContactPurpose().add(purposeText);
 			}
 			if(demographicContact.isSubstituteDecisionMaker())
 			{
 				// add a second purpose to indicate emergency contact designation
 				PurposeEnumOrPlainText purposeText = objectFactory.createPurposeEnumOrPlainText();
-				purposeEnumOrPlainText.setPurposeAsPlainText(DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE);
+				purposeText.setPurposeAsPlainText(DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE);
 				contact.getContactPurpose().add(purposeText);
 			}
 

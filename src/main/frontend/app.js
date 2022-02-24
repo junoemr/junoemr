@@ -290,6 +290,16 @@ oscarApp.config([
 			url: '/billing',
 			component: 'systemPropertiesBilling',
 		})
+		.state('admin.labConfig',
+		{
+			url: '/labConfig',
+			component: 'labConfig',
+		})
+		.state('admin.labConfig.olis',
+		{
+			url: '/olis',
+			component: 'olisConfig',
+		})
 		.state('admin.configureHealthTracker',
 		{
 			url: '/configureHealthTracker',

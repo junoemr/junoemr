@@ -13,14 +13,15 @@ import com.indivica.olis.parameters.OBR22;
 import com.indivica.olis.parameters.ORC21;
 import com.indivica.olis.parameters.QRD7;
 import com.indivica.olis.parameters.ZPD1;
+import com.indivica.olis.parameters.ZSD;
 
 /**
  * Z06 - Retrieve Laboratory Information Updates for Ordering Facility 
  * @author jen
  *
  */
-public class Z06Query extends Query {
-
+public class Z06Query extends DateRangeQuery
+{
 	private OBR22 startEndTimestamp = new OBR22(); // mandatory
 	private QRD7 quantityLimitedRequest = null;
 	private ORC21 orderingFacilityId = new ORC21(); // mandatory
@@ -44,7 +45,8 @@ public class Z06Query extends Query {
 		
 		return query;
 	}
-	
+
+	@Override
 	public void setStartEndTimestamp(OBR22 startEndTimestamp) {
     	this.startEndTimestamp = startEndTimestamp;
     }
@@ -65,4 +67,9 @@ public class Z06Query extends Query {
     public void setConsentToViewBlockedInformation(ZPD1 consentToViewBlockedInformation) {
 		throw new RuntimeException("Not valid for this type of query.");
     }
+	@Override
+	public void setSubstituteDecisionMakerInfo(ZSD substituteDecisionMakerInfo)
+	{
+		throw new RuntimeException("Not valid for this type of query.");
+	}
 }

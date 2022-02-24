@@ -150,6 +150,13 @@ public class JunoGenericImportLabWriter extends HL7LabWriter
 		terser.set(obrPath + "OBR-25-1", observation.getReportStatus().name());
 		terser.set(obrPath + "OBR-44-1", observation.getProcedureCode());
 
+		if(observation.isBlockedResult())
+		{
+			terser.set(obrPath + "OBR-47(0)-1", JunoLabCode.BLOCKED.name());
+			terser.set(obrPath + "OBR-47(0)-2", JunoLabCode.BLOCKED.getDescription());
+			terser.set(obrPath + "OBR-47(0)-3", JunoLabCode.CODING_SYSTEM);
+		}
+
 
 		// results info
 		int obxIndex = 0;

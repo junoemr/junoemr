@@ -9,23 +9,24 @@
 
 package com.indivica.olis.queries;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.indivica.olis.parameters.OBR22;
 import com.indivica.olis.parameters.OBR4;
 import com.indivica.olis.parameters.OBX3;
 import com.indivica.olis.parameters.QRD7;
 import com.indivica.olis.parameters.ZPD1;
 import com.indivica.olis.parameters.ZRP1;
+import com.indivica.olis.parameters.ZSD;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Z04 - Retrieve Laboratory Information Updates for Practitioner
  * @author jen
  *
  */
-public class Z04Query extends Query {
-
+public class Z04Query extends DateRangeQuery
+{
 	private OBR22 startEndTimestamp = new OBR22(); // mandatory
 	private QRD7 quantityLimitedRequest = null;
 	private ZRP1 requestingHic = new ZRP1(); // mandatory
@@ -57,9 +58,11 @@ public class Z04Query extends Query {
 		return query;
 	}
 
-	public void setStartEndTimestamp(OBR22 startEndTimestamp) {
-    	this.startEndTimestamp = startEndTimestamp;
-    }
+	@Override
+	public void setStartEndTimestamp(OBR22 startEndTimestamp)
+	{
+		this.startEndTimestamp = startEndTimestamp;
+	}
 
 	public void setQuantityLimitedRequest(QRD7 quantityLimitedRequest) {
     	this.quantityLimitedRequest = quantityLimitedRequest;
@@ -85,6 +88,11 @@ public class Z04Query extends Query {
 		this.testResultCodeList.add(testResultCode);
 	}
 
+	public String getRequestingHicIdNumber()
+	{
+		return requestingHic.getIdNumber();
+	}
+
 	@Override
 	public QueryType getQueryType() {
 		return QueryType.Z04;
@@ -93,4 +101,9 @@ public class Z04Query extends Query {
     public void setConsentToViewBlockedInformation(ZPD1 consentToViewBlockedInformation) {
 		throw new RuntimeException("Not valid for this type of query.");
     }
+	@Override
+	public void setSubstituteDecisionMakerInfo(ZSD substituteDecisionMakerInfo)
+	{
+		throw new RuntimeException("Not valid for this type of query.");
+	}
 }

@@ -80,7 +80,7 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	}
 
 	@Override
-	public boolean isSupportEmbeddedPdf()
+	public boolean supportsEmbeddedDocuments()
 	{
 		return true;
 	}

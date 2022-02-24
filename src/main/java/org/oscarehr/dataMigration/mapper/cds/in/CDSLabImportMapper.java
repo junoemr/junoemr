@@ -34,6 +34,7 @@ import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.LaboratoryResults;
 import xml.cds.v5_0.ResultNormalAbnormalFlag;
+import xml.cds.v5_0.YIndicator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -211,7 +212,8 @@ public class CDSLabImportMapper extends AbstractCDSImportMapper<List<LaboratoryR
 				annotation.setNoteText(physiciansNotes);
 				result.setAnnotation(annotation);
 			}
-			//TODO blocked result?
+			// if any lab result is blocked, the observation is blocked (OLIS feature)
+			labObservation.setBlockedResult(labObservation.isBlockedResult() || (importLabResults.getBlockedTestResult() == YIndicator.Y));
 
 			labObservation.addResult(result);
 		}

@@ -67,7 +67,8 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String PATIENT_NAME_LENGTH="patient_name_length";
     public static final String PROVIDER_FAXNUMBER = "faxnumber";
     public static final String PROVIDER_COLOUR = "ProviderColour";
-    
+
+    public static final String OLIS_POLLING_ENABLED="olis_polling_enabled";
     public static final String OFFICIAL_FIRST_NAME="official_first_name";
     public static final String OFFICIAL_SECOND_NAME="official_second_name";
     public static final String OFFICIAL_LAST_NAME="official_last_name";

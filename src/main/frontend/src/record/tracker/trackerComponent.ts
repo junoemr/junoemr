@@ -92,6 +92,10 @@ angular.module('Record.Tracker').component('healthTracker',
 					{
 						ctrl.selectedCareTracker = ctrl.careTrackers.find((careTracker) => careTracker.id === Number($stateParams.careTrackerId));
 					}
+					else
+					{
+						ctrl.onViewAllPatientMeasurements();
+					}
 
 					ctrl.initCareTrackerLists(ctrl.careTrackers);
 				}

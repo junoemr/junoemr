@@ -33,9 +33,9 @@
 		<form-bean name="clinicForm" type="org.apache.struts.validator.DynaValidatorForm">
 			<form-property name="clinic" type="org.oscarehr.common.model.Clinic" />
 			<form-property name="clinicBillingAddress" type="org.oscarehr.clinic.model.ClinicBillingAddress" />
-            <form-property name="clinicServiceLocationCode" type="java.lang.String"></form-property>
+      <form-property name="clinicServiceLocationCode" type="java.lang.String"></form-property>
+      <form-property name="clinicVisitLocationCode" type="java.lang.String"></form-property>
 		</form-bean>
-		<form-bean name="olisPreferences" type="org.oscarehr.olis.model.OLISSystemPreferences"/>
 
 		<form-bean name="siteForm" type="org.apache.struts.validator.DynaValidatorForm">
 			<form-property name="site" type="org.oscarehr.common.model.Site" />
@@ -1016,13 +1016,13 @@
                 <action input="/labDisplay.jsp" path="/lab/CA/ALL/UnlinkDemographic" scope="request" type="oscar.oscarLab.ca.all.pageUtil.UnlinkDemographicAction">
 			<forward name="success" path="/oscarMDS/Close.jsp" />
 		</action>
-		<action input="/labDisplayOLIS.jsp" path="/lab/CA/ALL/PrintOLIS" scope="request" type="oscar.oscarLab.ca.all.pageUtil.PrintOLISLabsAction">
+		<action input="/labDisplayOLIS.jsp" path="/lab/CA/ALL/PrintOLIS" scope="request" type="oscar.oscarLab.ca.all.pageUtil.OLIS.PrintOLISLabAttachmentAction">
             <forward name="error" path="/lab/CA/ALL/labDisplay.jsp" />
         </action>
         <action input="/olis/Search.jsp" path="/olis/Search" scope="request" type="org.oscarehr.olis.OLISSearchAction">
         	<forward name="results" path="/olis/Results.do" />
         </action>
-        <action input="/olis/Search.jsp" path="/olis/Results" scope="request" type="org.oscarehr.olis.OLISResultsAction">
+        <action input="/olis/Search.jsp" path="/olis/Results" scope="request" parameter="method" type="org.oscarehr.olis.OLISResultsAction">
         	<forward name="results" path="/olis/Results.jsp" />
         </action>
         <action input="/olis/Results.jsp" path="/olis/AddToInbox" scope="request" type="org.oscarehr.olis.OLISAddToInboxAction">
@@ -2458,10 +2458,6 @@
 			<forward name="exit" path="/oscarEncounter/close.jsp" />
 		</action>
 
-		<action path="/provider/OlisPreferences" type="org.oscarehr.provider.web.OlisPreferencesAction" parameter="method" scope="request" validate="false" input="/provider/olis_preferences.jsp">
-			<forward name="form" path="/provider/olis_preferences.jsp" />
-		</action>
-
 		<action path="/eyeform/ExaminationHistory" type="org.oscarehr.eyeform.web.ExaminationHistoryAction" parameter="method">
 			<forward name="success" path="/eyeform/examination_history.jsp" />
 			<forward name="results" path="/eyeform/examination_history_results.jsp" />
@@ -2514,9 +2510,6 @@
 			<forward name="success" path="/admin/clinicAdmin.jsp" />
 		</action>
 
-		<action path="/olis/Preferences" name="olisPreferences" type="org.oscarehr.olis.OLISPreferencesAction" parameter="method" scope="request">
-			<forward name="success" path="/olis/Preferences.jsp" />
-		</action>
 		<action path="/admin/ManageSites" name="siteForm" type="org.springframework.web.struts.DelegatingActionProxy" parameter="method" scope="request">
 			<forward name="list" path="/admin/sites/sitesAdmin.jsp" />
 			<forward name="details" path="/admin/sites/sitesAdminDetail.jsp" />

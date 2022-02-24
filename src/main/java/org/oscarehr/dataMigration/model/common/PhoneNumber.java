@@ -82,6 +82,15 @@ public class PhoneNumber extends AbstractTransientModel
 		return null;
 	}
 
+	public String getNumberFormattedDisplay()
+	{
+		if(number != null && number.length() == 10)
+		{
+			return "(" + number.substring(0,3) + ") " + number.substring(3,6) + "-" + number.substring(6);
+		}
+		return "";
+	}
+
 	public void setPhoneTypeHome()
 	{
 		this.setPhoneType(PHONE_TYPE.HOME);

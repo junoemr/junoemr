@@ -15,6 +15,9 @@ import com.indivica.olis.parameters.ZBX1;
 import com.indivica.olis.parameters.ZPD1;
 import com.indivica.olis.parameters.ZPD3;
 import com.indivica.olis.parameters.ZRP1;
+import com.indivica.olis.parameters.ZSD;
+
+import static com.indivica.olis.parameters.ZPD1.CONSENT_MARKER_SUBSTITUTE;
 
 /**
  * Z02 - Retrieve Laboratory Information for Order ID
@@ -26,6 +29,7 @@ public class Z02Query extends Query {
 	private ZBX1 retrieveAllTestResults = null;
 	private ZRP1 requestingHic = new ZRP1(); // mandatory
 	private ZPD1 consentToViewBlockedInformation = null;
+	private ZSD substituteDecisionMakerInfo = null;
 	private ZPD3 patientConsentBlockAllIndicator = null;
 	private PID3 patientIdentifier = new PID3(); // mandatory
 	private ORC4 placerGroupNumber = new ORC4(); // mandatory
@@ -40,9 +44,15 @@ public class Z02Query extends Query {
 		
 		if (requestingHic != null)
 			query += requestingHic.toOlisString() + "~";
-		
+
 		if (consentToViewBlockedInformation != null)
+		{
 			query += consentToViewBlockedInformation.toOlisString() + "~";
+			if(CONSENT_MARKER_SUBSTITUTE.equals(consentToViewBlockedInformation.getValue()))
+			{
+				query += substituteDecisionMakerInfo.toOlisString() + "~";
+			}
+		}
 		
 		if (patientConsentBlockAllIndicator != null)
 			query += patientConsentBlockAllIndicator.toOlisString() + "~";
@@ -76,6 +86,12 @@ public class Z02Query extends Query {
 	public void setConsentToViewBlockedInformation(ZPD1 consentToViewBlockedInformation) {
     	this.consentToViewBlockedInformation = consentToViewBlockedInformation;
     }
+
+	@Override
+	public void setSubstituteDecisionMakerInfo(ZSD substituteDecisionMakerInfo)
+	{
+		this.substituteDecisionMakerInfo = substituteDecisionMakerInfo;
+	}
 
 	public void setPatientConsentBlockAllIndicator(ZPD3 patientConsentBlockAllIndicator) {
     	this.patientConsentBlockAllIndicator = patientConsentBlockAllIndicator;
