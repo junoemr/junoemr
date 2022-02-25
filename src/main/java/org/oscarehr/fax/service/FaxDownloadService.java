@@ -68,6 +68,9 @@ public class FaxDownloadService
 	@Autowired
 	private FaxStatus faxStatus;
 
+	/**
+	 * Pulls, downloads and saves any new faxes for each active inbound fax account
+	 */
 	public void pullNewFaxes()
 	{
 		if(faxStatus.canPullFaxesAndIsMaster())
@@ -107,6 +110,11 @@ public class FaxDownloadService
 		}
 	}
 
+	/**
+	 * Handles each result in inboxResults by retrieving the fax file, saving the fax and marking as downloaded
+	 * @param faxAccount Fax account these inbox results are pulled from
+	 * @param inboxResults Fax inbox results to handle
+	 */
 	private void handleResults(FaxAccount faxAccount, List<? extends FaxInboxResult> inboxResults)
 	{
 		for(FaxInboxResult result : inboxResults)
