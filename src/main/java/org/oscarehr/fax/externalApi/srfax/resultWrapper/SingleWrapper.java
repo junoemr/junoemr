@@ -24,10 +24,9 @@ package org.oscarehr.fax.externalApi.srfax.resultWrapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.oscarehr.fax.result.SingleResultInterface;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SingleWrapper<T> implements SingleResultInterface<T>
+public class SingleWrapper<T>
 {
 	public static final String STATUS_SUCCESS = "Success";
 

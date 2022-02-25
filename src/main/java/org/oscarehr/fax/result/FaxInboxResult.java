@@ -22,14 +22,9 @@
  */
 package org.oscarehr.fax.result;
 
-import java.util.List;
-
-public interface ListResultInterface<T>
+public interface FaxInboxResult
 {
+	String getDetailsId();
 
-	boolean isSuccess();
-
-	List<T> getResult();
-
-	String getError();
+	String getCallerId();
 }

@@ -26,14 +26,13 @@ import org.apache.log4j.Logger;
 import org.oscarehr.fax.FaxStatus;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
+import org.oscarehr.fax.exception.FaxApiResultException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
-import org.oscarehr.fax.result.ListResultInterface;
-import org.oscarehr.fax.result.GenericGetFaxInboxResult;
+import org.oscarehr.fax.result.FaxInboxResult;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxInbound;
 import org.oscarehr.fax.provider.FaxDownloadProvider;
 import org.oscarehr.fax.provider.FaxProviderFactory;
-import org.oscarehr.fax.result.SingleResultInterface;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
@@ -85,17 +84,8 @@ public class FaxDownloadService
 				try
 				{
 					faxDownloadProvider = faxProviderFactory.createFaxDownloadProvider(faxAccount);
-					
-					// get list of un-downloaded faxes from external api
-					ListResultInterface<GenericGetFaxInboxResult> listResultWrapper = faxDownloadProvider.getFaxInbox(faxDaysPast);
-					if(listResultWrapper.isSuccess())
-					{
-						handleResults(faxAccount, listResultWrapper);
-					}
-					else
-					{
-						logger.warn("API Failure: " + listResultWrapper.getError());
-					}
+					List<? extends FaxInboxResult> faxInboxResults = faxDownloadProvider.getFaxInbox(faxDaysPast);
+					handleResults(faxAccount, faxInboxResults);
 				}
 				catch(FaxApiConnectionException e)
 				{
@@ -105,6 +95,10 @@ public class FaxDownloadService
 				{
 					logger.warn("Fax API validation error: " + e.getMessage());
 				}
+				catch(FaxApiResultException e)
+				{
+					logger.warn("Fax API result error: " + e.getMessage());
+				}
 				catch(Exception e)
 				{
 					logger.error("Unexpected Inbound Fax Error", e);
@@ -113,9 +107,9 @@ public class FaxDownloadService
 		}
 	}
 
-	private void handleResults(FaxAccount faxAccount, ListResultInterface<GenericGetFaxInboxResult> listResultWrapper)
+	private void handleResults(FaxAccount faxAccount, List<? extends FaxInboxResult> inboxResults)
 	{
-		for(GenericGetFaxInboxResult result : listResultWrapper.getResult())
+		for(FaxInboxResult result : inboxResults)
 		{
 			String logStatus = LogConst.STATUS_FAILURE;
 			String logData = null;
@@ -126,28 +120,18 @@ public class FaxDownloadService
 				FaxDownloadProvider faxDownloadProvider = new FaxProviderFactory().createFaxDownloadProvider(faxAccount);
 
 				// for each new fax to get, call api and request document.
-				SingleResultInterface<String> getDocResultWrapper = faxDownloadProvider.retrieveFax(referenceIdStr);
+				String faxContent = faxDownloadProvider.retrieveFax(referenceIdStr);
 
-				if(getDocResultWrapper.isSuccess())
-				{
-					// save document to input stream
-					FaxInbound faxInbound = incomingFaxService.saveFaxDocument(faxAccount, result, getDocResultWrapper.getResult());
-					inboundId = String.valueOf(faxInbound.getId());
-					logStatus = LogConst.STATUS_SUCCESS;
+				// save document to input stream
+				FaxInbound faxInbound = incomingFaxService.saveFaxDocument(faxAccount, result, faxContent);
+				inboundId = String.valueOf(faxInbound.getId());
+				logStatus = LogConst.STATUS_SUCCESS;
 
-					// mark the fax as downloaded if the download/save is successful
-					SingleResultInterface<String> markReadResultWrapper = faxDownloadProvider.updateViewedStatus(referenceIdStr);
-					
-					if(!markReadResultWrapper.isSuccess())
-					{
-						logger.error("Failed to mark fax(" + referenceIdStr + ") as read. " + markReadResultWrapper.getError());
-						logData = "Failed to mark fax as read: " + markReadResultWrapper.getError();
-					}
-				}
-				else
+				// mark the fax as downloaded if the download/save is successful
+				logData = faxDownloadProvider.markAsDownloaded(referenceIdStr);
+				if (logData != null)
 				{
-					logger.warn("API Failure: " + getDocResultWrapper.getError());
-					logData = getDocResultWrapper.getError();
+					logger.error(logData);
 				}
 			}
 			catch(FaxApiConnectionException e)

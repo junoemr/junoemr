@@ -20,11 +20,22 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.result;
+package org.oscarehr.fax.exception;
 
-public interface GenericGetFaxInboxResult
+public class FaxApiResultException extends FaxException
 {
-	String getDetailsId();
+	public FaxApiResultException(String message)
+	{
+		super(message);
+	}
 
-	String getCallerId();
+	public FaxApiResultException(Exception e)
+	{
+		super(e);
+	}
+
+	public FaxApiResultException(Exception e, String userMessageResourceKey)
+	{
+		super(e, userMessageResourceKey);
+	}
 }
