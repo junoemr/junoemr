@@ -139,18 +139,18 @@
 			<div class="flex-row">
 				<label class="flex-row-label"><bean:message bundle="ui" key="admin.fax.acct.edit.connectionStatus"/></label>
 				<div class="flex-row-content">
-					<span ng-show="$ctrl.faxAccount.connectionStatus == $ctrl.connectionStatusEnum.unknown"
+					<span ng-show="$ctrl.faxAccount.connectionStatusUnknown"
 					      class="glyphicon unknown glyphicon-question-sign"></span>
-					<span ng-show="$ctrl.faxAccount.connectionStatus == $ctrl.connectionStatusEnum.success"
+					<span ng-show="$ctrl.faxAccount.connectionStatusSuccess"
 					      class="glyphicon success glyphicon-ok-sign"></span>
-					<span ng-show="$ctrl.faxAccount.connectionStatus == $ctrl.connectionStatusEnum.failure"
+					<span ng-show="$ctrl.faxAccount.connectionStatusFailure"
 					      class="glyphicon failure glyphicon-remove-sign"></span>
 				</div>
 			</div>
 			<div class="flex-row">
 				<div class="flex-row-label">
 					<button type="button" class="btn input-content"
-					        ng-click="$ctrl.testConnection($ctrl.faxAccount)">
+					        ng-click="$ctrl.testConnection()">
 						<bean:message bundle="ui" key="admin.fax.acct.edit.btn-testConnection"/>
 					</button>
 				</div>

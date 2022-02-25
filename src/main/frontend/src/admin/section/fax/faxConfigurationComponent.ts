@@ -1,3 +1,5 @@
+import FaxAccountService from "../../../lib/fax/service/FaxAccountService";
+
 angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
 	bindings: {
@@ -5,15 +7,15 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	},
 	controller: [
 		"$uibModal",
-		"faxAccountService",
 		"providerService",
 		"systemPreferenceService",
 		function ($uibModal,
-		          faxAccountService,
 		          providerService,
 		          systemPreferenceService)
 		{
 			const controller = this;
+			controller.faxAccountService = new FaxAccountService();
+
 			controller.faxAccountList = [];
 			controller.loggedInProvider = null;
 			controller.masterFaxDisabled = true;
@@ -59,7 +61,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 					}
 				);
 
-				faxAccountService.listAccounts().then(
+				controller.faxAccountService.getAccounts().then(
 					function success(response)
 					{
 						controller.faxAccountList = response;

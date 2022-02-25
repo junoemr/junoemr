@@ -1,3 +1,5 @@
+import FaxAccountService from "../../../lib/fax/service/FaxAccountService";
+
 angular.module("Admin.Section.Fax").component('faxSendReceive', {
 	templateUrl: 'src/admin/section/fax/faxSendReceive.jsp',
 	bindings: {
@@ -6,16 +8,16 @@ angular.module("Admin.Section.Fax").component('faxSendReceive', {
 	controller: [
 		'NgTableParams',
 		'providerService',
-		"faxAccountService",
 		"faxInboundService",
 		"faxOutboundService",
 		function (NgTableParams,
 		          providerService,
-		          faxAccountService,
 		          faxInboundService,
 		          faxOutboundService)
 		{
 			const controller = this;
+			controller.faxAccountService = new FaxAccountService();
+
 			controller.displayStatus = Object.freeze({
 				all: {
 					value: null,
@@ -113,7 +115,7 @@ angular.module("Admin.Section.Fax").component('faxSendReceive', {
 
 			controller.initialize = function()
 			{
-				faxAccountService.listAccounts().then(
+				controller.faxAccountService.listAccounts().then(
 					function success(response)
 					{
 						controller.faxAccountList = response;
@@ -153,7 +155,7 @@ angular.module("Admin.Section.Fax").component('faxSendReceive', {
 
 							// @ts-ignore
 							var searchListHelper = new Juno.Common.SearchListHelper(defaults, searchParams);
-							return faxAccountService.getOutbox(controller.selectedFaxAccount.id, searchListHelper).then(
+							return controller.faxAccountService.getOutbox(controller.selectedFaxAccount.id, searchListHelper).then(
 								function success(response)
 								{
 									controller.outboxItemList = response.data;
@@ -180,7 +182,6 @@ angular.module("Admin.Section.Fax").component('faxSendReceive', {
 						getData: function (params)
 						{
 							controller.inbox.search = params.url();
-							console.info(controller.inbox);
 
 							let defaults = {
 								page: controller.inbox.search.page,
@@ -193,7 +194,7 @@ angular.module("Admin.Section.Fax").component('faxSendReceive', {
 
 							// @ts-ignore
 							var searchListHelper = new Juno.Common.SearchListHelper(defaults, searchParams);
-							return faxAccountService.getInbox(controller.selectedFaxAccount.id, searchListHelper).then(
+							return controller.faxAccountService.getInbox(controller.selectedFaxAccount.id, searchListHelper).then(
 								function success(response)
 								{
 									controller.inboxItemList = response.data;

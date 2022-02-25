@@ -1,3 +1,7 @@
+import FaxAccountService from "../../../lib/fax/service/FaxAccountService";
+import FaxAccount from "../../../lib/fax/model/FaxAccount";
+import {FaxAccountConnectionStatusType} from "../../../lib/fax/model/FaxAccountConnectionStatusType";
+
 angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 	templateUrl: 'src/admin/section/fax/faxConfigurationEditModal.jsp',
 	bindings: {
@@ -5,11 +9,12 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 		resolve: "<",
 	},
 	controller: [
-		"faxAccountService",
-		function (faxAccountService)
+		'$scope',
+		function ($scope)
 		{
 			const controller = this;
-			controller.connectionStatusEnum = Object.freeze({"unknown": 1, "success": 2, "failure": 3});
+			controller.faxAccountService = new FaxAccountService();
+
 			controller.coverLetterOptions = [
 				"None",
 				"Basic",
@@ -30,18 +35,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				}
 				else
 				{
-					controller.faxAccount = {
-						enabled: true,
-						enableInbound: false,
-						enableOutbound: false,
-						accountLogin: null,
-						accountEmail: '',
-						password: '',
-						displayName: '',
-						coverLetterOption: '',
-						faxNumber: '',
-						connectionStatus: controller.connectionStatusEnum.unknown
-					};
+					controller.faxAccount = new FaxAccount();
 				}
 				// get the master flag status for inbound/outbound settings
 				controller.masterFaxEnabledInbound = controller.resolve.masterFaxEnabledInbound;
@@ -83,14 +77,14 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 
 				if (controller.faxAccount.id)
 				{
-					faxAccountService.updateAccountSettings(controller.faxAccount.id, controller.faxAccount).then(
+					controller.faxAccountService.updateAccountSettings(controller.faxAccount).then(
 						closeSuccess,
 						closeError
 					)
 				}
 				else
 				{
-					faxAccountService.addAccountSettings(controller.faxAccount).then(
+					controller.faxAccountService.createAccountSettings(controller.faxAccount).then(
 						closeSuccess,
 						closeError
 					)
@@ -103,28 +97,29 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 
 			controller.testConnection = function ()
 			{
-				faxAccountService.testConnection(controller.faxAccount).then(
+				controller.faxAccountService.testFaxConnection(controller.faxAccount).then(
 					function success(response)
 					{
 						if (response)
 						{
-							controller.faxAccount.connectionStatus = controller.connectionStatusEnum.success;
+							controller.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Success;
 						}
 						else
 						{
-							controller.faxAccount.connectionStatus = controller.connectionStatusEnum.failure;
+							controller.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Failure;
 						}
+						$scope.$apply();
 					},
 					function error(error)
 					{
 						console.error(error);
-						controller.faxAccount.connectionStatus = controller.connectionStatusEnum.unknown;
+						controller.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Unknown;
 					}
 				)
 			};
 			controller.setDefaultConnectionStatus = function ()
 			{
-				controller.faxAccount.connectionStatus = controller.connectionStatusEnum.unknown;
+				controller.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Unknown;
 			};
 		}
 	]
