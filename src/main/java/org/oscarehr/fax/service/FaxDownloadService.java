@@ -128,11 +128,7 @@ public class FaxDownloadService
 				logStatus = LogConst.STATUS_SUCCESS;
 
 				// mark the fax as downloaded if the download/save is successful
-				logData = faxDownloadProvider.markAsDownloaded(referenceIdStr);
-				if (logData != null)
-				{
-					logger.error(logData);
-				}
+				faxDownloadProvider.markAsDownloaded(referenceIdStr);
 			}
 			catch(FaxApiConnectionException e)
 			{
@@ -142,6 +138,10 @@ public class FaxDownloadService
 			catch(FaxApiValidationException e)
 			{
 				logger.warn("Fax API validation error: " + e.getMessage());
+				logData = e.getMessage();
+			}
+			catch (FaxApiResultException e) {
+				logger.warn("Fax API result error: " + e.getMessage());
 				logData = e.getMessage();
 			}
 			catch(Exception e)

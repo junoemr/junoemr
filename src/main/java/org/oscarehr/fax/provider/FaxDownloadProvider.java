@@ -27,5 +27,5 @@ public interface FaxDownloadProvider
 
 	String retrieveFax(String referenceIdStr);
 
-	String markAsDownloaded(String referenceIdStr);
+	void markAsDownloaded(String referenceIdStr);
 }

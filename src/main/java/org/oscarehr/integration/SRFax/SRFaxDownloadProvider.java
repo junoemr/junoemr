@@ -23,6 +23,7 @@
 
 package org.oscarehr.integration.SRFax;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.fax.exception.FaxApiResultException;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxInboxResult;
@@ -37,7 +38,6 @@ import java.util.List;
 
 public class SRFaxDownloadProvider implements FaxDownloadProvider
 {
-
 	private final SRFaxApiConnector srFaxApiConnector;
 
 	public SRFaxDownloadProvider(FaxAccount faxAccount) {
@@ -90,10 +90,10 @@ public class SRFaxDownloadProvider implements FaxDownloadProvider
 	/**
 	 * Marks the fax as read in SRFax
 	 * @param referenceIdStr reference id of the fax to make as read
-	 * @return Error message if failed, otherwise null
+	 * @throws FaxApiResultException if result is not success
 	 */
 	@Override
-	public String markAsDownloaded(String referenceIdStr)
+	public void markAsDownloaded(String referenceIdStr) throws FaxApiResultException
 	{
 		SingleWrapper<String> updateViewedStatusResult = srFaxApiConnector.updateViewedStatus(null,
 			referenceIdStr,
@@ -101,8 +101,7 @@ public class SRFaxDownloadProvider implements FaxDownloadProvider
 			SRFaxApiConnector.MARK_AS_READ);
 		if (!updateViewedStatusResult.isSuccess())
 		{
-			return "Failed to mark fax as read: " + updateViewedStatusResult.getError();
+			throw new FaxApiResultException("Failed to mark fax as read: " + updateViewedStatusResult.getError());
 		}
-		return null;
 	}
 }
