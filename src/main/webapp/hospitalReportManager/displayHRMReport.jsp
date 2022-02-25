@@ -340,7 +340,7 @@
 			font-size: 12px;
 			line-height: 12px;
 			height: 24px;
-			width: 94px;
+			width: 102px;
 			margin-right: 4px;
 		}
 
@@ -568,7 +568,7 @@
 				url: "<%=request.getContextPath() %>/hospitalReportManager/Modify.do",
 				data: "method=assignProvider&reportId=" + reportId + "&providerNo=" + providerNo,
 				success: function(data) {
-					if (data.success)
+					if (data.trim())
 					{
 						alert("Successfully assigned provider");
 					}
