@@ -37,7 +37,7 @@ import java.util.HashMap;
 public class SRFaxUploadProvider implements FaxUploadProvider
 {
 	@Override
-	public boolean sendQueuedFax(FaxOutbound faxOutbound, GenericFile file) throws Exception
+	public FaxOutbound sendQueuedFax(FaxOutbound faxOutbound, GenericFile file) throws Exception
 	{
 		FaxAccount faxAccount = faxOutbound.getFaxAccount();
 
@@ -66,8 +66,7 @@ public class SRFaxUploadProvider implements FaxUploadProvider
 			coverLetterOption
 		);
 
-		boolean success = resultWrapper.isSuccess();
-		if (success)
+		if (resultWrapper.isSuccess())
 		{
 			faxOutbound.setStatusSent();
 			faxOutbound.setStatusMessage(OutgoingFaxService.STATUS_MESSAGE_IN_TRANSIT);
@@ -79,6 +78,6 @@ public class SRFaxUploadProvider implements FaxUploadProvider
 			faxOutbound.setStatusMessage(resultWrapper.getError());
 		}
 
-		return success;
+		return faxOutbound;
 	}
 }

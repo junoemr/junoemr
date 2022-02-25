@@ -26,9 +26,12 @@ package org.oscarehr.fax.provider;
 import org.oscarehr.integration.SRFax.SRFaxAccountProvider;
 import org.oscarehr.integration.SRFax.SRFaxDownloadProvider;
 import org.oscarehr.integration.SRFax.SRFaxUploadProvider;
+import org.springframework.stereotype.Service;
 
+@Service
 public class FaxProviderFactory
 {
+
 	private FaxProvider getSystemFaxProvider()
 	{
 		return FaxProvider.SRFAX;
@@ -47,12 +50,12 @@ public class FaxProviderFactory
 		}
 	}
 
-	public FaxUploadProvider createFaxUploadProvider()
+	public FaxDownloadProvider createFaxDownloadProvider()
 	{
 		switch (getSystemFaxProvider())
 		{
 			case SRFAX:
-				return new SRFaxUploadProvider();
+				return new SRFaxDownloadProvider();
 			case RINGCENTRAL:
 			case NONE:
 			default:
@@ -60,12 +63,17 @@ public class FaxProviderFactory
 		}
 	}
 
-	public FaxDownloadProvider createFaxDownloadProvider()
+	public FaxUploadProvider createFaxUploadProvider()
 	{
-		switch (getSystemFaxProvider())
+		return createFaxUploadProvider(getSystemFaxProvider());
+	}
+
+	public FaxUploadProvider createFaxUploadProvider(FaxProvider providerType)
+	{
+		switch (providerType)
 		{
 			case SRFAX:
-				return new SRFaxDownloadProvider();
+				return new SRFaxUploadProvider();
 			case RINGCENTRAL:
 			case NONE:
 			default:

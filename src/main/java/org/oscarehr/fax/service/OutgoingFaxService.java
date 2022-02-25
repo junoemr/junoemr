@@ -25,7 +25,6 @@ package org.oscarehr.fax.service;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.hibernate.cfg.NotYetImplementedException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.FaxStatus;
@@ -42,7 +41,6 @@ import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
-import org.oscarehr.integration.SRFax.SRFaxUploadProvider;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
@@ -92,6 +90,9 @@ public class OutgoingFaxService
 
 	@Autowired
 	private FaxStatus faxStatus;
+
+	@Autowired
+	private FaxProviderFactory faxProviderFactory;
 
 	public boolean isOutboundFaxEnabled()
 	{
@@ -421,25 +422,12 @@ public class OutgoingFaxService
 		try
 		{
 			FaxProvider faxType = faxOutbound.getExternalAccountType();
-			FaxUploadProvider uploadProvider = null;
-
-			switch (faxType)
-			{
-				case SRFAX:
-					uploadProvider = new SRFaxUploadProvider();
-					break;
-				case LEGACY:
-				case RINGCENTRAL:
-					throw new NotYetImplementedException();
-				case NONE:
-				default:
-					throw new UnsupportedOperationException("No fax provider is set");
-			}
+			FaxUploadProvider uploadProvider = faxProviderFactory.createFaxDownloadProvider(faxOutbound.getExternalAccountType());
 
 			try
 			{
-				boolean success = uploadProvider.sendQueuedFax(faxOutbound, fileToFax);
-				if (success)
+				FaxOutbound statusUpdate = uploadProvider.sendQueuedFax(faxOutbound, fileToFax);
+				if (statusUpdate.isStatusSent())
 				{
 					logStatus = LogConst.STATUS_SUCCESS;
 					logData = "Faxed To: " + faxOutbound.getSentTo();
