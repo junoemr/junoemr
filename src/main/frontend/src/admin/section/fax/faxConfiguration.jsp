@@ -34,29 +34,21 @@
 		</span>
 		<div ng-show="$ctrl.loggedInProvider.superAdmin">
 			<!-- let super admin enable/disable faxing -->
-			<div>
-				<div>
-					<label class="switch">
-						<input id="input-master-fax-integration-enabled-inbound" type="checkbox"
-						       ng-model="$ctrl.masterFaxEnabledInbound"
-						       ng-change="$ctrl.saveMasterFaxEnabledStateInbound();"/>
-						<span class="slider"></span>
-					</label>
-					<label for="input-master-fax-integration-enabled-inbound"><bean:message bundle="ui" key="admin.fax.acct.masterFaxEnabledInbound"/></label>
-				</div>
-				<div>
-					<label class="switch">
-						<input id="input-master-fax-integration-enabled-outbound" type="checkbox"
-						       ng-model="$ctrl.masterFaxEnabledOutbound"
-						       ng-change="$ctrl.saveMasterFaxEnabledStateOutbound();"/>
-						<span class="slider"></span>
-					</label>
-					<label for="input-master-fax-integration-enabled-outbound"><bean:message bundle="ui" key="admin.fax.acct.masterFaxEnabledOutbound"/></label>
-				</div>
-			</div>
+			<juno-toggle
+					label="<bean:message bundle="ui" key="admin.fax.acct.masterFaxEnabledInbound"/>"
+					ng-model="$ctrl.masterFaxEnabledInbound"
+					change="$ctrl.saveMasterFaxEnabledStateInbound()"
+			>
+			</juno-toggle>
+			<juno-toggle
+					label="<bean:message bundle="ui" key="admin.fax.acct.masterFaxEnabledOutbound"/>"
+					ng-model="$ctrl.masterFaxEnabledOutbound"
+					change="$ctrl.saveMasterFaxEnabledStateOutbound()"
+			>
+			</juno-toggle>
 		</div>
 		<button type="button" class="btn btn-primary"
-		        ng-show="$ctrl.faxAccountList.length == 0 && !$ctrl.masterFaxDisabled"
+		        ng-show="!$ctrl.masterFaxDisabled"
 		        ng-click="$ctrl.editNewFaxAccount()">
 			<bean:message bundle="ui" key="admin.fax.acct.btn-addNew"/>
 		</button>

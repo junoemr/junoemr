@@ -1,14 +1,13 @@
 .fax-config {
-	.switch {
-		@include juno-toggle-switch(32px, 4px, .4s);
+	.fax-config-header {
+		padding: 15px;
 	}
-  .fax-config-header {
-	padding: 15px;
-  }
+
 	.fax-config-body {
 		.account-list {
 			padding: 5px;
 			background-color: $color-neutral-white;
+
 			.account-item {
 				background-color: $color-neutral-lightest;
 				border: 2px $color-neutral-light-grey;

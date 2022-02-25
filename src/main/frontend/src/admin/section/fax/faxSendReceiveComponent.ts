@@ -1,4 +1,5 @@
 import FaxAccountService from "../../../lib/fax/service/FaxAccountService";
+import moment from "moment";
 
 angular.module("Admin.Section.Fax").component('faxSendReceive', {
 	templateUrl: 'src/admin/section/fax/faxSendReceive.jsp',
@@ -115,7 +116,7 @@ angular.module("Admin.Section.Fax").component('faxSendReceive', {
 
 			controller.initialize = function()
 			{
-				controller.faxAccountService.listAccounts().then(
+				controller.faxAccountService.getAccounts().then(
 					function success(response)
 					{
 						controller.faxAccountList = response;
