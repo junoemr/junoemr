@@ -25,7 +25,9 @@ package org.oscarehr.fax.converter;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.model.FaxStatusInternal;
 import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
+import org.oscarehr.fax.model.FaxStatusCombined;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -38,47 +40,49 @@ public class FaxOutboundToModelConverter extends AbstractModelConverter<FaxOutbo
 		FaxOutboxTransferOutbound model = new FaxOutboxTransferOutbound();
 		model.setId(entity.getId());
 		model.setFaxAccountId(entity.getFaxAccount().getId());
-		model.setProviderNo(entity.getProviderNo());
+		model.setProviderId(entity.getProviderNo());
 		model.setProviderName(entity.getProvider().getDisplayName());
-		model.setDemographicNo(entity.getDemographicNo());
+		model.setDemographicId(entity.getDemographicNo());
 		model.setSystemStatus(entity.getStatus());
 		model.setSystemStatusMessage(entity.getStatusMessage());
 		model.setArchived(entity.getArchived());
-		model.setNotificationStatus(entity.getNotificationStatus().name());
-		model.setSystemDateSent(ConversionUtils.toTimestampString(entity.getCreatedAt()));
+		model.setNotificationStatus(entity.getNotificationStatus());
+		model.setSystemSentDateTime(ConversionUtils.toLocalDateTime(entity.getCreatedAt()));
 		model.setToFaxNumber(entity.getSentTo());
-		model.setFileType(entity.getFileType().name());
+		model.setFileType(entity.getFileType());
 		model.setIntegrationStatus(entity.getExternalStatus());
-		model.setIntegrationDateSent(ConversionUtils.toTimestampString(entity.getExternalDeliveryDate()));
+		model.setIntegrationQueuedDateTime(ConversionUtils.toLocalDateTime(entity.getCreatedAt()));
+		model.setIntegrationSentDateTime(ConversionUtils.toLocalDateTime(entity.getExternalDeliveryDate()));
 		model.setCombinedStatus(toCombinedStatus(entity.getStatus(), entity.getExternalStatus()));
 
 		return model;
 	}
 
-	private static FaxOutboxTransferOutbound.CombinedStatus toCombinedStatus(FaxOutbound.Status systemStatus, String remoteStatus)
+	private static FaxStatusCombined toCombinedStatus(FaxStatusInternal systemStatus, String remoteStatus)
 	{
-		FaxOutboxTransferOutbound.CombinedStatus combinedStatus = null;
-		if(FaxOutbound.Status.ERROR.equals(systemStatus))
+		// todo need faxProvider for status checking
+		FaxStatusCombined combinedStatus = null;
+		if(FaxStatusInternal.ERROR.equals(systemStatus))
 		{
-			combinedStatus = FaxOutboxTransferOutbound.CombinedStatus.ERROR;
+			combinedStatus = FaxStatusCombined.ERROR;
 		}
-		else if(FaxOutbound.Status.QUEUED.equals(systemStatus))
+		else if(FaxStatusInternal.QUEUED.equals(systemStatus))
 		{
-			combinedStatus = FaxOutboxTransferOutbound.CombinedStatus.QUEUED;
+			combinedStatus = FaxStatusCombined.QUEUED;
 		}
-		else if(FaxOutbound.Status.SENT.equals(systemStatus)
+		else if(FaxStatusInternal.SENT.equals(systemStatus)
 				&& SRFaxApiConnector.RESPONSE_STATUS_SENT.equalsIgnoreCase(remoteStatus))
 		{
-			combinedStatus = FaxOutboxTransferOutbound.CombinedStatus.INTEGRATION_SUCCESS;
+			combinedStatus = FaxStatusCombined.INTEGRATION_SUCCESS;
 		}
-		else if(FaxOutbound.Status.SENT.equals(systemStatus)
+		else if(FaxStatusInternal.SENT.equals(systemStatus)
 				&& SRFaxApiConnector.RESPONSE_STATUS_FAILED.equalsIgnoreCase(remoteStatus))
 		{
-			combinedStatus = FaxOutboxTransferOutbound.CombinedStatus.INTEGRATION_FAILED;
+			combinedStatus = FaxStatusCombined.INTEGRATION_FAILED;
 		}
-		else if(FaxOutbound.Status.SENT.equals(systemStatus))
+		else if(FaxStatusInternal.SENT.equals(systemStatus))
 		{
-			combinedStatus = FaxOutboxTransferOutbound.CombinedStatus.IN_PROGRESS;
+			combinedStatus = FaxStatusCombined.IN_PROGRESS;
 		}
 		return combinedStatus;
 	}

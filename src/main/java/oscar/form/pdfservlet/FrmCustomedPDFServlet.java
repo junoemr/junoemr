@@ -34,7 +34,8 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.exception.FaxException;
-import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.model.FaxFileType;
+import org.oscarehr.fax.model.FaxStatusInternal;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -98,13 +99,13 @@ public class FrmCustomedPDFServlet extends HttpServlet
 					GenericFile fileToFax = FileFactory.createTempFile(baosPDF, ".pdf");
 					String pdfFile = "prescription_" + pdfId + "-" + fileToFax.getName();
 					fileToFax.rename(pdfFile);
-					FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.PRESCRIPTION, fileToFax);
-					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))
+					FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerNo, demographicNo, recipient, FaxFileType.PRESCRIPTION, fileToFax);
+					if(transfer.getSystemStatus().equals(FaxStatusInternal.ERROR))
 					{
 						faxMessage = "Failed to send fax. Check account settings. " +
 								"Reason: " + transfer.getSystemStatusMessage();
 					}
-					else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED))
+					else if(transfer.getSystemStatus().equals(FaxStatusInternal.QUEUED))
 					{
 						faxMessage = "Failed to send fax, it has been queued for automatic resend. " +
 								"Reason: " + transfer.getSystemStatusMessage();

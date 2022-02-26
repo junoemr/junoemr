@@ -14,7 +14,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
-import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.model.FaxFileType;
 import org.oscarehr.fax.service.OutgoingFaxService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -69,7 +69,7 @@ public final class FaxAction
 			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
 
 			GenericFile fileToFax = FileFactory.getExistingFile(tempFile);
-			FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerId, null, recipient, FaxOutbound.FileType.FORM, fileToFax);
+			FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerId, null, recipient, FaxFileType.FORM, fileToFax);
 			transferList.add(transfer);
 		}
 

@@ -36,6 +36,7 @@ import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.fax.transfer.FaxAccountUpdateInput;
 import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
 import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
+import org.oscarehr.fax.model.FaxStatusCombined;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.common.annotation.MaskParameter;
@@ -238,7 +239,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		}
 		if (StringUtils.trimToNull(combinedStatus) != null)
 		{
-			criteriaSearch.setCombinedStatus(FaxOutboxTransferOutbound.CombinedStatus.valueOf(combinedStatus));
+			criteriaSearch.setCombinedStatus(FaxStatusCombined.valueOf(combinedStatus));
 		}
 		if (StringUtils.trimToNull(archived) != null)
 		{

@@ -4,6 +4,10 @@ import FaxAccountToUpdateInputConverter from "../converter/FaxAccountToUpdateInp
 import FaxAccountToCreateInputConverter from "../converter/FaxAccountToCreateInputConverter";
 import FaxAccountToModelConverter from "../converter/FaxAccountToModelConverter";
 import FaxAccount from "../model/FaxAccount";
+import FaxInboxResult from "../model/FaxInboxResult";
+import FaxInboxResultToModelConverter from "../converter/FaxInboxResultToModelConverter";
+import FaxOutboxResultToModelConverter from "../converter/FaxOutboxResultToModelConverter";
+import FaxOutboxResult from "../model/FaxOutboxResult";
 
 export default class FaxAccountService
 {
@@ -14,6 +18,8 @@ export default class FaxAccountService
 	protected faxAccountToCreateInputConverter = new FaxAccountToCreateInputConverter();
 	protected faxAccountToUpdateInputConverter = new FaxAccountToUpdateInputConverter();
 	protected faxAccountToModelConverter = new FaxAccountToModelConverter();
+	protected faxInboxResultToModelConverter = new FaxInboxResultToModelConverter();
+	protected faxOutboxResultToModelConverter = new FaxOutboxResultToModelConverter();
 
 	// ==========================================================================
 	// Public Methods
@@ -77,9 +83,9 @@ export default class FaxAccountService
 
 	public getInbox = async (id: number, page: number, perPage: number,
 	                              startDate: any,
-	                              endDate: any): Promise<FaxAccount[]> =>
+	                              endDate: any): Promise<FaxInboxResult[]> =>
 	{
-		return this.faxAccountToModelConverter.convertList(
+		return this.faxInboxResultToModelConverter.convertList(
 			(await this.faxAccountApi.getInbox(id, page, perPage, endDate, startDate)).data.body);
 	}
 
@@ -87,9 +93,9 @@ export default class FaxAccountService
 	                          startDate: any,
 	                          endDate: any,
 	                          combinedStatus: string,
-	                          archived: string): Promise<FaxAccount[]> =>
+	                          archived: string): Promise<FaxOutboxResult[]> =>
 	{
-		return this.faxAccountToModelConverter.convertList(
+		return this.faxOutboxResultToModelConverter.convertList(
 			(await this.faxAccountApi.getOutbox(id, page, perPage, endDate, startDate, combinedStatus, archived)).data.body);
 	}
 }
