@@ -47,6 +47,7 @@
 </title>
 	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/library/bootstrap/3.0.0/css/bootstrap.min.css" />
 	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/js/jqplot/jquery.jqplot2.min.css" />
+	<link rel="stylesheet" type="text/css" href="${ pageContext.request.contextPath }/dashboard/display/dashBoardDisplay.css" />
 	<script>
 		var ctx = "${pageContext.request.contextPath}"
 		var providerNo = "<%=request.getAttribute("providerNo")%>"
@@ -114,7 +115,7 @@
 								<div class="col-md-3 indicatorWrapper" id="indicatorId_${ indicatorId }">
 									<div>
 										<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
-										Loading...
+										Loading... This could take a moment, time to refresh the coffee.
 									</div>
 								</div>
 							</c:forEach>

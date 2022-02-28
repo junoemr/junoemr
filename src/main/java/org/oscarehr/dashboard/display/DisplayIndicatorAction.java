@@ -68,7 +68,6 @@ public class DisplayIndicatorAction extends DispatchAction {
 		}
 		
 		IndicatorBean indicatorPanelBean = dashboardManager.getIndicatorPanel(loggedInInfo, id,  providerNo);
-		
 		request.setAttribute("indicatorPanel", indicatorPanelBean);
 		
 		return mapping.findForward("success");
