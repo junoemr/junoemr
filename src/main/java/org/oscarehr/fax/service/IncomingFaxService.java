@@ -26,7 +26,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.fax.dao.FaxInboundDao;
-import org.oscarehr.fax.externalApi.srfax.result.GetFaxInboxResult;
+import org.oscarehr.fax.result.FaxInboxResult;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxInbound;
 import org.oscarehr.provider.model.ProviderData;
@@ -53,7 +53,7 @@ public class IncomingFaxService
 	@Autowired
 	private DocumentService documentService;
 
-	public FaxInbound saveFaxDocument(final FaxAccount faxAccount, final GetFaxInboxResult inboxMeta, String result) throws IOException, InterruptedException
+	public FaxInbound saveFaxDocument(final FaxAccount faxAccount, final FaxInboxResult inboxMeta, String result) throws IOException, InterruptedException
 	{
 		InputStream documentStream = base64ToStream(result);
 		Long referenceId = Long.parseLong(inboxMeta.getDetailsId());

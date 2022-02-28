@@ -61,12 +61,17 @@ public class FaxProviderFactory
 		}
 	}
 
-	public FaxDownloadProvider createFaxDownloadProvider()
+	/**
+	 * Creates a new FaxDownloadProvider based on the provided faxAccount integration type
+	 * @param faxAccount fax account to create the provider from
+	 * @return FaxDownloadProvider
+	 */
+	public FaxDownloadProvider createFaxDownloadProvider(FaxAccount faxAccount)
 	{
-		switch (getSystemFaxProvider())
+		switch (faxAccount.getIntegrationType())
 		{
 			case SRFAX:
-				return new SRFaxDownloadProvider();
+				return new SRFaxDownloadProvider(faxAccount);
 			case RINGCENTRAL:
 			case NONE:
 			default:

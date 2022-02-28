@@ -24,7 +24,7 @@ package org.oscarehr.fax.schedulingTasks;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.FaxStatus;
-import org.oscarehr.fax.service.IncomingFaxDownloadService;
+import org.oscarehr.fax.service.FaxDownloadService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -45,7 +45,7 @@ public class InboundFaxSchedulingTask
 	private static CronSequenceGenerator cronTrigger;
 
 	@Autowired
-	private IncomingFaxDownloadService incomingFaxDownloadService;
+	private FaxDownloadService faxDownloadService;
 
 	@Autowired
 	private FaxStatus faxStatus;
@@ -62,7 +62,7 @@ public class InboundFaxSchedulingTask
 	{
 		try
 		{
-			incomingFaxDownloadService.pullNewFaxes();
+			faxDownloadService.pullNewFaxes();
 		}
 		catch(IllegalStateException e)
 		{
