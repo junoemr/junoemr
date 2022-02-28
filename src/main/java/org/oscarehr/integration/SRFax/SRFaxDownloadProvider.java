@@ -23,7 +23,6 @@
 
 package org.oscarehr.integration.SRFax;
 
-import org.apache.log4j.Logger;
 import org.oscarehr.fax.exception.FaxApiResultException;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.externalApi.srfax.result.GetFaxInboxResult;
@@ -33,6 +32,7 @@ import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxDownloadProvider;
 import org.oscarehr.fax.result.FaxInboxResult;
 import oscar.util.ConversionUtils;
+
 import java.time.LocalDate;
 import java.util.List;
 
