@@ -25,10 +25,6 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.util.ArrayList;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.Segment;
@@ -37,7 +33,12 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.oscarehr.common.hl7.v2.oscar_to_oscar.DynamicHapiLoaderUtils;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
+
+import java.util.ArrayList;
 
 public class IHAHandler extends ORU_R01MessageHandler
 {
@@ -280,11 +281,26 @@ public class IHAHandler extends ORU_R01MessageHandler
     @Override
     public String getAccessionNum()
     {
-		String accessionNo = get("/.OBR-18-1");
-		if(StringUtils.isBlank(accessionNo))
-		{
-			accessionNo = get("/.OBR-3-1");
-		}
+        String accessionNo = null;
+        switch(getSendingApplicationType())
+        {
+            case RAD:
+            {
+                accessionNo = StringUtils.trimToNull(get("/.OBR-18-1"));
+                break;
+            }
+            case OE:
+            case LAB:
+            {
+                accessionNo = StringUtils.trimToNull(get("/.OBR-3-1"));
+                break;
+            }
+        }
+
+        if(accessionNo == null)
+        {
+            throw new IllegalStateException("IHA lab cannot determine accession number");
+        }
 		return accessionNo;
     }
 
@@ -757,7 +773,6 @@ public class IHAHandler extends ORU_R01MessageHandler
                 currentHeader = getObservationHeader(i, 0);
                 arraySize = headers.size();
                 if (arraySize == 0 || !currentHeader.equals(headers.get(arraySize-1))){
-                    logger.info("Adding header: '"+currentHeader+"' to list");
                     headers.add(currentHeader);
                 }
                 
