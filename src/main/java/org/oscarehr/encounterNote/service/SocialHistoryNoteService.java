@@ -22,7 +22,7 @@
  */
 package org.oscarehr.encounterNote.service;
 
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.dataMigration.converter.in.note.SocialHistoryNoteModelToDbConverter;
 import org.oscarehr.dataMigration.model.encounterNote.SocialHistoryNote;
 import org.oscarehr.encounterNote.model.CaseManagementNote;

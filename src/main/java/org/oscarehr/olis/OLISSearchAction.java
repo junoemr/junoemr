@@ -56,7 +56,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.UserProperty;
-import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
@@ -115,7 +115,7 @@ public class OLISSearchAction extends DispatchAction
 			String demographicNo = StringUtils.trimToNull(request.getParameter("demographic"));
 			if(demographicNo != null)
 			{
-				Demographic demo = demographicService.getDemographicModel(Integer.parseInt(demographicNo));
+				DemographicModel demo = demographicService.getDemographicModel(Integer.parseInt(demographicNo));
 				request.setAttribute("demographic", demo);
 			}
 
@@ -260,7 +260,7 @@ public class OLISSearchAction extends DispatchAction
 
 				try {
 					if (demographicNo != null && demographicNo.trim().length() > 0) {
-						Demographic demo = demographicService.getDemographicModel(Integer.parseInt(demographicNo));
+						DemographicModel demo = demographicService.getDemographicModel(Integer.parseInt(demographicNo));
 						request.setAttribute("demographic", demo);
 
 						PID3 pid3 = new PID3(demo.getHealthNumber(),
@@ -484,7 +484,7 @@ public class OLISSearchAction extends DispatchAction
 				try {
 					if (demographicNo != null && demographicNo.trim().length() > 0) {
 
-						Demographic demo = demographicService.getDemographicModel(Integer.parseInt(demographicNo));
+						DemographicModel demo = demographicService.getDemographicModel(Integer.parseInt(demographicNo));
 						request.setAttribute("demographic", demo);
 
 						PID3 pid3 = new PID3(demo.getHealthNumber(),

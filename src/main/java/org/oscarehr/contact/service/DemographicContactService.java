@@ -31,8 +31,8 @@ import org.oscarehr.dataMigration.converter.in.contact.DemographicContactModelTo
 import org.oscarehr.dataMigration.converter.in.contact.ExternalContactModelToDbConverter;
 import org.oscarehr.dataMigration.model.contact.DemographicContact;
 import org.oscarehr.dataMigration.model.contact.ExternalContact;
-import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.demographic.entity.Demographic;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,7 +75,7 @@ public class DemographicContactService
 			{
 				case TYPE_PROVIDER:
 				{
-					newContactId = persistProviderContact((Provider) demographicContactModel.getContact()).getId();
+					newContactId = persistProviderContact((ProviderModel) demographicContactModel.getContact()).getId();
 					break;
 				}
 				case TYPE_DEMOGRAPHIC:
@@ -113,12 +113,12 @@ public class DemographicContactService
 		}
 	}
 
-	private ProviderData persistProviderContact(Provider providerModel)
+	private ProviderData persistProviderContact(ProviderModel providerModel)
 	{
 		throw new NotImplementedException("Conversion not implemented");
 	}
 
-	private org.oscarehr.demographic.model.Demographic persistDemographicContact(Demographic demographicModel)
+	private org.oscarehr.demographic.entity.Demographic persistDemographicContact(Demographic demographicModel)
 	{
 		throw new NotImplementedException("Conversion not implemented");
 	}

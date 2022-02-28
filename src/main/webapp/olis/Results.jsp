@@ -12,7 +12,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler" %>
 <%@ page import="org.oscarehr.olis.OLISResultsAction" %>
-<%@ page import="org.oscarehr.dataMigration.model.demographic.Demographic" %>
+<%@ page import="org.oscarehr.demographic.model.DemographicModel" %>
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
 <%@ page import="java.util.stream.Collectors" %>
 <%@ page import="org.oscarehr.olis.transfer.OLISSearchResultTransfer" %>
@@ -282,7 +282,7 @@
 	<tr>
 		<td colspan="2">
 			<%
-			Demographic demographic = (Demographic) request.getAttribute("demographic");
+			DemographicModel demographic = (DemographicModel) request.getAttribute("demographic");
 			boolean removeSearchResults = OscarProperties.getInstance().isPropertyActive("olis.enable_search_result_removal");
 
 			if (request.getAttribute("searchException") != null) {

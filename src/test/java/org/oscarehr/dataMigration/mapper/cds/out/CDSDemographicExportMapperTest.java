@@ -29,7 +29,7 @@ import org.mockito.MockitoAnnotations;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.springframework.beans.factory.annotation.Autowired;
 import xml.cds.v5_0.Demographics;
@@ -41,9 +41,9 @@ import java.time.LocalDateTime;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.oscarehr.demographic.model.Demographic.STATUS_ACTIVE;
-import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
-import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_ACTIVE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_DECEASED;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_INACTIVE;
 
 public class CDSDemographicExportMapperTest
 {
@@ -110,7 +110,7 @@ public class CDSDemographicExportMapperTest
 		rosterData.setRostered(true);
 		rosterData.setRosterDateTime(LocalDateTime.of(2021, 12, 24, 12, 0, 0));
 
-		Provider mockProvider = new Provider();
+		ProviderModel mockProvider = new ProviderModel();
 		mockProvider.setFirstName("test");
 		mockProvider.setLastName("provider");
 		rosterData.setRosterProvider(mockProvider);
@@ -134,7 +134,7 @@ public class CDSDemographicExportMapperTest
 		RosterData rosterData = new RosterData();
 		rosterData.setRostered(false);
 
-		Provider mockProvider = new Provider();
+		ProviderModel mockProvider = new ProviderModel();
 		mockProvider.setFirstName("test");
 		mockProvider.setLastName("provider");
 		rosterData.setRosterProvider(mockProvider);

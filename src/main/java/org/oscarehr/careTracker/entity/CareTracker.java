@@ -27,7 +27,7 @@ import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.common.model.Icd9;
 import org.oscarehr.careTrackerDecisionSupport.entity.Drools;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.provider.model.ProviderData;
 
 import javax.persistence.CascadeType;

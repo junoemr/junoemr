@@ -31,7 +31,7 @@
 	import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="org.oscarehr.PMmodule.service.ClientManager"%>
 <%@page import="org.oscarehr.common.model.Demographic"%>
-<%@page import="org.oscarehr.demographic.model.DemographicExt"%>
+<%@page import="org.oscarehr.demographic.entity.DemographicExt"%>
 <%@page import="oscar.OscarProperties"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
 <%@page import="org.oscarehr.PMmodule.service.AdmissionManager"%>

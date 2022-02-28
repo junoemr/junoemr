@@ -33,7 +33,6 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 	'$location',
 	'$stateParams',
 	'$state',
-	'demographicService',
 	'formService',
 	'user',
 	'securityRolesService',
@@ -44,7 +43,6 @@ angular.module('Record.Forms').controller('Record.Forms.FormController', [
 		$location,
 		$stateParams,
 		$state,
-		demographicService,
 		formService,
 		user,
 		securityRolesService)

@@ -23,7 +23,7 @@
 
 package org.oscarehr.demographicRoster.service;
 
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;

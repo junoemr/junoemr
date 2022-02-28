@@ -87,7 +87,7 @@
 <%@page import="org.oscarehr.common.model.ProviderPreference" %>
 <%@page import="org.oscarehr.common.model.Site" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
-<%@ page import="org.oscarehr.demographic.model.DemographicCust" %>
+<%@ page import="org.oscarehr.demographic.entity.DemographicCust" %>
 <%@page import="org.oscarehr.managers.DemographicManager" %>
 <%@page import="org.oscarehr.managers.LookupListManager" %>
 <%@page import="org.oscarehr.provider.dao.ProviderDataDao" %>

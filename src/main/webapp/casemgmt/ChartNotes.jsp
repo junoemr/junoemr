@@ -31,7 +31,7 @@
 <%@taglib uri="/WEB-INF/caisi-tag.tld" prefix="caisi"%>
 <%@page import="org.oscarehr.casemgmt.web.CheckBoxBean"%>
 <%@page import="org.oscarehr.casemgmt.web.formbeans.CaseManagementEntryFormBean"%>
-<%@page	import="org.oscarehr.demographic.dao.DemographicExtDao,org.oscarehr.common.dao.EncounterTemplateDao,org.oscarehr.demographic.model.DemographicExt,org.oscarehr.common.model.EncounterTemplate,org.oscarehr.common.model.Facility,org.oscarehr.common.model.Provider,org.oscarehr.eform.dao.EFormDao,org.oscarehr.managers.ProgramManager2,org.oscarehr.util.LoggedInInfo,org.oscarehr.util.MiscUtils,org.oscarehr.util.SpringUtils"%>
+<%@page	import="org.oscarehr.demographic.dao.DemographicExtDao,org.oscarehr.common.dao.EncounterTemplateDao,org.oscarehr.demographic.entity.DemographicExt,org.oscarehr.common.model.EncounterTemplate,org.oscarehr.common.model.Facility,org.oscarehr.common.model.Provider,org.oscarehr.eform.dao.EFormDao,org.oscarehr.managers.ProgramManager2,org.oscarehr.util.LoggedInInfo,org.oscarehr.util.MiscUtils,org.oscarehr.util.SpringUtils"%>
 <%@page import="oscar.OscarProperties"%>
 <%@page import="oscar.util.UtilDateUtilities,java.text.SimpleDateFormat,java.util.Date "%>
 <%@page import="java.util.Iterator"%>

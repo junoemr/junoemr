@@ -23,7 +23,7 @@
  */
 package org.oscarehr.ws.rest;
 
-import org.oscarehr.demographic.model.DemographicMerged;
+import org.oscarehr.demographic.entity.DemographicMerged;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.conversion.DemographicMergedConverter;

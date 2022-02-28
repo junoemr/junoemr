@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.server.ServerStateHandler;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.integration.dao.IntegrationDao;
 import org.oscarehr.integration.dao.IntegrationPushUpdateDao;
 import org.oscarehr.integration.model.Integration;

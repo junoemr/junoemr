@@ -81,7 +81,7 @@
 		</juno-typeahead>
 
 		<juno-select
-						ng-model="$ctrl.ngModel.scrAboriginal"
+						ng-model="$ctrl.ngModel.aboriginal"
 						options="$ctrl.aboriginalStatuses"
 						label="Aboriginal Status"
 						class="justify-content-space-between"

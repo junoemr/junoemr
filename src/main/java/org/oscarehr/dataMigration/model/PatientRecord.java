@@ -27,7 +27,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.oscarehr.dataMigration.model.allergy.Allergy;
 import org.oscarehr.dataMigration.model.appointment.Appointment;
 import org.oscarehr.dataMigration.model.contact.DemographicContact;
-import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.document.Document;
 import org.oscarehr.dataMigration.model.dx.DxRecord;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
@@ -55,7 +55,7 @@ import java.util.List;
  */
 public class PatientRecord extends AbstractTransientModel
 {
-	private Demographic demographic;
+	private DemographicModel demographic;
 	private Pharmacy preferredPharmacy;
 	private List<Appointment> appointmentList;
 	private List<FamilyHistoryNote> familyHistoryNoteList;

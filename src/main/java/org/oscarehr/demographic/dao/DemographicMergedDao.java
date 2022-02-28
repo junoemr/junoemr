@@ -24,7 +24,7 @@
 package org.oscarehr.demographic.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.demographic.model.DemographicMerged;
+import org.oscarehr.demographic.entity.DemographicMerged;
 import org.oscarehr.security.dao.SecObjPrivilegeDao;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;

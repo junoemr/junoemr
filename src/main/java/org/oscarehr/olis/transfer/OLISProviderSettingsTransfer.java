@@ -23,7 +23,7 @@
 package org.oscarehr.olis.transfer;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 
 import java.time.ZonedDateTime;
 
@@ -32,5 +32,5 @@ public class OLISProviderSettingsTransfer
 {
 	private ZonedDateTime startDateTime;
 	private boolean configured;
-	private Provider provider;
+	private ProviderModel provider;
 }

@@ -646,8 +646,14 @@ oscarApp.config([
 		.state('record.details',
 		{
 			url: '/details',
-			templateUrl: 'src/record/details/details.jsp',
-			controller: 'Record.Details.DetailsController as detailsCtrl',
+			component: 'detailsCtrl',
+			resolve:
+			{
+				user: ['providerService', function(providerService)
+				{
+					return providerService.getMe();
+				}],
+			},
 			meta:
 			{
 				auth: {

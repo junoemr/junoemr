@@ -96,7 +96,7 @@
 <%@page import="java.util.LinkedList, java.util.List, org.oscarehr.util.SpringUtils, org.oscarehr.PMmodule.dao.ProviderDao, java.util.Date" %>
 <%@ page import="org.oscarehr.dataMigration.model.hrm.HrmObservation" %>
 <%@ page import="oscar.util.ConversionUtils" %>
-<%@ page import="org.oscarehr.demographic.model.Demographic" %>
+<%@ page import="org.oscarehr.demographic.entity.Demographic" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicDao" %>
 <%@ page import="java.util.Arrays" %>
 <%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic" %>

@@ -25,8 +25,8 @@ package org.oscarehr.dataMigration.converter.out.contact;
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.contact.entity.Contact;
 import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
-import org.oscarehr.dataMigration.model.common.Address;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.AddressModel;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.contact.ExternalContact;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -59,12 +59,12 @@ public class ExternalContactDbToModelConverter extends
 		String workExtension = StringUtils.trimToNull(input.getWorkPhoneExtension());
 		String fax = StringUtils.trimToNull(input.getFax());
 
-		externalContact.setHomePhone(PhoneNumber.of(homePhone));
-		externalContact.setCellPhone(PhoneNumber.of(cellPhone));
-		externalContact.setWorkPhone(PhoneNumber.of(workPhone, workExtension));
-		externalContact.setFax(PhoneNumber.of(fax));
+		externalContact.setHomePhone(PhoneNumberModel.of(homePhone));
+		externalContact.setCellPhone(PhoneNumberModel.of(cellPhone));
+		externalContact.setWorkPhone(PhoneNumberModel.of(workPhone, workExtension));
+		externalContact.setFax(PhoneNumberModel.of(fax));
 
-		Address address = new Address();
+		AddressModel address = new AddressModel();
 		address.setAddressLine1(input.getAddress());
 		address.setAddressLine2(input.getAddress2());
 		address.setCity(input.getCity());

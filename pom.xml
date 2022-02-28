@@ -2018,6 +2018,7 @@
 								org.oscarehr.ws.rest.demographic.DemographicDocumentWebService
 								org.oscarehr.ws.rest.demographic.DemographicDxWebService
 								org.oscarehr.ws.rest.demographic.DemographicMeasurementsWebService
+								org.oscarehr.ws.rest.demographic.DemographicWaitListWebService
 								org.oscarehr.ws.rest.DocumentTypesWebService
 								org.oscarehr.ws.rest.DiseaseRegistryService
 								org.oscarehr.ws.rest.DocumentWebService
@@ -2059,6 +2060,7 @@
 								org.oscarehr.ws.rest.SecurityRolesWebService
 								org.oscarehr.ws.rest.SitesService
 								org.oscarehr.ws.rest.SystemPreferenceWebService
+								org.oscarehr.ws.rest.WaitListWebService
 							</value>
 						</systemProperty>
 						<systemProperty>

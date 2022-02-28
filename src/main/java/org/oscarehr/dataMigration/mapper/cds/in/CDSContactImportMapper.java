@@ -22,7 +22,7 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.contact.DemographicContact;
 import org.oscarehr.dataMigration.model.contact.ExternalContact;
 import org.springframework.stereotype.Component;
@@ -54,7 +54,7 @@ public class CDSContactImportMapper extends AbstractCDSImportMapper<Demographics
 
 		for(xml.cds.v5_0.PhoneNumber importNumber : importContact.getPhoneNumber())
 		{
-			PhoneNumber phoneNumber = getPhoneNumber(importNumber);
+			PhoneNumberModel phoneNumber = getPhoneNumber(importNumber);
 
 			if(phoneNumber.isTypeHome() && contact.getHomePhone() == null)
 			{

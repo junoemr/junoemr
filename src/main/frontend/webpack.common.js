@@ -146,10 +146,10 @@ module.exports = {
 
 			'./src/common/services/module.js',
 			'./src/common/services/appService.js',
-			'./src/common/services/autoCompleteService.js',
+			'./src/common/services/autoCompleteService.ts',
 			'./src/common/services/billingService.js',
 			'./src/common/services/consultService.js',
-			'./src/common/services/demographicService.js',
+			'./src/common/services/demographicService.ts',
 			'./src/common/services/demographicsService.js',
 			'./src/common/services/diseaseRegistryService.js',
 			'./src/common/services/errorsService.js',
@@ -182,6 +182,7 @@ module.exports = {
 			'./src/common/services/uxService.js',
 			'./src/common/services/specialistsService.js',
 			'./src/common/services/referralDoctorsService.js',
+			'./src/common/services/waitingListService.ts',
 
 			'./src/common/filters/module.js',
 			'./src/common/filters/age.js',
@@ -333,7 +334,7 @@ module.exports = {
 
 			'./src/patient/module.js',
 			'./src/patient/addDemographicModal/addDemographicModalComponent.ts',
-			'./src/patient/demographicCardComponent.js',
+			'./src/patient/demographicCardComponent.ts',
 			'./src/patient/demographicApi.service.ts',
 
 			'./src/dashboard/module.js',
@@ -359,7 +360,7 @@ module.exports = {
 			'./src/record/forms/components/modeSelector/modeSelectorComponent.js',
 			'./src/record/forms/components/groupSelector/groupSelectorComponent.js',
 			'./src/record/details/module.js',
-			'./src/record/details/detailsController.js',
+			'./src/record/details/detailsComponent.ts',
 			'./src/record/details/swipecardController.js',
 			'./src/record/details/components/mhaPatientConnection/mhaPatientConnectionComponent.js',
 			'./src/record/details/components/demographicSection/demographicSectionComponent.js',

@@ -28,16 +28,21 @@ import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.DemographicArchive;
-import org.oscarehr.dataMigration.converter.in.DemographicModelToDbConverter;
-import org.oscarehr.dataMigration.converter.out.DemographicDbToModelConverter;
+import org.oscarehr.demographic.converter.DemographicCreateInputToEntityConverter;
+import org.oscarehr.demographic.converter.DemographicDbToModelConverter;
+import org.oscarehr.demographic.converter.DemographicModelToDbConverter;
+import org.oscarehr.demographic.converter.DemographicUpdateInputToEntityConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicIntegrationDao;
-import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographic.model.DemographicCust;
-import org.oscarehr.demographic.model.DemographicExt;
-import org.oscarehr.demographic.model.DemographicIntegration;
+import org.oscarehr.demographic.entity.Demographic;
+import org.oscarehr.demographic.entity.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicIntegration;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
+import org.oscarehr.demographic.transfer.DemographicCreateInput;
+import org.oscarehr.demographic.transfer.DemographicUpdateInput;
 import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.oscarehr.integration.service.IntegrationPushUpdateService;
@@ -45,6 +50,7 @@ import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.waitList.service.WaitListService;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
@@ -106,6 +112,15 @@ public class DemographicService
 	@Autowired
 	private DemographicDbToModelConverter demographicDbToModelConverter;
 
+	@Autowired
+	private DemographicCreateInputToEntityConverter demographicCreateInputToEntityConverter;
+
+	@Autowired
+	private DemographicUpdateInputToEntityConverter demographicUpdateInputToEntityConverter;
+
+	@Autowired
+	private WaitListService waitListService;
+
 	public enum SEARCH_MODE
 	{
 		demographicNo, name, phone, dob, address, hin, chart_no, email
@@ -126,7 +141,7 @@ public class DemographicService
 		return DemographicConverter.getAsTransferObject(demographic, demographicExtList, demoCustom);
 	}
 
-	public org.oscarehr.dataMigration.model.demographic.Demographic getDemographicModel(Integer demographicId)
+	public DemographicModel getDemographicModel(Integer demographicId)
 	{
 		return demographicDbToModelConverter.convert(demographicDao.find(demographicId));
 	}
@@ -331,6 +346,11 @@ public class DemographicService
 		return result;
 	}
 
+	public DemographicModel getDemographic(Integer id)
+	{
+		return demographicDbToModelConverter.convert(demographicDao.find(id));
+	}
+
 	/**
 	 * Create a modern demographic object from a legacy demographic object.
 	 * @param legacyDemographic - legacy demographic object to convert
@@ -357,7 +377,15 @@ public class DemographicService
 
 		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtSet);
 	}
-	public Demographic addNewDemographicRecord(String providerNoStr, org.oscarehr.dataMigration.model.demographic.Demographic demographicModel)
+	public DemographicModel addNewDemographicRecord(String providerNoStr, DemographicCreateInput demographicInput)
+	{
+		Demographic demographic = demographicCreateInputToEntityConverter.convert(demographicInput);
+		Set<DemographicExt> demographicExtSet = demographic.getDemographicExtSet();
+		DemographicCust demoCustom = demographic.getDemographicCust();
+
+		return demographicDbToModelConverter.convert(addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtSet));
+	}
+	public Demographic addNewDemographicRecord(String providerNoStr, DemographicModel demographicModel)
 	{
 		Demographic demographic = demographicModelToDBConverter.convert(demographicModel);
 		Set<DemographicExt> demographicExtSet = demographic.getDemographicExtSet();
@@ -455,6 +483,34 @@ public class DemographicService
 		return demographic;
 	}
 
+	public DemographicModel updateDemographicRecord(DemographicUpdateInput updateInput, LoggedInInfo loggedInInfo)
+	{
+		Demographic oldDemographic = demographicDao.find(updateInput.getId());
+		demographicDao.detach(oldDemographic); // so it won't update when we set new values
+
+		archiveDemographicRecord(oldDemographic);
+
+		Demographic demographic = demographicUpdateInputToEntityConverter.convert(updateInput);
+		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
+
+		demographicDao.merge(demographic);
+		DemographicCust demoCustom = demographic.getDemographicCust();
+		if(demoCustom != null && !demoCustom.isPersistent())
+		{
+			demoCustom.setId(demographic.getId());
+			demoCustom.setDemographic(demographic);
+			demographicCustDao.persist(demoCustom);
+		}
+
+		demographicManager.addRosterHistoryEntry(demographic, oldDemographic);
+		if(updateInput.getWaitList() != null)
+		{
+			waitListService.updateDemographicWaitList(demographic.getId(), updateInput.getWaitList());
+		}
+
+		return demographicDbToModelConverter.convert(demographic);
+	}
+
 	/**
 	 * DO NOT USE IN NEW CODE.
 	 * Provides legacy saving support for old demographic objects
@@ -511,7 +567,12 @@ public class DemographicService
 	 */
 	public void queueMHAPatientUpdates(Demographic updatedDemographic, Demographic oldDemographic, LoggedInInfo loggedInInfo)
 	{
-		if (!updatedDemographic.getPatientStatus().equals(oldDemographic.getPatientStatus()))
+		queueMHAPatientUpdates(updatedDemographic, oldDemographic.getPatientStatus(), loggedInInfo);
+	}
+
+	public void queueMHAPatientUpdates(Demographic updatedDemographic, String previousPatientStatus, LoggedInInfo loggedInInfo)
+	{
+		if (!updatedDemographic.getPatientStatus().equals(previousPatientStatus))
 		{// patient status change
 			updateMHAPatientConnectionStatus(updatedDemographic.getId(), loggedInInfo, !updatedDemographic.isActive());
 		}

@@ -25,7 +25,7 @@ package org.oscarehr.careTracker.converter;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.model.Icd9;
 import org.oscarehr.dataMigration.model.dx.DxCode;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.dx.converter.Icd9EntityToDxCodeConverter;
 import org.oscarehr.careTracker.entity.CareTrackerItem;
 import org.oscarehr.careTracker.model.CareTracker;

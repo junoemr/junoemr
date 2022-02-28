@@ -86,6 +86,13 @@ public abstract class AbstractDao<T extends AbstractModel<?>> {
 	}
 
 	/**
+	 * Detach an entity
+	 */
+	public void detach(AbstractModel<?> o) {
+		entityManager.detach(o);
+	}
+
+	/**
 	 * You can only refresh attached instances.
 	 */
 	public void refresh(AbstractModel<?> o) {

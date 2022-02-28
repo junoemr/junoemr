@@ -1,13 +1,16 @@
-import {Demographic, DemographicTo1, SystemPreferenceApi} from "../../../generated";
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION, JUNO_STYLE} from "../../common/components/junoComponentConstants";
-import {ProvidersServiceApi} from "../../../generated";
+import {ProvidersServiceApi, SystemPreferenceApi} from "../../../generated";
+import {
+	JUNO_BUTTON_COLOR,
+	JUNO_BUTTON_COLOR_PATTERN,
+	JUNO_STYLE,
+	LABEL_POSITION
+} from "../../common/components/junoComponentConstants";
 import ToastService from "../../lib/alerts/service/ToastService";
-
-enum PHONE_TYPE {
-	HOME = "HOME",
-	WORK = "WORK",
-	CELL = "CELL"
-}
+import Demographic from "../../lib/demographic/model/Demographic";
+import moment from "moment";
+import PhoneNumber from "../../lib/common/model/PhoneNumber";
+import SimpleProvider from "../../lib/provider/model/SimpleProvider";
+import {PhoneType} from "../../lib/common/model/PhoneType";
 
 angular.module('Patient').component('addDemographicModal', {
 	templateUrl: 'src/patient/addDemographicModal/addDemographicModal.jsp',
@@ -55,29 +58,7 @@ angular.module('Patient').component('addDemographicModal', {
 			ctrl.provincesCA = staticDataService.getCanadaProvinces();
 			ctrl.mrpOptions = [];
 
-			// personal data
-			ctrl.emptyDemographicData = {
-				lastName: "",
-				firstName: "",
-				sex: "",
-				dateOfBirth: "",
-				address: {
-					address: "",
-					city: "",
-					province: "BC",
-					postal: "",
-				},
-				email: "",
-				phone: "",
-				alternativePhone: "",
-				hin: "",
-				ver: "",
-				hcType: "BC",
-				providerNo: null,
-				extras: [],
-			}
-
-			ctrl.newDemographicData = {};
+			ctrl.newDemographicData = new Demographic();
 			ctrl.isCreateAnotherEnabled = false;
 
 			// validation
@@ -101,20 +82,22 @@ angular.module('Patient').component('addDemographicModal', {
 			ctrl.defaultSex = null;
 			ctrl.defaultPhoneNumber = null;
 
-			ctrl.preferredPhoneType = PHONE_TYPE.CELL;
-			ctrl.preferredPhoneNumber = "";
+			ctrl.preferredPhoneType = PhoneType.Cell;
+			ctrl.preferredPhoneNumber = null;
+			ctrl.selectedMrp = null;
+			ctrl.selectedDateString = null;
 
 			ctrl.preferredPhoneOptions = [
 				{
-					value: PHONE_TYPE.HOME,
+					value: PhoneType.Home,
 					label: "Home",
 				},
 				{
-					value: PHONE_TYPE.CELL,
+					value: PhoneType.Cell,
 					label: "Mobile",
 				},
 				{
-					value: PHONE_TYPE.WORK,
+					value: PhoneType.Work,
 					label: "Work",
 				}
 			]
@@ -137,10 +120,15 @@ angular.module('Patient').component('addDemographicModal', {
 					}
 				);
 
-				ctrl.providersServiceApi.getBySecurityRole("doctor").then(
+				ctrl.providersServiceApi.getByType("doctor").then(
 					function success(data) {
-						ctrl.mrpOptions = data.data.body.map((doc) => {return {label: doc.name, value: doc.providerNo}});
-						ctrl.mrpOptions.push({label: "--", value: null})
+						ctrl.mrpOptions = data.data.body.map((doc) => {
+							return {
+								label: doc.name,
+								value: doc.providerNo,
+								data: new SimpleProvider(doc.providerNo, doc.lastName, doc.firstName),
+							}});
+						ctrl.mrpOptions.push({label: "--", value: null, data: null});
 					}
 				);
 
@@ -180,18 +168,20 @@ angular.module('Patient').component('addDemographicModal', {
 
 			ctrl.resetToDefaults = () :void =>
 			{
-				ctrl.newDemographicData = angular.copy(ctrl.emptyDemographicData);
+				ctrl.newDemographicData = new Demographic();
 
 				ctrl.firstNamePristine = true;
 				ctrl.lastNamePristine = true;
 				ctrl.genderPristine = true;
 
 				ctrl.newDemographicData.sex = ctrl.defaultSex;
-				ctrl.newDemographicData.hcType = ctrl.defaultProvince;
-				ctrl.newDemographicData.address.province = ctrl.defaultProvince;
+				ctrl.newDemographicData.healthNumberProvinceCode = ctrl.defaultProvince;
+				ctrl.newDemographicData.address.regionCode = ctrl.defaultProvince;
 
 				ctrl.preferredPhoneNumber = ctrl.defaultPhoneNumber;
-				ctrl.preferredPhoneType = PHONE_TYPE.CELL;
+				ctrl.preferredPhoneType = PhoneType.Cell;
+				ctrl.selectedMrp = null;
+				ctrl.selectedDateString = null;
 			}
 
 			ctrl.resetFocus = () :void =>
@@ -247,15 +237,16 @@ angular.module('Patient').component('addDemographicModal', {
 
 			ctrl.onHcTypeChange = (value :object) :void =>
 			{
-				ctrl.newDemographicData.hcType = value;
+				ctrl.newDemographicData.healthNumberType = value;
 			}
 
-			ctrl.onMRPChange = (value :object) :void =>
+			ctrl.onMRPChange = (value :object, option: any) :void =>
 			{
-				ctrl.newDemographicData.providerNo = value;
+				ctrl.newDemographicData.mrpProvider = option.data;
+				console.info(option.data, ctrl.newDemographicData);
 			}
 
-			ctrl.onPreferredPhoneTypeChange = (value :object) :void =>
+			ctrl.onPreferredPhoneTypeChange = (value: PhoneType): void =>
 			{
 				ctrl.preferredPhoneType = value;
 			}
@@ -268,41 +259,22 @@ angular.module('Patient').component('addDemographicModal', {
 			ctrl.finalizePhoneNumber = () :void =>
 			{
 				// Reset the all phone numbers in case the first attempt to save failed
-				ctrl.newDemographicData.phone = "";
-				ctrl.newDemographicData.alternativePhone = "";
-				ctrl.newDemographicData.extras = [];
+				ctrl.newDemographicData.homePhone = null;
+				ctrl.newDemographicData.workPhone = null;
+				ctrl.newDemographicData.cellPhone = null;
 
-				const preferredPhone = ctrl.preferredPhoneNumber + "*";
-
-				switch (ctrl.preferredPhoneType) {
-					case PHONE_TYPE.HOME:
-						ctrl.newDemographicData.phone = preferredPhone;
-						break;
-					case PHONE_TYPE.WORK:
-						ctrl.newDemographicData.alternativePhone = preferredPhone;
-						break;
-					case PHONE_TYPE.CELL:
-						const demoExt = {
-							id: null,
-							key: "demo_cell",
-							value: preferredPhone,
-							providerNo: securityService.getUser().providerNo,
-							dateCreated: Juno.Common.Util.getDateMoment(new Date()),
-							demographicNo: null
-						}
-						ctrl.newDemographicData.extras.push(demoExt);
-						break;
-				}
+				const preferredPhone = new PhoneNumber(ctrl.preferredPhoneNumber, null, ctrl.preferredPhoneType, true);
+				ctrl.newDemographicData.setPrimaryPhone(preferredPhone);
 			}
 
 			ctrl.finalizeHin = () :void =>
 			{
-				ctrl.newDemographicData.hin = ctrl.newDemographicData.hin.replace(/[\W_]/gi, '');
+				ctrl.newDemographicData.healthNumber = ctrl.newDemographicData.healthNumber.replace(/[\W_]/gi, '');
 			}
 
 			ctrl.finalizeStatusDates = ()  :void =>
 			{
-				const now = Juno.Common.Util.getDateMoment(new Date());
+				const now = moment();
 				ctrl.newDemographicData.dateJoined = now;
 				ctrl.newDemographicData.patientStatusDate = now;
 			}
@@ -328,7 +300,7 @@ angular.module('Patient').component('addDemographicModal', {
 			{
 				if (data.address)
 				{
-					ctrl.newDemographicData.address.address = data.address;
+					ctrl.newDemographicData.address.addressLine1 = data.address;
 				}
 
 				if (data.city)
@@ -338,13 +310,13 @@ angular.module('Patient').component('addDemographicModal', {
 
 				if (data.province)
 				{
-					ctrl.newDemographicData.address.province = data.province;
-					ctrl.hcType = data.province;
+					ctrl.newDemographicData.address.regionCode = data.province;
+					ctrl.newDemographicData.healthNumberProvinceCode = data.province;
 				}
 
 				if (data.postal)
 				{
-					ctrl.newDemographicData.address.postal = data.postal;
+					ctrl.newDemographicData.address.postalCode = data.postal;
 				}
 
 				if (data.firstName)
@@ -364,18 +336,18 @@ angular.module('Patient').component('addDemographicModal', {
 
 				if (data.hin)
 				{
-					ctrl.newDemographicData.hin = data.hin;
+					ctrl.newDemographicData.healthNumber = data.hin;
 				}
 
 				if (data.versionCode)
 				{
-					ctrl.newDemographicData.ver = data.versionCode;
+					ctrl.newDemographicData.healthNumberVersion = data.versionCode;
 				}
 
 				let dateOfBirth = Juno.Common.Util.getDateMomentFromComponents(data.dobYear, data.dobMonth, data.dobDay)
 				if (dateOfBirth.isValid())
 				{
-					ctrl.newDemographicData.dateOfBirth = dateOfBirth.format('YYYY-MM-DD');
+					ctrl.newDemographicData.dateOfBirth = dateOfBirth;
 				}
 			}
 
@@ -401,14 +373,16 @@ angular.module('Patient').component('addDemographicModal', {
 					ctrl.finalizePhoneNumber();
 				}
 
-				if (ctrl.newDemographicData.hin)
+				if (ctrl.newDemographicData.healthNumber)
 				{
 					ctrl.finalizeHin();
 				}
 
 				if (ctrl.validateDemographic())
 				{
-					demographicService.saveDemographic(ctrl.newDemographicData)
+					// make dob a moment before save
+					ctrl.newDemographicData.dateOfBirth = Juno.Common.Util.getDateMoment(ctrl.newDemographicData.dateOfBirth);
+					demographicService.createDemographic(ctrl.newDemographicData)
 					.then((results) =>
 					{
 						ctrl.toastService.successToast("Demographic Saved");
@@ -417,20 +391,18 @@ angular.module('Patient').component('addDemographicModal', {
 						{
 							ctrl.resetToDefaults();
 							ctrl.resetFocus();
-
-
-
 						}
 						else
 						{
 							ctrl.modalInstance.close(results);
 						}
 					})
-					.catch((errorMessage) =>
+					.catch((response) =>
 					{
-						if (errorMessage)
+						console.error(response);
+						if (response && response.data && response.data.error)
 						{
-							ctrl.toastService.errorToast(`Unable to save demographic (${errorMessage})`);
+							ctrl.toastService.errorToast(`Unable to save demographic (${response.data.error.message})`);
 						}
 						else
 						{

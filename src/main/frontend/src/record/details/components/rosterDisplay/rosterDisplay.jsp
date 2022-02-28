@@ -6,7 +6,7 @@
     <div class="details-fields">
 
         <!-- Family Doctor -->
-        <juno-typeahead model="$ctrl.ngModel.scrFamilyDoc"
+        <juno-typeahead model="$ctrl.selectedFamilyDoc"
                         options="$ctrl.familyDoctors"
                         filter-options="false"
                         name="FamilyDoctor"
@@ -20,7 +20,7 @@
 
         <!-- Family Doctor Number -->
         <juno-input
-                ng-model="$ctrl.ngModel.scrFamilyDocNo"
+                ng-model="$ctrl.selectedFamilyDocNo"
                 label="Family Doctor #"
                 placeholder="Family Doctor #"
                 valid-regex="$ctrl.numberRegex"
@@ -28,33 +28,37 @@
         </juno-input>
 
         <!-- Roster Status -->
-        <juno-select ng-model="$ctrl.ngModel.rosterStatus"
+        <juno-select ng-model="$ctrl.rosterStatusData.statusCode"
                      options="$ctrl.rosterStatusList"
                      label="Roster Status"
+                     on-change="$ctrl.setRosterData()"
                      component-style="$ctrl.componentStyle">
         </juno-select>
 
         <!-- Date Rostered -->
-        <juno-date-select ng-model="$ctrl.ngModel.rosterDate"
+        <juno-date-select ng-model="$ctrl.rosterStatusData.rosterDateTime"
                           label="Roster Date"
                           on-validity-change="$ctrl.rosterDateValid = valid"
+                          change="$ctrl.setRosterData()"
                           component-style="$ctrl.componentStyle">
         </juno-date-select>
 
         <!-- Termination Reason -->
-        <juno-select ng-if="$ctrl.ngModel.rosterStatus === 'TE'"
-                     ng-model="$ctrl.ngModel.rosterTerminationReason"
+        <juno-select ng-if="$ctrl.rosterStatusData.statusCode === 'TE'"
+                     ng-model="$ctrl.rosterStatusData.terminationReason"
                      options="$ctrl.rosterTermReasons"
                      invalid="!$ctrl.validations.rosterTerminationReason()"
                      label="Termination Reason"
+                     on-change="$ctrl.setRosterData()"
                      component-style="$ctrl.componentStyle">
         </juno-select>
 
         <!-- Termination Date -->
-        <juno-date-select ng-if="$ctrl.ngModel.rosterStatus === 'TE'"
-                          ng-model="$ctrl.ngModel.rosterTerminationDate"
+        <juno-date-select ng-if="$ctrl.rosterStatusData.statusCode === 'TE'"
+                          ng-model="$ctrl.rosterStatusData.terminationDateTime"
                           label="Termination Date"
                           on-validity-change="$ctrl.terminationDateValid = valid"
+                          change="$ctrl.setRosterData()"
                           component-style="$ctrl.componentStyle">
         </juno-date-select>
 

@@ -27,7 +27,7 @@ import org.oscarehr.contact.dao.ContactDao;
 import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
-import org.oscarehr.dataMigration.converter.out.DemographicDbToModelConverter;
+import org.oscarehr.demographic.converter.DemographicDbToModelConverter;
 import org.oscarehr.dataMigration.model.contact.Contact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

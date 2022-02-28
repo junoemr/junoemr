@@ -23,7 +23,7 @@
 package org.oscarehr.dataMigration.mapper.cds.in;
 
 import org.oscarehr.dataMigration.model.demographic.RosterData;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -72,7 +72,7 @@ public class CDSEnrollmentHistoryImportMapper extends AbstractCDSImportMapper<De
 		Demographics.Enrolment.EnrolmentHistory.EnrolledToPhysician enrolledPhysician = importStructure.getEnrolledToPhysician();
 		if(enrolledPhysician != null)
 		{
-			Provider provider = toProvider(enrolledPhysician.getName());
+			ProviderModel provider = toProvider(enrolledPhysician.getName());
 			provider.setOhipNumber(enrolledPhysician.getOHIPPhysicianId());
 			rosterData.setRosterProvider(provider);
 		}

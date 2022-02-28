@@ -23,7 +23,7 @@
 package org.oscarehr.demographic.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.demographic.model.DemographicIntegration;
+import org.oscarehr.demographic.entity.DemographicIntegration;
 import org.springframework.stereotype.Repository;
 
 @Repository

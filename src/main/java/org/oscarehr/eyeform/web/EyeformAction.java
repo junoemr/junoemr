@@ -75,7 +75,7 @@ import org.oscarehr.common.model.Billingreferral;
 import org.oscarehr.common.model.Clinic;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.contact.entity.DemographicContact;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.common.model.EFormGroup;
 import org.oscarehr.eform.model.EFormValue;

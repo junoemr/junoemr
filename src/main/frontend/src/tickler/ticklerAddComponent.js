@@ -67,14 +67,14 @@ angular.module('Tickler').component('ticklerAddComponent', {
 			if (Juno.Common.Util.exists($stateParams.demographicNo) || controller.resolve.presetDemographicNo)
 			{
 				controller.initialDemographicNo = $stateParams.demographicNo || controller.resolve.presetDemographicNo;
-				const data = await demographicService.getDemographic(controller.initialDemographicNo);
+				const model = await demographicService.getDemographic(controller.initialDemographicNo);
 				controller.demographicSearch = {
-					demographicNo: data.demographicNo,
-					firstName: data.firstName,
-					lastName: data.lastName,
-					name: data.lastName + "," + data.firstName // For display purposes
+					demographicNo: model.id,
+					firstName: model.firstName,
+					lastName: model.lastName,
+					name: model.displayName, // For display purposes
 				};
-				controller.tickler.demographic = data;
+				controller.tickler.demographic = model;
 			}
 
 			ticklerService.getTextSuggestions().then(function(data)
@@ -150,7 +150,7 @@ angular.module('Tickler').component('ticklerAddComponent', {
 			}
 
 			var tickler = {};
-			tickler.demographicNo = controller.tickler.demographic.demographicNo;
+			tickler.demographicNo = controller.tickler.demographic.id;
 			tickler.taskAssignedTo = controller.tickler.taskAssignedTo;
 			tickler.priority = controller.tickler.priority;
 			tickler.status = 'A';

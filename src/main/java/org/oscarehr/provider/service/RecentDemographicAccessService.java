@@ -61,4 +61,8 @@ public class RecentDemographicAccessService
 		record.setAccessDateTimeToNow();
 		recentDemographicAccessDao.upsert(record);
 	}
+	public synchronized void updateAccessRecord(String providerNo, Integer demographicNo)
+	{
+		updateAccessRecord(Integer.parseInt(providerNo), demographicNo);
+	}
 }

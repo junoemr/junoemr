@@ -23,7 +23,7 @@
 package org.oscarehr.dataMigration.model.hrm;
 
 import lombok.Data;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +31,7 @@ import java.time.LocalDateTime;
 public class HrmComment
 {
 	private Integer id;
-	private Provider provider;
+	private ProviderModel provider;
 	private String text;
 	private LocalDateTime observationDateTime;
 }

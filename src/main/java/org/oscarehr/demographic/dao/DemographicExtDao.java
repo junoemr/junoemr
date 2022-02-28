@@ -25,18 +25,18 @@
 
 package org.oscarehr.demographic.dao;
 
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.demographic.entity.DemographicExt;
+import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.persistence.Query;
-
-import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.demographic.model.DemographicExt;
-import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
 @Repository
 public class DemographicExtDao extends AbstractDao<DemographicExt>
@@ -102,8 +102,8 @@ public class DemographicExtDao extends AbstractDao<DemographicExt>
  	}
  	
  	
- 	public DemographicExt getLatestDemographicExt(Integer demographicNo, String key) {
-
+ 	public Optional<DemographicExt> getLatestDemographicExt(Integer demographicNo, String key)
+    {
  		if (demographicNo == null || demographicNo.intValue() <= 0) {
  			throw new IllegalArgumentException();
  		}
@@ -119,10 +119,10 @@ public class DemographicExtDao extends AbstractDao<DemographicExt>
  	    @SuppressWarnings("unchecked")
  		List<DemographicExt> results = query.getResultList();
 
-  		if (results.isEmpty()) return null;
+  		if (results.isEmpty()) return Optional.empty();
  		DemographicExt result = results.get(0);
 
- 		return result;
+ 		return Optional.of(result);
  	}
 
  	public void updateDemographicExt(DemographicExt de) {

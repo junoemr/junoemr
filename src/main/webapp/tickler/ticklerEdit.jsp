@@ -25,7 +25,7 @@
 --%>
 <%@page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
 <%@page import="org.oscarehr.ticklers.dao.TicklerTextSuggestDao" %>
-<%@page import="org.oscarehr.demographic.model.Demographic" %>
+<%@page import="org.oscarehr.demographic.entity.Demographic" %>
 <%@page import="org.oscarehr.common.model.Provider" %>
 <%@page import="org.oscarehr.ticklers.entity.Tickler" %>
 <%@page import="org.oscarehr.ticklers.entity.TicklerComment" %>

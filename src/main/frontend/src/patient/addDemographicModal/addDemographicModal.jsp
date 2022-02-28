@@ -64,10 +64,10 @@
 					<!-- HIN -->
 					<div class="flex-row flex-grow-1 align-items-center hin-fields">
 						<!-- HIN NUM-->
-						<juno-select-text select-model="$ctrl.newDemographicData.hcType"
+						<juno-select-text select-model="$ctrl.newDemographicData.healthNumberProvinceCode"
 										  select-options="$ctrl.hcTypeProvs"
 										  select-change="$ctrl.onHcTypeChange(value)"
-										  text-model="$ctrl.newDemographicData.hin"
+										  text-model="$ctrl.newDemographicData.healthNumber"
 										  label="Health Insurance Number"
 										  label-position="$ctrl.LABEL_POSITION"
 										  component-style="$ctrl.COMPONENT_STYLE"
@@ -76,7 +76,7 @@
 						</juno-select-text>
 						<!-- HIN VER -->
 						<juno-input label="Ver"
-									ng-model="$ctrl.newDemographicData.ver"
+									ng-model="$ctrl.newDemographicData.healthNumberVersion"
 									label-position="$ctrl.LABEL_POSITION"
 									component-style="$ctrl.COMPONENT_STYLE"
 									class="ver">
@@ -86,15 +86,15 @@
 					<juno-select label="MRP"
 								 label-position="$ctrl.LABEL_POSITION"
 								 component-style="$ctrl.COMPONENT_STYLE"
-								 ng-model="$ctrl.newDemographicData.mrp"
+								 ng-model="$ctrl.selectedMrp"
 								 options="$ctrl.mrpOptions"
-								 on-change="$ctrl.onMRPChange(value)">
+								 on-change="$ctrl.onMRPChange(value, option)">
 
 					</juno-select>
 				</div>
 				<div class="flex-col column-container">
 					<!-- ADDRESS -->
-					<juno-input ng-model="$ctrl.newDemographicData.address.address"
+					<juno-input ng-model="$ctrl.newDemographicData.address.addressLine1"
 								label="Address"
 								label-position="$ctrl.LABEL_POSITION"
 								component-style="$ctrl.COMPONENT_STYLE"
@@ -112,10 +112,10 @@
 								 label-position="$ctrl.LABEL_POSITION"
 								 component-style="$ctrl.COMPONENT_STYLE"
 								 options="$ctrl.provincesCA"
-								 ng-model="$ctrl.newDemographicData.address.province"
+								 ng-model="$ctrl.newDemographicData.address.regionCode"
 					></juno-select>
 					<!-- POSTAL CODE -->
-					<juno-input ng-model="$ctrl.newDemographicData.address.postal"
+					<juno-input ng-model="$ctrl.newDemographicData.address.postalCode"
 								label="Postal Code"
 								label-position="$ctrl.LABEL_POSITION"
 								component-style="$ctrl.COMPONENT_STYLE"

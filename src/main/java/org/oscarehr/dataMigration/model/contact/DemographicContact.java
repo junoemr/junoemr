@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.model.contact;
 import lombok.Data;
 import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 
 import java.time.LocalDateTime;
 
@@ -73,7 +73,7 @@ public class DemographicContact extends AbstractTransientModel
 
 	private LocalDateTime updateDateTime;
 	private boolean deleted;
-	private Provider createdBy;
+	private ProviderModel createdBy;
 	private LocalDateTime createdAt;
 
 

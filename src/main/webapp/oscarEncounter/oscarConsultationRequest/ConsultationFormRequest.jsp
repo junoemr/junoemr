@@ -66,7 +66,7 @@ if(!authed) {
 <%@page import="org.oscarehr.common.model.Site"%>
 <%@page import="org.oscarehr.common.model.UserProperty"%>
 <%@page import="org.oscarehr.demographic.dao.DemographicExtDao"%>
-<%@page import="org.oscarehr.demographic.model.DemographicExt"%>
+<%@page import="org.oscarehr.demographic.entity.DemographicExt"%>
 <%@page import="org.oscarehr.fax.service.OutgoingFaxService"%>
 <%@page import="org.oscarehr.ui.servlet.ImageRenderingServlet"%>
 <%@page import="org.oscarehr.util.DigitalSignatureUtils"%>
@@ -1406,7 +1406,7 @@ var requestIdKey = "<%=signatureRequestId %>";
 		}
 
 		int demographic_no = demographic.getDemographicNo();
-		DemographicExt demoExt = demographicExtDao.getLatestDemographicExt(demographic_no, "demo_cell");
+		DemographicExt demoExt = demographicExtDao.getLatestDemographicExt(demographic_no, "demo_cell").orElse(null);
 		String patientCPhone = (demoExt == null) ? "" : StringUtils.trimToEmpty(demoExt.getValue());
 		thisForm.setPatientCPhone(patientCPhone);
 

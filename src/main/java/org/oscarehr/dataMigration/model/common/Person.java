@@ -22,8 +22,9 @@
  */
 package org.oscarehr.dataMigration.model.common;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang3.EnumUtils;
-import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.demographic.model.DemographicModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,9 +48,9 @@ public interface Person
 
 		public static TITLE fromStringIgnoreCase(String enumString)
 		{
-			if(EnumUtils.isValidEnumIgnoreCase(Demographic.TITLE.class, enumString))
+			if(EnumUtils.isValidEnumIgnoreCase(DemographicModel.TITLE.class, enumString))
 			{
-				return Demographic.TITLE.valueOf(enumString.toUpperCase());
+				return DemographicModel.TITLE.valueOf(enumString.toUpperCase());
 			}
 			return null;
 		}
@@ -78,15 +79,24 @@ public interface Person
 		{
 			this.value = value;
 		}
+
+		@JsonValue
 		public String getValue()
 		{
 			return value;
 		}
+
+		@Override
+		public String toString()
+		{
+			return getValue();
+		}
+
 		public static SEX fromStringIgnoreCase(String enumString)
 		{
-			if(EnumUtils.isValidEnumIgnoreCase(Demographic.SEX.class, enumString))
+			if(EnumUtils.isValidEnumIgnoreCase(DemographicModel.SEX.class, enumString))
 			{
-				return Demographic.SEX.valueOf(enumString.toUpperCase());
+				return DemographicModel.SEX.valueOf(enumString.toUpperCase());
 			}
 			return null;
 		}

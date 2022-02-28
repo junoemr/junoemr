@@ -11,7 +11,7 @@ package org.oscarehr.hospitalReportManager.model;
 
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;

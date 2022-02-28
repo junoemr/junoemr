@@ -26,7 +26,7 @@ import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,8 +43,8 @@ public class Immunization extends AbstractTransientModel
 	private Boolean refused;
 	private Boolean never;
 
-	private Provider provider;
-	private Provider createdBy;
+	private ProviderModel provider;
+	private ProviderModel createdBy;
 	private LocalDateTime createdAt;
 	private LocalDateTime lastUpdateDate;
 

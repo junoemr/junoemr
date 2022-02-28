@@ -22,22 +22,23 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import org.oscarehr.dataMigration.exception.InvalidDocumentException;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.hrm.HrmComment;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.ReportClass;
 import xml.cds.v5_0.Reports;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmDocument>
@@ -118,7 +119,7 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 		return observationList;
 	}
 
-	protected Optional<HrmComment> getNoteAsHrmComment(String note, Provider commentProvider, LocalDateTime dateTime)
+	protected Optional<HrmComment> getNoteAsHrmComment(String note, ProviderModel commentProvider, LocalDateTime dateTime)
 	{
 		HrmComment comment = null;
 		if(note != null)

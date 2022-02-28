@@ -60,7 +60,7 @@
 <%@ page import="java.util.*, java.net.*, oscar.*" errorPage="errorpage.jsp"%>
 
 <%@page import="org.oscarehr.util.SpringUtils" %>
-<%@page import="org.oscarehr.demographic.model.Demographic"%>
+<%@page import="org.oscarehr.demographic.entity.Demographic"%>
 <%@page import="org.oscarehr.demographic.dao.DemographicDao" %>
 <%@ page import="oscar.oscarDemographic.data.DemographicMerged" %>
 <%@ page import="org.oscarehr.demographic.search.DemographicCriteriaSearch" %>

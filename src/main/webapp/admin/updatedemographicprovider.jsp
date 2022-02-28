@@ -45,7 +45,7 @@ if(!authed) {
 
 <jsp:useBean id="novector" class="java.util.Vector" scope="page" />
 <%@ page import="org.oscarehr.util.SpringUtils" %>
-<%@ page import="org.oscarehr.demographic.model.DemographicCust" %>
+<%@ page import="org.oscarehr.demographic.entity.DemographicCust" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
 <%@ page import="org.oscarehr.common.model.Provider" %>
 <%@ page import="org.oscarehr.PMmodule.dao.ProviderDao" %>
