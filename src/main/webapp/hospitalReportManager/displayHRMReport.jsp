@@ -269,23 +269,27 @@
             var categoryId = $("#category-select").val();
             $.ajax({
                 url: "<%=request.getContextPath() %>/hospitalReportManager/Modify.do",
-                dataType: "json",
                 type: "POST",
                 data: {
                     documentId: documentId,
                     categoryId: categoryId,
                     method: "recategorize",
                 },
-                success: function (data) {},
-                error: function(err){console.log(err)}
+                success: function (data) {
+					window.location.reload();
+				},
+                error: function(err)
+				{
+					console.error(err)
+				}
             });
         }
 
         reclassifyFutureReports = function(documentId)
         {
             var categoryId = $("#category-select").val();
+            var categoryText =  $("#category-select option:selected").text()
             $.ajax({
-                dataType: "json",
                 url: "<%=request.getContextPath() %>/hospitalReportManager/Modify.do",
                 type: "POST",
                 data: {
@@ -293,8 +297,11 @@
                     categoryId: categoryId,
                     method: "recategorizeFuture"
                 },
-                success: function (data) {},
-                error: function (err) {console.log(err)}
+                success: function (data) {
+                	alert("Success, future reports like this will be classified as " + categoryText);
+					window.location.reload();
+				},
+                error: function (err) {console.error(err)}
             })
         }
 
@@ -347,6 +354,12 @@
 		.input-button.danger {
 			border-color: #CC2929;
 			color: #CC2929;
+		}
+
+		.input-button:disabled {
+			border-color: #70778C;
+			color: #70778C;
+			cursor: not-allowed;
 		}
 
         #hrmReportContent {
@@ -519,7 +532,6 @@
 				url: "<%=request.getContextPath() %>/hospitalReportManager/Modify.do",
 				data: "method=makeIndependent&reportId=" + reportId,
 				success: function(data) {
-
 				}
 			});
 		}
@@ -535,6 +547,8 @@
 						$("demostatus" + reportId).innerHTML = data;
 						toggleButtonBar(true,reportId);
 					}
+
+					window.location.reload();
 				}
 			});
 		}
@@ -549,6 +563,8 @@
 						$("demostatus" + reportId).innerHTML = data;
 						toggleButtonBar(false,reportId);
 					}
+
+					window.location.reload();
 				}
 			});
 		}
@@ -571,6 +587,7 @@
 					if (data.trim())
 					{
 						alert("Successfully assigned provider");
+						window.location.reload();
 					}
 					else
 					{
@@ -590,6 +607,7 @@
 				data: "method=removeProvider&providerMappingId=" + mappingId,
 				success: function(data) {
 					alert("Provider removed from report");
+					window.location.reload();
 				}
 			});
 		}
@@ -601,7 +619,10 @@
 				data: "method=makeActiveSubClass&reportId=" + reportId + "&subClassId=" + subClassId,
 				success: function(data) {
 					if (data != null)
+					{
 						$("subclassstatus" + reportId).innerHTML = data;
+					}
+					window.location.reload();
 				}
 			});
 
@@ -616,7 +637,10 @@
 				data: "method=addComment&reportId=" + reportId + "&comment=" + comment,
 				success: function(data) {
 					if (data != null)
+					{
 						$("commentstatus" + reportId).innerHTML = data;
+					}
+					window.location.reload();
 				}
 			});
 		}
@@ -628,7 +652,10 @@
 				data: "method=deleteComment&commentId=" + commentId,
 				success: function(data) {
 					if (data != null)
+					{
 						$("commentstatus" + reportId).innerHTML = data;
+					}
+					window.location.reload();
 				}
 			});
 		}
@@ -668,7 +695,10 @@
 				data: "method=setDescription&reportId=" + reportId + "&description=" + comment,
 				success: function(data) {
 					if (data != null)
+					{
 						$("descriptionstatus" + reportId).innerHTML = data;
+					}
+					window.location.reload();
 				}
 			});
 		}
