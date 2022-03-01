@@ -36,16 +36,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.UriUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
 
 @Component
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -69,9 +64,8 @@ public class HRMDocumentSummary implements Summary
 		}
 
 		// Format of the Map is <"sendingFacility:facilityReportNumber:DeliverToId", HRMDemographicDocument">
-		Map<String, HRMDemographicDocument> documents = hrmService.getHrmDocumentsForDemographic(demographicNo);
-		
-		List<SummaryItemTo1> hrmItems = convertToSummaryItems(new ArrayList<>(documents.values()));
+		List<HRMDemographicDocument> documents = hrmService.getHrmDocumentsForDemographic(demographicNo);
+		List<SummaryItemTo1> hrmItems = convertToSummaryItems(documents);
 		hrmDocumentSummary.setSummaryItem(hrmItems);
 		
 		hrmDocumentSummary.setSummaryItem(hrmItems);
@@ -100,22 +94,13 @@ public class HRMDocumentSummary implements Summary
 			summary.setDate(hrmDocument.getReportDate());
 			
 			String utf8 = StandardCharsets.UTF_8.toString();
-			try
-			{
-				// TODO What's the format of the duplicate ids?
-				summary.setAction(String.format("../hospitalReportManager/Display.do?id=%s&duplicateIds=%s", UriUtils.encode(String.valueOf(hrmDocument.getId()), utf8), URLEncoder.encode("", utf8)));
-			}
-			catch (UnsupportedEncodingException e)
-			{
-				summary.setAction("");
-			}
-			
+			summary.setAction(String.format("../hospitalReportManager/Display.do?id=%d", hrmDocument.getId()));
+
 			summaryItems.add(summary);
 		}
-		
-		return summaryItems.stream()
-		                   .sorted(Comparator.comparing(SummaryItemTo1::getDate, Comparator.nullsLast(Comparator.naturalOrder())))
-		                   .collect(Collectors.toList());
+
+		// already sorted by database query
+		return summaryItems;
 	}
 	
 	private String formatDisplayName(HRMDocument document)

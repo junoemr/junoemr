@@ -39,7 +39,7 @@ public class HRMDocumentDao extends AbstractDao<HRMDocument> {
 		String sql = "SELECT x FROM " + this.modelClass.getName() + " x " +
 				"INNER JOIN x.documentToDemographicList d " +
 				"WHERE d.demographic.id = :demographicId " +
-				"ORDER BY x.id";
+				"ORDER BY x.reportDate DESC, x.timeReceived DESC";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("demographicId", demographicId);
 
