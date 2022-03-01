@@ -1,6 +1,8 @@
 .fax-config {
 	.fax-config-header {
-		padding: 15px;
+		h1 {
+			color: var(--color-primary-base);
+		}
 	}
 
 	.fax-config-body {

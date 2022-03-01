@@ -1,4 +1,5 @@
 import FaxAccountService from "../../../lib/fax/service/FaxAccountService";
+import {LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 
 angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
@@ -15,6 +16,8 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 		{
 			const controller = this;
 			controller.faxAccountService = new FaxAccountService();
+
+			controller.LABEL_POSITION = LABEL_POSITION;
 
 			controller.faxAccountList = [];
 			controller.loggedInProvider = null;
@@ -73,7 +76,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 				)
 			};
 
-			controller.editNewFaxAccount = function editNewFaxAccount()
+			controller.connectNewSRFaxAccount = () =>
 			{
 				controller.editFaxAccount(null);
 			};
@@ -119,20 +122,22 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 					});
 			};
 
-			controller.saveMasterFaxEnabledStateInbound = function saveMasterFaxEnabledState()
+			controller.saveMasterFaxEnabledStateInbound = (value) =>
 			{
+				controller.masterFaxEnabledInbound = value;
 				controller.setSystemProperty("masterFaxEnabledInbound", controller.masterFaxEnabledInbound);
 				controller.updateMasterFaxDisabledStatus();
 			};
-			controller.saveMasterFaxEnabledStateOutbound = function saveMasterFaxEnabledState()
+			controller.saveMasterFaxEnabledStateOutbound = (value) =>
 			{
+				controller.masterFaxEnabledOutbound = value;
 				controller.setSystemProperty("masterFaxEnabledOutbound", controller.masterFaxEnabledOutbound);
 				controller.updateMasterFaxDisabledStatus();
 			};
 
 			controller.updateMasterFaxDisabledStatus = function updateMasterFaxDisabledStatus()
 			{
-				controller.masterFaxDisabled = !controller.masterFaxEnabledInbound && !controller.masterFaxEnabledOutbound;
+				controller.masterFaxDisabled = !(controller.masterFaxEnabledInbound || controller.masterFaxEnabledOutbound);
 			};
 			controller.setSystemProperty = function setSystemProperty(key, value)
 			{
