@@ -8,6 +8,8 @@ import FaxInboxResult from "../model/FaxInboxResult";
 import FaxInboxResultToModelConverter from "../converter/FaxInboxResultToModelConverter";
 import FaxOutboxResultToModelConverter from "../converter/FaxOutboxResultToModelConverter";
 import FaxOutboxResult from "../model/FaxOutboxResult";
+import FaxInboxSearchParams from "../model/FaxInboxSearchParams";
+import FaxOutboxSearchParams from "../model/FaxOutboxSearchParams";
 
 export default class FaxAccountService
 {
@@ -81,21 +83,29 @@ export default class FaxAccountService
 			(await this.faxAccountApi.listAccounts(page, perPage)).data.body);
 	}
 
-	public getInbox = async (id: number, page: number, perPage: number,
-	                              startDate: any,
-	                              endDate: any): Promise<FaxInboxResult[]> =>
+	public getInbox = async (params: FaxInboxSearchParams): Promise<FaxInboxResult[]> =>
 	{
 		return this.faxInboxResultToModelConverter.convertList(
-			(await this.faxAccountApi.getInbox(id, page, perPage, endDate, startDate)).data.body);
+			(await this.faxAccountApi.getInbox(
+				params.faxAccount.id,
+				params.page,
+				params.perPage,
+				params.endDate ? Juno.Common.Util.formatMomentDate(params.endDate) : null,
+				params.startDate ? Juno.Common.Util.formatMomentDate(params.startDate) : null,
+			)).data.body);
 	}
 
-	public getOutbox = async (id: number, page: number, perPage: number,
-	                          startDate: any,
-	                          endDate: any,
-	                          combinedStatus: string,
-	                          archived: string): Promise<FaxOutboxResult[]> =>
+	public getOutbox = async (params: FaxOutboxSearchParams): Promise<FaxOutboxResult[]> =>
 	{
 		return this.faxOutboxResultToModelConverter.convertList(
-			(await this.faxAccountApi.getOutbox(id, page, perPage, endDate, startDate, combinedStatus, archived)).data.body);
+			(await this.faxAccountApi.getOutbox(
+				params.faxAccount.id,
+				params.page,
+				params.perPage,
+				params.endDate ? Juno.Common.Util.formatMomentDate(params.endDate) : null,
+				params.startDate ? Juno.Common.Util.formatMomentDate(params.startDate) : null,
+				params.combinedStatus as any,
+				params.archived,
+			)).data.body);
 	}
 }

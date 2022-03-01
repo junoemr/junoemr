@@ -406,6 +406,8 @@ module.exports = {
 			'./src/admin/section/fax/faxConfigurationComponent.ts',
 			'./src/admin/section/fax/faxConfigurationEditModalComponent.ts',
 			'./src/admin/section/fax/faxSendReceiveComponent.ts',
+			'./src/admin/section/fax/components/faxInbox/faxInboxComponent.ts',
+			'./src/admin/section/fax/components/faxOutbox/faxOutboxComponent.ts',
 			'./src/admin/section/landingPage/landingPageComponent.js',
 			'./src/admin/section/panelManagement/panelManagementAdminComponent.js',
 			'./src/admin/section/editProviderPage/editProviderAdminComponent.js',

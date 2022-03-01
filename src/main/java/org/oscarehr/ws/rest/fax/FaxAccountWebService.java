@@ -23,10 +23,10 @@
 package org.oscarehr.ws.rest.fax;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.lang.StringUtils;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
+import org.oscarehr.fax.model.FaxStatusCombined;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
@@ -36,7 +36,6 @@ import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.fax.transfer.FaxAccountUpdateInput;
 import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
 import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
-import org.oscarehr.fax.model.FaxStatusCombined;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.common.annotation.MaskParameter;
@@ -57,6 +56,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.time.LocalDate;
 import java.util.List;
 
 @Path("/faxAccount")
@@ -176,8 +176,8 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	public RestSearchResponse<FaxInboxTransferOutbound> getInbox(@PathParam("id") Long id,
 																 @QueryParam("page") @DefaultValue("1") Integer page,
 																 @QueryParam("perPage") @DefaultValue("10") Integer perPage,
-																 @QueryParam("endDate") String endDateStr,
-																 @QueryParam("startDate") String startDateStr)
+																 @QueryParam("endDate") LocalDate endDate,
+																 @QueryParam("startDate") LocalDate startDate)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_READ);
 
@@ -191,13 +191,13 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		criteriaSearch.setFaxAccountId(id);
 		criteriaSearch.setSortDirDescending();
 
-		if (endDateStr != null)
+		if (endDate != null)
 		{
-			criteriaSearch.setEndDate(ConversionUtils.toLocalDate(endDateStr));
+			criteriaSearch.setEndDate(endDate);
 		}
-		if (startDateStr != null)
+		if (startDate != null)
 		{
-			criteriaSearch.setStartDate(ConversionUtils.toLocalDate(startDateStr));
+			criteriaSearch.setStartDate(startDate);
 		}
 
 		int total = faxInboundDao.criteriaSearchCount(criteriaSearch);
@@ -213,10 +213,10 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	public RestSearchResponse<FaxOutboxTransferOutbound> getOutbox(@PathParam("id") Long id,
 																   @QueryParam("page") @DefaultValue("1") Integer page,
 																   @QueryParam("perPage") @DefaultValue("10") Integer perPage,
-																   @QueryParam("endDate") String endDateStr,
-																   @QueryParam("startDate") String startDateStr,
-																   @QueryParam("combinedStatus") String combinedStatus,
-																   @QueryParam("archived") String archived)
+																   @QueryParam("endDate") LocalDate endDate,
+																   @QueryParam("startDate") LocalDate startDate,
+																   @QueryParam("combinedStatus") FaxStatusCombined combinedStatus,
+																   @QueryParam("archived") Boolean archived)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_READ);
 
@@ -229,21 +229,21 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		criteriaSearch.setFaxAccountId(id);
 		criteriaSearch.setSortDirDescending();
 
-		if (endDateStr != null)
+		if (endDate != null)
 		{
-			criteriaSearch.setEndDate(ConversionUtils.toLocalDate(endDateStr));
+			criteriaSearch.setEndDate(endDate);
 		}
-		if (startDateStr != null)
+		if (startDate != null)
 		{
-			criteriaSearch.setStartDate(ConversionUtils.toLocalDate(startDateStr));
+			criteriaSearch.setStartDate(startDate);
 		}
-		if (StringUtils.trimToNull(combinedStatus) != null)
+		if (combinedStatus != null)
 		{
-			criteriaSearch.setCombinedStatus(FaxStatusCombined.valueOf(combinedStatus));
+			criteriaSearch.setCombinedStatus(combinedStatus);
 		}
-		if (StringUtils.trimToNull(archived) != null)
+		if (archived != null)
 		{
-			criteriaSearch.setArchived(Boolean.parseBoolean(archived));
+			criteriaSearch.setArchived(archived);
 		}
 		criteriaSearch.setOffset(offset);
 

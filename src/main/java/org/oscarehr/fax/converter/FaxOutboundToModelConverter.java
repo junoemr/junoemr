@@ -47,12 +47,12 @@ public class FaxOutboundToModelConverter extends AbstractModelConverter<FaxOutbo
 		model.setSystemStatusMessage(entity.getStatusMessage());
 		model.setArchived(entity.getArchived());
 		model.setNotificationStatus(entity.getNotificationStatus());
-		model.setSystemSentDateTime(ConversionUtils.toLocalDateTime(entity.getCreatedAt()));
+		model.setSystemSentDateTime(ConversionUtils.toNullableLocalDateTime(entity.getCreatedAt()));
 		model.setToFaxNumber(entity.getSentTo());
 		model.setFileType(entity.getFileType());
 		model.setIntegrationStatus(entity.getExternalStatus());
-		model.setIntegrationQueuedDateTime(ConversionUtils.toLocalDateTime(entity.getCreatedAt()));
-		model.setIntegrationSentDateTime(ConversionUtils.toLocalDateTime(entity.getExternalDeliveryDate()));
+		model.setIntegrationQueuedDateTime(ConversionUtils.toNullableLocalDateTime(entity.getCreatedAt()));
+		model.setIntegrationSentDateTime(ConversionUtils.toNullableLocalDateTime(entity.getExternalDeliveryDate()));
 		model.setCombinedStatus(toCombinedStatus(entity.getStatus(), entity.getExternalStatus()));
 
 		return model;
