@@ -25,8 +25,31 @@ package org.oscarehr.fax.provider;
 
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.result.GetFaxStatusResult;
+import java.util.List;
 
 public interface FaxUploadProvider
 {
+
+	/**
+	 * Send the specified fax using this faxing provider
+	 * @param faxOutbound queued fax outbound object.  This is a fax which has been marked for us to be sent, but has
+	 *                    yet to be uploaded to the external faxing service.
+	 * @param file file to send with the fax
+	 * @return Updated faxoutbound object
+	 * @throws Exception
+	 */
 	FaxOutbound sendQueuedFax(FaxOutbound faxOutbound, GenericFile file) throws Exception;
+
+	/**
+	 * Get a list of FaxProvider statuses which indicate that a fax has been processed by the remote service.
+	 * @return List of statuses that indicate that a fax has been processed.
+	 */
+	List<String> getRemoteFinalStatusIndicators();
+
+	GetFaxStatusResult getFaxStatus(FaxOutbound faxOutbound) throws Exception;
+
+	boolean isFaxInRemoteSentState(GetFaxStatusResult result);
+
+	boolean isFaxInRemoteFailedState(FaxOutbound faxOutbound);
 }

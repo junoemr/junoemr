@@ -16,7 +16,7 @@ This Page creates the fax form for eforms.
 <%@ page import="org.oscarehr.common.dao.UserPropertyDAO"%>
 <%@ page import="org.oscarehr.common.model.Demographic"%>
 <%@ page import="org.oscarehr.common.model.UserProperty"%>
-<%@ page import="org.oscarehr.fax.service.OutgoingFaxService"%>
+<%@ page import="org.oscarehr.fax.service.FaxUploadService"%>
 <%@ page import="org.oscarehr.util.LoggedInInfo"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
 <%@ page import="org.springframework.web.context.WebApplicationContext"%>
@@ -27,7 +27,7 @@ This Page creates the fax form for eforms.
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <jsp:useBean id="displayServiceUtil" scope="request" class="oscar.oscarEncounter.oscarConsultationRequest.config.pageUtil.EctConDisplayServiceUtil" />
 <%
-	OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
+	FaxUploadService faxUploadService = SpringUtils.getBean(FaxUploadService.class);
 
 	displayServiceUtil.estSpecialist();
 	String demo = request.getParameter("demographicNo");
@@ -39,7 +39,7 @@ This Page creates the fax form for eforms.
 		demographic = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request), demo);
 		rdohip = SxmlMisc.getXmlContent(demographic.getFamilyDoctor(), "rdohip").trim();
 	}
-	boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
+	boolean faxEnabled = faxUploadService.isOutboundFaxEnabled();
 %>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/util/fax.js"></script>
 <script type="text/javascript">

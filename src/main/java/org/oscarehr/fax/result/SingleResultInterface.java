@@ -20,61 +20,13 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.externalApi.srfax.resultWrapper;
+package org.oscarehr.fax.result;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SingleWrapper<T>
+public interface SingleResultInterface<T>
 {
-	public static final String STATUS_SUCCESS = "Success";
+	boolean isSuccess();
+	
+	String getError();
 
-	@JsonProperty("Status")
-	private String status;
-	@JsonProperty("Result")
-	private T result;
-
-	private String error;
-
-	public String getStatus()
-	{
-		return status;
-	}
-
-	public void setStatus(String status)
-	{
-		this.status = status;
-	}
-
-	public boolean isSuccess()
-	{
-		return STATUS_SUCCESS.equals(status);
-	}
-
-	public T getResult()
-	{
-		return result;
-	}
-
-	public void setResult(T result)
-	{
-		this.result = result;
-	}
-
-	public String getError()
-	{
-		return error;
-	}
-
-	public void setError(String error)
-	{
-		this.error = error;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "status:" + status + ", error:" + error + ", result:" + result;
-	}
+	T getResult();
 }

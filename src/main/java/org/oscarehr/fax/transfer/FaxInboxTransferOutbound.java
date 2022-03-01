@@ -20,17 +20,27 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.transfer.fax;
+package org.oscarehr.fax.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class FaxAccountTransferOutbound extends FaxAccountTransferBasic
+public class FaxInboxTransferOutbound implements Serializable
 {
 	private Long id;
+	private Long faxAccountId;
+	/* the received date of the document as recorded in the system */
+	private String systemDateReceived;
+	/* the id of the document in the system */
+	private Integer documentId;
+
+	private String sentFrom;
+
+	private Long externalReferenceId;
 
 	public Long getId()
 	{
@@ -40,5 +50,55 @@ public class FaxAccountTransferOutbound extends FaxAccountTransferBasic
 	public void setId(Long id)
 	{
 		this.id = id;
+	}
+
+	public Long getFaxAccountId()
+	{
+		return faxAccountId;
+	}
+
+	public void setFaxAccountId(Long faxAccountId)
+	{
+		this.faxAccountId = faxAccountId;
+	}
+
+	public String getSystemDateReceived()
+	{
+		return systemDateReceived;
+	}
+
+	public void setSystemDateReceived(String systemDateReceived)
+	{
+		this.systemDateReceived = systemDateReceived;
+	}
+
+	public Integer getDocumentId()
+	{
+		return documentId;
+	}
+
+	public void setDocumentId(Integer documentId)
+	{
+		this.documentId = documentId;
+	}
+
+	public String getSentFrom()
+	{
+		return sentFrom;
+	}
+
+	public void setSentFrom(String sentFrom)
+	{
+		this.sentFrom = sentFrom;
+	}
+
+	public Long getExternalReferenceId()
+	{
+		return externalReferenceId;
+	}
+
+	public void setExternalReferenceId(Long externalReferenceId)
+	{
+		this.externalReferenceId = externalReferenceId;
 	}
 }

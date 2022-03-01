@@ -20,17 +20,19 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest;
+package org.oscarehr.ws.rest.fax;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.schedulingTasks.OutboundFaxSchedulingTask;
-import org.oscarehr.fax.service.OutgoingFaxService;
+import org.oscarehr.fax.service.FaxUploadService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
-import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
+import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -48,15 +50,16 @@ import java.time.LocalDateTime;
 
 @Path("/faxOutbound")
 @Component("FaxOutboundWebService")
+@Tag(name = "faxOutbound")
 public class FaxOutboundWebService extends AbstractServiceImpl
 {
-	private static Logger logger = Logger.getLogger(FaxOutboundWebService.class);
+	private static final Logger logger = Logger.getLogger(FaxOutboundWebService.class);
 
 	@Autowired
 	private SecurityInfoManager securityInfoManager;
 
 	@Autowired
-	private OutgoingFaxService outgoingFaxService;
+	private FaxUploadService faxUploadService;
 
 	@Autowired
 	private OutboundFaxSchedulingTask outboundFaxSchedulingTask;
@@ -68,7 +71,7 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_UPDATE);
 
-		return RestResponse.successResponse(outgoingFaxService.resendFax(id));
+		return RestResponse.successResponse(faxUploadService.resendFax(id));
 	}
 
 	@PUT
@@ -79,7 +82,7 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_UPDATE);
 
-		return RestResponse.successResponse(outgoingFaxService.setNotificationStatus(id, status));
+		return RestResponse.successResponse(faxUploadService.setNotificationStatus(id, status));
 	}
 
 	@PUT
@@ -90,7 +93,7 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_UPDATE);
 
-		return RestResponse.successResponse(outgoingFaxService.setArchived(id, true));
+		return RestResponse.successResponse(faxUploadService.setArchived(id, true));
 	}
 
 	@GET
@@ -116,7 +119,7 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 		String filename = "faxed-document-" + id + ".pdf";
 		try
 		{
-			GenericFile file = outgoingFaxService.getFile(id);
+			GenericFile file = faxUploadService.getFile(id);
 			stream = new FileInputStream(file.getFileObject());
 		}
 		catch(Exception e)

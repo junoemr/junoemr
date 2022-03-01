@@ -20,11 +20,13 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest;
+package org.oscarehr.ws.rest.fax;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.fax.schedulingTasks.InboundFaxSchedulingTask;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,6 +39,7 @@ import java.time.LocalDateTime;
 
 @Path("/faxInbound")
 @Component("FaxInboundWebService")
+@Tag(name = "faxInbound")
 public class FaxInboundWebService extends AbstractServiceImpl
 {
 	@Autowired

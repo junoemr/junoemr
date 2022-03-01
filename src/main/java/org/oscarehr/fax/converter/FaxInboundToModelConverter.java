@@ -20,61 +20,28 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.externalApi.srfax.resultWrapper;
+package org.oscarehr.fax.converter;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.fax.model.FaxInbound;
+import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
+import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SingleWrapper<T>
+@Component
+public class FaxInboundToModelConverter extends AbstractModelConverter<FaxInbound, FaxInboxTransferOutbound>
 {
-	public static final String STATUS_SUCCESS = "Success";
-
-	@JsonProperty("Status")
-	private String status;
-	@JsonProperty("Result")
-	private T result;
-
-	private String error;
-
-	public String getStatus()
-	{
-		return status;
-	}
-
-	public void setStatus(String status)
-	{
-		this.status = status;
-	}
-
-	public boolean isSuccess()
-	{
-		return STATUS_SUCCESS.equals(status);
-	}
-
-	public T getResult()
-	{
-		return result;
-	}
-
-	public void setResult(T result)
-	{
-		this.result = result;
-	}
-
-	public String getError()
-	{
-		return error;
-	}
-
-	public void setError(String error)
-	{
-		this.error = error;
-	}
-
 	@Override
-	public String toString()
+	public FaxInboxTransferOutbound convert(FaxInbound entity)
 	{
-		return "status:" + status + ", error:" + error + ", result:" + result;
+		FaxInboxTransferOutbound model = new FaxInboxTransferOutbound();
+		model.setId(entity.getId());
+		model.setDocumentId(entity.getDocument().getDocumentNo());
+		model.setFaxAccountId(entity.getFaxAccount().getId());
+		model.setSystemDateReceived(ConversionUtils.toTimestampString(entity.getCreatedAt()));
+		model.setExternalReferenceId(entity.getExternalReferenceId());
+		model.setSentFrom(entity.getSentFrom());
+
+		return model;
 	}
 }

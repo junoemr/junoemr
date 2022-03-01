@@ -23,6 +23,8 @@
 
 package org.oscarehr.fax.provider;
 
+import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.integration.SRFax.SRFaxAccountProvider;
 import org.oscarehr.integration.SRFax.SRFaxDownloadProvider;
 import org.oscarehr.integration.SRFax.SRFaxUploadProvider;
@@ -37,12 +39,12 @@ public class FaxProviderFactory
 		return FaxProvider.SRFAX;
 	}
 
-	public FaxAccountProvider createFaxAccountProvider()
+	public FaxAccountProvider createFaxAccountProvider(FaxAccount faxAccount)
 	{
-		switch (getSystemFaxProvider())
+		switch (faxAccount.getIntegrationType())
 		{
 			case SRFAX:
-				return new SRFaxAccountProvider();
+				return new SRFaxAccountProvider(faxAccount);
 			case RINGCENTRAL:
 			case NONE:
 			default:
@@ -50,12 +52,12 @@ public class FaxProviderFactory
 		}
 	}
 
-	public FaxDownloadProvider createFaxDownloadProvider()
+	public FaxDownloadProvider createFaxDownloadProvider(FaxAccount faxAccount)
 	{
-		switch (getSystemFaxProvider())
+		switch (faxAccount.getIntegrationType())
 		{
 			case SRFAX:
-				return new SRFaxDownloadProvider();
+				return new SRFaxDownloadProvider(faxAccount);
 			case RINGCENTRAL:
 			case NONE:
 			default:
@@ -63,12 +65,17 @@ public class FaxProviderFactory
 		}
 	}
 
-	public FaxUploadProvider createFaxUploadProvider()
+	public FaxUploadProvider createFaxUploadProvider(FaxAccount faxAccount)
 	{
-		return createFaxUploadProvider(getSystemFaxProvider());
+		return createFaxUploadProvider(faxAccount.getIntegrationType());
 	}
 
-	public FaxUploadProvider createFaxUploadProvider(FaxProvider providerType)
+	public FaxUploadProvider createFaxUploadProvider(FaxAccountTransferOutbound faxAccount)
+	{
+		return createFaxUploadProvider(faxAccount.getAccountType());
+	}
+
+	private FaxUploadProvider createFaxUploadProvider(FaxProvider providerType)
 	{
 		switch (providerType)
 		{

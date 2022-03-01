@@ -29,7 +29,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.oscarehr.fax.service.OutgoingFaxService;
+import org.oscarehr.fax.service.FaxUploadService;
 import org.oscarehr.util.SpringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,12 +41,12 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class FaxPDFAction extends Action {
 
-	private static OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
+	private static FaxUploadService faxUploadService = SpringUtils.getBean(FaxUploadService.class);
 
     public ActionForward execute(ActionMapping mapping, ActionForm form,
 		HttpServletRequest request, HttpServletResponse response) 
 	{
-		if(!outgoingFaxService.isOutboundFaxEnabled())
+		if(!faxUploadService.isOutboundFaxEnabled())
 		{
 			return mapping.findForward("failed");
 		}

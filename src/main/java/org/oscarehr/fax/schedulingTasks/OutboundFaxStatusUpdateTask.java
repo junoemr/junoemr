@@ -23,13 +23,17 @@
 package org.oscarehr.fax.schedulingTasks;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.fax.service.OutgoingFaxService;
+import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
+import org.oscarehr.fax.service.FaxAccountService;
+import org.oscarehr.fax.service.FaxUploadService;
+import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @Component
 public class OutboundFaxStatusUpdateTask
@@ -38,7 +42,10 @@ public class OutboundFaxStatusUpdateTask
 	private static final String cronSchedule = "0 */5 * * * *";
 
 	@Autowired
-	private OutgoingFaxService outgoingFaxService;
+	private FaxAccountService faxAccountService;
+
+	@Autowired
+	private FaxUploadService faxUploadService;
 
 	@PostConstruct
 	public void init()
@@ -51,7 +58,17 @@ public class OutboundFaxStatusUpdateTask
 	{
 		try
 		{
-			outgoingFaxService.requestPendingStatusUpdates();
+			FaxAccountCriteriaSearch activeAccountQuery = new FaxAccountCriteriaSearch();
+			activeAccountQuery.setIntegrationEnabledStatus(true);
+			activeAccountQuery.setOutboundEnabledStatus(true);
+
+			List<FaxAccountTransferOutbound> activeAccounts = faxAccountService.listAccounts(activeAccountQuery);
+			for (FaxAccountTransferOutbound activeAccount : activeAccounts)
+			{
+				faxUploadService.requestPendingStatusUpdates(activeAccount);
+			}
+
+
 		}
 		catch(IllegalStateException e)
 		{

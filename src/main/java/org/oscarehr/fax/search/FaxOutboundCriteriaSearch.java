@@ -28,7 +28,7 @@ import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
 import org.oscarehr.fax.model.FaxOutbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
+import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -282,15 +282,15 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 
 	/**
 	 * set the list of remote statuses values to filter.
-	 * @param includeExternalStatuses
+	 * @param exclude
 	 * if true, results will be filtered to included only statuses in the given list.
 	 * if false, results will be filtered to exclude these statuses
 	 * this setting is ignored in the remote status list is not set or is empty
 	 */
-	public void setRemoteStatusList(List<String> remoteStatusList, boolean includeExternalStatuses)
+	public void setRemoteStatusList(List<String> remoteStatusList, boolean exclude)
 	{
 		this.remoteStatusList = remoteStatusList;
-		this.includeExternalStatuses = includeExternalStatuses;
+		this.includeExternalStatuses = exclude;
 	}
 
 	/**
