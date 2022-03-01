@@ -298,17 +298,19 @@
 
 	</script>
 
-	<select id="queryType" onchange="displaySearch(this)" style="margin-left:30px;">
-		<option value="Z01">Z01 - Retrieve Laboratory Information for Patient</option>
-		<option value="Z02">Z02 - Retrieve Laboratory Information for Order ID</option>
-		<option value="Z04">Z04 - Retrieve Laboratory Information Updates for Practitioner</option>
+<%--	select disabled for production. OMD requires only Z01 query be accessable to users			--%>
+
+<%--	<select id="queryType" onchange="displaySearch(this)" style="margin-left:30px;">--%>
+<%--		<option value="Z01">Z01 - Retrieve Laboratory Information for Patient</option>--%>
+<%--		<option value="Z02">Z02 - Retrieve Laboratory Information for Order ID</option>--%>
+<%--		<option value="Z04">Z04 - Retrieve Laboratory Information Updates for Practitioner</option>--%>
 <%--		REMOVED Below queries as they are not required for OLIS conformance --%>
 <%--		<option value="Z05">Z05 - Retrieve Laboratory Information Updates for Destination Laboratory</option>--%>
 <%--		<option value="Z06">Z06 - Retrieve Laboratory Information Updates for Ordering Facility</option>--%>
 <%--		<option value="Z07">Z07 - Retrieve Test Results Reportable to Public Health</option>--%>
 <%--		<option value="Z08">Z08 - Retrieve Test Results Reportable to Cancer Care Ontario</option>--%>
 <%--		<option value="Z50">Z50 - Identify Patient by Name, Sex, and Date of Birth</option>--%>
-	</select>
+<%--	</select>--%>
 
 	<form action="<%=request.getContextPath() %>/olis/Search.do" method="POST" onSubmit="checkBlockedConsent('Z01')" name="Z01_form">
 	<input type="hidden" name="queryType" value="Z01" />
