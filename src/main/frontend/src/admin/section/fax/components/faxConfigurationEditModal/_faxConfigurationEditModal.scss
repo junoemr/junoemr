@@ -1,0 +1,147 @@
+
+//hack to re-center modal for now
+.modal-dialog {
+	left: auto !important;
+}
+
+.faxEditModal {
+	.switch {
+		@include juno-toggle-switch(32px, 4px, .4s);
+	}
+	.modal-content {
+		background-color: $color-primary-base;
+	}
+
+	.modal-body {
+		padding: 30px;
+		background-color: $color-neutral-white;
+
+		input {
+			&.ng-invalid {
+				background-color: $input-color-invalid-background;
+				border-color: $input-color-invalid-border;
+			}
+		}
+
+		.input-validation {
+			font-size: 10px;
+			color: $input-color-invalid-text;
+		}
+
+		.flex-row {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: flex-start;
+
+			&.content-center {
+				justify-content: center;
+			}
+
+			&.content-end {
+				justify-content: flex-end;
+			}
+
+			&.info-section {
+				position: relative;
+
+				.info-icon {
+					position: absolute;
+					font-size: 14px;
+					color: $color-blue-light;
+				}
+			}
+
+			.flex-row-label {
+				width: 40%;
+				padding: 0 5px;
+				text-align: right;
+			}
+
+			.flex-row-content {
+				text-align: left;
+			}
+		}
+
+		.glyphicon {
+			font-size: 25px;
+
+			&.unknown {
+				color: $color-neutral-dark;
+			}
+
+			&.success {
+				color: $semantic-success-base;
+			}
+
+			&.failure {
+				color: $semantic-error-base;
+			}
+		}
+	}
+
+	.modal-header {
+		color: $color-neutral-white;
+	}
+
+	.modal-footer {
+		background-color: $color-neutral-lighter;
+		padding-top: 20px;
+		padding-bottom: 20px;
+	}
+}
+
+
+.fax-send_receive {
+	.tabs-heading {
+		padding: 5px 5px 0 5px;
+	}
+
+	.nav-justified {
+		margin-bottom: -1px;
+	}
+
+	.nav-tabs {
+		li {
+			&.active {
+				a {
+					color: black;
+					background-color: $color-neutral-white;
+					border-color: $color-neutral-light;
+					border-bottom-color: transparent;
+				}
+			}
+
+			a {
+				color: black;
+				background-color: $color-neutral-lighter;
+
+				&:hover, &:focus {
+					background-color: $color-neutral-grey;
+					border-color: transparent;
+				}
+			}
+		}
+	}
+
+	.search-frame {
+		padding: 10px;
+
+		.search-filters {
+			padding: 5px;
+		}
+
+		.search-buttons {
+			padding: 5px;
+			display: flex;
+			flex-direction: row;
+			align-items: end;
+		}
+	}
+
+	.table {
+		.float-right {
+			float: right;
+		}
+	}
+}

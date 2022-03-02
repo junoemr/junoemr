@@ -1,9 +1,9 @@
-import FaxAccountService from "../../../lib/fax/service/FaxAccountService";
-import FaxAccount from "../../../lib/fax/model/FaxAccount";
-import {FaxAccountConnectionStatusType} from "../../../lib/fax/model/FaxAccountConnectionStatusType";
+import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";
+import FaxAccount from "../../../../../lib/fax/model/FaxAccount";
+import {FaxAccountConnectionStatusType} from "../../../../../lib/fax/model/FaxAccountConnectionStatusType";
 
 angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
-	templateUrl: 'src/admin/section/fax/faxConfigurationEditModal.jsp',
+	templateUrl: 'src/admin/section/fax/components/faxConfigurationEditModal/faxConfigurationEditModal.jsp',
 	bindings: {
 		modalInstance: "<",
 		resolve: "<",
