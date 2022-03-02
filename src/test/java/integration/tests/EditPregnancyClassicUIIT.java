@@ -72,7 +72,7 @@ public class EditPregnancyClassicUIIT extends SeleniumTestBase
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 
 		//Add Normal Pregnancy
-		AddPregnancy();
+		addPregnancy();
 		Assert.assertTrue(pregnancyType + " is NOT added successfully",
 			PageUtil.isExistsBy(By.partialLinkText(pregnancyType), driver));
 	}
@@ -84,7 +84,7 @@ public class EditPregnancyClassicUIIT extends SeleniumTestBase
 		String eChartWindowHandle = driver.getWindowHandle();
 
 		//Add Normal Pregnancy
-		AddPregnancy();
+		addPregnancy();
 		String pregnancyXpath =
 			"//ul[@id='pregnancylist']//descendant::a[contains(.,'" + pregnancyType + "')]";
 
@@ -110,7 +110,7 @@ public class EditPregnancyClassicUIIT extends SeleniumTestBase
 			styleColor);
 
 		//Verify the status change on Pregnancy Management page
-		AccessPregnancyManagementPage();
+		accessPregnancyManagementPage();
 		String status = driver.findElement(By.xpath("//option[@selected='selected']"))
 			.getAttribute("value");
 		String statusExpected = statusComplete;
@@ -124,8 +124,8 @@ public class EditPregnancyClassicUIIT extends SeleniumTestBase
 		String eChartWindowHandle = driver.getWindowHandle();
 
 		//Add Normal Pregnancy
-		AddPregnancy();
-		AccessPregnancyManagementPage();
+		addPregnancy();
+		accessPregnancyManagementPage();
 
 		//Delete the Pregnancy
 		dropdownSelectByVisibleText(driver, webDriverWait, By.id("episode.status"), statusDelete);
@@ -136,7 +136,7 @@ public class EditPregnancyClassicUIIT extends SeleniumTestBase
 		Assert.assertFalse(pregnancyType + " is Not delted successfully.", PageUtil.isExistsBy(By.partialLinkText(pregnancyType), driver));
 	}
 
-	private void AddPregnancy()
+	private void addPregnancy()
 	{
 		Actions action = new Actions(driver);
 		WebElement plusButton = driver.findElement(
@@ -148,7 +148,7 @@ public class EditPregnancyClassicUIIT extends SeleniumTestBase
 			ExpectedConditions.presenceOfElementLocated(By.partialLinkText(pregnancyType)));
 	}
 
-	private void AccessPregnancyManagementPage()
+	private void accessPregnancyManagementPage()
 	{
 		driver.findElement(By.linkText("Pregnancies")).click();
 		PageUtil.switchToLastWindow(driver);

@@ -120,6 +120,7 @@ public class PageUtil
 	{
 		WebDriver.TargetLocator targetLocator = driver.switchTo();
 		targetLocator.window(windowHandle);
+		driver.navigate().refresh();
 	}
 
 	public static void clickWaitSwitchToLast(WebDriver driver, WebDriverWait webDriverWait, By clickTarget)
