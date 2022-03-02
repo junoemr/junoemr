@@ -385,14 +385,6 @@
 			</td>
 		</tr>
 		<tr>
-			<th>
-					Enable Patient Consent Block-All Indicator?
-			</th>
-			<td>
-				<input class="checkbox" type="checkbox" name="consentBlockAllIndicator" id="consentBlockAllIndicator">
-			</td>
-		</tr>
-		<tr>
 			<th width="20%">Specimen Collector</th>
 			<td width="30%"><select id="specimenCollector" name="specimenCollector">
 <option value=""></option>

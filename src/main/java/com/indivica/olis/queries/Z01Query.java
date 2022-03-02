@@ -28,7 +28,6 @@ import com.indivica.olis.parameters.ZBR3;
 import com.indivica.olis.parameters.ZBR4;
 import com.indivica.olis.parameters.ZBR6;
 import com.indivica.olis.parameters.ZPD1;
-import com.indivica.olis.parameters.ZPD3;
 import com.indivica.olis.parameters.ZRP1;
 import com.indivica.olis.parameters.ZSD;
 
@@ -50,7 +49,6 @@ public class Z01Query extends DateRangeQuery
 	private ZRP1 requestingHic = new ZRP1(); // mandatory
 	private ZPD1 consentToViewBlockedInformation = null;
 	private ZSD substituteDecisionMakerInfo = null;
-	private ZPD3 patientConsentBlockAllIndicator = null;
 	private ZBR3 specimenCollector = null;
 	private ZBR6 performingLaboratory = null;
 	private ZBE6 excludePerformingLaboratory = null;
@@ -91,9 +89,6 @@ public class Z01Query extends DateRangeQuery
 				query += substituteDecisionMakerInfo.toOlisString() + "~";
 			}
 		}
-		
-		if (patientConsentBlockAllIndicator != null)
-			query += patientConsentBlockAllIndicator.toOlisString() + "~";
 		
 		if (specimenCollector != null)
 			query += specimenCollector.toOlisString() + "~";
@@ -177,10 +172,6 @@ public class Z01Query extends DateRangeQuery
 	{
 		this.substituteDecisionMakerInfo = substituteDecisionMakerInfo;
 	}
-
-	public void setPatientConsentBlockAllIndicator(ZPD3 patientConsentBlockAllIndicator) {
-    	this.patientConsentBlockAllIndicator = patientConsentBlockAllIndicator;
-    }
 
 	public void setSpecimenCollector(ZBR3 specimenCollector) {
     	this.specimenCollector = specimenCollector;

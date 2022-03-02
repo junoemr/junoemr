@@ -205,13 +205,6 @@ public class OLISSearchAction extends DispatchAction
 
 				fillConsentOverrideSegments(request, query);
 
-				String consentBlockAllIndicator = request.getParameter("consentBlockAllIndicator");
-				if(StringUtils.isNotBlank(consentBlockAllIndicator))
-				{
-					((Z01Query) query).setPatientConsentBlockAllIndicator(new ZPD3("Y"));
-				}
-
-
 				String specimenCollector = request.getParameter("specimenCollector");
 				if(StringUtils.isNotBlank(specimenCollector))
 				{
