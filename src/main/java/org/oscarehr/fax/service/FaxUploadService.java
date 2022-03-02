@@ -22,7 +22,6 @@
  */
 package org.oscarehr.fax.service;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
@@ -55,7 +54,6 @@ import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.util.ConversionUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -100,11 +98,7 @@ public class FaxUploadService
 
 	public boolean isOutboundFaxEnabled()
 	{
-		return (faxStatus.canSendFaxes() || isLegacyFaxEnabled());
-	}
-	protected boolean isLegacyFaxEnabled()
-	{
-		return props.isFaxEnabled();
+		return (faxStatus.canSendFaxes());
 	}
 
 	/** Remove duplicate phone numbers and all non digit characters from fax numbers. */
@@ -150,22 +144,6 @@ public class FaxUploadService
 			FaxOutbound faxOutbound = queueNewFax(providerId, demographicId, faxAccount, faxNumber, fileType, fileToFax);
 			sendQueuedFax(faxOutbound, fileToFax);
 			transfer = faxOutboundToModelConverter.convert(faxOutbound);
-		}
-		// if legacy faxing is enabled, write to the outgoing folder.
-		else if(isLegacyFaxEnabled())
-		{
-			writeToFaxOutgoing(faxNumber, fileToFax);
-			LogAction.addLogEntry(providerId, demographicId, LogConst.ACTION_SENT, LogConst.CON_FAX,
-					LogConst.STATUS_SUCCESS, null, null, "Faxed To: " + faxNumber);
-
-			// fake a transfer object to return
-			transfer = new FaxOutboxTransferOutbound();
-			transfer.setSystemStatus(FaxOutbound.Status.SENT);
-			transfer.setToFaxNumber(faxNumber);
-			transfer.setFileType(fileType.name());
-			transfer.setDemographicNo(demographicId);
-			transfer.setProviderNo(providerId);
-			transfer.setSystemStatusMessage("Using legacy fax system");
 		}
 		else
 		{
@@ -332,7 +310,7 @@ public class FaxUploadService
 				{
 					GetFaxStatusResult apiResult = uploadProvider.getFaxStatus(faxOutbound);
 
-					if(apiResult.isSuccess())		// TODO: I would like to get rid of this check
+					if(apiResult.isSuccess())
 					{
 						String remoteSentStatus = apiResult.getRemoteSentStatus();
 						faxOutbound.setExternalStatus(remoteSentStatus);
@@ -382,22 +360,6 @@ public class FaxUploadService
 			file = FileFactory.getOutboundSentFaxFile(faxOutbound.getFileName());
 		}
 		return file;
-	}
-
-	/**
-	 * When there are no direct integration fax routes, write file to outbound location (old fax system)
-	 */
-	private void writeToFaxOutgoing(String faxNumber, GenericFile...filesToFax) throws IOException, InterruptedException
-	{
-		for(GenericFile fileToFax : filesToFax)
-		{
-			GenericFile faxNoFile = FileFactory.createTempFile(new ByteArrayInputStream(faxNumber.getBytes()), ".txt");
-			String filenameWithoutExt = FilenameUtils.removeExtension(fileToFax.getFileObject().getName());
-			faxNoFile.rename(filenameWithoutExt + ".txt");
-
-			fileToFax.moveToOutgoingFaxPending();
-			faxNoFile.moveToOutgoingFaxPending();
-		}
 	}
 
 	/**

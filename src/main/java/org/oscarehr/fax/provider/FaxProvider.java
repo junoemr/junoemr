@@ -26,7 +26,6 @@ package org.oscarehr.fax.provider;
 public enum FaxProvider
 {
 	NONE,
-	LEGACY,
 	SRFAX,
 	RINGCENTRAL
 }
