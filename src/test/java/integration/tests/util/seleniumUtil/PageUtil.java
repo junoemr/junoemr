@@ -22,19 +22,18 @@
  */
 package integration.tests.util.seleniumUtil;
 
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
 
 public class PageUtil
 {
@@ -120,7 +119,15 @@ public class PageUtil
 	{
 		WebDriver.TargetLocator targetLocator = driver.switchTo();
 		targetLocator.window(windowHandle);
+	}
+
+	public static void switchToWindowRefreshAndWait(String windowHandle, WebDriver driver, WebDriverWait webDriverWait, By element)
+	{
+		WebDriver.TargetLocator targetLocator = driver.switchTo();
+		targetLocator.window(windowHandle);
 		driver.navigate().refresh();
+		webDriverWait.until(
+			ExpectedConditions.presenceOfElementLocated(element));
 	}
 
 	public static void clickWaitSwitchToLast(WebDriver driver, WebDriverWait webDriverWait, By clickTarget)

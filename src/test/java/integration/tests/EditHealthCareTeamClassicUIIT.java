@@ -25,6 +25,7 @@ package integration.tests;
 
 import static integration.tests.AddProvidersIT.drBerry;
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.seleniumUtil.PageUtil.switchToWindowRefreshAndWait;
 
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
@@ -81,9 +82,7 @@ public class EditHealthCareTeamClassicUIIT extends SeleniumTestBase
 			PageUtil.isExistsBy(By.xpath("//td[contains(., '" + internalFullName + "')]"), driver));
 
 		//Verify on EeChart page
-		PageUtil.switchToWindow(eChartWindowHandle, driver);
-		webDriverWait.until(
-			ExpectedConditions.presenceOfElementLocated(By.linkText("Health Care Team")));
+		switchToWindowRefreshAndWait(eChartWindowHandle, driver, webDriverWait, By.linkText("Health Care Team"));
 		Assert.assertTrue("eChart page: Internal Provider is NOT added successfully.",
 			PageUtil.isExistsBy(By.partialLinkText(internalFullName), driver));
 	}
@@ -94,16 +93,12 @@ public class EditHealthCareTeamClassicUIIT extends SeleniumTestBase
 		String eChartWindowHandle = accessEChartPage();
 		String manageWindowHandle = accessManageHealthCarePage();
 		addExternalContact();
-		PageUtil.switchToWindow(manageWindowHandle, driver);
-		webDriverWait.until(
-			ExpectedConditions.presenceOfElementLocated(By.xpath("//td[contains(., '" + externalLName + "')]")));
+		switchToWindowRefreshAndWait(manageWindowHandle, driver, webDriverWait, By.xpath("//td[contains(., '" + externalLName + "')]"));
 		Assert.assertTrue("External Provider is NOT added successfully",
 			PageUtil.isExistsBy(By.xpath("//td[contains(., '" + externalFullName + "')]"), driver));
 
 		//Verify on EeChart page
-		PageUtil.switchToWindow(eChartWindowHandle, driver);
-		webDriverWait.until(
-			ExpectedConditions.presenceOfElementLocated(By.linkText("Health Care Team")));
+		switchToWindowRefreshAndWait(eChartWindowHandle, driver, webDriverWait, By.linkText("Health Care Team"));
 		Assert.assertTrue("eChart page: External Provider is NOT added successfully.",
 			PageUtil.isExistsBy(By.partialLinkText(externalFullName), driver));
 	}
@@ -116,9 +111,7 @@ public class EditHealthCareTeamClassicUIIT extends SeleniumTestBase
 		addExternalContact();
 
 		//Edit External Provider by adding Fax number
-		PageUtil.switchToWindow(manageWindowHandle, driver);
-		webDriverWait.until(
-			ExpectedConditions.presenceOfElementLocated(By.xpath("//td[contains(., '" + externalLName + "')]")));
+		switchToWindowRefreshAndWait(manageWindowHandle, driver, webDriverWait, By.xpath("//td[contains(., '" + externalLName + "')]"));
 		ActionUtil.findWaitClickById(driver, webDriverWait, "edit2_1");
 		PageUtil.switchToLastWindow(driver);
 		ActionUtil.findWaitSendKeysById(driver, webDriverWait, "pcontact.fax", externalFaxNumber);
@@ -126,18 +119,13 @@ public class EditHealthCareTeamClassicUIIT extends SeleniumTestBase
 		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//input[@value='Exit']");
 
 		//Verify the edit on Manage Health Care Team page
-		PageUtil.switchToWindow(manageWindowHandle, driver);
-		webDriverWait.until(
-			ExpectedConditions.presenceOfElementLocated(
-				By.xpath("//td[contains(., '" + externalLName + "')]")));
+		switchToWindowRefreshAndWait(manageWindowHandle, driver, webDriverWait, By.xpath("//td[contains(., '" + externalLName + "')]"));
 		Assert.assertTrue("External Provider Fax is NOT added successfully.",
 			PageUtil.isExistsBy(By.xpath("//td[contains(., '" + externalFaxNumber + "')]"),
 				driver));
 
 		//Verify the edit on eChart page
-		PageUtil.switchToWindow(eChartWindowHandle, driver);
-		webDriverWait.until(
-			ExpectedConditions.presenceOfElementLocated(By.linkText("Health Care Team")));
+		switchToWindowRefreshAndWait(eChartWindowHandle, driver, webDriverWait, By.linkText("Health Care Team"));
 		ActionUtil.findWaitClickByPartialLinkText(driver, webDriverWait, externalFullName);
 		PageUtil.switchToLastWindow(driver);
 		String faxNumber = driver.findElement(By.id("pcontact.fax")).getAttribute("value");
@@ -156,9 +144,7 @@ public class EditHealthCareTeamClassicUIIT extends SeleniumTestBase
 		ActionUtil.findWaitClickById(driver, webDriverWait, "remove0_1");
 
 		//Verify the removal from eChart page.
-		PageUtil.switchToWindow(eChartWindowHandle, driver);
-		webDriverWait.until(
-			ExpectedConditions.presenceOfElementLocated(By.linkText("Health Care Team")));
+		switchToWindowRefreshAndWait(eChartWindowHandle, driver, webDriverWait, By.linkText("Health Care Team"));
 		Assert.assertFalse("eChart page: Internal Provider is NOT removed successfully.",
 			PageUtil.isExistsBy(By.partialLinkText(internalFullName), driver));
 	}
@@ -171,15 +157,11 @@ public class EditHealthCareTeamClassicUIIT extends SeleniumTestBase
 		addExternalContact();
 
 		//Remove External provider
-		PageUtil.switchToWindow(manageWindowHandle, driver);
-		webDriverWait.until(
-			ExpectedConditions.presenceOfElementLocated(By.xpath("//td[contains(., '" + externalLName + "')]")));
+		switchToWindowRefreshAndWait(manageWindowHandle, driver, webDriverWait, By.xpath("//td[contains(., '" + externalLName + "')]"));
 		ActionUtil.findWaitClickById(driver, webDriverWait, "remove2_1");
 
 		//Verify the removal from eChart page.
-		PageUtil.switchToWindow(eChartWindowHandle, driver);
-		webDriverWait.until(
-			ExpectedConditions.presenceOfElementLocated(By.linkText("Health Care Team")));
+		switchToWindowRefreshAndWait(eChartWindowHandle, driver, webDriverWait, By.linkText("Health Care Team"));
 		Assert.assertFalse("eChart page: Internal Provider is NOT removed successfully.",
 			PageUtil.isExistsBy(By.partialLinkText(internalFullName), driver));
 		Assert.assertFalse("eChart page: External Provider is NOT removed successfully.",
