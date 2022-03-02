@@ -73,7 +73,8 @@
 								<div class="flex-column">
 									<span class="table-text-primary m-b-4">{{faxAccount.displayName}}</span>
 									<span class="table-text-secondary">{{faxAccount.faxNumber}}</span>
-								</div>							</td>
+								</div>
+							</td>
 							<td data-title="'Fax Account'">
 								<div class="flex-column">
 									<span class="table-text-primary m-b-4">{{faxAccount.accountType}}</span>
@@ -82,23 +83,23 @@
 							</td>
 
 							<td data-title="'<bean:message bundle="ui" key="admin.fax.acct.inbound"/>'">
-								<div ng-if="faxAccount.enableInbound">
-									<i class="icon icon-check"></i>
+								<div ng-if="faxAccount.enableInbound" class="state-enabled">
+									<icon-badge icon="icon-check"></icon-badge>
 									<span class="table-text-primary"><bean:message bundle="ui" key="admin.fax.acct.inboundEnabled"/></span>
 								</div>
-								<div ng-if="!faxAccount.enableInbound">
-									<i class="icon icon-cancel"></i>
+								<div ng-if="!faxAccount.enableInbound" class="state-disabled">
+									<icon-badge icon="icon-private"></icon-badge>
 									<span class="table-text-primary"><bean:message bundle="ui" key="admin.fax.acct.inboundDisabled"/></span>
 								</div>
 							</td>
 
 							<td data-title="'<bean:message bundle="ui" key="admin.fax.acct.outbound"/>'">
-								<div ng-if="faxAccount.enableOutbound">
-									<i class="icon icon-check"></i>
+								<div ng-if="faxAccount.enableOutbound" class="state-enabled">
+									<icon-badge icon="icon-check"></icon-badge>
 									<span class="table-text-primary"><bean:message bundle="ui" key="admin.fax.acct.outboundEnabled"/></span>
 								</div>
-								<div ng-if="!faxAccount.enableOutbound">
-									<i class="icon icon-cancel"></i>
+								<div ng-if="!faxAccount.enableOutbound" class="state-disabled">
+									<icon-badge icon="icon-private"></icon-badge>
 									<span class="table-text-primary"><bean:message bundle="ui" key="admin.fax.acct.outboundDisabled"/></span>
 								</div>
 							</td>

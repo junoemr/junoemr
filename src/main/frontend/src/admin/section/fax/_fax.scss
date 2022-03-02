@@ -13,13 +13,19 @@
 		{
 			@include juno-font-body-smallest();
 		}
-		i {
-			font-size: 14px;
-			&.icon-check {
-				color: var(--color-lime-dark);
+
+		.state-enabled {
+			.icon-badge {
+				--icon-font-size: 14px;
+				--icon-color: var(--color-neutral-white);
+				--badge-color: var(--color-green-base);
 			}
-			&.icon-cancel {
-				color: var(--color-red-dark);
+		}
+		.state-disabled {
+			.icon-badge {
+				--icon-font-size: 14px;
+				--icon-color: var(--color-neutral-white);
+				--badge-color: var(--color-red-base);
 			}
 		}
 	}

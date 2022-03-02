@@ -264,6 +264,7 @@ module.exports = {
 			'./src/common/components/zeroStateDisplayComponent.js',
 			'./src/common/components/accordionList/accordionListComponent.js',
 			'./src/common/components/junoTypeahead/junoTypeaheadComponent.js',
+			'./src/common/components/iconBadge/iconBadgeComponent.ts',
 			'./src/common/components/iconCard/iconCardComponent.js',
 			'./src/common/components/panel/panelComponent.js',
 			'./src/common/components/security/junoSecurityCheckComponent.js',
