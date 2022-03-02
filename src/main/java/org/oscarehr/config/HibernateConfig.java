@@ -25,8 +25,10 @@ package org.oscarehr.config;
 
 import org.oscarehr.util.persistence.OscarMySQL5Dialect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternUtils;
@@ -40,16 +42,28 @@ import java.util.Properties;
 public class HibernateConfig
 {
 	@Autowired
-	private DataSource dataSource;
-
-	@Autowired
 	private ResourceLoader resourceLoader;
 
 	@Bean
-	public LocalSessionFactoryBean sessionFactory() throws IOException
+	@Primary
+	public LocalSessionFactoryBean sessionFactory(@Qualifier("dataSource") DataSource dataSource)
+		throws IOException
 	{
 		LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
 		sessionFactoryBean.setDataSource(dataSource);
+		sessionFactoryBean.setMappingLocations(loadResources());
+		sessionFactoryBean.setPackagesToScan(new String[] {"org.oscarehr", "oscar"});
+		sessionFactoryBean.setHibernateProperties(hibernateProperties());
+
+		return sessionFactoryBean;
+	}
+
+	@Bean
+	public LocalSessionFactoryBean sessionFactoryReadOnly(@Qualifier("dataSourceReadOnly") DataSource dataSourceReadOnly)
+		throws IOException
+	{
+		LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
+		sessionFactoryBean.setDataSource(dataSourceReadOnly);
 		sessionFactoryBean.setMappingLocations(loadResources());
 		sessionFactoryBean.setPackagesToScan(new String[] {"org.oscarehr", "oscar"});
 		sessionFactoryBean.setHibernateProperties(hibernateProperties());

@@ -44,8 +44,7 @@ import java.util.Set;
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class CDMTicklerDao
 {
-    // TODO: SPRINGUPGRADE: make multiple connections work
-	@PersistenceContext
+	@PersistenceContext(unitName = "sessionFactoryReadOnly")
     private EntityManager entityManager;
 
     /**

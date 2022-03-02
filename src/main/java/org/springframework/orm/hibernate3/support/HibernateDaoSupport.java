@@ -57,12 +57,4 @@ public class HibernateDaoSupport extends org.springframework.orm.hibernate5.supp
 	{
 
 	}
-
-	/*
-	public DetunedHibernateTemplate getHibernateTemplate()
-	{
-
-	}
-
-	 */
 }
