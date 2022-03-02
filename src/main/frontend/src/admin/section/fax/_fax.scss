@@ -4,45 +4,24 @@
 			color: var(--color-primary-base);
 		}
 	}
-
 	.fax-config-body {
-		.account-list {
-			padding: 5px;
-			background-color: $color-neutral-white;
-
-			.account-item {
-				background-color: $color-neutral-lightest;
-				border: 2px $color-neutral-light-grey;
-				padding: 10px;
-
-				display: flex;
-				flex-direction: row;
-				justify-content: space-between;
-				align-items: center;
+		.table-text-primary
+		{
+			@include juno-font-body-small();
+		}
+		.table-text-secondary
+		{
+			@include juno-font-body-smallest();
+		}
+		i {
+			font-size: 14px;
+			&.icon-check {
+				color: var(--color-lime-dark);
 			}
-
-			.glyphicon {
-				&.glyphicon-lrg {
-					font-size: 30px;
-				}
-
-				&.glyphicon-sml {
-					font-size: 15px;
-				}
-
-				&.enabled {
-					color: $semantic-success-base;
-				}
-
-				&.disabled {
-					color: $semantic-error-base;
-				}
+			&.icon-cancel {
+				color: var(--color-red-dark);
 			}
 		}
-	}
-
-	.fax-config-footer {
-
 	}
 }
 

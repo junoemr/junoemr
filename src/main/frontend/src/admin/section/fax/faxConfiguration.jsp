@@ -63,43 +63,60 @@
 				<div ng-if="$ctrl.faxAccountList.length <= 0">
 					<span><bean:message bundle="ui" key="admin.fax.acct.noAccountsMessage"/></span>
 				</div>
-				<div class="account-list"
-				     ng-if="$ctrl.faxAccountList.length > 0"
-				     ng-repeat="faxAccount in $ctrl.faxAccountList">
-					<div class="account-item">
-						<div>
-							<span class="glyphicon enabled glyphicon-ok glyphicon-lrg" ng-show="faxAccount.enabled"
-							      title="<bean:message bundle="ui" key="admin.fax.acct.acctEnabled"/>"></span>
-							<span class="glyphicon disabled glyphicon-remove glyphicon-lrg" ng-hide="faxAccount.enabled"
-							      title="<bean:message bundle="ui" key="admin.fax.acct.acctDisabled"/>"></span>
-						</div>
-						<div>
-							<h5><bean:message bundle="ui" key="admin.fax.acct.inbound"/>:
-								<span class="glyphicon enabled glyphicon-ok glyphicon-sml" ng-show="faxAccount.enableInbound"
-								      title="<bean:message bundle="ui" key="admin.fax.acct.inboundEnabled"/>"></span>
-								<span class="glyphicon disabled glyphicon-remove glyphicon-sml" ng-hide="faxAccount.enableInbound"
-								      title="<bean:message bundle="ui" key="admin.fax.acct.inboundDisabled"/>"></span>
-							</h5>
-							<h5><bean:message bundle="ui" key="admin.fax.acct.outbound"/>:
-								<span class="glyphicon enabled glyphicon-ok glyphicon-sml" ng-show="faxAccount.enableOutbound"
-								      title="<bean:message bundle="ui" key="admin.fax.acct.outboundEnabled"/>"></span>
-								<span class="glyphicon disabled glyphicon-remove glyphicon-sml" ng-hide="faxAccount.enableOutbound"
-								      title="<bean:message bundle="ui" key="admin.fax.acct.outboundDisabled"/>"></span>
-							</h5>
-						</div>
-						<div>
-							<h4>{{faxAccount.displayName}}</h4>
-						</div>
-						<div>
-							<h4>{{faxAccount.coverLetterOption}}</h4>
-						</div>
-						<button type="button" class="btn btn-default"
-						        <%-- TODO disable button for non-admin users? --%>
-						        ng-click="$ctrl.editFaxAccount(faxAccount)"
-								ng-disabled="$ctrl.masterFaxDisabled">
-							<bean:message bundle="ui" key="admin.fax.acct.btn-EditAccount"/>
-						</button>
-					</div>
+
+				<div ng-if="$ctrl.faxAccountList.length > 0">
+					<table ng-table="$ctrl.tableParamsOutbox" show-filter="false" class="table table-striped table-bordered">
+						<tbody>
+						<tr ng-repeat="faxAccount in $ctrl.faxAccountList">
+
+							<td data-title="'Account Name'">
+								<div class="flex-column">
+									<span class="table-text-primary m-b-4">{{faxAccount.displayName}}</span>
+									<span class="table-text-secondary">{{faxAccount.faxNumber}}</span>
+								</div>							</td>
+							<td data-title="'Fax Account'">
+								<div class="flex-column">
+									<span class="table-text-primary m-b-4">{{faxAccount.accountType}}</span>
+									<span class="table-text-secondary">{{faxAccount.accountLogin}}</span>
+								</div>
+							</td>
+
+							<td data-title="'<bean:message bundle="ui" key="admin.fax.acct.inbound"/>'">
+								<div ng-if="faxAccount.enableInbound">
+									<i class="icon icon-check"></i>
+									<span class="table-text-primary"><bean:message bundle="ui" key="admin.fax.acct.inboundEnabled"/></span>
+								</div>
+								<div ng-if="!faxAccount.enableInbound">
+									<i class="icon icon-cancel"></i>
+									<span class="table-text-primary"><bean:message bundle="ui" key="admin.fax.acct.inboundDisabled"/></span>
+								</div>
+							</td>
+
+							<td data-title="'<bean:message bundle="ui" key="admin.fax.acct.outbound"/>'">
+								<div ng-if="faxAccount.enableOutbound">
+									<i class="icon icon-check"></i>
+									<span class="table-text-primary"><bean:message bundle="ui" key="admin.fax.acct.outboundEnabled"/></span>
+								</div>
+								<div ng-if="!faxAccount.enableOutbound">
+									<i class="icon icon-cancel"></i>
+									<span class="table-text-primary"><bean:message bundle="ui" key="admin.fax.acct.outboundDisabled"/></span>
+								</div>
+							</td>
+							<td data-title="'Action'">
+								<div class="w-128">
+									<juno-button
+											disabled="$ctrl.masterFaxDisabled || !$ctrl.userCanEdit()"
+											click="$ctrl.editFaxAccount(faxAccount)"
+											button-color="$ctrl.JUNO_BUTTON_COLOR.DEFAULT"
+											button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED">
+										<i class="icon icon-write"></i>
+										<bean:message bundle="ui" key="admin.fax.acct.btn-EditAccount"/>
+									</juno-button>
+								</div>
+							</td>
+						</tr>
+						</tbody>
+					</table>
 				</div>
 			</panel-body>
 		</panel>

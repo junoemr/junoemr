@@ -1,5 +1,10 @@
 import FaxAccountService from "../../../lib/fax/service/FaxAccountService";
-import {LABEL_POSITION} from "../../../common/components/junoComponentConstants";
+import {
+	JUNO_BUTTON_COLOR,
+	JUNO_BUTTON_COLOR_PATTERN,
+	LABEL_POSITION
+} from "../../../common/components/junoComponentConstants";
+import {SecurityPermissions} from "../../../common/security/securityConstants";
 
 angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
@@ -9,31 +14,35 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	controller: [
 		"$uibModal",
 		"providerService",
+		"securityRolesService",
 		"systemPreferenceService",
 		function ($uibModal,
 		          providerService,
+				  securityRolesService,
 		          systemPreferenceService)
 		{
-			const controller = this;
-			controller.faxAccountService = new FaxAccountService();
+			const ctrl = this;
+			ctrl.faxAccountService = new FaxAccountService();
 
-			controller.LABEL_POSITION = LABEL_POSITION;
+			ctrl.LABEL_POSITION = LABEL_POSITION;
+			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-			controller.faxAccountList = [];
-			controller.loggedInProvider = null;
-			controller.masterFaxDisabled = true;
-			controller.masterFaxEnabledInbound = false;
-			controller.masterFaxEnabledOutbound = false;
+			ctrl.faxAccountList = [];
+			ctrl.loggedInProvider = null;
+			ctrl.masterFaxDisabled = true;
+			ctrl.masterFaxEnabledInbound = false;
+			ctrl.masterFaxEnabledOutbound = false;
 
-			controller.initialize = function()
+			ctrl.$onInit = () =>
 			{
 				// if the current provider number is unknown, retrieve it.
-				if(controller.loggedInProvider == null)
+				if(ctrl.loggedInProvider == null)
 				{
 					providerService.getMe().then(
 						function success(response)
 						{
-							controller.loggedInProvider = response;
+							ctrl.loggedInProvider = response;
 						},
 						function error(error)
 						{
@@ -41,22 +50,22 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 						}
 					)
 				}
-				systemPreferenceService.isPreferenceEnabled("masterFaxEnabledInbound", controller.masterFaxEnabledInbound).then(
+				systemPreferenceService.isPreferenceEnabled("masterFaxEnabledInbound", ctrl.masterFaxEnabledInbound).then(
 					function success(response)
 					{
-						controller.masterFaxEnabledInbound = response;
-						controller.updateMasterFaxDisabledStatus();
+						ctrl.masterFaxEnabledInbound = response;
+						ctrl.updateMasterFaxDisabledStatus();
 					},
 					function error(error)
 					{
 						console.error(error);
 					}
 				);
-				systemPreferenceService.isPreferenceEnabled("masterFaxEnabledOutbound", controller.masterFaxEnabledOutbound).then(
+				systemPreferenceService.isPreferenceEnabled("masterFaxEnabledOutbound", ctrl.masterFaxEnabledOutbound).then(
 					function success(response)
 					{
-						controller.masterFaxEnabledOutbound = response;
-						controller.updateMasterFaxDisabledStatus();
+						ctrl.masterFaxEnabledOutbound = response;
+						ctrl.updateMasterFaxDisabledStatus();
 					},
 					function error(error)
 					{
@@ -64,10 +73,10 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 					}
 				);
 
-				controller.faxAccountService.getAccounts().then(
+				ctrl.faxAccountService.getAccounts().then(
 					function success(response)
 					{
-						controller.faxAccountList = response;
+						ctrl.faxAccountList = response;
 					},
 					function error(error)
 					{
@@ -76,11 +85,20 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 				)
 			};
 
-			controller.connectNewSRFaxAccount = () =>
+			ctrl.userCanCreate = (): boolean =>
 			{
-				controller.editFaxAccount(null);
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConfigureFaxCreate);
+			}
+			ctrl.userCanEdit = (): boolean =>
+			{
+				return securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConfigureFaxUpdate);
+			}
+
+			ctrl.connectNewSRFaxAccount = () =>
+			{
+				ctrl.editFaxAccount(null);
 			};
-			controller.editFaxAccount = function editFaxAccount(faxAccount)
+			ctrl.editFaxAccount = function editFaxAccount(faxAccount)
 			{
 				let isNewAcct = true;
 				if(faxAccount)
@@ -96,8 +114,8 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 						resolve:
 							{
 								faxAccount: () => faxAccount,
-								masterFaxEnabledInbound: () => controller.masterFaxEnabledInbound,
-								masterFaxEnabledOutbound: () => controller.masterFaxEnabledOutbound,
+								masterFaxEnabledInbound: () => ctrl.masterFaxEnabledInbound,
+								masterFaxEnabledOutbound: () => ctrl.masterFaxEnabledOutbound,
 							}
 					});
 
@@ -108,7 +126,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 						if(isNewAcct)
 						{
 							// new accounts get added to the account list
-							controller.faxAccountList.push(updatedAccount);
+							ctrl.faxAccountList.push(updatedAccount);
 						}
 						else
 						{
@@ -122,24 +140,24 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 					});
 			};
 
-			controller.saveMasterFaxEnabledStateInbound = (value) =>
+			ctrl.saveMasterFaxEnabledStateInbound = (value) =>
 			{
-				controller.masterFaxEnabledInbound = value;
-				controller.setSystemProperty("masterFaxEnabledInbound", controller.masterFaxEnabledInbound);
-				controller.updateMasterFaxDisabledStatus();
+				ctrl.masterFaxEnabledInbound = value;
+				ctrl.setSystemProperty("masterFaxEnabledInbound", ctrl.masterFaxEnabledInbound);
+				ctrl.updateMasterFaxDisabledStatus();
 			};
-			controller.saveMasterFaxEnabledStateOutbound = (value) =>
+			ctrl.saveMasterFaxEnabledStateOutbound = (value) =>
 			{
-				controller.masterFaxEnabledOutbound = value;
-				controller.setSystemProperty("masterFaxEnabledOutbound", controller.masterFaxEnabledOutbound);
-				controller.updateMasterFaxDisabledStatus();
+				ctrl.masterFaxEnabledOutbound = value;
+				ctrl.setSystemProperty("masterFaxEnabledOutbound", ctrl.masterFaxEnabledOutbound);
+				ctrl.updateMasterFaxDisabledStatus();
 			};
 
-			controller.updateMasterFaxDisabledStatus = function updateMasterFaxDisabledStatus()
+			ctrl.updateMasterFaxDisabledStatus = function updateMasterFaxDisabledStatus()
 			{
-				controller.masterFaxDisabled = !(controller.masterFaxEnabledInbound || controller.masterFaxEnabledOutbound);
+				ctrl.masterFaxDisabled = !(ctrl.masterFaxEnabledInbound || ctrl.masterFaxEnabledOutbound);
 			};
-			controller.setSystemProperty = function setSystemProperty(key, value)
+			ctrl.setSystemProperty = function setSystemProperty(key, value)
 			{
 				systemPreferenceService.setPreference(key, value).then(
 					function success(response)
@@ -151,8 +169,6 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 					}
 				);
 			};
-
-			controller.initialize();
 		}
 	]
 });
