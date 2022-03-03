@@ -62,17 +62,14 @@
 			<hr>
 			<fieldset ng-disabled="!$ctrl.masterFaxEnabledOutbound" class="input-fieldset">
 				<span ng-show="!$ctrl.masterFaxEnabledOutbound"><bean:message bundle="ui" key="admin.fax.acct.edit.outboundDisabledMessage"/></span>
-				<div class="flex-row content-end info-section">
-					<span class="glyphicon info-icon glyphicon-info-sign"
-					      title="<bean:message bundle="ui" key="admin.fax.acct.edit.outboundInfoMessage"/>">
-					</span>
-				</div>
-				<div class="m-l-48">
+
+				<div class="flex-row align-items-center m-l-48">
 					<juno-toggle round="true"
 					             ng-model="$ctrl.faxAccount.enableOutbound"
 					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.enableOutbound'/>"
 					             label-position="$ctrl.LABEL_POSITION.RIGHT">
 					</juno-toggle>
+					<i class="icon icon-info-circle info-badge" title="<bean:message bundle='ui' key='admin.fax.acct.edit.outboundInfoMessage'/>"></i>
 				</div>
 				<div class="input-group grid-flow-row grid-row-2 grid-row-gap-4">
 					<juno-input ng-model="$ctrl.faxAccount.accountEmail"
@@ -137,34 +134,33 @@
 			<hr>
 			<fieldset ng-disabled="!$ctrl.masterFaxEnabledInbound" class="input-fieldset">
 				<span ng-show="!$ctrl.masterFaxEnabledInbound"><bean:message bundle="ui" key="admin.fax.acct.edit.inboundDisabledMessage"/></span>
-				<div class="flex-row content-end info-section">
-					<span class="glyphicon info-icon glyphicon-info-sign"
-					      title="<bean:message bundle="ui" key="admin.fax.acct.edit.inboundInfoMessage"/>">
-					</span>
-				</div>
-				<div class="m-l-48 flex-row">
+
+				<div class="flex-row align-items-center m-l-48">
 					<juno-toggle round="true"
 					             ng-model="$ctrl.faxAccount.enableInbound"
 					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.enableInbound'/>"
 					             label-position="$ctrl.LABEL_POSITION.RIGHT">
 					</juno-toggle>
+					<i class="icon icon-info-circle info-badge" title="<bean:message bundle='ui' key='admin.fax.acct.edit.inboundInfoMessage'/>"></i>
 				</div>
 			</fieldset>
 			<hr>
 			<div class="flex-row input-fieldset" ng-class="$ctrl.getConnectionStatusClass()">
-				<juno-button click="$ctrl.testConnection()"
-				             label="<bean:message bundle='ui' key='admin.fax.acct.edit.connectionStatus'/>"
-				             label-position="$ctrl.LABEL_POSITION.LEFT"
-				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-				             button-color="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED">
-					<icon-badge icon="{{$ctrl.getConnectionIconClass()}}"></icon-badge>
-					<bean:message bundle="ui" key="admin.fax.acct.edit.btn-testConnection"/>
-				</juno-button>
+				<div class="input-group flex-row flex-grow">
+					<juno-button click="$ctrl.testConnection()"
+					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.connectionStatus'/>"
+					             label-position="$ctrl.LABEL_POSITION.LEFT"
+					             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+					             button-color="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED">
+						<icon-badge class="m-r-4" icon="{{$ctrl.getConnectionIconClass()}}"></icon-badge>
+						<bean:message bundle="ui" key="admin.fax.acct.edit.btn-testConnection"/>
+					</juno-button>
+				</div>
 			</div>
 		</form>
 	</modal-body>
 	<modal-footer>
-		<div class="flex-row justify-content-space-between">
+		<div class="flex-row justify-content-space-between align-items-center h-100">
 			<div class="footer-left">
 				<div class="w-128 m-r-2">
 					<juno-button ng-show="$ctrl.isModalEditMode()"

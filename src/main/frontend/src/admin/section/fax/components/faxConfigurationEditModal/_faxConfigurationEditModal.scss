@@ -1,4 +1,3 @@
-
 .fax-configuration-edit-modal {
 
 	.fax-configuration-edit-modal-content {
@@ -12,10 +11,12 @@
 		}
 		.input-group {
 			--juno-input-label-width: 30%;
+			--juno-select-label-width: 30%;
+			--juno-button-label-width: 30%;
 		}
 
 		.icon-badge {
-			--icon-font-size: 14px;
+			--icon-font-size: 12px;
 			--icon-color: var(--color-neutral-white);
 		}
 		.connection-status-success {
@@ -34,51 +35,10 @@
 			}
 		}
 
-		//input {
-		//	&.ng-invalid {
-		//		background-color: $input-color-invalid-background;
-		//		border-color: $input-color-invalid-border;
-		//	}
-		//}
-		//
-		//.input-validation {
-		//	font-size: 10px;
-		//	color: $input-color-invalid-text;
-		//}
-
-		//.flex-row {
-		//	display: flex;
-		//	flex-direction: row;
-		//	align-items: center;
-		//	justify-content: flex-start;
-		//
-		//	&.content-center {
-		//		justify-content: center;
-		//	}
-		//
-		//	&.content-end {
-		//		justify-content: flex-end;
-		//	}
-		//
-		//	&.info-section {
-		//		position: relative;
-		//
-		//		.info-icon {
-		//			position: absolute;
-		//			font-size: 14px;
-		//			color: $color-blue-light;
-		//		}
-		//	}
-		//
-		//	.flex-row-label {
-		//		width: 40%;
-		//		padding: 0 5px;
-		//		text-align: right;
-		//	}
-		//
-		//	.flex-row-content {
-		//		text-align: left;
-		//	}
-		//}
+		.info-badge {
+			i {
+				font-size: 10px;
+			}
+		}
 	}
 }

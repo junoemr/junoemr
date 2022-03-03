@@ -3,8 +3,15 @@ juno-button {
 	// customization variables.
 	--border-radius: 4px;
 	--default-button-height: 32px;
+	--juno-button-label-padding: 0;
+	--juno-button-label-width: unset;
 
 	flex-grow: 1;
+
+	.label-style {
+		padding: var(--juno-button-label-padding);
+		width: var(--juno-button-label-width);
+	}
 
 	.juno-button {
 		button {

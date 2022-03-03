@@ -9,7 +9,7 @@ set the html structure up like this:
 /* The switch - the box around the slider */
 
 .juno-toggle {
-  @include juno-toggle-switch(32px, 4px, .4s);
+  @include juno-toggle-switch(24px, 4px, .4s);
 
   .toggle-value-label {
     padding: 0 4px;
