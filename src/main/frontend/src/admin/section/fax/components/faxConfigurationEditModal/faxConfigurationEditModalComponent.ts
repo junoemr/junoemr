@@ -1,6 +1,13 @@
 import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";
 import FaxAccount from "../../../../../lib/fax/model/FaxAccount";
 import {FaxAccountConnectionStatusType} from "../../../../../lib/fax/model/FaxAccountConnectionStatusType";
+import {
+	JUNO_BUTTON_COLOR,
+	JUNO_BUTTON_COLOR_PATTERN,
+	JUNO_STYLE,
+	LABEL_POSITION
+} from "../../../../../common/components/junoComponentConstants";
+import ToastService from "../../../../../lib/alerts/service/ToastService";
 
 angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 	templateUrl: 'src/admin/section/fax/components/faxConfigurationEditModal/faxConfigurationEditModal.jsp',
@@ -10,117 +17,178 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 	},
 	controller: [
 		'$scope',
-		function ($scope)
+		'$uibModal',
+		function ($scope, $uibModal)
 		{
-			const controller = this;
-			controller.faxAccountService = new FaxAccountService();
+			const ctrl = this;
+			ctrl.faxAccountService = new FaxAccountService();
+			ctrl.toastService = new ToastService();
 
-			controller.coverLetterOptions = [
-				"None",
-				"Basic",
-				"Standard",
-				"Company",
-				"Personal"
+			ctrl.LABEL_POSITION = LABEL_POSITION;
+			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+
+			ctrl.coverLetterOptions = [
+				{
+					label: "None",
+					value: null,
+				},
+				{
+					label: "Basic",
+					value: "Basic",
+				},
+				{
+					label: "Standard",
+					value: "Standard",
+				},
+				{
+					label: "Company",
+					value: "Company",
+				},
+				{
+					label: "Personal",
+					value: "Personal",
+				},
 			];
 
-			controller.$onInit = () =>
+			ctrl.$onInit = () =>
 			{
-				if (controller.resolve.faxAccount)
+				ctrl.componentStyle = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
+				if (ctrl.resolve.faxAccount)
 				{
-					controller.faxAccount = angular.copy(controller.resolve.faxAccount);
-					if (!controller.faxAccount.connectionStatus)
+					ctrl.faxAccount = angular.copy(ctrl.resolve.faxAccount);
+					if (!ctrl.faxAccount.connectionStatus)
 					{
-						controller.setDefaultConnectionStatus();
+						ctrl.setDefaultConnectionStatus();
 					}
 				}
 				else
 				{
-					controller.faxAccount = new FaxAccount();
+					ctrl.faxAccount = new FaxAccount();
 				}
 				// get the master flag status for inbound/outbound settings
-				controller.masterFaxEnabledInbound = controller.resolve.masterFaxEnabledInbound;
-				controller.masterFaxEnabledOutbound = controller.resolve.masterFaxEnabledOutbound;
+				ctrl.masterFaxEnabledInbound = ctrl.resolve.masterFaxEnabledInbound;
+				ctrl.masterFaxEnabledOutbound = ctrl.resolve.masterFaxEnabledOutbound;
 
 				// switch off settings that are disabled and un-editable.
 				// if this is not done, form errors may prevent saving changes to other section
-				if (!controller.masterFaxEnabledInbound)
+				if (!ctrl.masterFaxEnabledInbound)
 				{
-					controller.faxAccount.enableInbound = false;
+					ctrl.faxAccount.enableInbound = false;
 				}
-				if (!controller.masterFaxEnabledOutbound)
+				if (!ctrl.masterFaxEnabledOutbound)
 				{
-					controller.faxAccount.enableOutbound = false;
+					ctrl.faxAccount.enableOutbound = false;
 				}
 			};
 
-			controller.saveSettings = function (form)
+			ctrl.isModalEditMode = (): boolean =>
 			{
-				controller.submitDisabled = true;
+				return Boolean(ctrl.faxAccount.id);
+			}
+
+			ctrl.saveSettings = function (form)
+			{
+				ctrl.submitDisabled = true;
 				if (!form.$valid)
 				{
-					alert("The form contains errors");
-					controller.submitDisabled = false;
+					ctrl.toastService.errorToast("The form contains errors");
+					ctrl.submitDisabled = false;
 					return;
 				}
 
 				let closeSuccess = function (updatedAccount)
 				{
 					// keep these settings
-					updatedAccount.connectionStatus = controller.faxAccount.connectionStatus;
-					controller.modalInstance.close(updatedAccount);
+					updatedAccount.connectionStatus = ctrl.faxAccount.connectionStatus;
+					ctrl.modalInstance.close(updatedAccount);
 				};
 				let closeError = function (error)
 				{
 					console.error(error);
-					controller.submitDisabled = false;
+					ctrl.submitDisabled = false;
 				};
 
-				if (controller.faxAccount.id)
+				if (ctrl.isModalEditMode())
 				{
-					controller.faxAccountService.updateAccountSettings(controller.faxAccount).then(
+					ctrl.faxAccountService.updateAccountSettings(ctrl.faxAccount).then(
 						closeSuccess,
 						closeError
 					)
 				}
 				else
 				{
-					controller.faxAccountService.createAccountSettings(controller.faxAccount).then(
+					ctrl.faxAccountService.createAccountSettings(ctrl.faxAccount).then(
 						closeSuccess,
 						closeError
 					)
 				}
 			};
-			controller.cancel = function cancel()
+
+			ctrl.deleteConfig = async () =>
 			{
-				controller.modalInstance.dismiss('cancel');
+				const confirm = await Juno.Common.Util.confirmationDialog(
+					$uibModal,
+					"Confirm Action", "Are you sure you want to delete this fax integration?",
+					ctrl.componentStyle);
+				if(confirm)
+				{
+					//todo
+				}
+			}
+
+			ctrl.cancel = function cancel()
+			{
+				ctrl.modalInstance.dismiss('cancel');
 			};
 
-			controller.testConnection = function ()
+			ctrl.testConnection = function ()
 			{
-				controller.faxAccountService.testFaxConnection(controller.faxAccount).then(
+				ctrl.faxAccountService.testFaxConnection(ctrl.faxAccount).then(
 					function success(response)
 					{
 						if (response)
 						{
-							controller.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Success;
+							ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Success;
 						}
 						else
 						{
-							controller.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Failure;
+							ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Failure;
 						}
 						$scope.$apply();
 					},
 					function error(error)
 					{
 						console.error(error);
-						controller.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Unknown;
+						ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Unknown;
 					}
 				)
 			};
-			controller.setDefaultConnectionStatus = function ()
+			ctrl.setDefaultConnectionStatus = function ()
 			{
-				controller.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Unknown;
+				ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Unknown;
 			};
+
+			ctrl.getConnectionStatusClass = (): string[] =>
+			{
+				switch (ctrl.faxAccount.connectionStatus)
+				{
+					case FaxAccountConnectionStatusType.Success: return ["connection-status-success"];
+					case FaxAccountConnectionStatusType.Failure: return ["connection-status-failure"];
+					case FaxAccountConnectionStatusType.Unknown:
+					default: return ["connection-status-unknown"];
+				}
+			}
+			ctrl.getConnectionIconClass = (): string =>
+			{
+				switch (ctrl.faxAccount.connectionStatus)
+				{
+					case FaxAccountConnectionStatusType.Success: return "icon-check";
+					case FaxAccountConnectionStatusType.Failure: return "icon-private";
+					case FaxAccountConnectionStatusType.Unknown:
+					default: return "icon-question";
+				}
+			}
 		}
 	]
 });

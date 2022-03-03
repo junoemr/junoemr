@@ -110,9 +110,10 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 					{
 						component: 'faxConfigurationEditModal',
 						backdrop: 'static',
-						windowClass: 'faxEditModal',
+						windowClass: 'juno-modal',
 						resolve:
 							{
+								style: ctrl.componentStyle,
 								faxAccount: () => faxAccount,
 								masterFaxEnabledInbound: () => ctrl.masterFaxEnabledInbound,
 								masterFaxEnabledOutbound: () => ctrl.masterFaxEnabledOutbound,

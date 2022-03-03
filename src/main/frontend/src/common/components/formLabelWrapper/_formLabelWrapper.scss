@@ -1,5 +1,6 @@
 .form-label-wrapper {
   flex: 0 0 100%;
+  --form-label-width: unset;
 
   &.juno-input-label-top {
     display: flex;
