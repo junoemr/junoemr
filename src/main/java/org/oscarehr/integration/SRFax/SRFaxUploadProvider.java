@@ -24,16 +24,17 @@
 package org.oscarehr.integration.SRFax;
 
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxIntegrationException;
-import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
-import org.oscarehr.fax.externalApi.srfax.result.GetFaxStatusResult;
-import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
+import org.oscarehr.fax.result.FaxStatusResult;
+import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
+import org.oscarehr.integration.SRFax.api.result.SRFaxFaxStatusResult;
+import org.oscarehr.integration.SRFax.api.resultWrapper.SingleWrapper;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.service.FaxUploadService;
-import org.oscarehr.integration.SRFax.result.SRFaxGetFaxStatus;
 import java.util.HashMap;
 import java.util.List;
 
@@ -84,8 +85,7 @@ public class SRFaxUploadProvider implements FaxUploadProvider
 		}
 		else
 		{
-			faxOutbound.setStatusError();
-			faxOutbound.setStatusMessage(resultWrapper.getError());
+			throw new FaxIntegrationException(resultWrapper.getError());
 		}
 
 		return faxOutbound;
@@ -98,7 +98,7 @@ public class SRFaxUploadProvider implements FaxUploadProvider
 	}
 
 	@Override
-	public boolean isFaxInRemoteSentState(org.oscarehr.fax.result.GetFaxStatusResult result)
+	public boolean isFaxInRemoteSentState(FaxStatusResult result)
 	{
 		return result.getRemoteSentStatus().equalsIgnoreCase(SRFaxApiConnector.RESPONSE_STATUS_SENT);
 	}
@@ -111,10 +111,16 @@ public class SRFaxUploadProvider implements FaxUploadProvider
 
 
 	@Override
-	public org.oscarehr.fax.result.GetFaxStatusResult getFaxStatus(FaxOutbound faxOutbound) throws Exception
+	public FaxStatusResult getFaxStatus(FaxOutbound faxOutbound) throws Exception
 	{
 		SRFaxApiConnector apiConnector = makeApiConnector(faxOutbound);
-		SingleWrapper<GetFaxStatusResult> apiResult = apiConnector.getFaxStatus(String.valueOf(faxOutbound.getExternalReferenceId()));
-		return new SRFaxGetFaxStatus(apiResult);
+		SingleWrapper<SRFaxFaxStatusResult> apiResult = apiConnector.getFaxStatus(String.valueOf(faxOutbound.getExternalReferenceId()));
+
+		if (!apiResult.isSuccess())
+		{
+			throw new FaxApiConnectionException(apiResult.getError());
+		}
+
+		return apiResult.getResult();
 	}
 }

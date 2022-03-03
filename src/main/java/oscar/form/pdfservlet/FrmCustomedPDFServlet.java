@@ -34,7 +34,8 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.exception.FaxException;
-import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.model.FaxOutbound.FileType;
+import org.oscarehr.fax.model.FaxOutbound.Status;
 import org.oscarehr.fax.service.FaxUploadService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -51,6 +52,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -62,10 +64,10 @@ public class FrmCustomedPDFServlet extends HttpServlet
 	private static final Logger logger = MiscUtils.getLogger();
 	private final OscarProperties props = OscarProperties.getInstance();
 
-	private static final FaxUploadService FAX_UPLOAD_SERVICE = SpringUtils.getBean(FaxUploadService.class);
+	private static final FaxUploadService faxUploadService = SpringUtils.getBean(FaxUploadService.class);
 
 	@Override
-    public void service(HttpServletRequest req, HttpServletResponse res) throws java.io.IOException
+    public void service(HttpServletRequest req, HttpServletResponse res) throws IOException
 	{
 		logger.info("CREATE CUSTOM RX PDF SERVICE");
 
@@ -98,14 +100,14 @@ public class FrmCustomedPDFServlet extends HttpServlet
 					GenericFile fileToFax = FileFactory.createTempFile(baosPDF, ".pdf");
 					String pdfFile = "prescription_" + pdfId + "-" + fileToFax.getName();
 					fileToFax.rename(pdfFile);
-					FaxOutboxTransferOutbound transfer = FAX_UPLOAD_SERVICE
-						.queueAndSendFax(providerNo, demographicNo, recipient, FaxOutbound.FileType.PRESCRIPTION, fileToFax);
-					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))
+					FaxOutboxTransferOutbound transfer = faxUploadService
+						.queueAndSendFax(providerNo, demographicNo, recipient, FileType.PRESCRIPTION, fileToFax);
+					if(transfer.getSystemStatus().equals(Status.ERROR))
 					{
 						faxMessage = "Failed to send fax. Check account settings. " +
 								"Reason: " + transfer.getSystemStatusMessage();
 					}
-					else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED))
+					else if(transfer.getSystemStatus().equals(Status.QUEUED))
 					{
 						faxMessage = "Failed to send fax, it has been queued for automatic resend. " +
 								"Reason: " + transfer.getSystemStatusMessage();
@@ -157,7 +159,7 @@ public class FrmCustomedPDFServlet extends HttpServlet
 			writer.println(dex.getMessage());
 			writer.println("</pre>");
 		}
-		catch(java.io.FileNotFoundException dex)
+		catch(FileNotFoundException dex)
 		{
 			res.setContentType("text/html");
 			PrintWriter writer = res.getWriter();

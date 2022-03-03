@@ -20,15 +20,16 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.externalApi.srfax.result;
+package org.oscarehr.integration.SRFax.api.result;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.oscarehr.fax.result.FaxInboxResult;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GetFaxStatusResult
+public class GetFaxInboxResult implements FaxInboxResult
 {
 	@JsonProperty("FileName")
 	private String rawFileName;
@@ -36,44 +37,31 @@ public class GetFaxStatusResult
 	private String fileName;
 	@JsonIgnore
 	private String detailsId;
-	@JsonProperty("SentStatus")
-	private String sentStatus;
-
-	/**
-	 * Datetime the fax was queued, format is determined by account preference
-	 */
-	@JsonProperty("DateQueued")
-	private String dateQueued;
-
-	/**
-	 * Datetime the fax was sent, format is determined by account preference.
-	 * A consistent format for this field found in GetFaxStatusResult.epochTime
-	 */
-	@JsonProperty("DateSent")
-	private String dateSent;
-
-	/**
-	 * Datetime the fax was sent, as seconds since the UNIX epoch.
-	 */
+	@JsonProperty("ReceiveStatus")
+	private String recieveStatus;
+	@JsonProperty("Date")
+	private String date;
 	@JsonProperty("EpochTime")
 	private String epochTime;
-	
-	@JsonProperty("ToFaxNumber")
-	private String toFaxNumber;
-	@JsonProperty("Pages")
-	private String pages;
-	@JsonProperty("Duration")
-	private String duration;
+	@JsonProperty("CallerID")
+	private String callerId;
 	@JsonProperty("RemoteID")
 	private String remoteId;
-	@JsonProperty("ErrorCode")
-	private String errorCode;
+	@JsonProperty("Pages")
+	private String pages;
 	@JsonProperty("Size")
 	private String size;
-	@JsonProperty("AccountCode")
-	private String accountCode;
+	@JsonProperty("ViewedStatus")
+	private String viewedStatus;
 
+	@JsonProperty("User_ID")
+	private String userId;
+	@JsonProperty("User_FaxNumber")
+	private String userFaxNumber;
 
+	/**
+	 * @return the fileName string as sent by SRFAX
+	 */
 	public String getRawFileName()
 	{
 		return rawFileName;
@@ -86,44 +74,40 @@ public class GetFaxStatusResult
 		this.detailsId = rawFileName.split("\\|")[1];
 	}
 
+	/**
+	 * @return the parsed fileName section of the fileName sent by SRFAX
+	 */
 	public String getFileName()
 	{
 		return fileName;
 	}
 
+	/**
+	 * @return the parsed detailsID section of the fileName sent by SRFAX
+	 */
 	public String getDetailsId()
 	{
 		return detailsId;
 	}
 
-	public String getSentStatus()
+	public String getRecieveStatus()
 	{
-		return sentStatus;
+		return recieveStatus;
 	}
 
-	public void setSentStatus(String sentStatus)
+	public void setRecieveStatus(String recieveStatus)
 	{
-		this.sentStatus = sentStatus;
+		this.recieveStatus = recieveStatus;
 	}
 
-	public String getDateQueued()
+	public String getDate()
 	{
-		return dateQueued;
+		return date;
 	}
 
-	public void setDateQueued(String dateQueued)
+	public void setDate(String date)
 	{
-		this.dateQueued = dateQueued;
-	}
-
-	public String getDateSent()
-	{
-		return dateSent;
-	}
-
-	public void setDateSent(String dateSent)
-	{
-		this.dateSent = dateSent;
+		this.date = date;
 	}
 
 	public String getEpochTime()
@@ -136,34 +120,14 @@ public class GetFaxStatusResult
 		this.epochTime = epochTime;
 	}
 
-	public String getToFaxNumber()
+	public String getCallerId()
 	{
-		return toFaxNumber;
+		return callerId;
 	}
 
-	public void setToFaxNumber(String toFaxNumber)
+	public void setCallerId(String callerId)
 	{
-		this.toFaxNumber = toFaxNumber;
-	}
-
-	public String getPages()
-	{
-		return pages;
-	}
-
-	public void setPages(String pages)
-	{
-		this.pages = pages;
-	}
-
-	public String getDuration()
-	{
-		return duration;
-	}
-
-	public void setDuration(String duration)
-	{
-		this.duration = duration;
+		this.callerId = callerId;
 	}
 
 	public String getRemoteId()
@@ -176,14 +140,14 @@ public class GetFaxStatusResult
 		this.remoteId = remoteId;
 	}
 
-	public String getErrorCode()
+	public String getPages()
 	{
-		return errorCode;
+		return pages;
 	}
 
-	public void setErrorCode(String errorCode)
+	public void setPages(String pages)
 	{
-		this.errorCode = errorCode;
+		this.pages = pages;
 	}
 
 	public String getSize()
@@ -196,14 +160,34 @@ public class GetFaxStatusResult
 		this.size = size;
 	}
 
-	public String getAccountCode()
+	public String getViewedStatus()
 	{
-		return accountCode;
+		return viewedStatus;
 	}
 
-	public void setAccountCode(String accountCode)
+	public void setViewedStatus(String viewedStatus)
 	{
-		this.accountCode = accountCode;
+		this.viewedStatus = viewedStatus;
+	}
+
+	public String getUserId()
+	{
+		return userId;
+	}
+
+	public void setUserId(String userId)
+	{
+		this.userId = userId;
+	}
+
+	public String getUserFaxNumber()
+	{
+		return userFaxNumber;
+	}
+
+	public void setUserFaxNumber(String userFaxNumber)
+	{
+		this.userFaxNumber = userFaxNumber;
 	}
 
 	@Override

@@ -54,7 +54,7 @@ public class EctConsultationFormFaxAction extends Action
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private static final FaxUploadService FAX_UPLOAD_SERVICE = SpringUtils.getBean(FaxUploadService.class);
+	private static final FaxUploadService faxUploadService = SpringUtils.getBean(FaxUploadService.class);
 	private static final ConsultationPDFCreationService consultationPDFCreationService = SpringUtils.getBean(ConsultationPDFCreationService.class);
 	private static final ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
 
@@ -161,7 +161,7 @@ public class EctConsultationFormFaxAction extends Action
 					String tempName = String.format("CRF-%s%s.%s.%s", faxClinicId, reqId, faxNo, fileToFax.getName());
 
 					fileToFax.rename(tempName);
-					FaxOutboxTransferOutbound transfer = FAX_UPLOAD_SERVICE
+					FaxOutboxTransferOutbound transfer = faxUploadService
 						.queueAndSendFax(providerNo, Integer.parseInt(demoNo), faxNo, FaxOutbound.FileType.CONSULTATION, fileToFax);
 					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))
 					{

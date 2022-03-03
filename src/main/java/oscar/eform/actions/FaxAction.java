@@ -31,7 +31,7 @@ import java.util.List;
 public final class FaxAction
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final FaxUploadService FAX_UPLOAD_SERVICE = SpringUtils.getBean(FaxUploadService.class);
+	private static final FaxUploadService faxUploadService = SpringUtils.getBean(FaxUploadService.class);
 
 	private final String localUri;
 	private final boolean skipSave;
@@ -69,7 +69,7 @@ public final class FaxAction
 			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
 
 			GenericFile fileToFax = FileFactory.getExistingFile(tempFile);
-			FaxOutboxTransferOutbound transfer = FAX_UPLOAD_SERVICE
+			FaxOutboxTransferOutbound transfer = faxUploadService
 				.queueAndSendFax(providerId, null, recipient, FaxOutbound.FileType.FORM, fileToFax);
 			transferList.add(transfer);
 		}

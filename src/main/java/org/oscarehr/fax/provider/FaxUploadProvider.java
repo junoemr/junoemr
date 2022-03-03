@@ -25,7 +25,7 @@ package org.oscarehr.fax.provider;
 
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.model.FaxOutbound;
-import org.oscarehr.fax.result.GetFaxStatusResult;
+import org.oscarehr.fax.result.FaxStatusResult;
 import java.util.List;
 
 public interface FaxUploadProvider
@@ -47,9 +47,9 @@ public interface FaxUploadProvider
 	 */
 	List<String> getRemoteFinalStatusIndicators();
 
-	GetFaxStatusResult getFaxStatus(FaxOutbound faxOutbound) throws Exception;
+	FaxStatusResult getFaxStatus(FaxOutbound faxOutbound) throws Exception;
 
-	boolean isFaxInRemoteSentState(GetFaxStatusResult result);
+	boolean isFaxInRemoteSentState(FaxStatusResult result);
 
 	boolean isFaxInRemoteFailedState(FaxOutbound faxOutbound);
 }

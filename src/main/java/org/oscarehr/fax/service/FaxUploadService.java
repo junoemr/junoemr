@@ -37,7 +37,7 @@ import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.provider.FaxProviderFactory;
 import org.oscarehr.fax.provider.FaxUploadProvider;
-import org.oscarehr.fax.result.GetFaxStatusResult;
+import org.oscarehr.fax.result.FaxStatusResult;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 
 import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
@@ -89,8 +89,6 @@ public class FaxUploadService
 	@Autowired
 	private FaxStatus faxStatus;
 
-	@Autowired
-	private FaxProviderFactory faxProviderFactory;
 
 	@Autowired
 	private FaxOutboundToModelConverter faxOutboundToModelConverter;
@@ -165,7 +163,7 @@ public class FaxUploadService
 		}
 
 		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
-		FaxUploadProvider faxUploadProvider = faxProviderFactory.createFaxUploadProvider(faxOutbound.getFaxAccount());
+		FaxUploadProvider faxUploadProvider = FaxProviderFactory.createFaxUploadProvider(faxOutbound.getFaxAccount());
 		GenericFile fileToResend;
 
 		if(faxOutbound.isStatusQueued())
@@ -289,7 +287,7 @@ public class FaxUploadService
 	 */
 	public void requestPendingStatusUpdates(FaxAccountTransferOutbound faxAccount)
 	{
-		FaxUploadProvider uploadProvider = faxProviderFactory.createFaxUploadProvider(faxAccount);
+		FaxUploadProvider uploadProvider = FaxProviderFactory.createFaxUploadProvider(faxAccount);
 		List<String> remoteFinalStatuses = uploadProvider.getRemoteFinalStatusIndicators();
 
 		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
@@ -305,39 +303,32 @@ public class FaxUploadService
 			{
 				logger.info("Checking status for outbound record id:" + faxOutbound.getId() +
 					" (Current status: " + faxOutbound.getExternalStatus() + ")");
-
 				try
 				{
-					GetFaxStatusResult apiResult = uploadProvider.getFaxStatus(faxOutbound);
+					FaxStatusResult apiResult = uploadProvider.getFaxStatus(faxOutbound);
 
-					if(apiResult.isSuccess())
+					String remoteSentStatus = apiResult.getRemoteSentStatus();
+					faxOutbound.setExternalStatus(remoteSentStatus);
+
+					// if the remote status is sent, update accordingly.
+					if(uploadProvider.isFaxInRemoteSentState(apiResult))
 					{
-						String remoteSentStatus = apiResult.getRemoteSentStatus();
-						faxOutbound.setExternalStatus(remoteSentStatus);
-
-						// if the remote status is sent, update accordingly.
-						if(uploadProvider.isFaxInRemoteSentState(apiResult))
-						{
-							apiResult.getRemoteSendTime().ifPresent(faxOutbound::setExternalDeliveryDate);
-							faxOutbound.setStatusMessage(STATUS_MESSAGE_COMPLETED);
-							faxOutbound.setArchived(true);
-						}
-						else
-						{
-							apiResult.getErrorCode().ifPresent(faxOutbound::setStatusMessage);
-						}
-						faxOutboundDao.merge(faxOutbound);
-						logger.info("Updated Status to: " + remoteSentStatus);
+						apiResult.getRemoteSendTime().ifPresent(faxOutbound::setExternalDeliveryDate);
+						faxOutbound.setStatusMessage(STATUS_MESSAGE_COMPLETED);
+						faxOutbound.setArchived(true);
 					}
 					else
 					{
-						logger.warn("F API Connection Failure: " + apiResult.getError());
+						apiResult.getErrorCode().ifPresent(faxOutbound::setStatusMessage);
 					}
+					faxOutboundDao.merge(faxOutbound);
+					logger.info("Updated Status to: " + remoteSentStatus);
 				}
-
 				catch (Exception e)
 				{
-					// what to do???
+					faxOutbound.setStatusError();
+					faxOutbound.setStatusMessage(e.getMessage());
+					logger.error("Unknown faxing exception", e);
 				}
 			}
 		}
@@ -396,7 +387,7 @@ public class FaxUploadService
 		String logData = null;
 		try
 		{
-			FaxUploadProvider uploadProvider = faxProviderFactory.createFaxUploadProvider(faxOutbound.getFaxAccount());
+			FaxUploadProvider uploadProvider = FaxProviderFactory.createFaxUploadProvider(faxOutbound.getFaxAccount());
 
 			try
 			{

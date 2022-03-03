@@ -60,13 +60,13 @@ import java.util.Set;
  */
 public class SendFaxPDFAction extends DispatchAction {
 
-	private static final FaxUploadService FAX_UPLOAD_SERVICE = SpringUtils.getBean(FaxUploadService.class);
+	private static final FaxUploadService faxUploadService = SpringUtils.getBean(FaxUploadService.class);
 
 	public ActionForward faxDocument(ActionMapping mapping, ActionForm form,
 		HttpServletRequest request, HttpServletResponse response)
 			throws IOException
 	{
-		if (!FAX_UPLOAD_SERVICE.isOutboundFaxEnabled())
+		if (!faxUploadService.isOutboundFaxEnabled())
 		{
 			return mapping.findForward("failed");
 		}
@@ -112,7 +112,7 @@ public class SendFaxPDFAction extends DispatchAction {
 							String faxFileName = FilenameUtils.removeExtension(tempFile.getName()) + "-" + faxNo;
 							fileToFax.rename(faxFileName + fileToFax.getName());
 
-							transfer = FAX_UPLOAD_SERVICE
+							transfer = faxUploadService
 								.queueAndSendFax(providerNo, demographicId, faxNo, FaxOutbound.FileType.DOCUMENT, fileToFax);
 							if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))
 							{
@@ -167,7 +167,7 @@ public class SendFaxPDFAction extends DispatchAction {
 								 HttpServletRequest request, HttpServletResponse response)
 			throws IOException
 	{
-		if (!FAX_UPLOAD_SERVICE.isOutboundFaxEnabled())
+		if (!faxUploadService.isOutboundFaxEnabled())
 		{
 			return mapping.findForward("failed");
 		}
@@ -191,7 +191,7 @@ public class SendFaxPDFAction extends DispatchAction {
 				{
 					GenericFile fileToFax = FileFactory.getExistingFile(pdfPath);
 					fileToFax.rename(GenericFile.getFormattedFileName(faxNo + "-" + tempFile.getName()));
-					transfer = FAX_UPLOAD_SERVICE
+					transfer = faxUploadService
 						.queueAndSendFax(providerNo, demographicNo, faxNo, FaxOutbound.FileType.FORM, fileToFax);
 					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR.name()))
 					{

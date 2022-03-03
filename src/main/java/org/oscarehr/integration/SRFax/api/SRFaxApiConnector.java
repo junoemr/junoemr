@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.externalApi.srfax;
+package org.oscarehr.integration.SRFax.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,12 +37,12 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
-import org.oscarehr.fax.externalApi.srfax.result.GetFaxInboxResult;
-import org.oscarehr.fax.externalApi.srfax.result.GetFaxOutboxResult;
-import org.oscarehr.fax.externalApi.srfax.result.GetFaxStatusResult;
-import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
-import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
-import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
+import org.oscarehr.integration.SRFax.api.result.GetFaxInboxResult;
+import org.oscarehr.integration.SRFax.api.result.GetFaxOutboxResult;
+import org.oscarehr.integration.SRFax.api.result.SRFaxFaxStatusResult;
+import org.oscarehr.integration.SRFax.api.result.GetUsageResult;
+import org.oscarehr.integration.SRFax.api.resultWrapper.ListWrapper;
+import org.oscarehr.integration.SRFax.api.resultWrapper.SingleWrapper;
 import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;
@@ -240,40 +240,40 @@ public class SRFaxApiConnector
 				null, null, null, null, null, null, null, null, null, null);
 	}
 
-	private SingleWrapper<GetFaxStatusResult> getFaxStatus(Map<String, String> parameters)
+	private SingleWrapper<SRFaxFaxStatusResult> getFaxStatus(Map<String, String> parameters)
 	{
 		String[] requiredFields = {S_FAX_DETAILS_ID};
 		String[] optionalFields = {S_RESPONSE_FORMAT};
 		String result = processRequest(ACTION_GET_FAX_STATUS, requiredFields, optionalFields, parameters);
-		return processSingleResponse(result, new TypeReference<SingleWrapper<GetFaxStatusResult>>(){});
+		return processSingleResponse(result, new TypeReference<SingleWrapper<SRFaxFaxStatusResult>>(){});
 	}
-	public SingleWrapper<GetFaxStatusResult> getFaxStatus(String sFaxDetailsID, String sResponseFormat)
+	public SingleWrapper<SRFaxFaxStatusResult> getFaxStatus(String sFaxDetailsID, String sResponseFormat)
 	{
 		Map<String, String> parameters = new HashMap<>();
 		parameters.put(S_FAX_DETAILS_ID, sFaxDetailsID);
 		parameters.put(S_RESPONSE_FORMAT, sResponseFormat);
 		return getFaxStatus(parameters);
 	}
-	public SingleWrapper<GetFaxStatusResult> getFaxStatus(String sFaxDetailsID)
+	public SingleWrapper<SRFaxFaxStatusResult> getFaxStatus(String sFaxDetailsID)
 	{
 		return getFaxStatus(sFaxDetailsID, RESPONSE_FORMAT_JSON);
 	}
 
-	private ListWrapper<GetFaxStatusResult> getMultiFaxStatus(Map<String, String> parameters)
+	private ListWrapper<SRFaxFaxStatusResult> getMultiFaxStatus(Map<String, String> parameters)
 	{
 		String[] requiredFields = {S_FAX_DETAILS_ID};
 		String[] optionalFields = {S_RESPONSE_FORMAT};
 		String result = processRequest(ACTION_GET_MULTI_FAX_STATUS, requiredFields, optionalFields, parameters);
-		return processListResponse(result, new TypeReference<ListWrapper<GetFaxStatusResult>>(){});
+		return processListResponse(result, new TypeReference<ListWrapper<SRFaxFaxStatusResult>>(){});
 	}
-	public ListWrapper<GetFaxStatusResult> getMultiFaxStatus(List<String> sFaxDetailsIDList, String sResponseFormat)
+	public ListWrapper<SRFaxFaxStatusResult> getMultiFaxStatus(List<String> sFaxDetailsIDList, String sResponseFormat)
 	{
 		Map<String, String> parameters = new HashMap<>();
 		parameters.put(S_FAX_DETAILS_ID, String.join("|", sFaxDetailsIDList));
 		parameters.put(S_RESPONSE_FORMAT, sResponseFormat);
 		return getMultiFaxStatus(parameters);
 	}
-	public ListWrapper<GetFaxStatusResult> getMultiFaxStatus(List<String> sFaxDetailsIDList)
+	public ListWrapper<SRFaxFaxStatusResult> getMultiFaxStatus(List<String> sFaxDetailsIDList)
 	{
 		return getMultiFaxStatus(sFaxDetailsIDList, RESPONSE_FORMAT_JSON);
 	}

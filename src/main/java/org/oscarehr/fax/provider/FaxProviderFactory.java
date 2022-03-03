@@ -28,18 +28,10 @@ import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.integration.SRFax.SRFaxAccountProvider;
 import org.oscarehr.integration.SRFax.SRFaxDownloadProvider;
 import org.oscarehr.integration.SRFax.SRFaxUploadProvider;
-import org.springframework.stereotype.Service;
 
-@Service
 public class FaxProviderFactory
 {
-
-	private FaxProvider getSystemFaxProvider()
-	{
-		return FaxProvider.SRFAX;
-	}
-
-	public FaxAccountProvider createFaxAccountProvider(FaxAccount faxAccount)
+	public static FaxAccountProvider createFaxAccountProvider(FaxAccount faxAccount)
 	{
 		switch (faxAccount.getIntegrationType())
 		{
@@ -52,7 +44,7 @@ public class FaxProviderFactory
 		}
 	}
 
-	public FaxDownloadProvider createFaxDownloadProvider(FaxAccount faxAccount)
+	public static FaxDownloadProvider createFaxDownloadProvider(FaxAccount faxAccount)
 	{
 		switch (faxAccount.getIntegrationType())
 		{
@@ -65,17 +57,17 @@ public class FaxProviderFactory
 		}
 	}
 
-	public FaxUploadProvider createFaxUploadProvider(FaxAccount faxAccount)
+	public static FaxUploadProvider createFaxUploadProvider(FaxAccount faxAccount)
 	{
 		return createFaxUploadProvider(faxAccount.getIntegrationType());
 	}
 
-	public FaxUploadProvider createFaxUploadProvider(FaxAccountTransferOutbound faxAccount)
+	public static FaxUploadProvider createFaxUploadProvider(FaxAccountTransferOutbound faxAccount)
 	{
 		return createFaxUploadProvider(faxAccount.getAccountType());
 	}
 
-	private FaxUploadProvider createFaxUploadProvider(FaxProvider providerType)
+	private static FaxUploadProvider createFaxUploadProvider(FaxProvider providerType)
 	{
 		switch (providerType)
 		{

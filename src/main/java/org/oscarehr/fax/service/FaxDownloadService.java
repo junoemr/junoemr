@@ -68,9 +68,6 @@ public class FaxDownloadService
 	@Autowired
 	private FaxStatus faxStatus;
 
-	@Autowired
-	private FaxProviderFactory faxProviderFactory;
-
 	/**
 	 * Pulls, downloads and saves any new faxes for each active inbound fax account
 	 */
@@ -88,7 +85,7 @@ public class FaxDownloadService
 			{
 				try
 				{
-					faxDownloadProvider = faxProviderFactory.createFaxDownloadProvider(faxAccount);
+					faxDownloadProvider = FaxProviderFactory.createFaxDownloadProvider(faxAccount);
 					List<? extends FaxInboxResult> faxInboxResults = faxDownloadProvider.getFaxInbox(faxDaysPast);
 					handleResults(faxAccount, faxInboxResults);
 				}
@@ -127,7 +124,7 @@ public class FaxDownloadService
 			try
 			{
 				String referenceIdStr = result.getDetailsId();
-				FaxDownloadProvider faxDownloadProvider = faxProviderFactory.createFaxDownloadProvider(faxAccount);
+				FaxDownloadProvider faxDownloadProvider = FaxProviderFactory.createFaxDownloadProvider(faxAccount);
 
 				// for each new fax to get, call api and request document.
 				String faxContent = faxDownloadProvider.retrieveFax(referenceIdStr);
