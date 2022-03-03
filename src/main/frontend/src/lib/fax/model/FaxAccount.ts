@@ -18,8 +18,9 @@ export default class FaxAccount
 	// transient properties
 	private _connectionStatus: FaxAccountConnectionStatusType;
 
-	constructor()
+	constructor(type: FaxAccountType)
 	{
+		this.accountType = type;
 		this.enabled = true;
 		this.enableInbound = false;
 		this.enableOutbound = false;

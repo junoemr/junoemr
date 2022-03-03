@@ -8,6 +8,7 @@ import {
 	LABEL_POSITION
 } from "../../../../../common/components/junoComponentConstants";
 import ToastService from "../../../../../lib/alerts/service/ToastService";
+import {FaxAccountType} from "../../../../../lib/fax/model/FaxAccountType";
 
 angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 	templateUrl: 'src/admin/section/fax/components/faxConfigurationEditModal/faxConfigurationEditModal.jsp',
@@ -51,6 +52,9 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				},
 			];
 
+			ctrl.validations = {};
+			ctrl.initialSave = false;
+
 			ctrl.$onInit = () =>
 			{
 				ctrl.componentStyle = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
@@ -64,7 +68,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				}
 				else
 				{
-					ctrl.faxAccount = new FaxAccount();
+					ctrl.faxAccount = new FaxAccount(FaxAccountType.Srfax);
 				}
 				// get the master flag status for inbound/outbound settings
 				ctrl.masterFaxEnabledInbound = ctrl.resolve.masterFaxEnabledInbound;
@@ -80,19 +84,43 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				{
 					ctrl.faxAccount.enableOutbound = false;
 				}
+
+				ctrl.setupValidations();
 			};
+
+			ctrl.setupValidations = () =>
+			{
+				ctrl.validations = {
+					accountLoginFilled: Juno.Validations.validationFieldRequired(ctrl.faxAccount, "accountLogin"),
+
+					passwordFilled: Juno.Validations.validationFieldOr(
+						Juno.Validations.validationCustom(() => ctrl.isModalEditMode()),
+						Juno.Validations.validationFieldRequired(ctrl.faxAccount, "password")),
+
+					displayNameFilled: Juno.Validations.validationFieldRequired(ctrl.faxAccount, "displayName"),
+
+					emailFilled: Juno.Validations.validationFieldOr(
+						Juno.Validations.validationCustom(() => !ctrl.faxAccount.enableOutbound),
+						Juno.Validations.validationFieldRequired(ctrl.faxAccount, "accountEmail")),
+
+					faxNumberFilled: Juno.Validations.validationFieldOr(
+						Juno.Validations.validationCustom(() => !ctrl.faxAccount.enableOutbound),
+						Juno.Validations.validationFieldRequired(ctrl.faxAccount, "faxNumber")),
+				};
+			}
 
 			ctrl.isModalEditMode = (): boolean =>
 			{
 				return Boolean(ctrl.faxAccount.id);
 			}
 
-			ctrl.saveSettings = function (form)
+			ctrl.saveSettings = function ()
 			{
 				ctrl.submitDisabled = true;
-				if (!form.$valid)
+				ctrl.initialSave = true;
+				if (!Juno.Validations.allValidationsValid(ctrl.validations))
 				{
-					ctrl.toastService.errorToast("The form contains errors");
+					Juno.Common.Util.errorAlert($uibModal, "Validation Errors", "Some fields are invalid, Please correct the highlighted fields");
 					ctrl.submitDisabled = false;
 					return;
 				}
@@ -134,6 +162,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				if(confirm)
 				{
 					//todo
+					ctrl.cancel();
 				}
 			}
 

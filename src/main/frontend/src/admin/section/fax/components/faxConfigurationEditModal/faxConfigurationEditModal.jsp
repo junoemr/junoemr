@@ -44,15 +44,18 @@
 					<juno-input ng-model="$ctrl.faxAccount.accountLogin"
 					            disabled="$ctrl.isModalEditMode()"
 					            ng-change="$ctrl.setDefaultConnectionStatus()"
+					            invalid="$ctrl.initialSave &&!$ctrl.validations.accountLoginFilled()"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.accountLogin"/>"
 					            label-position="$ctrl.LABEL_POSITION.LEFT">
 					</juno-input>
 					<juno-input ng-model="$ctrl.faxAccount.password"
 					            ng-change="$ctrl.setDefaultConnectionStatus()"
+					            invalid="$ctrl.initialSave &&!$ctrl.validations.passwordFilled()"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.password"/>"
 					            label-position="$ctrl.LABEL_POSITION.LEFT">
 					</juno-input>
 					<juno-input ng-model="$ctrl.faxAccount.displayName"
+					            invalid="$ctrl.initialSave &&!$ctrl.validations.displayNameFilled()"
 					            title="<bean:message bundle="ui" key="admin.fax.acct.edit.displayName-tooltip"/>"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.displayName"/>"
 					            label-position="$ctrl.LABEL_POSITION.LEFT">
@@ -74,12 +77,14 @@
 				<div class="input-group grid-flow-row grid-row-2 grid-row-gap-4">
 					<juno-input ng-model="$ctrl.faxAccount.accountEmail"
 					            disabled="!$ctrl.faxAccount.enableOutbound"
+					            invalid="$ctrl.initialSave && !$ctrl.validations.emailFilled()"
 					            title="<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail-tooltip"/>"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail"/>"
 					            label-position="$ctrl.LABEL_POSITION.LEFT">
 					</juno-input>
 					<juno-input ng-model="$ctrl.faxAccount.faxNumber"
 					            disabled="!$ctrl.faxAccount.enableOutbound"
+					            invalid="$ctrl.initialSave && !$ctrl.validations.faxNumberFilled()"
 					            title="<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber-tooltip"/>"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber"/>"
 					            label-position="$ctrl.LABEL_POSITION.LEFT">
@@ -180,7 +185,7 @@
 					</juno-button>
 				</div>
 				<div class="w-128 m-l-2">
-					<juno-button click="$ctrl.saveSettings(form)"
+					<juno-button click="$ctrl.saveSettings()"
 					             disabled="$ctrl.submitDisabled"
 					             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">

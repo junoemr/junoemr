@@ -12,9 +12,8 @@ export default class FaxAccountToModelConverter extends AbstractConverter<FaxAcc
 			return null;
 		}
 
-		let model = new FaxAccount();
+		let model = new FaxAccount(from.accountType as any as FaxAccountType);
 		model.id = from.id;
-		model.accountType = from.accountType as any as FaxAccountType;
 		model.accountLogin = from.accountLogin;
 		model.accountEmail = from.accountEmail;
 		model.enabled = from.enabled;
