@@ -41,20 +41,6 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 			ctrl.tableParamsInbox = null;
 			ctrl.loggedInProviderNo = null;
 
-			// ngTable object for storing search parameters
-			// ctrl.inbox =
-			// 	{
-			// 		search: {
-			// 			page: 1,
-			// 			count: 10,
-			// 			sorting: {
-			// 				DateSent: "desc"
-			// 			}
-			// 		},
-			// 		startDate: null,
-			// 		endDate: null
-			// 	};
-
 			ctrl.$onInit = () =>
 			{
 				ctrl.searchParams.faxAccount = ctrl.faxAccount;

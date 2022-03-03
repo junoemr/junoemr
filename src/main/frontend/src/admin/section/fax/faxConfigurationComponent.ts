@@ -129,6 +129,11 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 							// new accounts get added to the account list
 							ctrl.faxAccountList.push(updatedAccount);
 						}
+						else if(updatedAccount == null) // deleted
+						{
+							// remove deleted account from the list
+							ctrl.faxAccountList = ctrl.faxAccountList.filter((account) => (account.id !== faxAccount.id));
+						}
 						else
 						{
 							// clear the existing properties and replace with the updated ones

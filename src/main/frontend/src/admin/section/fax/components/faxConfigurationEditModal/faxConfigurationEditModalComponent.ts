@@ -9,6 +9,7 @@ import {
 } from "../../../../../common/components/junoComponentConstants";
 import ToastService from "../../../../../lib/alerts/service/ToastService";
 import {FaxAccountType} from "../../../../../lib/fax/model/FaxAccountType";
+import LoadingQueue from "../../../../../lib/util/LoadingQueue";
 
 angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 	templateUrl: 'src/admin/section/fax/components/faxConfigurationEditModal/faxConfigurationEditModal.jsp',
@@ -24,6 +25,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 			const ctrl = this;
 			ctrl.faxAccountService = new FaxAccountService();
 			ctrl.toastService = new ToastService();
+			ctrl.LoadingQueue = new LoadingQueue();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;
 			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
@@ -116,12 +118,12 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 
 			ctrl.saveSettings = function ()
 			{
-				ctrl.submitDisabled = true;
+				ctrl.LoadingQueue.pushLoadingState();
 				ctrl.initialSave = true;
 				if (!Juno.Validations.allValidationsValid(ctrl.validations))
 				{
 					Juno.Common.Util.errorAlert($uibModal, "Validation Errors", "Some fields are invalid, Please correct the highlighted fields");
-					ctrl.submitDisabled = false;
+					ctrl.LoadingQueue.popLoadingState()
 					return;
 				}
 
@@ -134,7 +136,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				let closeError = function (error)
 				{
 					console.error(error);
-					ctrl.submitDisabled = false;
+					ctrl.LoadingQueue.popLoadingState();
 				};
 
 				if (ctrl.isModalEditMode())
@@ -155,15 +157,17 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 
 			ctrl.deleteConfig = async () =>
 			{
+				ctrl.LoadingQueue.pushLoadingState();
 				const confirm = await Juno.Common.Util.confirmationDialog(
 					$uibModal,
 					"Confirm Action", "Are you sure you want to delete this fax integration?",
 					ctrl.componentStyle);
 				if(confirm)
 				{
-					//todo
-					ctrl.cancel();
+					await ctrl.faxAccountService.deleteAccountSettings(ctrl.faxAccount.id);
+					ctrl.modalInstance.close(null);
 				}
+				ctrl.LoadingQueue.popLoadingState();
 			}
 
 			ctrl.cancel = function cancel()
@@ -171,7 +175,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				ctrl.modalInstance.dismiss('cancel');
 			};
 
-			ctrl.testConnection = function ()
+			ctrl.testConnection = async () =>
 			{
 				ctrl.faxAccountService.testFaxConnection(ctrl.faxAccount).then(
 					function success(response)

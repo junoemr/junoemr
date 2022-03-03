@@ -36,7 +36,6 @@ import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.fax.transfer.FaxAccountUpdateInput;
 import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
 import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
-import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
@@ -46,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -63,9 +63,6 @@ import java.util.List;
 @Tag(name = "faxAccount")
 public class FaxAccountWebService extends AbstractServiceImpl
 {
-	@Autowired
-	private SecurityInfoManager securityInfoManager;
-
 	@Autowired
 	private FaxAccountDao faxAccountDao;
 
@@ -143,6 +140,16 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_UPDATE);
 		return RestResponse.successResponse(faxAccountService.updateFaxAccount(updateInput));
+	}
+
+	@DELETE
+	@Path("/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> deleteAccountSettings(@PathParam("id") Long id)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_DELETE);
+		return RestResponse.successResponse(faxAccountService.deleteFaxAccount(id));
 	}
 
 	@POST

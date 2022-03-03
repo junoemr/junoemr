@@ -62,6 +62,11 @@ export default class FaxAccountService
 			(await this.faxAccountApi.updateAccountSettings(model.id, input)).data.body);
 	};
 
+	public deleteAccountSettings = async (id: number): Promise<boolean> =>
+	{
+		return (await this.faxAccountApi.deleteAccountSettings(id)).data.body;
+	};
+
 	public testFaxConnection = async (model: FaxAccount): Promise<boolean> =>
 	{
 		if (model.id)

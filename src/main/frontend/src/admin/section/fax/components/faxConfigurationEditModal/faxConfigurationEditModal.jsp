@@ -97,44 +97,6 @@
 					             label-position="$ctrl.LABEL_POSITION.LEFT">
 					</juno-select>
 				</div>
-<%--					<div class="flex-row">--%>
-<%--						<label class="flex-row-label" for="input-fax-account-email"--%>
-<%--						       title="<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail-tooltip"/>">--%>
-<%--							<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail"/>--%>
-<%--						</label>--%>
-<%--						<input class="flex-row-content" id="input-fax-account-email" name="input-fax-account-email" type="email"--%>
-<%--						       ng-model="$ctrl.faxAccount.accountEmail"--%>
-<%--						       ng-required="$ctrl.faxAccount.enableOutbound">--%>
-<%--					</div>--%>
-<%--					<div class="flex-row input-validation" ng-show="!form['input-fax-account-email'].$valid">--%>
-<%--						<label class="flex-row-label">*</label>--%>
-<%--						<span><bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail-invalid"/></span>--%>
-<%--					</div>--%>
-<%--				<div>--%>
-<%--					<div class="flex-row">--%>
-<%--						<label class="flex-row-label" for="input-fax-account-fax-no"--%>
-<%--						       title="<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber-tooltip"/>">--%>
-<%--							<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber"/>--%>
-<%--						</label>--%>
-<%--						<input class="flex-row-content" id="input-fax-account-fax-no" name="input-fax-account-fax-no" type="text"--%>
-<%--						       ng-model="$ctrl.faxAccount.faxNumber"--%>
-<%--						       ng-minlength="10" ng-maxlength="10" ng-pattern="/\d{10}/" ng-required="$ctrl.faxAccount.enableOutbound">--%>
-<%--					</div>--%>
-<%--					<div class="flex-row input-validation" ng-show="!form['input-fax-account-fax-no'].$valid">--%>
-<%--						<label class="flex-row-label">*</label>--%>
-<%--						<span><bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber-invalid"/></span>--%>
-<%--					</div>--%>
-<%--				</div>--%>
-<%--				<div class="flex-row">--%>
-<%--					<label class="flex-row-label" for="input-fax-account-cover-letter-type"--%>
-<%--					       title="<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption-tooltip"/>">--%>
-<%--						<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption"/>--%>
-<%--					</label>--%>
-<%--					<select class="flex-row-content" id="input-fax-account-cover-letter-type"--%>
-<%--					        ng-model="$ctrl.faxAccount.coverLetterOption"--%>
-<%--					        ng-options="coverLetter for coverLetter in $ctrl.coverLetterOptions">--%>
-<%--					</select>--%>
-<%--				</div>--%>
 			</fieldset>
 			<hr>
 			<fieldset ng-disabled="!$ctrl.masterFaxEnabledInbound" class="input-fieldset">
@@ -170,6 +132,7 @@
 				<div class="w-128 m-r-2">
 					<juno-button ng-show="$ctrl.isModalEditMode()"
 					             click="$ctrl.deleteConfig()"
+					             disabled="$ctrl.LoadingQueue.isLoading"
 					             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
 					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED">
 						<bean:message key="admin.fax.acct.edit.btn-delete" bundle="ui"/>
@@ -179,6 +142,7 @@
 			<div class="footer-right flex-row">
 				<div class="w-128 m-r-2">
 					<juno-button click="$ctrl.cancel()"
+					             disabled="$ctrl.LoadingQueue.isLoading"
 					             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT">
 						<bean:message key="admin.fax.acct.edit.btn-cancel" bundle="ui"/>
@@ -186,7 +150,7 @@
 				</div>
 				<div class="w-128 m-l-2">
 					<juno-button click="$ctrl.saveSettings()"
-					             disabled="$ctrl.submitDisabled"
+					             disabled="$ctrl.LoadingQueue.isLoading"
 					             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
 						<bean:message key="admin.fax.acct.edit.btn-submit" bundle="ui"/>
