@@ -42,12 +42,12 @@ import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxFileType;
 import org.oscarehr.fax.model.FaxNotificationStatus;
 import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.model.FaxStatusCombined;
 import org.oscarehr.fax.model.FaxStatusInternal;
 import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
-import org.oscarehr.fax.model.FaxStatusCombined;
 import org.oscarehr.integration.SRFax.SRFaxUploadProvider;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
@@ -262,10 +262,10 @@ public class OutgoingFaxService
 		return faxOutboundDao.criteriaSearchCount(criteriaSearch);
 	}
 
-	public FaxOutboxTransferOutbound setNotificationStatus(Long faxOutId, String status)
+	public FaxOutboxTransferOutbound setNotificationStatus(Long faxOutId, FaxNotificationStatus status)
 	{
 		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
-		faxOutbound.setNotificationStatus(FaxNotificationStatus.valueOf(status));
+		faxOutbound.setNotificationStatus(status);
 		faxOutboundDao.persist(faxOutbound);
 		return faxOutboundToModelConverter.convert(faxOutbound);
 	}

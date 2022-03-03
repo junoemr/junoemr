@@ -4,12 +4,7 @@ import FaxAccountToUpdateInputConverter from "../converter/FaxAccountToUpdateInp
 import FaxAccountToCreateInputConverter from "../converter/FaxAccountToCreateInputConverter";
 import FaxAccountToModelConverter from "../converter/FaxAccountToModelConverter";
 import FaxAccount from "../model/FaxAccount";
-import FaxInboxResult from "../model/FaxInboxResult";
-import FaxInboxResultToModelConverter from "../converter/FaxInboxResultToModelConverter";
-import FaxOutboxResultToModelConverter from "../converter/FaxOutboxResultToModelConverter";
-import FaxOutboxResult from "../model/FaxOutboxResult";
-import FaxInboxSearchParams from "../model/FaxInboxSearchParams";
-import FaxOutboxSearchParams from "../model/FaxOutboxSearchParams";
+import PagedResponse from "../../common/response/pagedRespose";
 
 export default class FaxAccountService
 {
@@ -20,8 +15,6 @@ export default class FaxAccountService
 	protected faxAccountToCreateInputConverter = new FaxAccountToCreateInputConverter();
 	protected faxAccountToUpdateInputConverter = new FaxAccountToUpdateInputConverter();
 	protected faxAccountToModelConverter = new FaxAccountToModelConverter();
-	protected faxInboxResultToModelConverter = new FaxInboxResultToModelConverter();
-	protected faxOutboxResultToModelConverter = new FaxOutboxResultToModelConverter();
 
 	// ==========================================================================
 	// Public Methods
@@ -81,36 +74,9 @@ export default class FaxAccountService
 		}
 	}
 
-	//todo search should take search model?
-	public getAccounts = async (page: number = 1, perPage: number = 10): Promise<FaxAccount[]> =>
+	public getAccounts = async (page: number = 1, perPage: number = 10): Promise<PagedResponse<FaxAccount>> =>
 	{
-		return this.faxAccountToModelConverter.convertList(
-			(await this.faxAccountApi.listAccounts(page, perPage)).data.body);
-	}
-
-	public getInbox = async (params: FaxInboxSearchParams): Promise<FaxInboxResult[]> =>
-	{
-		return this.faxInboxResultToModelConverter.convertList(
-			(await this.faxAccountApi.getInbox(
-				params.faxAccount.id,
-				params.page,
-				params.perPage,
-				params.endDate ? Juno.Common.Util.formatMomentDate(params.endDate) : null,
-				params.startDate ? Juno.Common.Util.formatMomentDate(params.startDate) : null,
-			)).data.body);
-	}
-
-	public getOutbox = async (params: FaxOutboxSearchParams): Promise<FaxOutboxResult[]> =>
-	{
-		return this.faxOutboxResultToModelConverter.convertList(
-			(await this.faxAccountApi.getOutbox(
-				params.faxAccount.id,
-				params.page,
-				params.perPage,
-				params.endDate ? Juno.Common.Util.formatMomentDate(params.endDate) : null,
-				params.startDate ? Juno.Common.Util.formatMomentDate(params.startDate) : null,
-				params.combinedStatus as any,
-				params.archived,
-			)).data.body);
+		const transfer = (await this.faxAccountApi.listAccounts(page, perPage)).data;
+		return new PagedResponse<FaxAccount>(this.faxAccountToModelConverter.convertList(transfer.body), transfer.headers);
 	}
 }

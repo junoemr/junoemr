@@ -154,8 +154,6 @@ module.exports = {
 			'./src/common/services/diseaseRegistryService.js',
 			'./src/common/services/errorsService.js',
 			'./src/common/services/eFormService.js',
-			'./src/common/services/faxInboundService.js',
-			'./src/common/services/faxOutboundService.js',
 			'./src/common/services/fieldHelperService.js',
 			'./src/common/services/focusService.js',
 			'./src/common/services/formService.js',

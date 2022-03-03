@@ -28,7 +28,7 @@ angular.module("Admin.Section.Fax").component('faxSendReceive', {
 			{
 				try
 				{
-					ctrl.faxAccountList = await ctrl.faxAccountService.getAccounts();
+					ctrl.faxAccountList = (await ctrl.faxAccountService.getAccounts()).body;
 					ctrl.faxAccountOptions = ctrl.faxAccountList.map((faxAccount: FaxAccount) =>
 					{
 						return {

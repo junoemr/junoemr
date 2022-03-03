@@ -6,9 +6,11 @@ import {
 	JUNO_BUTTON_COLOR_PATTERN,
 	LABEL_POSITION
 } from "../../../../../common/components/junoComponentConstants";
-import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";
 import {FaxStatusCombinedType} from "../../../../../lib/fax/model/FaxStatusCombinedType";
 import {Moment} from "moment";
+import FaxOutboxService from "../../../../../lib/fax/service/FaxOutboxService";
+import PagedResponse from "../../../../../lib/common/response/pagedRespose";
+import {FaxNotificationStatusType} from "../../../../../lib/fax/model/FaxNotificationStatusType";
 
 angular.module("Admin.Section.Fax").component('faxOutbox', {
 	templateUrl: 'src/admin/section/fax/components/faxOutbox/faxOutbox.jsp',
@@ -18,15 +20,11 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 	},
 	controller: [
 		'NgTableParams',
-		'providerService',
-		"faxOutboundService",
-		function (NgTableParams,
-		          providerService,
-		          faxOutboundService)
+		function (NgTableParams)
 		{
 			const ctrl = this;
 			ctrl.toastService = new ToastService();
-			ctrl.faxAccountService = new FaxAccountService();
+			ctrl.faxOutboxService = new FaxOutboxService();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;
 			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
@@ -59,7 +57,7 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 				},
 			]);
 
-			ctrl.archivedStatus = Object.freeze({
+			ctrl.archivedOptions = Object.freeze({
 				all: {
 					value: null,
 					label: "All"
@@ -72,16 +70,6 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 					value: true,
 					label: "Archived"
 				}
-			});
-
-			ctrl.systemStatusEnum = Object.freeze({
-				sent:"SENT",
-				queued:"QUEUED",
-				error:"ERROR"
-			});
-			ctrl.notificationStatusEnum = Object.freeze({
-				notify:"NOTIFY",
-				dismissed:"SILENT"
 			});
 
 			ctrl.searchParams = new FaxOutboxSearchParams();
@@ -108,7 +96,8 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 						count: ctrl.searchParams.perPage,
 						sorting: {
 							DateSent: "desc"
-						}
+						},
+						total: 0,
 					},
 					{
 						getData: function(ngTableParams)
@@ -117,11 +106,11 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 							ctrl.searchParams.page = tableParams.page;
 							ctrl.searchParams.perPage = tableParams.count;
 
-							return ctrl.faxAccountService.getOutbox(ctrl.searchParams).then(
-								function success(response: FaxOutboxResult[])
+							return ctrl.faxOutboxService.getOutbox(ctrl.searchParams).then(
+								function success(response: PagedResponse<FaxOutboxResult>)
 								{
-									ctrl.outboxItemList = response;
-									// ctrl.tableParamsOutbox.total(response.meta.total);
+									ctrl.outboxItemList = response.body;
+									ctrl.tableParamsOutbox.total(response.total);
 									return ctrl.outboxItemList;
 								},
 								function error(error)
@@ -138,8 +127,8 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 
 			ctrl.loadNextPushTime = function()
 			{
-				faxOutboundService.getNextPushTime().then(
-					function success(response)
+				ctrl.faxOutboxService.getNextPushTime().then(
+					function success(response: Moment)
 					{
 						ctrl.nextPushTime = response;
 					},
@@ -152,20 +141,20 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 				);
 			};
 
-			ctrl.resendFax = function(outboxItem)
+			ctrl.resendFax = (outboxItem: FaxOutboxResult): void =>
 			{
 				// the resend will create a new record for some resend attempts, in that case force a reload of the table items
-				let requireFullRefresh = (outboxItem.combinedStatus === ctrl.displayStatus.integrationFailed.value);
+				let requireFullRefresh = outboxItem.isCombinedStatusIntegrationFailed();
 
 				// set a temp status to provider feedback/disable resend button
-				outboxItem.combinedStatus = ctrl.displayStatus.inProgress.value;
-				faxOutboundService.resendOutboundFax(outboxItem.id).then(
-					function success(response)
+				outboxItem.combinedStatus = FaxStatusCombinedType.InProgress;
+				ctrl.faxOutboxService.resendOutboundFax(outboxItem.id).then(
+					function success(response: FaxOutboxResult)
 					{
 						angular.copy(response, outboxItem);
-						if(outboxItem.systemStatus === ctrl.systemStatusEnum.error)
+						if(outboxItem.isInternalStatusError())
 						{
-							alert(outboxItem.systemStatusMessage);
+							ctrl.toastService.errorToast(outboxItem.systemStatusMessage);
 						}
 
 						if(requireFullRefresh)
@@ -175,16 +164,16 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 					},
 					function error(error)
 					{
-						outboxItem.combinedStatus = ctrl.displayStatus.error.value;
+						outboxItem.combinedStatus = FaxStatusCombinedType.Error;
 						console.error(error);
 						ctrl.toastService.errorToast("Failed to queue fax for resend");
 					}
 				);
 			};
 
-			ctrl.dismissNotification = function(outboxItem)
+			ctrl.dismissNotification = function(outboxItem: FaxOutboxResult)
 			{
-				faxOutboundService.setNotificationStatus(outboxItem.id, ctrl.notificationStatusEnum.dismissed).then(
+				ctrl.faxOutboxService.setNotificationStatus(outboxItem.id, FaxNotificationStatusType.Silent).then(
 					function success(response)
 					{
 						angular.copy(response, outboxItem);
@@ -192,14 +181,14 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 					function error(error)
 					{
 						console.error(error);
-						alert(error);
+						ctrl.toastService.errorToast("Failed to mark item as read");
 					}
 				);
 			};
 
-			ctrl.archive = function(outboxItem)
+			ctrl.archive = function(outboxItem: FaxOutboxResult)
 			{
-				faxOutboundService.archive(outboxItem.id).then(
+				ctrl.faxOutboxService.archive(outboxItem.id).then(
 					function success(response)
 					{
 						angular.copy(response, outboxItem);
@@ -207,16 +196,14 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 					function error(error)
 					{
 						console.error(error);
-						alert(error);
+						ctrl.toastService.errorToast("Failed to archive record");
 					}
 				);
 			};
 
-			ctrl.viewDownloadFile = function(outboundId)
+			ctrl.viewDownloadFile = (outboundId: number) =>
 			{
-				let url = faxOutboundService.getDownloadUrl(outboundId);
-				let windowName = "ViewFaxFile" + outboundId;
-				window.open(url, windowName, "scrollbars=1,width=1024,height=768");
+				ctrl.faxOutboxService.download(outboundId);
 			};
 
 			ctrl.getStatusDisplayLabel = (combinedStatus: FaxStatusCombinedType) =>
@@ -233,12 +220,11 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 				return "";
 			}
 
-			ctrl.hideResendButton = (item: FaxOutboxResult) =>
+			ctrl.hideResendButton = (outboxItem: FaxOutboxResult) =>
 			{
-				return item.archived ||
-					(item.combinedStatus != FaxStatusCombinedType.Queued
-					&& item.combinedStatus != FaxStatusCombinedType.Error
-					&& item.combinedStatus != FaxStatusCombinedType.IntegrationFailed)
+				return outboxItem.archived
+					|| outboxItem.isCombinedStatusInProgress()
+					|| outboxItem.isCombinedStatusSent()
 			}
 		}
 	]}

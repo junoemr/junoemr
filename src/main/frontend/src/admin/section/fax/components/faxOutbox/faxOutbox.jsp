@@ -82,14 +82,14 @@
 				</td>
 				<td ng-if="$ctrl.displayNotificationColumn == true">
 					<div class="w-128"
-					     ng-show="item.notificationStatus == $ctrl.notificationStatusEnum.notify">
+					     ng-show="item.isNotificationStatusNotify()">
 						<juno-button click="$ctrl.dismissNotification(item);"
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
 							<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.notification.dismiss"/>
 						</juno-button>
 					</div>
-					<span ng-show="item.notificationStatus == $ctrl.notificationStatusEnum.dismissed">
+					<span ng-show="item.isNotificationStatusSilent()">
 						<bean:message bundle="ui" key="admin.fax.sr.outbox.notification.dismissed"/>
 					</span>
 				</td>

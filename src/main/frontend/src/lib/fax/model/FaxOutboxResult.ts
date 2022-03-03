@@ -22,4 +22,54 @@ export default class FaxOutboxResult
 	integrationQueuedDateTime: Moment;
 	integrationSentDateTime: Moment;
 	combinedStatus: FaxStatusCombinedType;
+
+	public isInternalStatusError = (): boolean =>
+	{
+		return (this.systemStatus === FaxStatusInternalType.Error);
+	}
+
+	public isInternalStatusSent = (): boolean =>
+	{
+		return (this.systemStatus === FaxStatusInternalType.Sent);
+	}
+
+	public isInternalStatusQueued = (): boolean =>
+	{
+		return (this.systemStatus === FaxStatusInternalType.Queued);
+	}
+
+	public isCombinedStatusSent = (): boolean =>
+	{
+		return (this.combinedStatus === FaxStatusCombinedType.IntegrationSuccess);
+	}
+
+	public isCombinedStatusError = (): boolean =>
+	{
+		return (this.combinedStatus === FaxStatusCombinedType.Error);
+	}
+
+	public isCombinedStatusIntegrationFailed = (): boolean =>
+	{
+		return (this.combinedStatus === FaxStatusCombinedType.IntegrationFailed);
+	}
+
+	public isCombinedStatusInProgress = (): boolean =>
+	{
+		return (this.combinedStatus === FaxStatusCombinedType.InProgress);
+	}
+
+	public isCombinedStatusInQueued = (): boolean =>
+	{
+		return (this.combinedStatus === FaxStatusCombinedType.Queued);
+	}
+
+	public isNotificationStatusNotify = (): boolean =>
+	{
+		return (this.notificationStatus === FaxNotificationStatusType.Notify);
+	}
+
+	public isNotificationStatusSilent = (): boolean =>
+	{
+		return (this.notificationStatus === FaxNotificationStatusType.Silent);
+	}
 }

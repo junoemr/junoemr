@@ -2,12 +2,12 @@ export default class SimpleResponse<T>
 {
 	protected _body: T;
 
-	constructor(body)
+	constructor(body: T)
 	{
 		this._body = body;
 	}
 
-	get body()
+	get body(): T
 	{
 		return this._body;
 	}

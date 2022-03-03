@@ -5,9 +5,10 @@ import {
 	JUNO_BUTTON_COLOR_PATTERN,
 	LABEL_POSITION
 } from "../../../../../common/components/junoComponentConstants";
-import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";
 import FaxInboxResult from "../../../../../lib/fax/model/FaxInboxResult";
 import {Moment} from "moment";
+import FaxInboxService from "../../../../../lib/fax/service/FaxInboxService";
+import PagedResponse from "../../../../../lib/common/response/pagedRespose";
 
 angular.module("Admin.Section.Fax").component('faxInbox', {
 	templateUrl: 'src/admin/section/fax/components/faxInbox/faxInbox.jsp',
@@ -18,14 +19,12 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 	controller: [
 		'NgTableParams',
 		'providerService',
-		"faxInboundService",
 		function (NgTableParams,
-		          providerService,
-		          faxInboundService)
+		          providerService)
 		{
 			const ctrl = this;
 			ctrl.toastService = new ToastService();
-			ctrl.faxAccountService = new FaxAccountService();
+			ctrl.faxInboxService = new FaxInboxService();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;
 			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
@@ -54,7 +53,8 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 						count: ctrl.searchParams.perPage,
 						sorting: {
 							DateSent: "desc"
-						}
+						},
+						total: 0,
 					},
 					{
 						getData: function (ngTableParams)
@@ -63,12 +63,11 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 							ctrl.searchParams.page = tableParams.page;
 							ctrl.searchParams.perPage = tableParams.count;
 
-							return ctrl.faxAccountService.getInbox(ctrl.searchParams).then(
-								function success(response: FaxInboxResult[])
+							return ctrl.faxInboxService.getInbox(ctrl.searchParams).then(
+								function success(response: PagedResponse<FaxInboxResult>)
 								{
-									//todo search results object with meta info?
-									ctrl.inboxItemList = response;
-									// ctrl.tableParamsInbox.total(response.meta.total);
+									ctrl.inboxItemList = response.body;
+									ctrl.tableParamsInbox.total(response.total);
 									return ctrl.inboxItemList;
 								},
 								function error(error)
@@ -85,8 +84,8 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 
 			ctrl.loadNextPullTime = (): void =>
 			{
-				faxInboundService.getNextPullTime().then(
-					function success(response)
+				ctrl.faxInboxService.getNextPullTime().then(
+					function success(response: Moment)
 					{
 						ctrl.nextPullTime = response;
 					},

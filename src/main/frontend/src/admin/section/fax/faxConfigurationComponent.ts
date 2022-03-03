@@ -5,6 +5,8 @@ import {
 	LABEL_POSITION
 } from "../../../common/components/junoComponentConstants";
 import {SecurityPermissions} from "../../../common/security/securityConstants";
+import PagedResponse from "../../../lib/common/response/pagedRespose";
+import FaxAccount from "../../../lib/fax/model/FaxAccount";
 
 angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
@@ -74,9 +76,9 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 				);
 
 				ctrl.faxAccountService.getAccounts().then(
-					function success(response)
+					function success(response: PagedResponse<FaxAccount>)
 					{
-						ctrl.faxAccountList = response;
+						ctrl.faxAccountList = response.body;
 					},
 					function error(error)
 					{
