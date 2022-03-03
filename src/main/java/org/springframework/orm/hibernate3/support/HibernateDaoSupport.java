@@ -37,6 +37,10 @@ public class HibernateDaoSupport extends org.springframework.orm.hibernate5.supp
 	@Qualifier("sessionFactory")
 	private SessionFactory sessionFactory;
 
+	@Autowired
+	@Qualifier("sessionFactoryReadOnly")
+	private SessionFactory readonlySessionFactory;
+
 	public HibernateDaoSupport()
 	{
 
@@ -51,6 +55,11 @@ public class HibernateDaoSupport extends org.springframework.orm.hibernate5.supp
 	public Session getSession()
 	{
 		return sessionFactory.getCurrentSession();
+	}
+
+	public Session getReadOnlySession()
+	{
+		return readonlySessionFactory.getCurrentSession();
 	}
 
 	public void releaseSession(Session session)

@@ -52,19 +52,19 @@ public class IndicatorQueryHandler extends AbstractQueryHandler {
 	}
 
 	@Override
-	public List<?> execute( String query ) {
+	public List<?> executeReadOnly( String query ) {
 
-		logger.debug("Executing Indicator Query Thread " + Thread.currentThread().getName()
+		logger.debug("Executing Readonly Indicator Query Thread " + Thread.currentThread().getName()
 				+  "[" + Thread.currentThread().getId() + "]" );
 		
 		List<?> results = null;
 		
 		if( DashboardManager.MULTI_THREAD_ON ) {
-			results = super.execute( query );
+			results = super.executeReadOnly(query);
 		} else {
-			this.setQuery( query );	
-			results = super.execute();
-			graphPlots( results );
+			this.setQuery(query);
+			results = super.executeReadOnly();
+			graphPlots(results);
 		}
 		
 		return results;
