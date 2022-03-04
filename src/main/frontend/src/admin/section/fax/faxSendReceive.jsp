@@ -26,22 +26,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <div class="fax-send_receive">
-	<div class="flex-row search-filters">
-		<juno-select
-				label="<bean:message bundle="ui" key="admin.fax.sr.choose-account"/>"
-				label-position="$ctrl.LABEL_POSITION.TOP"
-				ng-model="$ctrl.selectedFaxAccountId"
-				options="$ctrl.faxAccountOptions"
-				on-change="$ctrl.updateSelectedAccount(value, option)">
-		</juno-select>
-	</div>
 	<div class="tabs-heading">
 		<ul class="nav nav-tabs">
-			<li>
+			<li ng-class="$ctrl.tabActiveClass(0)">
 				<a data-toggle="tab" ng-click="$ctrl.changeTab($ctrl.tabEnum.inbox);">
 					<bean:message bundle="ui" key="admin.fax.sr.inbox"/></a>
 			</li>
-			<li class="active">
+			<li ng-class="$ctrl.tabActiveClass(1)">
 				<a data-toggle="tab" ng-click="$ctrl.changeTab($ctrl.tabEnum.outbox);">
 					<bean:message bundle="ui" key="admin.fax.sr.outbox"/>
 				</a>
@@ -49,19 +40,6 @@
 		</ul>
 	</div>
 	<div class="tabs-body">
-		<div id="fax_inbox" class="tab-pane"
-		     ng-show="$ctrl.activeTab == $ctrl.tabEnum.inbox">
-			<fax-inbox ng-if="$ctrl.selectedFaxAccount"
-			           fax-account="$ctrl.selectedFaxAccount"
-			           component-style="$ctrl.componentStyle">
-			</fax-inbox>
-		</div>
-		<div id="fax_outbox" class="tab-pane"
-		     ng-show="$ctrl.activeTab == $ctrl.tabEnum.outbox">
-			<fax-outbox ng-if="$ctrl.selectedFaxAccount"
-			            fax-account="$ctrl.selectedFaxAccount"
-			            component-style="$ctrl.componentStyle">
-			</fax-outbox>
-		</div>
+		<ui-view></ui-view>
 	</div>
 </div>

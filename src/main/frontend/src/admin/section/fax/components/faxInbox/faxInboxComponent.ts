@@ -9,6 +9,8 @@ import FaxInboxResult from "../../../../../lib/fax/model/FaxInboxResult";
 import {Moment} from "moment";
 import FaxInboxService from "../../../../../lib/fax/service/FaxInboxService";
 import PagedResponse from "../../../../../lib/common/response/pagedRespose";
+import FaxAccount from "../../../../../lib/fax/model/FaxAccount";
+import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";
 
 angular.module("Admin.Section.Fax").component('faxInbox', {
 	templateUrl: 'src/admin/section/fax/components/faxInbox/faxInbox.jsp',
@@ -24,6 +26,7 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 		{
 			const ctrl = this;
 			ctrl.toastService = new ToastService();
+			ctrl.faxAccountService = new FaxAccountService();
 			ctrl.faxInboxService = new FaxInboxService();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;
@@ -39,10 +42,33 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 			ctrl.nextPullTime = null;
 			ctrl.tableParamsInbox = null;
 			ctrl.loggedInProviderNo = null;
+			ctrl.selectedFaxAccountId = null;
+			ctrl.faxAccountOptions = [
+				{
+					value: null,
+					label: "All",
+					data: null,
+				},
+			];
 
-			ctrl.$onInit = () =>
+			ctrl.$onInit = async () =>
 			{
-				ctrl.searchParams.faxAccount = ctrl.faxAccount;
+				try
+				{
+					let faxAccountList = (await ctrl.faxAccountService.getAccounts()).body;
+					faxAccountList.map((faxAccount: FaxAccount) =>
+					{
+						return {
+							value: faxAccount.id,
+							label: faxAccount.displayName,
+							data: faxAccount,
+						}
+					}).forEach((option: object) => ctrl.faxAccountOptions.push(option));
+				}
+				catch (error)
+				{
+					console.error(error);
+				}
 			}
 
 			ctrl.loadInboxItems = (): void =>
@@ -97,6 +123,12 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 					}
 				);
 			};
+
+			ctrl.updateSelectedAccount = (value: number, option: any) =>
+			{
+				ctrl.selectedFaxAccountId = value;
+				ctrl.searchParams.faxAccount = option.data ? option.data : null;
+			}
 
 			ctrl.openDocument = function(documentId: number): void
 			{

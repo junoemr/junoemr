@@ -1,6 +1,5 @@
 import FaxAccountService from "../../../lib/fax/service/FaxAccountService";
 import {LABEL_POSITION} from "../../../common/components/junoComponentConstants";
-import FaxAccount from "../../../lib/fax/model/FaxAccount";
 
 angular.module("Admin.Section.Fax").component('faxSendReceive', {
 	templateUrl: 'src/admin/section/fax/faxSendReceive.jsp',
@@ -8,7 +7,8 @@ angular.module("Admin.Section.Fax").component('faxSendReceive', {
 		componentStyle: "<?",
 	},
 	controller: [
-		function ()
+		'$state',
+		function ($state)
 		{
 			const ctrl = this;
 			ctrl.faxAccountService = new FaxAccountService();
@@ -18,46 +18,40 @@ angular.module("Admin.Section.Fax").component('faxSendReceive', {
 				inbox:0,
 				outbox:1
 			});
-			ctrl.activeTab = ctrl.tabEnum.outbox;
+			ctrl.activeTab = null;
 
-			ctrl.selectedFaxAccountId = null;
-			ctrl.selectedFaxAccount = null;
-			ctrl.faxAccountOptions = [];
-
-			ctrl.$onInit = async () =>
+			ctrl.$onInit = () =>
 			{
-				try
+				if($state.includes("**.inbox"))
 				{
-					ctrl.faxAccountList = (await ctrl.faxAccountService.getAccounts()).body;
-					ctrl.faxAccountOptions = ctrl.faxAccountList.map((faxAccount: FaxAccount) =>
-					{
-						return {
-							value: faxAccount.id,
-							label: faxAccount.displayName,
-							data: faxAccount,
-						}
-					});
-					if(ctrl.faxAccountOptions.length > 0)
-					{
-						ctrl.updateSelectedAccount(ctrl.faxAccountOptions[0].value, ctrl.faxAccountOptions[0]);
-					}
+					ctrl.changeTab(ctrl.tabEnum.inbox);
 				}
-				catch (error)
+				else
 				{
-					console.error(error);
+					ctrl.changeTab(ctrl.tabEnum.outbox);
 				}
-			};
-
-			ctrl.updateSelectedAccount = (value: number, option: any) =>
-			{
-				ctrl.selectedFaxAccountId = value;
-				ctrl.selectedFaxAccount = option.data;
 			}
 
 			ctrl.changeTab = function(tabId)
 			{
 				ctrl.activeTab = tabId;
+				switch (tabId)
+				{
+					case 0: {
+						$state.go("admin.faxSendReceive.inbox");
+						break;
+					}
+					case 1: {
+						$state.go("admin.faxSendReceive.outbox");
+						break;
+					}
+				}
 			};
+
+			ctrl.tabActiveClass = (index: number): string[] =>
+			{
+				return (index === ctrl.activeTab) ? ["active"] : [];
+			}
 		}
 	]
 });

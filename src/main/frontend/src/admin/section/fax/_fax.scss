@@ -62,25 +62,4 @@
 			}
 		}
 	}
-
-	.search-frame {
-		padding: 10px;
-
-		.search-filters {
-			padding: 5px;
-		}
-
-		.search-buttons {
-			padding: 5px;
-			display: flex;
-			flex-direction: row;
-			align-items: end;
-		}
-	}
-
-	.table {
-		.float-right {
-			float: right;
-		}
-	}
 }

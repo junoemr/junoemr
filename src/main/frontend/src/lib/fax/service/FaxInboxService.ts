@@ -35,7 +35,7 @@ export default class FaxInboxService
 			params.perPage,
 			params.endDate ? Juno.Common.Util.formatMomentDate(params.endDate) : null,
 			params.startDate ? Juno.Common.Util.formatMomentDate(params.startDate) : null,
-			params.faxAccount.id,
+			params.faxAccount?.id,
 		)).data;
 
 		return new PagedResponse(this.faxInboxResultToModelConverter.convertList(transfer.body, transfer.headers));

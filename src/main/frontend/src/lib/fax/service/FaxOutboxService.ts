@@ -35,7 +35,7 @@ export default class FaxOutboxService
 				params.perPage,
 				params.endDate ? Juno.Common.Util.formatMomentDate(params.endDate) : null,
 				params.startDate ? Juno.Common.Util.formatMomentDate(params.startDate) : null,
-				params.faxAccount.id,
+				params.faxAccount?.id,
 				params.combinedStatus as any,
 				params.archived,
 			)).data;

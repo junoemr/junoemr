@@ -151,6 +151,16 @@ oscarApp.config([
 			url: '/faxSendReceive',
 			component: 'faxSendReceive',
 		})
+		.state('admin.faxSendReceive.inbox',
+		{
+			url: '/inbox',
+			component: 'faxInbox',
+		})
+		.state('admin.faxSendReceive.outbox',
+		{
+			url: '/outbox',
+			component: 'faxOutbox',
+		})
 		.state('admin.landingPage',
 		{
 			url: '/landingPage',

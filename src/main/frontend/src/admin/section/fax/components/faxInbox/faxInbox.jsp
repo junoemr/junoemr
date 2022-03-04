@@ -26,6 +26,13 @@
 					label="<bean:message bundle="ui" key="admin.fax.sr.search.endDate"/>"
 					label-position="$ctrl.LABEL_POSITION.TOP">
 			</juno-date-select>
+			<juno-select
+					label="<bean:message bundle="ui" key="admin.fax.sr.choose-account"/>"
+					label-position="$ctrl.LABEL_POSITION.TOP"
+					ng-model="$ctrl.selectedFaxAccountId"
+					options="$ctrl.faxAccountOptions"
+					on-change="$ctrl.updateSelectedAccount(value, option)">
+			</juno-select>
 			<div class="w-128">
 				<juno-button click="$ctrl.loadInboxItems();"
 				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
