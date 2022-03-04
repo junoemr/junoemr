@@ -86,6 +86,7 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 			ctrl.nextPushTime = null;
 			ctrl.displayNotificationColumn = false;
 			ctrl.selectedFaxAccountId = null;
+			ctrl.faxAccountList = [];
 			ctrl.faxAccountOptions = [
 				{
 					value: null,
@@ -98,8 +99,8 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 			{
 				try
 				{
-					let faxAccountList = (await ctrl.faxAccountService.getAccounts()).body;
-					faxAccountList.map((faxAccount: FaxAccount) =>
+					ctrl.faxAccountList = (await ctrl.faxAccountService.getAccounts()).body;
+					ctrl.faxAccountList.map((faxAccount: FaxAccount) =>
 					{
 						return {
 							value: faxAccount.id,
@@ -241,6 +242,11 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 			ctrl.getStatusDisplayLabel = (combinedStatus: FaxStatusCombinedType) =>
 			{
 				return ctrl.statusFilterOptions.find((option) => combinedStatus === option.value).label;
+			}
+
+			ctrl.getFaxAccountDisplayName = (faxAccountId: number) =>
+			{
+				return ctrl.faxAccountList.find((faxAccount) => faxAccountId === faxAccount.id)?.displayName;
 			}
 
 			ctrl.formatDateForDisplay = (date: Moment): string =>

@@ -43,6 +43,7 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 			ctrl.tableParamsInbox = null;
 			ctrl.loggedInProviderNo = null;
 			ctrl.selectedFaxAccountId = null;
+			ctrl.faxAccountList = [];
 			ctrl.faxAccountOptions = [
 				{
 					value: null,
@@ -55,8 +56,8 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 			{
 				try
 				{
-					let faxAccountList = (await ctrl.faxAccountService.getAccounts()).body;
-					faxAccountList.map((faxAccount: FaxAccount) =>
+					ctrl.faxAccountList = (await ctrl.faxAccountService.getAccounts()).body;
+					ctrl.faxAccountList.map((faxAccount: FaxAccount) =>
 					{
 						return {
 							value: faxAccount.id,
@@ -164,6 +165,11 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 			ctrl.formatDateForDisplay = (date: Moment): string =>
 			{
 				return Juno.Common.Util.formatMomentDate(date) + " " + Juno.Common.Util.formatMomentTime(date);
+			}
+
+			ctrl.getFaxAccountDisplayName = (faxAccountId: number) =>
+			{
+				return ctrl.faxAccountList.find((faxAccount) => faxAccountId === faxAccount.id)?.displayName;
 			}
 		}
 	]}

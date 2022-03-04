@@ -53,6 +53,9 @@
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.providerName"/>'">
 					{{item.providerName}} ({{item.providerNo}})
 				</td>
+				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.accountName"/>'">
+					{{$ctrl.getFaxAccountDisplayName(item.id)}}
+				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.fileType"/>'">
 					{{item.fileType}}
 				</td>

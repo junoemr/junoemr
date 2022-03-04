@@ -47,12 +47,17 @@
 		<table ng-table="$ctrl.tableParamsInbox" show-filter="false" class="table table-striped table-bordered">
 			<tbody>
 			<tr ng-repeat="item in $ctrl.inboxItemList">
-
+				<td>
+					<icon-badge icon="icon-check"></icon-badge>
+				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.inbox.tbl-hdr.systemDateReceived"/>'">
 					{{$ctrl.formatDateForDisplay(item.systemDateReceived)}}
 				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.inbox.tbl-hdr.sentFrom"/>'">
 					{{item.sentFrom}}
+				</td>
+				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.inbox.tbl-hdr.accountName"/>'">
+					{{$ctrl.getFaxAccountDisplayName(item.id)}}
 				</td>
 				<td class="w-128">
 					<juno-button click="$ctrl.openDocument(item.documentId)"
