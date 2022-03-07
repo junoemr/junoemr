@@ -1,0 +1,44 @@
+.fax-configuration-edit-modal {
+
+	.fax-configuration-edit-modal-content {
+		padding: 30px;
+		background-color: var(--color-neutral-white);
+		overflow: auto;
+		height: 100%;
+
+		.input-fieldset {
+			margin: 0 20%;
+		}
+		.input-group {
+			--juno-input-label-width: 30%;
+			--juno-select-label-width: 30%;
+			--juno-button-label-width: 30%;
+		}
+
+		.icon-badge {
+			--icon-font-size: 12px;
+			--icon-color: var(--color-neutral-white);
+		}
+		.connection-status-success {
+			.icon-badge {
+				--badge-color: var(--color-green-base);
+			}
+		}
+		.connection-status-failure {
+			.icon-badge {
+				--badge-color: var(--color-red-base);
+			}
+		}
+		.connection-status-unknown {
+			.icon-badge {
+				--badge-color: var(--color-neutral-grey);
+			}
+		}
+
+		.info-badge {
+			i {
+				font-size: 10px;
+			}
+		}
+	}
+}

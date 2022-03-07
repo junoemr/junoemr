@@ -26,6 +26,7 @@ export enum LABEL_POSITION
 {
 	TOP = "juno-input-label-top",
 	LEFT = "juno-input-label-left",
+	RIGHT = "juno-input-label-right",
 }
 
 // styles of juno inputs

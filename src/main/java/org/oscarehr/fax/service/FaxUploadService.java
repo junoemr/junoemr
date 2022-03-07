@@ -34,12 +34,15 @@ import org.oscarehr.fax.exception.FaxApiValidationException;
 import org.oscarehr.fax.exception.FaxException;
 import org.oscarehr.fax.exception.FaxNumberException;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.model.FaxFileType;
+import org.oscarehr.fax.model.FaxNotificationStatus;
 import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.model.FaxStatusCombined;
+import org.oscarehr.fax.model.FaxStatusInternal;
 import org.oscarehr.fax.provider.FaxProviderFactory;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.result.FaxStatusResult;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
-
 import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import org.oscarehr.provider.dao.ProviderDataDao;
@@ -123,7 +126,7 @@ public class FaxUploadService
 	 * Send a fax with the default fax account
 	 * @throws IOException
 	 */
-	public FaxOutboxTransferOutbound queueAndSendFax(String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
+	public FaxOutboxTransferOutbound queueAndSendFax(String providerId, Integer demographicId, String faxNumber, FaxFileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
 	{
 		FaxAccount faxAccount = faxAccountService.getDefaultFaxAccount();
 		return queueAndSendFax(faxAccount, providerId, demographicId, faxNumber, fileType, fileToFax);
@@ -133,7 +136,7 @@ public class FaxUploadService
 	 * Send a fax with the given fax account
 	 * @throws IOException
 	 */
-	public FaxOutboxTransferOutbound queueAndSendFax(FaxAccount faxAccount, String providerId, Integer demographicId, String faxNumber, FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
+	public FaxOutboxTransferOutbound queueAndSendFax(FaxAccount faxAccount, String providerId, Integer demographicId, String faxNumber, FaxFileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
 	{
 		FaxOutboxTransferOutbound transfer;
 		// check for enabled fax routes
@@ -225,21 +228,21 @@ public class FaxUploadService
 		}
 		if (StringUtils.trimToNull(combinedStatus) != null)
 		{
-			criteriaSearch.setCombinedStatus(FaxOutboxTransferOutbound.CombinedStatus.valueOf(combinedStatus));
+			criteriaSearch.setCombinedStatus(FaxStatusCombined.valueOf(combinedStatus));
 		}
 		if (StringUtils.trimToNull(archived) != null)
 		{
 			criteriaSearch.setArchived(Boolean.parseBoolean(archived));
 		}
-		criteriaSearch.setNotificationStatus(FaxOutbound.NotificationStatus.NOTIFY);
+		criteriaSearch.setNotificationStatus(FaxNotificationStatus.NOTIFY);
 
 		return faxOutboundDao.criteriaSearchCount(criteriaSearch);
 	}
 
-	public FaxOutboxTransferOutbound setNotificationStatus(Long faxOutId, String status)
+	public FaxOutboxTransferOutbound setNotificationStatus(Long faxOutId, FaxNotificationStatus status)
 	{
 		FaxOutbound faxOutbound = faxOutboundDao.find(faxOutId);
-		faxOutbound.setNotificationStatus(FaxOutbound.NotificationStatus.valueOf(status));
+		faxOutbound.setNotificationStatus(status);
 		faxOutboundDao.persist(faxOutbound);
 		return faxOutboundToModelConverter.convert(faxOutbound);
 	}
@@ -291,7 +294,7 @@ public class FaxUploadService
 		List<String> remoteFinalStatuses = uploadProvider.getRemoteFinalStatusIndicators();
 
 		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
-		criteriaSearch.setStatus(FaxOutbound.Status.SENT); // only check records with a local sent status
+		criteriaSearch.setStatus(FaxStatusInternal.SENT); // only check records with a local sent status
 		criteriaSearch.setArchived(false); // ignore archived records
 		criteriaSearch.setRemoteStatusList(remoteFinalStatuses, false);
 
@@ -359,7 +362,7 @@ public class FaxUploadService
 	 * @throws IOException - if a fax file cannot be moved to the pending folder
 	 */
 	private FaxOutbound queueNewFax(String providerId, Integer demographicId, FaxAccount faxAccount, String faxNumber,
-	                                FaxOutbound.FileType fileType, GenericFile fileToFax) throws IOException
+	                               FaxFileType fileType, GenericFile fileToFax) throws IOException
 	{
 		ProviderData provider = providerDataDao.find(providerId);
 

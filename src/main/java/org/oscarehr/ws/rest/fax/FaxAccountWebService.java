@@ -23,20 +23,12 @@
 package org.oscarehr.ws.rest.fax;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.lang.StringUtils;
 import org.oscarehr.fax.dao.FaxAccountDao;
-import org.oscarehr.fax.dao.FaxInboundDao;
-import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
-import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
-import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
 import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.fax.transfer.FaxAccountCreateInput;
 import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.fax.transfer.FaxAccountUpdateInput;
-import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
-import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
-import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.common.annotation.MaskParameter;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
@@ -44,9 +36,9 @@ import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.util.ConversionUtils;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -64,16 +56,7 @@ import java.util.List;
 public class FaxAccountWebService extends AbstractServiceImpl
 {
 	@Autowired
-	private SecurityInfoManager securityInfoManager;
-
-	@Autowired
 	private FaxAccountDao faxAccountDao;
-
-	@Autowired
-	private FaxOutboundDao faxOutboundDao;
-
-	@Autowired
-	private FaxInboundDao faxInboundDao;
 
 	@Autowired
 	private FaxAccountService faxAccountService;
@@ -145,6 +128,16 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		return RestResponse.successResponse(faxAccountService.updateFaxAccount(updateInput));
 	}
 
+	@DELETE
+	@Path("/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> deleteAccountSettings(@PathParam("id") Long id)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_DELETE);
+		return RestResponse.successResponse(faxAccountService.deleteFaxAccount(id));
+	}
+
 	@POST
 	@Path("/testConnection")
 	@MaskParameter
@@ -166,89 +159,5 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
 		return RestResponse.successResponse(faxAccountService.testConnectionStatus(updateInput));
-	}
-
-	@GET
-	@Path("/{id}/inbox")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestSearchResponse<FaxInboxTransferOutbound> getInbox(@PathParam("id") Long id,
-																 @QueryParam("page") @DefaultValue("1") Integer page,
-																 @QueryParam("perPage") @DefaultValue("10") Integer perPage,
-																 @QueryParam("endDate") String endDateStr,
-																 @QueryParam("startDate") String startDateStr)
-	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_READ);
-
-		page = validPageNo(page);
-		perPage = limitedResultCount(perPage);
-		int offset = calculatedOffset(page, perPage);
-
-		FaxInboundCriteriaSearch criteriaSearch = new FaxInboundCriteriaSearch();
-		criteriaSearch.setOffset(offset);
-		criteriaSearch.setLimit(perPage);
-		criteriaSearch.setFaxAccountId(id);
-		criteriaSearch.setSortDirDescending();
-
-		if (endDateStr != null)
-		{
-			criteriaSearch.setEndDate(ConversionUtils.toLocalDate(endDateStr));
-		}
-		if (startDateStr != null)
-		{
-			criteriaSearch.setStartDate(ConversionUtils.toLocalDate(startDateStr));
-		}
-
-		int total = faxInboundDao.criteriaSearchCount(criteriaSearch);
-		List<FaxInboxTransferOutbound> inboundList = faxAccountService.getInboxResults(criteriaSearch);
-
-		return RestSearchResponse.successResponse(inboundList, page, perPage, total);
-	}
-
-	@GET
-	@Path("/{id}/outbox")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestSearchResponse<FaxOutboxTransferOutbound> getOutbox(@PathParam("id") Long id,
-																   @QueryParam("page") @DefaultValue("1") Integer page,
-																   @QueryParam("perPage") @DefaultValue("10") Integer perPage,
-																   @QueryParam("endDate") String endDateStr,
-																   @QueryParam("startDate") String startDateStr,
-																   @QueryParam("combinedStatus") String combinedStatus,
-																   @QueryParam("archived") String archived)
-	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_READ);
-
-		page = validPageNo(page);
-		perPage = limitedResultCount(perPage);
-		int offset = calculatedOffset(page, perPage);
-
-		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
-		criteriaSearch.setLimit(perPage);
-		criteriaSearch.setFaxAccountId(id);
-		criteriaSearch.setSortDirDescending();
-
-		if (endDateStr != null)
-		{
-			criteriaSearch.setEndDate(ConversionUtils.toLocalDate(endDateStr));
-		}
-		if (startDateStr != null)
-		{
-			criteriaSearch.setStartDate(ConversionUtils.toLocalDate(startDateStr));
-		}
-		if (StringUtils.trimToNull(combinedStatus) != null)
-		{
-			criteriaSearch.setCombinedStatus(FaxOutboxTransferOutbound.CombinedStatus.valueOf(combinedStatus));
-		}
-		if (StringUtils.trimToNull(archived) != null)
-		{
-			criteriaSearch.setArchived(Boolean.parseBoolean(archived));
-		}
-		criteriaSearch.setOffset(offset);
-
-		List<FaxOutboxTransferOutbound> transferList = faxAccountService.getOutboxResults(criteriaSearch);
-		int total = faxOutboundDao.criteriaSearchCount(criteriaSearch);
-
-		return RestSearchResponse.successResponse(transferList, page, perPage, total);
 	}
 }

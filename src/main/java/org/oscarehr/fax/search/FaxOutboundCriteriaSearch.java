@@ -27,8 +27,10 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
-import org.oscarehr.fax.model.FaxOutbound;
-import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
+import org.oscarehr.fax.model.FaxFileType;
+import org.oscarehr.fax.model.FaxNotificationStatus;
+import org.oscarehr.fax.model.FaxStatusInternal;
+import org.oscarehr.fax.model.FaxStatusCombined;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -46,16 +48,16 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 	private String sentTo;
 	private String providerNo;
 	private Integer demographicNo;
-	private FaxOutbound.FileType fileType;
-	private FaxOutbound.Status status;
-	private FaxOutbound.NotificationStatus notificationStatus;
+	private FaxFileType fileType;
+	private FaxStatusInternal status;
+	private FaxNotificationStatus notificationStatus;
 	private Long faxAccountId;
 	private LocalDate startDate;
 	private LocalDate endDate;
 	private Boolean archived;
 	private List<String> remoteStatusList;
 	private boolean includeExternalStatuses;
-	private FaxOutboxTransferOutbound.CombinedStatus combinedStatus;
+	private FaxStatusCombined combinedStatus;
 
 	private SORTMODE sortMode = SORTMODE.CreationDate;
 
@@ -137,23 +139,23 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 		}
 	}
 
-	private Criterion getCombinedStatusCriteria(FaxOutboxTransferOutbound.CombinedStatus combinedStatus)
+	private Criterion getCombinedStatusCriteria(FaxStatusCombined combinedStatus)
 	{
 		Criterion criterion = null;
 		switch(combinedStatus)
 		{
 			case ERROR:
 			{
-				criterion = Restrictions.eq("status", FaxOutbound.Status.ERROR); break;
+				criterion = Restrictions.eq("status", FaxStatusInternal.ERROR); break;
 			}
 			case QUEUED:
 			{
-				criterion = Restrictions.eq("status", FaxOutbound.Status.QUEUED); break;
+				criterion = Restrictions.eq("status", FaxStatusInternal.QUEUED); break;
 			}
 			case IN_PROGRESS:
 			{
 				criterion = Restrictions.and(
-						Restrictions.eq("status", FaxOutbound.Status.SENT),
+						Restrictions.eq("status", FaxStatusInternal.SENT),
 						Restrictions.or(
 								Restrictions.not(Restrictions.in("externalStatus", SRFaxApiConnector.RESPONSE_STATUSES_FINAL)),
 								Restrictions.isNull("externalStatus")
@@ -163,14 +165,14 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 			case INTEGRATION_FAILED:
 			{
 				criterion = Restrictions.and(
-						Restrictions.eq("status", FaxOutbound.Status.SENT),
+						Restrictions.eq("status", FaxStatusInternal.SENT),
 						Restrictions.eq("externalStatus", SRFaxApiConnector.RESPONSE_STATUS_FAILED)
 				); break;
 			}
 			case INTEGRATION_SUCCESS:
 			{
 				criterion = Restrictions.and(
-						Restrictions.eq("status", FaxOutbound.Status.SENT),
+						Restrictions.eq("status", FaxStatusInternal.SENT),
 						Restrictions.eq("externalStatus", SRFaxApiConnector.RESPONSE_STATUS_SENT)
 				); break;
 			}
@@ -208,29 +210,29 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 		this.demographicNo = demographicNo;
 	}
 
-	public FaxOutbound.FileType getFileType()
+	public FaxFileType getFileType()
 	{
 		return fileType;
 	}
 
-	public void setFileType(FaxOutbound.FileType fileType)
+	public void setFileType(FaxFileType fileType)
 	{
 		this.fileType = fileType;
 	}
 
-	public FaxOutbound.Status getStatus()
+	public FaxStatusInternal getStatus()
 	{
 		return status;
 	}
 
-	public void setStatus(FaxOutbound.Status status)
+	public void setStatus(FaxStatusInternal status)
 	{
 		this.status = status;
 	}
 
-	public FaxOutbound.NotificationStatus getNotificationStatus() { return notificationStatus; }
+	public FaxNotificationStatus getNotificationStatus() { return notificationStatus; }
 
-	public void setNotificationStatus (FaxOutbound.NotificationStatus notificationStatus) { this.notificationStatus = notificationStatus; }
+	public void setNotificationStatus (FaxNotificationStatus notificationStatus) { this.notificationStatus = notificationStatus; }
 
 	public Long getFaxAccountId()
 	{
@@ -306,12 +308,12 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 	/** set the combined status to filter on.
 	 * the combined status will override the individual (local and remote) status parameters
 	 */
-	public void setCombinedStatus(FaxOutboxTransferOutbound.CombinedStatus combinedStatus)
+	public void setCombinedStatus(FaxStatusCombined combinedStatus)
 	{
 		this.combinedStatus = combinedStatus;
 	}
 
-	public FaxOutboxTransferOutbound.CombinedStatus getCombinedStatus()
+	public FaxStatusCombined getCombinedStatus()
 	{
 		return combinedStatus;
 	}

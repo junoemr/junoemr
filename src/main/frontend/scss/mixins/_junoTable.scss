@@ -17,7 +17,7 @@
 		th {
 			color: $header-text-color;
 			background-color: $header-background-color;
-			border-top: solid $border-color #{$border-width};
+			border-top: solid $border-color #{$border-width} !important;
 			font-weight: normal;
 
 			&:first-child {

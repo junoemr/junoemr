@@ -1,0 +1,12 @@
+.fax-inbox {
+  @include juno-table-default;
+
+  .header {
+    color: var(--color-primary-base);
+  }
+
+  .icon-badge {
+    --icon-color: var(--color-neutral-white);
+    --badge-color: var(--color-green-base);
+  }
+}

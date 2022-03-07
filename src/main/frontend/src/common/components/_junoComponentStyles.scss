@@ -11,6 +11,12 @@
 	text-align: right;
 }
 
+.juno-input-label-right {
+	margin-right: var(--juno-form-input-label-padding-right);
+	margin-bottom: 0 !important;/// _forms.scss is a little baby and will add a margin to the bottom!
+	text-align: left;
+}
+
 // ============ MIXINS ===============
 
 @mixin junoTabColor ($background-color, $selected-background-color, $border-color, $text-color)

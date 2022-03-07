@@ -23,10 +23,12 @@
 package org.oscarehr.fax.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
+@Data
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 public class FaxInboxTransferOutbound implements Serializable
@@ -41,64 +43,4 @@ public class FaxInboxTransferOutbound implements Serializable
 	private String sentFrom;
 
 	private Long externalReferenceId;
-
-	public Long getId()
-	{
-		return id;
-	}
-
-	public void setId(Long id)
-	{
-		this.id = id;
-	}
-
-	public Long getFaxAccountId()
-	{
-		return faxAccountId;
-	}
-
-	public void setFaxAccountId(Long faxAccountId)
-	{
-		this.faxAccountId = faxAccountId;
-	}
-
-	public String getSystemDateReceived()
-	{
-		return systemDateReceived;
-	}
-
-	public void setSystemDateReceived(String systemDateReceived)
-	{
-		this.systemDateReceived = systemDateReceived;
-	}
-
-	public Integer getDocumentId()
-	{
-		return documentId;
-	}
-
-	public void setDocumentId(Integer documentId)
-	{
-		this.documentId = documentId;
-	}
-
-	public String getSentFrom()
-	{
-		return sentFrom;
-	}
-
-	public void setSentFrom(String sentFrom)
-	{
-		this.sentFrom = sentFrom;
-	}
-
-	public Long getExternalReferenceId()
-	{
-		return externalReferenceId;
-	}
-
-	public void setExternalReferenceId(Long externalReferenceId)
-	{
-		this.externalReferenceId = externalReferenceId;
-	}
 }

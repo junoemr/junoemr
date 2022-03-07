@@ -6,7 +6,7 @@ export default class PagedResponse<T> extends SimpleResponse<Array<T>>
 	protected _perPage: number;
 	protected _total: number;
 
-	constructor(body, headers?)
+	constructor(body: Array<T>, headers?)
 	{
 		super(body);
 		if (headers)
@@ -17,7 +17,7 @@ export default class PagedResponse<T> extends SimpleResponse<Array<T>>
 		}
 	}
 
-	get body()
+	get body(): Array<T>
 	{
 		return this._body;
 	}

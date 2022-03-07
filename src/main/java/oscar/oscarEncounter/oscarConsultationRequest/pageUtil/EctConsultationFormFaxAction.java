@@ -24,7 +24,8 @@ import org.oscarehr.consultations.service.ConsultationAttachmentService;
 import org.oscarehr.consultations.service.ConsultationPDFCreationService;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.fax.exception.FaxException;
-import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.model.FaxFileType;
+import org.oscarehr.fax.model.FaxStatusInternal;
 import org.oscarehr.fax.service.FaxUploadService;
 import org.oscarehr.fax.util.PdfCoverPageCreator;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -162,13 +163,13 @@ public class EctConsultationFormFaxAction extends Action
 
 					fileToFax.rename(tempName);
 					FaxOutboxTransferOutbound transfer = faxUploadService
-						.queueAndSendFax(providerNo, Integer.parseInt(demoNo), faxNo, FaxOutbound.FileType.CONSULTATION, fileToFax);
-					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))
+						.queueAndSendFax(providerNo, Integer.parseInt(demoNo), faxNo, FaxFileType.CONSULTATION, fileToFax);
+					if(transfer.getSystemStatus().equals(FaxStatusInternal.ERROR))
 					{
 						errorList.add("Failed to send fax. Check account settings. " +
 									"Reason: " + transfer.getSystemStatusMessage());
 					}
-					else if(transfer.getSystemStatus().equals(FaxOutbound.Status.QUEUED))
+					else if(transfer.getSystemStatus().equals(FaxStatusInternal.QUEUED))
 					{
 						errorList.add("Failed to send fax, it has been queued for automatic resend. " +
 									"Reason: " + transfer.getSystemStatusMessage());

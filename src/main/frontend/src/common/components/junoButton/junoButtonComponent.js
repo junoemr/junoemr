@@ -58,7 +58,7 @@ angular.module('Common.Components').component('junoButton', {
 
 		ctrl.labelClasses = () =>
 		{
-			return [ctrl.labelPosition];
+			return [ctrl.labelPosition, 'label-style'];
 		};
 
 		ctrl.componentClasses = () =>

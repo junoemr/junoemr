@@ -24,6 +24,7 @@ package org.oscarehr.fax.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.model.FaxStatusInternal;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
@@ -46,7 +47,7 @@ public class FaxOutboundDao extends AbstractDao<FaxOutbound>
 						"WHERE record.status = :status " +
 						"AND acct.outboundEnabled = :enabled " +
 						"ORDER BY record.createdAt ASC");
-		query.setParameter("status", FaxOutbound.Status.QUEUED);
+		query.setParameter("status", FaxStatusInternal.QUEUED);
 		query.setParameter("enabled", true);
 		return query.getResultList();
 	}

@@ -46,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -138,6 +139,14 @@ public class FaxAccountService
 		FaxAccount faxAccount = faxAccountUpdateToEntityConverter.convert(updateInput);
 		faxAccountDao.merge(faxAccount);
 		return faxAccountToModelConverter.convert(faxAccount);
+	}
+
+	public boolean deleteFaxAccount(Long id)
+	{
+		FaxAccount faxAccount = faxAccountDao.find(id);
+		faxAccount.setDeletedAt(new Date());
+		faxAccountDao.merge(faxAccount);
+		return true;
 	}
 
 	public List<FaxAccountTransferOutbound> listAccounts(FaxAccountCriteriaSearch criteriaSearch)

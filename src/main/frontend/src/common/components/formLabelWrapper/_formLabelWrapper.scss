@@ -1,0 +1,41 @@
+.form-label-wrapper {
+  flex: 0 0 100%;
+  --form-label-width: unset;
+
+  &.juno-input-label-top {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 4px;
+  }
+
+  &.juno-input-label-left {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+
+    .label-style {
+      margin-right: var(--juno-form-input-label-padding-left);
+      margin-bottom: 0 !important;/// _forms.scss is a little baby and will add a margin to the bottom!
+      text-align: right;
+    }
+  }
+
+  &.juno-input-label-right {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: flex-end;
+
+    .label-style {
+      margin-left: var(--juno-form-input-label-padding-right);
+      margin-bottom: 0 !important;/// _forms.scss is a little baby and will add a margin to the bottom!
+      text-align: left;
+    }
+  }
+
+  .form-input-wrapper {
+    display: inline-block;
+  }
+}

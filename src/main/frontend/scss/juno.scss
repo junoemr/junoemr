@@ -39,6 +39,7 @@
 @import "../src/common/components/junoLoadingIndicator";
 @import "../src/common/components/modal";
 @import "../src/common/components/filterPanel/filterPanel";
+@import "../src/common/components/formLabelWrapper/formLabelWrapper";
 @import "../src/common/components/junoButton/junoButton";
 @import "../src/common/components/junoRoundButton/junoRoundButton";
 @import "../src/common/components/junoCheckBox/junoCheckBox";
@@ -65,6 +66,7 @@
 @import "../src/common/components/junoComponentStyles";
 @import "../src/common/components/zeroStateDisplay";
 @import "../src/common/components/accordionList/accordionList";
+@import "../src/common/components/iconBadge/iconBadge";
 @import "../src/common/components/iconCard/iconCard";
 @import "../src/common/components/panel/_panel.scss";
 @import "../src/common/layout/pageWrapper/pageWrapper";
@@ -161,6 +163,9 @@
 @import "../src/admin/systemProperties/components/junoSelectSave/junoSelectSave";
 @import "../src/admin/section/know2act/Know2act";
 @import "../src/admin/section/fax/fax";
+@import "../src/admin/section/fax/components/faxConfigurationEditModal/faxConfigurationEditModal";
+@import "../src/admin/section/fax/components/faxInbox/faxInbox";
+@import "../src/admin/section/fax/components/faxOutbox/faxOutbox";
 @import "../src/admin/section/landingPage/landingPage";
 @import "../src/admin/section/integrationModules/integrationModules";
 @import "../src/admin/section/panelManagement/panelManagement";

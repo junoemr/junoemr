@@ -45,26 +45,6 @@ import java.util.Date;
 @Table(name = "fax_outbound")
 public class FaxOutbound extends AbstractModel<Long>
 {
-	public enum FileType
-	{
-		DOCUMENT,
-		FORM,
-		PRESCRIPTION,
-		CONSULTATION
-	}
-
-	public enum Status
-	{
-		ERROR,
-		QUEUED,
-		SENT
-	}
-
-	public enum NotificationStatus
-	{
-		NOTIFY,
-		SILENT
-	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -77,7 +57,7 @@ public class FaxOutbound extends AbstractModel<Long>
 
 	@Enumerated(EnumType.STRING)
 	@Column(name= "status")
-	private Status status;
+	private FaxStatusInternal status;
 
 	@Column(name= "status_message")
 	private String statusMessage;
@@ -87,7 +67,7 @@ public class FaxOutbound extends AbstractModel<Long>
 
 	@Column(name= "notification_status")
 	@Enumerated(EnumType.STRING)
-	private NotificationStatus notificationStatus = NotificationStatus.NOTIFY;
+	private FaxNotificationStatus notificationStatus = FaxNotificationStatus.NOTIFY;
 
 	@Column(name= "archived")
 	private Boolean archived = false;
@@ -100,7 +80,7 @@ public class FaxOutbound extends AbstractModel<Long>
 
 	@Enumerated(EnumType.STRING)
 	@Column(name= "file_type")
-	private FileType fileType;
+	private FaxFileType fileType;
 
 	@Column(name= "file_name")
 	private String fileName;
@@ -151,44 +131,44 @@ public class FaxOutbound extends AbstractModel<Long>
 		this.createdAt = createdAt;
 	}
 
-	public Status getStatus()
+	public FaxStatusInternal getStatus()
 	{
 		return status;
 	}
 
-	public void setStatus(Status status)
+	public void setStatus(FaxStatusInternal status)
 	{
 		this.status = status;
 	}
 
 	public void setStatusSent()
 	{
-		setStatus(Status.SENT);
+		setStatus(FaxStatusInternal.SENT);
 	}
 
 	public void setStatusQueued()
 	{
-		setStatus(Status.QUEUED);
+		setStatus(FaxStatusInternal.QUEUED);
 	}
 
 	public void setStatusError()
 	{
-		setStatus(Status.ERROR);
+		setStatus(FaxStatusInternal.ERROR);
 	}
 
 	public boolean isStatusSent()
 	{
-		return Status.SENT.equals(getStatus());
+		return FaxStatusInternal.SENT.equals(getStatus());
 	}
 
 	public boolean isStatusQueued()
 	{
-		return Status.QUEUED.equals(getStatus());
+		return FaxStatusInternal.QUEUED.equals(getStatus());
 	}
 
 	public boolean isStatusError()
 	{
-		return Status.ERROR.equals(getStatus());
+		return FaxStatusInternal.ERROR.equals(getStatus());
 	}
 
 	public String getStatusMessage()
@@ -221,12 +201,12 @@ public class FaxOutbound extends AbstractModel<Long>
 		this.sentTo = sentTo;
 	}
 
-	public NotificationStatus getNotificationStatus()
+	public FaxNotificationStatus getNotificationStatus()
 	{
 		return notificationStatus;
 	}
 
-	public void setNotificationStatus(NotificationStatus notificationStatus)
+	public void setNotificationStatus(FaxNotificationStatus notificationStatus)
 	{
 		this.notificationStatus = notificationStatus;
 	}
@@ -262,12 +242,12 @@ public class FaxOutbound extends AbstractModel<Long>
 		this.demographicNo = demographicNo;
 	}
 
-	public FileType getFileType()
+	public FaxFileType getFileType()
 	{
 		return fileType;
 	}
 
-	public void setFileType(FileType fileType)
+	public void setFileType(FaxFileType fileType)
 	{
 		this.fileType = fileType;
 	}

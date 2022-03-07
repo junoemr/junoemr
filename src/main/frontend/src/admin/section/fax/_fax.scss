@@ -1,142 +1,35 @@
 .fax-config {
-	.switch {
-		@include juno-toggle-switch(32px, 4px, .4s);
+	.fax-config-header {
+		h1 {
+			color: var(--color-primary-base);
+		}
 	}
-  .fax-config-header {
-	padding: 15px;
-  }
 	.fax-config-body {
-		.account-list {
-			padding: 5px;
-			background-color: $color-neutral-white;
-			.account-item {
-				background-color: $color-neutral-lightest;
-				border: 2px $color-neutral-light-grey;
-				padding: 10px;
+		.table-text-primary
+		{
+			@include juno-font-body-small();
+		}
+		.table-text-secondary
+		{
+			@include juno-font-body-smallest();
+		}
 
-				display: flex;
-				flex-direction: row;
-				justify-content: space-between;
-				align-items: center;
-			}
-
-			.glyphicon {
-				&.glyphicon-lrg {
-					font-size: 30px;
-				}
-
-				&.glyphicon-sml {
-					font-size: 15px;
-				}
-
-				&.enabled {
-					color: $semantic-success-base;
-				}
-
-				&.disabled {
-					color: $semantic-error-base;
-				}
+		.state-enabled {
+			.icon-badge {
+				--icon-font-size: 14px;
+				--icon-color: var(--color-neutral-white);
+				--badge-color: var(--color-green-base);
 			}
 		}
-	}
-
-	.fax-config-footer {
-
+		.state-disabled {
+			.icon-badge {
+				--icon-font-size: 14px;
+				--icon-color: var(--color-neutral-white);
+				--badge-color: var(--color-red-base);
+			}
+		}
 	}
 }
-
-//hack to re-center modal for now
-.modal-dialog {
-	left: auto !important;
-}
-
-.faxEditModal {
-	.switch {
-		@include juno-toggle-switch(32px, 4px, .4s);
-	}
-	.modal-content {
-		background-color: $color-primary-base;
-	}
-
-	.modal-body {
-		padding: 30px;
-		background-color: $color-neutral-white;
-
-		input {
-			&.ng-invalid {
-				background-color: $input-color-invalid-background;
-				border-color: $input-color-invalid-border;
-			}
-		}
-
-		.input-validation {
-			font-size: 10px;
-			color: $input-color-invalid-text;
-		}
-
-		.flex-row {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			justify-content: flex-start;
-
-			&.content-center {
-				justify-content: center;
-			}
-
-			&.content-end {
-				justify-content: flex-end;
-			}
-
-			&.info-section {
-				position: relative;
-
-				.info-icon {
-					position: absolute;
-					font-size: 14px;
-					color: $color-blue-light;
-				}
-			}
-
-			.flex-row-label {
-				width: 40%;
-				padding: 0 5px;
-				text-align: right;
-			}
-
-			.flex-row-content {
-				text-align: left;
-			}
-		}
-
-		.glyphicon {
-			font-size: 25px;
-
-			&.unknown {
-				color: $color-neutral-dark;
-			}
-
-			&.success {
-				color: $semantic-success-base;
-			}
-
-			&.failure {
-				color: $semantic-error-base;
-			}
-		}
-	}
-
-	.modal-header {
-		color: $color-neutral-white;
-	}
-
-	.modal-footer {
-		background-color: $color-neutral-lighter;
-		padding-top: 20px;
-		padding-bottom: 20px;
-	}
-}
-
 
 .fax-send_receive {
 	.tabs-heading {
@@ -167,27 +60,6 @@
 					border-color: transparent;
 				}
 			}
-		}
-	}
-
-	.search-frame {
-		padding: 10px;
-
-		.search-filters {
-			padding: 5px;
-		}
-
-		.search-buttons {
-			padding: 5px;
-			display: flex;
-			flex-direction: row;
-			align-items: end;
-		}
-	}
-
-	.table {
-		.float-right {
-			float: right;
 		}
 	}
 }

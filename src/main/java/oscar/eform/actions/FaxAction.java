@@ -14,7 +14,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
-import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.model.FaxFileType;
 import org.oscarehr.fax.service.FaxUploadService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -70,7 +70,7 @@ public final class FaxAction
 
 			GenericFile fileToFax = FileFactory.getExistingFile(tempFile);
 			FaxOutboxTransferOutbound transfer = faxUploadService
-				.queueAndSendFax(providerId, null, recipient, FaxOutbound.FileType.FORM, fileToFax);
+				.queueAndSendFax(providerId, null, recipient, FaxFileType.FORM, fileToFax);
 			transferList.add(transfer);
 		}
 
