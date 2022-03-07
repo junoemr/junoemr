@@ -7,7 +7,7 @@ import {
 	LABEL_POSITION
 } from "../../../../../common/components/junoComponentConstants";
 import {FaxStatusCombinedType} from "../../../../../lib/fax/model/FaxStatusCombinedType";
-import {Moment} from "moment";
+import moment, {Moment} from "moment";
 import FaxOutboxService from "../../../../../lib/fax/service/FaxOutboxService";
 import PagedResponse from "../../../../../lib/common/response/pagedRespose";
 import {FaxNotificationStatusType} from "../../../../../lib/fax/model/FaxNotificationStatusType";
@@ -22,7 +22,9 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 	},
 	controller: [
 		'NgTableParams',
-		function (NgTableParams)
+		'systemPreferenceService',
+		function (NgTableParams,
+		          systemPreferenceService)
 		{
 			const ctrl = this;
 			ctrl.toastService = new ToastService();
@@ -52,7 +54,7 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 				},
 				{
 					value: FaxStatusCombinedType.IntegrationFailed,
-					label: "Failed"
+					label: "Integration Failed"
 				},
 				{
 					value: FaxStatusCombinedType.IntegrationSuccess,
@@ -113,6 +115,10 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 				{
 					console.error(error);
 				}
+
+				ctrl.loadNextPushTime();
+
+				ctrl.masterFaxEnabledOutbound = await systemPreferenceService.isPreferenceEnabled("masterFaxEnabledOutbound", ctrl.masterFaxEnabledOutbound);
 			}
 
 			ctrl.loadOutboxItems = function()
@@ -149,7 +155,6 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 						}
 					}
 				);
-				ctrl.loadNextPushTime();
 			};
 
 			ctrl.loadNextPushTime = function()
@@ -244,6 +249,30 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 				return ctrl.statusFilterOptions.find((option) => combinedStatus === option.value).label;
 			}
 
+			ctrl.getStatusIcon = (combinedStatus: FaxStatusCombinedType) =>
+			{
+				switch (combinedStatus)
+				{
+					case FaxStatusCombinedType.Queued: return "icon-clock";
+					case FaxStatusCombinedType.InProgress: return "icon-send";
+					case FaxStatusCombinedType.Error:
+					case FaxStatusCombinedType.IntegrationFailed: return "icon-private";
+					case FaxStatusCombinedType.IntegrationSuccess: return "icon-check";
+				}
+			}
+
+			ctrl.getBadgeClasses = (combinedStatus: FaxStatusCombinedType) =>
+			{
+				switch (combinedStatus)
+				{
+					case FaxStatusCombinedType.Queued:return "badge-queued";
+					case FaxStatusCombinedType.InProgress:return "badge-in-progress";
+					case FaxStatusCombinedType.Error:
+					case FaxStatusCombinedType.IntegrationFailed:return "badge-error";
+					case FaxStatusCombinedType.IntegrationSuccess:return "badge-complete";
+				}
+			}
+
 			ctrl.getFaxAccountDisplayName = (faxAccountId: number) =>
 			{
 				return ctrl.faxAccountList.find((faxAccount) => faxAccountId === faxAccount.id)?.displayName;
@@ -261,8 +290,19 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 			ctrl.hideResendButton = (outboxItem: FaxOutboxResult) =>
 			{
 				return outboxItem.archived
+					|| outboxItem.isCombinedStatusInQueued()
 					|| outboxItem.isCombinedStatusInProgress()
 					|| outboxItem.isCombinedStatusSent()
+			}
+
+			ctrl.nextPushTimeDisplay = () =>
+			{
+				if(ctrl.nextPushTime && ctrl.nextPushTime.isValid())
+				{
+					let now = moment();
+					let minutes = ctrl.nextPushTime.diff(now, 'minutes');
+					return (minutes + 1) + " minutes";
+				}
 			}
 		}
 	]}

@@ -6,7 +6,7 @@ import {
 	LABEL_POSITION
 } from "../../../../../common/components/junoComponentConstants";
 import FaxInboxResult from "../../../../../lib/fax/model/FaxInboxResult";
-import {Moment} from "moment";
+import moment, {Moment} from "moment";
 import FaxInboxService from "../../../../../lib/fax/service/FaxInboxService";
 import PagedResponse from "../../../../../lib/common/response/pagedRespose";
 import FaxAccount from "../../../../../lib/fax/model/FaxAccount";
@@ -21,8 +21,10 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 	controller: [
 		'NgTableParams',
 		'providerService',
+		'systemPreferenceService',
 		function (NgTableParams,
-		          providerService)
+		          providerService,
+		          systemPreferenceService)
 		{
 			const ctrl = this;
 			ctrl.toastService = new ToastService();
@@ -43,6 +45,7 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 			ctrl.tableParamsInbox = null;
 			ctrl.loggedInProviderNo = null;
 			ctrl.selectedFaxAccountId = null;
+			ctrl.masterFaxEnabledInbound = false;
 			ctrl.faxAccountList = [];
 			ctrl.faxAccountOptions = [
 				{
@@ -51,6 +54,7 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 					data: null,
 				},
 			];
+			ctrl.inboxItemList = [];
 
 			ctrl.$onInit = async () =>
 			{
@@ -65,6 +69,10 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 							data: faxAccount,
 						}
 					}).forEach((option: object) => ctrl.faxAccountOptions.push(option));
+
+					ctrl.loadNextPullTime();
+
+					ctrl.masterFaxEnabledInbound = await systemPreferenceService.isPreferenceEnabled("masterFaxEnabledInbound", ctrl.masterFaxEnabledInbound);
 				}
 				catch (error)
 				{
@@ -106,7 +114,6 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 						}
 					}
 				);
-				ctrl.loadNextPullTime();
 			};
 
 			ctrl.loadNextPullTime = (): void =>
@@ -170,6 +177,16 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 			ctrl.getFaxAccountDisplayName = (faxAccountId: number) =>
 			{
 				return ctrl.faxAccountList.find((faxAccount) => faxAccountId === faxAccount.id)?.displayName;
+			}
+
+			ctrl.nextPullTimeDisplay = () =>
+			{
+				if(ctrl.nextPullTime && ctrl.nextPullTime.isValid())
+				{
+					let now = moment();
+					let minutes = ctrl.nextPullTime.diff(now, 'minutes');
+					return (minutes + 1) + " minutes";
+				}
 			}
 		}
 	]}

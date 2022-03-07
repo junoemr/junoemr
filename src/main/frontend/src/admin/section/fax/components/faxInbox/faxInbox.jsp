@@ -4,12 +4,13 @@
 
 <div class="fax-inbox">
 	<h1><bean:message bundle="ui" key="admin.fax.sr.inbox.header-title"/></h1>
-	<div ng-show="$ctrl.faxAccount.enableInbound == true">
-		<span><bean:message bundle="ui" key="admin.fax.sr.inbox.checkNewFaxesAt"/> {{$ctrl.nextPullTime}}</span>
+	<div ng-if="$ctrl.masterFaxEnabledInbound">
+		<span><bean:message bundle="ui" key="admin.fax.sr.inbox.checkNewFaxesAt"/></span>
+		<span class="text-bold">{{$ctrl.nextPullTimeDisplay()}}</span>
 		<br/>
 		<span><bean:message bundle="ui" key="admin.fax.sr.inbox.unreadOnlyWarning"/></span>
 	</div>
-	<div ng-show="$ctrl.faxAccount.enableInbound == false">
+	<div ng-if="!$ctrl.masterFaxEnabledInbound">
 		<span><bean:message bundle="ui" key="admin.fax.sr.inbox.disabledMessage"/></span>
 	</div>
 
@@ -44,10 +45,13 @@
 	</filter-panel>
 
 	<div>
-		<table ng-table="$ctrl.tableParamsInbox" show-filter="false" class="table table-striped table-bordered">
+		<table ng-show="$ctrl.inboxItemList.length > 0"
+		       ng-table="$ctrl.tableParamsInbox"
+		       show-filter="false"
+		       class="table table-striped table-bordered">
 			<tbody>
 			<tr ng-repeat="item in $ctrl.inboxItemList">
-				<td>
+				<td class="w-32">
 					<icon-badge icon="icon-check"></icon-badge>
 				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.inbox.tbl-hdr.systemDateReceived"/>'">
@@ -57,7 +61,7 @@
 					{{item.sentFrom}}
 				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.inbox.tbl-hdr.accountName"/>'">
-					{{$ctrl.getFaxAccountDisplayName(item.id)}}
+					{{$ctrl.getFaxAccountDisplayName(item.faxAccountId)}}
 				</td>
 				<td class="w-128">
 					<juno-button click="$ctrl.openDocument(item.documentId)"

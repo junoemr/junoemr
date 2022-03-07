@@ -3,8 +3,12 @@
 
 <div class="fax-outbox">
 	<h1><bean:message bundle="ui" key="admin.fax.sr.outbox.header-title"/></h1>
-	<div>
-		<span><bean:message bundle="ui" key="admin.fax.sr.outbox.resendAtMessage"/> {{$ctrl.nextPushTime}}</span>
+	<div ng-if="$ctrl.masterFaxEnabledOutbound">
+		<span><bean:message bundle="ui" key="admin.fax.sr.outbox.resendAtMessage"/></span>
+		<span class="text-bold">{{$ctrl.nextPushTimeDisplay()}}</span>
+	</div>
+	<div ng-if="!$ctrl.masterFaxEnabledOutbound">
+		<span><bean:message bundle="ui" key="admin.fax.sr.outbox.disabledMessage"/></span>
 	</div>
 
 	<filter-panel label="Search Options"
@@ -44,17 +48,20 @@
 	</filter-panel>
 
 	<div>
-		<table ng-table="$ctrl.tableParamsOutbox" show-filter="false" class="table table-striped table-bordered">
+		<table ng-show="$ctrl.outboxItemList.length > 0"
+		       ng-table="$ctrl.tableParamsOutbox"
+		       show-filter="false"
+		       class="table table-striped table-bordered">
 			<tbody>
 			<tr ng-repeat="item in $ctrl.outboxItemList">
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.systemDateSent"/>'">
 					{{$ctrl.formatDateForDisplay(item.systemSentDateTime)}}
 				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.providerName"/>'">
-					{{item.providerName}} ({{item.providerNo}})
+					{{item.providerName}} ({{item.providerId}})
 				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.accountName"/>'">
-					{{$ctrl.getFaxAccountDisplayName(item.id)}}
+					{{$ctrl.getFaxAccountDisplayName(item.faxAccountId)}}
 				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.fileType"/>'">
 					{{item.fileType}}
@@ -63,42 +70,42 @@
 					{{item.toFaxNumber}}
 				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.sentStatus"/>'">
-					<span title="{{item.systemStatusMessage}}">
-						{{$ctrl.getStatusDisplayLabel(item.combinedStatus)}}
-					</span>
-				</td>
-				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateSent"/>'">
-					{{$ctrl.formatDateForDisplay(item.integrationSentDateTime)}}
-				</td>
-				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.actionButtons"/>'">
-					<div class="flex-row justify-content-end">
-						<div class="w-128"
-						     ng-hide="$ctrl.hideResendButton(item)">
-							<juno-button click="$ctrl.resendFax(item);"
-							             title="<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend-tooltip"/>"
-							             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-							             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
-								<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend"/>
-							</juno-button>
-						</div>
-						<div class="w-128">
-							<juno-button click="$ctrl.viewDownloadFile(item.id);"
-							             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-							             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
-								<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.download"/>
-							</juno-button>
-						</div>
+					<div class="flex-row align-items-start">
+						<icon-badge icon="{{$ctrl.getStatusIcon(item.combinedStatus)}}"
+						            ng-class="$ctrl.getBadgeClasses(item.combinedStatus)">
+						</icon-badge>
+						<span title="{{item.systemStatusMessage}}" class="m-l-4">
+							{{$ctrl.getStatusDisplayLabel(item.combinedStatus)}}
+						</span>
 					</div>
 				</td>
-				<td ng-if="$ctrl.displayNotificationColumn == true">
-					<div class="w-128"
-					     ng-show="item.isNotificationStatusNotify()">
-						<juno-button click="$ctrl.dismissNotification(item);"
+				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.integrationDateSent"/>'">
+					<div ng-hide="$ctrl.hideResendButton(item)">
+						<juno-button click="$ctrl.resendFax(item);"
+						             title="<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend-tooltip"/>"
+						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
+							<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.resend"/>
+						</juno-button>
+					</div>
+					<span ng-show="$ctrl.hideResendButton(item)">
+						{{$ctrl.formatDateForDisplay(item.integrationSentDateTime)}}
+					</span>
+				</td>
+				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.actionButtons"/>'" class="w-128">
+					<juno-button click="$ctrl.viewDownloadFile(item.id);"
+					             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
+						<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.download"/>
+					</juno-button>
+				</td>
+				<td ng-if="$ctrl.displayNotificationColumn == true" class="w-128">
+						<juno-button ng-if="item.isNotificationStatusNotify()"
+						             click="$ctrl.dismissNotification(item);"
 						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
 							<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.notification.dismiss"/>
 						</juno-button>
-					</div>
 					<span ng-show="item.isNotificationStatusSilent()">
 						<bean:message bundle="ui" key="admin.fax.sr.outbox.notification.dismissed"/>
 					</span>

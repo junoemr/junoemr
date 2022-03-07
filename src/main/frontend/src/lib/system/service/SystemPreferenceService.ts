@@ -121,9 +121,9 @@ export default class SystemPreferenceService
    * @param defaultValue - an optional default value to use if the preference is not set on the server.
    * @return boolean true if enabled, false otherwise
    */
-  public async isPreferenceEnabled(preferenceName: string, defaultValue?: boolean): Promise<any>
+  public async isPreferenceEnabled(preferenceName: string, defaultValue?: boolean): Promise<boolean>
   {
-    return (await this.systemPreferenceApi.getPreferenceEnabled(preferenceName, false)).data.body;
+    return (await this.systemPreferenceApi.getPreferenceEnabled(preferenceName, defaultValue)).data.body;
   }
 
 /**

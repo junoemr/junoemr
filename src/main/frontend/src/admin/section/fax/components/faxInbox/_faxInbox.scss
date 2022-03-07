@@ -1,4 +1,6 @@
 .fax-inbox {
+  @include juno-table-default;
+
   .icon-badge {
     --icon-color: var(--color-neutral-white);
     --badge-color: var(--color-green-base);

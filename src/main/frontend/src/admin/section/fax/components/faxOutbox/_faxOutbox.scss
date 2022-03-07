@@ -1,3 +1,27 @@
 .fax-outbox {
+  @include juno-table-default;
 
+  .badge-error {
+    .icon-badge {
+      --badge-color: var(--color-red-base);
+    }
+  }
+
+  .badge-queued {
+    .icon-badge {
+      --badge-color: var(--color-orange-base);
+    }
+  }
+
+  .badge-in-progress {
+    .icon-badge {
+      --badge-color: var(--color-primary-base);
+    }
+  }
+
+  .badge-complete {
+    .icon-badge {
+      --badge-color: var(--color-green-base);
+    }
+  }
 }
