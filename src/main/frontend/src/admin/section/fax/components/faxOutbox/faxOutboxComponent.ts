@@ -96,6 +96,7 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 					data: null,
 				},
 			];
+			ctrl.initialized = false;
 
 			ctrl.$onInit = async () =>
 			{
@@ -110,15 +111,15 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 							data: faxAccount,
 						}
 					}).forEach((option: object) => ctrl.faxAccountOptions.push(option));
+
+					ctrl.nextPushTime = await ctrl.faxOutboxService.getNextPushTime();
+					ctrl.masterFaxEnabledOutbound = await systemPreferenceService.isPreferenceEnabled("masterFaxEnabledOutbound", ctrl.masterFaxEnabledOutbound);
 				}
 				catch (error)
 				{
 					console.error(error);
 				}
-
-				ctrl.loadNextPushTime();
-
-				ctrl.masterFaxEnabledOutbound = await systemPreferenceService.isPreferenceEnabled("masterFaxEnabledOutbound", ctrl.masterFaxEnabledOutbound);
+				ctrl.initialized = true;
 			}
 
 			ctrl.loadOutboxItems = function()
@@ -153,22 +154,6 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 								}
 							);
 						}
-					}
-				);
-			};
-
-			ctrl.loadNextPushTime = function()
-			{
-				ctrl.faxOutboxService.getNextPushTime().then(
-					function success(response: Moment)
-					{
-						ctrl.nextPushTime = response;
-					},
-					function error(error)
-					{
-						ctrl.nextPushTime = null;
-						console.error(error);
-						ctrl.toastService.errorToast("Failed to load outbox polling time");
 					}
 				);
 			};
@@ -301,6 +286,7 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 				{
 					let now = moment();
 					let minutes = ctrl.nextPushTime.diff(now, 'minutes');
+					minutes = (minutes < 0) ? 0 : minutes;
 					return (minutes + 1) + " minutes";
 				}
 			}

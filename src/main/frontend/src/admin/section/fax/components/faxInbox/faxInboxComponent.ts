@@ -55,6 +55,7 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 				},
 			];
 			ctrl.inboxItemList = [];
+			ctrl.initialized = false;
 
 			ctrl.$onInit = async () =>
 			{
@@ -70,14 +71,14 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 						}
 					}).forEach((option: object) => ctrl.faxAccountOptions.push(option));
 
-					ctrl.loadNextPullTime();
-
+					ctrl.nextPullTime = await ctrl.faxInboxService.getNextPullTime();
 					ctrl.masterFaxEnabledInbound = await systemPreferenceService.isPreferenceEnabled("masterFaxEnabledInbound", ctrl.masterFaxEnabledInbound);
 				}
 				catch (error)
 				{
 					console.error(error);
 				}
+				ctrl.initialized = true;
 			}
 
 			ctrl.loadInboxItems = (): void =>
@@ -112,22 +113,6 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 								}
 							);
 						}
-					}
-				);
-			};
-
-			ctrl.loadNextPullTime = (): void =>
-			{
-				ctrl.faxInboxService.getNextPullTime().then(
-					function success(response: Moment)
-					{
-						ctrl.nextPullTime = response;
-					},
-					function error(error)
-					{
-						ctrl.nextPullTime = null;
-						console.error(error);
-						ctrl.toastService.errorToast("Failed to load inbox polling time");
 					}
 				);
 			};
@@ -185,6 +170,7 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 				{
 					let now = moment();
 					let minutes = ctrl.nextPullTime.diff(now, 'minutes');
+					minutes = (minutes < 0) ? 0 : minutes;
 					return (minutes + 1) + " minutes";
 				}
 			}

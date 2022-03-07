@@ -1,6 +1,10 @@
 .fax-outbox {
   @include juno-table-default;
 
+  .header {
+    color: var(--color-primary-base);
+  }
+
   .badge-error {
     .icon-badge {
       --badge-color: var(--color-red-base);

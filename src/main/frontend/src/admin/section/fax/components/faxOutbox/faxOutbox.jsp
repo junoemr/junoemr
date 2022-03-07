@@ -2,50 +2,47 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <div class="fax-outbox">
-	<h1><bean:message bundle="ui" key="admin.fax.sr.outbox.header-title"/></h1>
-	<div ng-if="$ctrl.masterFaxEnabledOutbound">
+	<h1 class="header"><bean:message bundle="ui" key="admin.fax.sr.outbox.header-title"/></h1>
+	<div ng-if="$ctrl.masterFaxEnabledOutbound" ng-show="$ctrl.initialized">
 		<span><bean:message bundle="ui" key="admin.fax.sr.outbox.resendAtMessage"/></span>
-		<span class="text-bold">{{$ctrl.nextPushTimeDisplay()}}</span>
+		<span class="text-bold">{{$ctrl.nextPushTimeDisplay()}}.</span>
 	</div>
-	<div ng-if="!$ctrl.masterFaxEnabledOutbound">
+	<div ng-if="!$ctrl.masterFaxEnabledOutbound" ng-show="$ctrl.initialized">
 		<span><bean:message bundle="ui" key="admin.fax.sr.outbox.disabledMessage"/></span>
 	</div>
 
-	<filter-panel label="Search Options"
-	              tooltip="Show/Hide inbox filters">
-		<div class="flex-row p-16 align-items-flex-end">
-			<juno-date-select
-					ng-model="$ctrl.searchParams.startDate"
-					label="<bean:message bundle="ui" key="admin.fax.sr.search.startDate"/>"
-					label-position="$ctrl.LABEL_POSITION.TOP">
-			</juno-date-select>
-			<juno-date-select
-					ng-model="$ctrl.searchParams.endDate"
-					label="<bean:message bundle="ui" key="admin.fax.sr.search.endDate"/>"
-					label-position="$ctrl.LABEL_POSITION.TOP">
-			</juno-date-select>
-			<juno-select
-					ng-model="$ctrl.searchParams.combinedStatus"
-					options="$ctrl.statusFilterOptions"
-					label="<bean:message bundle="ui" key="admin.fax.sr.search.combinedStatus"/>"
-					label-position="$ctrl.LABEL_POSITION.TOP">
-			</juno-select>
-			<juno-select
-					label="<bean:message bundle="ui" key="admin.fax.sr.choose-account"/>"
-					label-position="$ctrl.LABEL_POSITION.TOP"
-					ng-model="$ctrl.selectedFaxAccountId"
-					options="$ctrl.faxAccountOptions"
-					on-change="$ctrl.updateSelectedAccount(value, option)">
-			</juno-select>
-			<div class="w-128">
-				<juno-button click="$ctrl.loadOutboxItems();"
-				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
-					<bean:message bundle="ui" key="global.search"/>
-				</juno-button>
-			</div>
+	<div class="flex-row flex-gap-16 p-t-16 p-b-16 align-items-flex-end">
+		<juno-date-select
+				ng-model="$ctrl.searchParams.startDate"
+				label="<bean:message bundle="ui" key="admin.fax.sr.search.startDate"/>"
+				label-position="$ctrl.LABEL_POSITION.TOP">
+		</juno-date-select>
+		<juno-date-select
+				ng-model="$ctrl.searchParams.endDate"
+				label="<bean:message bundle="ui" key="admin.fax.sr.search.endDate"/>"
+				label-position="$ctrl.LABEL_POSITION.TOP">
+		</juno-date-select>
+		<juno-select
+				ng-model="$ctrl.searchParams.combinedStatus"
+				options="$ctrl.statusFilterOptions"
+				label="<bean:message bundle="ui" key="admin.fax.sr.search.combinedStatus"/>"
+				label-position="$ctrl.LABEL_POSITION.TOP">
+		</juno-select>
+		<juno-select
+				label="<bean:message bundle="ui" key="admin.fax.sr.choose-account"/>"
+				label-position="$ctrl.LABEL_POSITION.TOP"
+				ng-model="$ctrl.selectedFaxAccountId"
+				options="$ctrl.faxAccountOptions"
+				on-change="$ctrl.updateSelectedAccount(value, option)">
+		</juno-select>
+		<div class="w-128">
+			<juno-button click="$ctrl.loadOutboxItems();"
+			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
+				<bean:message bundle="ui" key="global.search"/>
+			</juno-button>
 		</div>
-	</filter-panel>
+	</div>
 
 	<div>
 		<table ng-show="$ctrl.outboxItemList.length > 0"
