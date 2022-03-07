@@ -23,7 +23,7 @@
 package org.oscarehr.fax.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
+import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import org.springframework.stereotype.Component;

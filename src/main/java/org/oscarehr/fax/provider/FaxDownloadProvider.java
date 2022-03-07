@@ -23,22 +23,20 @@
 
 package org.oscarehr.fax.provider;
 
-
-//import org.oscarehr.fax.exception.FaxApiResultException;
+import org.oscarehr.fax.exception.FaxApiResultException;
 import org.oscarehr.fax.result.FaxInboxResult;
-
 import java.util.List;
 
 public interface FaxDownloadProvider
 {
-
 	/**
 	 * Generates a List of FaxInboxResults which represents non-downloaded faxes
 	 * @param faxDaysPast Number of days to retrieve fax inbox results for
 	 * @return List of non-downloaded faxes
 	 * @throws FaxApiResultException on result error
 	 */
-	List<? extends FaxInboxResult> getFaxInbox(int faxDaysPast);
+
+	List<? extends FaxInboxResult> getFaxInbox(int faxDaysPast) throws FaxApiResultException;
 
 	/**
 	 * Retrieves a single fax document identified by the referenceIdStr

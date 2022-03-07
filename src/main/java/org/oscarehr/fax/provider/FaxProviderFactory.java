@@ -24,18 +24,14 @@
 package org.oscarehr.fax.provider;
 
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.integration.SRFax.SRFaxAccountProvider;
 import org.oscarehr.integration.SRFax.SRFaxDownloadProvider;
 import org.oscarehr.integration.SRFax.SRFaxUploadProvider;
 
 public class FaxProviderFactory
 {
-	private FaxProvider getSystemFaxProvider()
-	{
-		return FaxProvider.SRFAX;
-	}
-
-	public FaxAccountProvider createFaxAccountProvider(FaxAccount faxAccount)
+	public static FaxAccountProvider createFaxAccountProvider(FaxAccount faxAccount)
 	{
 		switch (faxAccount.getIntegrationType())
 		{
@@ -48,12 +44,12 @@ public class FaxProviderFactory
 		}
 	}
 
-	public FaxUploadProvider createFaxUploadProvider()
+	public static FaxDownloadProvider createFaxDownloadProvider(FaxAccount faxAccount)
 	{
-		switch (getSystemFaxProvider())
+		switch (faxAccount.getIntegrationType())
 		{
 			case SRFAX:
-				return new SRFaxUploadProvider();
+				return new SRFaxDownloadProvider(faxAccount);
 			case RINGCENTRAL:
 			case NONE:
 			default:
@@ -61,17 +57,22 @@ public class FaxProviderFactory
 		}
 	}
 
-	/**
-	 * Creates a new FaxDownloadProvider based on the provided faxAccount integration type
-	 * @param faxAccount fax account to create the provider from
-	 * @return FaxDownloadProvider
-	 */
-	public FaxDownloadProvider createFaxDownloadProvider(FaxAccount faxAccount)
+	public static FaxUploadProvider createFaxUploadProvider(FaxAccount faxAccount)
 	{
-		switch (faxAccount.getIntegrationType())
+		return createFaxUploadProvider(faxAccount.getIntegrationType());
+	}
+
+	public static FaxUploadProvider createFaxUploadProvider(FaxAccountTransferOutbound faxAccount)
+	{
+		return createFaxUploadProvider(faxAccount.getAccountType());
+	}
+
+	private static FaxUploadProvider createFaxUploadProvider(FaxProvider providerType)
+	{
+		switch (providerType)
 		{
 			case SRFAX:
-				return new SRFaxDownloadProvider(faxAccount);
+				return new SRFaxUploadProvider();
 			case RINGCENTRAL:
 			case NONE:
 			default:

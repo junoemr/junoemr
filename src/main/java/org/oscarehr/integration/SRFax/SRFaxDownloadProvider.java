@@ -24,10 +24,12 @@
 package org.oscarehr.integration.SRFax;
 
 import org.oscarehr.fax.exception.FaxApiResultException;
-import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
-import org.oscarehr.fax.externalApi.srfax.result.GetFaxInboxResult;
-import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
-import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
+
+import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
+import org.oscarehr.integration.SRFax.api.result.GetFaxInboxResult;
+import org.oscarehr.integration.SRFax.api.resultWrapper.ListWrapper;
+import org.oscarehr.integration.SRFax.api.resultWrapper.SingleWrapper;
+
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxDownloadProvider;
 import org.oscarehr.fax.result.FaxInboxResult;
@@ -50,6 +52,7 @@ public class SRFaxDownloadProvider implements FaxDownloadProvider
 	 * @return The list of unread FaxInboxResults
 	 * @throws FaxApiResultException if result is not success
 	 */
+
 	@Override
 	public List<? extends FaxInboxResult> getFaxInbox(int faxDaysPast) throws FaxApiResultException
 	{
@@ -61,12 +64,14 @@ public class SRFaxDownloadProvider implements FaxDownloadProvider
 			endDate,
 			SRFaxApiConnector.VIEWED_STATUS_UNREAD,
 			null);
+
 		if (!inboxResultList.isSuccess())
 		{
 			throw new FaxApiResultException(inboxResultList.getError());
 		}
 		return inboxResultList.getResult();
 	}
+
 
 	/**
 	 * Retrieves a fax from SRFax
@@ -85,7 +90,6 @@ public class SRFaxDownloadProvider implements FaxDownloadProvider
 		}
 		return inboxResultList.getResult();
 	}
-
 
 	/**
 	 * Marks the fax as read in SRFax

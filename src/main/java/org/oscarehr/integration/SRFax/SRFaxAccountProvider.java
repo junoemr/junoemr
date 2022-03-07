@@ -23,9 +23,9 @@
 
 package org.oscarehr.integration.SRFax;
 
-import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
-import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
-import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
+import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
+import org.oscarehr.integration.SRFax.api.result.GetUsageResult;
+import org.oscarehr.integration.SRFax.api.resultWrapper.ListWrapper;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxAccountProvider;
 import oscar.util.ConversionUtils;

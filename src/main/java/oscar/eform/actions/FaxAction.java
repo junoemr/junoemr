@@ -15,7 +15,7 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.eform.dao.EFormDataDao;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.fax.model.FaxOutbound;
-import org.oscarehr.fax.service.OutgoingFaxService;
+import org.oscarehr.fax.service.FaxUploadService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.oscarehr.util.WKHtmlToPdfUtils;
@@ -31,7 +31,7 @@ import java.util.List;
 public final class FaxAction
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
+	private static final FaxUploadService faxUploadService = SpringUtils.getBean(FaxUploadService.class);
 
 	private final String localUri;
 	private final boolean skipSave;
@@ -54,7 +54,7 @@ public final class FaxAction
 	 */
 	public List<FaxOutboxTransferOutbound> faxForms(String[] numbers, String formId, String providerId) throws IOException, HtmlToPdfConversionException, InterruptedException
 	{
-		HashSet<String> recipients = OutgoingFaxService.preProcessFaxNumbers(numbers);
+		HashSet<String> recipients = FaxUploadService.preProcessFaxNumbers(numbers);
 		List<FaxOutboxTransferOutbound> transferList = new ArrayList<>(recipients.size());
 		for (String recipient : recipients)
 		{
@@ -69,7 +69,8 @@ public final class FaxAction
 			WKHtmlToPdfUtils.convertToPdf(viewUri, tempFile);
 
 			GenericFile fileToFax = FileFactory.getExistingFile(tempFile);
-			FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerId, null, recipient, FaxOutbound.FileType.FORM, fileToFax);
+			FaxOutboxTransferOutbound transfer = faxUploadService
+				.queueAndSendFax(providerId, null, recipient, FaxOutbound.FileType.FORM, fileToFax);
 			transferList.add(transfer);
 		}
 

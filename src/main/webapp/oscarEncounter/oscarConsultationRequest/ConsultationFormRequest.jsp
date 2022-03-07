@@ -67,7 +67,7 @@ if(!authed) {
 <%@page import="org.oscarehr.common.model.UserProperty"%>
 <%@page import="org.oscarehr.demographic.dao.DemographicExtDao"%>
 <%@page import="org.oscarehr.demographic.model.DemographicExt"%>
-<%@page import="org.oscarehr.fax.service.OutgoingFaxService"%>
+<%@page import="org.oscarehr.fax.service.FaxUploadService"%>
 <%@page import="org.oscarehr.ui.servlet.ImageRenderingServlet"%>
 <%@page import="org.oscarehr.util.DigitalSignatureUtils"%>
 <%@page import="org.oscarehr.util.EmailUtilsOld"%>
@@ -104,8 +104,8 @@ if(!authed) {
 	LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 
 	DemographicExtDao demographicExtDao = (DemographicExtDao) SpringUtils.getBean("demographicExtDao");
-	OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
-	boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
+	FaxUploadService faxUploadService = SpringUtils.getBean(FaxUploadService.class);
+	boolean faxEnabled = faxUploadService.isOutboundFaxEnabled();
 
 	displayServiceUtil.estSpecialist();
 

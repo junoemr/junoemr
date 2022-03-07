@@ -171,7 +171,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 
 	public ActionForward assignProvider(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String assignee = request.getParameter("providerNo");
-		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromRequest(request).getLoggedInProviderNo(), Permission.HRM_UPDATE);
+		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE);
 
 		try {
 			String hrmDocumentId = request.getParameter("reportId");

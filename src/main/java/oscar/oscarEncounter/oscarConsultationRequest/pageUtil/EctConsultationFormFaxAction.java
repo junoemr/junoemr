@@ -25,7 +25,7 @@ import org.oscarehr.consultations.service.ConsultationPDFCreationService;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.fax.exception.FaxException;
 import org.oscarehr.fax.model.FaxOutbound;
-import org.oscarehr.fax.service.OutgoingFaxService;
+import org.oscarehr.fax.service.FaxUploadService;
 import org.oscarehr.fax.util.PdfCoverPageCreator;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
@@ -54,7 +54,7 @@ public class EctConsultationFormFaxAction extends Action
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private static final OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
+	private static final FaxUploadService faxUploadService = SpringUtils.getBean(FaxUploadService.class);
 	private static final ConsultationPDFCreationService consultationPDFCreationService = SpringUtils.getBean(ConsultationPDFCreationService.class);
 	private static final ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
 
@@ -90,7 +90,7 @@ public class EctConsultationFormFaxAction extends Action
 		try
 		{
 			// ensure valid fax number formatting. Throw exception if invalid
-			HashSet<String> recipients = OutgoingFaxService.preProcessFaxNumbers(tmpRecipients);
+			HashSet<String> recipients = FaxUploadService.preProcessFaxNumbers(tmpRecipients);
 
 			List<EDoc> attachedDocuments;
 			List<LabResultData> attachedLabs;
@@ -161,7 +161,8 @@ public class EctConsultationFormFaxAction extends Action
 					String tempName = String.format("CRF-%s%s.%s.%s", faxClinicId, reqId, faxNo, fileToFax.getName());
 
 					fileToFax.rename(tempName);
-					FaxOutboxTransferOutbound transfer = outgoingFaxService.queueAndSendFax(providerNo, Integer.parseInt(demoNo), faxNo, FaxOutbound.FileType.CONSULTATION, fileToFax);
+					FaxOutboxTransferOutbound transfer = faxUploadService
+						.queueAndSendFax(providerNo, Integer.parseInt(demoNo), faxNo, FaxOutbound.FileType.CONSULTATION, fileToFax);
 					if(transfer.getSystemStatus().equals(FaxOutbound.Status.ERROR))
 					{
 						errorList.add("Failed to send fax. Check account settings. " +

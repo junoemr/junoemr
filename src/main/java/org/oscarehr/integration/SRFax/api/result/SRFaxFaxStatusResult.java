@@ -20,15 +20,19 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.externalApi.srfax.result;
+package org.oscarehr.integration.SRFax.api.result;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.oscarehr.fax.result.FaxStatusResult;
+import oscar.util.ConversionUtils;
+import java.util.Date;
+import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GetFaxOutboxResult
+public class SRFaxFaxStatusResult implements FaxStatusResult
 {
 	@JsonProperty("FileName")
 	private String rawFileName;
@@ -38,12 +42,26 @@ public class GetFaxOutboxResult
 	private String detailsId;
 	@JsonProperty("SentStatus")
 	private String sentStatus;
+
+	/**
+	 * Datetime the fax was queued, format is determined by account preference
+	 */
 	@JsonProperty("DateQueued")
 	private String dateQueued;
+
+	/**
+	 * Datetime the fax was sent, format is determined by account preference.
+	 * A consistent format for this field found in GetFaxStatusResult.epochTime
+	 */
 	@JsonProperty("DateSent")
 	private String dateSent;
+
+	/**
+	 * Datetime the fax was sent, as seconds since the UNIX epoch.
+	 */
 	@JsonProperty("EpochTime")
 	private String epochTime;
+	
 	@JsonProperty("ToFaxNumber")
 	private String toFaxNumber;
 	@JsonProperty("Pages")
@@ -54,19 +72,11 @@ public class GetFaxOutboxResult
 	private String remoteId;
 	@JsonProperty("ErrorCode")
 	private String errorCode;
-	@JsonProperty("AccountCode")
-	private String accountCode;
-	@JsonProperty("Subject")
-	private String subject;
 	@JsonProperty("Size")
 	private String size;
-	@JsonProperty("SubmittedFiles")
-	private String submittedFiles;
+	@JsonProperty("AccountCode")
+	private String accountCode;
 
-	@JsonProperty("User_ID")
-	private String userId;
-	@JsonProperty("User_FaxNumber")
-	private String userFaxNumber;
 
 	public String getRawFileName()
 	{
@@ -169,35 +179,10 @@ public class GetFaxOutboxResult
 	{
 		this.remoteId = remoteId;
 	}
-
-	public String getErrorCode()
-	{
-		return errorCode;
-	}
-
+	
 	public void setErrorCode(String errorCode)
 	{
 		this.errorCode = errorCode;
-	}
-
-	public String getAccountCode()
-	{
-		return accountCode;
-	}
-
-	public void setAccountCode(String accountCode)
-	{
-		this.accountCode = accountCode;
-	}
-
-	public String getSubject()
-	{
-		return subject;
-	}
-
-	public void setSubject(String subject)
-	{
-		this.subject = subject;
 	}
 
 	public String getSize()
@@ -210,39 +195,54 @@ public class GetFaxOutboxResult
 		this.size = size;
 	}
 
-	public String getSubmittedFiles()
+	public String getAccountCode()
 	{
-		return submittedFiles;
+		return accountCode;
 	}
 
-	public void setSubmittedFiles(String submittedFiles)
+	public void setAccountCode(String accountCode)
 	{
-		this.submittedFiles = submittedFiles;
-	}
-
-	public String getUserId()
-	{
-		return userId;
-	}
-
-	public void setUserId(String userId)
-	{
-		this.userId = userId;
-	}
-
-	public String getUserFaxNumber()
-	{
-		return userFaxNumber;
-	}
-
-	public void setUserFaxNumber(String userFaxNumber)
-	{
-		this.userFaxNumber = userFaxNumber;
+		this.accountCode = accountCode;
 	}
 
 	@Override
 	public String toString()
 	{
 		return new ReflectionToStringBuilder(this).toString();
+	}
+	
+	/*
+	 * Interface Methods
+	 */
+	@Override
+	public String getRemoteSentStatus()
+	{
+		return this.getRemoteSentStatus();
+	}
+
+	@Override
+	public Optional<Date> getRemoteSendTime()
+	{
+		Date remoteSendTime = null;
+		String secondsSinceEpoch = this.getEpochTime();
+
+		if (ConversionUtils.hasContent(secondsSinceEpoch))
+		{
+			remoteSendTime = ConversionUtils.fromEpochStringSeconds(secondsSinceEpoch);
+		}
+
+		return Optional.ofNullable(remoteSendTime);
+	}
+
+	@Override
+	public Optional<String> getError()
+	{
+		return this.getError();
+	}
+
+	@Override
+	public Optional<String> getErrorCode()
+	{
+		return Optional.ofNullable(this.errorCode);
 	}
 }

@@ -50,15 +50,15 @@
 <%@page import="java.io.File"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.Vector"%>
-<%@ page import="org.oscarehr.fax.service.OutgoingFaxService" %>
+<%@ page import="org.oscarehr.fax.service.FaxUploadService" %>
 <%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
 <%
 	OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 
-	OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
-	boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
+	FaxUploadService faxUploadService = SpringUtils.getBean(FaxUploadService.class);
+	boolean faxEnabled = faxUploadService.isOutboundFaxEnabled();
 %>
 
 <%

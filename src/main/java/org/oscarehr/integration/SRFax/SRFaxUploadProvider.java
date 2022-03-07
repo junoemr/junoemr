@@ -24,29 +24,40 @@
 package org.oscarehr.integration.SRFax;
 
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxIntegrationException;
-import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
-import org.oscarehr.fax.externalApi.srfax.resultWrapper.SingleWrapper;
+import org.oscarehr.fax.result.FaxStatusResult;
+import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
+import org.oscarehr.integration.SRFax.api.result.SRFaxFaxStatusResult;
+import org.oscarehr.integration.SRFax.api.resultWrapper.SingleWrapper;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.fax.provider.FaxUploadProvider;
-import org.oscarehr.fax.service.OutgoingFaxService;
+import org.oscarehr.fax.service.FaxUploadService;
 import java.util.HashMap;
+import java.util.List;
 
 public class SRFaxUploadProvider implements FaxUploadProvider
 {
-	@Override
-	public boolean sendQueuedFax(FaxOutbound faxOutbound, GenericFile file) throws Exception
+	private SRFaxApiConnector makeApiConnector(FaxOutbound fax) throws FaxIntegrationException
 	{
-		FaxAccount faxAccount = faxOutbound.getFaxAccount();
+		FaxAccount faxAccount = fax.getFaxAccount();
 
 		if (!faxAccount.getIntegrationType().equals(FaxProvider.SRFAX))
 		{
 			throw new FaxIntegrationException("SRFax provider is processing non-SRFAX outbound fax");
 		}
 
-		SRFaxApiConnector apiConnector = new SRFaxApiConnector(faxAccount.getLoginId(), faxAccount.getLoginPassword());
+		return new SRFaxApiConnector(faxAccount.getLoginId(), faxAccount.getLoginPassword());
+	}
+
+
+	@Override
+	public FaxOutbound sendQueuedFax(FaxOutbound faxOutbound, GenericFile file) throws Exception
+	{
+		SRFaxApiConnector apiConnector = makeApiConnector(faxOutbound);
+		FaxAccount faxAccount = faxOutbound.getFaxAccount();
 
 		String coverLetterOption = faxAccount.getCoverLetterOption();
 		if(coverLetterOption == null || !SRFaxApiConnector.validCoverLetterNames.contains(coverLetterOption))
@@ -66,19 +77,50 @@ public class SRFaxUploadProvider implements FaxUploadProvider
 			coverLetterOption
 		);
 
-		boolean success = resultWrapper.isSuccess();
-		if (success)
+		if (resultWrapper.isSuccess())
 		{
 			faxOutbound.setStatusSent();
-			faxOutbound.setStatusMessage(OutgoingFaxService.STATUS_MESSAGE_IN_TRANSIT);
+			faxOutbound.setStatusMessage(FaxUploadService.STATUS_MESSAGE_IN_TRANSIT);
 			faxOutbound.setExternalReferenceId(resultWrapper.getResult().longValue());
 		}
 		else
 		{
-			faxOutbound.setStatusError();
-			faxOutbound.setStatusMessage(resultWrapper.getError());
+			throw new FaxIntegrationException(resultWrapper.getError());
 		}
 
-		return success;
+		return faxOutbound;
+	}
+
+	@Override
+	public List<String> getRemoteFinalStatusIndicators()
+	{
+		return SRFaxApiConnector.RESPONSE_STATUSES_FINAL;
+	}
+
+	@Override
+	public boolean isFaxInRemoteSentState(FaxStatusResult result)
+	{
+		return result.getRemoteSentStatus().equalsIgnoreCase(SRFaxApiConnector.RESPONSE_STATUS_SENT);
+	}
+
+	@Override
+	public boolean isFaxInRemoteFailedState(FaxOutbound faxOutbound)
+	{
+		return faxOutbound.getExternalStatus().equalsIgnoreCase(SRFaxApiConnector.RESPONSE_STATUS_FAILED);
+	}
+
+
+	@Override
+	public FaxStatusResult getFaxStatus(FaxOutbound faxOutbound) throws Exception
+	{
+		SRFaxApiConnector apiConnector = makeApiConnector(faxOutbound);
+		SingleWrapper<SRFaxFaxStatusResult> apiResult = apiConnector.getFaxStatus(String.valueOf(faxOutbound.getExternalReferenceId()));
+
+		if (!apiResult.isSuccess())
+		{
+			throw new FaxApiConnectionException(apiResult.getError());
+		}
+
+		return apiResult.getResult();
 	}
 }

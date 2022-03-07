@@ -18,7 +18,7 @@
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@ page import="org.oscarehr.fax.service.OutgoingFaxService" %>
+<%@ page import="org.oscarehr.fax.service.FaxUploadService" %>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <% oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance(); %>
 
@@ -31,8 +31,8 @@
 	int provNo = Integer.parseInt((String) session.getAttribute("user"));
 	FrmRecord rec = (new FrmRecordFactory()).factory(formClass);
     java.util.Properties props = rec.getFormRecord(LoggedInInfo.getLoggedInInfoFromSession(request),demoNo, formId);
-	OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
-	boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
+	FaxUploadService faxUploadService = SpringUtils.getBean(FaxUploadService.class);
+	boolean faxEnabled = faxUploadService.isOutboundFaxEnabled();
 
     FrmData fd = new FrmData();
     String resource = fd.getResource();

@@ -79,14 +79,13 @@ public class FaxDownloadService
 			criteriaSearch.setIntegrationEnabledStatus(true);
 			criteriaSearch.setInboundEnabledStatus(true);
 			List<FaxAccount> faxAccountList = faxAccountDao.criteriaSearch(criteriaSearch);
-			FaxProviderFactory faxProviderFactory = new FaxProviderFactory();
 			FaxDownloadProvider faxDownloadProvider;
 
 			for(FaxAccount faxAccount : faxAccountList)
 			{
 				try
 				{
-					faxDownloadProvider = faxProviderFactory.createFaxDownloadProvider(faxAccount);
+					faxDownloadProvider = FaxProviderFactory.createFaxDownloadProvider(faxAccount);
 					List<? extends FaxInboxResult> faxInboxResults = faxDownloadProvider.getFaxInbox(faxDaysPast);
 					handleResults(faxAccount, faxInboxResults);
 				}
@@ -125,7 +124,8 @@ public class FaxDownloadService
 			try
 			{
 				String referenceIdStr = result.getDetailsId();
-				FaxDownloadProvider faxDownloadProvider = new FaxProviderFactory().createFaxDownloadProvider(faxAccount);
+
+				FaxDownloadProvider faxDownloadProvider = FaxProviderFactory.createFaxDownloadProvider(faxAccount);
 
 				// for each new fax to get, call api and request document.
 				String faxContent = faxDownloadProvider.retrieveFax(referenceIdStr);

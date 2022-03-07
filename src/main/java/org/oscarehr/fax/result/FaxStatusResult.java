@@ -20,61 +20,36 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.externalApi.srfax.resultWrapper;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+package org.oscarehr.fax.result;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SingleWrapper<T>
+import java.util.Date;
+import java.util.Optional;
+
+public interface FaxStatusResult
 {
-	public static final String STATUS_SUCCESS = "Success";
+	/**
+	 * Return a provider-specific string indicating that the remote service has sent the fax
+	 * @return provider-specific sent string.
+	 */
+	String getRemoteSentStatus();
 
-	@JsonProperty("Status")
-	private String status;
-	@JsonProperty("Result")
-	private T result;
+	/**
+	 * The time at which the remote service sent the fax
+	 * @return Optional sending time as Java.date
+	 */
+	Optional<Date> getRemoteSendTime();
 
-	private String error;
+	/**
+	 * API Error code. If the API call is successful, or if no error code is sent on an error this value will be empty.
+	 * @return Optional error code.
+	 */
+	Optional<String> getErrorCode();
 
-	public String getStatus()
-	{
-		return status;
-	}
-
-	public void setStatus(String status)
-	{
-		this.status = status;
-	}
-
-	public boolean isSuccess()
-	{
-		return STATUS_SUCCESS.equals(status);
-	}
-
-	public T getResult()
-	{
-		return result;
-	}
-
-	public void setResult(T result)
-	{
-		this.result = result;
-	}
-
-	public String getError()
-	{
-		return error;
-	}
-
-	public void setError(String error)
-	{
-		this.error = error;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "status:" + status + ", error:" + error + ", result:" + result;
-	}
+	/**
+	 * API error message.  If the API call is successful, or if no error reason is provided,
+	 * then this value will be empty.
+	 * @return Optional error reason
+	 */
+	Optional<String> getError();
 }

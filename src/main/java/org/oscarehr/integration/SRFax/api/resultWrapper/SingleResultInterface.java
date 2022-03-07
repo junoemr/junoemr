@@ -20,12 +20,13 @@
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.integration.SRFax.api.resultWrapper;
 
-package org.oscarehr.fax.provider;
-
-public enum FaxProvider
+public interface SingleResultInterface<T>
 {
-	NONE,
-	SRFAX,
-	RINGCENTRAL
+	boolean isSuccess();
+	
+	String getError();
+
+	T getResult();
 }
