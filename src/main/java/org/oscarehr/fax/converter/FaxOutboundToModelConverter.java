@@ -24,11 +24,11 @@ package org.oscarehr.fax.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
+import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
-import org.oscarehr.fax.model.FaxStatusCombined;
-import org.oscarehr.fax.model.FaxStatusInternal;
+import org.oscarehr.fax.provider.FaxProviderFactory;
+import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
-import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -38,9 +38,12 @@ public class FaxOutboundToModelConverter extends AbstractModelConverter<FaxOutbo
 	@Override
 	public FaxOutboxTransferOutbound convert(FaxOutbound entity)
 	{
+		FaxAccount faxAccount = entity.getFaxAccount();
+		FaxUploadProvider uploadProvider = FaxProviderFactory.createFaxUploadProvider(faxAccount);
+
 		FaxOutboxTransferOutbound model = new FaxOutboxTransferOutbound();
 		model.setId(entity.getId());
-		model.setFaxAccountId(entity.getFaxAccount().getId());
+		model.setFaxAccountId(faxAccount.getId());
 		model.setProviderId(entity.getProviderNo());
 		model.setProviderName(entity.getProvider().getDisplayName());
 		model.setDemographicId(entity.getDemographicNo());
@@ -54,37 +57,8 @@ public class FaxOutboundToModelConverter extends AbstractModelConverter<FaxOutbo
 		model.setIntegrationStatus(entity.getExternalStatus());
 		model.setIntegrationQueuedDateTime(ConversionUtils.toNullableLocalDateTime(entity.getCreatedAt()));
 		model.setIntegrationSentDateTime(ConversionUtils.toNullableLocalDateTime(entity.getExternalDeliveryDate()));
-		model.setCombinedStatus(toCombinedStatus(entity.getStatus(), entity.getExternalStatus()));
+		model.setCombinedStatus(entity.getCombinedStatus(uploadProvider));
 
 		return model;
-	}
-
-	private static FaxStatusCombined toCombinedStatus(FaxStatusInternal systemStatus, String remoteStatus)
-	{
-		// todo need faxProvider for status checking
-		FaxStatusCombined combinedStatus = null;
-		if(FaxStatusInternal.ERROR.equals(systemStatus))
-		{
-			combinedStatus = FaxStatusCombined.ERROR;
-		}
-		else if(FaxStatusInternal.QUEUED.equals(systemStatus))
-		{
-			combinedStatus = FaxStatusCombined.QUEUED;
-		}
-		else if(FaxStatusInternal.SENT.equals(systemStatus)
-				&& SRFaxApiConnector.RESPONSE_STATUS_SENT.equalsIgnoreCase(remoteStatus))
-		{
-			combinedStatus = FaxStatusCombined.INTEGRATION_SUCCESS;
-		}
-		else if(FaxStatusInternal.SENT.equals(systemStatus)
-				&& SRFaxApiConnector.RESPONSE_STATUS_FAILED.equalsIgnoreCase(remoteStatus))
-		{
-			combinedStatus = FaxStatusCombined.INTEGRATION_FAILED;
-		}
-		else if(FaxStatusInternal.SENT.equals(systemStatus))
-		{
-			combinedStatus = FaxStatusCombined.IN_PROGRESS;
-		}
-		return combinedStatus;
 	}
 }

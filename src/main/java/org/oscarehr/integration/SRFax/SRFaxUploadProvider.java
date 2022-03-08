@@ -26,15 +26,16 @@ package org.oscarehr.integration.SRFax;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxIntegrationException;
-import org.oscarehr.fax.result.FaxStatusResult;
-import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
-import org.oscarehr.integration.SRFax.api.result.SRFaxFaxStatusResult;
-import org.oscarehr.integration.SRFax.api.resultWrapper.SingleWrapper;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.fax.provider.FaxUploadProvider;
+import org.oscarehr.fax.result.FaxStatusResult;
 import org.oscarehr.fax.service.FaxUploadService;
+import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
+import org.oscarehr.integration.SRFax.api.result.SRFaxFaxStatusResult;
+import org.oscarehr.integration.SRFax.api.resultWrapper.SingleWrapper;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -98,15 +99,15 @@ public class SRFaxUploadProvider implements FaxUploadProvider
 	}
 
 	@Override
-	public boolean isFaxInRemoteSentState(FaxStatusResult result)
+	public boolean isFaxInRemoteSentState(String externalStatus)
 	{
-		return result.getRemoteSentStatus().equalsIgnoreCase(SRFaxApiConnector.RESPONSE_STATUS_SENT);
+		return SRFaxApiConnector.RESPONSE_STATUS_SENT.equalsIgnoreCase(externalStatus);
 	}
 
 	@Override
-	public boolean isFaxInRemoteFailedState(FaxOutbound faxOutbound)
+	public boolean isFaxInRemoteFailedState(String externalStatus)
 	{
-		return faxOutbound.getExternalStatus().equalsIgnoreCase(SRFaxApiConnector.RESPONSE_STATUS_FAILED);
+		return SRFaxApiConnector.RESPONSE_STATUS_FAILED.equalsIgnoreCase(externalStatus);
 	}
 
 
