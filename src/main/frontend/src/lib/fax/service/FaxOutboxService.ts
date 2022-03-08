@@ -42,14 +42,11 @@ export default class FaxOutboxService
 		return new PagedResponse(this.faxOutboxResultToModelConverter.convertList(transfer.body, transfer.headers));
 	}
 
-	public download(recordId: number): void
+	public async download(recordId: number): Promise<void>
 	{
-		//todo how to ?
-
-		// this.faxOutboundApi.download();
-		// service.apiPath + '/' + id + '/download';
-		// let windowName = "ViewFaxFile" + outboundId;
-		// window.open(url, windowName, "scrollbars=1,width=1024,height=768");
+		// it would be nice to figure out how to dynamically get this url somehow
+		let url = "../ws/rs/faxOutbound/" + recordId + "/download";
+		window.open(url, "_blank");
 	}
 
 	public async resendOutboundFax(recordId: number): Promise<FaxOutboxResult>
