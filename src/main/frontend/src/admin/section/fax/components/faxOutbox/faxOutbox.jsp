@@ -96,14 +96,14 @@
 						<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.download"/>
 					</juno-button>
 				</td>
-				<td ng-if="$ctrl.displayNotificationColumn == true" class="w-128">
-						<juno-button ng-if="item.isNotificationStatusNotify()"
-						             click="$ctrl.dismissNotification(item);"
-						             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-						             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
-							<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.notification.dismiss"/>
-						</juno-button>
-					<span ng-show="item.isNotificationStatusSilent()">
+				<td ng-if="$ctrl.displayNotificationColumn" class="w-128">
+					<juno-button ng-if="item.isNotificationStatusNotify"
+					             click="$ctrl.dismissNotification(item);"
+					             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
+						<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-btn.notification.dismiss"/>
+					</juno-button>
+					<span ng-show="item.isNotificationStatusSilent">
 						<bean:message bundle="ui" key="admin.fax.sr.outbox.notification.dismissed"/>
 					</span>
 				</td>

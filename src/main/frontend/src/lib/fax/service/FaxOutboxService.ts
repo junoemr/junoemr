@@ -28,43 +28,43 @@ export default class FaxOutboxService
 		return moment(transfer);
 	}
 
-	public getOutbox = async (params: FaxOutboxSearchParams): Promise<PagedResponse<FaxOutboxResult>> =>
+	public async getOutbox(params: FaxOutboxSearchParams): Promise<PagedResponse<FaxOutboxResult>>
 	{
 		let transfer = (await this.faxOutboundApi.getOutbox(
-				params.page,
-				params.perPage,
-				params.endDate ? Juno.Common.Util.formatMomentDate(params.endDate) : null,
-				params.startDate ? Juno.Common.Util.formatMomentDate(params.startDate) : null,
-				params.faxAccount?.id,
-				params.combinedStatus as any,
-				params.archived,
-			)).data;
+			params.page,
+			params.perPage,
+			params.endDate ? Juno.Common.Util.formatMomentDate(params.endDate) : null,
+			params.startDate ? Juno.Common.Util.formatMomentDate(params.startDate) : null,
+			params.faxAccount?.id,
+			params.combinedStatus as any,
+			params.archived,
+		)).data;
 		return new PagedResponse(this.faxOutboxResultToModelConverter.convertList(transfer.body, transfer.headers));
 	}
 
-	 public download = (recordId: number):void =>
-	 {
-		 //todo how to ?
+	public download(recordId: number): void
+	{
+		//todo how to ?
 
-		 // this.faxOutboundApi.download();
-		 // service.apiPath + '/' + id + '/download';
-		 // let windowName = "ViewFaxFile" + outboundId;
-		 // window.open(url, windowName, "scrollbars=1,width=1024,height=768");
-	 }
+		// this.faxOutboundApi.download();
+		// service.apiPath + '/' + id + '/download';
+		// let windowName = "ViewFaxFile" + outboundId;
+		// window.open(url, windowName, "scrollbars=1,width=1024,height=768");
+	}
 
-	public resendOutboundFax = async (recordId: number): Promise<FaxOutboxResult> =>
+	public async resendOutboundFax(recordId: number): Promise<FaxOutboxResult>
 	{
 		return this.faxOutboxResultToModelConverter.convert(
 			(await this.faxOutboundApi.resend(recordId)).data.body);
 	};
 
-	public setNotificationStatus = async (recordId: number, status: string): Promise<FaxOutboxResult> =>
+	public async setNotificationStatus(recordId: number, status: string): Promise<FaxOutboxResult>
 	{
 		return this.faxOutboxResultToModelConverter.convert(
 			(await this.faxOutboundApi.setNotificationStatus(recordId, status)).data.body);
 	}
 
-	public archive = async (recordId: number): Promise<FaxOutboxResult> =>
+	public async archive(recordId: number): Promise<FaxOutboxResult>
 	{
 		return this.faxOutboxResultToModelConverter.convert(
 			(await this.faxOutboundApi.archive(recordId)).data.body);

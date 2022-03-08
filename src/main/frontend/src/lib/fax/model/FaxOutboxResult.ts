@@ -24,6 +24,63 @@ export default class FaxOutboxResult
 	private _integrationSentDateTime: Moment;
 	private _combinedStatus: FaxStatusCombinedType;
 
+	/**
+	 * helpers
+	 */
+
+	get isInternalStatusError(): boolean
+	{
+		return (this.systemStatus === FaxStatusInternalType.Error);
+	}
+
+	get isInternalStatusSent(): boolean
+	{
+		return (this.systemStatus === FaxStatusInternalType.Sent);
+	}
+
+	get isInternalStatusQueued(): boolean
+	{
+		return (this.systemStatus === FaxStatusInternalType.Queued);
+	}
+
+	get isCombinedStatusSent(): boolean
+	{
+		return (this.combinedStatus === FaxStatusCombinedType.IntegrationSuccess);
+	}
+
+	get isCombinedStatusError(): boolean
+	{
+		return (this.combinedStatus === FaxStatusCombinedType.Error);
+	}
+
+	get isCombinedStatusIntegrationFailed(): boolean
+	{
+		return (this.combinedStatus === FaxStatusCombinedType.IntegrationFailed);
+	}
+
+	get isCombinedStatusInProgress(): boolean
+	{
+		return (this.combinedStatus === FaxStatusCombinedType.InProgress);
+	}
+
+	get isCombinedStatusInQueued(): boolean
+	{
+		return (this.combinedStatus === FaxStatusCombinedType.Queued);
+	}
+
+	get isNotificationStatusNotify(): boolean
+	{
+		return (this.notificationStatus === FaxNotificationStatusType.Notify);
+	}
+
+	get isNotificationStatusSilent(): boolean
+	{
+		return (this.notificationStatus === FaxNotificationStatusType.Silent);
+	}
+
+	/**
+	 * direct getters and setters
+	 */
 	get id(): number
 	{
 		return this._id;
@@ -114,12 +171,12 @@ export default class FaxOutboxResult
 		this._systemStatusMessage = value;
 	}
 
-	get systemSentDateTime(): moment.Moment
+	get systemSentDateTime(): Moment
 	{
 		return this._systemSentDateTime;
 	}
 
-	set systemSentDateTime(value: moment.Moment)
+	set systemSentDateTime(value: Moment)
 	{
 		this._systemSentDateTime = value;
 	}
@@ -154,22 +211,22 @@ export default class FaxOutboxResult
 		this._integrationStatus = value;
 	}
 
-	get integrationQueuedDateTime(): moment.Moment
+	get integrationQueuedDateTime(): Moment
 	{
 		return this._integrationQueuedDateTime;
 	}
 
-	set integrationQueuedDateTime(value: moment.Moment)
+	set integrationQueuedDateTime(value: Moment)
 	{
 		this._integrationQueuedDateTime = value;
 	}
 
-	get integrationSentDateTime(): moment.Moment
+	get integrationSentDateTime(): Moment
 	{
 		return this._integrationSentDateTime;
 	}
 
-	set integrationSentDateTime(value: moment.Moment)
+	set integrationSentDateTime(value: Moment)
 	{
 		this._integrationSentDateTime = value;
 	}
@@ -184,153 +241,4 @@ export default class FaxOutboxResult
 		this._combinedStatus = value;
 	}
 
-	get isInternalStatusError(): () => boolean
-	{
-		return this._isInternalStatusError;
-	}
-
-	set isInternalStatusError(value: () => boolean)
-	{
-		this._isInternalStatusError = value;
-	}
-
-	get isInternalStatusSent(): () => boolean
-	{
-		return this._isInternalStatusSent;
-	}
-
-	set isInternalStatusSent(value: () => boolean)
-	{
-		this._isInternalStatusSent = value;
-	}
-
-	get isInternalStatusQueued(): () => boolean
-	{
-		return this._isInternalStatusQueued;
-	}
-
-	set isInternalStatusQueued(value: () => boolean)
-	{
-		this._isInternalStatusQueued = value;
-	}
-
-	get isCombinedStatusSent(): () => boolean
-	{
-		return this._isCombinedStatusSent;
-	}
-
-	set isCombinedStatusSent(value: () => boolean)
-	{
-		this._isCombinedStatusSent = value;
-	}
-
-	get isCombinedStatusError(): () => boolean
-	{
-		return this._isCombinedStatusError;
-	}
-
-	set isCombinedStatusError(value: () => boolean)
-	{
-		this._isCombinedStatusError = value;
-	}
-
-	get isCombinedStatusIntegrationFailed(): () => boolean
-	{
-		return this._isCombinedStatusIntegrationFailed;
-	}
-
-	set isCombinedStatusIntegrationFailed(value: () => boolean)
-	{
-		this._isCombinedStatusIntegrationFailed = value;
-	}
-
-	get isCombinedStatusInProgress(): () => boolean
-	{
-		return this._isCombinedStatusInProgress;
-	}
-
-	set isCombinedStatusInProgress(value: () => boolean)
-	{
-		this._isCombinedStatusInProgress = value;
-	}
-
-	get isCombinedStatusInQueued(): () => boolean
-	{
-		return this._isCombinedStatusInQueued;
-	}
-
-	set isCombinedStatusInQueued(value: () => boolean)
-	{
-		this._isCombinedStatusInQueued = value;
-	}
-
-	get isNotificationStatusNotify(): () => boolean
-	{
-		return this._isNotificationStatusNotify;
-	}
-
-	set isNotificationStatusNotify(value: () => boolean)
-	{
-		this._isNotificationStatusNotify = value;
-	}
-
-	get isNotificationStatusSilent(): () => boolean
-	{
-		return this._isNotificationStatusSilent;
-	}
-
-	set isNotificationStatusSilent(value: () => boolean)
-	{
-		this._isNotificationStatusSilent = value;
-	}
-
-	private _isInternalStatusError = (): boolean =>
-	{
-		return (this._systemStatus === FaxStatusInternalType.Error);
-	}
-
-	private _isInternalStatusSent = (): boolean =>
-	{
-		return (this._systemStatus === FaxStatusInternalType.Sent);
-	}
-
-	private _isInternalStatusQueued = (): boolean =>
-	{
-		return (this._systemStatus === FaxStatusInternalType.Queued);
-	}
-
-	private _isCombinedStatusSent = (): boolean =>
-	{
-		return (this._combinedStatus === FaxStatusCombinedType.IntegrationSuccess);
-	}
-
-	private _isCombinedStatusError = (): boolean =>
-	{
-		return (this._combinedStatus === FaxStatusCombinedType.Error);
-	}
-
-	private _isCombinedStatusIntegrationFailed = (): boolean =>
-	{
-		return (this._combinedStatus === FaxStatusCombinedType.IntegrationFailed);
-	}
-
-	private _isCombinedStatusInProgress = (): boolean =>
-	{
-		return (this._combinedStatus === FaxStatusCombinedType.InProgress);
-	}
-
-	private _isCombinedStatusInQueued = (): boolean =>
-	{
-		return (this._combinedStatus === FaxStatusCombinedType.Queued);
-	}
-
-	private _isNotificationStatusNotify = (): boolean =>
-	{
-		return (this._notificationStatus === FaxNotificationStatusType.Notify);
-	}
-
-	private _isNotificationStatusSilent = (): boolean =>
-	{
-		return (this._notificationStatus === FaxNotificationStatusType.Silent);
-	}
 }

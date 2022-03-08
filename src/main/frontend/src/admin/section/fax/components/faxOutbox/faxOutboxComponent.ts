@@ -168,7 +168,7 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 			ctrl.resendFax = (outboxItem: FaxOutboxResult): void =>
 			{
 				// the resend will create a new record for some resend attempts, in that case force a reload of the table items
-				let requireFullRefresh = outboxItem.isCombinedStatusIntegrationFailed();
+				let requireFullRefresh = outboxItem.isCombinedStatusIntegrationFailed;
 
 				// set a temp status to provider feedback/disable resend button
 				outboxItem.combinedStatus = FaxStatusCombinedType.InProgress;
@@ -176,7 +176,7 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 					function success(response: FaxOutboxResult)
 					{
 						angular.copy(response, outboxItem);
-						if(outboxItem.isInternalStatusError())
+						if(outboxItem.isInternalStatusError)
 						{
 							ctrl.toastService.errorToast(outboxItem.systemStatusMessage);
 						}
@@ -281,9 +281,9 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 			ctrl.hideResendButton = (outboxItem: FaxOutboxResult) =>
 			{
 				return outboxItem.archived
-					|| outboxItem.isCombinedStatusInQueued()
-					|| outboxItem.isCombinedStatusInProgress()
-					|| outboxItem.isCombinedStatusSent()
+					|| outboxItem.isCombinedStatusInQueued
+					|| outboxItem.isCombinedStatusInProgress
+					|| outboxItem.isCombinedStatusSent
 			}
 
 			ctrl.nextPushTimeDisplay = () =>
