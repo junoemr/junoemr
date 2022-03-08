@@ -24,6 +24,7 @@ package org.oscarehr.fax.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.fax.model.FaxFileType;
 import org.oscarehr.fax.model.FaxNotificationStatus;
 import org.oscarehr.fax.model.FaxStatusCombined;
@@ -45,7 +46,7 @@ public class FaxOutboxTransferOutbound implements Serializable
 	private String providerId;
 	private String providerName;
 	private Integer demographicId;
-	private String toFaxNumber;
+	private PhoneNumberModel toFaxNumber;
 	/* file type: document, form, consult, etc. */
 	private FaxFileType fileType;
 	/* the sent status of the document as recorded in the system */

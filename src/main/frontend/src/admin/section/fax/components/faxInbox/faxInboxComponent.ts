@@ -11,6 +11,7 @@ import FaxInboxService from "../../../../../lib/fax/service/FaxInboxService";
 import PagedResponse from "../../../../../lib/common/response/pagedRespose";
 import FaxAccount from "../../../../../lib/fax/model/FaxAccount";
 import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";
+import PhoneNumber from "../../../../../lib/common/model/PhoneNumber";
 
 angular.module("Admin.Section.Fax").component('faxInbox', {
 	templateUrl: 'src/admin/section/fax/components/faxInbox/faxInbox.jsp',
@@ -157,6 +158,11 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 			ctrl.formatDateForDisplay = (date: Moment): string =>
 			{
 				return Juno.Common.Util.formatMomentDate(date) + " " + Juno.Common.Util.formatMomentTime(date);
+			}
+
+			ctrl.getFaxDisplayNumber = (number: PhoneNumber): string =>
+			{
+				return number ? number.formattedForDisplay : "";
 			}
 
 			ctrl.getFaxAccountDisplayName = (faxAccountId: number) =>

@@ -13,6 +13,7 @@ import PagedResponse from "../../../../../lib/common/response/pagedRespose";
 import {FaxNotificationStatusType} from "../../../../../lib/fax/model/FaxNotificationStatusType";
 import FaxAccount from "../../../../../lib/fax/model/FaxAccount";
 import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";
+import PhoneNumber from "../../../../../lib/common/model/PhoneNumber";
 
 angular.module("Admin.Section.Fax").component('faxOutbox', {
 	templateUrl: 'src/admin/section/fax/components/faxOutbox/faxOutbox.jsp',
@@ -232,6 +233,11 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 			ctrl.getStatusDisplayLabel = (combinedStatus: FaxStatusCombinedType) =>
 			{
 				return ctrl.statusFilterOptions.find((option) => combinedStatus === option.value).label;
+			}
+
+			ctrl.getFaxDisplayNumber = (number: PhoneNumber): string =>
+			{
+				return number ? number.formattedForDisplay : "";
 			}
 
 			ctrl.getStatusIcon = (combinedStatus: FaxStatusCombinedType) =>

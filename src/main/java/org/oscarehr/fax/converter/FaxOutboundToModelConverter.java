@@ -23,11 +23,12 @@
 package org.oscarehr.fax.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.fax.model.FaxOutbound;
+import org.oscarehr.fax.model.FaxStatusCombined;
 import org.oscarehr.fax.model.FaxStatusInternal;
 import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
-import org.oscarehr.fax.model.FaxStatusCombined;
+import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -48,7 +49,7 @@ public class FaxOutboundToModelConverter extends AbstractModelConverter<FaxOutbo
 		model.setArchived(entity.getArchived());
 		model.setNotificationStatus(entity.getNotificationStatus());
 		model.setSystemSentDateTime(ConversionUtils.toNullableLocalDateTime(entity.getCreatedAt()));
-		model.setToFaxNumber(entity.getSentTo());
+		model.setToFaxNumber(PhoneNumberModel.of(entity.getSentTo(), PhoneNumberModel.PHONE_TYPE.FAX));
 		model.setFileType(entity.getFileType());
 		model.setIntegrationStatus(entity.getExternalStatus());
 		model.setIntegrationQueuedDateTime(ConversionUtils.toNullableLocalDateTime(entity.getCreatedAt()));

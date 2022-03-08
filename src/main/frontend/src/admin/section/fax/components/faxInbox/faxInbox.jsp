@@ -54,7 +54,7 @@
 					{{$ctrl.formatDateForDisplay(item.systemDateReceived)}}
 				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.inbox.tbl-hdr.sentFrom"/>'">
-					{{item.sentFrom}}
+					{{$ctrl.getFaxDisplayNumber(item.sentFrom)}}
 				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.inbox.tbl-hdr.accountName"/>'">
 					{{$ctrl.getFaxAccountDisplayName(item.faxAccountId)}}

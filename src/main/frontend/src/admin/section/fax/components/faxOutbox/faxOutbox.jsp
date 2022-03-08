@@ -64,7 +64,7 @@
 					{{item.fileType}}
 				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.toFaxNumber"/>'">
-					{{item.toFaxNumber}}
+					{{$ctrl.getFaxDisplayNumber(item.toFaxNumber)}}
 				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.sentStatus"/>'">
 					<div class="flex-row align-items-start">

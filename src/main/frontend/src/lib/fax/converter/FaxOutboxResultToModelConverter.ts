@@ -6,6 +6,7 @@ import {FaxStatusCombinedType} from "../model/FaxStatusCombinedType";
 import {FaxStatusInternalType} from "../model/FaxStatusInternalType";
 import {FaxNotificationStatusType} from "../model/FaxNotificationStatusType";
 import {FaxFileType} from "../model/FaxFileType";
+import PhoneNumberToModelConverter from "../../common/converter/PhoneNumberToModelConverter";
 
 export default class FaxOutboxResultToModelConverter extends AbstractConverter<FaxOutboxTransferOutbound, FaxOutboxResult>
 {
@@ -22,7 +23,7 @@ export default class FaxOutboxResultToModelConverter extends AbstractConverter<F
 		model.providerId = from.providerId;
 		model.providerName = from.providerName;
 		model.demographicId = from.demographicId;
-		model.toFaxNumber = from.toFaxNumber;
+		model.toFaxNumber = new PhoneNumberToModelConverter().convert(from.toFaxNumber);
 		model.fileType = from.fileType as any as FaxFileType;
 		model.systemStatus = from.systemStatus as any as FaxStatusInternalType;
 		model.systemStatusMessage = from.systemStatusMessage;

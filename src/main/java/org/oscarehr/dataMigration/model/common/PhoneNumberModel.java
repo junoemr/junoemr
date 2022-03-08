@@ -33,6 +33,7 @@ public class PhoneNumberModel extends AbstractTransientModel
 		HOME,
 		WORK,
 		CELL,
+		FAX,
 	}
 
 	private String number;
@@ -128,10 +129,19 @@ public class PhoneNumberModel extends AbstractTransientModel
 	{
 		return (PHONE_TYPE.CELL.equals(this.getPhoneType()));
 	}
+	@JsonIgnore
+	public boolean isTypeFax()
+	{
+		return (PHONE_TYPE.FAX.equals(this.getPhoneType()));
+	}
 
 	public static PhoneNumberModel of(String number)
 	{
 		return PhoneNumberModel.of(number, null, false, null);
+	}
+	public static PhoneNumberModel of(String number, PHONE_TYPE type)
+	{
+		return PhoneNumberModel.of(number, null, false, type);
 	}
 	public static PhoneNumberModel of(String number, String extension)
 	{

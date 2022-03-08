@@ -22,90 +22,31 @@
  */
 package org.oscarehr.fax.transfer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.Optional;
 
+@Data
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 public abstract class FaxAccountTransferBasic implements Serializable
 {
-	private Boolean enabled;
-	private Boolean enableInbound;
-	private Boolean enableOutbound;
+	private boolean enabled;
+	private boolean enableInbound;
+	private boolean enableOutbound;
 	private String accountEmail;
 	private String displayName;
-	private String faxNumber;
+	private PhoneNumberModel faxNumber;
 	private String coverLetterOption;
 
-	public Boolean isEnabled()
+	@JsonIgnore
+	public Optional<PhoneNumberModel> getOptionalFaxNumber()
 	{
-		return enabled;
-	}
-
-	public void setEnabled(Boolean enabled)
-	{
-		this.enabled = enabled;
-	}
-
-	public Boolean isEnableInbound()
-	{
-		return enableInbound;
-	}
-
-	public void setEnableInbound(Boolean enableInbound)
-	{
-		this.enableInbound = enableInbound;
-	}
-
-	public Boolean isEnableOutbound()
-	{
-		return enableOutbound;
-	}
-
-	public void setEnableOutbound(Boolean enableOutbound)
-	{
-		this.enableOutbound = enableOutbound;
-	}
-
-	public String getAccountEmail()
-	{
-		return accountEmail;
-	}
-
-	public void setAccountEmail(String accountEmail)
-	{
-		this.accountEmail = accountEmail;
-	}
-
-	public String getDisplayName()
-	{
-		return displayName;
-	}
-
-	public void setDisplayName(String displayName)
-	{
-		this.displayName = displayName;
-	}
-
-	public String getFaxNumber()
-	{
-		return faxNumber;
-	}
-
-	public void setFaxNumber(String faxNumber)
-	{
-		this.faxNumber = faxNumber;
-	}
-
-	public String getCoverLetterOption()
-	{
-		return coverLetterOption;
-	}
-
-	public void setCoverLetterOption(String coverLetterOption)
-	{
-		this.coverLetterOption = coverLetterOption;
+		return Optional.ofNullable(getFaxNumber());
 	}
 }

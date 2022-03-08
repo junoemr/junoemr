@@ -23,6 +23,7 @@
 package org.oscarehr.fax.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.fax.model.FaxInbound;
 import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
 import org.springframework.stereotype.Component;
@@ -40,7 +41,7 @@ public class FaxInboundToModelConverter extends AbstractModelConverter<FaxInboun
 		model.setFaxAccountId(entity.getFaxAccount().getId());
 		model.setSystemDateReceived(ConversionUtils.toTimestampString(entity.getCreatedAt()));
 		model.setExternalReferenceId(entity.getExternalReferenceId());
-		model.setSentFrom(entity.getSentFrom());
+		model.setSentFrom(PhoneNumberModel.of(entity.getSentFrom(), PhoneNumberModel.PHONE_TYPE.FAX));
 
 		return model;
 	}
