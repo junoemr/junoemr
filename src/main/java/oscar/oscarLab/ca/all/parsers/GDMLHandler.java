@@ -67,6 +67,7 @@ import java.util.List;
  */
 public class GDMLHandler extends ORU_R01MessageHandler
 {
+    public static final String GDML_MESSAGE_TYPE = "GDML";
 
     Logger logger = Logger.getLogger(GDMLHandler.class);
     ArrayList<String> headers = null;
@@ -656,8 +657,9 @@ public class GDMLHandler extends ORU_R01MessageHandler
     	return "";
     }
 
-    public String getMsgType(){
-        return("GDML");
+    public String getMsgType()
+    {
+        return (GDML_MESSAGE_TYPE);
     }
 
     public String getMsgDate(){

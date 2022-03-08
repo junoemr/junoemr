@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.mapper.cds.in;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.dataMigration.model.encounterNote.EncounterNote;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -57,7 +57,7 @@ public class CDSEncounterNoteImportMapper extends AbstractCDSNoteImportMapper<Cl
 		{
 			for(ClinicalNotes.ParticipatingProviders participatingProvider : importStructure.getParticipatingProviders())
 			{
-				Provider provider = new Provider();
+				ProviderModel provider = new ProviderModel();
 				provider.setFirstName(participatingProvider.getName().getFirstName());
 				provider.setLastName(participatingProvider.getName().getLastName());
 				provider.setOhipNumber(participatingProvider.getOHIPPhysicianId());
@@ -67,7 +67,7 @@ public class CDSEncounterNoteImportMapper extends AbstractCDSNoteImportMapper<Cl
 			// for now, first provider will be the MRP
 			ClinicalNotes.ParticipatingProviders participatingProvider = importStructure.getParticipatingProviders().get(0);
 
-			Provider provider = new Provider();
+			ProviderModel provider = new ProviderModel();
 			provider.setFirstName(participatingProvider.getName().getFirstName());
 			provider.setLastName(participatingProvider.getName().getLastName());
 			provider.setOhipNumber(participatingProvider.getOHIPPhysicianId());

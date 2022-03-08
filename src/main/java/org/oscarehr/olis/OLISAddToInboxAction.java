@@ -8,15 +8,7 @@
  */
 package org.oscarehr.olis;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -28,13 +20,20 @@ import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarLab.FileUploadCheck;
 import oscar.oscarLab.ca.all.upload.HandlerClassFactory;
 import oscar.oscarLab.ca.all.upload.handlers.OLISHL7Handler;
 import oscar.oscarLab.ca.on.CommonLabResultData;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 
 public class OLISAddToInboxAction extends DispatchAction {
 
@@ -47,8 +46,8 @@ public class OLISAddToInboxAction extends DispatchAction {
 		String providerNo=loggedInInfo.getLoggedInProviderNo();
 		
 		String uuidToAdd = request.getParameter("uuid");
-		String pFile = request.getParameter("file");
-		String pAck = request.getParameter("ack");
+		String pFile = StringUtils.trimToNull(request.getParameter("file"));
+		String pAck = StringUtils.trimToNull(request.getParameter("ack"));
 		boolean doFile = false, doAck = false;
 		if (pFile != null && pFile.equals("true")) {
 			doFile = true;
@@ -59,26 +58,30 @@ public class OLISAddToInboxAction extends DispatchAction {
 
 		String fileLocation = System.getProperty("java.io.tmpdir") + "/olis_" + uuidToAdd + ".response";
 		File file = new File(fileLocation);
-		OLISHL7Handler msgHandler = (OLISHL7Handler) HandlerClassFactory.getHandler("OLIS_HL7");
+		OLISHL7Handler msgUploadHandler = (OLISHL7Handler) HandlerClassFactory.getHandler(oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler.OLIS_MESSAGE_TYPE);
 
 		InputStream is = null;
-		try {
+		try
+		{
+			//TODO make this transactional
 			is = new FileInputStream(fileLocation);
 			int check = FileUploadCheck.addFile(file.getName(), is, providerNo);
 
-			if (check != FileUploadCheck.UNSUCCESSFUL_SAVE) {
-				if (msgHandler.parse(loggedInInfo, "OLIS_HL7", fileLocation, check, true) != null) {
+			if (check != FileUploadCheck.UNSUCCESSFUL_SAVE)
+			{
+				if (msgUploadHandler.parse(loggedInInfo, "OLIS_HL7", fileLocation, check, true, false) != null)
+				{
 					request.setAttribute("result", "Success");
 					if (doFile) {
 						ArrayList<String[]> labsToFile = new ArrayList<String[]>();
-						String item[] = new String[] { String.valueOf(msgHandler.getLastSegmentId()), "HL7" };
+						String item[] = new String[] { String.valueOf(msgUploadHandler.getLastSegmentId()), "HL7" };
 						labsToFile.add(item);
 						CommonLabResultData.fileLabs(labsToFile, providerNo);
 					}
 					if (doAck) {
-						String demographicID = getDemographicIdFromLab("HL7", msgHandler.getLastSegmentId());
-						LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACK, LogConst.CON_HL7_LAB, "" + msgHandler.getLastSegmentId(), request.getRemoteAddr(), demographicID);
-						CommonLabResultData.updateReportStatus(msgHandler.getLastSegmentId(), providerNo, ProviderInboxItem.ACK, "comment", "HL7");
+						String demographicID = getDemographicIdFromLab("HL7", msgUploadHandler.getLastSegmentId());
+						LogAction.addLog((String) request.getSession().getAttribute("user"), LogConst.ACK, LogConst.CON_HL7_LAB, "" + msgUploadHandler.getLastSegmentId(), request.getRemoteAddr(), demographicID);
+						CommonLabResultData.updateReportStatus(msgUploadHandler.getLastSegmentId(), providerNo, ProviderInboxItem.ACK, "auto-acknowledged from olis search", "HL7");
 
 					}
 				} else {

@@ -375,6 +375,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicContactsWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicDxWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicMeasurementsWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicWaitListWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DiseaseRegistryService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DocumentTypesWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DocumentWebService"/>
@@ -398,7 +399,8 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmScheduleWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.LabWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.lab.LabWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.lab.olis.OlisLabWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.MeasurementsWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.MessagingService"/>
 			<!-- MHA -->
@@ -441,6 +443,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.SystemPreferenceWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.TicklerWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.UserMetricsService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.WaitListWebService"/>
 
 			<!--  Not yet implemented
 

@@ -95,7 +95,7 @@ public class CheckBillingData {
                 if (checkOldPHN(m)) ret = "";
             }
         }
-        if (m != null && m.equals("") && ins != null && !ins.equals(""))
+        if (m != null && (m.equals("") || m.equals(TeleplanSubmission.DEFAULT_BLANK_HEALTH_CARE_NUMBER)) && ins != null && !ins.equals(""))
                 ret = "";
         return ret;
     }

@@ -23,7 +23,7 @@
 
 package org.oscarehr.ws.external.rest.v1.conversion;
 
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicListTransfer;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import oscar.util.ConversionUtils;

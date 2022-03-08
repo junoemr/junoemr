@@ -39,7 +39,7 @@ import javassist.Modifier;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Id;
 
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.MiscUtils;

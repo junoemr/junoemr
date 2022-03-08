@@ -25,7 +25,7 @@ package org.oscarehr.ws.rest.conversion;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import oscar.util.ConversionUtils;
@@ -80,6 +80,7 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		demographic.setFamilyDoctor2(transfer.getFamilyDoctor2());
 		demographic.setCity(transfer.getAddress().getCity());
 		demographic.setFirstName(transfer.getFirstName());
+		demographic.setMiddleName(transfer.getMiddleName());
 		demographic.setPostal(transfer.getAddress().getPostal());
 		demographic.setHcRenewDate(transfer.getHcRenewDate());
 		demographic.setPhone2(transfer.getAlternativePhone());
@@ -165,6 +166,7 @@ public class DemographicConverter extends AbstractConverter<Demographic, Demogra
 		transfer.setFamilyDoctor2(demographic.getFamilyDoctor2());
 		transfer.getAddress().setCity(demographic.getCity());
 		transfer.setFirstName(demographic.getFirstName());
+		transfer.setMiddleName(demographic.getMiddleName());
 		transfer.getAddress().setPostal(demographic.getPostal());
 		transfer.setHcRenewDate(demographic.getHcRenewDate());
 		transfer.setAlternativePhone(demographic.getPhone2());

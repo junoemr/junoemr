@@ -36,7 +36,7 @@ import xml.cds.v5_0.ObjectFactory;
 import xml.cds.v5_0.PersonNameSimple;
 import xml.cds.v5_0.ReportClass;
 import xml.cds.v5_0.Reports;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -92,7 +92,7 @@ public class CDSReportDocumentImportMapperTest
 		personNameSimple.setLastName(expectedLastName);
 		authorPhysician.setAuthorName(personNameSimple);
 
-		Provider convertedProvider = cdsReportDocumentImportMapper.getAuthorPhysician(authorPhysician);
+		ProviderModel convertedProvider = cdsReportDocumentImportMapper.getAuthorPhysician(authorPhysician);
 
 		assertEquals(expectedFirstName, convertedProvider.getFirstName());
 		assertEquals(expectedLastName, convertedProvider.getLastName());
@@ -108,7 +108,7 @@ public class CDSReportDocumentImportMapperTest
 		Reports.SourceAuthorPhysician authorPhysician = objectFactory.createReportsSourceAuthorPhysician();
 		authorPhysician.setAuthorFreeText(expectedLastName + "," + expectedFirstName);
 
-		Provider convertedProvider = cdsReportDocumentImportMapper.getAuthorPhysician(authorPhysician);
+		ProviderModel convertedProvider = cdsReportDocumentImportMapper.getAuthorPhysician(authorPhysician);
 
 		assertEquals(expectedFirstName, convertedProvider.getFirstName());
 		assertEquals(expectedLastName, convertedProvider.getLastName());

@@ -22,4 +22,5 @@
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2020-01-21.ontario_master_numbers.sql" />
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2021-09-07.compress_columns.sql" />
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="2021-12-21.create_any_missing_tables.sql" />
+	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="olisinit.sql" />
 </suppressions>

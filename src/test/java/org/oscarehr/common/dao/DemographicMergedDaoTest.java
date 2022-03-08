@@ -30,7 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.demographic.model.DemographicMerged;
+import org.oscarehr.demographic.entity.DemographicMerged;
 import org.oscarehr.demographic.dao.DemographicMergedDao;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.boot.test.context.SpringBootTest;

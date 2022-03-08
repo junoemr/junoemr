@@ -31,7 +31,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.CtlDocumentPK;
 import org.oscarehr.common.model.PatientLabRouting;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.dataMigration.converter.in.DocumentModelToDbConverter;
 import org.oscarehr.document.dao.CtlDocumentDao;

@@ -47,6 +47,7 @@
 @import "../src/common/components/junoCollapseArea/junoCollapseArea";
 @import "../src/common/components/junoFileChooser/junoFileChooser";
 @import "../src/common/components/junoInput/junoInput";
+@import "../src/common/components/junoSelectText/junoSelectText";
 @import "../src/common/components/junoInputSave/junoInputSave";
 @import "../src/common/components/junoListItemSelector/junoListItemSelector";
 @import "../src/common/components/junoPatientSelect/junoPatientSelect";
@@ -166,6 +167,7 @@
 @import "../src/admin/section/fax/components/faxConfigurationEditModal/faxConfigurationEditModal";
 @import "../src/admin/section/fax/components/faxInbox/faxInbox";
 @import "../src/admin/section/fax/components/faxOutbox/faxOutbox";
+@import "../src/admin/section/lab/config/olis/olisLab";
 @import "../src/admin/section/landingPage/landingPage";
 @import "../src/admin/section/integrationModules/integrationModules";
 @import "../src/admin/section/panelManagement/panelManagement";

@@ -28,7 +28,7 @@ import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,7 +40,7 @@ public abstract class Medication extends AbstractTransientModel
 	private Integer id;
 
 	// prescription given
-	private Provider prescribingProvider;
+	private ProviderModel prescribingProvider;
 	private String outsideProviderName;
 	private String outsideProviderOhip;
 

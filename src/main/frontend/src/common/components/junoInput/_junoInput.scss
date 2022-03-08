@@ -29,8 +29,13 @@ juno-input {
 			left: 8px;
 		}
 
+		span.required-icon {
+			color: var(--color-red-base);
+		}
+
 		input {
 			width: 100%;
+			outline: none;
 
 			&.uppercase {
 				text-transform: uppercase;

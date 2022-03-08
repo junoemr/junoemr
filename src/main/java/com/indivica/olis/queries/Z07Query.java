@@ -12,6 +12,7 @@ package com.indivica.olis.queries;
 import com.indivica.olis.parameters.OBR22;
 import com.indivica.olis.parameters.QRD7;
 import com.indivica.olis.parameters.ZPD1;
+import com.indivica.olis.parameters.ZSD;
 
 /**
  * Z07 - Retrieve Test Results Reportable to Public Health
@@ -56,4 +57,9 @@ public class Z07Query extends Query {
     public void setConsentToViewBlockedInformation(ZPD1 consentToViewBlockedInformation) {
 		throw new RuntimeException("Not valid for this type of query.");
     }
+	@Override
+	public void setSubstituteDecisionMakerInfo(ZSD substituteDecisionMakerInfo)
+	{
+		throw new RuntimeException("Not valid for this type of query.");
+	}
 }

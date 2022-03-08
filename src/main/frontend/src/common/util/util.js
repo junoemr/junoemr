@@ -28,6 +28,7 @@ Juno.Common.Util.DisplaySettings = {
 	dateFormat: "yyyy-MM-dd",
 	timeFormat: "HH:mm a",
 	calendarDateFormat: 'dddd MMM Do',
+	dateTimeFormat: "YYYY-MM-DD hh:mm a",
 };
 
 Juno.Common.Util.exists = function exists(object) {
@@ -126,9 +127,17 @@ Juno.Common.Util.formatMomentTime = function formatMomentTime(d, format) {
 	return d.format(format);
 };
 
+Juno.Common.Util.formatMomentDateTime = function formatMomentDateTime(d, format) {
+	if(!format) {
+		format = Juno.Common.Util.settings.datetime_no_timezone_format;
+	}
+	return d.format(format);
+};
+
 Juno.Common.Util.formatMomentDateTimeNoTimezone = function formatMomentDateTimeNoTimezone(d) {
 	return d.format(Juno.Common.Util.settings.datetime_no_timezone_format);
 };
+
 
 Juno.Common.Util.getDateMoment = function getDateMoment(date_string)
 {

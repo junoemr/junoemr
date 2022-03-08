@@ -122,7 +122,7 @@ if(!authed) {
 <%@ page import="java.util.Collections"%>
 <%@ page import="java.util.List" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
-<%@ page import="org.oscarehr.demographic.model.DemographicMerged" %>
+<%@ page import="org.oscarehr.demographic.entity.DemographicMerged" %>
 
 <%
 	List<Demographic> demoList = null;

@@ -37,7 +37,7 @@ import org.junit.runner.RunWith;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.demographic.dao.DemographicExtDao;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -126,7 +126,7 @@ public class DemographicExtDaoTest extends DaoTestFixtures
 		newerEntity.setDemographicNo(20);
 		newerEntity.setDateCreated(new Date(2222222));
 		demographicExtDao.persist(newerEntity);
-		DemographicExt foundEntity = demographicExtDao.getLatestDemographicExt(20, "Test");
+		DemographicExt foundEntity = demographicExtDao.getLatestDemographicExt(20, "Test").orElse(null);
 		assertEquals(newerEntity.getId(), foundEntity.getId());
 	}
 

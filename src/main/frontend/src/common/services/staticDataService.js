@@ -25,6 +25,12 @@
  Ontario, Canada
 
  */
+import {Sex} from "../../lib/demographic/model/Sex";
+import {OfficialLanguageType} from "../../lib/demographic/model/OfficialLanguageType";
+import {RosterTerminationReasonType} from "../../lib/demographic/model/RosterTerminationReasonType";
+import {Province} from "../../lib/constants/Province";
+import {USStateCode} from "../../lib/constants/USStateCode";
+
 angular.module("Common.Services").service("staticDataService", [
 	function()
 	{
@@ -35,27 +41,27 @@ angular.module("Common.Services").service("staticDataService", [
 			var genders = [];
 			genders.push(
 			{
-				"value": "M",
+				"value": Sex.Male,
 				"label": "Male"
 			});
 			genders.push(
 			{
-				"value": "F",
+				"value": Sex.Female,
 				"label": "Female"
 			});
 			genders.push(
 			{
-				"value": "T",
+				"value": Sex.Transgender,
 				"label": "Transgender"
 			});
 			genders.push(
 			{
-				"value": "O",
+				"value": Sex.Other,
 				"label": "Other"
 			});
 			genders.push(
 			{
-				"value": "U",
+				"value": Sex.Undefined,
 				"label": "Undefined"
 			});
 			return genders;
@@ -472,68 +478,68 @@ angular.module("Common.Services").service("staticDataService", [
 			var provinces = [];
 			provinces.push(
 			{
-				"value": "AB",
-				"label": "AB-Alberta"
+				"value": Province.AB,
+				"label": "Alberta"
 			});
 			provinces.push(
 			{
-				"value": "BC",
-				"label": "BC-British Columbia"
+				"value": Province.BC,
+				"label": "British Columbia"
 			});
 			provinces.push(
 			{
-				"value": "MB",
-				"label": "MB-Manitoba"
+				"value": Province.MB,
+				"label": "Manitoba"
 			});
 			provinces.push(
 			{
-				"value": "NB",
-				"label": "NB-New Brunswick"
+				"value": Province.NB,
+				"label": "New Brunswick"
 			});
 			provinces.push(
 			{
-				"value": "NL",
-				"label": "NL-Newfoundland Labrador"
+				"value": Province.NL,
+				"label": "Newfoundland & Labrador"
 			});
 			provinces.push(
 			{
-				"value": "NT",
-				"label": "NT-Northwest Territory"
+				"value": Province.NT,
+				"label": "Northwest Territories"
 			});
 			provinces.push(
 			{
-				"value": "NS",
-				"label": "NS-Nova Scotia"
+				"value": Province.NS,
+				"label": "Nova Scotia"
 			});
 			provinces.push(
 			{
-				"value": "NU",
-				"label": "NU-Nunavut"
+				"value": Province.NU,
+				"label": "Nunavut"
 			});
 			provinces.push(
 			{
-				"value": "ON",
-				"label": "ON-Ontario"
+				"value": Province.ON,
+				"label": "Ontario"
 			});
 			provinces.push(
 			{
-				"value": "PE",
-				"label": "PE-Prince Edward Island"
+				"value": Province.PE,
+				"label": "Prince Edward Island"
 			});
 			provinces.push(
 			{
-				"value": "QC",
-				"label": "QC-Quebec"
+				"value": Province.QC,
+				"label": "Quebec"
 			});
 			provinces.push(
 			{
-				"value": "SK",
-				"label": "SK-Saskatchewan"
+				"value": Province.SK,
+				"label": "Saskatchewan"
 			});
 			provinces.push(
 			{
-				"value": "YT",
-				"label": "YT-Yukon"
+				"value": Province.YT,
+				"label": "Yukon"
 			});
 			return provinces;
 		};
@@ -543,357 +549,357 @@ angular.module("Common.Services").service("staticDataService", [
 			var provinces = [];
 			provinces.push(
 			{
-				"value": "AB",
+				"value": Province.AB,
 				"label": "AB-Alberta"
 			});
 			provinces.push(
 			{
-				"value": "BC",
+				"value": Province.BC,
 				"label": "BC-British Columbia"
 			});
 			provinces.push(
 			{
-				"value": "MB",
+				"value": Province.MB,
 				"label": "MB-Manitoba"
 			});
 			provinces.push(
 			{
-				"value": "NB",
+				"value": Province.NB,
 				"label": "NB-New Brunswick"
 			});
 			provinces.push(
 			{
-				"value": "NL",
+				"value": Province.NL,
 				"label": "NL-Newfoundland Labrador"
 			});
 			provinces.push(
 			{
-				"value": "NT",
+				"value": Province.NT,
 				"label": "NT-Northwest Territory"
 			});
 			provinces.push(
 			{
-				"value": "NS",
+				"value": Province.NS,
 				"label": "NS-Nova Scotia"
 			});
 			provinces.push(
 			{
-				"value": "NU",
+				"value": Province.NU,
 				"label": "NU-Nunavut"
 			});
 			provinces.push(
 			{
-				"value": "ON",
+				"value": Province.ON,
 				"label": "ON-Ontario"
 			});
 			provinces.push(
 			{
-				"value": "PE",
+				"value": Province.PE,
 				"label": "PE-Prince Edward Island"
 			});
 			provinces.push(
 			{
-				"value": "QC",
+				"value": Province.QC,
 				"label": "QC-Quebec"
 			});
 			provinces.push(
 			{
-				"value": "SK",
+				"value": Province.SK,
 				"label": "SK-Saskatchewan"
 			});
 			provinces.push(
 			{
-				"value": "YT",
+				"value": Province.YT,
 				"label": "YT-Yukon"
 			});
 			provinces.push(
 			{
-				"value": "US",
+				"value": USStateCode.RESIDENT,
 				"label": "US resident"
 			});
 			provinces.push(
 			{
-				"value": "US-AK",
+				"value": USStateCode.AK,
 				"label": "US-AK-Alaska"
 			});
 			provinces.push(
 			{
-				"value": "US-AL",
+				"value": USStateCode.AL,
 				"label": "US-AL-Alabama"
 			});
 			provinces.push(
 			{
-				"value": "US-AR",
+				"value": USStateCode.AR,
 				"label": "US-AR-Arkansas"
 			});
 			provinces.push(
 			{
-				"value": "US-AZ",
+				"value": USStateCode.AZ,
 				"label": "US-AZ-Arizona"
 			});
 			provinces.push(
 			{
-				"value": "US-CA",
+				"value": USStateCode.CA,
 				"label": "US-CA-California"
 			});
 			provinces.push(
 			{
-				"value": "US-CO",
+				"value": USStateCode.CO,
 				"label": "US-CO-Colorado"
 			});
 			provinces.push(
 			{
-				"value": "US-CT",
+				"value": USStateCode.CT,
 				"label": "US-CT-Connecticut"
 			});
 			provinces.push(
 			{
-				"value": "US-CZ",
+				"value": USStateCode.CZ,
 				"label": "US-CZ-Canal Zone"
 			});
 			provinces.push(
 			{
-				"value": "US-DC",
+				"value": USStateCode.DC,
 				"label": "US-DC-District Of Columbia"
 			});
 			provinces.push(
 			{
-				"value": "US-DE",
+				"value": USStateCode.DE,
 				"label": "US-DE-Delaware"
 			});
 			provinces.push(
 			{
-				"value": "US-FL",
+				"value": USStateCode.FL,
 				"label": "US-FL-Florida"
 			});
 			provinces.push(
 			{
-				"value": "US-GA",
+				"value": USStateCode.GA,
 				"label": "US-GA-Georgia"
 			});
 			provinces.push(
 			{
-				"value": "US-GU",
+				"value": USStateCode.GU,
 				"label": "US-GU-Guam"
 			});
 			provinces.push(
 			{
-				"value": "US-HI",
+				"value": USStateCode.HI,
 				"label": "US-HI-Hawaii"
 			});
 			provinces.push(
 			{
-				"value": "US-IA",
+				"value": USStateCode.IA,
 				"label": "US-IA-Iowa"
 			});
 			provinces.push(
 			{
-				"value": "US-ID",
+				"value": USStateCode.ID,
 				"label": "US-ID-Idaho"
 			});
 			provinces.push(
 			{
-				"value": "US-IL",
+				"value": USStateCode.IL,
 				"label": "US-IL-Illinois"
 			});
 			provinces.push(
 			{
-				"value": "US-IN",
+				"value": USStateCode.IN,
 				"label": "US-IN-Indiana"
 			});
 			provinces.push(
 			{
-				"value": "US-KS",
+				"value": USStateCode.KS,
 				"label": "US-KS-Kansas"
 			});
 			provinces.push(
 			{
-				"value": "US-KY",
+				"value": USStateCode.KY,
 				"label": "US-KY-Kentucky"
 			});
 			provinces.push(
 			{
-				"value": "US-LA",
+				"value": USStateCode.LA,
 				"label": "US-LA-Louisiana"
 			});
 			provinces.push(
 			{
-				"value": "US-MA",
+				"value": USStateCode.MA,
 				"label": "US-MA-Massachusetts"
 			});
 			provinces.push(
 			{
-				"value": "US-MD",
+				"value": USStateCode.MD,
 				"label": "US-MD-Maryland"
 			});
 			provinces.push(
 			{
-				"value": "US-ME",
+				"value": USStateCode.ME,
 				"label": "US-ME-Maine"
 			});
 			provinces.push(
 			{
-				"value": "US-MI",
+				"value": USStateCode.MI,
 				"label": "US-MI-Michigan"
 			});
 			provinces.push(
 			{
-				"value": "US-MN",
+				"value": USStateCode.MN,
 				"label": "US-MN-Minnesota"
 			});
 			provinces.push(
 			{
-				"value": "US-MO",
+				"value": USStateCode.MO,
 				"label": "US-MO-Missouri"
 			});
 			provinces.push(
 			{
-				"value": "US-MS",
+				"value": USStateCode.MS,
 				"label": "US-MS-Mississippi"
 			});
 			provinces.push(
 			{
-				"value": "US-MT",
+				"value": USStateCode.MT,
 				"label": "US-MT-Montana"
 			});
 			provinces.push(
 			{
-				"value": "US-NC",
+				"value": USStateCode.NC,
 				"label": "US-NC-North Carolina"
 			});
 			provinces.push(
 			{
-				"value": "US-ND",
+				"value": USStateCode.ND,
 				"label": "US-ND-North Dakota"
 			});
 			provinces.push(
 			{
-				"value": "US-NE",
+				"value": USStateCode.NE,
 				"label": "US-NE-Nebraska"
 			});
 			provinces.push(
 			{
-				"value": "US-NH",
+				"value": USStateCode.NH,
 				"label": "US-NH-New Hampshire"
 			});
 			provinces.push(
 			{
-				"value": "US-NJ",
+				"value": USStateCode.NJ,
 				"label": "US-NJ-New Jersey"
 			});
 			provinces.push(
 			{
-				"value": "US-NM",
+				"value": USStateCode.NM,
 				"label": "US-NM-New Mexico"
 			});
 			provinces.push(
 			{
-				"value": "US-NU",
+				"value": USStateCode.NU,
 				"label": "US-NU-Nunavut"
 			});
 			provinces.push(
 			{
-				"value": "US-NV",
+				"value": USStateCode.NV,
 				"label": "US-NV-Nevada"
 			});
 			provinces.push(
 			{
-				"value": "US-NY",
+				"value": USStateCode.NY,
 				"label": "US-NY-New York"
 			});
 			provinces.push(
 			{
-				"value": "US-OH",
+				"value": USStateCode.OH,
 				"label": "US-OH-Ohio"
 			});
 			provinces.push(
 			{
-				"value": "US-OK",
+				"value": USStateCode.OK,
 				"label": "US-OK-Oklahoma"
 			});
 			provinces.push(
 			{
-				"value": "US-OR",
+				"value": USStateCode.OR,
 				"label": "US-OR-Oregon"
 			});
 			provinces.push(
 			{
-				"value": "US-PA",
+				"value": USStateCode.PA,
 				"label": "US-PA-Pennsylvania"
 			});
 			provinces.push(
 			{
-				"value": "US-PR",
+				"value": USStateCode.PR,
 				"label": "US-PR-Puerto Rico"
 			});
 			provinces.push(
 			{
-				"value": "US-RI",
+				"value": USStateCode.RI,
 				"label": "US-RI-Rhode Island"
 			});
 			provinces.push(
 			{
-				"value": "US-SC",
+				"value": USStateCode.SC,
 				"label": "US-SC-South Carolina"
 			});
 			provinces.push(
 			{
-				"value": "US-SD",
+				"value": USStateCode.SD,
 				"label": "US-SD-South Dakota"
 			});
 			provinces.push(
 			{
-				"value": "US-TN",
+				"value": USStateCode.TN,
 				"label": "US-TN-Tennessee"
 			});
 			provinces.push(
 			{
-				"value": "US-TX",
+				"value": USStateCode.TX,
 				"label": "US-TX-Texas"
 			});
 			provinces.push(
 			{
-				"value": "US-UT",
+				"value": USStateCode.UT,
 				"label": "US-UT-Utah"
 			});
 			provinces.push(
 			{
-				"value": "US-VA",
+				"value": USStateCode.VA,
 				"label": "US-VA-Virginia"
 			});
 			provinces.push(
 			{
-				"value": "US-VI",
+				"value": USStateCode.VI,
 				"label": "US-VI-Virgin Islands"
 			});
 			provinces.push(
 			{
-				"value": "US-VT",
+				"value": USStateCode.VT,
 				"label": "US-VT-Vermont"
 			});
 			provinces.push(
 			{
-				"value": "US-WA",
+				"value": USStateCode.WA,
 				"label": "US-WA-Washington"
 			});
 			provinces.push(
 			{
-				"value": "US-WI",
+				"value": USStateCode.WI,
 				"label": "US-WI-Wisconsin"
 			});
 			provinces.push(
 			{
-				"value": "US-WV",
+				"value": USStateCode.WV,
 				"label": "US-WV-West Virginia"
 			});
 			provinces.push(
 			{
-				"value": "US-WY",
+				"value": USStateCode.WY,
 				"label": "US-WY-Wyoming"
 			});
 			provinces.push(
 			{
-				"value": "OT",
+				"value": USStateCode.OTHER,
 				"label": "Other"
 			});
 			return provinces;
@@ -2145,17 +2151,17 @@ angular.module("Common.Services").service("staticDataService", [
 			var langs = [];
 			langs.push(
 			{
-				"value": "English",
+				"value": OfficialLanguageType.English,
 				"label": "English"
 			});
 			langs.push(
 			{
-				"value": "French",
+				"value": OfficialLanguageType.French,
 				"label": "French"
 			});
 			langs.push(
 			{
-				"value": "Other",
+				"value": OfficialLanguageType.Other,
 				"label": "Other"
 			});
 			return langs;
@@ -4527,152 +4533,152 @@ angular.module("Common.Services").service("staticDataService", [
 			var reasons = [];
 			reasons.push(
 			{
-				"value": "39",
+				"value": RosterTerminationReasonType._39,
 				"label": "(39) Assigned member status ended; roster transferred per physician request"
 			});
 			reasons.push(
 			{
-				"value": "59",
+				"value": RosterTerminationReasonType._59,
 				"label": "(59) Enrolment ended; patient out of geographic area"
 			});
 			reasons.push(
 			{
-				"value": "57",
+				"value": RosterTerminationReasonType._57,
 				"label": "(57) Enrolment terminated by patient"
 			});
 			reasons.push(
 			{
-				"value": "12",
+				"value": RosterTerminationReasonType._12,
 				"label": "(12) Health Number error"
 			});
 			reasons.push(
 			{
-				"value": "38",
+				"value": RosterTerminationReasonType._38,
 				"label": "(38) Long Term Care enrolment ended; patient has left Long Term Care"
 			});
 			reasons.push(
 			{
-				"value": "82",
+				"value": RosterTerminationReasonType._82,
 				"label": "(82) Ministry has not received enrolment/ Consent form"
 			});
 			reasons.push(
 			{
-				"value": "60",
+				"value": RosterTerminationReasonType._60,
 				"label": "(60) No current eligibility"
 			});
 			reasons.push(
 			{
-				"value": "73",
+				"value": RosterTerminationReasonType._73,
 				"label": "(73) No current eligibility"
 			});
 			reasons.push(
 			{
-				"value": "74",
+				"value": RosterTerminationReasonType._74,
 				"label": "(74) No current eligibility"
 			});
 			reasons.push(
 			{
-				"value": "37",
+				"value": RosterTerminationReasonType._37,
 				"label": "(37) Original enrolment ended; patient now enrolled as Long Term Care"
 			});
 			reasons.push(
 			{
-				"value": "36",
+				"value": RosterTerminationReasonType._36,
 				"label": "(36) Original enrolment ended; patient now re-enroled"
 			});
 			reasons.push(
 			{
-				"value": "24",
+				"value": RosterTerminationReasonType._24,
 				"label": "(24) Patient added to roster in error"
 			});
 			reasons.push(
 			{
-				"value": "14",
+				"value": RosterTerminationReasonType._14,
 				"label": "(14) Patient identified as deceased on ministry database"
 			});
 			reasons.push(
 			{
-				"value": "51",
+				"value": RosterTerminationReasonType._51,
 				"label": "(51) Patient no longer meets selection criteria for your roster"
 			});
 			reasons.push(
 			{
-				"value": "41",
+				"value": RosterTerminationReasonType._41,
 				"label": "(41) Patient no longer meets selection criteria for your roster - assigned to another physician"
 			});
 			reasons.push(
 			{
-				"value": "61",
+				"value": RosterTerminationReasonType._61,
 				"label": "(61) Patient out of geographic area; address over-ride applied"
 			});
 			reasons.push(
 			{
-				"value": "62",
+				"value": RosterTerminationReasonType._62,
 				"label": "(62) Patient out of geographic area; address over-ride removed"
 			});
 			reasons.push(
 			{
-				"value": "35",
+				"value": RosterTerminationReasonType._35,
 				"label": "(35) Patient transferred from roster per physician request"
 			});
 			reasons.push(
 			{
-				"value": "42",
+				"value": RosterTerminationReasonType._42,
 				"label": "(42) Physician ended enrolment; patient entered Long Term Care facility"
 			});
 			reasons.push(
 			{
-				"value": "54",
+				"value": RosterTerminationReasonType._54,
 				"label": "(54) Physician ended enrolment; patient left province"
 			});
 			reasons.push(
 			{
-				"value": "53",
+				"value": RosterTerminationReasonType._53,
 				"label": "(53) Physician ended enrolment; patient moved out of geographic area"
 			});
 			reasons.push(
 			{
-				"value": "56",
+				"value": RosterTerminationReasonType._56,
 				"label": "(56) Physician ended enrolment; per patient request"
 			});
 			reasons.push(
 			{
-				"value": "44",
+				"value": RosterTerminationReasonType._44,
 				"label": "(44) Physician ended patient enrolment"
 			});
 			reasons.push(
 			{
-				"value": "40",
+				"value": RosterTerminationReasonType._40,
 				"label": "(40) Physician reported member as deceased"
 			});
 			reasons.push(
 			{
-				"value": "32",
+				"value": RosterTerminationReasonType._32,
 				"label": "(32) Pre-member/ Assigned member ended; now enrolled or registered with photo health card"
 			});
 			reasons.push(
 			{
-				"value": "30",
+				"value": RosterTerminationReasonType._30,
 				"label": "(30) Pre-member/ Assigned member ended; now enrolled or registered with red and white health card"
 			});
 			reasons.push(
 			{
-				"value": "33",
+				"value": RosterTerminationReasonType._33,
 				"label": "(33) Termination reason cannot be released (due to patient confidentiality)"
 			});
 			reasons.push(
 			{
-				"value": "84",
+				"value": RosterTerminationReasonType._84,
 				"label": "(84) Termination reason cannot be released (due to patient confidentiality)"
 			});
 			reasons.push(
 			{
-				"value": "90",
+				"value": RosterTerminationReasonType._90,
 				"label": "(90) Termination reason cannot be released (due to patient confidentiality)"
 			});
 			reasons.push(
 			{
-				"value": "91",
+				"value": RosterTerminationReasonType._91,
 				"label": "(91) Termination reason cannot be released (due to patient confidentiality)"
 			});
 			return reasons;
@@ -4884,18 +4890,18 @@ angular.module("Common.Services").service("staticDataService", [
 		service.getAboriginalStatuses = () =>
 		{
 			return [
-				{label: "Yes", value: "Yes"},
-				{label: "No", value: "No"},
-				{label: "Select Aboriginal status", value: ""}
+				{label: "Yes", value: true},
+				{label: "No", value: false},
+				{label: "Select Aboriginal status", value: null}
 			]
 		};
 
 		service.getArchivedChartOptions = () =>
 		{
 			return [
-				{label: "--", value: ""},
-				{label: "No", value: "NO"},
-				{label: "Yes", value: "YES"},
+				{label: "--", value: null},
+				{label: "No", value: false},
+				{label: "Yes", value: true},
 			]
 		}
 

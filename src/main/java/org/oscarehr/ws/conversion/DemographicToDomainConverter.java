@@ -24,8 +24,8 @@
 package org.oscarehr.ws.conversion;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.Demographic;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.ws.rest.conversion.DemographicExtConverter;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.springframework.beans.BeanUtils;

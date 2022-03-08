@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.oscarehr.dataMigration.model.common.PartialDate;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import xml.hrm.v4_3.DateFullOrPartial;
 import xml.hrm.v4_3.PersonNameSimple;
@@ -63,7 +63,7 @@ public class HRMExportMapperTest
 		String expectedFirstName = "first";
 		String expectedLastName = "last";
 
-		Provider provider = new Provider();
+		ProviderModel provider = new ProviderModel();
 		provider.setFirstName(expectedFirstName);
 		provider.setLastName(expectedLastName);
 

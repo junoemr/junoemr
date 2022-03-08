@@ -28,6 +28,7 @@ import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.hrm.HrmComment;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
+import org.oscarehr.dataMigration.model.hrm.HrmDocumentMatchingData;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
@@ -79,10 +80,14 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 
 		hrmDocument.setHrmCategory(categoryToEntity.convert(input.getCategory()));
 
-		hrmDocument.setNumDuplicatesReceived(input.getMatchingData().getNumDuplicatesReceived());
-		hrmDocument.setReportHash(input.getMatchingData().getReportHash());
-		hrmDocument.setReportLessDemographicInfoHash(input.getMatchingData().getReportLessDemographicInfoHash());
-		hrmDocument.setReportLessTransactionInfoHash(input.getMatchingData().getReportLessTransactionInfoHash());
+		HrmDocumentMatchingData matchingData = input.getMatchingData();
+		if(matchingData != null)
+		{
+			hrmDocument.setNumDuplicatesReceived(matchingData.getNumDuplicatesReceived());
+			hrmDocument.setReportHash(matchingData.getReportHash());
+			hrmDocument.setReportLessDemographicInfoHash(matchingData.getReportLessDemographicInfoHash());
+			hrmDocument.setReportLessTransactionInfoHash(matchingData.getReportLessTransactionInfoHash());
+		}
 		
 		List<HRMDocumentToProvider> providerLinks = new ArrayList<>();
 		HRMDocumentToProvider deliverToProviderLink = createDeliverToLink(hrmDocument, input.getDeliverToUserId());

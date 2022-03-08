@@ -51,6 +51,7 @@ import org.jdom.input.SAXBuilder;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.hl7.AHS.model.v23.message.ORM_002;
 import org.oscarehr.common.hl7.AHS.model.v251.message.ORU_R01;
+import org.oscarehr.common.hl7.OLIS.model.v231.message.ERP_R09;
 import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -79,6 +80,7 @@ import oscar.oscarLab.ca.all.parsers.AHS.v23.ProvlabHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestORMHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v251.ConnectCareLabHandler;
+import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
 import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 
 import java.io.FileInputStream;
@@ -104,6 +106,7 @@ public final class Factory {
 		"CLS",
 		"CLSDI",
 		"EI",
+		OLISHL7Handler.OLIS_MESSAGE_TYPE,
 		JunoGenericLabHandler.LAB_TYPE_VALUE);
 
 	private Factory() {
@@ -138,8 +141,8 @@ public final class Factory {
 		catch(Exception e)
 		{
 			logger.error("Could not retrieve lab for segmentID(" + hl7TextMessage.getId() + ")", e);
+			throw e;
 		}
-		return new DefaultGenericHandler();
 	}
 
 	public static String getHL7Body(String segmentID) {
@@ -172,8 +175,7 @@ public final class Factory {
 		catch(HL7Exception e)
 		{
 			//TODO-legacy - the error should not get caught here but most of oscar does not expect a checked exception when calling this method
-			logger.error("Parse Error", e);
-			throw new RuntimeException("Hl7 Parse Error");
+			throw new RuntimeException("Hl7 Parse Error", e);
 		}
 		return handler;
 	}
@@ -244,9 +246,22 @@ public final class Factory {
 				handler = new ConnectCareDocumentationCancelHandler(msg);
 			}
 		}
+		else if(mshSplit[8].equals("ERP^Z99^ERP_R09"))
+		{
+			/* We need to use a custom HL7 message object because OLIS Includes non-standard segments */
+			ModelClassFactory modelClassFactory = new CustomModelClassFactory(ERP_R09.ROOT_PACKAGE);
+			context.setModelClassFactory(modelClassFactory);
+			context.getParserConfiguration().setDefaultObx2Type("ST");
+
+			Message msg = p.parse(hl7Body);
+			if (OLISHL7Handler.handlerTypeMatch(msg))
+			{
+				handler = new OLISHL7Handler(msg);
+			}
+		}
 		else //handle default ORU^R01 messages
 		{
-			/* We need to use a custom HL7 message object because Connect Care Includes non standard segments */
+			/* We need to use a custom HL7 message object because Connect Care Includes non-standard segments */
 			// this package string needs to match the custom model location in the oscar source code.
 			ModelClassFactory modelClassFactory = new CustomModelClassFactory(ORU_R01.ROOT_PACKAGE);
 			context.setModelClassFactory(modelClassFactory);
@@ -290,7 +305,7 @@ public final class Factory {
 		if(handler == null)
 			throw new RuntimeException("Hl7 message/type does not match a known lab handler.");
 
-		logger.info("Loaded " + handler.getMsgType() + " HL7 Handler " + handler.getClass().getSimpleName());
+		logger.info("Loaded " + handler.getMsgType() + " HL7 Handler " + handler.getClass().getSimpleName() + " [" + handler.getAccessionNum() + "]");
 		return handler;
 	}
 

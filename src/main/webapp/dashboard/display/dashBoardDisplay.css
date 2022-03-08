@@ -1,0 +1,11 @@
+.no-results {
+	height: 300px;
+}
+
+.no-results > span {
+	display: block;
+	width: 100%;
+	padding-top: 50%;
+	margin: 0 auto;
+	text-align: center;
+}

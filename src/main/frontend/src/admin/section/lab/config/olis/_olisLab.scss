@@ -1,0 +1,22 @@
+.lab-config-olis {
+	.button-wrapper {
+		width: 128px;
+	}
+
+	.settings-table {
+		border: 1px solid var(--color-neutral-darker);
+
+		.header {
+			background-color: var(--color-neutral-lightest);
+		}
+		.header-text {
+			font-weight: bold;
+		}
+	}
+
+	.input-form {
+		label {
+			min-width: 192px;
+		}
+	}
+}

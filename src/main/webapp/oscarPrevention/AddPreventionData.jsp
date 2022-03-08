@@ -28,7 +28,7 @@
 <%@ page import="org.oscarehr.casemgmt.service.CaseManagementManager"%>
 <%@ page import="org.oscarehr.common.dao.PreventionsLotNrsDao"%>
 <%@ page import="org.oscarehr.demographic.dao.DemographicExtDao"%>
-<%@ page import="org.oscarehr.demographic.model.DemographicExt"%>
+<%@ page import="org.oscarehr.demographic.entity.DemographicExt"%>
 <%@ page import="org.oscarehr.prevention.model.Prevention" %>
 <%@ page import="org.oscarehr.provider.model.ProviderData" %>
 <%@ page import="org.oscarehr.provider.dao.ProviderDataDao" %>

@@ -27,7 +27,7 @@ import org.oscarehr.dataMigration.model.medication.CustomMedication;
 import org.oscarehr.dataMigration.model.medication.FrequencyCode;
 import org.oscarehr.dataMigration.model.medication.Medication;
 import org.oscarehr.dataMigration.model.medication.StandardMedication;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.DrugMeasure;
 import xml.cds.v5_0.MedicationsAndTreatments;
@@ -69,7 +69,7 @@ public class CDSMedicationExportMapper extends AbstractCDSExportMapper<Medicatio
 		medicationsAndTreatments.setStrength(getDrugMeasure(medication));
 		medicationsAndTreatments.setSubstitutionNotAllowed(toYnIndicatorString(medication.getNoSubs()));
 
-		Provider prescribingProvider = medication.getPrescribingProvider();
+		ProviderModel prescribingProvider = medication.getPrescribingProvider();
 		if(prescribingProvider != null)
 		{
 			MedicationsAndTreatments.PrescribedBy prescribedBy = objectFactory.createMedicationsAndTreatmentsPrescribedBy();

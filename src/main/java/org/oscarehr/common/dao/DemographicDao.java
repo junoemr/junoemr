@@ -23,7 +23,7 @@
 package org.oscarehr.common.dao;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -764,11 +764,11 @@ public class DemographicDao extends HibernateDaoSupport implements ApplicationEv
 	{
 		// at least 1 parameter must exist
 		// we remove the first " and" because the first clause is after the "where" in the sql statement.
-		if (hin == null && (firstName == null && lastName == null && dateOfBirth == null))
+		if(StringUtils.isAllBlank(hin, firstName, lastName) && dateOfBirth == null)
 		{
 			String message = "Health number or name and date of birth are required to match a lab to a patient";
 			logger.error(message);
-			throw new IllegalArgumentException(message);
+			return null;
 		}
 
 		// here we build the sql where clause, to simplify the logic we just append all parameters

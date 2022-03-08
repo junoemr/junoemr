@@ -179,6 +179,20 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
 		return results;
     }
 
+	public List<Hl7TextInfo> searchByAccessionNumber(String accession, String labType)
+	{
+		String sqlCommand="select x from Hl7TextInfo x where x.accessionNumber = :accession AND x.hl7TextMessage.type = :type";
+
+		Query query = entityManager.createQuery(sqlCommand);
+		query.setParameter("accession", accession);
+		query.setParameter("type", labType);
+
+		@SuppressWarnings("unchecked")
+		List<Hl7TextInfo> results = query.getResultList();
+
+		return results;
+	}
+
 	public Hl7TextInfo findLatestVersionByAccessionNo(String acc) {
 		String sqlCommand="SELECT x FROM Hl7TextInfo x WHERE x.accessionNumber = :accession " +
 				"ORDER BY x.obrDate DESC, x.labNumber DESC";
@@ -290,14 +304,22 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
     	 query.setParameter("labNo", labNo);
     	 return query.getResultList();
     }
-    
+
 	@SuppressWarnings("unchecked")
-    public List<Object[]> findByLabIdViaMagic(Integer labNo) {
+    public List<Object[]> findByLabIdViaMagic(Integer labNo, boolean prioritizeFinalCount)
+    {
 		String sql = "FROM Hl7TextInfo a, Hl7TextInfo b " +
 				"WHERE a.accessionNumber <> '' " +
 				"AND a.accessionNumber = b.accessionNumber " +
 				"AND b.labNumber = :labNo " +
-				"ORDER BY a.obrDate, a.finalResultCount, a.labNumber";
+				"ORDER BY a.obrDate, ";
+
+		if(prioritizeFinalCount)
+		{
+			sql += "a.finalResultCount, ";
+		}
+		sql += "a.labNumber";
+
 	    Query q = entityManager.createQuery(sql);
 	    q.setParameter("labNo", labNo);
 	    return q.getResultList();
@@ -517,14 +539,6 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
 	    String sql = "SELECT DISTINCT i.discipline FROM " + modelClass.getName() + " i WHERE i.discipline <> '' AND i.labNumber = :labid";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("labid", labid);
-		return query.getResultList();
-		
-    }
-	
-	public List<Hl7TextInfo> findByFillerOrderNumber(String fillerOrderNum) {
-	    String sql = "SELECT h FROM " + modelClass.getName() + " h WHERE h.fillerOrderNum = ?1 ORDER BY id";
-		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, fillerOrderNum);
 		return query.getResultList();
 		
     }

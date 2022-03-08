@@ -55,7 +55,7 @@ import org.oscarehr.common.dao.BatchEligibilityDao;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.common.model.BatchEligibility;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;

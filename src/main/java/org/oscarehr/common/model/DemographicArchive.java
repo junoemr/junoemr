@@ -228,7 +228,7 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 		this.setElectronicMessagingConsentRejectedAt(demographic.getElectronicMessagingConsentRejectedAt());
 	}
 
-	public DemographicArchive(org.oscarehr.demographic.model.Demographic demographic)
+	public DemographicArchive(org.oscarehr.demographic.entity.Demographic demographic)
 	{
 		this.address = demographic.getAddress();
 		this.alias = demographic.getAlias();

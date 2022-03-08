@@ -35,7 +35,7 @@ import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.ws.external.soap.v1.converter.DemographicModelToSoapTransferConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
-import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.managers.DemographicManager;
@@ -258,7 +258,7 @@ public class DemographicWs extends AbstractWs
 			throw new Exception("null or empty health numbers are not permitted");
 		}
 
-		org.oscarehr.demographic.model.Demographic demographic = demographicManager.getDemographicByHealthNumber(healthNumber, versionCode);
+		org.oscarehr.demographic.entity.Demographic demographic = demographicManager.getDemographicByHealthNumber(healthNumber, versionCode);
 
 		if (demographic != null)
 		{

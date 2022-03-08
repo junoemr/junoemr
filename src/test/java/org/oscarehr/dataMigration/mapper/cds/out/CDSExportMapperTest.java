@@ -30,12 +30,12 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oscarehr.dataMigration.logger.cds.CDSExportLogger;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.dataMigration.model.dx.DxCodingSystem;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.service.context.PatientExportContext;
 import org.oscarehr.dataMigration.service.context.PatientExportContextService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,7 +109,7 @@ public class CDSExportMapperTest
 		String expectedCountry = "CA";
 		String expectedPostal = "V8V0T0";
 
-		Address address = new Address();
+		AddressModel address = new AddressModel();
 		address.setAddressLine1(expectedAddressLine1);
 		address.setAddressLine2(expectedAddressLine2);
 		address.setCity(expectedCity);
@@ -135,7 +135,7 @@ public class CDSExportMapperTest
 		String expectedCountry = "US";
 		String expectedZip = "40170";
 
-		Address address = new Address();
+		AddressModel address = new AddressModel();
 		address.setAddressLine1(expectedAddressLine1);
 		address.setAddressLine2(expectedAddressLine2);
 		address.setCity(expectedCity);
@@ -163,7 +163,7 @@ public class CDSExportMapperTest
 		String expectedFirstName = "first";
 		String expectedLastName = "last";
 
-		Provider provider = new Provider();
+		ProviderModel provider = new ProviderModel();
 		provider.setFirstName(expectedFirstName);
 		provider.setLastName(expectedLastName);
 

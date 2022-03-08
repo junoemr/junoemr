@@ -24,9 +24,10 @@ package org.oscarehr.dataMigration.converter.out;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -37,16 +38,16 @@ import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.COUNTRY_CODE_CA
 // can't extend the base class because the base uses this converter
 @Component
 public class ProviderDbToModelConverter extends
-		AbstractModelConverter<ProviderData, org.oscarehr.dataMigration.model.provider.Provider>
+		AbstractModelConverter<ProviderData, ProviderModel>
 {
 	@Override
-	public org.oscarehr.dataMigration.model.provider.Provider convert(ProviderData input)
+	public ProviderModel convert(ProviderData input)
 	{
 		if(input == null)
 		{
 			return null;
 		}
-		org.oscarehr.dataMigration.model.provider.Provider exportProvider = new org.oscarehr.dataMigration.model.provider.Provider();
+		ProviderModel exportProvider = new ProviderModel();
 		BeanUtils.copyProperties(input, exportProvider, "address", "dob", "sex", "title");
 		exportProvider.setId(input.getId());
 
@@ -54,7 +55,7 @@ public class ProviderDbToModelConverter extends
 		exportProvider.setSex(Person.SEX.getIgnoreCase(input.getSex()));
 		exportProvider.setTitle(Person.TITLE.fromStringIgnoreCase(input.getTitle()));
 
-		Address address = new Address();
+		AddressModel address = new AddressModel();
 		address.setAddressLine1(input.getAddress());
 //		address.setCity(input.getCity());
 //		address.setRegionCode(input.getProvince());
@@ -69,9 +70,9 @@ public class ProviderDbToModelConverter extends
 		exportProvider.setHsoNumber(StringUtils.trimToNull(input.getHsoNo()));
 		exportProvider.setOhipNumber(StringUtils.trimToNull(input.getOhipNo()));
 
-		exportProvider.setHomePhone(PhoneNumber.of(input.getPhone()));
-		exportProvider.setWorkPhone(PhoneNumber.of(input.getWorkPhone()));
-		exportProvider.setCellPhone(PhoneNumber.of(input.getCellPhone()));
+		exportProvider.setHomePhone(PhoneNumberModel.of(input.getPhone()));
+		exportProvider.setWorkPhone(PhoneNumberModel.of(input.getWorkPhone()));
+		exportProvider.setCellPhone(PhoneNumberModel.of(input.getCellPhone()));
 
 		return exportProvider;
 	}

@@ -26,7 +26,7 @@ package org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules;
 import org.json.simple.JSONObject;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.util.SpringUtils;
 
 /**

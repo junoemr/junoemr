@@ -49,8 +49,8 @@
 <%@page import="org.oscarehr.common.model.ConsentType" %>
 <%@page import="org.oscarehr.common.model.Demographic" %>
 <%@page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
-<%@page import="org.oscarehr.demographic.model.DemographicCust" %>
-<%@page import="org.oscarehr.demographic.model.DemographicExt" %>
+<%@page import="org.oscarehr.demographic.entity.DemographicCust" %>
+<%@page import="org.oscarehr.demographic.entity.DemographicExt" %>
 <%@page import="org.oscarehr.managers.DemographicManager" %>
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
 <%@page import="org.oscarehr.provider.model.ProviderPreventionManager" %>

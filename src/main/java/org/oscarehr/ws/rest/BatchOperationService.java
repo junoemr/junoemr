@@ -24,7 +24,7 @@
 package org.oscarehr.ws.rest;
 
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.dx.service.DxResearchService;
 import org.oscarehr.managers.SecurityInfoManager;

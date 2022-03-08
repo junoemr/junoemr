@@ -9,54 +9,56 @@
 
 package com.indivica.olis;
 
-import org.oscarehr.common.model.Provider;
-
 import com.indivica.olis.queries.Query;
 import com.indivica.olis.segments.DSCSegment;
 import com.indivica.olis.segments.MSHSegment;
 import com.indivica.olis.segments.SPRSegment;
 import com.indivica.olis.segments.ZSHSegment;
+import org.oscarehr.common.model.Provider;
 
-public class OLISMessage {
+public class OLISMessage
+{
+	private final MSHSegment mshSegment;
+	private final ZSHSegment zshSegment;
+	private final SPRSegment sprSegment;
+	private final DSCSegment dscSegment;
 
-	private MSHSegment mshSegment;
-	private ZSHSegment zshSegment;
-	private SPRSegment sprSegment;
-	private DSCSegment dscSegment = null;
-	
-	private Provider provider;
-
-	public OLISMessage(Provider provider) {
-		this.provider = provider;
+	public OLISMessage()
+	{
+		this(null, null);
 	}
 
-	public OLISMessage(Query query) {
+	public OLISMessage(Provider provider, Query query)
+	{
+		this(provider, query, null);
+	}
+	
+	public OLISMessage(Provider provider, Query query, String continuationPointer)
+	{
 		mshSegment = new MSHSegment(query.getQueryType());
 		zshSegment = new ZSHSegment(provider);
 		sprSegment = new SPRSegment(query.getQueryType(), query);
+		dscSegment = (continuationPointer != null) ? new DSCSegment(continuationPointer) : null;
 	}
-	
-	public OLISMessage(Query query, String continuationPointer) {
-		mshSegment = new MSHSegment(query.getQueryType());
-		zshSegment = new ZSHSegment(provider);
-		sprSegment = new SPRSegment(query.getQueryType(), query);
-		dscSegment = new DSCSegment(continuationPointer);
-	}	
-	
-	public String getTransactionId() {
+
+	public String getTransactionId()
+	{
 		return mshSegment.getUuidString();
 	}
-	
-	public String getOlisHL7String() {
+
+	public String getOlisHL7String()
+	{
 		String output = "";
-		
+
 		output += mshSegment.getSegmentHL7String() + "\r";
 		output += zshSegment.getSegmentHL7String() + "\r";
 		output += sprSegment.getSegmentHL7String();
-		
-		if (dscSegment != null)
+
+		if(dscSegment != null)
+		{
 			output += "\r" + dscSegment.getSegmentHL7String();
-		
+		}
+
 		return output;
 	}
 	

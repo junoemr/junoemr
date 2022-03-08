@@ -26,34 +26,36 @@ package org.oscarehr.managers;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.joda.time.DateTimeComparator;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.dao.AdmissionDao;
-import org.oscarehr.contact.dao.ContactDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
-import org.oscarehr.contact.dao.DemographicContactDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.PHRVerificationDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Admission;
-import org.oscarehr.contact.entity.Contact;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Demographic.PatientStatus;
-import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.contact.dao.ContactDao;
+import org.oscarehr.contact.dao.DemographicContactDao;
+import org.oscarehr.contact.entity.Contact;
+import org.oscarehr.contact.entity.DemographicContact;
+import org.oscarehr.contact.transfer.DemographicContactFewTo1;
 import org.oscarehr.demographic.dao.DemographicCustArchiveDao;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicExtArchiveDao;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.dao.DemographicMergedDao;
-import org.oscarehr.demographic.model.DemographicCust;
-import org.oscarehr.demographic.model.DemographicExt;
-import org.oscarehr.demographic.model.DemographicExtArchive;
-import org.oscarehr.demographic.model.DemographicMerged;
+import org.oscarehr.demographic.entity.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExtArchive;
+import org.oscarehr.demographic.entity.DemographicMerged;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographic.service.HinValidationService;
@@ -66,7 +68,6 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicTransfer;
 import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.to.model.AddressTo1;
-import org.oscarehr.contact.transfer.DemographicContactFewTo1;
 import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -451,6 +452,7 @@ public class DemographicManager {
 	{
 		createDemographic(loggedInInfo.getLoggedInProviderNo(), demographic, programManager.getDefaultProgramId());
 	}
+
 	public void createDemographic(String providerNo, Demographic demographic, Integer admissionProgramId) {
 		checkPrivilege(providerNo, Permission.DEMOGRAPHIC_CREATE);
 		try {
@@ -488,6 +490,7 @@ public class DemographicManager {
 
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {
+				ext.setDemographicNo(demographic.getDemographicNo());
 				createExtension(providerNo, ext);
 			}
 		}
@@ -498,10 +501,10 @@ public class DemographicManager {
 	 * @param loggedInInfo provider making changes
 	 * @param demographic updated demographic record
 	 */
-	public void updateDemographic(LoggedInInfo loggedInInfo, org.oscarehr.demographic.model.Demographic demographic)
+	public void updateDemographic(LoggedInInfo loggedInInfo, org.oscarehr.demographic.entity.Demographic demographic)
 	{
 		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), demographic.getDemographicId(), Permission.DEMOGRAPHIC_UPDATE);
-		org.oscarehr.demographic.model.Demographic previousDemographic = newDemographicDao.find(demographic.getDemographicId());
+		org.oscarehr.demographic.entity.Demographic previousDemographic = newDemographicDao.find(demographic.getDemographicId());
 		demographicArchiveDao.archiveDemographic(previousDemographic);
 
 		String previousStatus = previousDemographic.getPatientStatus();
@@ -532,7 +535,7 @@ public class DemographicManager {
 		{
 			for (DemographicExt ext : demographic.getDemographicExtSet())
 			{
-				DemographicExt existingExt = demographicExtDao.getLatestDemographicExt(demographic.getDemographicId(), ext.getKey());
+				DemographicExt existingExt = demographicExtDao.getLatestDemographicExt(demographic.getDemographicId(), ext.getKey()).orElse(null);
 				if (existingExt != null)
 				{
 					ext.setId(existingExt.getId());
@@ -593,7 +596,7 @@ public class DemographicManager {
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {
 
-				DemographicExt existingExt = demographicExtDao.getLatestDemographicExt(demographic.getDemographicNo(), ext.getKey());
+				DemographicExt existingExt = demographicExtDao.getLatestDemographicExt(demographic.getDemographicNo(), ext.getKey()).orElse(null);
 				if (existingExt != null)
 				{
 					ext.setId(existingExt.getId());
@@ -664,18 +667,20 @@ public class DemographicManager {
 	 * @param currentDemo current revision of the demographic we want to record
 	 * @param previousDemo previous version of the demographic
 	 */
-	public void addRosterHistoryEntry(org.oscarehr.demographic.model.Demographic currentDemo,
-									  org.oscarehr.demographic.model.Demographic previousDemo)
+	public void addRosterHistoryEntry(org.oscarehr.demographic.entity.Demographic currentDemo,
+									  org.oscarehr.demographic.entity.Demographic previousDemo)
 	{
 		boolean hasChanged = false;
 		
 		// If the roster status is valid, check if any fields changed from last time we edited
 		if (ConversionUtils.hasContent(currentDemo.getRosterStatus()))
 		{
+			DateTimeComparator dateComparator = DateTimeComparator.getDateOnlyInstance();
+
 			hasChanged = currentDemo.getFamilyDoctor() != null && !currentDemo.getFamilyDoctor().equals(previousDemo.getFamilyDoctor());
-			hasChanged |= currentDemo.getRosterDate() != null && currentDemo.getRosterDate() != previousDemo.getRosterDate();
+			hasChanged |= currentDemo.getRosterDate() != null && dateComparator.compare(currentDemo.getRosterDate(), previousDemo.getRosterDate()) != 0;
 			hasChanged |= currentDemo.getRosterStatus() != null && !currentDemo.getRosterStatus().equals(previousDemo.getRosterStatus());
-			hasChanged |= currentDemo.getRosterTerminationDate() != null && currentDemo.getRosterTerminationDate() != previousDemo.getRosterTerminationDate();
+			hasChanged |= currentDemo.getRosterTerminationDate() != null && dateComparator.compare(currentDemo.getRosterTerminationDate(), previousDemo.getRosterTerminationDate()) != 0;
 			hasChanged |= currentDemo.getRosterTerminationReason() != null && !currentDemo.getRosterTerminationReason().equals(previousDemo.getRosterTerminationReason());
 		}
 
@@ -1357,7 +1362,7 @@ public class DemographicManager {
 	 * @param healthNumber - The HIN to lookup
 	 * @return The matched demographic or null if none match
 	 */
-	public org.oscarehr.demographic.model.Demographic getDemographicByHealthNumber(String healthNumber)
+	public org.oscarehr.demographic.entity.Demographic getDemographicByHealthNumber(String healthNumber)
 	{
 		return getDemographicByHealthNumber(healthNumber, null);
 	}
@@ -1368,7 +1373,7 @@ public class DemographicManager {
 	 * @param versionCode - [optional] The version code to lookup
 	 * @return The matched demographic or null if none match
 	 */
-	public org.oscarehr.demographic.model.Demographic getDemographicByHealthNumber(String healthNumber, String versionCode)
+	public org.oscarehr.demographic.entity.Demographic getDemographicByHealthNumber(String healthNumber, String versionCode)
 	{
 		DemographicCriteriaSearch search = new DemographicCriteriaSearch();
 		search.setHin(healthNumber);
@@ -1388,7 +1393,7 @@ public class DemographicManager {
 			}
 		}
 
-		List<org.oscarehr.demographic.model.Demographic> demographics = newDemographicDao.criteriaSearch(search);
+		List<org.oscarehr.demographic.entity.Demographic> demographics = newDemographicDao.criteriaSearch(search);
 		if (demographics.size() == 1)
 		{
 			return demographics.get(0);

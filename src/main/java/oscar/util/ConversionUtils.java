@@ -77,6 +77,7 @@ public class ConversionUtils {
 	public static final String TIME_PATTERN_NO_SEC = "HH:mm";
 	public static final String DEFAULT_TS_PATTERN = "yyyy-MM-dd HH:mm:ss";
 	public static final String DATE_TIME_ZONE_OFFSET_X_PATTERN = "yyyy-MM-dd HH:mm:ss X";
+	public static final String DATE_TIME_ZONE_DISPLAY_PATTERN = "yyyy-MM-dd HH:mm:ss z";
 	public static final String DATE_TIME_FILENAME = "yyyy-MM-dd.HH.mm.ss";
 
 	public static final String DISPLAY_DATE_PATTERN = "dd-MMM-yyyy";
@@ -830,6 +831,28 @@ public class ConversionUtils {
 	public static ZonedDateTime toZonedDateTime(Date legacyDate)
 	{
 		return ZonedDateTime.ofInstant(legacyDate.toInstant(), ZoneId.systemDefault());
+	}
+
+	public static ZonedDateTime toZonedDateTime(String dateString)
+	{
+		return ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
+	}
+
+	public static ZonedDateTime toNullableZonedDateTime(String dateString)
+	{
+		if(dateString == null) return null;
+		return toZonedDateTime(dateString);
+	}
+
+	public static ZonedDateTime toNullableZonedDateTime(String dateString, DateTimeFormatter dateTimeFormatter)
+	{
+		if(dateString == null) return null;
+		return toZonedDateTime(dateString, dateTimeFormatter);
+	}
+
+	public static ZonedDateTime toZonedDateTime(String dateString, DateTimeFormatter dateTimeFormatter)
+	{
+		return ZonedDateTime.parse(dateString, dateTimeFormatter);
 	}
 
 	public static LocalDateTime toNullableLocalDateTime(Date legacyDate)

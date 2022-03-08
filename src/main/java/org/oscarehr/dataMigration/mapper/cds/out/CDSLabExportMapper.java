@@ -32,6 +32,7 @@ import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.LaboratoryResults;
 import xml.cds.v5_0.ResultNormalAbnormalFlag;
+import xml.cds.v5_0.YIndicator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,7 +105,7 @@ public class CDSLabExportMapper extends AbstractCDSExportMapper<List<LaboratoryR
 				laboratoryResult.setNotesFromLab(getLabObxComments(labObrResult));
 				laboratoryResult.setPhysiciansNotes(getPhysiciansNotes(labObrResult));
 				laboratoryResult.setTestResultStatus(labObrResult.getResultStatus());
-				laboratoryResult.setBlockedTestResult(null); //TODO how to determine this?
+				laboratoryResult.setBlockedTestResult(labObr.isBlockedResult() ? YIndicator.Y : null);
 
 				laboratoryResults.add(laboratoryResult);
 			}

@@ -175,7 +175,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 				demographicService.getDemographic(model).then(
 					function success(results)
 					{
-						controller.consult.demographicName = results.lastName + ", " + results.firstName;
+						controller.consult.demographicName = results.displayName;
 					},
 					function error(errors)
 					{

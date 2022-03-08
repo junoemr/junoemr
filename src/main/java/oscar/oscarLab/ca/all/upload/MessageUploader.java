@@ -35,8 +35,10 @@
 package oscar.oscarLab.ca.all.upload;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
+import org.oscarehr.common.Gender;
 import org.oscarehr.common.OtherIdManager;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
@@ -44,6 +46,7 @@ import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.dao.PatientLabRoutingDao;
 import org.oscarehr.common.dao.ProviderLabRoutingDao;
 import org.oscarehr.common.hl7.Hl7Const;
+import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Hl7TextInfo;
@@ -67,41 +70,44 @@ import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 import oscar.oscarDemographic.data.DemographicMerged;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
+import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
 import oscar.oscarLab.ca.all.parsers.Factory;
 import oscar.oscarLab.ca.all.parsers.HHSEmrDownloadHandler;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
 import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
 import oscar.oscarLab.ca.all.parsers.SpireHandler;
+import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-
-import static org.oscarehr.common.io.FileFactory.createEmbeddedLabFile;
 
 public final class MessageUploader {
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final String DEFAULT_BLANK_PROVIDER_NO = "0";
-	private static PatientLabRoutingDao patientLabRoutingDao = SpringUtils.getBean(PatientLabRoutingDao.class);
-	private static Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
-	private static Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
-	private static Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
-	private static DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-	private static ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
-	private static DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
-	private static DocumentService documentService = SpringUtils.getBean(DocumentService.class);
+	private static final PatientLabRoutingDao patientLabRoutingDao = SpringUtils.getBean(PatientLabRoutingDao.class);
+	private static final Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
+	private static final Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
+	private static final Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
+	private static final DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
+	private static final ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	private static final DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+	private static final DocumentService documentService = SpringUtils.getBean(DocumentService.class);
 
 	private MessageUploader() {
 		// there's no reason to instantiate a class with no fields.
@@ -123,17 +129,20 @@ public final class MessageUploader {
 	{
 		return routeReport(loggedInInfo.getLoggedInProviderNo(), serviceName, type, hl7Body, fileId, results);
 	}
+
+	public static String routeReport(String loggedInProviderNo, String serviceName, String type, String hl7Body, int fileId, RouteReportResults results) throws Exception
+	{
+		MessageHandler messageHandler = Factory.getHandler(type, hl7Body);
+		return routeReport(loggedInProviderNo, serviceName, messageHandler, type, hl7Body, fileId, results);
+	}
 	/**
 	 * Insert the lab into the proper tables of the database
 	 */
-	public static String routeReport(String loggedInProviderNo, String serviceName, String type, String hl7Body, int fileId, RouteReportResults results) throws Exception
+	public static String routeReport(String loggedInProviderNo, String serviceName, MessageHandler messageHandler, String type, String hl7Body, int fileId, RouteReportResults results) throws Exception
 	{
-
 		String retVal;
 		try
 		{
-			MessageHandler messageHandler = Factory.getHandler(type, hl7Body);
-
 			String firstName = messageHandler.getFirstName();
 			String lastName = messageHandler.getLastName();
 			String dob = messageHandler.getDOB();
@@ -160,7 +169,7 @@ public final class MessageUploader {
 			String accessionNum = messageHandler.getAccessionNum();
 			String fillerOrderNum = messageHandler.getFillerOrderNumber();
 			String sendingFacility = messageHandler.getPatientLocation();
-			ArrayList docNums = messageHandler.getDocNums();
+			List<String> docNums = messageHandler.getDocNums();
 			int finalResultCount = messageHandler.getOBXFinalResultCount();
 			String obrDate = messageHandler.getMsgDate();
 
@@ -199,13 +208,17 @@ public final class MessageUploader {
 				}
 			}
 
+			if(StringUtils.isBlank(obrDate))
+			{
+				throw new IllegalStateException("Lab Date cannot be blank");
+			}
 			try
 			{
 				// reformat date
 				String format = "yyyy-MM-dd HH:mm:ss".substring(0, obrDate.length() - 1);
 				obrDate = UtilDateUtilities.DateToString(UtilDateUtilities.StringToDate(obrDate, format), "yyyy-MM-dd HH:mm:ss");
 			}
-			catch (Exception e)
+			catch(Exception e)
 			{
 				logger.error("Error parsing obr date : ", e);
 				throw e;
@@ -260,71 +273,37 @@ public final class MessageUploader {
 				List<Hl7TextInfo> matchingTdisLab =  hl7TextInfoDao.searchByFillerOrderNumber(fillerOrderNum, sendingFacility);
 				if (matchingTdisLab.size() > 0)
 				{
-					hl7TextMessageDao.updateIfFillerOrderNumberMatches(new String(Base64.encodeBase64(hl7Body.getBytes(MiscUtils.DEFAULT_UTF8_ENCODING)), MiscUtils.DEFAULT_UTF8_ENCODING),fileId,matchingTdisLab.get(0).getLabNumber());
+					hl7TextMessageDao.updateIfFillerOrderNumberMatches(new String(Base64.encodeBase64(hl7Body.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8),fileId,matchingTdisLab.get(0).getLabNumber());
 					hl7TextInfoDao.updateReportStatusByLabId(reportStatus,matchingTdisLab.get(0).getLabNumber());
 					hasBeenUpdated = true;
 				}
 			}
 			int insertID = 0;
 
-			// Embedded Document - check has to be here
-			// If we get a document with identifier ED we need to switch up how we're storing it
-			// [1] Strip out the embedded PDF in the OBX message
-			// [2] Convert it to a document and get the document ID
-			boolean hasPDF = false;
-			List<String> embeddedPDFs = new ArrayList<>();
-
-			if (messageHandler.isSupportEmbeddedPdf())
-			{
-				String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
-				// Every PDF should be prefixed with this due to b64 encoding of PDF header
-
-				for (int i = 0; i < messageHandler.getOBRCount(); i++)
-				{
-					for (int c =0; c < messageHandler.getOBXCount(i); c ++)
-					{
-						if (messageHandler.getOBXValueType(i, c).equals("ED"))
-						{
-							// Some embedded PDFs simply have the lab as-is, some have it split up like above
-							for (int k = 1; k <= referenceStrings.length; k++)
-							{
-								String embeddedPdf = messageHandler.getOBXResult(i, c, k);
-								if (embeddedPdf.startsWith(PATHL7Handler.embeddedPdfPrefix))
-								{
-									MiscUtils.getLogger().info("Found embedded PDF in lab upload, pulling it out");
-									hasPDF = true;
-									embeddedPDFs.add(embeddedPdf);
-								}
-							}
-						}
-					}
-				}
-			}
-
-			int docId = 0;
-
 			if (!isTDIS || !hasBeenUpdated)
 			{
-				if (hasPDF)
+				int docId = 0;
+				if (messageHandler.supportsEmbeddedDocuments())
 				{
-					int count = 0;
-					for (String pdf : embeddedPDFs)
+					// Embedded Document
+					// If we get a document with identifier ED we need to switch up how we're storing it
+					// [1] Strip out the embedded PDF in the OBX message
+					// [2] Convert it to a document and get the document ID
+					for (EmbeddedDocument embeddedDocument : messageHandler.getEmbeddedDocuments())
 					{
-						String fileName = "-" + accessionNum + "-" + fillerOrderNum + "-" + count + "-" + (int)(Math.random()*1000000000) + ".pdf";
 						// Replace original PDF string with meta info to prevent saving > 500k char strings in table
-						docId = createDocumentFromEmbeddedPDF(pdf, fileName);
-						hl7Body = hl7Body.replace(pdf, PATHL7Handler.pdfReplacement + docId);
+						docId = createDocumentFromEmbeddedPDF(embeddedDocument);
+						hl7Body = hl7Body.replace(embeddedDocument.getBase64Data(), MessageHandler.pdfReplacement + docId);
 						if (docId <= 0)
 						{
 							throw new ParseException("did not save embedded lab document correctly", 0);
 						}
-						count ++;
 					}
 				}
 
 				hl7TextMessage.setFileUploadCheckId(fileId);
 				hl7TextMessage.setType(type);
-				hl7TextMessage.setBase64EncodedeMessage(new String(Base64.encodeBase64(hl7Body.getBytes(MiscUtils.DEFAULT_UTF8_ENCODING)), MiscUtils.DEFAULT_UTF8_ENCODING));
+				hl7TextMessage.setBase64EncodedeMessage(new String(Base64.encodeBase64(hl7Body.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
 				hl7TextMessage.setServiceName(serviceName);
 				hl7TextMessageDao.persist(hl7TextMessage);
 				insertID = hl7TextMessage.getId();
@@ -363,7 +342,7 @@ public final class MessageUploader {
 				demProviderNo = DEFAULT_BLANK_PROVIDER_NO;
 			}
 
-			if (type.equals("OLIS_HL7") && demProviderNo.equals(DEFAULT_BLANK_PROVIDER_NO))
+			if (OLISHL7Handler.OLIS_MESSAGE_TYPE.equals(type) && demProviderNo.equals(DEFAULT_BLANK_PROVIDER_NO))
 			{
 				OLISSystemPreferencesDao olisPrefDao = SpringUtils.getBean(OLISSystemPreferencesDao.class);
 				OLISSystemPreferences olisPreferences = olisPrefDao.getPreferences();
@@ -385,7 +364,7 @@ public final class MessageUploader {
 				String search = null;
 				if (type.equals("Spire"))
 				{
-					limit = new Integer(1);
+					limit = 1;
 					orderByLength = true;
 					search = "provider_no";
 				}
@@ -442,7 +421,7 @@ public final class MessageUploader {
 				if(!custom_route_enabled)
 				{
 					/* allow property override setting to route all labs to a specific inbox or list of inboxes. */
-					ArrayList<String> providers = OscarProperties.getInstance().getRouteLabsToProviders(docNums);
+					List<String> providers = OscarProperties.getInstance().getRouteLabsToProviders(docNums);
 					providerRouteReport(String.valueOf(insertID), providers, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
 				}
 			}
@@ -523,7 +502,7 @@ public final class MessageUploader {
 	/**
 	 * Attempt to match the doctors from the lab to a provider
 	 */
-	private static void providerRouteReport(String labId, ArrayList<String> docNums, Connection conn, String altProviderNo, String labType, String search_on, Integer limit, boolean orderByLength) throws Exception {
+	private static void providerRouteReport(String labId, List<String> docNums, Connection conn, String altProviderNo, String labType, String search_on, Integer limit, boolean orderByLength) throws Exception {
 		ArrayList<String> providerNums = new ArrayList<String>();
 		String sqlSearchOn = "ohip_no";
 		String routeToProvider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");
@@ -596,7 +575,7 @@ public final class MessageUploader {
 	/**
 	 * Attempt to match the doctors from the lab to a provider
 	 */
-	private static void providerRouteReport(String labId, ArrayList<String> docNums, Connection conn, String altProviderNo, String labType) throws Exception {
+	private static void providerRouteReport(String labId, List<String> docNums, Connection conn, String altProviderNo, String labType) throws Exception {
 		providerRouteReport(labId, docNums, conn, altProviderNo, labType, null, null, false);
 	}
 
@@ -705,29 +684,53 @@ public final class MessageUploader {
 	}
 
 	/**
-	 * Helper function for creating a proper document from an embedded PDF string.
-	 * These PDFs are encoded in the lab message as a base64 string.
-	 * @param embeddedPDF base64-encoded String representing the PDF we want to save
+	 * Helper function for creating a proper document from an embedded base64 string.
+	 * These documents are encoded in the lab message as a base64 string.
+	 * @param embeddedDocument model with base64 encoded String data representing the document we want to save
 	 * @return an integer corresponding to the document ID we've created. Document gets saved
 	 * in same generic OscarDocument/{instance}/document directory
 	 */
-	private static int createDocumentFromEmbeddedPDF(String embeddedPDF, String fileName)
+	private static int createDocumentFromEmbeddedPDF(EmbeddedDocument embeddedDocument)
 			throws InterruptedException, IOException
 	{
-		InputStream fileStream = new ByteArrayInputStream(Base64.decodeBase64(embeddedPDF));
-
-		GenericFile embeddedLabDoc = createEmbeddedLabFile(fileStream, fileName);
+		InputStream fileStream = new ByteArrayInputStream(Base64.decodeBase64(embeddedDocument.getBase64Data()));
+		GenericFile embeddedLabDoc = FileFactory.createEmbeddedLabFile(fileStream, embeddedDocument.getFileName());
 
 		Document document = new Document();
 		document.setDocCreator(ProviderData.SYSTEM_PROVIDER_NO);
 		document.setResponsible(ProviderData.SYSTEM_PROVIDER_NO);
-		document.setDocfilename(fileName);
-		document.setDocdesc("embedded_pdf");
-		document.setSourceFacility("HL7Upload");
-		document.setSource("Excelleris");
+		document.setDocfilename(embeddedDocument.getFileName());
+		document.setContenttype(embeddedDocument.getMimeType());
+		document.setDocdesc(embeddedDocument.getDescription());
+		document.setSource(embeddedDocument.getSource());
+		document.setSourceFacility(embeddedDocument.getSourceFacility());
 
 		Document savedDoc = documentService.uploadNewDemographicDocument(document, embeddedLabDoc, null);
 
 		return savedDoc.getDocumentNo();
+	}
+
+	/**
+	 * Taken from Oscar 19 OLIS changes and refactored a bit
+	 */
+	public static Integer willOLISLabReportMatch(String lastName, String firstName, String sex, String dob, String hin)
+	{
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(ConversionUtils.fromDateString(dob));
+
+		List<Demographic> matches = demographicDao.findByAttributes(
+				hin,
+				firstName,
+				lastName,
+				Gender.fromLetterCode(sex),
+				calendar,
+				null, null, null, null, null,
+				0, 2);
+
+		if(matches.size() != 1)
+		{
+			return null;
+		}
+		return matches.get(0).getDemographicNo();
 	}
 }

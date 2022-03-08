@@ -92,7 +92,7 @@ public class DemographicArchiveDao extends AbstractDao<DemographicArchive> {
 		return da.getId();
     }
 
-    public DemographicArchive archiveDemographic(org.oscarehr.demographic.model.Demographic demographic)
+    public DemographicArchive archiveDemographic(org.oscarehr.demographic.entity.Demographic demographic)
 	{
 		DemographicArchive demographicArchive = new DemographicArchive(demographic);
 		persist(demographicArchive);

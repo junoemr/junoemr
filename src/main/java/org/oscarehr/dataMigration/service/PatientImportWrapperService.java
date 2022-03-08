@@ -37,7 +37,7 @@ import org.oscarehr.dataMigration.pref.ImportPreferences;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
 import org.oscarehr.dataMigration.service.context.PatientImportContextService;
 import org.oscarehr.dataMigration.transfer.CoPDRecordData;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.log.dao.LogDataMigrationDao;
 import org.oscarehr.log.model.LogDataMigration;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -32,7 +32,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

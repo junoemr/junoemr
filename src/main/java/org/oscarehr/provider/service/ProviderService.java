@@ -34,6 +34,7 @@ import org.oscarehr.common.exception.NoSuchRecordException;
 import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.providerBilling.dao.ProviderBillingDao;
@@ -88,6 +89,9 @@ public class ProviderService
 
 	@Autowired
 	private ProviderBillingDao providerBillingDao;
+
+	@Autowired
+	private ProviderManager2 providerManager;
 
 	public ProviderData getProvider(String providerNo)
 	{
@@ -216,16 +220,16 @@ public class ProviderService
 	 * @param providerNo - the provider to get the form for.
 	 * @return - the edit provider form.
 	 */
-	public ProviderEditFormTo1 getEditFormForProvider(Integer providerNo, Security loggedInSecurity)
+	public ProviderEditFormTo1 getEditFormForProvider(String providerNo, Security loggedInSecurity)
 	{
-		ProviderData provider = providerDataDao.findByProviderNo(providerNo.toString());
+		ProviderData provider = providerDataDao.findByProviderNo(providerNo);
 		ProviderEditFormTo1 providerEditFormTo1 = new ProviderEditFormTo1();
 
 		//set provider fields
 		providerEditFormTo1.setProviderData(provider);
 
 		//set billing fields
-		ProviderBilling providerBilling = providerBillingDao.getByProvider(providerNo);
+		ProviderBilling providerBilling = providerBillingDao.findByProviderId(providerNo);
 		if (providerBilling != null)
 		{
 			providerEditFormTo1.setProviderBilling(providerBilling);
@@ -233,11 +237,11 @@ public class ProviderService
 
 		//set security records
 		//Security unameSec = securityDao.findProviderUserNameSecurityRecord(providerNo.toString());
-		providerEditFormTo1.setSecurityRecords(SecurityRecordTo1.fromList(securityDao.findByProviderNo(providerNo.toString())));
+		providerEditFormTo1.setSecurityRecords(SecurityRecordTo1.fromList(securityDao.findByProviderNo(providerNo)));
 		providerEditFormTo1.setCurrentSecurityRecord(loggedInSecurity.getSecurityNo());
 
 		//set sites
-		List<ProviderSite> providerSites = providerSiteDao.findByProviderNo(provider.getProviderNo().toString());
+		List<ProviderSite> providerSites = providerSiteDao.findByProviderNo(providerNo);
 		ArrayList<Integer> siteList = new ArrayList<>();
 		ArrayList<Integer> bcpSites = new ArrayList<>();
 		for(ProviderSite providerSite: providerSites)
@@ -259,6 +263,11 @@ public class ProviderService
 			roleIds.add(role.getSecRole().getId());
 		}
 		providerEditFormTo1.setUserRoles(roleIds);
+
+		providerEditFormTo1.setOlisOfficialFirstName(userPropertyDAO.getStringValue(providerNo, UserProperty.OFFICIAL_FIRST_NAME));
+		providerEditFormTo1.setOlisOfficialSecondName(userPropertyDAO.getStringValue(providerNo, UserProperty.OFFICIAL_SECOND_NAME));
+		providerEditFormTo1.setOlisOfficialLastName(userPropertyDAO.getStringValue(providerNo, UserProperty.OFFICIAL_LAST_NAME));
+		providerEditFormTo1.setOlisOfficialIdType(userPropertyDAO.getStringValue(providerNo, UserProperty.OFFICIAL_OLIS_IDTYPE));
 
 		return providerEditFormTo1;
 	}
@@ -282,6 +291,8 @@ public class ProviderService
 		createProviderSecurityRecords(providerEditFormTo1, provider.getProviderNo());
 
 		updateProviderSiteAndRole(providerEditFormTo1, provider.getProviderNo());
+
+		setProviderProperties(providerEditFormTo1, provider.getId());
 
 		setJunoUIAsDefault(provider.getProviderNo());
 		return provider;
@@ -324,6 +335,8 @@ public class ProviderService
 			editProviderSecurityRecords(providerEditFormTo1, newProviderData.getProviderNo());
 
 			updateProviderSiteAndRole(providerEditFormTo1, newProviderData.getProviderNo());
+
+			setProviderProperties(providerEditFormTo1, newProviderData.getId());
 
 			return newProviderData;
 		}
@@ -491,6 +504,14 @@ public class ProviderService
 		existingRecord.setBLocallockset(source.getBLocallockset());
 		existingRecord.setBRemotelockset(source.getBRemotelockset());
 		existingRecord.setForcePasswordReset(source.isForcePasswordReset());
+	}
+
+	public void setProviderProperties(ProviderEditFormTo1 providerEditFormTo1, String providerNo)
+	{
+		providerManager.updateSingleSetting(providerNo, UserProperty.OFFICIAL_FIRST_NAME, StringUtils.trimToEmpty(providerEditFormTo1.getOlisOfficialFirstName()));
+		providerManager.updateSingleSetting(providerNo, UserProperty.OFFICIAL_SECOND_NAME, StringUtils.trimToEmpty(providerEditFormTo1.getOlisOfficialSecondName()));
+		providerManager.updateSingleSetting(providerNo, UserProperty.OFFICIAL_LAST_NAME, StringUtils.trimToEmpty(providerEditFormTo1.getOlisOfficialLastName()));
+		providerManager.updateSingleSetting(providerNo, UserProperty.OFFICIAL_OLIS_IDTYPE, StringUtils.trimToEmpty(providerEditFormTo1.getOlisOfficialIdType()));
 	}
 
 	public void createAndSaveProviderImdHealthUuid(ProviderData providerData)

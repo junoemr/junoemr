@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.model.demographic;
 
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
 
 import java.time.LocalDateTime;
@@ -40,5 +40,5 @@ public class RosterData extends AbstractTransientModel
 	private LocalDateTime rosterDateTime;
 	private LocalDateTime terminationDateTime;
 	private DemographicRoster.ROSTER_TERMINATION_REASON terminationReason;
-	private Provider rosterProvider;
+	private ProviderModel rosterProvider;
 }

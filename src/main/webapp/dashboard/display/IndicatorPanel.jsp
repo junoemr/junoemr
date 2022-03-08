@@ -25,7 +25,7 @@
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<div class="indicatorPanelContainer" >
+<div class="indicatorPanelContainer">
 			
 	<div class="row indicatorHeading" >
 		<div class="col-md-12">
@@ -34,13 +34,19 @@
 	</div>
 	
 	<!-- indicator panel results body - the graph and numbers -->
-	<div class="row indicatorData" >						
+	<div class="row indicatorData" >
 		<div class="col-md-12">
-	
+		<c:if test="${indicatorPanel.isPlottable()}">
 			<input type="hidden" id="graphPlots_${ indicatorPanel.id }" value="${ indicatorPanel.stringArrayPlots }" />
 			<input type="hidden" id="graphLabels_${ indicatorPanel.id }" value="${ indicatorPanel.stringArrayTooltips }" />
 			<div class="indicatorGraph" id="graphContainer_${ indicatorPanel.id }" ></div>
-		</div>									
+		</c:if>
+		<c:if test="${not indicatorPanel.isPlottable()}">
+			<div class="no-results">
+				<span>This report contains no results</span>
+			</div>
+		</c:if>
+		</div>
 	</div>
 	
 	<div class="row indicatorFooter" >

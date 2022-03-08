@@ -25,7 +25,7 @@ package org.oscarehr.ws.external.rest.v1;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.document.service.DocumentService;

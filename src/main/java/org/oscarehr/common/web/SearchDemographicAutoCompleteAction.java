@@ -44,8 +44,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
-import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.entity.Demographic;
+import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.util.AppointmentUtil;
@@ -136,6 +136,7 @@ public class SearchDemographicAutoCompleteAction extends Action {
             hashMap.put("formattedName",StringEscapeUtils.escapeJava(demo.getFormattedName().replaceAll("\"", "\\\"")));
             hashMap.put("demographicNo",String.valueOf(demoId));
             hashMap.put("status",demo.getPatientStatus());
+            hashMap.put("hin",demo.getHin());
              
 
             Provider provider = rx.getProvider(demo.getProviderNo());

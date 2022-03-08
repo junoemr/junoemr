@@ -1,5 +1,4 @@
 import BasicToast from "./BasicToast";
-import ToastService from "../service/ToastService";
 import {ToastStyle} from "./ToastStyle";
 
 // like basic toast but never expires. The user must click to dismiss
@@ -16,7 +15,7 @@ export default class DismissToast extends BasicToast
 	 * @param icon - [optional] icon to use
 	 * @param duration - [optional] [default 5 seconds] duration of the toast
 	 */
-	constructor(message: string, style: ToastStyle = ToastStyle.Notification, icon: string = null, duration = BasicToast.TOAST_DEFAULT_DURATION)
+	constructor(message: string, style: ToastStyle = ToastStyle.Notification, icon: string = null, duration = BasicToast.BASIC_TOAST_DEFAULT_DURATION)
 	{
 		super(message, style, icon, duration);
 	}

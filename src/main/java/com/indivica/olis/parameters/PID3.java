@@ -19,6 +19,8 @@ import java.util.Date;
  */
 public class PID3 implements Parameter {
 
+	public static final String ID_TYPE_CODE_JHN = "JHN";
+
 	private String idNumber;
 	private String universalId;
 	private String universalIdType;

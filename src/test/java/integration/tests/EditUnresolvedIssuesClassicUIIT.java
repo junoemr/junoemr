@@ -49,10 +49,8 @@ public class EditUnresolvedIssuesClassicUIIT extends SeleniumTestBase
 	protected String[] getTablesToRestore()
 	{
 		return new String[]{
-				"casemgmt_cpp", "casemgmt_issue", "casemgmt_issue_notes", "casemgmt_note",
-				"casemgmt_note_ext", "eChart", "hash_audit", "log", "property", "measurementType",
-				"demographic", "admission", "log_ws_rest","validations"
-
+			"admission", "casemgmt_issue", "casemgmt_issue_notes", "casemgmt_note", "demographic",
+			"eChart", "log", "log_ws_rest", "measurementType", "validations"
 		};
 	}
 
@@ -63,14 +61,79 @@ public class EditUnresolvedIssuesClassicUIIT extends SeleniumTestBase
 		databaseUtil.createTestDemographic();
 	}
 
+	String issue = "PERINATAL INTEST PERFOR";
+
 	@Test
-	public void AddUnresolvedIssuesTest() throws InterruptedException
+
+	public void EditUnresolvedIssuesTest()
 	{
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
-		String issue = "PERINATAL INTEST PERFOR";
 		String issueChange = "MALIGN NEOPL VULVA";
 		PageUtil.switchToLastWindow(driver);
 
+		AddUnresolvedIssues(issue);
+		Assert.assertTrue("Unresolved issue is NOT added to Unresolved Issues section successfully",
+			PageUtil.isExistsBy(By.partialLinkText(issue), driver));
+
+		driver.findElement(By.id("displayUnresolvedIssuesButton")).click();
+		String issueXPath =
+			"//tbody[@id='setIssueListBody']//descendant::a[contains(., '" + issue + "')]";
+		Assert.assertTrue("Unresolved issue is NOT added in Encounter note successfully",
+			PageUtil.isExistsBy(By.xpath(issueXPath), driver));
+
+		//Edit Unresolved Issue
+		driver.findElement(By.linkText("Change")).click();
+		driver.findElement(By.id("issueAutocomplete")).sendKeys(issueChange);
+		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(
+			By.cssSelector("#issueTable div.enTemplate_name_auto_complete li"),
+			"1844 - " + issueChange));
+		driver.findElement(By.id("issueAutocomplete")).sendKeys(Keys.ENTER);
+		webDriverWait.until(ExpectedConditions.invisibilityOfElementLocated(
+			By.cssSelector("#issueTable div.enTemplate_name_auto_complete li")));
+		findWaitClickById(driver, webDriverWait, "changeIssues");
+		findWaitClickById(driver, webDriverWait, "saveImg");
+		driver.navigate().refresh();
+		webDriverWait.until(
+			ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(issueChange)));
+		Assert.assertTrue(
+			"Changed unresolved issue is NOT added to Unresolved Issues section successfully",
+			PageUtil.isExistsBy(By.partialLinkText(issueChange), driver));
+
+		driver.findElement(By.id("displayUnresolvedIssuesButton")).click();
+		String issueChangedXPath =
+			"//tbody[@id='setIssueListBody']//descendant::a[contains(., '" + issueChange + "')]";
+		Assert.assertTrue("Changed unresolved issue is NOT added in Encounter note successfully",
+			PageUtil.isExistsBy(By.xpath(issueChangedXPath), driver));
+	}
+
+	@Test
+	public void EditResolvedIssuesTest()
+	{
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
+		PageUtil.switchToLastWindow(driver);
+
+		//Add Unresolbed Issues
+		AddUnresolvedIssues(issue);
+		Assert.assertTrue("Unresolved issue is NOT added to Unresolved Issues section successfully",
+			PageUtil.isExistsBy(By.partialLinkText(issue), driver));
+
+		//Resolve Issue
+		driver.findElement(By.id("displayUnresolvedIssuesButton")).click();
+		driver.findElement(By.xpath("//div[@id='noteIssues-unresolved']//descendant::a[contains(., '" + issue + "')]")).click();
+		driver.findElement(By.id("issueCheckList9934.resolved")).click();
+		driver.navigate().refresh();
+		webDriverWait.until(
+			ExpectedConditions.visibilityOfElementLocated(By.id("displayResolvedIssuesButton")));
+		driver.findElement(By.id("displayResolvedIssuesButton")).click();
+		Assert.assertTrue("Issue is not Relsolved successfully",
+			PageUtil.isExistsBy(By.xpath("//div[@id='noteIssues-resolved']//descendant::a[contains(., '" + issue + "')]"), driver));
+
+		Assert.assertTrue("Resolved issue is NOT added to Resolved Issues section successfully",
+			PageUtil.isExistsBy(By.xpath("//ul[@id='resolvedIssueslist']//descendant::a[contains(., '" + issue + "')]"), driver));
+	}
+
+	private void AddUnresolvedIssues(String issue)
+	{
 		//Add Unresolved Issue
 		driver.findElement(By.id("issueAutocomplete")).sendKeys(issue);
 		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#issueTable div.enTemplate_name_auto_complete li"), "7776 - " + issue));
@@ -78,29 +141,7 @@ public class EditUnresolvedIssuesClassicUIIT extends SeleniumTestBase
 		driver.findElement(By.id("asgnIssues")).click();
 		driver.findElement(By.id("saveImg")).click();
 		driver.navigate().refresh();
-		Assert.assertTrue("Unresolved issue is NOT added to Unresolved Issues section successfully",
-				PageUtil.isExistsBy(By.partialLinkText(issue), driver));
-
-		driver.findElement(By.id("displayUnresolvedIssuesButton")).click();
- 		Assert.assertTrue("Unresolved issue is NOT added in Encounter note successfully",
-				PageUtil.isExistsBy(By.xpath("//tbody[@id='setIssueListBody']//descendant::a[contains(., '" + issue + "')]"), driver));
-
-		//Edit Unresolved Issue
-		driver.findElement(By.linkText("Change")).click();
-		driver.findElement(By.id("issueAutocomplete")).sendKeys(issueChange);
-		webDriverWait.until(ExpectedConditions.textToBePresentInElementLocated(By.cssSelector("#issueTable div.enTemplate_name_auto_complete li"), "1844 - " + issueChange));
-		driver.findElement(By.id("issueAutocomplete")).sendKeys(Keys.ENTER);
-		webDriverWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("#issueTable div.enTemplate_name_auto_complete li")));
-		findWaitClickById(driver, webDriverWait, "changeIssues");
-		findWaitClickById(driver, webDriverWait, "saveImg");
-		driver.navigate().refresh();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(issueChange)));
-		Assert.assertTrue("Changed unresolved issue is NOT added to Unresolved Issues section successfully",
-			PageUtil.isExistsBy(By.partialLinkText(issueChange), driver));
-
-		driver.findElement(By.id("displayUnresolvedIssuesButton")).click();
-		Assert.assertTrue("Chaned unresolved issue is NOT added in Encounter note successfully",
-			PageUtil.isExistsBy(By.xpath("//tbody[@id='setIssueListBody']//descendant::a[contains(., '" + issueChange + "')]"), driver));
-
 	}
 }
+
+

@@ -42,20 +42,20 @@
 		<div id="left_pane" class="col-md-2">
 			<label class="control-label">Patient Details:</label>
 			<div class="demographic">
-				<p>{{consultResponseCtrl.consult.demographic.lastName}}, {{consultResponseCtrl.consult.demographic.firstName}} ({{consultResponseCtrl.consult.demographic.title}})</p>
-				<p>DOB: {{consultResponseCtrl.consult.demographic.dateOfBirth | date:'yyyy-MM-dd'}} ({{consultResponseCtrl.consult.demographic.age.years}})</p>
-				<p>Sex: {{consultResponseCtrl.consult.demographic.sexDesc}}</p>
-				<p>HIN: {{consultResponseCtrl.consult.demographic.hin}} - {{consultResponseCtrl.consult.demographic.ver}}</p>
+				<p>{{consultResponseCtrl.consult.demographic.displayName}} ({{consultResponseCtrl.consult.demographic.title}})</p>
+				<p>DOB: {{consultResponseCtrl.consult.demographic.displayDateOfBirth}} ({{consultResponseCtrl.consult.demographic.displayAge}})</p>
+				<p>Sex: {{consultResponseCtrl.consult.demographic.displaySex}}</p>
+				<p>HIN: {{consultResponseCtrl.consult.demographic.healthNumber}} - {{consultResponseCtrl.consult.demographic.healthNumberVersion}}</p>
 				<p>Address:</p>
 				<address>
-				{{consultResponseCtrl.consult.demographic.address.address}}<br/>
-				{{consultResponseCtrl.consult.demographic.address.city}}, {{consultResponseCtrl.consult.demographic.address.province}}, {{consultResponseCtrl.consult.demographic.address.postal}}<br>
+					{{consultResponseCtrl.consult.demographic.address.displayLine1of2}}<br/>
+					{{consultResponseCtrl.consult.demographic.address.displayLine2of2}}
 				</address>
-				<p>Phone (H): {{consultResponseCtrl.consult.demographic.phone}}</p>
-				<p>Phone (W): {{consultResponseCtrl.consult.demographic.alternativePhone}}</p>
-				<p>Phone (C): {{consultResponseCtrl.consult.demographic.cellPhone}}</p>
+				<p>Phone (H): {{consultResponseCtrl.consult.demographic.homePhone.formattedForDisplay}}</p>
+				<p>Phone (W): {{consultResponseCtrl.consult.demographic.workPhone.formattedForDisplay}}</p>
+				<p>Phone (C): {{consultResponseCtrl.consult.demographic.cellPhone.formattedForDisplay}}</p>
 				<p>Email: {{consultResponseCtrl.consult.demographic.email}}</p>
-				<p>MRP: {{consultResponseCtrl.consult.demographic.provider.firstName}}, {{consultResponseCtrl.consult.demographic.provider.lastName}}</p>
+				<p>MRP: {{consultRequestCtrl.consult.demographic.mrpProvider.displayName}}</p>
 			</div>
 			<br/>
 			<div id="consult_status">

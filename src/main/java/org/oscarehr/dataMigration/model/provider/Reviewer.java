@@ -27,7 +27,7 @@ import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.springframework.beans.BeanUtils;
 
 @Data
-public class Reviewer extends Provider
+public class Reviewer extends ProviderModel
 {
 	private PartialDateTime reviewDateTime;
 
@@ -36,7 +36,7 @@ public class Reviewer extends Provider
 		super();
 	}
 
-	public static Reviewer fromProvider(Provider provider)
+	public static Reviewer fromProvider(ProviderModel provider)
 	{
 		Reviewer reviewer = null;
 		if(provider != null)

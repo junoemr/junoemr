@@ -130,7 +130,7 @@ import org.oscarehr.common.model.BillingONItem;
 import org.oscarehr.common.model.Consent;
 import org.oscarehr.common.model.ConsentType;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.eform.model.EFormData;
@@ -1809,7 +1809,7 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 		int demographicFetchCount = 0;
 		for(Integer demographicNo:demographicNos){
 			logger.debug("Demographic "+demographicNo+" updated on the integrator, primary emr ? ");
-			DemographicExt demographicExt = demographicExtDao.getLatestDemographicExt(demographicNo, "primaryEMR");
+			DemographicExt demographicExt = demographicExtDao.getLatestDemographicExt(demographicNo, "primaryEMR").orElse(null);
 			if (demographicExt != null && demographicExt.getValue().equals("1")){
 				demographicFetchCount++;
 				BenchmarkTimer benchTimer = new BenchmarkTimer("fetch and save for facilityId:" + facility.getId() + ", demographicId:" + demographicNo + "  " + demographicFetchCount + " of " + demographicNos.size());
