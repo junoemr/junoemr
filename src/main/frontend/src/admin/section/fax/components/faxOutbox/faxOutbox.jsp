@@ -58,7 +58,7 @@
 					{{item.providerName}} ({{item.providerId}})
 				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.accountName"/>'">
-					{{$ctrl.getFaxAccountDisplayName(item.faxAccountId)}}
+					{{item.faxAccount.displayName}}
 				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.outbox.tbl-hdr.fileType"/>'">
 					{{item.fileType}}

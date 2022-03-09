@@ -41,7 +41,7 @@ public class FaxOutboxTransferOutbound implements Serializable
 {
 
 	private Long id;
-	private Long faxAccountId;
+	private FaxAccountTransferOutbound faxAccount;
 
 	private String providerId;
 	private String providerName;

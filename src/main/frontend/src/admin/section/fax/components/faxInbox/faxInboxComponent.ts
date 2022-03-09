@@ -165,11 +165,6 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 				return phoneNumber ? phoneNumber.formattedForDisplay : "";
 			}
 
-			ctrl.getFaxAccountDisplayName = (faxAccountId: number) =>
-			{
-				return ctrl.faxAccountList.find((faxAccount) => faxAccountId === faxAccount.id)?.displayName;
-			}
-
 			ctrl.nextPullTimeDisplay = () =>
 			{
 				if(ctrl.nextPullTime && ctrl.nextPullTime.isValid())

@@ -35,7 +35,7 @@ import java.io.Serializable;
 public class FaxInboxTransferOutbound implements Serializable
 {
 	private Long id;
-	private Long faxAccountId;
+	private FaxAccountTransferOutbound faxAccount;
 	/* the received date of the document as recorded in the system */
 	private String systemDateReceived;
 	/* the id of the document in the system */

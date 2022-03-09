@@ -264,11 +264,6 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 				}
 			}
 
-			ctrl.getFaxAccountDisplayName = (faxAccountId: number) =>
-			{
-				return ctrl.faxAccountList.find((faxAccount) => faxAccountId === faxAccount.id)?.displayName;
-			}
-
 			ctrl.formatDateForDisplay = (date: Moment): string =>
 			{
 				if(date && date.isValid())

@@ -26,19 +26,23 @@ import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.fax.model.FaxInbound;
 import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 @Component
 public class FaxInboundToModelConverter extends AbstractModelConverter<FaxInbound, FaxInboxTransferOutbound>
 {
+	@Autowired
+	private FaxAccountToModelConverter faxAccountToModelConverter;
+
 	@Override
 	public FaxInboxTransferOutbound convert(FaxInbound entity)
 	{
 		FaxInboxTransferOutbound model = new FaxInboxTransferOutbound();
 		model.setId(entity.getId());
 		model.setDocumentId(entity.getDocument().getDocumentNo());
-		model.setFaxAccountId(entity.getFaxAccount().getId());
+		model.setFaxAccount(faxAccountToModelConverter.convert(entity.getFaxAccount()));
 		model.setSystemDateReceived(ConversionUtils.toTimestampString(entity.getCreatedAt()));
 		model.setExternalReferenceId(entity.getExternalReferenceId());
 		model.setSentFrom(PhoneNumberModel.of(entity.getSentFrom(), PhoneNumberModel.PHONE_TYPE.FAX));

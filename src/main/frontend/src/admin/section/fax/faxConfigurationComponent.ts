@@ -39,6 +39,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 			ctrl.masterFaxEnabledInbound = false;
 			ctrl.masterFaxEnabledOutbound = false;
 			ctrl.activeAccount = null;
+			ctrl.initialized = false;
 
 			ctrl.$onInit = async () =>
 			{
@@ -68,6 +69,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 				{
 					ctrl.faxAccountSelectStates[ctrl.activeAccount.id] = true;
 				}
+				ctrl.initialized = true;
 			};
 
 			ctrl.userCanCreate = (): boolean =>
@@ -108,12 +110,17 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 
 				modalInstance.result.then(
 					// the object passed back on closing
-					function success(updatedAccount)
+					function success(updatedAccount: FaxAccount)
 					{
 						if(isNewAcct)
 						{
 							// new accounts get added to the account list
 							ctrl.faxAccountList.push(updatedAccount);
+							if(ctrl.faxAccountList.length === 1)
+							{
+								ctrl.faxAccountSelectStates[updatedAccount.id] = true;
+								ctrl.setActiveAccount(true, updatedAccount);
+							}
 						}
 						else if(updatedAccount == null) // deleted
 						{

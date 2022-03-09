@@ -29,12 +29,16 @@ import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.provider.FaxProviderFactory;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 @Component
 public class FaxOutboundToModelConverter extends AbstractModelConverter<FaxOutbound, FaxOutboxTransferOutbound>
 {
+	@Autowired
+	private FaxAccountToModelConverter faxAccountToModelConverter;
+
 	@Override
 	public FaxOutboxTransferOutbound convert(FaxOutbound entity)
 	{
@@ -43,7 +47,7 @@ public class FaxOutboundToModelConverter extends AbstractModelConverter<FaxOutbo
 
 		FaxOutboxTransferOutbound model = new FaxOutboxTransferOutbound();
 		model.setId(entity.getId());
-		model.setFaxAccountId(faxAccount.getId());
+		model.setFaxAccount(faxAccountToModelConverter.convert(faxAccount));
 		model.setProviderId(entity.getProviderNo());
 		model.setProviderName(entity.getProvider().getDisplayName());
 		model.setDemographicId(entity.getDemographicNo());

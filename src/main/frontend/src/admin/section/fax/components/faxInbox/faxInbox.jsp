@@ -57,7 +57,7 @@
 					{{$ctrl.getFaxDisplayNumber(item.sentFrom)}}
 				</td>
 				<td data-title="'<bean:message bundle="ui" key="admin.fax.sr.inbox.tbl-hdr.accountName"/>'">
-					{{$ctrl.getFaxAccountDisplayName(item.faxAccountId)}}
+					{{item.faxAccount.displayName}}
 				</td>
 				<td class="w-128">
 					<juno-button click="$ctrl.openDocument(item.documentId)"

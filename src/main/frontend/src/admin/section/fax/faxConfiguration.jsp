@@ -25,7 +25,7 @@
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<div class="fax-config">
+<div class="fax-config" ng-if="$ctrl.initialized">
 	<div class="fax-config-header">
 		<h1><bean:message bundle="ui" key="admin.fax.acct.header"/></h1>
 
@@ -70,7 +70,7 @@
 						<tr ng-repeat="faxAccount in $ctrl.faxAccountList">
 							<td class="w-32">
 								<juno-check-box ng-model="$ctrl.faxAccountSelectStates[faxAccount.id]"
-								                readonly="$ctrl.activeAccount === faxAccount"
+								                readonly="faxAccount.equals($ctrl.activeAccount)"
 								                change="$ctrl.setActiveAccount(value, faxAccount)">
 								</juno-check-box>
 							</td>

@@ -1,10 +1,11 @@
 import {Moment} from "moment";
 import PhoneNumber from "../../common/model/PhoneNumber";
+import FaxAccount from "./FaxAccount";
 
 export default class FaxInboxResult
 {
 	private _id: number;
-	private _faxAccountId: number;
+	private _faxAccount: FaxAccount;
 	private _systemDateReceived: Moment;
 	private _documentId: number;
 	private _sentFrom: PhoneNumber;
@@ -21,14 +22,14 @@ export default class FaxInboxResult
 		this._id = value;
 	}
 
-	get faxAccountId(): number
+	get faxAccount(): FaxAccount
 	{
-		return this._faxAccountId;
+		return this._faxAccount;
 	}
 
-	set faxAccountId(value: number)
+	set faxAccount(value: FaxAccount)
 	{
-		this._faxAccountId = value;
+		this._faxAccount = value;
 	}
 
 	get systemDateReceived(): Moment
