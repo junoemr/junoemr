@@ -1,5 +1,6 @@
 import {Moment} from "moment";
 import FaxAccount from "./FaxAccount";
+import moment from "moment/moment";
 
 export default class FaxInboxSearchParams
 {
