@@ -22,6 +22,7 @@
  */
 package org.oscarehr.fax.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.converter.FaxAccountCreateToEntityConverter;
 import org.oscarehr.fax.converter.FaxAccountToModelConverter;
@@ -90,14 +91,20 @@ public class FaxAccountService
 	public boolean testConnectionStatus(FaxAccountCreateInput createInput)
 	{
 		FaxAccount faxAccount = faxAccountCreateToEntityConverter.convert(createInput);
-		FaxAccountProvider faxAccountProvider = new FaxProviderFactory().createFaxAccountProvider(faxAccount);
+		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccount);
 		return faxAccountProvider.testConnectionStatus();
 	}
 
 	public boolean testConnectionStatus(FaxAccountUpdateInput updateInput)
 	{
-		FaxAccount faxAccount = faxAccountDao.find(updateInput.getId());// todo detatch entity to prevent auto saving it
-		FaxAccountProvider faxAccountProvider = new FaxProviderFactory().createFaxAccountProvider(faxAccount);
+		FaxAccount faxAccount = faxAccountDao.find(updateInput.getId());
+		if (StringUtils.isNotBlank(updateInput.getPassword()))
+		{
+			// detach entity to prevent auto saving it with updated password
+			faxAccountDao.detach(faxAccount);
+			faxAccount.setLoginPassword(updateInput.getPassword());
+		}
+		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccount);
 		return faxAccountProvider.testConnectionStatus();
 	}
 

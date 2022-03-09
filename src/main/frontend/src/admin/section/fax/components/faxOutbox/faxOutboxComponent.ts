@@ -235,9 +235,9 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 				return ctrl.statusFilterOptions.find((option) => combinedStatus === option.value).label;
 			}
 
-			ctrl.getFaxDisplayNumber = (number: PhoneNumber): string =>
+			ctrl.getFaxDisplayNumber = (phoneNumber: PhoneNumber): string =>
 			{
-				return number ? number.formattedForDisplay : "";
+				return phoneNumber ? phoneNumber.formattedForDisplay : "";
 			}
 
 			ctrl.getStatusIcon = (combinedStatus: FaxStatusCombinedType) =>

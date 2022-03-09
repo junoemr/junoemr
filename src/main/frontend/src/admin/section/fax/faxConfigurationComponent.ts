@@ -31,10 +31,12 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 			ctrl.faxAccountList = [];
+			ctrl.faxAccountSelectStates = [];
 			ctrl.loggedInProvider = null;
 			ctrl.masterFaxDisabled = true;
 			ctrl.masterFaxEnabledInbound = false;
 			ctrl.masterFaxEnabledOutbound = false;
+			ctrl.activeAccount = null;
 
 			ctrl.$onInit = () =>
 			{
@@ -100,6 +102,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 			{
 				ctrl.editFaxAccount(null);
 			};
+
 			ctrl.editFaxAccount = function editFaxAccount(faxAccount)
 			{
 				let isNewAcct = true;
@@ -154,6 +157,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 				ctrl.setSystemProperty("masterFaxEnabledInbound", ctrl.masterFaxEnabledInbound);
 				ctrl.updateMasterFaxDisabledStatus();
 			};
+
 			ctrl.saveMasterFaxEnabledStateOutbound = (value) =>
 			{
 				ctrl.masterFaxEnabledOutbound = value;
@@ -161,10 +165,28 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 				ctrl.updateMasterFaxDisabledStatus();
 			};
 
+			ctrl.setActiveAccount = (value: boolean, faxAccount: FaxAccount) =>
+			{
+				if(value)
+				{
+					ctrl.activeAccount = faxAccount;
+
+					// set all other selected states to false (unchecked)
+					ctrl.faxAccountList.filter((account: FaxAccount) => account.id !== faxAccount.id)
+						.forEach((account: FaxAccount) => ctrl.faxAccountSelectStates[account.id] = false);
+				}
+				else
+				{
+					ctrl.activeAccount = null;
+				}
+			};
+
 			ctrl.updateMasterFaxDisabledStatus = function updateMasterFaxDisabledStatus()
 			{
 				ctrl.masterFaxDisabled = !(ctrl.masterFaxEnabledInbound || ctrl.masterFaxEnabledOutbound);
 			};
+
+
 			ctrl.setSystemProperty = function setSystemProperty(key, value)
 			{
 				systemPreferenceService.setPreference(key, value).then(
@@ -177,6 +199,8 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 					}
 				);
 			};
+
+
 		}
 	]
 });

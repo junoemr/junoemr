@@ -160,9 +160,9 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 				return Juno.Common.Util.formatMomentDate(date) + " " + Juno.Common.Util.formatMomentTime(date);
 			}
 
-			ctrl.getFaxDisplayNumber = (number: PhoneNumber): string =>
+			ctrl.getFaxDisplayNumber = (phoneNumber: PhoneNumber): string =>
 			{
-				return number ? number.formattedForDisplay : "";
+				return phoneNumber ? phoneNumber.formattedForDisplay : "";
 			}
 
 			ctrl.getFaxAccountDisplayName = (faxAccountId: number) =>

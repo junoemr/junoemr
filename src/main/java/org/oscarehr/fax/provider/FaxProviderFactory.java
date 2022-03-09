@@ -40,7 +40,7 @@ public class FaxProviderFactory
 			case RINGCENTRAL:
 			case NONE:
 			default:
-				return null;
+				throw new IllegalStateException("Fax account " + faxAccount.getId() + " has invalid integration type");
 		}
 	}
 
@@ -53,7 +53,7 @@ public class FaxProviderFactory
 			case RINGCENTRAL:
 			case NONE:
 			default:
-				return null;
+				throw new IllegalStateException("Fax account " + faxAccount.getId() + " has invalid integration type");
 		}
 	}
 

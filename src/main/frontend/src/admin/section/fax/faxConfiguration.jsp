@@ -68,7 +68,12 @@
 					<table ng-table="$ctrl.tableParamsOutbox" show-filter="false" class="table table-striped table-bordered">
 						<tbody>
 						<tr ng-repeat="faxAccount in $ctrl.faxAccountList">
-
+							<td class="w-32">
+								<juno-check-box ng-model="$ctrl.faxAccountSelectStates[faxAccount.id]"
+								                readonly="$ctrl.activeAccount === faxAccount"
+								                change="$ctrl.setActiveAccount(value, faxAccount)">
+								</juno-check-box>
+							</td>
 							<td data-title="'Account Name'">
 								<div class="flex-column">
 									<span class="table-text-primary m-b-4">{{faxAccount.displayName}}</span>
@@ -103,8 +108,8 @@
 									<span class="table-text-primary"><bean:message bundle="ui" key="admin.fax.acct.outboundDisabled"/></span>
 								</div>
 							</td>
-							<td data-title="'Action'">
-								<div class="w-128">
+							<td data-title="'Action'" class="w-128">
+								<div>
 									<juno-button
 											disabled="$ctrl.masterFaxDisabled || !$ctrl.userCanEdit()"
 											click="$ctrl.editFaxAccount(faxAccount)"
@@ -119,6 +124,7 @@
 						</tbody>
 					</table>
 				</div>
+				<span><bean:message bundle="ui" key="admin.fax.acct.accountSelectionMessage"/></span>
 			</panel-body>
 		</panel>
 	</div>
