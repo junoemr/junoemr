@@ -116,24 +116,27 @@ $(document).ready(function()
 // build Indicator panel with Pie chart.
 function buildIndicatorPanel(html, target, id)
 {
+	var panel = $("#" + target + "_" + id).html(html); //.append("<h3>" +id+ "</h3>");
 
-	var indicatorGraph;
-
-	if (indicatorGraph)
+	var graphPlot = panel.find('#graphPlots_' + id).val();
+	if (graphPlot)
 	{
-		indicatorGraph.destroy();
+		var data = "[" + panel.find("#graphPlots_" + id).val() + "]";
+		data = data.replace(/'/g, '"');
+		data = JSON.parse(data)
 	}
 
-	var panel = $("#" + target + "_" + id).html(html); //.append("<h3>" +id+ "</h3>");
-	var data = "[" + panel.find("#graphPlots_" + id).val() + "]";
-	data = data.replace(/'/g, '"');
-	data = JSON.parse(data)
-	indicatorGraph = $.jqplot('graphContainer_' + id, data, jqplotOptions).replot();
-
-	window.onresize = function(event)
+	var container = $('#graphContainer_' + id);
+	if (container.length)
 	{
+		var indicatorGraph = $.jqplot('graphContainer_' + id, data, jqplotOptions);
 		indicatorGraph.replot();
-	};
+
+		window.onresize = function(event)
+		{
+			indicatorGraph.replot();
+		};
+	}
 
 	var name = panel.find(".indicatorHeading div").text();
 

@@ -48,7 +48,7 @@
 <%@ taglib uri="http://jakarta.apache.org/struts/tags-html-el" prefix="html-el" %>
 <%@ taglib uri="/WEB-INF/phr-tag.tld" prefix="phr" %>
 <%@ page import="oscar.oscarDemographic.data.DemographicData"%>
-<%@ page import="org.oscarehr.demographic.model.DemographicExt"%>
+<%@ page import="org.oscarehr.demographic.entity.DemographicExt"%>
 <%@ page import="org.oscarehr.demographic.dao.DemographicExtDao"%>
 <%@ page import="org.oscarehr.util.SpringUtils"%>
 <%@ page import="oscar.oscarProvider.data.ProviderMyOscarIdData"%>

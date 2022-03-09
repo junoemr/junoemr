@@ -29,8 +29,8 @@ import java.util.List;
 import javax.persistence.Query;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.demographic.model.DemographicExt;
-import org.oscarehr.demographic.model.DemographicExtArchive;
+import org.oscarehr.demographic.entity.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExtArchive;
 import org.springframework.stereotype.Repository;
 
 @Repository

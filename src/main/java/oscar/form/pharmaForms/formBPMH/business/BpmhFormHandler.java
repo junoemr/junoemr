@@ -50,7 +50,7 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.contact.entity.Contact;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.contact.entity.DemographicContact;
-import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.DrugReason;
 import org.oscarehr.common.model.Icd9Synonym;

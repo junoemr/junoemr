@@ -20,7 +20,7 @@ export default class FaxAccountToModelConverter extends AbstractConverter<FaxAcc
 		model.enableInbound = from.enableInbound;
 		model.enableOutbound = from.enableOutbound;
 		model.displayName = from.displayName;
-		model.faxNumber = from.faxNumber;
+		model.faxNumber = from.faxNumber ? from.faxNumber.number : null;
 		model.coverLetterOption = from.coverLetterOption;
 
 		return model;

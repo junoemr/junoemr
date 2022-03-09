@@ -274,7 +274,7 @@
 						<div class="row">
 							<!-- show patient alerts -->
 							<div class="col-md-12">
-								<span class="form-control-static alert-message">{{eventController.demographicModel.data.alert}}</span>
+								<span class="form-control-static alert-message">{{eventController.demographicModel.data.patientAlert}}</span>
 							</div>
 						</div>
 						<div class="row">

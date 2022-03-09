@@ -3,73 +3,242 @@ import {FaxStatusInternalType} from "./FaxStatusInternalType";
 import {FaxStatusCombinedType} from "./FaxStatusCombinedType";
 import {FaxNotificationStatusType} from "./FaxNotificationStatusType";
 import {FaxFileType} from "./FaxFileType";
+import PhoneNumber from "../../common/model/PhoneNumber";
 
 export default class FaxOutboxResult
 {
-	id: number;
-	faxAccountId: number;
-	providerId: string;
-	providerName: string;
-	demographicId: number;
-	toFaxNumber: string;
-	fileType: FaxFileType;
-	systemStatus: FaxStatusInternalType;
-	systemStatusMessage: string;
-	systemSentDateTime: Moment;
-	archived: boolean;
-	notificationStatus: FaxNotificationStatusType;
-	integrationStatus: string;
-	integrationQueuedDateTime: Moment;
-	integrationSentDateTime: Moment;
-	combinedStatus: FaxStatusCombinedType;
+	private _id: number;
+	private _faxAccountId: number;
+	private _providerId: string;
+	private _providerName: string;
+	private _demographicId: number;
+	private _toFaxNumber: PhoneNumber;
+	private _fileType: FaxFileType;
+	private _systemStatus: FaxStatusInternalType;
+	private _systemStatusMessage: string;
+	private _systemSentDateTime: Moment;
+	private _archived: boolean;
+	private _notificationStatus: FaxNotificationStatusType;
+	private _integrationStatus: string;
+	private _integrationQueuedDateTime: Moment;
+	private _integrationSentDateTime: Moment;
+	private _combinedStatus: FaxStatusCombinedType;
 
-	public isInternalStatusError = (): boolean =>
+	/**
+	 * helpers
+	 */
+
+	get isInternalStatusError(): boolean
 	{
 		return (this.systemStatus === FaxStatusInternalType.Error);
 	}
 
-	public isInternalStatusSent = (): boolean =>
+	get isInternalStatusSent(): boolean
 	{
 		return (this.systemStatus === FaxStatusInternalType.Sent);
 	}
 
-	public isInternalStatusQueued = (): boolean =>
+	get isInternalStatusQueued(): boolean
 	{
 		return (this.systemStatus === FaxStatusInternalType.Queued);
 	}
 
-	public isCombinedStatusSent = (): boolean =>
+	get isCombinedStatusSent(): boolean
 	{
 		return (this.combinedStatus === FaxStatusCombinedType.IntegrationSuccess);
 	}
 
-	public isCombinedStatusError = (): boolean =>
+	get isCombinedStatusError(): boolean
 	{
 		return (this.combinedStatus === FaxStatusCombinedType.Error);
 	}
 
-	public isCombinedStatusIntegrationFailed = (): boolean =>
+	get isCombinedStatusIntegrationFailed(): boolean
 	{
 		return (this.combinedStatus === FaxStatusCombinedType.IntegrationFailed);
 	}
 
-	public isCombinedStatusInProgress = (): boolean =>
+	get isCombinedStatusInProgress(): boolean
 	{
 		return (this.combinedStatus === FaxStatusCombinedType.InProgress);
 	}
 
-	public isCombinedStatusInQueued = (): boolean =>
+	get isCombinedStatusInQueued(): boolean
 	{
 		return (this.combinedStatus === FaxStatusCombinedType.Queued);
 	}
 
-	public isNotificationStatusNotify = (): boolean =>
+	get isNotificationStatusNotify(): boolean
 	{
 		return (this.notificationStatus === FaxNotificationStatusType.Notify);
 	}
 
-	public isNotificationStatusSilent = (): boolean =>
+	get isNotificationStatusSilent(): boolean
 	{
 		return (this.notificationStatus === FaxNotificationStatusType.Silent);
 	}
+
+	/**
+	 * direct getters and setters
+	 */
+	get id(): number
+	{
+		return this._id;
+	}
+
+	set id(value: number)
+	{
+		this._id = value;
+	}
+
+	get faxAccountId(): number
+	{
+		return this._faxAccountId;
+	}
+
+	set faxAccountId(value: number)
+	{
+		this._faxAccountId = value;
+	}
+
+	get providerId(): string
+	{
+		return this._providerId;
+	}
+
+	set providerId(value: string)
+	{
+		this._providerId = value;
+	}
+
+	get providerName(): string
+	{
+		return this._providerName;
+	}
+
+	set providerName(value: string)
+	{
+		this._providerName = value;
+	}
+
+	get demographicId(): number
+	{
+		return this._demographicId;
+	}
+
+	set demographicId(value: number)
+	{
+		this._demographicId = value;
+	}
+
+	get toFaxNumber(): PhoneNumber
+	{
+		return this._toFaxNumber;
+	}
+
+	set toFaxNumber(value: PhoneNumber)
+	{
+		this._toFaxNumber = value;
+	}
+
+	get fileType(): FaxFileType
+	{
+		return this._fileType;
+	}
+
+	set fileType(value: FaxFileType)
+	{
+		this._fileType = value;
+	}
+
+	get systemStatus(): FaxStatusInternalType
+	{
+		return this._systemStatus;
+	}
+
+	set systemStatus(value: FaxStatusInternalType)
+	{
+		this._systemStatus = value;
+	}
+
+	get systemStatusMessage(): string
+	{
+		return this._systemStatusMessage;
+	}
+
+	set systemStatusMessage(value: string)
+	{
+		this._systemStatusMessage = value;
+	}
+
+	get systemSentDateTime(): Moment
+	{
+		return this._systemSentDateTime;
+	}
+
+	set systemSentDateTime(value: Moment)
+	{
+		this._systemSentDateTime = value;
+	}
+
+	get archived(): boolean
+	{
+		return this._archived;
+	}
+
+	set archived(value: boolean)
+	{
+		this._archived = value;
+	}
+
+	get notificationStatus(): FaxNotificationStatusType
+	{
+		return this._notificationStatus;
+	}
+
+	set notificationStatus(value: FaxNotificationStatusType)
+	{
+		this._notificationStatus = value;
+	}
+
+	get integrationStatus(): string
+	{
+		return this._integrationStatus;
+	}
+
+	set integrationStatus(value: string)
+	{
+		this._integrationStatus = value;
+	}
+
+	get integrationQueuedDateTime(): Moment
+	{
+		return this._integrationQueuedDateTime;
+	}
+
+	set integrationQueuedDateTime(value: Moment)
+	{
+		this._integrationQueuedDateTime = value;
+	}
+
+	get integrationSentDateTime(): Moment
+	{
+		return this._integrationSentDateTime;
+	}
+
+	set integrationSentDateTime(value: Moment)
+	{
+		this._integrationSentDateTime = value;
+	}
+
+	get combinedStatus(): FaxStatusCombinedType
+	{
+		return this._combinedStatus;
+	}
+
+	set combinedStatus(value: FaxStatusCombinedType)
+	{
+		this._combinedStatus = value;
+	}
+
 }

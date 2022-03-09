@@ -1173,6 +1173,38 @@ public class ConversionUtilsTest
 	}
 
 	@Test
+	public void toZonedDateTime_DateStringISO_ExpectZonedDateTime()
+	{
+		String dateTime = "2021-12-31T12:00:00.000-08:00";
+		ZonedDateTime expectedDateTime = ZonedDateTime.parse("2021-12-31T12:00:00.000-08:00");
+		ZonedDateTime actualDateTime = ConversionUtils.toZonedDateTime(dateTime);
+		assertEquals(expectedDateTime, actualDateTime);
+	}
+
+	@Test
+	public void toNullableZonedDateTime_ExpectNull()
+	{
+		assertNull(ConversionUtils.toNullableZonedDateTime(null));
+	}
+
+	@Test
+	public void toNullableZonedDateTime_DateStringCustom_ExpectNull()
+	{
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssZ");
+		assertNull(ConversionUtils.toNullableZonedDateTime(null, dateTimeFormatter));
+	}
+
+	@Test
+	public void toZonedDateTime_DateStringCustom_ExpectZonedDateTime()
+	{
+		String dateTime = "20211231120000-0800";
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssZ");
+		ZonedDateTime expectedDateTime = ZonedDateTime.parse("2021-12-31T12:00:00.000-08:00");
+		ZonedDateTime actualDateTime = ConversionUtils.toZonedDateTime(dateTime, dateTimeFormatter);
+		assertEquals(expectedDateTime, actualDateTime);
+	}
+
+	@Test
 	public void toNullableLocalDateTime_NullParameter_ExpectNull()
 	{
 		assertNull(ConversionUtils.toNullableLocalDateTime((Date) null));

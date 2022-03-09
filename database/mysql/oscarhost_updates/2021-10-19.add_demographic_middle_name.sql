@@ -1,0 +1,1 @@
+ALTER TABLE demographic ADD COLUMN IF NOT EXISTS middle_name VARCHAR(30) AFTER last_name;

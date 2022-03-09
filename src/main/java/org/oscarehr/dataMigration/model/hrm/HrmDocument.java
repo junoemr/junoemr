@@ -26,7 +26,7 @@ import lombok.Data;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.document.Document;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 
 import java.time.LocalDateTime;
@@ -144,7 +144,7 @@ public class HrmDocument extends AbstractTransientModel
 	
 	private LocalDateTime reportDateTime;
 	private LocalDateTime receivedDateTime;
-	private Provider createdBy;
+	private ProviderModel createdBy;
 
 	private String description;
 	private ReportClass reportClass;

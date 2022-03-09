@@ -27,11 +27,13 @@ import org.apache.log4j.Logger;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.mapper.cds.CDSDemographicInterface;
 import org.oscarehr.dataMigration.model.PatientRecord;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.contact.DemographicContact;
-import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 import xml.hrm.v4_3.Address;
@@ -57,8 +59,8 @@ import java.util.List;
 
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_FALSE;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
-import static org.oscarehr.demographic.model.Demographic.STATUS_DECEASED;
-import static org.oscarehr.demographic.model.Demographic.STATUS_INACTIVE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_DECEASED;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_INACTIVE;
 
 @Component
 public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemographicInterface, PatientRecord>
@@ -75,7 +77,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 	public Demographics exportFromJuno(PatientRecord exportStructure)
 	{
 		Demographics demographics = objectFactory.createDemographics();
-		Demographic exportDemographic = exportStructure.getDemographic();
+		DemographicModel exportDemographic = exportStructure.getDemographic();
 
 		demographics.setNames(getExportNames(exportDemographic));
 		demographics.setDateOfBirth(toNullableDateFullOrPartial(exportDemographic.getDateOfBirth()));
@@ -106,7 +108,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		return demographics;
 	}
 
-	protected PersonNameStandard getExportNames(Demographic exportStructure)
+	protected PersonNameStandard getExportNames(DemographicModel exportStructure)
 	{
 		PersonNameStandard names = objectFactory.createPersonNameStandard();
 		PersonNameStandard.LegalName legalName = objectFactory.createPersonNameStandardLegalName();
@@ -131,7 +133,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		return names;
 	}
 
-	protected PersonNamePrefixCode getExportNamePrefix(Demographic exportStructure)
+	protected PersonNamePrefixCode getExportNamePrefix(DemographicModel exportStructure)
 	{
 		String title = exportStructure.getTitleString();
 		PersonNamePrefixCode prefixCode = null;
@@ -162,35 +164,35 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		}
 	}
 
-	protected HealthCard getExportHealthCard(Demographic exportStructure)
+	protected HealthCard getExportHealthCard(DemographicModel exportStructure)
 	{
 		HealthCard healthCard = objectFactory.createHealthCard();
 		healthCard.setNumber(exportStructure.getHealthNumber());
 		healthCard.setVersion(exportStructure.getHealthNumberVersion());
 		healthCard.setExpirydate(ConversionUtils.toNullableXmlGregorianCalendar(exportStructure.getHealthNumberRenewDate()));
-		healthCard.setProvinceCode(org.oscarehr.dataMigration.model.common.Address.getSubdivisionCodeCT013Format(
+		healthCard.setProvinceCode(AddressModel.getSubdivisionCodeCT013Format(
 				exportStructure.getHealthNumberProvinceCode(), CDSConstants.COUNTRY_CODE_CANADA));
 
 		return healthCard;
 	}
 
-	protected List<Address> getExportAddresses(List<org.oscarehr.dataMigration.model.common.Address> addressList)
+	protected List<Address> getExportAddresses(List<AddressModel> addressList)
 	{
 		List<Address> exportAddressList = new ArrayList<>(addressList.size());
-		for(org.oscarehr.dataMigration.model.common.Address address : addressList)
+		for(AddressModel address : addressList)
 		{
 			exportAddressList.add(toHrmAddress(address, AddressType.R));
 		}
 		return exportAddressList;
 	}
 
-	protected List<PhoneNumber> getExportPhones(Demographic exportStructure)
+	protected List<PhoneNumber> getExportPhones(DemographicModel exportStructure)
 	{
 		List<PhoneNumber> exportPhoneList = new ArrayList<>(3);
 
-		org.oscarehr.dataMigration.model.common.PhoneNumber homePhone = exportStructure.getHomePhone();
-		org.oscarehr.dataMigration.model.common.PhoneNumber workPhone = exportStructure.getWorkPhone();
-		org.oscarehr.dataMigration.model.common.PhoneNumber cellPhone = exportStructure.getCellPhone();
+		PhoneNumberModel homePhone = exportStructure.getHomePhone();
+		PhoneNumberModel workPhone = exportStructure.getWorkPhone();
+		PhoneNumberModel cellPhone = exportStructure.getCellPhone();
 		if(homePhone != null)
 		{
 			exportPhoneList.add(getExportPhone(PhoneNumberType.R, homePhone));
@@ -206,7 +208,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		return exportPhoneList;
 	}
 
-	protected PhoneNumber getExportPhone(PhoneNumberType type, 	org.oscarehr.dataMigration.model.common.PhoneNumber phoneNumber)
+	protected PhoneNumber getExportPhone(PhoneNumberType type, 	PhoneNumberModel phoneNumber)
 	{
 		String number = phoneNumber.getNumber();
 		String extension = phoneNumber.getExtension();
@@ -221,9 +223,10 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		return phone;
 	}
 
-	protected Demographics.PrimaryPhysician getExportPrimaryPhysician(Demographic exportStructure)
+	protected Demographics.PrimaryPhysician getExportPrimaryPhysician(
+		DemographicModel exportStructure)
 	{
-		Provider provider = exportStructure.getMrpProvider();
+		ProviderModel provider = exportStructure.getMrpProvider();
 		Demographics.PrimaryPhysician primaryPhysician = null;
 		if(provider != null)
 		{
@@ -247,7 +250,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		return personStatus;
 	}
 
-	protected OfficialSpokenLanguageCode getExportOfficialLanguage(Demographic.OFFICIAL_LANGUAGE officialLanguage)
+	protected OfficialSpokenLanguageCode getExportOfficialLanguage(DemographicModel.OFFICIAL_LANGUAGE officialLanguage)
 	{
 		if(officialLanguage != null)
 		{
@@ -276,9 +279,9 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 			contact.setNote(demographicContact.getNote());
 
 			//contact phone conversion
-			org.oscarehr.dataMigration.model.common.PhoneNumber homePhone = demographicContact.getContact().getHomePhone();
-			org.oscarehr.dataMigration.model.common.PhoneNumber workPhone = demographicContact.getContact().getWorkPhone();
-			org.oscarehr.dataMigration.model.common.PhoneNumber cellPhone = demographicContact.getContact().getCellPhone();
+			PhoneNumberModel homePhone = demographicContact.getContact().getHomePhone();
+			PhoneNumberModel workPhone = demographicContact.getContact().getWorkPhone();
+			PhoneNumberModel cellPhone = demographicContact.getContact().getCellPhone();
 			if(homePhone != null)
 			{
 				contact.getPhoneNumber().add(getExportPhone(PhoneNumberType.R, homePhone));
@@ -310,7 +313,7 @@ public class HRMDemographicExportMapper extends AbstractHRMExportMapper<CDSDemog
 		return contactList;
 	}
 
-	protected Address toHrmAddress(org.oscarehr.dataMigration.model.common.Address addressModel, AddressType addressType)
+	protected Address toHrmAddress(AddressModel addressModel, AddressType addressType)
 	{
 		Address address = null;
 		if(addressModel != null)

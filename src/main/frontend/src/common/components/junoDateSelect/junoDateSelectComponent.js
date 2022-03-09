@@ -33,6 +33,7 @@ angular.module('Common.Components').component('junoDateSelect', {
 		showAge: "<?",
 		onValidityChange: "&?",
 		change: "&?",
+		readonly: "<?",
 	},
 	controller: ["$scope", function ($scope)
 	{
@@ -53,6 +54,7 @@ angular.module('Common.Components').component('junoDateSelect', {
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.showAge = ctrl.showAge || false;
+			ctrl.readonly = ctrl.readonly || null;
 
 			ctrl.updateDateFields();
 		};

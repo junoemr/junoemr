@@ -66,18 +66,21 @@ public class GenericFile
 		APPLICATION_XML("application/xml"),
 		APPLICATION_IMAGE("application/image"),
 		APPLICATION_DOC("application/doc"),
+		APPLICATION_RTF("application/rtf"),
 		APPLICATION_MSWORD("application/msword"),
 		APPLICATION_ZIP("application/zip"),
 		APPLICATION_OCTET_STREAM("application/octet-stream"),
 		TEXT_CSV("text/csv"),
 		TEXT_PLAIN("text/plain"),
 		TEXT_XML("text/xml"),
+		TEXT_HTML("text/html"),
 		IMAGE_TIFF("image/tiff"),
 		IMAGE_JPEG("image/jpeg"),
+		IMAGE_GIF("image/gif"),
 		IMAGE_PNG("image/png"),
 		IMAGE_BMP("image/bmp");
 
-		private String contentType;
+		private final String contentType;
 
 		public String getContentType()
 		{
@@ -105,6 +108,7 @@ public class GenericFile
 
 	public static final String RESOURCE_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("RESOURCE_BASE_DIR")).getPath();
 	public static final String HRM_BASE_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("omd.hrm.base_directory")).getPath();
+	public static final String LAB_BASE_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("LAB_BASE_DIR")).getPath();
 
 	public static final String LOG_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("LOG_BASE_DIR")).getPath();
 	public static final String LOG_IMPORT_DIR = new File(LOG_BASE_DIR, props.getProperty("LOG_IMPORT_DIR")).getPath();
@@ -165,6 +169,10 @@ public class GenericFile
 	public GenericFile moveToOriginal() throws IOException
 	{
 		return moveFile(DOCUMENT_ORIGINAL_DIR);
+	}
+	public GenericFile moveToLabs() throws IOException
+	{
+		return moveFile(LAB_BASE_DIR);
 	}
 	public GenericFile moveToLogImport(String identifier) throws IOException
 	{

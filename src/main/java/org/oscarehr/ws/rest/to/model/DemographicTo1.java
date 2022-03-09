@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.Setter;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.ElectronicMessagingConsentStatus;
 import oscar.util.Jackson.DateDeserializer;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -67,6 +67,7 @@ public class DemographicTo1 implements Serializable {
 	private String familyDoctor;
 	private String familyDoctor2;
 	private String firstName;
+	private String middleName;
 	private String lastName;
 	@JsonDeserialize(using = DateDeserializer.class)
 	private Date hcRenewDate;
@@ -121,7 +122,7 @@ public class DemographicTo1 implements Serializable {
 	private Date electronicMessagingConsentRejectedAt;
 	@Getter
 	@Setter
-	private Demographic.ELECTRONIC_MESSAGING_CONSENT_STATUS electronicMessagingConsentStatus;
+	private ElectronicMessagingConsentStatus electronicMessagingConsentStatus;
 
 	private List<DemographicExtTo1> extras = new ArrayList<DemographicExtTo1>();
 	private List<WaitingListNameTo1> waitingListNames = new ArrayList<WaitingListNameTo1>();
@@ -286,6 +287,16 @@ public class DemographicTo1 implements Serializable {
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
+	}
+
+	public String getMiddleName()
+	{
+		return middleName;
+	}
+
+	public void setMiddleName(String middleName)
+	{
+		this.middleName = middleName;
 	}
 
 	public String getLastName() {

@@ -24,7 +24,7 @@
 --%>
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicDao" %>
-<%@ page import="org.oscarehr.demographic.model.Demographic" %>
+<%@ page import="org.oscarehr.demographic.entity.Demographic" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%

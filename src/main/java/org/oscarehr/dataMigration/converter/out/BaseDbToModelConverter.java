@@ -25,7 +25,7 @@ package org.oscarehr.dataMigration.converter.out;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
@@ -41,7 +41,7 @@ public abstract class BaseDbToModelConverter<I, E> extends AbstractModelConverte
 {
 	protected static final OscarProperties properties = OscarProperties.getInstance();
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final ConcurrentMap<String, Provider> providerLookupCache = new ConcurrentHashMap<>();
+	private static final ConcurrentMap<String, ProviderModel> providerLookupCache = new ConcurrentHashMap<>();
 
 	@Autowired
 	private ProviderDataDao providerDao;
@@ -55,9 +55,9 @@ public abstract class BaseDbToModelConverter<I, E> extends AbstractModelConverte
 		providerLookupCache.clear();
 	}
 
-	protected synchronized Provider findProvider(String providerId)
+	protected synchronized ProviderModel findProvider(String providerId)
 	{
-		Provider providerRecord = null;
+		ProviderModel providerRecord = null;
 		providerId = StringUtils.trimToNull(providerId);
 		if(providerId != null)
 		{
@@ -75,9 +75,9 @@ public abstract class BaseDbToModelConverter<I, E> extends AbstractModelConverte
 		return providerRecord;
 	}
 
-	protected synchronized Provider findProvider(ProviderData provider)
+	protected synchronized ProviderModel findProvider(ProviderData provider)
 	{
-		Provider providerRecord = null;
+		ProviderModel providerRecord = null;
 		if(provider != null)
 		{
 			providerRecord = findProvider(provider.getId());
@@ -85,16 +85,16 @@ public abstract class BaseDbToModelConverter<I, E> extends AbstractModelConverte
 		return providerRecord;
 	}
 
-	protected Provider getProviderFromString(String referralProviderName, String referralProviderNumber)
+	protected ProviderModel getProviderFromString(String referralProviderName, String referralProviderNumber)
 	{
-		Provider referralProvider = null;
+		ProviderModel referralProvider = null;
 		if(referralProviderName != null && referralProviderName.contains(","))
 		{
 			String[] nameArray = referralProviderName.split(",", 2);
 			String firstName = StringUtils.trimToNull(nameArray[1]);
 			String lastName = StringUtils.trimToNull(nameArray[0]);
 
-			referralProvider = new Provider();
+			referralProvider = new ProviderModel();
 			referralProvider.setFirstName((firstName != null) ? firstName : "Missing");
 			referralProvider.setLastName((lastName != null) ? lastName : "Missing");
 			referralProvider.setOhipNumber(StringUtils.trimToNull(referralProviderNumber));

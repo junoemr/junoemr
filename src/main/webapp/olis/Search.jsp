@@ -9,19 +9,37 @@
 
 --%>
 <%@page contentType="text/html"%>
-	<%@page import="java.util.*,org.oscarehr.common.dao.DemographicDao, 
-		org.oscarehr.common.model.Demographic, org.oscarehr.PMmodule.dao.ProviderDao, org.oscarehr.common.model.Provider,
-		org.oscarehr.olis.dao.OLISRequestNomenclatureDao, org.oscarehr.olis.dao.OLISResultNomenclatureDao,
-		org.oscarehr.olis.model.OLISRequestNomenclature, org.oscarehr.olis.model.OLISResultNomenclature, org.oscarehr.util.SpringUtils" %>
-	<%@page import="org.oscarehr.common.dao.UserPropertyDAO" %>
+<%@page import="org.oscarehr.PMmodule.dao.ProviderDao,
+                org.oscarehr.common.model.Provider,
+                org.oscarehr.util.SpringUtils" %>
+<%@page import="org.oscarehr.common.dao.UserPropertyDAO" %>
 	<%@page import="org.oscarehr.common.model.UserProperty" %>
 	<%@page import="org.oscarehr.util.LoggedInInfo" %>
-	<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
+<%@ page import="java.util.List" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicDao" %>
+<%@ page import="org.apache.commons.lang3.StringUtils" %>
+<%@ page import="org.oscarehr.demographic.entity.Demographic" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 	<%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 
 	<% 
 	if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+
+	ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
+	DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+	List<Provider> allProvidersList = providerDao.getActiveProviders();
+
+	String demographicId = request.getParameter("demographic");
+	String requestingHicId = request.getParameter("hic");
+
+	Demographic demographic = null;
+	if(StringUtils.isNotBlank(demographicId))
+	{
+		demographic = demographicDao.find(Integer.parseInt(demographicId));
+	}
+
 	%>
 
 
@@ -42,10 +60,7 @@
 	<%
 	    }
 	}
-
 	%>
-	
-
 
 	<html>
 	<head>
@@ -54,20 +69,18 @@
 
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title><bean:message key="olis.olisSearch" /></title>
-	<link rel="stylesheet" type="text/css" href="../../../share/css/OscarStandardLayout.css">
 	<link rel="stylesheet" type="text/css" href="../share/css/OscarStandardLayout.css">
-	<script type="text/javascript" src="../../../share/javascript/Oscar.js"></script>
 	<script type="text/javascript" src="../share/javascript/Oscar.js"></script>
 	
 	<script type="text/javascript" src="../share/yui/js/yahoo-dom-event.js"></script>
-        <script type="text/javascript" src="../share/yui/js/connection-min.js"></script>
-        <script type="text/javascript" src="../share/yui/js/animation-min.js"></script>
-        <script type="text/javascript" src="../share/yui/js/datasource-min.js"></script>
-        <script type="text/javascript" src="../share/yui/js/autocomplete-min.js"></script>
-        <script type="text/javascript" src="../js/demographicProviderAutocomplete.js"></script>
+    <script type="text/javascript" src="../share/yui/js/connection-min.js"></script>
+    <script type="text/javascript" src="../share/yui/js/animation-min.js"></script>
+    <script type="text/javascript" src="../share/yui/js/datasource-min.js"></script>
+    <script type="text/javascript" src="../share/yui/js/autocomplete-min.js"></script>
+    <script type="text/javascript" src="../js/demographicProviderAutocomplete.js"></script>
 
-        <link rel="stylesheet" type="text/css" href="../share/yui/css/fonts-min.css"/>
-        <link rel="stylesheet" type="text/css" href="../share/yui/css/autocomplete.css"/>
+    <link rel="stylesheet" type="text/css" href="../share/yui/css/fonts-min.css"/>
+    <link rel="stylesheet" type="text/css" href="../share/yui/css/autocomplete.css"/>
 	
 	
 	<script type="text/javascript">
@@ -136,18 +149,26 @@
 		input.checkbox {
 			width: auto;
 		}
-	</style>
-	 <style type="text/css">
-#myAutoComplete {
-    width:15em; /* set width here or else widget will expand to fit its container */
-    padding-bottom:2em;
-}
+		.required:after {
+			content:" *";
+			color: red;
+		}
 
+		.page-wrapper {
+			display: flex;
+			flex-direction: column;
+		}
+		</style>
+<style type="text/css">
+	#myAutoComplete {
+		width: 15em; /* set width here or else widget will expand to fit its container */
+		padding-bottom: 2em;
+	}
 
-
-
-        .yui-ac {
-	    position:relative;font-family:arial;font-size:100%;
+	.yui-ac {
+		position: relative;
+		font-family: arial;
+		font-size: 100%;
 	}
 
 	/* styles for input field */
@@ -191,10 +212,11 @@
 	}
 
 </style>
-	
+
 	</head>
 
 	<body>
+	<div class="page-wrapper">
 	
 	<table style="width:600px;" class="MainTable" align="left">
 		<tbody><tr class="MainTableTopRow">
@@ -227,36 +249,68 @@
 	
 	}
 
+	function displayDateRange(selection) {
+
+		var observationStartTimePeriod = $("#observationStartTimePeriod");
+		var observationEndTimePeriod = $("#observationEndTimePeriod");
+
+		var startTimePeriod = $("#startTimePeriod");
+		var endTimePeriod = $("#endTimePeriod");
+
+		console.info(selection.value, observationStartTimePeriod.val(), endTimePeriod.val());
+
+		if(selection.value === "OBR_22")
+		{
+			observationStartTimePeriod.css("display", "table-cell");
+			observationEndTimePeriod.css("display", "table-cell");
+			startTimePeriod.css("display", "none");
+			startTimePeriod.val("");
+			endTimePeriod.css("display", "none");
+			endTimePeriod.val("");
+		}
+		else
+		{
+			startTimePeriod.css("display", "table-cell");
+			endTimePeriod.css("display", "table-cell");
+			observationStartTimePeriod.css("display", "none");
+			observationStartTimePeriod.val("")
+			observationEndTimePeriod.css("display", "none");
+			observationEndTimePeriod.val("");
+		}
+	}
+
+	$(document).ready(function()
+	{
+		const initialHicVal = "<%=requestingHicId%>";
+		if(initialHicVal)
+		{
+			$("#requestingHic").val(initialHicVal);
+		}
+
+		const demographicId = <%=(demographic != null) ? (demographic.getId()) : "null" %>
+		const demographicName = "<%=(demographic != null) ? (demographic.getDisplayName() + " (" + demographic.getDateOfBirth() + ")") : "" %>"
+		if(demographicId && demographicName)
+		{
+			$("#demofind1").val(demographicId);
+			$("#autocompletedemo1").val(demographicName);
+		}
+	})
+
 	</script>
 
+<%--	select disabled for production. OMD requires only Z01 query be accessable to users			--%>
 
-
-<%
-ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
-List<Provider> allProvidersList = providerDao.getActiveProviders(); 
-
-//DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographicDao");
-//List allDemographics = demographicDao.getDemographics();
-
-OLISResultNomenclatureDao resultDao = (OLISResultNomenclatureDao) SpringUtils.getBean("OLISResultNomenclatureDao");
-List<OLISResultNomenclature> resultNomenclatureList = resultDao.findAll();
-
-OLISRequestNomenclatureDao requestDao = (OLISRequestNomenclatureDao) SpringUtils.getBean("OLISRequestNomenclatureDao");
-List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
-
-%>
-			
-
-	<select id="queryType" onchange="displaySearch(this)" style="margin-left:30px;">
-		<option value="Z01">Z01 - Retrieve Laboratory Information for Patient</option>
-		<option value="Z02">Z02 - Retrieve Laboratory Information for Order ID</option>
-		<%-- REMOVED UNTIL IT'S OPERATIONAL, REQUESTED BY ONTARIO MD option value="Z04">Z04 - Retrieve Laboratory Information Updates for Practitioner</option  --%>
-		<option value="Z05">Z05 - Retrieve Laboratory Information Updates for Destination Laboratory</option>
-		<option value="Z06">Z06 - Retrieve Laboratory Information Updates for Ordering Facility</option>
-		<option value="Z07">Z07 - Retrieve Test Results Reportable to Public Health</option>
-		<option value="Z08">Z08 - Retrieve Test Results Reportable to Cancer Care Ontario</option>
-		<option value="Z50">Z50 - Identify Patient by Name, Sex, and Date of Birth</option>
-	</select>
+<%--	<select id="queryType" onchange="displaySearch(this)" style="margin-left:30px;">--%>
+<%--		<option value="Z01">Z01 - Retrieve Laboratory Information for Patient</option>--%>
+<%--		<option value="Z02">Z02 - Retrieve Laboratory Information for Order ID</option>--%>
+<%--		<option value="Z04">Z04 - Retrieve Laboratory Information Updates for Practitioner</option>--%>
+<%--		REMOVED Below queries as they are not required for OLIS conformance --%>
+<%--		<option value="Z05">Z05 - Retrieve Laboratory Information Updates for Destination Laboratory</option>--%>
+<%--		<option value="Z06">Z06 - Retrieve Laboratory Information Updates for Ordering Facility</option>--%>
+<%--		<option value="Z07">Z07 - Retrieve Test Results Reportable to Public Health</option>--%>
+<%--		<option value="Z08">Z08 - Retrieve Test Results Reportable to Cancer Care Ontario</option>--%>
+<%--		<option value="Z50">Z50 - Identify Patient by Name, Sex, and Date of Birth</option>--%>
+<%--	</select>--%>
 
 	<form action="<%=request.getContextPath() %>/olis/Search.do" method="POST" onSubmit="checkBlockedConsent('Z01')" name="Z01_form">
 	<input type="hidden" name="queryType" value="Z01" />
@@ -265,27 +319,70 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<td colspan=2><input type="submit" name="submit" value="Search" /></td>
 		</tr>
 		<tr>
-			<th width="20%">Date &amp; Time Period to Search<br />(yyyy-mm-dd)</th>
-			<td width="30%"><input style="width:150px" type="text" name="startTimePeriod" id="startTimePeriod" value="" > to <input style="width:150px" name="endTimePeriod" type="text" id="endTimePeriod" ></td>
-		</tr><tr>
-			<th width="20%">Observation Date &amp; Time Period<br />(yyyy-mm-dd)</th>
-			<td width="30%"><input style="width:150px;" type="text" name="observationStartTimePeriod" id="observationStartTimePeriod" > to <input style="width:150px" name="obsevationEndTimePeriod" type="text" id="observationEndTimePeriod" ></td>
-		</tr>
-		<tr>
-			<th width="20%"><input class="checkbox" type="checkbox" name="quantityLimitedQuery" id="quantityLimitedQuery"> Quantity Limit?</th>
-			<td width="30%">Quantity<br><input type="text" id="quantityLimit" name="quantityLimit"></td>
-		</tr><tr>
-			<th width="20%">Consent to View Blocked Information?</th>
-			<td width="30%"><select id="blockedInformationConsent" name="blockedInformationConsent"><option value="">(none)</option>
-			<option value="Z">Temporary </option>
-			</select>
-			&nbsp;&nbsp;Authorized by: <select name="blockedInformationIndividual" id="blockedInformationIndividual">
-			<option value="patient">Patient</option><option value="substitute">Substitute Decision Maker</option><option value="">Neither</option>
-			</select> 
+			<th>
+				<select id="dateType" onchange="displayDateRange(this)">
+					<option value="OBR_22" selected>Date &amp; Time Period to Search</option>
+					<option value="OBR_7">Observation Date &amp; Time Period</option>
+				</select>
+				<span>(yyyy-MM-dd)</span>
+				<span class="required"></span>
+			</th>
+			<td width="30%">
+				<input style="width:150px;" type="text" name="startTimePeriod" id="startTimePeriod" value="">
+				<input style="width:150px; display:none;" type="text" name="observationStartTimePeriod" id="observationStartTimePeriod">
+				to
+				<input style="width:150px;" name="endTimePeriod" type="text" id="endTimePeriod">
+				<input style="width:150px; display:none;" name="obsevationEndTimePeriod" type="text" id="observationEndTimePeriod">
 			</td>
 		</tr>
 		<tr>
-			<td width="20%" colspan=4><span><input class="checkbox" type="checkbox" name="consentBlockAllIndicator" id="consentBlockAllIndicator"> Enable Patient Consent Block-All Indicator?</span></td>
+			<th width="20%">
+				Quantity Limit?
+			</th>
+			<td>
+				<input class="checkbox" type="checkbox" name="quantityLimitedQuery" id="quantityLimitedQuery">
+				<span>Quantity:
+					<input type="text" id="quantityLimit" name="quantityLimit">
+				</span>
+			</td>
+		</tr>
+		<tr>
+			<th width="20%">Consent to View Blocked Information?</th>
+			<td width="30%">
+				<select id="blockedInformationConsent" name="blockedInformationConsent">
+					<option value="">(none)</option>
+					<option value="T">Temporary</option>
+				</select>
+			&nbsp;&nbsp;Authorized by:
+				<select name="blockedInformationIndividual">
+					<option value="">(none)</option>
+					<option value="Z">Patient</option>
+					<option value="X">Substitute Decision Maker</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th width="20%">Substitute Decision Maker</th>
+			<td width="30%">
+				<label>Given Name:
+					<input type="text" name="substituteGivenName">
+				</label>
+				<label>Last Name:
+					<input type="text" name="substituteLastName">
+				</label>
+				<label>Relationship:
+					<select name="substituteRelationship">
+						<option value="A0">Guardian for the Person</option>
+						<option value="A1">Attorney for Personal Care</option>
+						<option value="A2">Representative appointed by Consent and Capacity Board</option>
+						<option value="A3">Spouse/Partner</option>
+						<option value="A4">Parent</option>
+						<option value="A5">Child</option>
+						<option value="A6">Sibling</option>
+						<option value="A7">Other Relative</option>
+					</select>
+				</label>
+			</td>
 		</tr>
 		<tr>
 			<th width="20%">Specimen Collector</th>
@@ -350,7 +447,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<td colspan=4><hr /></td>
 		</tr>
 		<tr>
-			<td><span>Patient</span></td>
+			<td><span class="required">Patient</span></td>
 			<td> 
 				<%String currentDocId="1"; %>
 				<input type="hidden" name="demographic" id="demofind<%=currentDocId%>" />
@@ -368,7 +465,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
                         // Define the schema of the delimited resultsTEST, PATIENT(1985-06-15)
                         oDS.responseSchema = {
                             resultsList : "results",
-                            fields : ["formattedName","fomattedDob","demographicNo","status"]
+                            fields : ["formattedName","formattedDob","demographicNo","status"]
                         };
                         // Enable caching
                         oDS.maxCacheEntries = 100;
@@ -387,7 +484,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
                            document.getElementById(str).value = args[2][2];//li.id;
                            args[0].getInputEl().value = args[2][0] + "("+args[2][1]+")";
                            selectedDemos.push(args[0].getInputEl().value);
-                           
+
                         });
 
 
@@ -407,7 +504,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<td colspan=4><hr /></td>
 		</tr>	
 		<tr>
-			<td><span>Requesting HIC</span></td><td>
+			<td><span class="required">Requesting HIC</span></td><td>
 			<select name="requestingHic" id="requestingHic">
 			
 			<option value=""></option>
@@ -477,56 +574,31 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 </select></td>		
 		</tr>
 		<tr>
-			<th width="20%">Test Request Placer</th><td><select>
-<option></option>
-<option value="5552">Gamma-Dynacare</option>
-<option value="5407">CML</option>
-<option value="5687">LifeLabs</option>
-</select></td>
-		</tr>
-		<tr>
-			<td colspan="4">
-				<table>
-					<tbody><tr>
-						<th width="20%">Test Request Status (max. 15)</th>
-						<td><select multiple="multiple" id="testRequestStatus" name="testRequestStatus">
-						<option value=""></option>
-						<option value="O"> Order Received </option>
-						<option value="I"> No results </option>
-						<option value="P"> Preliminary </option>
-						<option value="A"> Partial </option>
-						<option value="F"> Final </option>
-						<option value="C"> Correction </option>
-						<option value="X"> Cancelled </option>
-						<option value="E"> Expired  </option>
-						</select></td>
-						<th width="20%">Test Result Code (max. 200)</th>
-						<td><select multiple="multiple" style="width:300px;" name="testResultCode" id="testResultCode">
-						<%
-						
-						for (OLISResultNomenclature nomenclature : resultNomenclatureList) {
-						%>
-							<option value="<%=nomenclature.getId() %>"><%=oscar.Misc.getStr(nomenclature.getName(), "").trim()%></option>
-					    <%
-						}
-						%>
-						</select></td>
-						<th width="20%">Test Request Code (max. 100)</th>
-						<td><select multiple="multiple" style="width:300px;" name="testRequestCode" id="testRequestCode">
-						<%
-						
-						for (OLISRequestNomenclature nomenclature : requestNomenclatureList) {
-						%>
-							<option value="<%=nomenclature.getId() %>"><%=oscar.Misc.getStr(nomenclature.getName(),"").trim() %></option>
-					    <%
-						}
-						%>
-						</select></td>
-					</tr>
-				</tbody></table>
+			<th width="20%"><label for="testRequestPlacer">Test Request Placer</label></th>
+			<td>
+				<select id="testRequestPlacer" name="testRequestPlacer">
+					<option></option>
+					<option value="5552">Gamma-Dynacare</option>
+					<option value="5407">CML</option>
+					<option value="5687">LifeLabs</option>
+				</select>
 			</td>
 		</tr>
-		
+		<tr>
+			<th width="20%"><span>Placer Group Number</span></th>
+			<td>
+				<input type="text" name="placerGroupNumber" maxlength="25">
+
+				<label>Ordering Facility</label>
+				<select name="orderingFacility">
+					<option value=""></option>
+					<option value="5552">Gamma-Dynacare</option>
+					<option value="5407">CML</option>
+					<option value="5687">LifeLabs</option>
+				</select>
+			</td>
+		</tr>
+		</tr>
 		<tr>
 			<td colspan=2><input type="submit" name="submit" value="Search" /></td>
 		</tr>			
@@ -544,12 +616,40 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 		<tr>
 			<td width="50%" colspan=2><span><input class="checkbox" type="checkbox" name="retrieveAllResults" id="retrieveAllResults"> Retrieve All Test Results?</span></td>
 			<th width="20%">Consent to View Blocked Information?</th>
-			<td width="30%"><select id="blockedInformationConsent" name="blockedInformationConsent"><option value="">(none)</option>
-			<option value="Z">Temporary </option>
-			</select>
-			<br />Authorized by: <select name="blockedInformationIndividual" id="blockedInformationIndividual">
-			<option value="patient">Patient</option><option value="substitute">Substitute Decision Maker</option><option value="">Neither</option>
-			</select>
+			<td width="30%">
+				<select id="blockedInformationConsent" name="blockedInformationConsent">
+					<option value="">(none)</option>
+					<option value="T">Temporary </option>
+				</select>
+				<br />Authorized by:
+					<select name="blockedInformationIndividual">
+						<option value="">(none)</option>
+						<option value="Z">Patient</option>
+						<option value="X">Substitute Decision Maker</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<th width="20%">Substitute Decision Maker</th>
+			<td width="30%">
+				<label>Given Name:
+					<input type="text" name="substituteGivenName">
+				</label>
+				<label>Last Name:
+					<input type="text" name="substituteLastName">
+				</label>
+				<label>Relationship:
+					<select name="substituteRelationship">
+						<option value="A0">Guardian for the Person</option>
+						<option value="A1">Attorney for Personal Care</option>
+						<option value="A2">Representative appointed by Consent and Capacity Board</option>
+						<option value="A3">Spouse/Partner</option>
+						<option value="A4">Parent</option>
+						<option value="A5">Child</option>
+						<option value="A6">Sibling</option>
+						<option value="A7">Other Relative</option>
+					</select>
+				</label>
 			</td>
 		</tr>
 		<tr>
@@ -559,7 +659,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<td colspan=4><hr /></td>
 		</tr>
 		<tr>
-			<td width="20%"><span>Patient</span></td>
+			<td width="20%"><span class="required">Patient</span></td>
 			<td> 
 			<%currentDocId="2"; %>
 				<input type="hidden" name="demographic" id="demofind<%=currentDocId%>" />
@@ -577,7 +677,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
                         // Define the schema of the delimited resultsTEST, PATIENT(1985-06-15)
                         oDS.responseSchema = {
                             resultsList : "results",
-                            fields : ["formattedName","fomattedDob","demographicNo","status"]
+                            fields : ["formattedName","formattedDob","demographicNo","status"]
                         };
                         // Enable caching
                         oDS.maxCacheEntries = 100;
@@ -616,7 +716,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<td colspan=4><hr /></td>
 		</tr>
 		<tr>
-			<td width="20%"><span>Requesting HIC</span></td>
+			<td width="20%"><span class="required">Requesting HIC</span></td>
 			<td><select name="requestingHic" id="requestingHic">
 			
 			<option value=""></option>
@@ -627,7 +727,30 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<%	
 			}
 			%>
-</select></td>		
+			</select></td>
+		</tr>
+		<tr>
+			<td colspan=4><hr /></td>
+		</tr>
+		<tr>
+			<td>
+				<span class="required">Placer Group Number</span>
+			</td>
+			<td>
+				<input type="text" name="placerGroupNumber" maxlength="25">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<span class="required">Ordering Facility</span>
+			</td>
+			<td>
+				<select id="orderingFacility" name="orderingFacility">
+				<option value=""></option>
+				<option value="5552">Gamma-Dynacare</option>
+				<option value="5407">CML</option>
+				<option value="5687">LifeLabs</option>
+			</select>
 		</tr>
 		<tr>
 			<td colspan=2><input type="submit" name="submit" value="Search" /></td>
@@ -646,7 +769,7 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<td colspan=2><input type="submit" name="submit" value="Search" /></td>
 		</tr>
 		<tr>
-			<th width="20%">Date &amp; Time Period to Search<br />(yyyy-mm-dd)</th>
+			<th width="20%" class="required">Date &amp; Time Period to Search<br />(yyyy-mm-dd)</th>
 			<td width="30%"><input style="width:150px" type="text" name="startTimePeriod" id="startTimePeriod" value="" > to <input style="width:150px" name="endTimePeriod" type="text" id="endTimePeriod" ></td>
 			<th width="20%"><input class="checkbox" type="checkbox" name="quantityLimitedQuery" id="quantityLimitedQuery"> Quantity Limit?</th>
 			<td width="30%">Quantity<br><input type="text" id="quantityLimit" name="quantityLimit"></td>
@@ -655,51 +778,24 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 			<td colspan=4><hr /></td>
 		</tr>
 		<tr>
-			<td width="20%"><span>Requesting HIC</span></td><td><select multiple="multiple" name="requestingHic" id="requestingHic">
-			
-			<option value=""></option>
-			<%
-			for (Provider provider : allProvidersList) {
+			<td width="20%"><span class="required">Requesting HIC</span></td>
+			<td>
+				<select name="requestingHic" id="requestingHic">
+
+				<option value=""></option>
+				<%
+				for (Provider provider : allProvidersList) {
+					%>
+					<option value="<%=provider.getProviderNo() %>">[<%=provider.getProviderNo()%>] <%=provider.getLastName() %>, <%=provider.getFirstName() %></option>
+				<%
+				}
 				%>
-				<option value="<%=provider.getProviderNo() %>">[<%=provider.getProviderNo()%>] <%=provider.getLastName() %>, <%=provider.getFirstName() %></option>
-			<%	
-			}
-			%>
-</select></td>		
+				</select>
+			</td>
 		</tr>
 		
 		<tr>
 			<td colspan="4"><hr></td>
-		</tr>
-		<tr>
-			<td colspan="4">
-				<table>
-					<tbody><tr>
-						<th width="20%">Test Result Code (max. 200)</th>
-						<td><input type="text"><br><select multiple="multiple" style="width:300px;" name="testResultCode" id="testResultCode">
-						<%
-						
-						for (OLISResultNomenclature nomenclature : resultNomenclatureList) {
-						%>
-							<option value="<%=nomenclature.getId() %>"><%=nomenclature.getName().trim() %></option>
-					    <%
-						}
-						%>
-						</select></td>
-						<th width="20%">Test Request Code (max. 100)</th>
-						<td><input type="text"><br><select multiple="multiple" style="width:300px;" name="testRequestCode" id="testRequestCode">
-						<%
-						
-						for (OLISRequestNomenclature nomenclature : requestNomenclatureList) {
-						%>
-							<option value="<%=nomenclature.getId() %>"><%=nomenclature.getName().trim() %></option>
-					    <%
-						}
-						%>
-						</select></td>
-					</tr>
-				</tbody></table>
-			</td>
 		</tr>
 		<tr>
 			<td colspan=2><input type="submit" name="submit" value="Search" /></td>
@@ -846,12 +942,17 @@ List<OLISRequestNomenclature> requestNomenclatureList = requestDao.findAll();
 	
 	<oscar:oscarPropertiesCheck value="yes" property="olis_simulate">
 
-		<iframe src="Simulate.jsp" width="500" heigh="300" frameborder="0" scrolling="no"></iframe>	
+		<iframe src="Simulate.jsp" width="500" height="300" frameborder="0" scrolling="no"></iframe>
 
 	</oscar:oscarPropertiesCheck>
 		
 			</td>
 		</tr>
 	</tbody></table>
+		<div>
+			<span class="required"></span>
+			<span>Required field indicator</span>
+		</div>
+	</div>
 	</body>
 	</html>

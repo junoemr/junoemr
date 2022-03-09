@@ -179,7 +179,7 @@ public class FaxUploadService
 			fileToResend.moveToOutgoingFaxPending();
 			faxOutbound.setStatusQueued();
 		}
-		else if(faxOutbound.isStatusSent() && faxUploadProvider.isFaxInRemoteFailedState(faxOutbound))
+		else if(faxOutbound.isStatusSent() && faxUploadProvider.isFaxInRemoteFailedState(faxOutbound.getExternalStatus()))
 		{
 			/*Here the fax was sent to the integration but failed remotely.
 			* In this case, duplicate the fax record and send it again as a new copy.
@@ -314,7 +314,7 @@ public class FaxUploadService
 					faxOutbound.setExternalStatus(remoteSentStatus);
 
 					// if the remote status is sent, update accordingly.
-					if(uploadProvider.isFaxInRemoteSentState(apiResult))
+					if(uploadProvider.isFaxInRemoteSentState(apiResult.getRemoteSentStatus()))
 					{
 						apiResult.getRemoteSendTime().ifPresent(faxOutbound::setExternalDeliveryDate);
 						faxOutbound.setStatusMessage(STATUS_MESSAGE_COMPLETED);

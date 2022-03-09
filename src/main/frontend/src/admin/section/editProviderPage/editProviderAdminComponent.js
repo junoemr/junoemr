@@ -112,6 +112,25 @@ angular.module('Admin.Section').component('editProviderAdmin',
 			}
 		];
 
+		ctrl.olisIdTypes = [
+			{
+				label: "Physician",
+				value: "MDL",
+			},
+			{
+				label: "Dentist",
+				value: "DDSL",
+			},
+			{
+				label: "Nurse Practitioner",
+				value: "NPL",
+			},
+			{
+				label: "Midwife",
+				value: "ML",
+			},
+		];
+
 		// security records that can be edited.
 		ctrl.securityRecordOptions = [];
 
@@ -238,7 +257,11 @@ angular.module('Admin.Section').component('editProviderAdmin',
 			takNumber: null,
 			lifeLabsClientIds: null,
 			eDeliveryIds: null,
-			imdHealthUuid: null
+			imdHealthUuid: null,
+			olisOfficialFirstName: null,
+			olisOfficialSecondName: null,
+			olisOfficialLastName: null,
+			olisOfficialIdType: null,
 		};
 
 		ctrl.setupFormValidations = function()

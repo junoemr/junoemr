@@ -42,7 +42,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oscarehr.dataMigration.logger.cds.CDSImportLogger;
 import org.oscarehr.dataMigration.model.medication.FrequencyCode;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.service.context.PatientImportContext;
 import org.oscarehr.dataMigration.service.context.PatientImportContextService;
 import org.powermock.api.mockito.PowerMockito;
@@ -217,7 +217,7 @@ public class CDSMedicationImportMapperTest
 		prescribedBy.setOHIPPhysicianId(expectedOhipNumber);
 
 		medicationsAndTreatments.setPrescribedBy(prescribedBy);
-		Provider provider = cdsMedicationImportMapper.getPrescribingProvider(medicationsAndTreatments);
+		ProviderModel provider = cdsMedicationImportMapper.getPrescribingProvider(medicationsAndTreatments);
 
 		assertEquals(expectedFirstName, provider.getFirstName());
 		assertEquals(expectedLastName, provider.getLastName());

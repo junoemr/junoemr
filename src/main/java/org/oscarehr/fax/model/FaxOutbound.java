@@ -22,8 +22,10 @@
  */
 package org.oscarehr.fax.model;
 
+import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.fax.provider.FaxProvider;
+import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.provider.model.ProviderData;
 
 import javax.persistence.Column;
@@ -41,6 +43,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
 
+@Data
 @Entity
 @Table(name = "fax_outbound")
 public class FaxOutbound extends AbstractModel<Long>
@@ -110,37 +113,6 @@ public class FaxOutbound extends AbstractModel<Long>
 	@JoinColumn(name="provider_no", referencedColumnName="provider_no", insertable=false, updatable=false)
 	private ProviderData provider;
 
-	@Override
-	public Long getId()
-	{
-		return id;
-	}
-
-	public void setId(Long id)
-	{
-		this.id = id;
-	}
-
-	public Date getCreatedAt()
-	{
-		return createdAt;
-	}
-
-	public void setCreatedAt(Date createdAt)
-	{
-		this.createdAt = createdAt;
-	}
-
-	public FaxStatusInternal getStatus()
-	{
-		return status;
-	}
-
-	public void setStatus(FaxStatusInternal status)
-	{
-		this.status = status;
-	}
-
 	public void setStatusSent()
 	{
 		setStatus(FaxStatusInternal.SENT);
@@ -171,157 +143,6 @@ public class FaxOutbound extends AbstractModel<Long>
 		return FaxStatusInternal.ERROR.equals(getStatus());
 	}
 
-	public String getStatusMessage()
-	{
-		return statusMessage;
-	}
-
-	public void setStatusMessage(String statusMessage)
-	{
-		this.statusMessage = statusMessage;
-	}
-
-	public Boolean getArchived()
-	{
-		return archived;
-	}
-
-	public void setArchived(Boolean acknowledged)
-	{
-		this.archived = acknowledged;
-	}
-
-	public String getSentTo()
-	{
-		return sentTo;
-	}
-
-	public void setSentTo(String sentTo)
-	{
-		this.sentTo = sentTo;
-	}
-
-	public FaxNotificationStatus getNotificationStatus()
-	{
-		return notificationStatus;
-	}
-
-	public void setNotificationStatus(FaxNotificationStatus notificationStatus)
-	{
-		this.notificationStatus = notificationStatus;
-	}
-
-	public String getProviderNo()
-	{
-		return providerNo;
-	}
-
-	public void setProviderNo(String providerNo)
-	{
-		this.providerNo = providerNo;
-	}
-
-	public ProviderData getProvider()
-	{
-		return provider;
-	}
-
-	public void setProvider(ProviderData provider)
-	{
-		this.provider = provider;
-		this.providerNo = provider.getId();
-	}
-
-	public Integer getDemographicNo()
-	{
-		return demographicNo;
-	}
-
-	public void setDemographicNo(Integer demographicNo)
-	{
-		this.demographicNo = demographicNo;
-	}
-
-	public FaxFileType getFileType()
-	{
-		return fileType;
-	}
-
-	public void setFileType(FaxFileType fileType)
-	{
-		this.fileType = fileType;
-	}
-
-	public String getFileName()
-	{
-		return fileName;
-	}
-
-	public void setFileName(String fileName)
-	{
-		this.fileName = fileName;
-	}
-
-	public String getExternalAccountId()
-	{
-		return externalAccountId;
-	}
-
-	public void setExternalAccountId(String externalAccountId)
-	{
-		this.externalAccountId = externalAccountId;
-	}
-
-	public FaxProvider getExternalAccountType()
-	{
-		return externalAccountType;
-	}
-
-	public void setExternalAccountType(FaxProvider externalAccountType)
-	{
-		this.externalAccountType = externalAccountType;
-	}
-
-	public Long getExternalReferenceId()
-	{
-		return externalReferenceId;
-	}
-
-	public void setExternalReferenceId(Long externalReferenceId)
-	{
-		this.externalReferenceId = externalReferenceId;
-	}
-
-	public String getExternalStatus()
-	{
-		return externalStatus;
-	}
-
-	public void setExternalStatus(String externalStatus)
-	{
-		this.externalStatus = externalStatus;
-	}
-
-	public Date getExternalDeliveryDate()
-	{
-		return externalDeliveryDate;
-	}
-
-	public void setExternalDeliveryDate(Date externalDeliveryDate)
-	{
-		this.externalDeliveryDate = externalDeliveryDate;
-	}
-
-	public FaxAccount getFaxAccount()
-	{
-		return faxAccount;
-	}
-
-	public void setFaxAccount(FaxAccount faxAccount)
-	{
-		this.faxAccount = faxAccount;
-	}
-
 	/**
 	 * determine the given account will have a record of this outbound fax.
 	 * This requires this fax to have been sent (failed faxes will have no remote record),
@@ -335,5 +156,32 @@ public class FaxOutbound extends AbstractModel<Long>
 				this.getExternalAccountId().equals(accountToCheck.getLoginId()) &&
 				this.getExternalAccountType().equals(accountToCheck.getIntegrationType());
 
+	}
+
+	public FaxStatusCombined getCombinedStatus(FaxUploadProvider uploadProvider)
+	{
+		FaxStatusInternal systemStatus = this.getStatus();
+		FaxStatusCombined combinedStatus = null;
+		if(FaxStatusInternal.ERROR.equals(systemStatus))
+		{
+			combinedStatus = FaxStatusCombined.ERROR;
+		}
+		else if(FaxStatusInternal.QUEUED.equals(systemStatus))
+		{
+			combinedStatus = FaxStatusCombined.QUEUED;
+		}
+		else if(FaxStatusInternal.SENT.equals(systemStatus) && uploadProvider.isFaxInRemoteSentState(this.getExternalStatus()))
+		{
+			combinedStatus = FaxStatusCombined.INTEGRATION_SUCCESS;
+		}
+		else if(FaxStatusInternal.SENT.equals(systemStatus) && uploadProvider.isFaxInRemoteFailedState(this.getExternalStatus()))
+		{
+			combinedStatus = FaxStatusCombined.INTEGRATION_FAILED;
+		}
+		else if(FaxStatusInternal.SENT.equals(systemStatus))
+		{
+			combinedStatus = FaxStatusCombined.IN_PROGRESS;
+		}
+		return combinedStatus;
 	}
 }

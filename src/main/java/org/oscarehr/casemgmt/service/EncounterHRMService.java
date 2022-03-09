@@ -27,8 +27,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote.SortChronologicDescTextAsc;
@@ -106,17 +104,16 @@ public class EncounterHRMService extends EncounterSectionService
 			return EncounterNotes.noNotes();
 		}
 
-		Map<String, HRMDemographicDocument> demographicDocuments = hrmService.getHrmDocumentsForDemographic(
+		List<HRMDemographicDocument> demographicDocuments = hrmService.getHrmDocumentsForDemographic(
 			Integer.parseInt(sectionParams.getDemographicNo())
 		);
 
 		List<EncounterSectionNote> out = new ArrayList<>();
-		for (Entry<String, HRMDemographicDocument> entry: demographicDocuments.entrySet())
+		for (HRMDemographicDocument entry: demographicDocuments)
 		{
 			EncounterSectionNote sectionNote = new EncounterSectionNote();
 
-			HRMDocument hrmDocument = entry.getValue().getHrmDocument();
-			List<Integer> duplicateIdList = entry.getValue().getDuplicateIds();
+			HRMDocument hrmDocument = entry.getHrmDocument();
 
 			HRMDocument.STATUS reportStatus = hrmDocument.getReportStatus();
 			String dispFilename = hrmDocument.getReportType();
@@ -145,24 +142,9 @@ public class EncounterHRMService extends EncounterSectionService
 			{
 				sectionNote.setUpdateDate(date.atStartOfDay());
 			}
-			
-			StringBuilder duplicateLabIdQueryString = new StringBuilder();
-			if (duplicateIdList!=null)
-			{
-				for (Integer duplicateLabIdTemp : duplicateIdList)
-				{
-					if (duplicateLabIdQueryString.length() > 0)
-					{
-						duplicateLabIdQueryString.append(',');
-					}
-					duplicateLabIdQueryString.append(duplicateLabIdTemp);
-				}
-			}
 
 			int hash = Math.abs(this.getWinName(sectionParams).hashCode());
-			String url = sectionParams.getContextPath() + "/hospitalReportManager/Display.do" +
-				"?id=" + encodeUrlParam(dispDocNo) +
-				"&duplicateLabIds=" + encodeUrlParam(duplicateLabIdQueryString.toString());
+			String url = sectionParams.getContextPath() + "/hospitalReportManager/Display.do?id=" + encodeUrlParam(dispDocNo);
 
 			String onClickString = "junoEncounter.popupPageAndReload(700,800,'" + hash + "', '" + url +"', '" + SECTION_ID + "');";
 			sectionNote.setOnClick(onClickString);

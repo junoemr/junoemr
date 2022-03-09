@@ -136,7 +136,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 
 		ctrl.loadMhaPatientProfiles = async () =>
 		{
-			if (ctrl.demographic && ctrl.demographic.demographicNo)
+			if (ctrl.demographic && ctrl.demographic.id)
 			{
 				try
 				{
@@ -145,7 +145,7 @@ angular.module('Record.Details').component('mhaPatientConnection', {
 					let siteList = [];
 					for (let integration of ctrl.integrationsList)
 					{
-						let isConfirmed = (await mhaDemographicApi.isPatientConfirmed(integration.id, ctrl.demographic.demographicNo)).data.body;
+						let isConfirmed = (await mhaDemographicApi.isPatientConfirmed(integration.id, ctrl.demographic.id)).data.body;
 						ctrl.isConfirmed = ctrl.isConfirmed || isConfirmed;
 
 						if (isConfirmed)

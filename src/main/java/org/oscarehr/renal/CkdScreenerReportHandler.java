@@ -38,7 +38,7 @@ import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.OscarLogDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.common.model.Provider;
@@ -72,7 +72,7 @@ public class CkdScreenerReportHandler {
 			
 			result.setMedication(ckdScreener.checkMedication(demographicNo));
 			
-			DemographicExt ab = demographicExtDao.getLatestDemographicExt(demographicNo, "aboriginal");
+			DemographicExt ab = demographicExtDao.getLatestDemographicExt(demographicNo, DemographicExt.KEY_ABORIGINAL).orElse(null);
 			if(ab != null && ab.getValue().equals("Yes")) {
 				result.setAboriginalStr("Yes");
 			} else if(ab != null && ab.getValue().equals("No")) {

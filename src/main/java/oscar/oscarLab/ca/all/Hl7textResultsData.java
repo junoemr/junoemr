@@ -46,7 +46,9 @@ import oscar.util.UtilDateUtilities;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Hl7textResultsData {
 
@@ -73,11 +75,50 @@ public class Hl7textResultsData {
 	 	measurementDao.populateMeasurements( messageHandler, lab_no, demographic_no, new Date());
 	}
 
-	public static String getMatchingLabs(String lab_no) {
-		String ret = "";
-		int monthsBetween = 0;
+	/** get lab id's of other versions matching this segmentId
+	 * @return csv list of id's
+	 * @deprecated use list version instead */
+	@Deprecated
+	public static String getMatchingLabs(String segmentId)
+	{
+		return getMatchingLabs(segmentId, true);
+	}
+	/** get lab id's of other versions matching this segmentId
+	 * @return csv list of id's
+	 * @deprecated use list version instead */
+	@Deprecated
+	public static String getMatchingLabs(String segmentId, boolean prioritizeFinalCount)
+	{
+		Integer labNo = ConversionUtils.fromIntString(segmentId);
+		List<Integer> labIds = getMatchingLabs(labNo, prioritizeFinalCount);
+		if(labIds.isEmpty())
+		{
+			labIds.add(labNo); // not sure why we do this?
+		}
+		return idsToString(labIds);
+	}
 
-		for (Object[] o : hl7TxtInfoDao.findByLabIdViaMagic(ConversionUtils.fromIntString(lab_no)))
+	public static String idsToString(List<Integer> idList)
+	{
+		return idList.stream()
+				.map(String::valueOf)
+				.collect(Collectors.joining(","));
+	}
+
+	/** get lab id's of other versions matching this segmentId
+	 * @return list of id's, empty if no matches
+	 */
+	public static List<Integer> getMatchingLabs(Integer segmentId)
+	{
+		return getMatchingLabs(segmentId, true);
+	}
+	/** get lab id's of other versions matching this segmentId
+	 * @return list of id's, empty if no matches
+	 */
+	public static List<Integer> getMatchingLabs(Integer segmentId, boolean prioritizeFinalCount)
+	{
+		List<Integer> labIds = new LinkedList<>();
+		for (Object[] o : hl7TxtInfoDao.findByLabIdViaMagic(segmentId, prioritizeFinalCount))
 		{
 			Hl7TextInfo a = (Hl7TextInfo) o[0];
 			Hl7TextInfo b = (Hl7TextInfo) o[1];
@@ -91,7 +132,8 @@ public class Hl7textResultsData {
 			Date dateA = ConversionUtils.fromTimestampString(a.getObrDate());
 			Date dateB = ConversionUtils.fromTimestampString(b.getObrDate());
 			if (dateA==null || dateB==null) continue;
-			
+
+			int monthsBetween = 0;
 			if (dateA.before(dateB)) {
 				monthsBetween = UtilDateUtilities.getNumMonths(dateA, dateB);
 			} else {
@@ -99,16 +141,14 @@ public class Hl7textResultsData {
 			}
 
 			logger.debug("monthsBetween: " + monthsBetween);
-			logger.debug("lab_no: " + labNo + " lab: " + lab_no);
+			logger.debug("lab_no: " + labNo + " lab: " + segmentId);
 
-			if (monthsBetween < 4) {
-				if (ret.equals("")) ret = "" + labNo;
-				else ret = ret + "," + labNo;
+			if (monthsBetween < 4)
+			{
+				labIds.add(labNo);
 			}
 		}
-
-		if (ret.equals("")) return (lab_no);
-		else return (ret);
+		return labIds;
 	}
 
 	/**

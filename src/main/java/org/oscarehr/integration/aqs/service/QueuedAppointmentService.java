@@ -31,7 +31,7 @@ import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Site;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.integration.aqs.conversion.CommunicationTypeToVirtualAppointmentTypeConverter;
 import org.oscarehr.integration.aqs.conversion.IntegerToQueuedAppointmentMoveDtoConverter;
 import org.oscarehr.integration.aqs.conversion.QueuedAppointmentDtoQueuedAppointmentConverter;

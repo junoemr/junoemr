@@ -38,6 +38,7 @@ public class LabObservation extends AbstractTransientModel
 {
 	private String name;
 	private String procedureCode;
+	private boolean blockedResult; // represents data that is blocked (OLIS specific)
 	private LocalDateTime observationDateTime;
 	private LocalDateTime requestDateTime;
 	private Hl7TextInfo.REPORT_STATUS reportStatus;

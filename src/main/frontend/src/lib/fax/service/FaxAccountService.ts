@@ -30,37 +30,37 @@ export default class FaxAccountService
 		this.faxOutboundApi = new FaxOutboundApi($http, $httpParamSerializer, API_BASE_PATH);
 	}
 
-	public isAccountEnabled = async (id: number): Promise<boolean> =>
+	public async isAccountEnabled(id: number): Promise<boolean>
 	{
 		return (await this.faxAccountApi.isEnabled(id)).data.body;
 	};
 
-	public getAccountSettings = async (id: number): Promise<FaxAccount> =>
+	public async getAccountSettings(id: number): Promise<FaxAccount>
 	{
 		return this.faxAccountToModelConverter.convert(
 			(await this.faxAccountApi.getAccountSettings(id)).data.body);
 	};
 
-	public createAccountSettings = async (model: FaxAccount): Promise<FaxAccount> =>
+	public async createAccountSettings(model: FaxAccount): Promise<FaxAccount>
 	{
 		let input = this.faxAccountToCreateInputConverter.convert(model);
 		return this.faxAccountToModelConverter.convert(
 			(await this.faxAccountApi.createAccountSettings(input)).data.body);
 	};
 
-	public updateAccountSettings = async (model: FaxAccount): Promise<FaxAccount> =>
+	public async updateAccountSettings(model: FaxAccount): Promise<FaxAccount>
 	{
 		let input = this.faxAccountToUpdateInputConverter.convert(model);
 		return this.faxAccountToModelConverter.convert(
 			(await this.faxAccountApi.updateAccountSettings(model.id, input)).data.body);
 	};
 
-	public deleteAccountSettings = async (id: number): Promise<boolean> =>
+	public async deleteAccountSettings(id: number): Promise<boolean>
 	{
 		return (await this.faxAccountApi.deleteAccountSettings(id)).data.body;
 	};
 
-	public testFaxConnection = async (model: FaxAccount): Promise<boolean> =>
+	public async testFaxConnection(model: FaxAccount): Promise<boolean>
 	{
 		if (model.id)
 		{
@@ -74,7 +74,7 @@ export default class FaxAccountService
 		}
 	}
 
-	public getAccounts = async (page: number = 1, perPage: number = 10): Promise<PagedResponse<FaxAccount>> =>
+	public async getAccounts(page: number = 1, perPage: number = 10): Promise<PagedResponse<FaxAccount>>
 	{
 		const transfer = (await this.faxAccountApi.listAccounts(page, perPage)).data;
 		return new PagedResponse<FaxAccount>(this.faxAccountToModelConverter.convertList(transfer.body), transfer.headers);

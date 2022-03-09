@@ -1,5 +1,12 @@
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import {
+    JUNO_BUTTON_COLOR,
+    JUNO_BUTTON_COLOR_PATTERN,
+    JUNO_STYLE,
+    LABEL_POSITION
+} from "../../../../common/components/junoComponentConstants";
 import {ReferralDoctorsApi, RosterServiceApi} from "../../../../../generated";
+import RosterStatusData from "../../../../lib/demographic/model/RosterStatusData";
+import SimpleProvider from "../../../../lib/provider/model/SimpleProvider";
 
 angular.module('Record.Details').component('rosterDisplaySection', {
     templateUrl: 'src/record/details/components/rosterDisplay/rosterDisplay.jsp',
@@ -28,7 +35,7 @@ angular.module('Record.Details').component('rosterDisplaySection', {
             $scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
             ctrl.numberRegex=/^\d*$/
-            ctrl.familyDoctors = [{value: "", label: "--"}];
+            ctrl.familyDoctors = [{value: null, label: "--"}];
             ctrl.rosterTermReasons = staticDataService.getRosterTerminationReasons();
 
             ctrl.rosterDateValid = true;
@@ -36,6 +43,10 @@ angular.module('Record.Details').component('rosterDisplaySection', {
 
             ctrl.$onInit = () =>
             {
+                ctrl.rosterStatusData = ctrl.ngModel.rosterData || new RosterStatusData();
+                ctrl.selectedFamilyDoc = ctrl.ngModel.familyDoctor ? ctrl.ngModel.familyDoctor.displayName : null;
+                ctrl.selectedFamilyDocNo = ctrl.ngModel.familyDoctor ? ctrl.ngModel.familyDoctor.ohipNumber : null;
+
                 ctrl.validations["rosterDate"] = Juno.Validations.validationCustom(() => ctrl.rosterDateValid);
                 ctrl.validations["terminationDate"] = Juno.Validations.validationCustom(() => ctrl.terminationDateValid);
 
@@ -59,6 +70,11 @@ angular.module('Record.Details').component('rosterDisplaySection', {
                 );
             }
 
+            ctrl.setRosterData = () =>
+            {
+                ctrl.ngModel.rosterData = ctrl.rosterStatusData;
+            }
+
             ctrl.updateFamilyDoctors = async (docSearchString, docReferralNo) =>
             {
                 referralDoctorsApi.searchEnrolledDoctors(docSearchString, docReferralNo, 1, 10).then(
@@ -67,7 +83,7 @@ angular.module('Record.Details').component('rosterDisplaySection', {
                         let familyDoctors = [];
                         if (!results.data.body || results.data.body.length === 0)
                         {
-                            familyDoctors.push({value: "", label: "--"})
+                            familyDoctors.push({value: null, label: "--"})
                         }
 
                         for (let i = 0; i < results.data.body.length; i++)
@@ -98,7 +114,9 @@ angular.module('Record.Details').component('rosterDisplaySection', {
 
             ctrl.updateFamilyDocNo = (value) =>
             {
-                ctrl.ngModel.scrFamilyDocNo = value.referralNo;
+                let providerName = Juno.Common.Util.isBlank(value.value) ? null : value.value.trim();
+                ctrl.ngModel.familyDoctor = SimpleProvider.fromDisplayNameAndOhip(providerName, value.referralNo);
+                ctrl.selectedFamilyDoctorNo = value.referralNo;
             }
 
             ctrl.openRosteredHistoryModal = async () =>

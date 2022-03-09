@@ -13,6 +13,7 @@ import com.indivica.olis.parameters.OBR22;
 import com.indivica.olis.parameters.QRD7;
 import com.indivica.olis.parameters.ZBR8;
 import com.indivica.olis.parameters.ZPD1;
+import com.indivica.olis.parameters.ZSD;
 
 /**
  * Z05 - Retrieve Laboratory Information Updates for Destination Laboratory
@@ -61,4 +62,9 @@ public class Z05Query extends Query {
     public void setConsentToViewBlockedInformation(ZPD1 consentToViewBlockedInformation) {
 		throw new RuntimeException("Not valid for this type of query.");
     }
+	@Override
+	public void setSubstituteDecisionMakerInfo(ZSD substituteDecisionMakerInfo)
+	{
+		throw new RuntimeException("Not valid for this type of query.");
+	}
 }

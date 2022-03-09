@@ -43,7 +43,7 @@ import org.oscarehr.dataMigration.converter.in.ReviewerModelToDbConverter;
 import org.oscarehr.dataMigration.exception.DuplicateDemographicException;
 import org.oscarehr.dataMigration.logger.ImportLogger;
 import org.oscarehr.dataMigration.model.PatientRecord;
-import org.oscarehr.dataMigration.model.demographic.Demographic;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.document.Document;
 import org.oscarehr.dataMigration.model.encounterNote.EncounterNote;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
@@ -189,7 +189,7 @@ public class PatientImportService
 	@Autowired
 	private ProviderService providerService;
 
-	public org.oscarehr.demographic.model.Demographic importDemographic(GenericFile importFile,
+	public org.oscarehr.demographic.entity.Demographic importDemographic(GenericFile importFile,
 	                              PatientImportContext context,
 	                              DemographicImporter.MERGE_STRATEGY mergeStrategy) throws Exception
 	{
@@ -199,11 +199,11 @@ public class PatientImportService
 		importer.verifyFileFormat(importFile);
 		PatientRecord patientRecord = importer.importDemographic(importFile);
 
-		Demographic demographicModel = patientRecord.getDemographic();
-		org.oscarehr.demographic.model.Demographic dbDemographicDuplicate = findDuplicate(demographicModel);
+		DemographicModel demographicModel = patientRecord.getDemographic();
+		org.oscarehr.demographic.entity.Demographic dbDemographicDuplicate = findDuplicate(demographicModel);
 		boolean duplicateDetected = (dbDemographicDuplicate != null);
 
-		org.oscarehr.demographic.model.Demographic dbDemographic;
+		org.oscarehr.demographic.entity.Demographic dbDemographic;
 		try
 		{
 			if(duplicateDetected)
@@ -273,7 +273,7 @@ public class PatientImportService
 		return dbDemographic;
 	}
 
-	private void persistNotes(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)
+	private void persistNotes(PatientRecord patientRecord, org.oscarehr.demographic.entity.Demographic dbDemographic)
 	{
 		socialHistoryNoteService.saveSocialHistoryNote(patientRecord.getSocialHistoryNoteList(), dbDemographic);
 		familyHistoryNoteService.saveFamilyHistoryNote(patientRecord.getFamilyHistoryNoteList(), dbDemographic);
@@ -284,7 +284,7 @@ public class PatientImportService
 		encounterNoteService.saveChartNotes(patientRecord.getEncounterNoteList(), dbDemographic);
 	}
 
-	private void persistMeasurements(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)
+	private void persistMeasurements(PatientRecord patientRecord, org.oscarehr.demographic.entity.Demographic dbDemographic)
 	{
 		for(org.oscarehr.dataMigration.model.measurement.Measurement measurement : patientRecord.getMeasurementList())
 		{
@@ -299,7 +299,7 @@ public class PatientImportService
 		}
 	}
 
-	private void persistPreventions(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)
+	private void persistPreventions(PatientRecord patientRecord, org.oscarehr.demographic.entity.Demographic dbDemographic)
 	{
 		for(Immunization immunization : patientRecord.getImmunizationList())
 		{
@@ -327,7 +327,7 @@ public class PatientImportService
 		}
 	}
 
-	private void persistLabs(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic) throws HL7Exception, IOException
+	private void persistLabs(PatientRecord patientRecord, org.oscarehr.demographic.entity.Demographic dbDemographic) throws HL7Exception, IOException
 	{
 		for(Lab lab : patientRecord.getLabList())
 		{
@@ -390,7 +390,7 @@ public class PatientImportService
 		}
 	}
 
-	private void persistHrmDocuments(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic) throws Exception
+	private void persistHrmDocuments(PatientRecord patientRecord, org.oscarehr.demographic.entity.Demographic dbDemographic) throws Exception
 	{
 		// for imports, we build our own HRM documents before saving the record
 		DemographicExporter exporter = importerExporterFactory.getExporter(ImporterExporterFactory.EXPORTER_TYPE.HRM_4);
@@ -422,7 +422,7 @@ public class PatientImportService
 		}
 	}
 
-	private void persistPharmacy(PatientRecord patientRecord, org.oscarehr.demographic.model.Demographic dbDemographic)
+	private void persistPharmacy(PatientRecord patientRecord, org.oscarehr.demographic.entity.Demographic dbDemographic)
 	{
 		//TODO replace this with prescribeIt lookup/save when available
 		Pharmacy pharmacy = patientRecord.getPreferredPharmacy();
@@ -452,7 +452,8 @@ public class PatientImportService
 		}
 	}
 
-	private org.oscarehr.demographic.model.Demographic findDuplicate(Demographic demographicModel)
+	private org.oscarehr.demographic.entity.Demographic findDuplicate(
+		DemographicModel demographicModel)
 	{
 		String hin = demographicModel.getHealthNumber();
 		if(hin != null)
@@ -461,7 +462,7 @@ public class PatientImportService
 			searchQuery.setHin(hin);
 			searchQuery.setDateOfBirth(demographicModel.getDateOfBirth());
 
-			List<org.oscarehr.demographic.model.Demographic> possibleMatches = demographicDao.criteriaSearch(searchQuery);
+			List<org.oscarehr.demographic.entity.Demographic> possibleMatches = demographicDao.criteriaSearch(searchQuery);
 			if(possibleMatches.size() == 1)
 			{
 				return possibleMatches.get(0);
@@ -474,7 +475,7 @@ public class PatientImportService
 		return null;
 	}
 
-	private void writeAuditLogImportStatement(org.oscarehr.demographic.model.Demographic dbDemographic,
+	private void writeAuditLogImportStatement(org.oscarehr.demographic.entity.Demographic dbDemographic,
 	                                          ImporterExporterFactory.IMPORTER_TYPE importType,
 	                                          ImporterExporterFactory.IMPORT_SOURCE importSource,
 	                                          boolean duplicateDetected)

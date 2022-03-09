@@ -26,12 +26,12 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.dataMigration.mapper.AbstractImportMapper;
-import org.oscarehr.dataMigration.model.common.Address;
+import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.PartialDate;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.common.ResidualInfo;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 import xml.cds.v5_0.AddressStructured;
@@ -160,25 +160,25 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return null;
 	}
 
-	protected Provider toProvider(PersonNameSimple personNameSimple)
+	protected ProviderModel toProvider(PersonNameSimple personNameSimple)
 	{
-		Provider provider = null;
+		ProviderModel provider = null;
 		if(personNameSimple != null)
 		{
-			provider = new Provider();
+			provider = new ProviderModel();
 			provider.setFirstName(personNameSimple.getFirstName());
 			provider.setLastName(personNameSimple.getLastName());
 		}
 		return provider;
 	}
 
-	protected Provider toProviderNames(String providerNameString)
+	protected ProviderModel toProviderNames(String providerNameString)
 	{
-		Provider provider = null;
+		ProviderModel provider = null;
 		if(providerNameString != null && providerNameString.contains(","))
 		{
 			String[] providerNames = providerNameString.split(",", 2);
-			provider = new Provider();
+			provider = new ProviderModel();
 			provider.setLastName(providerNames[0]);
 			provider.setFirstName(providerNames[1]);
 		}
@@ -202,7 +202,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return null;
 	}
 
-	protected PhoneNumber getPhoneNumber(xml.cds.v5_0.PhoneNumber importNumber)
+	protected PhoneNumberModel getPhoneNumber(xml.cds.v5_0.PhoneNumber importNumber)
 	{
 		if(importNumber == null)
 		{
@@ -241,7 +241,7 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		}
 
 		String fullNumber = StringUtils.trimToEmpty(area) + StringUtils.trimToEmpty(exchange) + StringUtils.trimToEmpty(number);
-		PhoneNumber phoneNumber = PhoneNumber.of(fullNumber, extension);
+		PhoneNumberModel phoneNumber = PhoneNumberModel.of(fullNumber, extension);
 
 		PhoneNumberType type = importNumber.getPhoneNumberType();
 		if(PhoneNumberType.R.equals(type))
@@ -302,12 +302,12 @@ public abstract class AbstractCDSImportMapper<I, E> extends AbstractImportMapper
 		return countryCode;
 	}
 
-	protected Address getAddress(xml.cds.v5_0.Address importAddress)
+	protected AddressModel getAddress(xml.cds.v5_0.Address importAddress)
 	{
-		Address address = null;
+		AddressModel address = null;
 		if(importAddress != null)
 		{
-			address = new Address();
+			address = new AddressModel();
 			AddressStructured structured = importAddress.getStructured();
 			if(structured != null)
 			{

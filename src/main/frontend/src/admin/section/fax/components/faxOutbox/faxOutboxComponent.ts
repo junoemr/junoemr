@@ -13,6 +13,7 @@ import PagedResponse from "../../../../../lib/common/response/pagedRespose";
 import {FaxNotificationStatusType} from "../../../../../lib/fax/model/FaxNotificationStatusType";
 import FaxAccount from "../../../../../lib/fax/model/FaxAccount";
 import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";
+import PhoneNumber from "../../../../../lib/common/model/PhoneNumber";
 
 angular.module("Admin.Section.Fax").component('faxOutbox', {
 	templateUrl: 'src/admin/section/fax/components/faxOutbox/faxOutbox.jsp',
@@ -167,7 +168,7 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 			ctrl.resendFax = (outboxItem: FaxOutboxResult): void =>
 			{
 				// the resend will create a new record for some resend attempts, in that case force a reload of the table items
-				let requireFullRefresh = outboxItem.isCombinedStatusIntegrationFailed();
+				let requireFullRefresh = outboxItem.isCombinedStatusIntegrationFailed;
 
 				// set a temp status to provider feedback/disable resend button
 				outboxItem.combinedStatus = FaxStatusCombinedType.InProgress;
@@ -175,7 +176,7 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 					function success(response: FaxOutboxResult)
 					{
 						angular.copy(response, outboxItem);
-						if(outboxItem.isInternalStatusError())
+						if(outboxItem.isInternalStatusError)
 						{
 							ctrl.toastService.errorToast(outboxItem.systemStatusMessage);
 						}
@@ -234,6 +235,11 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 				return ctrl.statusFilterOptions.find((option) => combinedStatus === option.value).label;
 			}
 
+			ctrl.getFaxDisplayNumber = (number: PhoneNumber): string =>
+			{
+				return number ? number.formattedForDisplay : "";
+			}
+
 			ctrl.getStatusIcon = (combinedStatus: FaxStatusCombinedType) =>
 			{
 				switch (combinedStatus)
@@ -275,9 +281,9 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 			ctrl.hideResendButton = (outboxItem: FaxOutboxResult) =>
 			{
 				return outboxItem.archived
-					|| outboxItem.isCombinedStatusInQueued()
-					|| outboxItem.isCombinedStatusInProgress()
-					|| outboxItem.isCombinedStatusSent()
+					|| outboxItem.isCombinedStatusInQueued
+					|| outboxItem.isCombinedStatusInProgress
+					|| outboxItem.isCombinedStatusSent
 			}
 
 			ctrl.nextPushTimeDisplay = () =>

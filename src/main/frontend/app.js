@@ -298,6 +298,16 @@ oscarApp.config([
 			url: '/billing',
 			component: 'systemPropertiesBilling',
 		})
+		.state('admin.labConfig',
+		{
+			url: '/labConfig',
+			component: 'labConfig',
+		})
+		.state('admin.labConfig.olis',
+		{
+			url: '/olis',
+			component: 'olisConfig',
+		})
 		.state('admin.configureHealthTracker',
 		{
 			url: '/configureHealthTracker',
@@ -644,8 +654,14 @@ oscarApp.config([
 		.state('record.details',
 		{
 			url: '/details',
-			templateUrl: 'src/record/details/details.jsp',
-			controller: 'Record.Details.DetailsController as detailsCtrl',
+			component: 'detailsCtrl',
+			resolve:
+			{
+				user: ['providerService', function(providerService)
+				{
+					return providerService.getMe();
+				}],
+			},
 			meta:
 			{
 				auth: {

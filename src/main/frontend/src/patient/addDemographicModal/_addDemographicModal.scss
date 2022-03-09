@@ -1,38 +1,65 @@
 #add-demographic-modal {
 	@include juno-font-default();
 
-	.add-demographic-button {
-		max-width: 112px;
+	label {
+		text-align: left;
+		margin-top: 8px;
 	}
-	.add-demographic-content {
-		padding: 10px;
+
+	/* Make the one ClinicAid component on the page space properly */
+	#dob.form-group {
+		margin-bottom: 0;
+
+		label.control-label {
+			padding: 0;
+			margin-bottom: 4px;
+		}
 
 		.invalid-field {
 			input, select{
 				border: 1px solid $color-red-base;
 			}
 		}
+	}
 
-		.right-column-container {
-			flex: 0 0 75%;
+	#create-another {
+		display: inline-block;
+		button {
+			height: 16px;
+			width: 16px;
 		}
+	}
 
-		.left-column-container {
-			flex: 0 0 75%;
+	#preferred-phone {
+		select {
+			width: 80px;
+		}
+	}
 
-			.hin-fields {
-				display: flex;
-				flex-wrap: wrap;
-				flex-direction: row;
-				align-items: end;
+	#swipe-healthcard-button {
+		button {
+			border-color: var(--theme-color-primary-base);
+		}
+	}
 
-				.hin {
-					flex: 0 0 80%;
-				}
+	.add-demographic-content {
+		padding: 10px;
 
-				.ver {
-					flex: 1 1 20%;
-				}
+		.column-container {
+			flex: 0 0 40%;
+		}
+		.hin-fields {
+			display: flex;
+			flex-wrap: wrap;
+			flex-direction: row;
+			align-items: end;
+
+			.hin {
+				flex: 3.5;
+			}
+
+			.ver {
+				flex: 1;
 			}
 		}
 	}

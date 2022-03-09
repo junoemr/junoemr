@@ -26,7 +26,7 @@ package org.oscarehr.dataMigration.mapper.hrm.in;
 import org.oscarehr.dataMigration.mapper.AbstractImportMapper;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -132,14 +132,14 @@ public abstract class AbstractHRMImportMapper<I, E> extends AbstractImportMapper
 		return reviewers;
 	}
 	
-	protected Provider stubProviderFromPersonName(PersonNameSimple name)
+	protected ProviderModel stubProviderFromPersonName(PersonNameSimple name)
 	{
 		if (name == null)
 		{
 			return null;
 		}
 		
-		Provider provider = new Provider();
+		ProviderModel provider = new ProviderModel();
 		provider.setFirstName(name.getFirstName());
 		provider.setLastName(name.getLastName());
 		

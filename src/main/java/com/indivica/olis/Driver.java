@@ -9,38 +9,19 @@
 
 package com.indivica.olis;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.Security;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.SchemaFactory;
-
+import ca.ssha._2005.hial.ArrayOfError;
+import ca.ssha._2005.hial.ArrayOfString;
+import ca.ssha._2005.hial.Response;
+import ca.ssha.www._2005.hial.OLISStub;
+import ca.ssha.www._2005.hial.OLISStub.HIALRequest;
+import ca.ssha.www._2005.hial.OLISStub.HIALRequestSignedRequest;
+import ca.ssha.www._2005.hial.OLISStub.OLISRequest;
+import ca.ssha.www._2005.hial.OLISStub.OLISRequestResponse;
+import com.indivica.olis.queries.Query;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
+import org.apache.log4j.Logger;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSProcessableByteArray;
@@ -58,34 +39,48 @@ import org.bouncycastle.util.Store;
 import org.bouncycastle.util.encoders.Base64;
 import org.oscarehr.common.dao.OscarLogDao;
 import org.oscarehr.common.model.OscarLog;
+import org.oscarehr.common.model.OscarMsgType;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.olis.OLISProtocolSocketFactory;
-import org.oscarehr.util.LoggedInInfo;
+import org.oscarehr.olis.OLISUtils;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.xml.sax.InputSource;
-
 import oscar.OscarProperties;
 import oscar.oscarMessenger.data.MsgProviderData;
-import ca.ssha._2005.hial.ArrayOfError;
-import ca.ssha._2005.hial.ArrayOfString;
-import ca.ssha._2005.hial.Response;
-import ca.ssha.www._2005.hial.OLISStub;
-import ca.ssha.www._2005.hial.OLISStub.HIALRequest;
-import ca.ssha.www._2005.hial.OLISStub.HIALRequestSignedRequest;
-import ca.ssha.www._2005.hial.OLISStub.OLISRequest;
-import ca.ssha.www._2005.hial.OLISStub.OLISRequestResponse;
 
-import com.indivica.olis.queries.Query;
-import org.oscarehr.common.model.OscarMsgType;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
+import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.Security;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-public class Driver {
+public class Driver
+{
+	private static final Logger logger = MiscUtils.getLogger();
+	private static final OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
 
-	private static OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
-
-	public static String submitOLISQuery(HttpServletRequest request, Query query) {
-		try {
-			OLISMessage message = new OLISMessage(query);
+	public static DriverResponse submitOLISQuery(@NotNull Provider loggedInProvider, @NotNull Query query)
+	{
+		return submitOLISQuery(loggedInProvider, query, null);
+	}
+	public static DriverResponse submitOLISQuery(@NotNull Provider loggedInProvider, @NotNull Query query, @Null String continuationPointer)
+	{
+		DriverResponse response;
+		try
+		{
+			OLISMessage message = new OLISMessage(loggedInProvider, query, continuationPointer);
 
 			System.setProperty("javax.net.ssl.trustStore", OscarProperties.getInstance().getProperty("olis_truststore").trim());
 			System.setProperty("javax.net.ssl.trustStorePassword", OscarProperties.getInstance().getProperty("olis_truststore_password").trim());
@@ -102,119 +97,107 @@ public class Driver {
 			String olisHL7String = message.getOlisHL7String().replaceAll("\n", "\r");
 			String msgInXML = String.format("<Request xmlns=\"http://www.ssha.ca/2005/HIAL\"><Content><![CDATA[%s]]></Content></Request>", olisHL7String);
 
-			String signedRequest = null;
-
-			if (OscarProperties.getInstance().getProperty("olis_returned_cert") != null) {
+			String signedRequest;
+			if(OscarProperties.getInstance().getProperty("olis_returned_cert") != null)
+			{
 				signedRequest = Driver.signData2(msgInXML);
-			} else {
+			}
+			else
+			{
 				signedRequest = Driver.signData(msgInXML);
 			}
-
 			olisRequest.getHIALRequest().getSignedRequest().setSignedData(signedRequest);
 
-			try {
+			try
+			{
 				OscarLog logItem = new OscarLog();
 				logItem.setAction("OLIS");
 				logItem.setContent("query");
 				logItem.setData(olisHL7String);
-
-				LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-				if (loggedInInfo.getLoggedInProvider() != null) logItem.setProviderNo(loggedInInfo.getLoggedInProviderNo());
-
+				logItem.setProviderNo(loggedInProvider.getProviderNo());
 				logDao.persist(logItem);
-
-			} catch (Exception e) {
-				MiscUtils.getLogger().error("Couldn't write log message for OLIS query", e);
+			}
+			catch(Exception e)
+			{
+				logger.error("Couldn't write log message for OLIS query", e);
 			}
 
-			if (OscarProperties.getInstance().getProperty("olis_simulate", "no").equals("yes")) {
-				String response = (String) request.getSession().getAttribute("olisResponseContent");
-				request.setAttribute("olisResponseContent", response);
-				request.getSession().setAttribute("olisResponseContent", null);
-				return response;
-			} else {
+			logger.info("OLIS Request" +
+					"\nclientTransactionId: " + message.getTransactionId() +
+					"\nrequest URL: " + olisRequestURL +
+					"\nhl7 request query:\n" + olisHL7String.replaceAll("\r", "\n"));
+
+			if (OscarProperties.getInstance().getProperty("olis_simulate", "no").equals("yes"))
+			{
+				//TODO how to handle this without request object?
+//				String olisResponseContent = (String) request.getSession().getAttribute("olisResponseContent");
+//				request.setAttribute("olisResponseContent", response);
+//				request.getSession().setAttribute("olisResponseContent", null);
+
+//				DriverResponse response = new DriverResponse();
+//				response.setHl7Response(olisResponseContent);
+				response = new DriverResponse();
+			}
+			else
+			{
 				OLISRequestResponse olisResponse = olis.oLISRequest(olisRequest);
 
 				String signedData = olisResponse.getHIALResponse().getSignedResponse().getSignedData();
 				String unsignedData = Driver.unsignData(signedData);
-				//MiscUtils.getLogger().info(msgInXML);
-				//MiscUtils.getLogger().info("---------------------------------");			
-				//MiscUtils.getLogger().info(unsignedData);
 
-				if (request != null) {
-					request.setAttribute("msgInXML", msgInXML);
-					request.setAttribute("signedRequest", signedRequest);
-					request.setAttribute("signedData", signedData);
-					request.setAttribute("unsignedResponse", unsignedData);
-				}
-
-				writeToFile(unsignedData);
-				readResponseFromXML(request, unsignedData);
-
-				return unsignedData;
-
+				response = readResponseFromXML(loggedInProvider.getProviderNo(), unsignedData);
+				response.setHl7Request(olisHL7String);
 			}
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("Can't perform OLIS query due to exception.", e);
-			if (request != null) {
-				request.setAttribute("searchException", e);
-			}
-
-			LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-			notifyOlisError(loggedInInfo.getLoggedInProvider(), e.getMessage());
-			return "";
 		}
+		catch(Exception e)
+		{
+			logger.error("Can't perform OLIS query due to exception.", e);
+			response = new DriverResponse();
+			response.setSearchException(e);
+			notifyOlisError(loggedInProvider.getProviderNo(), e.getMessage());
+		}
+		return response;
 	}
 
-	public static void readResponseFromXML(HttpServletRequest request, String olisResponse) {
-
-		olisResponse = olisResponse.replaceAll("<Content", "<Content xmlns=\"\" ");
-		olisResponse = olisResponse.replaceAll("<Errors", "<Errors xmlns=\"\" ");
-
-		try {
-			DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
-
-			Source schemaFile = new StreamSource(new File(OscarProperties.getInstance().getProperty("olis_response_schema")));
-			factory.newSchema(schemaFile);
-
-			JAXBContext jc = JAXBContext.newInstance("ca.ssha._2005.hial");
-			Unmarshaller u = jc.createUnmarshaller();
-			@SuppressWarnings("unchecked")
-			Response root = ((JAXBElement<Response>) u.unmarshal(new InputSource(new StringReader(olisResponse)))).getValue();
-
-			if (root.getErrors() != null) {
-				List<String> errorStringList = new LinkedList<String>();
+	public static DriverResponse readResponseFromXML(@NotNull String loggedInProviderNo, String olisResponse)
+	{
+		DriverResponse response = new DriverResponse();
+		try
+		{
+			Response root = OLISUtils.getOLISResponse(olisResponse);
+			if (root.getErrors() != null)
+			{
+				List<String> errorStringList = new LinkedList<>();
 
 				// Read all the errors
 				ArrayOfError errors = root.getErrors();
 				List<ca.ssha._2005.hial.Error> errorList = errors.getError();
 
-				for (ca.ssha._2005.hial.Error error : errorList) {
-					String errorString = "";
-					errorString += "ERROR " + error.getNumber() + " (" + error.getSeverity() + ") : " + error.getMessage();
-					MiscUtils.getLogger().debug(errorString);
+				for (ca.ssha._2005.hial.Error error : errorList)
+				{
+					String errorString = "ERROR " + error.getNumber() + " (" + error.getSeverity() + ") : " + error.getMessage();
+					logger.debug(errorString);
 
 					ArrayOfString details = error.getDetails();
-                                        if (details != null) {
-                                            List<String> detailList = details.getString();
-                                            for (String detail : detailList) {
-                                                    errorString += "\n" + detail;
-                                            }
-                                        }
-
+					if(details != null)
+					{
+						errorString += String.join("\n", details.getString());
+					}
 					errorStringList.add(errorString);
 				}
-				if (request != null) request.setAttribute("errors", errorStringList);
-			} else if (root.getContent() != null) {
-				if (request != null) request.setAttribute("olisResponseContent", root.getContent());
+				response.setErrors(errorStringList);
 			}
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("Couldn't read XML from OLIS response.", e);
-			
-			LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
-			notifyOlisError(loggedInInfo.getLoggedInProvider(), "Couldn't read XML from OLIS response." + "\n" + e);
+			else if(root.getContent() != null)
+			{
+				response.setHl7Response(root.getContent());
+			}
 		}
+		catch(Exception e)
+		{
+			logger.error("Couldn't read XML from OLIS response.", e);
+			notifyOlisError(loggedInProviderNo, "Couldn't read XML from OLIS response." + "\n" + e);
+		}
+		return response;
 	}
 
 	public static String unsignData(String data) {
@@ -242,10 +225,10 @@ public class Driver {
 
 			CMSProcessableByteArray cpb = (CMSProcessableByteArray) s.getSignedContent();
 			byte[] signedContent = (byte[]) cpb.getContent();
-			String content = new String(signedContent);
+			String content = new String(signedContent, StandardCharsets.ISO_8859_1);
 			return content;
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("error", e);
+			logger.error("error", e);
 		}
 		return null;
 
@@ -257,7 +240,8 @@ public class Driver {
 		X509Certificate cert = null;
 		PrivateKey priv = null;
 		KeyStore keystore = null;
-		String pwd = OscarProperties.getInstance().getProperty("olis_ssl_keystore_password","changeit");
+		String pwd = OscarProperties.getInstance().getProperty("olis_ssl_keystore_password", "changeit");
+		String keystoreAlias = OscarProperties.getInstance().getProperty("olis_ssl_keystore_alias", "olis");
 		String result = null;
 		try {
 			Security.addProvider(new BouncyCastleProvider());
@@ -266,11 +250,19 @@ public class Driver {
 			// Load the keystore
 			keystore.load(new FileInputStream(OscarProperties.getInstance().getProperty("olis_keystore")), pwd.toCharArray());
 
-			//Enumeration e = keystore.aliases();
-			String name = "olis";
+			Enumeration<String> e = keystore.aliases();
+
+			// print keystore aliases in debug mode.
+			if(logger.isDebugEnabled())
+			{
+				while(e.hasMoreElements())
+				{
+					logger.debug("keystore alis: " + e.nextElement());
+				}
+			}
 
 			// Get the private key and the certificate
-			priv = (PrivateKey) keystore.getKey(name, pwd.toCharArray());
+			priv = (PrivateKey) keystore.getKey(keystoreAlias, pwd.toCharArray());
 
 			FileInputStream is = new FileInputStream(OscarProperties.getInstance().getProperty("olis_returned_cert"));
 			CertificateFactory cf = CertificateFactory.getInstance("X.509");
@@ -287,7 +279,7 @@ public class Driver {
 			CMSSignedDataGenerator sgen = new CMSSignedDataGenerator();
 
 			// What digest algorithm i must use? SHA1? MD5? RSA?...
-			ContentSigner sha1Signer = new JcaContentSignerBuilder("SHA1withRSA").setProvider("BC").build(priv);			
+			ContentSigner sha1Signer = new JcaContentSignerBuilder("SHA256withRSA").setProvider("BC").build(priv);
 			sgen.addSignerInfoGenerator(new JcaSignerInfoGeneratorBuilder(new JcaDigestCalculatorProviderBuilder().setProvider("BC").build())
 	                     .build(sha1Signer, cert));
 			
@@ -303,7 +295,7 @@ public class Driver {
 			result = new String(signedDataB64);
 
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("Can't sign HL7 message for OLIS", e);
+			logger.error("Can't sign HL7 message for OLIS", e);
 		}
 		return result;
 	}
@@ -365,53 +357,24 @@ public class Driver {
 			result = new String(signedDataB64);
 
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("Can't sign HL7 message for OLIS", e);
+			logger.error("Can't sign HL7 message for OLIS", e);
 		}
 		return result;
 	}
 
-	private static void notifyOlisError(Provider provider, String errorMsg) {
-		HashSet<String> sendToProviderList = new HashSet<String>();
-
-		String providerNoTemp = "999998";
-		sendToProviderList.add(providerNoTemp);
-
-		if (provider != null) {
-			// manual prompts always send to admin
-			sendToProviderList.add(providerNoTemp);
-
-			providerNoTemp = provider.getProviderNo();
-			sendToProviderList.add(providerNoTemp);
-		}
-
-		// no one wants to hear about the problem
-		if (sendToProviderList.size() == 0) return;
-
+	private static void notifyOlisError(@NotNull String loggedInProviderNo, String errorMsg)
+	{
 		String message = "OSCAR attempted to perform a fetch of OLIS data at " + new Date() + " but there was an error during the task.\n\nSee below for the error message:\n" + errorMsg;
 
 		oscar.oscarMessenger.data.MsgMessageData messageData = new oscar.oscarMessenger.data.MsgMessageData();
 
-		ArrayList<MsgProviderData> sendToProviderListData = new ArrayList<MsgProviderData>();
-		for (String providerNo : sendToProviderList) {
-			MsgProviderData mpd = new MsgProviderData();
-			mpd.providerNo = providerNo;
-			mpd.locationId = "145";
-			sendToProviderListData.add(mpd);
-		}
+		ArrayList<MsgProviderData> sendToProviderListData = new ArrayList<>();
+		MsgProviderData mpd = new MsgProviderData();
+		mpd.providerNo = loggedInProviderNo;
+		mpd.locationId = "145";
+		sendToProviderListData.add(mpd);
 
 		String sentToString = messageData.createSentToString(sendToProviderListData);
 		messageData.sendMessage2(message, "OLIS Retrieval Error", "System", sentToString, "-1", sendToProviderListData, null, null, OscarMsgType.GENERAL_TYPE);
-	}
-
-	static void writeToFile(String data) {
-		try {
-			File tempFile = new File(System.getProperty("java.io.tmpdir") + (Math.random() * 100) + ".xml");
-			PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
-			pw.println(data);
-			pw.flush();
-			pw.close();
-		} catch (Exception e) {
-			MiscUtils.getLogger().error("Error", e);
-		}
 	}
 }

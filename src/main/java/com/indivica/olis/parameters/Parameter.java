@@ -11,6 +11,10 @@ package com.indivica.olis.parameters;
 
 public interface Parameter {
 
+	String UNIVERSAL_ID_ISO = "ISO";
+	String ASSIGNING_JURISDICTION = "ON";
+	String ASSIGNING_JURISDICTION_CODING_SYSTEM = "HL70347";
+
 	public String toOlisString();
 	
 	public void setValue(Object value);

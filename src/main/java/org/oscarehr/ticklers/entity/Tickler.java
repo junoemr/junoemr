@@ -29,7 +29,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.oscarehr.PMmodule.model.Program;
 import org.oscarehr.common.model.AbstractModel;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.util.LocaleUtils;
 

@@ -40,7 +40,7 @@ import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.common.dao.JointAdmissionDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.common.model.JointAdmission;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.transaction.annotation.Transactional;

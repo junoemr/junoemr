@@ -24,12 +24,18 @@
 
 */
 import {SecurityPermissions} from "../../common/security/securityConstants";
+import {SystemPreferenceApi} from "../../../generated";
+import {
+	INSTANCE_TYPE,
+	SYSTEM_PROPERTIES
+} from "../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Record.Summary').controller('Record.Summary.SummaryController', [
 
 	'$rootScope',
 	'$scope',
 	'$http',
+	'$httpParamSerializer',
 	'$location',
 	'$stateParams',
 	'$state',
@@ -45,6 +51,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		$rootScope,
 		$scope,
 		$http,
+		$httpParamSerializer,
 		$location,
 		$stateParams,
 		$state,
@@ -59,6 +66,9 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		var controller = this;
 		controller.SecurityPermissions = SecurityPermissions;
+
+		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
+			'../ws/rs');
 
 		controller.page = {};
 		controller.page.columnOne = {};
@@ -75,6 +85,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.user = user;
+		controller.olisSearchEnabled = false;
 
 		// store the child component refresh function so that this controller can trigger it.
 		controller.noteListComponentRefreshFunction = null;
@@ -96,6 +107,16 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 			{
 				controller.getLeftItems();
 				controller.getRightItems();
+
+				systemPreferenceApi.getPropertyValue(
+					SYSTEM_PROPERTIES.INSTANCE_TYPE, INSTANCE_TYPE.BC).then(
+					function success(result)
+					{
+						if (result.data.body === INSTANCE_TYPE.ON)
+						{
+							controller.olisSearchEnabled = true;
+						}
+					});
 			}
 		}
 
@@ -665,5 +686,13 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		{
 			controller.noteListComponentRefreshFunction = refresh;
 		}
+
+		controller.openOlisSearch = function ()
+		{
+			const target = "_blank";
+			const url = "../olis/Search.jsp?demographic=" + controller.demographicNo + "&hic=" + controller.user.providerNo;
+			window.open(url, target, "scrollbars=yes, location=no, width=1024, height=800");
+			win.focus();
+		};
 	}
 ]);

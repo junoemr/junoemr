@@ -6,35 +6,39 @@
 	<div class="details-fields">
 
 		<!-- MRP -->
-		<juno-select ng-model="$ctrl.ngModel.providerNo"
-					options="$ctrl.doctors"
-					label="MRP"
-					component-style="$ctrl.componentStyle">
+		<juno-select ng-model="$ctrl.selectedDoctorId"
+		             options="$ctrl.doctors"
+		             label="MRP"
+		             on-change="$ctrl.onDoctorSelected(value)"
+		             component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Nurse -->
-		<juno-select ng-model="$ctrl.ngModel.nurse"
-					options="$ctrl.nurses"
-					label="Nurse"
-					component-style="$ctrl.componentStyle">
+		<juno-select ng-model="$ctrl.selectedNurseId"
+		             options="$ctrl.nurses"
+		             label="Nurse"
+		             on-change="$ctrl.onNurseSelected(value)"
+		             component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Midwife -->
-		<juno-select ng-model="$ctrl.ngModel.midwife"
-					options="$ctrl.midwives"
-					label="Midwife"
-					component-style="$ctrl.componentStyle">
+		<juno-select ng-model="$ctrl.selectedMidwifeId"
+		             options="$ctrl.midwives"
+		             label="Midwife"
+		             on-change="$ctrl.onMidwifeSelected(value)"
+		             component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Resident -->
-		<juno-select ng-model="$ctrl.ngModel.resident"
-					options="$ctrl.doctors"
-					label="Resident"
-					component-style="$ctrl.componentStyle">
+		<juno-select ng-model="$ctrl.selectedResidentId"
+		             options="$ctrl.residents"
+		             label="Resident"
+		             on-change="$ctrl.onResidentSelected(value)"
+		             component-style="$ctrl.componentStyle">
 		</juno-select>
 
 		<!-- Referral Doctor -->
-		<juno-typeahead model="$ctrl.ngModel.scrReferralDoc"
+		<juno-typeahead model="$ctrl.selectedReferralDoc"
 						options="$ctrl.referralDoctors"
 						filter-options="false"
 						name="ReferralDoctor"
@@ -47,7 +51,7 @@
 		</juno-typeahead>
 
 		<!-- Referral Doctor Number -->
-		<juno-input ng-model="$ctrl.ngModel.scrReferralDocNo"
+		<juno-input ng-model="$ctrl.selectedReferralDocNo"
 					label="Referral Doctor #"
 					placeholder="Referral Doctor #"
 					valid-regex="$ctrl.numberRegex"
@@ -72,9 +76,9 @@
 
 		<!-- Patient Status Date -->
 		<juno-date-select ng-model="$ctrl.ngModel.patientStatusDate"
-						label="Patient Status Date"
-						on-validity-change="$ctrl.patientStatusDateValid = valid"
-						component-style="$ctrl.componentStyle">
+		                  label="Patient Status Date"
+		                  on-validity-change="$ctrl.patientStatusDateValid = valid"
+		                  component-style="$ctrl.componentStyle">
 		</juno-date-select>
 
 		<!-- Date Joined -->
@@ -85,21 +89,21 @@
 		</juno-date-select>
 
 		<!-- End Date -->
-		<juno-date-select ng-model="$ctrl.ngModel.endDate"
+		<juno-date-select ng-model="$ctrl.ngModel.dateEnded"
 		                  label="End Date"
 		                  on-validity-change="$ctrl.endDateValid = valid"
 		                  component-style="$ctrl.componentStyle">
 		</juno-date-select>
 
 		<!-- Chart Number-->
-		<juno-input ng-model="$ctrl.ngModel.chartNo"
+		<juno-input ng-model="$ctrl.ngModel.chartNumber"
 					label="Chart Number"
 					placeholder="Chart Number"
 					component-style="$ctrl.componentStyle">
 		</juno-input>
 
 		<!-- Cytology Number-->
-		<juno-input ng-model="$ctrl.ngModel.scrCytolNum"
+		<juno-input ng-model="$ctrl.ngModel.cytolNum"
 					label="Cytology #"
 					placeholder="Cytology #"
 					valid-regex="$ctrl.numberRegex"

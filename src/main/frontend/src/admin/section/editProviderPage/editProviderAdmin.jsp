@@ -863,6 +863,37 @@
 									   ca-disabled="$ctrl.fieldsDisabled"
 						>
 						</ca-field-text>
+						<ca-field-text ca-name="olis-official-first-name"
+						               ca-title="OLIS Official First Name"
+						               ca-model="$ctrl.provider.olisOfficialFirstName"
+						               ca-rows="1"
+						               ca-disabled="$ctrl.fieldsDisabled"
+						>
+						</ca-field-text>
+						<ca-field-text ca-name="olis-official-second-name"
+						               ca-title="OLIS Official Second Name"
+						               ca-model="$ctrl.provider.olisOfficialSecondName"
+						               ca-rows="1"
+						               ca-disabled="$ctrl.fieldsDisabled"
+						>
+						</ca-field-text>
+						<ca-field-text ca-name="olis-official-last-name"
+						               ca-title="OLIS Official Last Name"
+						               ca-model="$ctrl.provider.olisOfficialLastName"
+						               ca-rows="1"
+						               ca-disabled="$ctrl.fieldsDisabled"
+						>
+						</ca-field-text>
+						<ca-field-select
+								class="juno-modal no-padding"
+								ca-template="label"
+								ca-name="olis-id-type"
+								ca-title="OLIS ID Type"
+								ca-model="$ctrl.provider.olisOfficialIdType"
+								ca-options="$ctrl.olisIdTypes"
+								ca-disabled="$ctrl.fieldsDisabled"
+						>
+						</ca-field-select>
 						<ca-field-text
 										ca-name="lifeLabsClientId"
 										ca-title="Life Labs Client Id"

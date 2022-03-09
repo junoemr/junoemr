@@ -28,7 +28,7 @@ export default class FaxInboxService
 		return moment(transfer);
 	}
 
-	public getInbox = async (params: FaxInboxSearchParams): Promise<PagedResponse<FaxInboxResult>> =>
+	public async getInbox (params: FaxInboxSearchParams): Promise<PagedResponse<FaxInboxResult>>
 	{
 		let transfer = (await this.faxInboundApi.getInbox(
 			params.page,

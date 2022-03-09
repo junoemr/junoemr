@@ -43,7 +43,7 @@
 			</label>
 			<div class="col-sm-10">
 				<span class="form-control-static input-sm">
-					{{ $ctrl.model.data.sex }}
+					{{ $ctrl.model.data.displaySex }}
 				</span>
 			</div>
 		</div>
@@ -54,9 +54,9 @@
 			</label>
 			<div class="col-sm-10">
 				<span class="form-control-static">
-					<span class="patient-health-number" ng-if="$ctrl.model.data.hin">
-						{{$ctrl.model.data.hin}}
-						{{$ctrl.model.data.ver}}
+					<span class="patient-health-number" ng-if="$ctrl.model.data.healthNumber">
+						{{$ctrl.model.data.healthNumber}}
+						{{$ctrl.model.data.healthNumberVersion}}
 					</span>
 					<%--<button type="button"--%>
 					        <%--aria-label="Check Eligibility"--%>
@@ -88,7 +88,7 @@
 				Phone:
 			</label>
 			<div class="col-sm-10">
-				<span class="form-control-static">{{$ctrl.model.data.phone}}</span>
+				<span class="form-control-static">{{$ctrl.model.data.primaryPhone.formattedForDisplay}}</span>
 			</div>
 		</div>
 		<!-- patient email -->

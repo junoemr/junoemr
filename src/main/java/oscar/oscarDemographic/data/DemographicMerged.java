@@ -67,7 +67,7 @@ public class DemographicMerged {
 
     public void Merge(LoggedInInfo loggedInInfo, String demographic_no, String head) {
 
-    	org.oscarehr.demographic.model.DemographicMerged dm = new org.oscarehr.demographic.model.DemographicMerged();
+    	org.oscarehr.demographic.entity.DemographicMerged dm = new org.oscarehr.demographic.entity.DemographicMerged();
     	
     	 // always merge the head of records that have already been merged to the new head
         String record_head = getHead(demographic_no);
@@ -89,8 +89,8 @@ public class DemographicMerged {
 
     public void UnMerge(LoggedInInfo loggedInInfo, String demographic_no, String curUser_no) {
 
-    	List<org.oscarehr.demographic.model.DemographicMerged> dms = dao.findByDemographicNo(Integer.parseInt(demographic_no));
-    	for(org.oscarehr.demographic.model.DemographicMerged dm:dms) {
+    	List<org.oscarehr.demographic.entity.DemographicMerged> dms = dao.findByDemographicNo(Integer.parseInt(demographic_no));
+    	for(org.oscarehr.demographic.entity.DemographicMerged dm:dms) {
     		dm.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
             dm.setLastUpdateDate(new Date());
 			dm.delete();
@@ -125,7 +125,7 @@ public class DemographicMerged {
     public Integer getHead(Integer demographic_no)  {
     	Integer head = null;
 
-		org.oscarehr.demographic.model.DemographicMerged dm = dao.getCurrentHead(demographic_no);
+		org.oscarehr.demographic.entity.DemographicMerged dm = dao.getCurrentHead(demographic_no);
 
 		if (dm != null)
 		{
@@ -138,8 +138,8 @@ public class DemographicMerged {
     public ArrayList<String> getTail(String demographic_no) {
     	ArrayList<String> tailArray = new ArrayList<String>();
 
-    	List<org.oscarehr.demographic.model.DemographicMerged> dms = dao.findCurrentByMergedTo(Integer.parseInt(demographic_no));
-    	for(org.oscarehr.demographic.model.DemographicMerged dm:dms) {
+    	List<org.oscarehr.demographic.entity.DemographicMerged> dms = dao.findCurrentByMergedTo(Integer.parseInt(demographic_no));
+    	for(org.oscarehr.demographic.entity.DemographicMerged dm:dms) {
     		tailArray.add(String.valueOf(dm.getDemographicNo()));
     	}
     	

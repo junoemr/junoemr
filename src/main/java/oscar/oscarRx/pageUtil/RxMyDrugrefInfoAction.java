@@ -44,7 +44,7 @@ import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.AppDefinition;
 import org.oscarehr.common.model.AppUser;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.common.model.UserDSMessagePrefs;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.util.LoggedInInfo;
@@ -209,7 +209,7 @@ public final class RxMyDrugrefInfoAction extends DispatchAction {
 
 			DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
 
-			DemographicExt demoWarn = demographicExtDao.getLatestDemographicExt(bean.getDemographicNo(), "rxInteractionWarningLevel");
+			DemographicExt demoWarn = demographicExtDao.getLatestDemographicExt(bean.getDemographicNo(), DemographicExt.KEY_RX_INTERACTION_WARNING_LEVEL).orElse(null);
 			if (demoWarn != null) {
 				if (demoWarn.getValue() != null && demoWarn.getValue().length() > 0) {
 					int demoLevel = Integer.valueOf(demoWarn.getValue());

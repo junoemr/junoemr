@@ -25,7 +25,7 @@ import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Measurement;
 import org.oscarehr.common.model.MessageList;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;

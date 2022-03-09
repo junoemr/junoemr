@@ -42,7 +42,7 @@ import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.MeasurementDao;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.Measurement;
@@ -237,7 +237,7 @@ public class CkdScreener {
 			reasons.add("Family Hx");
 		
 		boolean positiveAboriginalMatch=false;
-		DemographicExt ab = demographicExtDao.getLatestDemographicExt(demographicNo, "aboriginal");
+		DemographicExt ab = demographicExtDao.getLatestDemographicExt(demographicNo, DemographicExt.KEY_ABORIGINAL).orElse(null);
 		if(ab != null && ab.getValue().equals("Yes")) {
 			positiveAboriginalMatch=true;
 		}

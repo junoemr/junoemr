@@ -24,7 +24,7 @@ package org.oscarehr.encounterNote.model;
 
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.provider.model.ProviderData;
 
 import javax.persistence.CascadeType;

@@ -27,7 +27,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.io.ZIPFile;
 import org.oscarehr.dataMigration.logger.ExportLogger;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.pref.ExportPreferences;
 import org.oscarehr.dataMigration.service.DemographicExporter;
 import org.oscarehr.util.MiscUtils;
@@ -96,7 +96,7 @@ public class PatientExportContext extends PollableContext
 	 * will use a default provider value if the provider is null
 	 * @param provider - the provider to increment
 	 */
-	public synchronized void incrementProviderExportCount(Provider provider)
+	public synchronized void incrementProviderExportCount(ProviderModel provider)
 	{
 		String providerKey = "Provider Unassigned";
 		if(provider != null)

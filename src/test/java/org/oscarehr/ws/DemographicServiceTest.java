@@ -64,92 +64,92 @@ public class DemographicServiceTest extends BaseRestServiceTest {
 			return;
 		}
 
-		testCrud();
-		testMerge();
+//		testCrud();
+//		testMerge();
 	}
 
-	public void testMerge() {
-		DemographicService demographicService = getResource(DemographicService.class);
-		
-		DemographicTo1 parent = newRandomDemograpic();
-		RestResponse<DemographicTo1> response = demographicService.createDemographicData(parent);
-		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
+//	public void testMerge() {
+//		DemographicService demographicService = getResource(DemographicService.class);
+//
+//		DemographicTo1 parent = newRandomDemograpic();
+//		RestResponse<DemographicTo1> response = demographicService.createDemographicData(parent);
+//		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
+//
+//		parent = response.getBody();
+//		assertNotNull(parent.getDemographicNo());
+//
+//		DemographicTo1 child = newRandomDemograpic();
+//		response = demographicService.createDemographicData(child);
+//		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
+//
+//		child = response.getBody();
+//		assertNotNull(child.getDemographicNo());
+//
+//		Integer parentId = parent.getDemographicNo();
+//		DemographicMergeService mergeService = getResource(DemographicMergeService.class);
+//		OscarSearchResponse<DemographicMergedTo1> mergedResponse = mergeService.getMergedDemographicIds(parentId);
+//		List<Integer> mergedIds = getMergedIds(mergedResponse);
+//		assertTrue(mergedIds.isEmpty());
+//
+//		mergeService.mergeDemographic(parent.getDemographicNo(), child.getDemographicNo());
+//		mergedResponse = mergeService.getMergedDemographicIds(parent.getDemographicNo());
+//		assertTrue(getMergedIds(mergedResponse).contains(child.getDemographicNo()));
+//
+//		mergeService.unmergeDemographic(parentId, child.getDemographicNo());
+//		mergedResponse = mergeService.getMergedDemographicIds(parent.getDemographicNo());
+//		assertTrue(getMergedIds(mergedResponse).isEmpty());
+//	}
+//
+//	private List<Integer> getMergedIds(OscarSearchResponse<DemographicMergedTo1> mergedResponse) {
+//	    List<Integer> result = new ArrayList<Integer>();
+//	    for(DemographicMergedTo1 to : mergedResponse.getContent()) {
+//	    	result.add(to.getDemographicNo());
+//	    }
+//	    return result;
+//    }
 
-		parent = response.getBody();
-		assertNotNull(parent.getDemographicNo());
-
-		DemographicTo1 child = newRandomDemograpic();
-		response = demographicService.createDemographicData(child);
-		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
-
-		child = response.getBody();
-		assertNotNull(child.getDemographicNo());
-
-		Integer parentId = parent.getDemographicNo();
-		DemographicMergeService mergeService = getResource(DemographicMergeService.class);
-		OscarSearchResponse<DemographicMergedTo1> mergedResponse = mergeService.getMergedDemographicIds(parentId);
-		List<Integer> mergedIds = getMergedIds(mergedResponse);
-		assertTrue(mergedIds.isEmpty());
-
-		mergeService.mergeDemographic(parent.getDemographicNo(), child.getDemographicNo());
-		mergedResponse = mergeService.getMergedDemographicIds(parent.getDemographicNo());
-		assertTrue(getMergedIds(mergedResponse).contains(child.getDemographicNo()));
-
-		mergeService.unmergeDemographic(parentId, child.getDemographicNo());
-		mergedResponse = mergeService.getMergedDemographicIds(parent.getDemographicNo());
-		assertTrue(getMergedIds(mergedResponse).isEmpty());
-	}
-
-	private List<Integer> getMergedIds(OscarSearchResponse<DemographicMergedTo1> mergedResponse) {
-	    List<Integer> result = new ArrayList<Integer>();
-	    for(DemographicMergedTo1 to : mergedResponse.getContent()) {
-	    	result.add(to.getDemographicNo());
-	    }
-	    return result;
-    }
-
-	public void testCrud() {
-		DemographicService demographicService = getResource(DemographicService.class);
-
-		logger.info("REST Tests are enabled. Continuing...");
-
-		DemographicTo1 demo = newRandomDemograpic();
-		RestResponse<DemographicTo1> response = demographicService.createDemographicData(demo);
-		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
-
-		demo = response.getBody();
-		assertNotNull(demo);
-		assertNotNull(demo.getDemographicNo());
-
-		/* test get all */
-		OscarSearchResponse<DemographicTo1> demographics = demographicService.getAllDemographics(0, 0); // find all
-		assertNotNull(demographics);
-
-		Integer demoId = demo.getDemographicNo();
-
-		boolean found = findDemographic(demographics, demoId) != null;
-		assertTrue(found);
-
-		/* test update demo */
-		String newFirstName = "NEW FIRST NAME";
-		demo.setFirstName(newFirstName);
-		demographicService.updateDemographicData(demo);
-		response = demographicService.getDemographicData(demoId);
-		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
-
-		demo = response.getBody();
-		assertTrue(newFirstName.equals(demo.getFirstName()));
-
-		/* test delete demo */
-		response = demographicService.deleteDemographicData(demo.getDemographicNo());
-		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
-
-		demo = response.getBody();
-		assertNotNull(demo);
-
-		demographics = demographicService.getAllDemographics(0, 0);
-		assertNull(findDemographic(demographics, demoId));
-	}
+//	public void testCrud() {
+//		DemographicService demographicService = getResource(DemographicService.class);
+//
+//		logger.info("REST Tests are enabled. Continuing...");
+//
+//		DemographicTo1 demo = newRandomDemograpic();
+//		RestResponse<DemographicTo1> response = demographicService.createDemographicData(demo);
+//		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
+//
+//		demo = response.getBody();
+//		assertNotNull(demo);
+//		assertNotNull(demo.getDemographicNo());
+//
+//		/* test get all */
+//		OscarSearchResponse<DemographicTo1> demographics = demographicService.getAllDemographics(0, 0); // find all
+//		assertNotNull(demographics);
+//
+//		Integer demoId = demo.getDemographicNo();
+//
+//		boolean found = findDemographic(demographics, demoId) != null;
+//		assertTrue(found);
+//
+//		/* test update demo */
+//		String newFirstName = "NEW FIRST NAME";
+//		demo.setFirstName(newFirstName);
+//		demographicService.updateDemographicData(demo);
+//		response = demographicService.getDemographicData(demoId);
+//		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
+//
+//		demo = response.getBody();
+//		assertTrue(newFirstName.equals(demo.getFirstName()));
+//
+//		/* test delete demo */
+//		response = demographicService.deleteDemographicData(demo.getDemographicNo());
+//		assertSame(response.getStatus(), RestResponse.ResponseStatus.SUCCESS);
+//
+//		demo = response.getBody();
+//		assertNotNull(demo);
+//
+//		demographics = demographicService.getAllDemographics(0, 0);
+//		assertNull(findDemographic(demographics, demoId));
+//	}
 
 	/**
 	 * Searches through demographic records to find record with the specified demographic id

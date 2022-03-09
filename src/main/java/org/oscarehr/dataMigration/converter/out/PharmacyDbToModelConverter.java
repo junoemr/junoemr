@@ -25,8 +25,8 @@ package org.oscarehr.dataMigration.converter.out;
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.model.PharmacyInfo;
 import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
-import org.oscarehr.dataMigration.model.common.Address;
-import org.oscarehr.dataMigration.model.common.PhoneNumber;
+import org.oscarehr.dataMigration.model.common.AddressModel;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.pharmacy.Pharmacy;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
@@ -51,7 +51,7 @@ public class PharmacyDbToModelConverter extends
 		pharmacy.setServiceLocationIdentifier(input.getServiceLocationIdentifier());
 		pharmacy.setCreatedDateTime(ConversionUtils.toNullableLocalDateTime(input.getAddDate()));
 
-		Address address = new Address();
+		AddressModel address = new AddressModel();
 		address.setAddressLine1(input.getAddress());
 		address.setCity(input.getCity());
 		address.setRegionCode(input.getProvince());
@@ -59,9 +59,9 @@ public class PharmacyDbToModelConverter extends
 		address.setPostalCode(input.getPostalCode());
 		pharmacy.setAddress(address);
 
-		pharmacy.setPhone1(PhoneNumber.of(StringUtils.trimToNull(input.getPhone1())));
-		pharmacy.setPhone2(PhoneNumber.of(StringUtils.trimToNull(input.getPhone2())));
-		pharmacy.setFax(PhoneNumber.of(StringUtils.trimToNull(input.getFax())));
+		pharmacy.setPhone1(PhoneNumberModel.of(StringUtils.trimToNull(input.getPhone1())));
+		pharmacy.setPhone2(PhoneNumberModel.of(StringUtils.trimToNull(input.getPhone2())));
+		pharmacy.setFax(PhoneNumberModel.of(StringUtils.trimToNull(input.getFax())));
 
 		return pharmacy;
 	}

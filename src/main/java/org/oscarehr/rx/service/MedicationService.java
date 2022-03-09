@@ -27,7 +27,7 @@ import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.dataMigration.converter.in.DrugModelToDbConverter;
 import org.oscarehr.dataMigration.converter.in.PrescriptionModelToDbConverter;
 import org.oscarehr.dataMigration.model.medication.Medication;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.provider.model.ProviderData;

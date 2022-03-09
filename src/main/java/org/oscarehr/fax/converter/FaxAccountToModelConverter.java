@@ -23,6 +23,7 @@
 package org.oscarehr.fax.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.springframework.stereotype.Component;
@@ -43,7 +44,7 @@ public class FaxAccountToModelConverter extends AbstractModelConverter<FaxAccoun
 		model.setDisplayName(entity.getDisplayName());
 		model.setCoverLetterOption(entity.getCoverLetterOption());
 		model.setAccountEmail(entity.getEmail());
-		model.setFaxNumber(entity.getReplyFaxNumber());
+		model.setFaxNumber(PhoneNumberModel.of(entity.getReplyFaxNumber(), PhoneNumberModel.PHONE_TYPE.FAX));
 		return model;
 	}
 }

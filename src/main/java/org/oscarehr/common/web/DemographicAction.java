@@ -42,7 +42,7 @@ import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicExtArchiveDao;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.DemographicArchive;
-import org.oscarehr.demographic.model.DemographicExtArchive;
+import org.oscarehr.demographic.entity.DemographicExtArchive;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;

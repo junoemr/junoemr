@@ -31,7 +31,7 @@ import java.util.List;
 import javax.persistence.Query;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.demographic.model.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicCust;
 import org.springframework.stereotype.Repository;
 
 @Repository

@@ -23,7 +23,7 @@
 package org.oscarehr.encounterNote.model;
 
 import org.oscarehr.common.model.AbstractModel;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

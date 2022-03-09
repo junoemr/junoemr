@@ -1,6 +1,8 @@
 import AbstractConverter from "../../conversion/AbstractConverter";
-import {FaxAccountUpdateInput} from "../../../../generated";
+import {FaxAccountUpdateInput, PhoneNumberModel} from "../../../../generated";
 import FaxAccount from "../model/FaxAccount";
+import PhoneNumber from "../../common/model/PhoneNumber";
+import PhoneNumberToInputConverter from "../../common/converter/PhoneNumberToInputConverter";
 
 export default class FaxAccountToUpdateInputConverter extends AbstractConverter<FaxAccount, FaxAccountUpdateInput>
 {
@@ -19,7 +21,11 @@ export default class FaxAccountToUpdateInputConverter extends AbstractConverter<
 		input.enableInbound = model.enableInbound;
 		input.enableOutbound = model.enableOutbound;
 		input.displayName = model.displayName;
-		input.faxNumber = model.faxNumber;
+		if(model.faxNumber)
+		{
+			let modelNumber = new PhoneNumber(model.faxNumber, null, PhoneNumberModel.PhoneTypeEnum.Fax);
+			input.faxNumber = new PhoneNumberToInputConverter().convert(modelNumber);
+		}
 		input.coverLetterOption = model.coverLetterOption;
 
 		return input;

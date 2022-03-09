@@ -31,7 +31,7 @@
 <%@ page import="org.oscarehr.common.model.ProviderPreference"%>
 <%@ page import="org.oscarehr.web.admin.ProviderPreferencesUIBean"%>
 <%@ page import="org.oscarehr.common.dao.DemographicDao, org.oscarehr.common.model.Demographic" %>
-<%@ page import="org.oscarehr.demographic.dao.DemographicCustDao, org.oscarehr.demographic.model.DemographicCust" %>
+<%@ page import="org.oscarehr.demographic.dao.DemographicCustDao, org.oscarehr.demographic.entity.DemographicCust" %>
 <%@ page import="org.oscarehr.common.dao.MyGroupAccessRestrictionDao" %>
 <%@ page import="org.oscarehr.common.model.MyGroupAccessRestriction" %>
 <%@ page import="org.oscarehr.common.dao.DemographicStudyDao" %>

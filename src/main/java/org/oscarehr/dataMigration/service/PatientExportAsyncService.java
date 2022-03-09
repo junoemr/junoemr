@@ -64,7 +64,7 @@ public class PatientExportAsyncService
 		{
 			patientExportContext.addProcessIdentifier(String.valueOf(demographicId));
 			logger.info("Load Demographic " + demographicId);
-			org.oscarehr.demographic.model.Demographic demographic = demographicDao.find(demographicId);
+			org.oscarehr.demographic.entity.Demographic demographic = demographicDao.find(demographicId);
 
 			PatientRecord patientRecord = patientRecordModelConverter.convert(demographic);
 			instant = LogAction.printDuration(instant, "[" + demographicId + "] Export Service: load patient model");

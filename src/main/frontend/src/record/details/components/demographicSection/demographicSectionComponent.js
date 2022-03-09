@@ -43,7 +43,7 @@ angular.module('Record.Details').component('demographicSection', {
 			ctrl.spokenLanguages = staticDataService.getSpokenLanguages();
 			ctrl.languages =  staticDataService.getEngFre();
 			ctrl.titles = staticDataService.getTitles();
-			ctrl.titles.push({"label": "--", "value": ''})
+			ctrl.titles.push({"label": "--", "value": null})
 			ctrl.aboriginalStatuses = staticDataService.getAboriginalStatuses();
 			ctrl.countries = staticDataService.getCountries();
 
@@ -59,7 +59,6 @@ angular.module('Record.Details').component('demographicSection', {
 			ctrl.$onInit = () =>
 			{
 				ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT
-
 				ctrl.validations["dateOfBirth"] = Juno.Validations.validationCustom(() => ctrl.dobValid);
 			}
 

@@ -50,7 +50,7 @@
 <br/>
 <%@page import="org.oscarehr.util.SpringUtils"%>
 <%@page import="org.oscarehr.PMmodule.dao.ProgramDao"%>
-<%@page import="org.oscarehr.demographic.model.Demographic"%>
+<%@page import="org.oscarehr.demographic.entity.Demographic"%>
 <%@page import="org.oscarehr.common.model.Provider"%>
 <script>
 	function reassign_tickler() {

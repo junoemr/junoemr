@@ -35,7 +35,6 @@ import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -72,7 +71,6 @@ public class FaxInboundWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/inbox")
-	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<FaxInboxTransferOutbound> getInbox(@QueryParam("page") @DefaultValue("1") Integer page,
 	                                                             @QueryParam("perPage") @DefaultValue("10") Integer perPage,

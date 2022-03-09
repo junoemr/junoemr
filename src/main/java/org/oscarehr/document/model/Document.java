@@ -58,7 +58,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 import org.oscarehr.common.model.AbstractModel;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.provider.model.ProviderData;
 
 /**

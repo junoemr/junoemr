@@ -18,6 +18,12 @@
 		            component-style="$ctrl.componentStyle">
 		</juno-input>
 
+		<juno-input ng-model="$ctrl.ngModel.middleName"
+		            label="Middle Name"
+		            class="justify-content-space-between"
+		            component-style="$ctrl.componentStyle">
+		</juno-input>
+
 		<juno-date-select ng-model="$ctrl.ngModel.dateOfBirth"
 		                  label="Date of Birth"
 		                  show-age="true"
@@ -75,7 +81,7 @@
 		</juno-typeahead>
 
 		<juno-select
-						ng-model="$ctrl.ngModel.scrAboriginal"
+						ng-model="$ctrl.ngModel.aboriginal"
 						options="$ctrl.aboriginalStatuses"
 						label="Aboriginal Status"
 						class="justify-content-space-between"

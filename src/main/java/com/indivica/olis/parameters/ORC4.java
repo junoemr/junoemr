@@ -9,6 +9,8 @@
 
 package com.indivica.olis.parameters;
 
+import org.oscarehr.olis.OLISUtils;
+
 /**
  * Placer Group Number
  * @author jen
@@ -32,7 +34,7 @@ public class ORC4 implements Parameter {
 	@Override
 	public String toOlisString() {
 		return getQueryCode() + ".1^" + (entityIdentifier != null ? entityIdentifier : "") + "~" +
-			getQueryCode() + ".3^" + (universalId != null ? universalId : "") + "~" +
+			getQueryCode() + ".3^" + (universalId != null ? OLISUtils.PROVINCIAL_LAB_ON + ":" + universalId : "") + "~" +
 			getQueryCode() + ".4^" + (universalIdType != null ? universalIdType : "");
 	}
 

@@ -24,6 +24,7 @@ package org.oscarehr.fax.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
@@ -40,7 +41,7 @@ public class FaxInboxTransferOutbound implements Serializable
 	/* the id of the document in the system */
 	private Integer documentId;
 
-	private String sentFrom;
+	private PhoneNumberModel sentFrom;
 
 	private Long externalReferenceId;
 }

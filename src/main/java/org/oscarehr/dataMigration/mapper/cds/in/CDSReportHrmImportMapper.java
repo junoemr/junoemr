@@ -27,7 +27,7 @@ import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.hrm.HrmComment;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmDocument>
@@ -87,7 +88,7 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 
 		document.setReportStatus(HrmDocument.ReportStatus.fromValueString(importStructure.getHRMResultStatus()));
 		document.setObservations(getObservations(importStructure.getOBRContent()));
-		document.addComment(getNoteAsHrmComment(importStructure.getNotes(), document.getCreatedBy(), document.getReportDateTime()));
+		getNoteAsHrmComment(importStructure.getNotes(), document.getCreatedBy(), document.getReportDateTime()).ifPresent(document::addComment);
 		document.setDescription(document.getReportClass().getValue() + " (" + CDSConstants.DEFAULT_HRM_DESCRIPTION + ")");
 
 		// The CDS source facility is the user friendly name of the sending facility.
@@ -118,7 +119,7 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 		return observationList;
 	}
 
-	protected HrmComment getNoteAsHrmComment(String note, Provider commentProvider, LocalDateTime dateTime)
+	protected Optional<HrmComment> getNoteAsHrmComment(String note, ProviderModel commentProvider, LocalDateTime dateTime)
 	{
 		HrmComment comment = null;
 		if(note != null)
@@ -128,6 +129,6 @@ public class CDSReportHrmImportMapper extends AbstractCDSReportImportMapper<HrmD
 			comment.setProvider(commentProvider);
 			comment.setObservationDateTime(dateTime);
 		}
-		return comment;
+		return Optional.ofNullable(comment);
 	}
 }

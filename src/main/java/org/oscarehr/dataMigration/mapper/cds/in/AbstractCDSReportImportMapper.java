@@ -27,7 +27,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.dataMigration.exception.InvalidDocumentException;
 import org.oscarehr.dataMigration.model.common.PartialDateTime;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.dataMigration.model.provider.Reviewer;
 import org.springframework.stereotype.Component;
 import xml.cds.v5_0.PersonNameSimple;
@@ -67,13 +67,28 @@ public abstract class AbstractCDSReportImportMapper<E> extends AbstractCDSImport
 		try
 		{
 			ReportFormat format = importStructure.getFormat();
+			String fileExtention = importStructure.getFileExtensionAndVersion();
+
 			if(format.equals(ReportFormat.BINARY)) //Document file
 			{
-				String filePath = importStructure.getFilePath();
+				String filePath = importStructure.getFilePath().replace('\\','/');
+
 				if(filePath != null) // external document
 				{
-					GenericFile externalFile = FileFactory.getExistingFile(patientImportContextService.getContext().getImportPreferences().getExternalDocumentPath(), filePath);
-					tempFile = FileFactory.createTempFile(externalFile.asFileInputStream(), "." + externalFile.getExtension().toLowerCase());
+					if(filePath.endsWith(fileExtention))
+					{
+						GenericFile externalFile = FileFactory.getExistingFile(patientImportContextService.getContext().getImportPreferences()
+								.getExternalDocumentPath(), filePath);
+						tempFile = FileFactory.createTempFile(externalFile.asFileInputStream(),
+							"." + externalFile.getExtension().toLowerCase());
+					}
+					else
+					{
+						GenericFile externalFile = FileFactory.getExistingFile(patientImportContextService.getContext().getImportPreferences()
+								.getExternalDocumentPath(), filePath+fileExtention);
+						tempFile = FileFactory.createTempFile(externalFile.asFileInputStream(),
+							"." + externalFile.getExtension().toLowerCase());
+					}
 				}
 				else
 				{
@@ -96,9 +111,9 @@ public abstract class AbstractCDSReportImportMapper<E> extends AbstractCDSImport
 		return tempFile;
 	}
 
-	protected Provider getAuthorPhysician(Reports.SourceAuthorPhysician authorPhysician)
+	protected ProviderModel getAuthorPhysician(Reports.SourceAuthorPhysician authorPhysician)
 	{
-		Provider provider = null;
+		ProviderModel provider = null;
 		if(authorPhysician != null)
 		{
 			PersonNameSimple personNameSimple = authorPhysician.getAuthorName();

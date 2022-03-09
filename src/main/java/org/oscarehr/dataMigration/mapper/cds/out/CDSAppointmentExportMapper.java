@@ -24,7 +24,7 @@ package org.oscarehr.dataMigration.mapper.cds.out;
 
 import org.oscarehr.dataMigration.model.appointment.Appointment;
 import org.oscarehr.dataMigration.model.appointment.AppointmentStatus;
-import org.oscarehr.dataMigration.model.provider.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 import xml.cds.v5_0.Appointments;
@@ -59,7 +59,7 @@ public class CDSAppointmentExportMapper extends AbstractCDSExportMapper<Appointm
 
 	protected Appointments.Provider getExportProvider(Appointment exportStructure)
 	{
-		Provider provider = exportStructure.getProvider();
+		ProviderModel provider = exportStructure.getProvider();
 		Appointments.Provider primaryPhysician = null;
 		if(provider != null)
 		{

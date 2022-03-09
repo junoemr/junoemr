@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.model.Demographic;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.integration.iceFall.dao.IceFallLogDao;
 import org.oscarehr.integration.iceFall.model.IceFallCredentials;

@@ -8,9 +8,30 @@
     and "gnu.org/licenses/gpl-2.0.html".
 
 --%>
-<%@ page language="java" errorPage="../../../provider/errorpage.jsp" %>
-<%@ page import="java.util.*,java.sql.*,org.oscarehr.olis.*,org.oscarehr.common.dao.PatientLabRoutingDao, org.oscarehr.util.SpringUtils, org.oscarehr.common.model.PatientLabRouting,oscar.oscarLab.ca.all.*,oscar.oscarLab.ca.all.util.*,oscar.oscarLab.ca.all.parsers.*,oscar.oscarLab.LabRequestReportLink,oscar.oscarMDS.data.ReportStatus,oscar.log.*,org.apache.commons.codec.binary.Base64" %>
-<%@page import="org.oscarehr.util.AppointmentUtil" %>
+<%@ page errorPage="../../../provider/errorpage.jsp" %>
+<%@ page import="org.oscarehr.common.dao.PatientLabRoutingDao" %>
+<%@ page import="org.oscarehr.common.model.PatientLabRouting" %>
+<%@ page import="org.oscarehr.olis.OLISResultsAction" %>
+<%@ page import="org.oscarehr.util.AppointmentUtil" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="oscar.oscarLab.ca.all.upload.MessageUploader"%>
+<%@ page import="oscar.log.LogAction" %>
+<%@ page import="oscar.log.LogConst" %>
+<%@ page import="oscar.oscarLab.LabRequestReportLink" %>
+<%@ page import="oscar.oscarLab.ca.all.AcknowledgementData" %>
+<%@ page import="oscar.oscarLab.ca.all.Hl7textResultsData" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.Factory" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.MessageHandler" %>
+<%@ page import="oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler" %>
+<%@ page import="oscar.oscarMDS.data.ReportStatus" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Set" %>
+<%@ page import="org.oscarehr.common.dao.DemographicDao" %>
+<%@ page import="org.oscarehr.common.model.Demographic" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.apache.commons.lang3.StringUtils" %>
+<%@ page import="org.apache.commons.text.StringEscapeUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -33,6 +54,8 @@ if(!authed) {
 %>
 
 <%
+	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+
 	String segmentID = request.getParameter("segmentID");
 String originalSegmentID = segmentID;
 String providerNo = request.getParameter("providerNo");
@@ -46,8 +69,13 @@ String reqTableID = reqIDL==null ? "" : reqIDL.toString();
 
 PatientLabRoutingDao plrDao = preview ? null : (PatientLabRoutingDao) SpringUtils.getBean("patientLabRoutingDao");
 PatientLabRouting plr = preview ? null : plrDao.findDemographicByLabId(Integer.valueOf(segmentID));
-String demographicID = preview || plr.getDemographicNo() == null ? "" : plr.getDemographicNo().toString();
+String demographicID = null;
+if(plr != null)
+{
+	demographicID = preview || plr.getDemographicNo() == null ? "" : plr.getDemographicNo().toString();
+}
 
+Integer demographicIDThatWillMatch = null;
 
 if(demographicID != null && !demographicID.equals("")){
     LogAction.addLog((String) session.getAttribute("user"), LogConst.ACTION_READ, LogConst.CON_HL7_LAB, segmentID, request.getRemoteAddr(),demographicID);
@@ -57,16 +85,16 @@ if(demographicID != null && !demographicID.equals("")){
 
 
 boolean ackFlag = false;
-ArrayList ackList = preview ? null : AcknowledgementData.getAcknowledgements(segmentID);
-Factory f;
+ArrayList<ReportStatus> ackList = preview ? null : AcknowledgementData.getAcknowledgements(segmentID);
 MessageHandler handlerMain;
 String hl7 = "";
+String resultUuid = oscar.Misc.getStr(request.getParameter("uuid"), "");
 
 if (!preview) {
 
 	if (ackList != null){
 	    for (int i=0; i < ackList.size(); i++){
-	        ReportStatus reportStatus = (ReportStatus) ackList.get(i);
+	        ReportStatus reportStatus = ackList.get(i);
 	        if ( reportStatus.getProviderNo().equals(providerNo) && reportStatus.getStatus().equals("A") ){
 	            ackFlag = true;
 	            break;
@@ -77,11 +105,10 @@ if (!preview) {
 	hl7 = Factory.getHL7Body(segmentID);
 
 } else {
-	String resultUuid = oscar.Misc.getStr(request.getParameter("uuid"), "");
-	handlerMain = OLISResultsAction.searchResultsMap.get(resultUuid);
+	handlerMain = OLISResultsAction.getHandlerByUUID(resultUuid);
 }
 
-
+String disableIfPreview = preview ? "disabled='disabled'" : "";
 
 
 OLISHL7Handler handler = null;
@@ -91,29 +118,71 @@ if (handlerMain instanceof OLISHL7Handler) {
 else {
 %> <jsp:forward page="labDisplay.jsp" /> <%
 }
-if (!preview && "true".equals(request.getParameter("showLatest"))) {
 
-	String multiLabId = Hl7textResultsData.getMatchingLabs(segmentID);
-	segmentID = multiLabId.split(",")[multiLabId.split(",").length - 1];
+List<Integer> multiLabIds = preview ? new ArrayList<>(0) : Hl7textResultsData.getMatchingLabs(Integer.parseInt(segmentID), false);
+String multiLabId = preview ? "" : Hl7textResultsData.idsToString(multiLabIds);
+
+if(!preview && "true".equals(request.getParameter("showLatest")) && !multiLabIds.isEmpty())
+{
+	// use the newest lab as the segmentId to display
+	segmentID = String.valueOf(multiLabIds.get(multiLabIds.size()-1));
 }
 
-String multiLabId = preview ? "" :  Hl7textResultsData.getMatchingLabs(segmentID);
-
-for (String tempId : multiLabId.split(",")) {
-	if (tempId.equals(segmentID) || tempId.equals("")) { continue; }
-	else {
-		try {
-			handler.importSourceOrganizations((OLISHL7Handler)Factory.getHandler(tempId));
-		} catch (Exception e) {
-			org.oscarehr.util.MiscUtils.getLogger().error("error",e);
+for(Integer tempId : multiLabIds)
+{
+	if(String.valueOf(tempId).equals(segmentID))
+	{
+		continue;
+	}
+	else
+	{
+		try
+		{
+			handler.importSourceOrganizations((OLISHL7Handler) Factory.getHandler(tempId));
+		}
+		catch(Exception e)
+		{
+			org.oscarehr.util.MiscUtils.getLogger().error("error", e);
 		}
 	}
 }
 
+String patientDisplayName = handler.getPatientName();
+String patientHealthNo = handler.getHealthNum();
+
+if(preview)
+{
+	demographicIDThatWillMatch = MessageUploader.willOLISLabReportMatch(
+			handler.getLastName(),
+			handler.getFirstName(),
+			handler.getSex(),
+			handler.getDOB(),
+			patientHealthNo);
+}
+
+String patientPrintHeaderData;
+if(StringUtils.isBlank(patientHealthNo))
+{
+	String[] values = handler.getMedicalRecordNumber();
+	String value = values[0];
+	String attrib = values[1];
+
+	patientPrintHeaderData = "MRN: " + value;
+	if(attrib != null)
+	{
+		patientPrintHeaderData += " (" + StringUtils.trimToEmpty(handler.getSourceOrganization(attrib)) + ")";
+	}
+}
+else
+{
+	patientPrintHeaderData = "HIN: " + patientHealthNo;
+}
+
+
 // check for errors printing
 if (request.getAttribute("printError") != null && (Boolean) request.getAttribute("printError")){
 %>
-<script language="JavaScript">
+<script>
     alert("The lab could not be printed due to an error. Please see the server logs for more detail.");
 </script>
 <%}
@@ -130,114 +199,417 @@ public String strikeOutInvalidContent(String content, String status) {
 	<!--  This is an OLIS lab display -->
     <head>
         <html:base/>
-        <title><%=handler.getPatientName()+" Lab Results"%></title>
+        <title><%=patientDisplayName+" Lab Results"%></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <script language="javascript" type="text/javascript" src="../../../share/javascript/Oscar.js" ></script>
-        <link rel="stylesheet" type="text/css" href="../../../share/css/OscarStandardLayout.css">
+        <script language="javascript" type="text/javascript" src="<%= request.getContextPath() %>/share/javascript/Oscar.js" ></script>
+        <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/share/css/OscarStandardLayout.css">
         <style type="text/css">
             <!--
-* { word-wrap: break-word; }
-.RollRes     { font-weight: 700; font-size: 8pt; color: white; font-family:
-               Verdana, Arial, Helvetica }
-.RollRes a:link { color: white }
-.RollRes a:hover { color: white }
-.RollRes a:visited { color: white }
-.RollRes a:active { color: white }
-.AbnormalRollRes { font-weight: 700; font-size: 8pt; color: red; font-family:
-               Verdana, Arial, Helvetica }
-.AbnormalRollRes a:link { color: red }
-.AbnormalRollRes a:hover { color: red }
-.AbnormalRollRes a:visited { color: red }
-.AbnormalRollRes a:active { color: red }
-.CorrectedRollRes { font-weight: 700; font-size: 8pt; color: yellow; font-family:
-               Verdana, Arial, Helvetica }
-.CorrectedRollRes a:link { color: yellow }
-.CorrectedRollRes a:hover { color: yellow }
-.CorrectedRollRes a:visited { color: yellow }
-.CorrectedRollRes a:active { color: yellow }
-.AbnormalRes { font-weight: bold; font-size: 8pt; color: red; font-family:
-               Verdana, Arial, Helvetica }
-.AbnormalRes a:link { color: red }
-.AbnormalRes a:hover { color: red }
-.AbnormalRes a:visited { color: red }
-.AbnormalRes a:active { color: red }
-.NormalRes   { font-weight: bold; font-size: 8pt; color: black; font-family:
-               Verdana, Arial, Helvetica }
-.NormalRes a:link { color: black }
-.NormalRes a:hover { color: black }
-.NormalRes a:visited { color: black }
-.NormalRes a:active { color: black }
-.HiLoRes     { font-weight: bold; font-size: 8pt; color: blue; font-family:
-               Verdana, Arial, Helvetica }
-.HiLoRes a:link { color: blue }
-.HiLoRes a:hover { color: blue }
-.HiLoRes a:visited { color: blue }
-.HiLoRes a:active { color: blue }
-.CorrectedRes { font-weight: bold; font-size: 8pt; color: #E000D0; font-family:
-               Verdana, Arial, Helvetica }
-.CorrectedRes a:link { color: #6da997 }
-.CorrectedRes a:hover { color: #6da997 }
-.CorrectedRes a:visited { color: #6da997 }
-.CorrectedRes a:active { color: #6da997 }
-.Field       { font-weight: bold; font-size: 8.5pt; color: black; font-family:
-               Verdana, Arial, Helvetica }
-div.Field a:link { color: black }
-div.Field a:hover { color: black }
-div.Field a:visited { color: black }
-div.Field a:active { color: black }
-.Field2      { font-weight: bold; font-size: 8pt; color: #ffffff; font-family:
-               Verdana, Arial, Helvetica }
-div.Field2   { font-weight: bold; font-size: 8pt; color: #ffffff; font-family:
-               Verdana, Arial, Helvetica }
-div.FieldData { font-weight: normal; font-size: 8pt; color: black; font-family:
-               Verdana, Arial, Helvetica }
-div.Field3   { font-weight: normal; font-size: 8pt; color: black; font-style: italic;
-               font-family: Verdana, Arial, Helvetica }
-div.Title    { font-weight: 800; font-size: 10pt; color: white; font-family:
-               Verdana, Arial, Helvetica; padding-top: 4pt; padding-bottom:
-               2pt }
-div.Title a:link { color: white }
-div.Title a:hover { color: white }
-div.Title a:visited { color: white }
-div.Title a:active { color: white }
-div.Title2   { font-weight: bolder; font-size: 9pt; color: black; text-indent: 5pt;
-               font-family: Verdana, Arial, Helvetica; padding: 10pt 15pt 2pt 2pt}
-div.Title2 a:link { color: black }
-div.Title2 a:hover { color: black }
-div.Title2 a:visited { color: black }
-div.Title2 a:active { color: black }
-.Cell        { background-color: #9999CC; border-left: thin solid #CCCCFF;
-               border-right: thin solid #6666CC;
-               border-top: thin solid #CCCCFF;
-               border-bottom: thin solid #6666CC }
-.Cell2       { background-color: #376c95; border-left-style: none; border-left-width: medium;
-               border-right-style: none; border-right-width: medium;
-               border-top: thin none #bfcbe3; border-bottom-style: none;
-               border-bottom-width: medium }
-.Cell3       { background-color: #add9c7; border-left: thin solid #dbfdeb;
-               border-right: thin solid #5d9987;
-               border-top: thin solid #dbfdeb;
-               border-bottom: thin solid #5d9987 }
-.CellHdr     { background-color: #cbe5d7; border-right-style: none; border-right-width:
-               medium; border-bottom-style: none; border-bottom-width: medium }
-.Nav         { font-weight: bold; font-size: 8pt; color: black; font-family:
-               Verdana, Arial, Helvetica }
-.PageLink a:link { font-size: 8pt; color: white }
-.PageLink a:hover { color: red }
-.PageLink a:visited { font-size: 9pt; color: yellow }
-.PageLink a:active { font-size: 12pt; color: yellow }
-.PageLink    { font-family: Verdana }
-.text1       { font-size: 8pt; color: black; font-family: Verdana, Arial, Helvetica }
-div.txt1     { font-size: 8pt; color: black; font-family: Verdana, Arial }
-div.txt2     { font-weight: bolder; font-size: 6pt; color: black; font-family: Verdana, Arial }
-div.Title3   { font-weight: bolder; font-size: 12pt; color: black; font-family:
-               Verdana, Arial }
-.red         { color: red }
-.text2       { font-size: 7pt; color: black; font-family: Verdana, Arial }
-.white       { color: white }
-.title1      { font-size: 9pt; color: black; font-family: Verdana, Arial }
-div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
-               Verdana, Arial, Helvetica }
+            * {
+                word-wrap: break-word;
+            }
+
+            .RollRes {
+                font-weight: 700;
+                font-size: 8pt;
+                color: white;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .RollRes a:link {
+                color: white
+            }
+
+            .RollRes a:hover {
+                color: white
+            }
+
+            .RollRes a:visited {
+                color: white
+            }
+
+            .RollRes a:active {
+                color: white
+            }
+
+            .AbnormalRollRes {
+                font-weight: 700;
+                font-size: 8pt;
+                color: red;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .AbnormalRollRes a:link {
+                color: red
+            }
+
+            .AbnormalRollRes a:hover {
+                color: red
+            }
+
+            .AbnormalRollRes a:visited {
+                color: red
+            }
+
+            .AbnormalRollRes a:active {
+                color: red
+            }
+
+            .CorrectedRollRes {
+                font-weight: 700;
+                font-size: 8pt;
+                color: yellow;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .CorrectedRollRes a:link {
+                color: yellow
+            }
+
+            .CorrectedRollRes a:hover {
+                color: yellow
+            }
+
+            .CorrectedRollRes a:visited {
+                color: yellow
+            }
+
+            .CorrectedRollRes a:active {
+                color: yellow
+            }
+
+            .AbnormalRes {
+                font-weight: bold;
+                font-size: 8pt;
+                color: red;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .AbnormalRes a:link {
+                color: red
+            }
+
+            .AbnormalRes a:hover {
+                color: red
+            }
+
+            .AbnormalRes a:visited {
+                color: red
+            }
+
+            .AbnormalRes a:active {
+                color: red
+            }
+
+            .NormalRes {
+                font-weight: bold;
+                font-size: 8pt;
+                color: black;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .NormalRes a:link {
+                color: black
+            }
+
+            .NormalRes a:hover {
+                color: black
+            }
+
+            .NormalRes a:visited {
+                color: black
+            }
+
+            .NormalRes a:active {
+                color: black
+            }
+
+            .HiLoRes {
+                font-weight: bold;
+                font-size: 8pt;
+                color: blue;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .HiLoRes a:link {
+                color: blue
+            }
+
+            .HiLoRes a:hover {
+                color: blue
+            }
+
+            .HiLoRes a:visited {
+                color: blue
+            }
+
+            .HiLoRes a:active {
+                color: blue
+            }
+
+            .CorrectedRes {
+                font-weight: bold;
+                font-size: 8pt;
+                color: #E000D0;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .CorrectedRes a:link {
+                color: #6da997
+            }
+
+            .CorrectedRes a:hover {
+                color: #6da997
+            }
+
+            .CorrectedRes a:visited {
+                color: #6da997
+            }
+
+            .CorrectedRes a:active {
+                color: #6da997
+            }
+
+            .Field {
+                font-weight: bold;
+                font-size: 8.5pt;
+                color: black;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            div.Field a:link {
+                color: black
+            }
+
+            div.Field a:hover {
+                color: black
+            }
+
+            div.Field a:visited {
+                color: black
+            }
+
+            div.Field a:active {
+                color: black
+            }
+
+            .Field2 {
+                font-weight: bold;
+                font-size: 8pt;
+                color: #ffffff;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            div.Field2 {
+                font-weight: bold;
+                font-size: 8pt;
+                color: #ffffff;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            div.FieldData {
+                font-weight: normal;
+                font-size: 8pt;
+                color: black;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            div.Field3 {
+                font-weight: normal;
+                font-size: 8pt;
+                color: black;
+                font-style: italic;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            div.Title {
+                font-weight: 800;
+                font-size: 10pt;
+                color: white;
+                font-family: Verdana, Arial, Helvetica;
+                padding-top: 4pt;
+                padding-bottom: 2pt
+            }
+
+            div.Title a:link {
+                color: white
+            }
+
+            div.Title a:hover {
+                color: white
+            }
+
+            div.Title a:visited {
+                color: white
+            }
+
+            div.Title a:active {
+                color: white
+            }
+
+            div.Title2 {
+                font-weight: bolder;
+                font-size: 9pt;
+                color: black;
+                text-indent: 5pt;
+                font-family: Verdana, Arial, Helvetica;
+                padding: 10pt 15pt 2pt 2pt
+            }
+
+            div.Title2 a:link {
+                color: black
+            }
+
+            div.Title2 a:hover {
+                color: black
+            }
+
+            div.Title2 a:visited {
+                color: black
+            }
+
+            div.Title2 a:active {
+                color: black
+            }
+
+            .Cell {
+                background-color: #9999CC;
+                border-left: thin solid #CCCCFF;
+                border-right: thin solid #6666CC;
+                border-top: thin solid #CCCCFF;
+                border-bottom: thin solid #6666CC
+            }
+
+            .Cell2 {
+                background-color: #376c95;
+                border-left-style: none;
+                border-left-width: medium;
+                border-right-style: none;
+                border-right-width: medium;
+                border-top: thin none #bfcbe3;
+                border-bottom-style: none;
+                border-bottom-width: medium
+            }
+
+            .Cell3 {
+                background-color: #add9c7;
+                border-left: thin solid #dbfdeb;
+                border-right: thin solid #5d9987;
+                border-top: thin solid #dbfdeb;
+                border-bottom: thin solid #5d9987
+            }
+
+            .CellHdr {
+                background-color: #cbe5d7;
+                border-right-style: none;
+                border-right-width: medium;
+                border-bottom-style: none;
+                border-bottom-width: medium
+            }
+
+            .Nav {
+                font-weight: bold;
+                font-size: 8pt;
+                color: black;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            .PageLink a:link {
+                font-size: 8pt;
+                color: white
+            }
+
+            .PageLink a:hover {
+                color: red
+            }
+
+            .PageLink a:visited {
+                font-size: 9pt;
+                color: yellow
+            }
+
+            .PageLink a:active {
+                font-size: 12pt;
+                color: yellow
+            }
+
+            .PageLink {
+                font-family: Verdana;
+            }
+
+            .text1 {
+                font-size: 8pt;
+                color: black;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            div.txt1 {
+                font-size: 8pt;
+                color: black;
+                font-family: Verdana, Arial;
+            }
+
+            div.txt2 {
+                font-weight: bolder;
+                font-size: 6pt;
+                color: black;
+                font-family: Verdana, Arial;
+            }
+
+            div.Title3 {
+                font-weight: bolder;
+                font-size: 12pt;
+                color: black;
+                font-family: Verdana, Arial;
+            }
+
+            .red {
+                color: red
+            }
+
+            .text2 {
+                font-size: 7pt;
+                color: black;
+                font-family: Verdana, Arial;
+            }
+
+            .white {
+                color: white
+            }
+
+            .title1 {
+                font-size: 9pt;
+                color: black;
+                font-family: Verdana, Arial;
+            }
+
+            div.Title4 {
+                font-weight: 600;
+                font-size: 8pt;
+                color: white;
+                font-family: Verdana, Arial, Helvetica;
+            }
+
+            @media screen {
+	            .print-only {
+		            display: none;
+	            }
+            }
+
+            @media print {
+                .no-print {
+                    display: none;
+                }
+
+                .NormalRes, .AbnormalRes {
+                    background-color: white;
+                }
+
+	            s {
+		            /* pdf renderer doesn't properly support strikethrough tag. */
+		            text-decoration: line-through;
+	            }
+            }
             -->
         </style>
         <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
@@ -245,9 +617,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 		    jQuery.noConflict();
 		</script>
 
-<script type="text/javascript" src="<%= request.getContextPath() %>/share/jquery/jquery.form.js"></script>
-
-        <script type="text/javaScript">
+        <script type="text/javascript">
         function popupStart(vheight,vwidth,varpage,windowname) {
             var page = varpage;
             windowprops = "height="+vheight+",width="+vwidth+",location=no,scrollbars=yes,menubars=no,toolbars=no,resizable=yes";
@@ -271,7 +641,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
         }
 
 	function linkreq(rptId, reqId) {
-	    var link = "../../LinkReq.jsp?table=hl7TextMessage&rptid="+rptId+"&reqid="+reqId;
+	    var link = "../../LinkReq.jsp?table=hl7TextMessage&rptid="+rptId+"&reqid="+reqId + "<%=demographicID != null ? "&demographicNo=" + demographicID : ""%>";
 	    window.open(link, "linkwin", "width=500, height=200");
 	}
 
@@ -304,67 +674,74 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
             <input type="hidden" name="labType<%= segmentID %>HL7" value="imNotNull" />
             <input type="hidden" name="providerNo" value="<%= providerNo %>" />
         </form>
-        <form name="acknowledgeForm" method="post" action="../../../oscarMDS/UpdateStatus.do">
-            <input type="hidden" name="originalSegmentID" value="<%=originalSegmentID%>" />
+        <form name="acknowledgeForm" method="post" action="<%= request.getContextPath() %>/oscarMDS/UpdateStatus.do">
+            <input type="hidden" name="originalSegmentID" value="<%=originalSegmentID%>"/>
+            <input type="hidden" name="labRequestUrl" value="<%=request.getRequestURL()%>"/>
             <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
                     <td valign="top">
                         <table width="100%" border="0" cellspacing="0" cellpadding="3">
                             <tr>
-                                <td align="left" class="MainTableTopRowRightColumn" width="100%">
+                                <td align="left" class="MainTableTopRowRightColumn no-print" width="100%">
                                 	<input type="hidden" name="labName" value="<%=handler.getAccessionNum() %>"/>
                                     <input type="hidden" name="segmentID" value="<%= segmentID %>"/>
+	                                <input type="hidden" name="uuid" value="<%= resultUuid %>"/>
                                     <input type="hidden" name="multiID" value="<%= multiLabId %>" />
                                     <input type="hidden" name="providerNo" value="<%= providerNo %>"/>
                                     <input type="hidden" name="status" value="A"/>
                                     <input type="hidden" name="comment" value=""/>
                                     <input type="hidden" name="labType" value="HL7"/>
+	                                <input type="hidden" name="patientDisplayName" value="<%=StringEscapeUtils.escapeHtml4(patientDisplayName)%>"/>
+                                    <input type="hidden" name="patientPrintHeaderData" value="<%=StringEscapeUtils.escapeHtml4(patientPrintHeaderData)%>"/>
                                     <% if ( !ackFlag ) { %>
-                                    <input type="submit" value="<bean:message key="oscarMDS.segmentDisplay.btnAcknowledge"/>" onclick="return getComment();">
+                                    <input type="submit" <%=disableIfPreview%> value="<bean:message key="oscarMDS.segmentDisplay.btnAcknowledge"/>" onclick="return getComment();">
                                     <% } %>
-                                    <input type="button" class="smallButton" value="<bean:message key="oscarMDS.index.btnForward"/>" onClick="popupStart(300, 400, '../../../oscarMDS/SelectProvider.jsp', 'providerselect')">
+                                    <input type="button" <%=disableIfPreview%> class="smallButton" value="<bean:message key="oscarMDS.index.btnForward"/>" onClick="popupStart(300, 400, '<%= request.getContextPath() %>/oscarMDS/SelectProvider.jsp', 'providerselect')">
                                     <input type="button" value=" <bean:message key="global.btnClose"/> " onClick="window.close()">
                                     <input type="button" value=" <bean:message key="global.btnPrint"/> " onClick="printPDF()">
                                     <% if ( demographicID != null && !demographicID.equals("") && !demographicID.equalsIgnoreCase("null")){ %>
-                                    <input type="button" value="Msg" onclick="popup(700,960,'../../../oscarMessenger/SendDemoMessage.do?demographic_no=<%=demographicID%>','msg')"/>
-                                    <input type="button" value="Tickler" onclick="popup(450,600,'../../../tickler/ForwardDemographicTickler.do?docType=HL7&docId=<%= segmentID %>&demographic_no=<%=demographicID%>','tickler')"/>
+                                    <input type="button" value="Msg" onclick="popup(700,960,'<%= request.getContextPath() %>/oscarMessenger/SendDemoMessage.do?demographic_no=<%=demographicID%>','msg')"/>
+                                    <input type="button" value="Tickler" onclick="popup(450,600,'<%= request.getContextPath() %>/tickler/ForwardDemographicTickler.do?docType=HL7&docId=<%= segmentID %>&demographic_no=<%=demographicID%>','tickler')"/>
                                     <% } %>
 
-                                    <input type="button" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="popupStart(360, 680, '../../../oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">
+                                    <input type="button" <%=disableIfPreview%> value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="popupStart(360, 680, '<%= request.getContextPath() %>/oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">
 
-				    <input type="button" value="Req# <%=reqTableID%>" title="Link to Requisition" onclick="linkreq('<%=segmentID%>','<%=reqID%>');" />
+				    <input type="button" <%=disableIfPreview%> value="Req# <%=reqTableID%>" title="Link to Requisition" onclick="linkreq('<%=segmentID%>','<%=reqID%>');" />
                                     <span class="Field2"><i>Next Appointment: <%=AppointmentUtil.getNextAppointment(demographicID) %></i></span>
                                 </td>
                             </tr>
                         </table>
                         <table width="100%" border="1" cellspacing="0" cellpadding="3" bgcolor="#9999CC" bordercolordark="#bfcbe3">
                             <%
-                            if (multiLabId != null){
-                                String[] multiID = multiLabId.split(",");
-                                if (multiID.length > 1){
-                                    %>
-                                    <tr>
-                                        <td class="Cell" colspan="2" align="middle">
-                                            <div class="Field2">
-                                                Version:&#160;&#160;
-                                                <%
-                                                for (int i=0; i < multiID.length; i++){
-                                                    if (multiID[i].equals(segmentID)){
-                                                        %>v<%= i+1 %>&#160;<%
+                            if (!multiLabIds.isEmpty())
+							{
+                                %>
+                                <tr>
+                                    <td class="Cell" colspan="2" align="middle">
+                                        <div class="Field2">
+                                            Version:&#160;&#160;
+                                            <%
+                                            for (int i=0; i < multiLabIds.size(); i++)
+											{
+												String multiIdSegmentId = String.valueOf(multiLabIds.get(i));
+                                                if (multiIdSegmentId.equals(segmentID))
+												{
+                                                    %>v<%= i+1 %>&#160;<%
+                                                }
+												else
+												{
+                                                    if ( searchProviderNo != null ) { // null if we were called from e-chart
+                                                        %><a href="labDisplay.jsp?segmentID=<%=multiIdSegmentId%>&multiID=<%=multiLabId%>&providerNo=<%= providerNo %>&searchProviderNo=<%= searchProviderNo %>">v<%= i+1 %></a>&#160;<%
                                                     }else{
-                                                        if ( searchProviderNo != null ) { // null if we were called from e-chart
-                                                            %><a href="labDisplay.jsp?segmentID=<%=multiID[i]%>&multiID=<%=multiLabId%>&providerNo=<%= providerNo %>&searchProviderNo=<%= searchProviderNo %>">v<%= i+1 %></a>&#160;<%
-                                                        }else{
-                                                            %><a href="labDisplay.jsp?segmentID=<%=multiID[i]%>&multiID=<%=multiLabId%>&providerNo=<%= providerNo %>">v<%= i+1 %></a>&#160;<%
-                                                        }
+                                                        %><a href="labDisplay.jsp?segmentID=<%=multiIdSegmentId%>&multiID=<%=multiLabId%>&providerNo=<%= providerNo %>">v<%= i+1 %></a>&#160;<%
                                                     }
                                                 }
-                                                %>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <%
-                                }
+                                            }
+                                            %>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <%
                             }
                             %>
                             <tr>
@@ -398,7 +775,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                                     </td>
                                                                     <td>
                                                                         <div class="FieldData">
-                                                                            <%=handler.getHealthNum()%>
+                                                                            <%=patientHealthNo%>
                                                                         </div>
                                                                     </td>
 
@@ -446,12 +823,25 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                                     <td>
                                                                         <div class="FieldData" >
                                                                             <% if ( searchProviderNo == null ) { // we were called from e-chart%>
-                                                                            <a href="javascript:window.close()">
+                                                                            <span><%=patientDisplayName%>
+                                                                            	<%
+                                                                            		if(preview) {
+                                                                            			if(demographicIDThatWillMatch != null) {
+                                                                            				Demographic pt =  demographicDao.getDemographicById(demographicIDThatWillMatch);
+                                                                            				if(pt != null) {
+                                                                            				%><a target="_blank" href="<%=request.getContextPath()%>/demographic/demographiccontrol.jsp?demographic_no=<%=demographicIDThatWillMatch %>&displaymode=edit&dboperation=search_detail">(Matched)</a><%
+                                                                            				} } else {
+                                                                            				%>(Unmatched)<%
+                                                                            			}
+                                                                            		}
+                                                                            	%>
+                                                                            </span>
                                                                             <% } else { // we were called from lab module%>
-                                                                            <a href="javascript:popupStart(360, 680, '../../../oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">
-                                                                                <% } %>
-                                                                                <%=handler.getPatientName()%>
+                                                                            <a href="javascript:popupStart(360, 680, '<%= request.getContextPath() %>/oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%= segmentID %>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">
+
+                                                                                <%=patientDisplayName%>
                                                                             </a>
+                                                                              <% } %>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -691,6 +1081,30 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                 </div>
                                             </td>
                                         </tr>
+                                          <tr>
+                                            <td valign="top">
+                                                <div class="FieldData">
+                                                    <strong>Abnormal Result(s):</strong>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="FieldData">
+                                                 <%
+													boolean abnormalD = false;
+													for(int x=0;x<handler.getOBRCount();x++) {
+														for(int y=0;y<handler.getOBXCount(x);y++) {
+															if(handler.isOBXAbnormal(x,y)) {
+																abnormalD=true;
+																break;
+															}
+														}
+													}
+												%>
+                                                   <%=abnormalD ?  "<span style='color:red'>Yes</span>" : "No" %>
+                                                </div>
+                                            </td>
+                                        </tr>
+
                                         <tr>
                                             <td></td>
                                         </tr>
@@ -797,7 +1211,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                         <tr>
                                             <td colspan="2">
                                                 <div class="FieldData">
-                                                    <%= handler.getDocName()%>
+                                                    <%= handler.getOrderingProviderFullName()%>
                                                     <%
                                                     HashMap<String,String> address = handler.getOrderingProviderAddress();
                                                     if (address != null && address.size() > 0) {
@@ -972,17 +1386,15 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                 <td bgcolor="white" colspan="2">
                                     <table width="100%" border="0" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
                                         <tr>
-                                            <%-- <td bgcolor="white">
-                                    <div class="FieldData">
-                                        <strong><bean:message key="oscarMDS.segmentDisplay.formReportToClient"/>: </strong>
-                                            <%= No admitting Doctor for CML messages%>
-                                    </div>
-                                </td> --%>
-                                            <td bgcolor="white" align="right" colspan="2">
+                                            <td bgcolor="white" colspan="2">
                                                 <div class="FieldData">
                                                     <strong><bean:message key="oscarMDS.segmentDisplay.formCCClient"/>: </strong>
-                                                    <%= handler.getCCDocs()%>
-
+	                                                <%
+		                                                for(String ccDoc : handler.getCCDocsListFullName())
+		                                                {
+															%><div><%=ccDoc%></div><%
+		                                                }
+	                                                %>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1030,7 +1442,18 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                                         <font color="red"><%= ackStatus %></font>
                                                                         <% if ( ackStatus.equals("Acknowledged") ) { %>
                                                                             <%= report.getTimestamp() %>,
-                                                                            <%= ( report.getComment() == null || report.getComment().isEmpty() ? "no comment" : "comment : " + report.getComment() ) %>
+                                                                            <% if(report.getComment() != null) {
+                                                                            	if(report.getComment().equals("")) {
+                                                                            		out.print("no comment");
+                                                                            	} else {
+                                                                            		out.print("comment : "+report.getComment());
+                                                                            	}
+                                                                            } else {
+                                                                            	out.print("no comment");
+
+                                                                            }
+
+                                                                            %>
                                                                         <% } %>
                                                                         <br>
                                                                     <% }
@@ -1052,26 +1475,20 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                             <tr>
                                 <td bgcolor="white" colspan="2">
                                     <table width="100%" border="0" cellpadding="0" cellspacing="0" bordercolor="#CCCCCC">
+	                                    <% if (handler.isReportBlocked() || handler.hasBlockedTest()) {
+	                                    %>
+	                                    <tr>
+		                                    <td>
+			                                    <div class="FieldData" style="text-align: center;">
+				                                    <span style="color:red; font-weight:bold;">Do Not Disclose Without Explicit Patient Consent</span>
+			                                    </div>
+		                                    </td>
+	                                    </tr>
+	                                    <% } %>
                                         <tr>
                                             <td bgcolor="white">
-                                                <div class="FieldData">
-                                                <% if (handler.isReportBlocked()) { %>
-                                                <%
-                                                boolean hasBlockedTest=false;
-                                                for(int i=0;i<handler.getHeaders().size();i++) {
-                                                	int obr = handler.getMappedOBR(i);
-                                                	if(handler.isOBRBlocked(obr)) {
-                                                		hasBlockedTest=true;
-                                                		break;
-                                                	}
-                                                }
-                                                if(hasBlockedTest) {
-                                                %>
-                                                	<span style="color:red; font-weight:bold">Do Not Disclose Without Explicit Patient Consent</span>
-                                                	<br/>
-                                                <% } } %>
-
-                                                    <strong>Report Comments: </strong>
+	                                                <div class="FieldData">
+	                                                <strong>Report Comments: </strong>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1102,19 +1519,21 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                         int l=0;
                         int linenum=0;
                         String highlight = "#E0E0FF";
-                        ArrayList headers = handler.getHeaders();
+                        List<String> headers = handler.getHeaders();
                         int OBRCount = handler.getOBRCount();
                         String category = "";
                         String newCategory = "";
 
                         int obr;
 
-                        for(i=0;i<headers.size();i++) {
-                        	obr = handler.getMappedOBR(i);
-                            linenum = obr + 1;
-                            if (handler.isChildOBR(linenum)) {
-                            	continue;
-                            }
+                        for(i = 0; i < headers.size(); i++)
+                        {
+	                        obr = handler.getMappedOBR(i);
+	                        linenum = obr + 1;
+	                        if(handler.isChildOBR(obr))
+	                        {
+		                        continue;
+	                        }
                         %>
                         <table style="page-break-inside:avoid;" bgcolor="#003399" border="0" cellpadding="0" cellspacing="0" width="100%">
                             <%
@@ -1144,11 +1563,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                     <div class="Title2">
                                         <%=headers.get(obr)%>
                                         <%
-                                        String poc = handler.getPointOfCare(obr);
-                                        if (!stringIsNullOrEmpty(poc)) {
+                                        String pocMessage = handler.getPointOfCareMessage(obr);
+                                        if (!stringIsNullOrEmpty(pocMessage)) {
                                         %>
                                         <br/>
-                                        <span style="font-size:8px; color:#333333;">Test performed at patient location</span>
+                                        <span style="font-size:8px; color:#333333;"><%=pocMessage%></span>
                                         <% } %>
                                         <%
                                         boolean blocked = handler.isOBRBlocked(obr);
@@ -1165,7 +1584,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                 		<% if (!handler.getObrSpecimenSource(obr).equals("")) { %>
                                 			<tr> <td> Specimen Source: </td><td><%=handler.getObrSpecimenSource(obr) %></td> </tr>
                                 		<% } %>
-                                		<tr> <td> Request Status: </td><td> <%=handler.getObrStatus(obr) %></td></tr>
+                                		<tr> <td> Request Status: </td><td> <%=handler.getObrStatusDisplayMessage(obr) %></td></tr>
                                 	</table>
 
                                 	</div>
@@ -1265,14 +1684,15 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                         </tr>
                                         <% } %>
                                         <%
-                                        String diagnosis = handler.getDiagnosis(obr);
-                                        if (!stringIsNullOrEmpty(diagnosis)) {
+                                        List<String> diagnoses = handler.getDiagnosis(obr);
+                                        if (!diagnoses.isEmpty()) {
                                         %>
                                         <tr>
                                             <td bgcolor="#FFCC00" colspan="2">
                                                 <div class="FieldData">
-                                                    <strong>Diagnosis:</strong><br/>
-                                                    <%=diagnosis%>
+                                                    <strong>Diagnosis:</strong>
+	                                                <br/>
+                                                    <%=String.join("<br/>", diagnoses)%>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1300,49 +1720,52 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                 boolean obrFlag = false;
                                 int obxCount = handler.getOBXCount(obr);
-                                String collectorsComment = handler.getCollectorsComment(obr); // TODO-legacy: get collector attribution
-                                if (collectorsComment != null && !collectorsComment.equals("")) {
+                                String collectorsComment = handler.getCollectorsComment(obr);
+                                if (StringUtils.isNotBlank(collectorsComment))
+								{
                                 	 %>
                                      <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
                                          <td valign="top" align="left" colspan="7"><div style="margin-left:15px; width:700px">
-                                         <strong>Comments:</strong> <%=handler.formatString(collectorsComment)%>
+                                         <strong>Collector's Comments:</strong> <%=handler.formatString(collectorsComment)%>
                                          <span style="margin-left:15px;font-size:8px; color:#333333;"><%=handler.getCollectorsCommentSourceOrganization(obr)%></span>
                                          </div></td>
                                      </tr>
                                      <%
                                 }
 
-                                if (handler.getObservationHeader(obr, 0).equals(headers.get(obr))) {
-                                	int cc = handler.getOBRCommentCount(obr);
-                                	for (int comment = 0; comment < cc; comment++){
-                                    // the obrName should only be set if it has not been
-                                    // set already which will only have occured if the
-                                    // obx name is "" or if it is the same as the obr name
-                                    String obxNN = handler.getOBXName(obr,0);
-                                    if(!obrFlag && obxNN.equals("")){%>
-                                        <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" >
-                                            <td valign="top" align="left"><%=handler.getOBRName(comment)%></td>
-                                            <td valign="top" align="left"><%=handler.getObrSpecimenSource(comment) %></td>
-                                            <td colspan="5">&nbsp;</td>
-                                        </tr>
-                                        <%obrFlag = true;
-                                    }
+								// does this check even do anything?
+                                if (handler.getOBRName(obr).equals(headers.get(obr)))
+								{
+                                	int obrCommentCount = handler.getOBRCommentCount(obr);
+	                                for(int n = 0; n < obrCommentCount; n++)
+	                                {
+	                                    // the obrName should only be set if it has not been set already,
+		                                // which will only have occurred if the obx name is ""
+		                                // or if it is the same as the obr name
+		                                String obxNN = (obxCount > 0) ? handler.getOBXName(obr, 0) : "";
+	                                    if(!obrFlag && StringUtils.isBlank(obxNN))
+										{%>
+	                                        <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
+	                                            <td valign="top" align="left"><%=handler.getOBRName(obr)%></td>
+	                                            <td colspan="6">&nbsp;</td>
+	                                        </tr>
+	                                        <%obrFlag = true;
+	                                    }
 
-                                    String obrComment = handler.getOBRComment(obr, comment);
-                                    String sourceOrg = handler.getOBRSourceOrganization(obr, comment);
-                                    %>
+	                                    String obrComment = handler.getOBRComment(obr, n);
+	                                    String sourceOrg = handler.getOBRSourceOrganization(obr, n);
+	                                    %>
                                 <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
                                     <td valign="top" align="left" colspan="7">
-                                    <div  style="margin-left:15px;width: 700px;">
-                                    	<%=obrComment%>
+                                    <div style="margin-left:15px;width: 700px;">
+	                                    <span><%=obrComment%></span>
                                     	<span style="margin-left:15px;font-size:8px; color:#333333;"><%=sourceOrg%></span>
                                    	</div>
                                     </td>
                                 </tr>
-                                <%
-
-                                }//end for k=0
-                            	}//end if handler.getObservation..
+                                    <%
+	                                }//end for n=0
+                            	}//end if handler.getObservation
 
                                 for (int k=0; k < obxCount; k++){
                                 	obx = handler.getMappedOBX(obr, k);
@@ -1388,7 +1811,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                         String status = handler.getOBXResultStatus(obr, obx).trim();
                                         String statusMsg = "";
                                         try {
-                                        	 statusMsg = handler.getTestResultStatusMessage(handler.getOBXResultStatus(obr, obx).charAt(0));
+                                        	 statusMsg = OLISHL7Handler.getObxTestResultStatusValue(handler.getOBXResultStatus(obr, obx));
                                         }
                                         catch (Exception e) {
                                         	statusMsg = "";
@@ -1414,7 +1837,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                         } else if ( abnormal != null && ( abnormal.equals("A") || abnormal.startsWith("H") || handler.isOBXAbnormal(obr, obx) ) ){
                                             lineClass = "AbnormalRes";
                                         }
-                                        String obxValueType = handler.getOBXValueType(obr,obx).trim();
+                                        String obxValueType = handler.getOBXValueType(obr,obx);
 
                                         if (obxValueType.equals("ST") &&  handler.renderAsFT(obr,obx)) {
                                         	obxValueType = "FT";
@@ -1433,8 +1856,10 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                            	</tr>
                                             <% } %>
                                             <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
-                                                <td valign="top" align="leftZOR"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(obr, obx)%>'))"><%=obxDisplayName %></a></td>
-                                                <td align="right"><%= strikeOutInvalidContent(handler.getOBXResult(obr, obx), status) %></td>
+                                                <td valign="top" align="leftZOR"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %>
+                                                    <a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(obr, obx)%>'))"><%=obxDisplayName %></a>
+                                                </td>
+                                                <td align="right"><%= strikeOutInvalidContent(handler.formatString(handler.getOBXResult(obr, obx)), status) %></td>
                                                 <td align="center">
                                                         <%= strikeOutInvalidContent(handler.getOBXAbnormalFlag(obr, obx), status)%>
                                                 </td>
@@ -1449,8 +1874,10 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                         } else if (obxValueType.equals("SN")) { // or Structured Numeric
 	                                              %>
 	                                              <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
-	                                                  <td valign="top" align="leftZOR"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(obr, obx)%>'))"><%=obxDisplayName %></a></td>
-	                                                  <td align="right"><%= strikeOutInvalidContent(handler.getOBXSNResult(obr, obx), status) %></td>
+	                                                  <td valign="top" align="leftZOR"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %>
+                                                          <a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(obr, obx)%>'))"><%=obxDisplayName %></a>
+                                                      </td>
+	                                                  <td align="right"><%= strikeOutInvalidContent(handler.formatString(handler.getOBXSNResult(obr, obx)), status) %></td>
 	                                                  <td align="center">
 	                                                          <%= strikeOutInvalidContent(handler.getOBXAbnormalFlag(obr, obx), status)%>
 	                                                  </td>
@@ -1506,10 +1933,12 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
    											</tr>
    											<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
    											<%if(!preview) { %>
-   												<td colspan="4" valign="left"><a href="PrintOLIS.do?segmentID=<%=segmentID%>&obr=<%=obr%>&obx=<%=obx%>" style="margin-left: 30px;">Click to view attachment.</a>
+   												<td class="no-print" colspan="4" valign="left"><a href="PrintOLIS.do?segmentID=<%=segmentID%>&obr=<%=obr%>&obx=<%=obx%>" style="margin-left: 30px;">Click to view attachment.</a>
+											    <td class="print-only" colspan="4" valign="left"><span style="margin-left: 12px;">This result has an attachment. Please print it separately and include it with this report</span></td>
    											<% } else { %>
-   												<td colspan="4" valign="left"><a href="PrintOLIS.do?uuid=<%=oscar.Misc.getStr(request.getParameter("uuid"), "")%>&obr=<%=obr%>&obx=<%=obx%>" style="margin-left: 30px;">Click to view attachment.</a>   											
-   											<% } %>
+   												<td class="no-print" colspan="4" valign="left"><a href="PrintOLIS.do?uuid=<%=oscar.Misc.getStr(request.getParameter("uuid"), "")%>&obr=<%=obr%>&obx=<%=obx%>" style="margin-left: 30px;">Click to view attachment.</a>
+											    <td class="print-only" colspan="4" valign="left"><span style="margin-left: 12px;">This result has an attachment. Please print it separately and include it with this report</span></td>
+											    <% } %>
    												</td>
    												<td align="left" colspan="2"><%=strikeOutInvalidContent(handler.getOBXUnits(obr, obx), status) %></td>
    												<td align="center"><%=statusMsg %></td>
@@ -1526,29 +1955,49 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
    												<td align="center"><%=statusMsg %></td>
    											</tr>
    											<%
-   											if (handler.isStatusFinal(handler.getOBXResultStatus(obr, obx).charAt(0))) {
-  												String parentId = handler.getOBXCEParentId(obr, obx);
-  												if (!stringIsNullOrEmpty(parentId)) {
+   											if (handler.isOBRStatusFinal(handler.getOBXResultStatus(obr, obx)) && handler.hasChildOBR(obr, obx))
+											   {
    											%>
    											<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
    												<td colspan="7" align="center">
-   													<table style="border: 1px solid black; margin-left 30px;">
+   													<table style="border: 1px solid black; margin-left: 30px;">
    														<tr><th>Agent</th><th>Sensitivity</th> </tr>
    												    <%
 
-   												    int childOBR = handler.getChildOBR(parentId) - 1;
-   												    if (childOBR != -1) {
+   												    int childOBR = handler.getChildOBR(obr, obx);
+											        if(childOBR != -1)
+											        {
 	   												    int childLength = handler.getOBXCount(childOBR);
-	   												    for (int ceIndex = 0; ceIndex < childLength; ceIndex++) {
-	   												    	String ceStatus = handler.getOBXResultStatus(childOBR, ceIndex).trim();
-	   	   			                                        boolean ceStrikeout = ceStatus != null && ceStatus.startsWith("W");
-	   	   			                                        String ceName = handler.getOBXName(childOBR,ceIndex);
-	   	   			                                        ceName = ceStrikeout ? "<s>" + ceName + "</s>" : ceName;
-	   	   			                                        String ceSense = handler.getOBXCESensitivity(childOBR,ceIndex);
-	   	   			                                        ceSense = ceStrikeout ? "<s>" + ceSense + "</s>" : ceSense;
-	   												    	%><tr><td><%=ceName%></td><td align="center"><%=ceSense%></td></tr><%
-	   													}
-   												    }
+												        for(int ceIndex = 0; ceIndex < childLength; ceIndex++)
+												        {
+													        String ceStatus = handler.getOBXResultStatus(childOBR, ceIndex).trim();
+													        boolean ceStrikeout = ceStatus != null && ceStatus.startsWith("W");
+															String ceStatusMessage = handler.isOBXStatusFinal(ceStatus) ? "" : "(" + OLISHL7Handler.getObxTestResultStatusValue(ceStatus) + ")";
+													        String ceName = handler.getOBXName(childOBR, ceIndex);
+													        ceName = ceStrikeout ? "<s>" + ceName + "</s>" : ceName;
+													        String ceSense = handler.getOBXCESensitivity(childOBR, ceIndex);
+													        ceSense = ceStrikeout ? "<s>" + ceSense + "</s>" : ceSense;
+	   												    	%><tr>
+													            <td style="text-align: left"><%=ceName%>
+														            <span style="margin-left: 4px; color:red;"><%=ceStatusMessage%></span>
+													            </td>
+													            <td align="center"><%=ceSense%></td>
+												            </tr><%
+														    for (int n=0; n < handler.getOBXCommentCount(childOBR, ceIndex); n++)
+														    {%>
+														    <tr class="NormalRes" style="font-size:10px; color:#333333">
+															    <td valign="top" align="left" colspan="2">
+																    <div style="max-width:700px; margin-left: 4px;">
+																	    <%=handler.getOBXComment(childOBR, ceIndex, n)%>
+																	    <span style="margin-left:15px;font-size:8px; color:#333333;word-break:normal;">
+													                        <%=handler.getOBXSourceOrganization(childOBR, ceIndex, n)%>
+												                        </span>
+																    </div>
+															    </td>
+														    </tr>
+														    <%}
+													    }
+												    }
    													%>
    													</table>
    												</td>
@@ -1556,19 +2005,35 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
    											<% 		if (category.toUpperCase().trim().equals("MICROBIOLOGY")) {%>
    											<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
    												<td align="center" colspan="7">
-   														S=Sensitive R=Resistant I=Intermediate MS=Moderately Sensitive VS=Very Sensitive
-
+												    I=Intermediate, MS=Moderately Susceptible, NI=No Interpretation, R=Resistant, S=Susceptible, S-DD=Susceptible Dose Dependent, VS=Very Susceptible
    												</td>
    											</tr>
 											<%
 													}
-  												}
+													// display child obr comments at the bottom of the section
+													for (int n=0; n < handler.getOBRCommentCount(childOBR); n++)
+													{%>
+					                        <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
+						                        <td valign="top" align="left" colspan="7">
+							                        <%=handler.getOBRComment(childOBR, n)%>
+							                        <span style="margin-left:15px;font-size:8px; color:#333333;word-break:normal;">
+								                        <%=handler.getOBRSourceOrganization(childOBR, n)%>
+		                                            </span>
+						                        </td>
+					                        </tr>
+		                                            <%}
+		                                            // add some spacing after comments%>
+                                            <tr style="height: 8px;" bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
+						                        <td colspan="7">&nbsp</td>
+					                        </tr><%
    											}
                                         } else {
                                         	%>
                                             <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>">
-                                                <td valign="top" align="leftZOR"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(obr, obx)%>'))"><%=obxDisplayName %></a></td>
-                                                <td align="right"><%= strikeOutInvalidContent(handler.getOBXResult(obr, obx), status) %></td>
+                                                <td valign="top" align="leftZOR"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %>
+                                                    <a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier='+encodeURIComponent('<%= handler.getOBXIdentifier(obr, obx)%>'))"><%=obxDisplayName %></a>
+                                                </td>
+                                                <td align="right"><%= strikeOutInvalidContent(handler.formatString(handler.getOBXResult(obr, obx)), status) %></td>
                                                 <td align="center">
                                                         <%= strikeOutInvalidContent(handler.getOBXAbnormalFlag(obr, obx), status)%>
                                                 </td>
@@ -1598,25 +2063,21 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                             </tr>
                                         	<%
                                         }
-                                        for (l=0; l < handler.getOBXCommentCount(obr, obx); l++){%>
-                                            <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
-                                                <td valign="top" align="left" colspan="7" style="font-family:courier;">
-                                                <div style="width:700px">
-                                                	<%=handler.getOBXComment(obr, obx, l)%><span style="margin-left:15px;font-size:8px; color:#333333;word-break:normal;"><%=handler.getOBXSourceOrganization(obr, obx, l)%></span>
-                                                </div>
-                                                </td>
-                                            </tr>
+                                        for (l=0; l < handler.getOBXCommentCount(obr, obx); l++)
+										{%>
+					                        <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
+						                        <td valign="top" align="left" colspan="7" style="font-family:courier;">
+							                        <div style="width:700px">
+								                        <%=handler.getOBXComment(obr, obx, l)%>
+								                        <span style="margin-left:15px;font-size:8px; color:#333333;word-break:normal;">
+									                        <%=handler.getOBXSourceOrganization(obr, obx, l)%>
+								                        </span>
+							                        </div>
+						                        </td>
+					                        </tr>
                                         <%}
                                     }
                                 }
-                            //}
-
-                            String obsHeader = handler.getObservationHeader(obr, 0);
-                            String headr = (String) headers.get(i);
-
-                            //for ( j=0; j< OBRCount; j++){
-
-                            //} //end for j=0; j<obrCount;
                             %>
                         </table>
                         <% // end for headers
@@ -1624,18 +2085,18 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                         <table width="100%" border="0" cellspacing="0" cellpadding="3" class="MainTableBottomRowRightColumn" bgcolor="#003399">
                             <tr>
-                                <td align="left" width="50%">
+                                <td align="left" width="50%" class="no-print">
                                     <% if ( providerNo != null /*&& ! mDSSegmentData.getAcknowledgedStatus(providerNo) */) { %>
-                                    <input type="submit" value="<bean:message key="oscarMDS.segmentDisplay.btnAcknowledge"/>" onclick="getComment()">
+                                    <input type="submit" <%=disableIfPreview%> value="<bean:message key="oscarMDS.segmentDisplay.btnAcknowledge"/>" onclick="getComment()">
                                     <% } %>
-                                    <input type="button" class="smallButton" value="<bean:message key="oscarMDS.index.btnForward"/>" onClick="popupStart(300, 400, '../../../oscarMDS/SelectProvider.jsp', 'providerselect')">
+                                    <input type="button" <%=disableIfPreview%> class="smallButton" value="<bean:message key="oscarMDS.index.btnForward"/>" onClick="popupStart(300, 400, '<%= request.getContextPath() %>/oscarMDS/SelectProvider.jsp', 'providerselect')">
                                     <input type="button" value=" <bean:message key="global.btnClose"/> " onClick="window.close()">
                                     <input type="button" value=" <bean:message key="global.btnPrint"/> " onClick="printPDF()">
                                         <indivo:indivoRegistered demographic="<%=demographicID%>" provider="<%=providerNo%>">
                                         <input type="button" value="<bean:message key="global.btnSendToPHR"/>" onClick="sendToPHR('<%=segmentID%>', '<%=demographicID%>')">
                                         </indivo:indivoRegistered>
                                     <% if ( searchProviderNo != null ) { // we were called from e-chart %>
-                                    <input type="button" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="popupStart(360, 680, '../../../oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%=segmentID%>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">
+                                    <input type="button" value=" <bean:message key="oscarMDS.segmentDisplay.btnEChart"/> " onClick="popupStart(360, 680, '<%= request.getContextPath() %>/oscarMDS/SearchPatient.do?labType=HL7&segmentID=<%=segmentID%>&name=<%=java.net.URLEncoder.encode(handler.getLastName()+", "+handler.getFirstName())%>', 'searchPatientWindow')">
                                     <% } %>
                                 </td>
                                 <td width="50%" valign="center" align="left">
@@ -1646,7 +2107,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                     </td>
                 </tr>
             </table>
-
         </form>
+        <pre style="display: none"><%=hl7%></pre>
     </body>
 </html>

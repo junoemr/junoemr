@@ -255,7 +255,7 @@ angular.module('Schedule').component('eventComponent', {
 				fillData: function fillData(data)
 				{
 					this.data = data;
-					this.demographicNo = data.demographicNo;
+					this.demographicNo = data.id;
 				},
 				loadData: function loadData(demographicNo)
 				{

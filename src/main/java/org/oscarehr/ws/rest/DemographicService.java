@@ -27,16 +27,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.service.CaseManagementIssueService;
-import org.oscarehr.casemgmt.service.CaseManagementManager;
-import org.oscarehr.common.dao.WaitingListDao;
-import org.oscarehr.common.dao.WaitingListNameDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.WaitingList;
-import org.oscarehr.common.model.WaitingListName;
-import org.oscarehr.demographic.model.DemographicCust;
-import org.oscarehr.demographic.model.DemographicExt;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.service.HinValidationService;
+import org.oscarehr.demographic.transfer.DemographicCreateInput;
+import org.oscarehr.demographic.transfer.DemographicUpdateInput;
 import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
 import org.oscarehr.encounterNote.dao.CaseManagementIssueDao;
@@ -45,26 +41,18 @@ import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
-import org.oscarehr.ws.conversion.DemographicToDomainConverter;
-import org.oscarehr.ws.conversion.DemographicToTransferConverter;
 import org.oscarehr.ws.rest.conversion.CaseManagementIssueConverter;
-import org.oscarehr.ws.rest.conversion.DemographicContactFewConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
-import org.oscarehr.ws.rest.conversion.WaitingListNameConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
-import org.oscarehr.ws.rest.to.model.AddressTo1;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
-import org.oscarehr.ws.rest.to.model.DemographicExtTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
-import org.oscarehr.ws.rest.to.model.WaitingListNameTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarEncounter.data.EctProgram;
-import oscar.oscarWaitingList.util.WLWaitingListUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -103,37 +91,19 @@ public class DemographicService extends AbstractServiceImpl {
 	private DemographicManager demographicManager;
 
 	@Autowired
-	private WaitingListDao waitingListDao;
-	
-	@Autowired
-	private WaitingListNameDao waitingListNameDao;
-
-	@Autowired
 	private RecentDemographicAccessService recentDemographicAccessService;
 
 	@Autowired
 	private DemographicRosterService demographicRosterService;
 
 	@Autowired
-	private DemographicToDomainConverter demographicToDomainConverter;
-
-	@Autowired
-	private DemographicToTransferConverter demographicToTransferConverter;
-
-	private CaseManagementManager caseManagementMgr;
-
-	public void setCaseManagementManager(CaseManagementManager caseManagementMgr)
-	{
-		this.caseManagementMgr = caseManagementMgr;
-	}
+	private org.oscarehr.demographic.service.DemographicService demographicService;
 
 	@Autowired
 	private HinValidationService hinValidationService;
 
 	@Deprecated // use ToTransfer/ToDomain + JPA demographic model
 	private DemographicConverter demoConverter = new DemographicConverter();
-	private DemographicContactFewConverter demoContactFewConverter = new DemographicContactFewConverter();
-	private WaitingListNameConverter waitingListNameConverter = new WaitingListNameConverter();
 	
 	/**
 	 * Finds all demographics.
@@ -148,6 +118,8 @@ public class DemographicService extends AbstractServiceImpl {
 	 * 		Returns all demographics.
 	 */
 	@GET
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
 	public OscarSearchResponse<DemographicTo1> getAllDemographics(@QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
@@ -181,172 +153,84 @@ public class DemographicService extends AbstractServiceImpl {
 	 * 		Returns data for the demographic provided 
 	 */
 	@GET
-	@Path("/{dataId}")
+	@Path("/{demographicId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> getDemographicData(@PathParam("dataId") Integer id) throws PatientDirectiveException
+	public RestResponse<DemographicModel> getDemographicData(@PathParam("demographicId") Integer id) throws PatientDirectiveException
 	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), id, Permission.DEMOGRAPHIC_READ);
+		String loggedInUserId = getLoggedInProviderId();
+		securityInfoManager.requireAllPrivilege(loggedInUserId, id, Permission.DEMOGRAPHIC_READ);
 
-		try
-		{
-			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
-			int providerNo = Integer.parseInt(providerNoStr);
+		DemographicModel demo = demographicService.getDemographic(id);
+		LogAction.addLogEntry(loggedInUserId, demo.getId(), LogConst.ACTION_READ,
+				LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
+		recentDemographicAccessService.updateAccessRecord(loggedInUserId, demo.getId());
 
-			Demographic demo = demographicManager.getDemographic(getLoggedInInfo(), id);
-			if (demo == null)
-			{
-				return RestResponse.errorResponse("No demographic found with id " + id);
-			}
-
-			List<DemographicExt> demoExts = demographicManager.getDemographicExts(getLoggedInInfo(), id);
-			if (demoExts != null && !demoExts.isEmpty())
-			{
-				DemographicExt[] demoExtArray = demoExts.toArray(new DemographicExt[demoExts.size()]);
-				demo.setExtras(demoExtArray);
-			}
-
-			DemographicTo1 result = demoConverter.getAsTransferObject(getLoggedInInfo(), demo);
-			AddressTo1 extraAddress = demographicManager.getExtraAddress(result);
-			result.setAddress2(extraAddress);
-
-			DemographicCust demoCust = demographicManager.getDemographicCust(getLoggedInInfo(), id);
-			if (demoCust != null)
-			{
-				result.setNurse(demoCust.getNurse());
-				result.setResident(demoCust.getResident());
-				result.setAlert(demoCust.getAlert());
-				result.setMidwife(demoCust.getMidwife());
-				result.setNotes(demoCust.getNotes());
-			}
-
-			List<WaitingList> waitingList = waitingListDao.search_wlstatus(id);
-			if (waitingList != null && !waitingList.isEmpty())
-			{
-				WaitingList wl = waitingList.get(0);
-				result.setWaitingListID(wl.getListId());
-				result.setWaitingListNote(wl.getNote());
-				result.setOnWaitingListSinceDate(wl.getOnListSince());
-			}
-
-			List<WaitingListName> waitingListNames = waitingListNameDao.findAll(null, null);
-			if (waitingListNames != null)
-			{
-				for (WaitingListName waitingListName : waitingListNames)
-				{
-					if (waitingListName.getIsHistory().equals("Y")) continue;
-
-					WaitingListNameTo1 waitingListNameTo1 = waitingListNameConverter.getAsTransferObject(getLoggedInInfo(), waitingListName);
-					result.getWaitingListNames().add(waitingListNameTo1);
-				}
-			}
-
-			LogAction.addLogEntry(providerNoStr, demo.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
-			recentDemographicAccessService.updateAccessRecord(providerNo, demo.getDemographicNo());
-
-			return RestResponse.successResponse(result);
-		}
-		catch (Exception e)
-		{
-			logger.error("Error",e);
-		}
-		return RestResponse.errorResponse("Error");
+		return RestResponse.successResponse(demo);
 	}
 
 	/**
 	 * Saves demographic information. 
 	 *
-	 * @param data
+	 * @param createInput
 	 * 		Detailed demographic data to be saved
 	 * @return
 	 * 		Returns the saved demographic data
 	 */
 	@POST
+	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> createDemographicData(DemographicTo1 data)
+	public RestResponse<DemographicModel> createDemographicData(DemographicCreateInput createInput)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_CREATE);
 
-		Demographic demographic = demoConverter.getAsDomainObject(getLoggedInInfo(), data);
-		hinValidationService.validateNoDuplication(demographic.getHin(), demographic.getVer(), demographic.getHcType());
-		demographicManager.createDemographic(getLoggedInInfo(), demographic);
+		hinValidationService.validateNoDuplication(
+				createInput.getHealthNumber(),
+				createInput.getHealthNumberVersion(),
+				createInput.getHealthNumberProvinceCode());
+		DemographicModel demographicModel = demographicService.addNewDemographicRecord(getLoggedInProviderId(), createInput);
 
-		String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
-		int providerNo = Integer.parseInt(providerNoStr);
+		LogAction.addLogEntry(getLoggedInProviderId(), demographicModel.getId(),
+				LogConst.ACTION_ADD,
+				LogConst.CON_DEMOGRAPHIC,
+				LogConst.STATUS_SUCCESS,
+				null,
+				getLoggedInInfo().getIp());
+		recentDemographicAccessService.updateAccessRecord(getLoggedInProviderId(), demographicModel.getId());
 
-		LogAction.addLogEntry(providerNoStr, demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null,getLoggedInInfo().getIp());
-		recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getDemographicNo());
-
-		return RestResponse.successResponse(demoConverter.getAsTransferObject(getLoggedInInfo(), demographic));
+		return RestResponse.successResponse(demographicModel);
 	}
 
 	/**
 	 * Updates demographic information. 
 	 * 
-	 * @param data
+	 * @param updateInput
 	 * 		Detailed demographic data to be updated
 	 * @return
 	 * 		Returns the updated demographic data
 	 */
 	@PUT
+	@Path("/{demographicId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> updateDemographicData(DemographicTo1 data)
+	public RestResponse<DemographicModel> updateDemographicData(@PathParam("demographicId") Integer demographicId,
+	                                                            DemographicUpdateInput updateInput)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), data.getDemographicNo(), Permission.DEMOGRAPHIC_UPDATE);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), updateInput.getId(), Permission.DEMOGRAPHIC_UPDATE);
 
-		try
-		{
-			if (data.getAddress2().getAddress() != null || data.getAddress2().getCity() != null ||
-					 data.getAddress2().getPostal() != null || data.getAddress2().getProvince() != null)
-			{
-				List<DemographicExtTo1> extraAddress = demographicManager.setExtraAddress(data);
-				data.setExtras(extraAddress);
-			}
-			//update demographiccust
-			if (data.getNurse() != null || data.getResident() != null || data.getAlert() != null || data.getMidwife() != null || data.getNotes() != null)
-			{
-				DemographicCust demoCust = demographicManager.getDemographicCust(getLoggedInInfo(), data.getDemographicNo());
-				if (demoCust == null)
-				{
-					demoCust = new DemographicCust();
-					demoCust.setId(data.getDemographicNo());
-				}
-				demoCust.setNurse(data.getNurse());
-				demoCust.setResident(data.getResident());
-				demoCust.setAlert(data.getAlert());
-				demoCust.setMidwife(data.getMidwife());
-				demoCust.setNotes(data.getNotes());
-				demographicManager.createUpdateDemographicCust(getLoggedInInfo(), demoCust);
-			}
+		DemographicModel updatedModel = demographicService.updateDemographicRecord(updateInput, loggedInInfo);
 
-			//update waitingList
-			if (data.getWaitingListID() != null)
-			{
-				WLWaitingListUtil.updateWaitingListRecord(data.getWaitingListID().toString(), data.getWaitingListNote(), data.getDemographicNo().toString(), null);
-			}
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), updatedModel.getId(),
+				LogConst.ACTION_UPDATE,
+				LogConst.CON_DEMOGRAPHIC,
+				LogConst.STATUS_SUCCESS,
+				null,
+				loggedInInfo.getIp());
 
-			org.oscarehr.demographic.model.Demographic demographic = demographicToDomainConverter.convert(data);
-			demographicManager.updateDemographic(loggedInInfo, demographic);
+		recentDemographicAccessService.updateAccessRecord(getLoggedInInfo().getLoggedInProviderNo(), updatedModel.getId());
 
-			LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), demographic.getDemographicId(),
-					LogConst.ACTION_UPDATE,
-					LogConst.CON_DEMOGRAPHIC,
-					LogConst.STATUS_SUCCESS,
-					null,
-					loggedInInfo.getIp());
-
-			Integer providerNo = Integer.parseInt(loggedInInfo.getLoggedInProviderNo());
-			recentDemographicAccessService.updateAccessRecord(providerNo, demographic.getId());
-
-			return RestResponse.successResponse(demographicToTransferConverter.convert(demographic));
-		}
-		catch (Exception e)
-		{
-			logger.error("Error",e);
-		}
-		return RestResponse.errorResponse("Error");
+		return RestResponse.successResponse(updatedModel);
 	}
 
 	/**
@@ -360,32 +244,21 @@ public class DemographicService extends AbstractServiceImpl {
 	@DELETE
 	@Path("/{dataId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<DemographicTo1> deleteDemographicData(@PathParam("dataId") Integer id)
+	public RestResponse<DemographicModel> deleteDemographicData(@PathParam("dataId") Integer id)
 	{
+		//TODO This seems incorrect, as demographics should not be deleteable. remove after checking this
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), id, Permission.DEMOGRAPHIC_DELETE);
-		try
-		{
-			Demographic demo = demographicManager.getDemographic(getLoggedInInfo(), id);
-			DemographicTo1 result = getDemographicData(id).getBody();
-			if (demo == null)
-			{
-				return RestResponse.errorResponse("Demographic with id " + id + " not found");
-			}
 
-			String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
-			int providerNo = Integer.parseInt(providerNoStr);
+		Demographic demo = demographicManager.getDemographic(getLoggedInInfo(), id);
 
-			demographicManager.deleteDemographic(getLoggedInInfo(), demo);
-			LogAction.addLogEntry(providerNoStr, demo.getDemographicNo(), LogConst.ACTION_DELETE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
-			recentDemographicAccessService.updateAccessRecord(providerNo, demo.getDemographicNo());
+		String providerNoStr = getLoggedInInfo().getLoggedInProviderNo();
+		int providerNo = Integer.parseInt(providerNoStr);
 
-			return RestResponse.successResponse(result);
-		}
-		catch (Exception e)
-		{
-			logger.error("Error",e);
-		}
-		return RestResponse.errorResponse("Error");
+		demographicManager.deleteDemographic(getLoggedInInfo(), demo);
+		LogAction.addLogEntry(providerNoStr, demo.getDemographicNo(), LogConst.ACTION_DELETE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
+		recentDemographicAccessService.updateAccessRecord(providerNo, demo.getDemographicNo());
+
+		return RestResponse.successResponse(demographicService.getDemographic(id));
 	}
 
 	@GET

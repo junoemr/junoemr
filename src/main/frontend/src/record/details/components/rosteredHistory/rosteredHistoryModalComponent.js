@@ -43,7 +43,7 @@ angular.module('Record.Details').component('rosteredHistoryModal', {
         {
             ctrl.demographic = ctrl.resolve.demographic;
 
-            demographicApi.getRosteredHistory(ctrl.demographic.demographicNo).then(
+            demographicApi.getRosteredHistory(ctrl.demographic.id).then(
                 (data) => {
                     ctrl.rosteredHistory = data.data.body.map((entry) => {
                         return {
