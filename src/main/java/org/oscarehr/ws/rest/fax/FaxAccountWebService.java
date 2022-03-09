@@ -160,4 +160,13 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
 		return RestResponse.successResponse(faxAccountService.testConnectionStatus(updateInput));
 	}
+
+	@GET
+	@Path("/active")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<FaxAccountTransferOutbound> getActiveFaxAccount()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
+		return RestResponse.successResponse(faxAccountService.getActiveFaxAccount(getLoggedInProviderId()));
+	}
 }

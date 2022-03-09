@@ -124,7 +124,9 @@
 						</tbody>
 					</table>
 				</div>
-				<span><bean:message bundle="ui" key="admin.fax.acct.accountSelectionMessage"/></span>
+				<span ng-if="$ctrl.faxAccountList.length > 0">
+					<bean:message bundle="ui" key="admin.fax.acct.accountSelectionMessage"/>
+				</span>
 			</panel-body>
 		</panel>
 	</div>

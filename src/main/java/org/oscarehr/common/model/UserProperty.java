@@ -78,6 +78,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     
     //added to user properties with new interface
     public static final String FAX = "fax";
+    public static final String SYSTEM_ACTIVE_FAX_ACCOUNT = "system_active_fax_account_id";
     public static final String SIGNATURE = "signature";
     public static final String COLOUR = "colour";
     public static final String SEX = "sex";

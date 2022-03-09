@@ -24,6 +24,7 @@ package org.oscarehr.fax.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.fax.converter.FaxAccountCreateToEntityConverter;
 import org.oscarehr.fax.converter.FaxAccountToModelConverter;
 import org.oscarehr.fax.converter.FaxAccountUpdateToEntityConverter;
@@ -43,6 +44,7 @@ import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.fax.transfer.FaxAccountUpdateInput;
 import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
 import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,6 +69,9 @@ public class FaxAccountService
 
 	@Autowired
 	private FaxAccountDao faxAccountDao;
+
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
 
 	@Autowired
 	private FaxAccountCreateToEntityConverter faxAccountCreateToEntityConverter;
@@ -111,17 +116,33 @@ public class FaxAccountService
 	/**
 	 * get the default fax account to be used. return null if none exists
 	 */
-	public FaxAccount getDefaultFaxAccount()
+	public FaxAccount getSystemActiveFaxAccount()
 	{
-		//TODO provider specific logic etc?
-		FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
-		criteriaSearch.setIntegrationEnabledStatus(true);
-		criteriaSearch.setOutboundEnabledStatus(true);
-		criteriaSearch.setLimit(1);
-		criteriaSearch.setSortDirAscending();
-		List<FaxAccount> faxAccountList = faxAccountDao.criteriaSearch(criteriaSearch);
+		String accountIdStr = systemPreferenceService.getPreferenceValue(UserProperty.SYSTEM_ACTIVE_FAX_ACCOUNT, null);
+		if(accountIdStr != null)
+		{
+			Long accountId = Long.parseLong(accountIdStr);
+			return faxAccountDao.find(accountId);
+		}
+		else
+		{
+			// fallback to simple logic of using first active fax account.
+			// mostly for legacy purposes where some systems may not have set the active account id.
+			FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
+			criteriaSearch.setIntegrationEnabledStatus(true);
+			criteriaSearch.setOutboundEnabledStatus(true);
+			criteriaSearch.setLimit(1);
+			criteriaSearch.setSortDirAscending();
+			List<FaxAccount> faxAccountList = faxAccountDao.criteriaSearch(criteriaSearch);
 
-		return faxAccountList.isEmpty() ? null : faxAccountList.get(0);
+			return faxAccountList.isEmpty() ? null : faxAccountList.get(0);
+		}
+	}
+
+	public FaxAccountTransferOutbound getActiveFaxAccount(String providerId)
+	{
+		//todo provider specific account selection
+		return faxAccountToModelConverter.convert(getSystemActiveFaxAccount());
 	}
 
 	public FaxAccountTransferOutbound getFaxAccount(Long id)

@@ -5,8 +5,9 @@ import {
 	LABEL_POSITION
 } from "../../../common/components/junoComponentConstants";
 import {SecurityPermissions} from "../../../common/security/securityConstants";
-import PagedResponse from "../../../lib/common/response/pagedRespose";
 import FaxAccount from "../../../lib/fax/model/FaxAccount";
+import ToastService from "../../../lib/alerts/service/ToastService";
+import {SYSTEM_PROPERTIES} from "../../../common/services/systemPreferenceServiceConstants";
 
 angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
@@ -25,6 +26,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 		{
 			const ctrl = this;
 			ctrl.faxAccountService = new FaxAccountService();
+			ctrl.toastService = new ToastService();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;
 			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
@@ -38,55 +40,34 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 			ctrl.masterFaxEnabledOutbound = false;
 			ctrl.activeAccount = null;
 
-			ctrl.$onInit = () =>
+			ctrl.$onInit = async () =>
 			{
-				// if the current provider number is unknown, retrieve it.
-				if(ctrl.loggedInProvider == null)
-				{
-					providerService.getMe().then(
-						function success(response)
-						{
-							ctrl.loggedInProvider = response;
-						},
-						function error(error)
-						{
-							console.error(error);
-						}
-					)
-				}
-				systemPreferenceService.isPreferenceEnabled("masterFaxEnabledInbound", ctrl.masterFaxEnabledInbound).then(
-					function success(response)
-					{
-						ctrl.masterFaxEnabledInbound = response;
-						ctrl.updateMasterFaxDisabledStatus();
-					},
-					function error(error)
-					{
-						console.error(error);
-					}
-				);
-				systemPreferenceService.isPreferenceEnabled("masterFaxEnabledOutbound", ctrl.masterFaxEnabledOutbound).then(
-					function success(response)
-					{
-						ctrl.masterFaxEnabledOutbound = response;
-						ctrl.updateMasterFaxDisabledStatus();
-					},
-					function error(error)
-					{
-						console.error(error);
-					}
-				);
+				let responses = await Promise.all([
+					providerService.getMe(),
+					systemPreferenceService.isPreferenceEnabled("masterFaxEnabledInbound", ctrl.masterFaxEnabledInbound),
+					systemPreferenceService.isPreferenceEnabled("masterFaxEnabledOutbound", ctrl.masterFaxEnabledOutbound),
+					ctrl.faxAccountService.getAccounts(),
+					ctrl.faxAccountService.getActiveAccount(),
+				]);
 
-				ctrl.faxAccountService.getAccounts().then(
-					function success(response: PagedResponse<FaxAccount>)
-					{
-						ctrl.faxAccountList = response.body;
-					},
-					function error(error)
-					{
-						console.error(error);
-					}
-				)
+				ctrl.loggedInProvider = responses[0];
+				ctrl.masterFaxEnabledInbound = responses[1];
+				ctrl.masterFaxEnabledOutbound = responses[2];
+				ctrl.faxAccountList = responses[3].body;
+				ctrl.activeAccount = responses[4];
+
+				ctrl.updateMasterFaxDisabledStatus();
+
+				// initialize selection checkboxes
+				ctrl.faxAccountList.forEach((account: FaxAccount) =>
+				{
+					ctrl.faxAccountSelectStates[account.id] = false;
+				});
+
+				if(ctrl.activeAccount)
+				{
+					ctrl.faxAccountSelectStates[ctrl.activeAccount.id] = true;
+				}
 			};
 
 			ctrl.userCanCreate = (): boolean =>
@@ -174,6 +155,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 					// set all other selected states to false (unchecked)
 					ctrl.faxAccountList.filter((account: FaxAccount) => account.id !== faxAccount.id)
 						.forEach((account: FaxAccount) => ctrl.faxAccountSelectStates[account.id] = false);
+					ctrl.setSystemProperty(SYSTEM_PROPERTIES.ACTIVE_FAX_ACCOUNT, faxAccount.id);
 				}
 				else
 				{
@@ -186,18 +168,15 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 				ctrl.masterFaxDisabled = !(ctrl.masterFaxEnabledInbound || ctrl.masterFaxEnabledOutbound);
 			};
 
-
 			ctrl.setSystemProperty = function setSystemProperty(key, value)
 			{
-				systemPreferenceService.setPreference(key, value).then(
-					function success(response)
-					{
-					},
-					function error(error)
-					{
-						console.error(error);
-					}
-				);
+				systemPreferenceService.setPreference(key, value)
+					.catch((error) =>
+						{
+							console.error(error);
+							ctrl.toastService.errorToast("Failed to save preference setting.");
+						}
+					);
 			};
 
 

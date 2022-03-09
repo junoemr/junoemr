@@ -128,7 +128,7 @@ public class FaxUploadService
 	 */
 	public FaxOutboxTransferOutbound queueAndSendFax(String providerId, Integer demographicId, String faxNumber, FaxFileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
 	{
-		FaxAccount faxAccount = faxAccountService.getDefaultFaxAccount();
+		FaxAccount faxAccount = faxAccountService.getSystemActiveFaxAccount();
 		return queueAndSendFax(faxAccount, providerId, demographicId, faxNumber, fileType, fileToFax);
 	}
 
