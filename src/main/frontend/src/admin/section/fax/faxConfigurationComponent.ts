@@ -126,6 +126,13 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 						{
 							// remove deleted account from the list
 							ctrl.faxAccountList = ctrl.faxAccountList.filter((account) => (account.id !== faxAccount.id));
+
+							if(ctrl.faxAccountList.length > 0)
+							{
+								let firstActive = ctrl.faxAccountList[0];
+								ctrl.faxAccountSelectStates[firstActive.id] = true;
+								ctrl.setActiveAccount(true, firstActive);
+							}
 						}
 						else
 						{
