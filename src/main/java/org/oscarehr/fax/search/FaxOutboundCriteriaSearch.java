@@ -26,11 +26,11 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
-import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
 import org.oscarehr.fax.model.FaxFileType;
 import org.oscarehr.fax.model.FaxNotificationStatus;
-import org.oscarehr.fax.model.FaxStatusInternal;
 import org.oscarehr.fax.model.FaxStatusCombined;
+import org.oscarehr.fax.model.FaxStatusInternal;
+import org.oscarehr.fax.provider.FaxProviderFactory;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -157,24 +157,26 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 				criterion = Restrictions.and(
 						Restrictions.eq("status", FaxStatusInternal.SENT),
 						Restrictions.or(
-								Restrictions.not(Restrictions.in("externalStatus", SRFaxApiConnector.RESPONSE_STATUSES_FINAL)),
-								Restrictions.isNull("externalStatus")
-						)
-				); break;
+								Restrictions.isNull("externalStatus"),
+								FaxProviderFactory.getStatusSearchRestrictionsInProgress("externalAccountType", "externalStatus"))
+				);
+				break;
 			}
 			case INTEGRATION_FAILED:
 			{
 				criterion = Restrictions.and(
 						Restrictions.eq("status", FaxStatusInternal.SENT),
-						Restrictions.eq("externalStatus", SRFaxApiConnector.RESPONSE_STATUS_FAILED)
-				); break;
+						FaxProviderFactory.getStatusSearchRestrictionsIntegrationFailed("externalAccountType", "externalStatus")
+				);
+				break;
 			}
 			case INTEGRATION_SUCCESS:
 			{
 				criterion = Restrictions.and(
 						Restrictions.eq("status", FaxStatusInternal.SENT),
-						Restrictions.eq("externalStatus", SRFaxApiConnector.RESPONSE_STATUS_SENT)
-				); break;
+						FaxProviderFactory.getStatusSearchRestrictionsIntegrationSuccess("externalAccountType", "externalStatus")
+				);
+				break;
 			}
 		}
 		return criterion;
