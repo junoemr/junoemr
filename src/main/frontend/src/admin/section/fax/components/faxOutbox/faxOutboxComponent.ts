@@ -84,7 +84,7 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 			ctrl.searchParams.startDate = null;
 			ctrl.searchParams.endDate = null;
 			ctrl.searchParams.combinedStatus = null;
-			ctrl.searchParams.archived = false;
+			ctrl.searchParams.archived = null;
 
 			ctrl.nextPushTime = null;
 			ctrl.displayNotificationColumn = false;
