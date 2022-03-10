@@ -31,7 +31,6 @@ import java.util.List;
 
 public interface FaxUploadProvider
 {
-
 	/**
 	 * Send the specified fax using this faxing provider
 	 * @param faxOutbound queued fax outbound object.  This is a fax which has been marked for us to be sent, but has

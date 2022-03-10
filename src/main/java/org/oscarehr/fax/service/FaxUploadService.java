@@ -343,7 +343,7 @@ public class FaxUploadService
 					}
 					else
 					{
-						apiResult.getErrorCode().ifPresent(faxOutbound::setStatusMessage);
+						apiResult.getError().ifPresent(faxOutbound::setStatusMessage);
 					}
 					faxOutboundDao.merge(faxOutbound);
 					logger.info("Updated Status to: " + remoteSentStatus);

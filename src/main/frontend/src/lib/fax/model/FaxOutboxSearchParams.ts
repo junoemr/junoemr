@@ -1,6 +1,7 @@
 import {Moment} from "moment";
 import FaxAccount from "./FaxAccount";
 import {FaxStatusCombinedType} from "./FaxStatusCombinedType";
+import moment from "moment/moment";
 
 export default class FaxOutboxSearchParams
 {

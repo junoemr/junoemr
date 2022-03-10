@@ -41,12 +41,6 @@ public interface FaxStatusResult
 	Optional<Date> getRemoteSendTime();
 
 	/**
-	 * API Error code. If the API call is successful, or if no error code is sent on an error this value will be empty.
-	 * @return Optional error code.
-	 */
-	Optional<String> getErrorCode();
-
-	/**
 	 * API error message.  If the API call is successful, or if no error reason is provided,
 	 * then this value will be empty.
 	 * @return Optional error reason

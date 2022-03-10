@@ -217,7 +217,7 @@ public class SRFaxFaxStatusResult implements FaxStatusResult
 	@Override
 	public String getRemoteSentStatus()
 	{
-		return this.getRemoteSentStatus();
+		return this.sentStatus;
 	}
 
 	@Override
@@ -236,12 +236,6 @@ public class SRFaxFaxStatusResult implements FaxStatusResult
 
 	@Override
 	public Optional<String> getError()
-	{
-		return this.getError();
-	}
-
-	@Override
-	public Optional<String> getErrorCode()
 	{
 		return Optional.ofNullable(this.errorCode);
 	}
