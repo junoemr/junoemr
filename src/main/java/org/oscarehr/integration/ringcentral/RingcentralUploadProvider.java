@@ -29,8 +29,8 @@ import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.result.FaxStatusResult;
+import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RingcentralUploadProvider implements FaxUploadProvider
@@ -52,22 +52,19 @@ public class RingcentralUploadProvider implements FaxUploadProvider
 	@Override
 	public List<String> getRemoteFinalStatusIndicators()
 	{
-		//TODO
-		return new ArrayList<>();
+		return RingcentralApiConnector.RESPONSE_STATUSES_FINAL;
 	}
 
 	@Override
 	public boolean isFaxInRemoteSentState(String externalStatus)
 	{
-		//TODO
-		return false;
+		return RingcentralApiConnector.RESPONSE_STATUS_DELIVERED.equals(externalStatus);
 	}
 
 	@Override
 	public boolean isFaxInRemoteFailedState(String externalStatus)
 	{
-		//TODO
-		return false;
+		return RingcentralApiConnector.RESPONSE_STATUSES_FAILED.contains(externalStatus);
 	}
 
 

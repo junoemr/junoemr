@@ -158,7 +158,7 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 						Restrictions.eq("status", FaxStatusInternal.SENT),
 						Restrictions.or(
 								Restrictions.isNull("externalStatus"),
-								FaxProviderFactory.getStatusSearchRestrictionsInProgress("externalAccountType", "externalStatus"))
+								FaxProviderFactory.getStatusSearchRestrictionsInProgress("fa.integrationType", "externalStatus"))
 				);
 				break;
 			}
@@ -166,7 +166,7 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 			{
 				criterion = Restrictions.and(
 						Restrictions.eq("status", FaxStatusInternal.SENT),
-						FaxProviderFactory.getStatusSearchRestrictionsIntegrationFailed("externalAccountType", "externalStatus")
+						FaxProviderFactory.getStatusSearchRestrictionsIntegrationFailed("fa.integrationType", "externalStatus")
 				);
 				break;
 			}
@@ -174,7 +174,7 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 			{
 				criterion = Restrictions.and(
 						Restrictions.eq("status", FaxStatusInternal.SENT),
-						FaxProviderFactory.getStatusSearchRestrictionsIntegrationSuccess("externalAccountType", "externalStatus")
+						FaxProviderFactory.getStatusSearchRestrictionsIntegrationSuccess("fa.integrationType", "externalStatus")
 				);
 				break;
 			}

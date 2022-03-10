@@ -33,6 +33,7 @@ import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
 import org.oscarehr.integration.ringcentral.RingcentralAccountProvider;
 import org.oscarehr.integration.ringcentral.RingcentralDownloadProvider;
 import org.oscarehr.integration.ringcentral.RingcentralUploadProvider;
+import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
 
 public class FaxProviderFactory
 {
@@ -87,7 +88,7 @@ public class FaxProviderFactory
 				),
 				Restrictions.and(
 						Restrictions.eq(accountTypePropertyName, FaxProvider.RINGCENTRAL),
-						Restrictions.not(Restrictions.in(statusPropertyName, "TODO in progress"))
+						Restrictions.not(Restrictions.in(statusPropertyName, RingcentralApiConnector.RESPONSE_STATUSES_FINAL))
 				)
 		);
 	}
@@ -101,7 +102,7 @@ public class FaxProviderFactory
 				),
 				Restrictions.and(
 						Restrictions.eq(accountTypePropertyName, FaxProvider.RINGCENTRAL),
-						Restrictions.in(statusPropertyName, "TODO Failed")
+						Restrictions.in(statusPropertyName, RingcentralApiConnector.RESPONSE_STATUSES_FAILED)
 				)
 		);
 	}
@@ -115,7 +116,7 @@ public class FaxProviderFactory
 				),
 				Restrictions.and(
 						Restrictions.eq(accountTypePropertyName, FaxProvider.RINGCENTRAL),
-						Restrictions.in(statusPropertyName, "TODO Sent")
+						Restrictions.in(statusPropertyName, RingcentralApiConnector.RESPONSE_STATUS_DELIVERED)
 				)
 		);
 	}
