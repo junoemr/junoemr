@@ -158,6 +158,12 @@ public class FaxOutbound extends AbstractModel<Long>
 
 	}
 
+	public void setProvider(ProviderData provider)
+	{
+		this.provider = provider;
+		this.providerNo = provider.getId();
+	}
+
 	public FaxStatusCombined getCombinedStatus(FaxUploadProvider uploadProvider)
 	{
 		FaxStatusInternal systemStatus = this.getStatus();
