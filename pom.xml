@@ -1404,6 +1404,16 @@
 			<artifactId>google-auth-library-oauth2-http</artifactId>
 			<version>0.21.1</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.oauth-client</groupId>
+			<artifactId>google-oauth-client</artifactId>
+			<version>1.33.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.oauth-client</groupId>
+			<artifactId>google-oauth-client-servlet</artifactId>
+			<version>1.33.1</version>
+		</dependency>
 		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>

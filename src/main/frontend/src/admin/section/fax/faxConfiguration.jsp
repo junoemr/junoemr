@@ -125,6 +125,9 @@
 	<div class="fax-config-footer">
 		<panel no-header="true" ng-if="!$ctrl.masterFaxDisabled">
 			<panel-body>
+				<juno-button class="w-128 d-block m-t-4" click='$ctrl.toRingCentralLogin()'>
+					Login with RingCentral
+				</juno-button>
 				<button type="button" class="btn btn-primary"
 				        ng-click="$ctrl.connectNewSRFaxAccount()">
 					<bean:message bundle="ui" key="admin.fax.acct.btn-connectSRFax"/>

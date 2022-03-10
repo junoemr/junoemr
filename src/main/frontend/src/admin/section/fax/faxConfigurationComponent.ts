@@ -165,6 +165,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 			{
 				ctrl.masterFaxDisabled = !(ctrl.masterFaxEnabledInbound || ctrl.masterFaxEnabledOutbound);
 			};
+
 			ctrl.setSystemProperty = function setSystemProperty(key, value)
 			{
 				systemPreferenceService.setPreference(key, value).then(
@@ -177,6 +178,11 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 					}
 				);
 			};
+
+			ctrl.toRingCentralLogin = () =>
+			{
+				location.href = "/oauth"		// TODO: figure out how to bind a better name later, ie: /fax/ringcentral/oauth
+			}
 		}
 	]
 });
