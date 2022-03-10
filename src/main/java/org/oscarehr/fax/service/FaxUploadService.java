@@ -28,6 +28,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.FaxStatus;
 import org.oscarehr.fax.converter.FaxOutboundToModelConverter;
+import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
@@ -42,8 +43,8 @@ import org.oscarehr.fax.model.FaxStatusInternal;
 import org.oscarehr.fax.provider.FaxProviderFactory;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.result.FaxStatusResult;
+import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
-import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
@@ -85,6 +86,9 @@ public class FaxUploadService
 
 	@Autowired
 	private FaxOutboundDao faxOutboundDao;
+
+	@Autowired
+	private FaxAccountDao faxAccountDao;
 
 	@Autowired
 	private FaxAccountService faxAccountService;
@@ -288,7 +292,24 @@ public class FaxUploadService
 	 * Ask remote sources for status updates on sent files that have not been completed.
 	 * Update any records that have status changes
 	 */
-	public void requestPendingStatusUpdates(FaxAccountTransferOutbound faxAccount)
+	public void requestAllPendingStatusUpdates()
+	{
+		FaxAccountCriteriaSearch activeAccountQuery = new FaxAccountCriteriaSearch();
+		activeAccountQuery.setIntegrationEnabledStatus(true);
+		activeAccountQuery.setOutboundEnabledStatus(true);
+
+		List<FaxAccount> activeAccounts = faxAccountDao.criteriaSearch(activeAccountQuery);
+		for (FaxAccount activeAccount : activeAccounts)
+		{
+			requestPendingStatusUpdates(activeAccount);
+		}
+	}
+
+	/**
+	 * Ask remote sources for status updates on sent files that have not been completed.
+	 * Update any records that have status changes
+	 */
+	public void requestPendingStatusUpdates(FaxAccount faxAccount)
 	{
 		FaxUploadProvider uploadProvider = FaxProviderFactory.createFaxUploadProvider(faxAccount);
 		List<String> remoteFinalStatuses = uploadProvider.getRemoteFinalStatusIndicators();

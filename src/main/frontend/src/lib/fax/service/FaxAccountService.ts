@@ -4,7 +4,7 @@ import FaxAccountToUpdateInputConverter from "../converter/FaxAccountToUpdateInp
 import FaxAccountToCreateInputConverter from "../converter/FaxAccountToCreateInputConverter";
 import FaxAccountToModelConverter from "../converter/FaxAccountToModelConverter";
 import FaxAccount from "../model/FaxAccount";
-import PagedResponse from "../../common/response/pagedRespose";
+import PagedResponse from "../../common/response/PagedResponse";
 
 export default class FaxAccountService
 {

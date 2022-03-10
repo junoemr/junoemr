@@ -4,7 +4,7 @@ import moment, {Moment} from "moment";
 import FaxOutboxResultToModelConverter from "../converter/FaxOutboxResultToModelConverter";
 import FaxOutboxSearchParams from "../model/FaxOutboxSearchParams";
 import FaxOutboxResult from "../model/FaxOutboxResult";
-import PagedResponse from "../../common/response/pagedRespose";
+import PagedResponse from "../../common/response/PagedResponse";
 
 export default class FaxOutboxService
 {

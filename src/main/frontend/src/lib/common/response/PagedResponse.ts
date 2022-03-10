@@ -1,4 +1,4 @@
-import SimpleResponse from "./simpleRespose";
+import SimpleResponse from "./SimpleResponse";
 
 export default class PagedResponse<T> extends SimpleResponse<Array<T>>
 {

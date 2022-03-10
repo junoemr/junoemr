@@ -8,7 +8,7 @@ import {
 import FaxInboxResult from "../../../../../lib/fax/model/FaxInboxResult";
 import moment, {Moment} from "moment";
 import FaxInboxService from "../../../../../lib/fax/service/FaxInboxService";
-import PagedResponse from "../../../../../lib/common/response/pagedRespose";
+import PagedResponse from "../../../../../lib/common/response/PagedResponse";
 import FaxAccount from "../../../../../lib/fax/model/FaxAccount";
 import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";
 import PhoneNumber from "../../../../../lib/common/model/PhoneNumber";

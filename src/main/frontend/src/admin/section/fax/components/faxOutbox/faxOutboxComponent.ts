@@ -9,7 +9,7 @@ import {
 import {FaxStatusCombinedType} from "../../../../../lib/fax/model/FaxStatusCombinedType";
 import moment, {Moment} from "moment";
 import FaxOutboxService from "../../../../../lib/fax/service/FaxOutboxService";
-import PagedResponse from "../../../../../lib/common/response/pagedRespose";
+import PagedResponse from "../../../../../lib/common/response/PagedResponse";
 import {FaxNotificationStatusType} from "../../../../../lib/fax/model/FaxNotificationStatusType";
 import FaxAccount from "../../../../../lib/fax/model/FaxAccount";
 import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";

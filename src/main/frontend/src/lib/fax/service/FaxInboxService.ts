@@ -4,7 +4,7 @@ import FaxInboxResultToModelConverter from "../converter/FaxInboxResultToModelCo
 import moment, {Moment} from "moment";
 import FaxInboxSearchParams from "../model/FaxInboxSearchParams";
 import FaxInboxResult from "../model/FaxInboxResult";
-import PagedResponse from "../../common/response/pagedRespose";
+import PagedResponse from "../../common/response/PagedResponse";
 
 export default class FaxInboxService
 {

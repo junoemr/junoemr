@@ -24,7 +24,6 @@
 package org.oscarehr.fax.provider;
 
 import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.integration.SRFax.SRFaxAccountProvider;
 import org.oscarehr.integration.SRFax.SRFaxDownloadProvider;
 import org.oscarehr.integration.SRFax.SRFaxUploadProvider;
@@ -59,24 +58,14 @@ public class FaxProviderFactory
 
 	public static FaxUploadProvider createFaxUploadProvider(FaxAccount faxAccount)
 	{
-		return createFaxUploadProvider(faxAccount.getIntegrationType());
-	}
-
-	public static FaxUploadProvider createFaxUploadProvider(FaxAccountTransferOutbound faxAccount)
-	{
-		return createFaxUploadProvider(faxAccount.getAccountType());
-	}
-
-	private static FaxUploadProvider createFaxUploadProvider(FaxProvider providerType)
-	{
-		switch (providerType)
+		switch (faxAccount.getIntegrationType())
 		{
 			case SRFAX:
 				return new SRFaxUploadProvider();
 			case RINGCENTRAL:
 			case NONE:
 			default:
-				return null;
+				throw new IllegalStateException("Fax account " + faxAccount.getId() + " has invalid integration type");
 		}
 	}
 }
