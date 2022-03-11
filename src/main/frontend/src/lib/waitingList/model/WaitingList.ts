@@ -50,12 +50,12 @@ export default class WaitingList
 		this._provider = value;
 	}
 
-	get createdDateTime(): moment.Moment
+	get createdDateTime(): Moment
 	{
 		return this._createdDateTime;
 	}
 
-	set createdDateTime(value: moment.Moment)
+	set createdDateTime(value: Moment)
 	{
 		this._createdDateTime = value;
 	}
