@@ -173,6 +173,7 @@ public class FaxAccountService
 	{
 		FaxAccount faxAccount = faxAccountDao.find(id);
 		faxAccount.setDeletedAt(new Date());
+		faxAccount.setLoginPassword(null); // wipe the password
 		faxAccountDao.merge(faxAccount);
 		return true;
 	}
