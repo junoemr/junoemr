@@ -34,7 +34,7 @@ CREATE TABLE `OLISRequestNomenclature` (
   `sortKey` varchar(14) DEFAULT NULL,
   `category` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4096 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4096 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -61,7 +61,7 @@ CREATE TABLE `OLISResultNomenclature` (
   `altName1` text DEFAULT NULL,
   `sortKey` varchar(14) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=65536 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=65536 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
