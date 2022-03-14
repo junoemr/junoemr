@@ -33,9 +33,8 @@ import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import org.apache.log4j.Logger;
-import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -48,8 +47,8 @@ import java.io.IOException;
 public class FaxRingCentralRedirectServlet extends AbstractAuthorizationCodeCallbackServlet implements
 	RingCentralOAuthServlet
 {
-	@Autowired
-	private SystemPreferenceService systemPreferenceService;
+	@Value("${fax.ringcentral.redirect_url}")
+	String redirectUrl;
 
 	private static Logger logger = MiscUtils.getLogger();
 
@@ -100,7 +99,6 @@ public class FaxRingCentralRedirectServlet extends AbstractAuthorizationCodeCall
 	protected String getRedirectUri(HttpServletRequest httpServletRequest)
 		throws ServletException, IOException
 	{
-		String redirectUrl = systemPreferenceService.getPropertyValue("fax.ringcentral.redirect_url", null);
 		if (redirectUrl == null)
 		{
 			throw new RuntimeException("OAuth redirect URL not specified");
