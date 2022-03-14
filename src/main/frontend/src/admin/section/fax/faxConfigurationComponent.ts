@@ -98,7 +98,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 					{
 						component: 'faxConfigurationEditModal',
 						backdrop: 'static',
-						windowClass: 'juno-modal',
+						windowClass: 'juno-modal tall',
 						resolve:
 							{
 								style: ctrl.componentStyle,

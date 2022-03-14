@@ -7,12 +7,16 @@
 		height: 100%;
 
 		.input-fieldset {
-			margin: 0 20%;
+			margin: 0;
+			max-width: 480px;
 		}
 		.input-group {
 			--juno-input-label-width: 30%;
 			--juno-select-label-width: 30%;
 			--juno-button-label-width: 30%;
+		}
+		.fax-config-grid {
+			grid-template-columns: .6fr .4fr;
 		}
 
 		.icon-badge {

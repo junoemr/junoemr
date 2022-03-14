@@ -66,7 +66,7 @@
 			<fieldset ng-disabled="!$ctrl.masterFaxEnabledOutbound" class="input-fieldset">
 				<span ng-show="!$ctrl.masterFaxEnabledOutbound"><bean:message bundle="ui" key="admin.fax.acct.edit.outboundDisabledMessage"/></span>
 
-				<div class="flex-row align-items-center m-l-48">
+				<div class="grid-flow-row fax-config-grid grid-align-items-center m-l-48">
 					<juno-toggle round="true"
 					             ng-model="$ctrl.faxAccount.enableOutbound"
 					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.enableOutbound'/>"
@@ -76,14 +76,14 @@
 				</div>
 				<div class="input-group grid-flow-row grid-row-2 grid-row-gap-4">
 					<juno-input ng-model="$ctrl.faxAccount.accountEmail"
-					            disabled="!$ctrl.faxAccount.enableOutbound"
+					            ng-if="$ctrl.faxAccount.enableOutbound"
 					            invalid="$ctrl.initialSave && !$ctrl.validations.emailFilled()"
 					            title="<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail-tooltip"/>"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail"/>"
 					            label-position="$ctrl.LABEL_POSITION.LEFT">
 					</juno-input>
 					<juno-input ng-model="$ctrl.faxAccount.faxNumber"
-					            disabled="!$ctrl.faxAccount.enableOutbound"
+					            ng-if="$ctrl.faxAccount.enableOutbound"
 					            invalid="$ctrl.initialSave && !$ctrl.validations.faxNumberFilled()"
 					            title="<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber-tooltip"/>"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber"/>"
@@ -91,7 +91,7 @@
 					</juno-input>
 					<juno-select ng-model="$ctrl.faxAccount.coverLetterOption"
 					             options="$ctrl.coverLetterOptions"
-					             disabled="!$ctrl.faxAccount.enableOutbound"
+					             ng-if="$ctrl.faxAccount.enableOutbound"
 					             title="<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption-tooltip"/>"
 					             label="<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption"/>"
 					             label-position="$ctrl.LABEL_POSITION.LEFT">
@@ -102,7 +102,7 @@
 			<fieldset ng-disabled="!$ctrl.masterFaxEnabledInbound" class="input-fieldset">
 				<span ng-show="!$ctrl.masterFaxEnabledInbound"><bean:message bundle="ui" key="admin.fax.acct.edit.inboundDisabledMessage"/></span>
 
-				<div class="flex-row align-items-center m-l-48">
+				<div class="grid-flow-row fax-config-grid grid-align-items-center m-l-48">
 					<juno-toggle round="true"
 					             ng-model="$ctrl.faxAccount.enableInbound"
 					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.enableInbound'/>"
