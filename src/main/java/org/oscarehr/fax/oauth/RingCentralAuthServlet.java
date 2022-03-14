@@ -21,7 +21,7 @@
  * Canada
  */
 
-package org.oscarehr.fax.auth;
+package org.oscarehr.fax.oauth;
 
 import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
@@ -31,8 +31,10 @@ import com.google.api.client.extensions.servlet.auth.oauth2.AbstractAuthorizatio
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import org.apache.log4j.Logger;
-import org.oscarehr.util.MiscUtils;
+import org.oscarehr.preferences.service.SystemPreferenceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+import oscar.OscarProperties;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -40,53 +42,61 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(name="FaxServlet",description="Ringcentral OAuth servlet", value="/oauth",loadOnStartup = 1)
-public class FaxServlet extends AbstractAuthorizationCodeServlet
+@WebServlet(name="FaxOAuthServlet",description="Ringcentral OAuth servlet", value="/oauth",loadOnStartup = 1)
+public class RingCentralAuthServlet extends AbstractAuthorizationCodeServlet implements
+	RingCentralOAuthServlet
 {
-	Logger logger = MiscUtils.getLogger();
-
-	private static final String baseUrl = "";
-	private static final String tokenServer = baseUrl + "/restapi/oauth/authorize";
-
-	private String getClientID()
+	@Override
+	public String getClientID()
 	{
-		String clientId = System.getenv("RINGCENTRAL_CLIENT_SECRET");
+		// TODO, integrate with openshift secrets management
+		String clientId = System.getenv("RINGCENTRAL_CLIENT_ID");
 		if (clientId == null)
 		{
-			throw new RuntimeException("Missing required environment variable");
+			throw new RuntimeException("Missing required env variable $RINGCENTRAL_CLIENT_ID");
 		}
 
 		return clientId;
 	}
 
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
+
 	@Override
 	public void init(ServletConfig config) throws ServletException
 	{
-		logger.info("####################################################### HELLO ###############################");
+		// Any init code goes here
 		super.init(config);
+		SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
 	}
 
 	@Override
 	protected AuthorizationCodeFlow initializeFlow() throws ServletException, IOException
 	{
-		ClientParametersAuthentication clientSecret = new ClientParametersAuthentication(getClientID(), null);
+		ClientParametersAuthentication clientId = new ClientParametersAuthentication(
+			getClientID(), null);
 
 		AuthorizationCodeFlow auth = new AuthorizationCodeFlow.Builder(
 			BearerToken.formEncodedBodyAccessMethod(),
 			new NetHttpTransport(),
 			new JacksonFactory(),
-			new GenericUrl("tokenserverUrl"),
-			clientSecret,
+			new GenericUrl(TOKEN_SERVER_URL),
+			clientId,
 			getClientID(),
-			"authServerUrl"
-		).build();
+			AUTH_SERVER_URL
+		)
+			.enablePKCE()
+			.build();
+
+		// TODO datastore (file???)
 
 		return auth;
 	}
 
 	@Override protected void onAuthorization(HttpServletRequest req, HttpServletResponse resp, AuthorizationCodeRequestUrl authorizationUrl) throws ServletException, IOException
 	{
-		authorizationUrl.setState("xyz");
+		// Thanks google, to set the state this method has to be overridden
+		authorizationUrl.setState("foobar1234"); // TODO, send instance context here
 		super.onAuthorization(req, resp, authorizationUrl);
 	}
 
@@ -94,7 +104,13 @@ public class FaxServlet extends AbstractAuthorizationCodeServlet
 	protected String getRedirectUri(HttpServletRequest httpServletRequest)
 		throws ServletException, IOException
 	{
-		GenericUrl url = new GenericUrl(httpServletRequest.getRequestURL().toString()); url.setRawPath("/oauthcallback");
+		String redirectUrl = OscarProperties.getInstance().getProperty("fax.ringcentral.redirect_url", "");
+		if (redirectUrl == null)
+		{
+			throw new RuntimeException("OAuth redirect URL not specified");
+		}
+
+		GenericUrl url = new GenericUrl(redirectUrl);
 		return url.build();
 	}
 
@@ -102,6 +118,8 @@ public class FaxServlet extends AbstractAuthorizationCodeServlet
 	protected String getUserId(HttpServletRequest httpServletRequest)
 		throws ServletException, IOException
 	{
-		return "ringcentral";  // Right now this can be a constant because all users on the same app are accessing the same ringcentral account;
+		// Right now this can be a constant because all users on the same app are accessing the same ringcentral account.
+		// Once accounts are enabled per user, this should be tied to the sessionId or getLoggedInInfo.
+		return LOCAL_USER_ID;
 	}
 }
