@@ -23,17 +23,13 @@
 
 package org.oscarehr.fax.provider;
 
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.integration.SRFax.SRFaxAccountProvider;
 import org.oscarehr.integration.SRFax.SRFaxDownloadProvider;
 import org.oscarehr.integration.SRFax.SRFaxUploadProvider;
-import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
 import org.oscarehr.integration.ringcentral.RingcentralAccountProvider;
 import org.oscarehr.integration.ringcentral.RingcentralDownloadProvider;
 import org.oscarehr.integration.ringcentral.RingcentralUploadProvider;
-import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
 
 public class FaxProviderFactory
 {
@@ -89,47 +85,5 @@ public class FaxProviderFactory
 			default:
 				throw new IllegalStateException("Fax account " + faxAccount.getId() + " has invalid integration type");
 		}
-	}
-
-	public static Criterion getStatusSearchRestrictionsInProgress(String accountTypePropertyName, String statusPropertyName)
-	{
-		return Restrictions.or(
-				Restrictions.and(
-						Restrictions.eq(accountTypePropertyName, FaxProvider.SRFAX),
-						Restrictions.not(Restrictions.in(statusPropertyName, SRFaxApiConnector.RESPONSE_STATUSES_FINAL))
-				),
-				Restrictions.and(
-						Restrictions.eq(accountTypePropertyName, FaxProvider.RINGCENTRAL),
-						Restrictions.not(Restrictions.in(statusPropertyName, RingcentralApiConnector.RESPONSE_STATUSES_FINAL))
-				)
-		);
-	}
-
-	public static Criterion getStatusSearchRestrictionsIntegrationFailed(String accountTypePropertyName, String statusPropertyName)
-	{
-		return Restrictions.or(
-				Restrictions.and(
-						Restrictions.eq(accountTypePropertyName, FaxProvider.SRFAX),
-						Restrictions.in(statusPropertyName, SRFaxApiConnector.RESPONSE_STATUS_FAILED)
-				),
-				Restrictions.and(
-						Restrictions.eq(accountTypePropertyName, FaxProvider.RINGCENTRAL),
-						Restrictions.in(statusPropertyName, RingcentralApiConnector.RESPONSE_STATUSES_FAILED)
-				)
-		);
-	}
-
-	public static Criterion getStatusSearchRestrictionsIntegrationSuccess(String accountTypePropertyName, String statusPropertyName)
-	{
-		return Restrictions.or(
-				Restrictions.and(
-						Restrictions.eq(accountTypePropertyName, FaxProvider.SRFAX),
-						Restrictions.in(statusPropertyName, SRFaxApiConnector.RESPONSE_STATUS_SENT)
-				),
-				Restrictions.and(
-						Restrictions.eq(accountTypePropertyName, FaxProvider.RINGCENTRAL),
-						Restrictions.in(statusPropertyName, RingcentralApiConnector.RESPONSE_STATUS_DELIVERED)
-				)
-		);
 	}
 }
