@@ -22,11 +22,38 @@
  */
 package org.oscarehr.integration.ringcentral.api;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonObjectParser;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.store.DataStoreFactory;
+import com.google.api.client.util.store.FileDataStoreFactory;
+import lombok.Synchronized;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+@Lazy
+@Component
 public class RingcentralApiConnector
 {
+	private String FAX_CREDENTIALS_DIR = "";
+
+	private DataStoreFactory dataStoreFactory;
+	private HttpTransport httpTransport;
+	private HttpRequestFactory requestFactory;		// TODO: can this be made each request?
+
+	private Credential credential;
+
 	public static final String RESPONSE_STATUS_RECEIVED="Received";
 	public static final String RESPONSE_STATUS_QUEUED="Queued";
 	public static final String RESPONSE_STATUS_SENT="Sent";
@@ -34,16 +61,58 @@ public class RingcentralApiConnector
 	public static final String RESPONSE_STATUS_SEND_FAILED="SendingFailed";
 	public static final String RESPONSE_STATUS_DELIVERY_FAILED="DeliveryFailed";
 
-	public static final List<String> RESPONSE_STATUSES_FINAL = new ArrayList<String>(3) {{
-		add(RESPONSE_STATUS_DELIVERED);
-		add(RESPONSE_STATUS_SEND_FAILED);
-		add(RESPONSE_STATUS_DELIVERY_FAILED);
-	}};
+	public static final List<String> RESPONSE_STATUSES_FINAL = new ArrayList<>(Arrays.asList(
+		RESPONSE_STATUS_DELIVERED,
+		RESPONSE_STATUS_SEND_FAILED,
+		RESPONSE_STATUS_DELIVERY_FAILED
+	));
 
-	public static final List<String> RESPONSE_STATUSES_FAILED = new ArrayList<String>(2) {{
-		add(RESPONSE_STATUS_SEND_FAILED);
-		add(RESPONSE_STATUS_DELIVERY_FAILED);
-	}};
+	public static final List<String> RESPONSE_STATUSES_FAILED = new ArrayList<>(Arrays.asList(
+		RESPONSE_STATUS_SEND_FAILED,
+		RESPONSE_STATUS_DELIVERY_FAILED
+	));
 
-	//TODO
+	public RingcentralApiConnector()
+	{
+	}
+
+	@Synchronized
+	public DataStoreFactory getDataStoreFactory()
+	{
+		return this.dataStoreFactory;
+	}
+
+	@Synchronized
+	public Credential getCredential()
+	{
+		return this.credential;
+	}
+
+	@Synchronized
+	public void setCredential(Credential credential)
+	{
+		this.credential = credential;
+	}
+
+	@PostConstruct
+	@Synchronized
+	public void init() throws Exception
+	{
+		// TODO: move all this into constructor
+		dataStoreFactory = new FileDataStoreFactory(new File(FAX_CREDENTIALS_DIR));
+		httpTransport = new NetHttpTransport();
+
+		// TODO: check if credential needs to be initialized by this point
+		Credential credential = getCredential();
+		requestFactory = httpTransport.createRequestFactory(new HttpRequestInitializer()
+		{
+			@Override
+			public void initialize(HttpRequest httpRequest) throws IOException
+			{
+				credential.initialize(httpRequest);
+				httpRequest.setParser(new JsonObjectParser(new JacksonFactory()));		// Use request factory here to talk to ringcentral
+			}
+		});
+
+	}
 }

@@ -66,14 +66,14 @@ public class FaxRingCentralRedirectServlet extends AbstractAuthorizationCodeCall
 		throws ServletException, IOException
 	{
 		resp.sendRedirect(""); // TODO: redirect back to fax page
-		// TODO: pass credential around?
+		// TODO: pass credential around?  RingCentalApiConnector.setCredential?
 	}
 
 	@Override
 	protected void onError(HttpServletRequest req, HttpServletResponse resp, AuthorizationCodeResponseUrl errorResponse)
 		throws ServletException, IOException
 	{
-		logger.error(errorResponse.getError());
+		logger.error(errorResponse.getError());  // TODO: redirect back to fax page
 	}
 
 	@Override
