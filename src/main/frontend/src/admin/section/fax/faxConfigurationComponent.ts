@@ -5,8 +5,9 @@ import {
 	LABEL_POSITION
 } from "../../../common/components/junoComponentConstants";
 import {SecurityPermissions} from "../../../common/security/securityConstants";
-import PagedResponse from "../../../lib/common/response/pagedRespose";
 import FaxAccount from "../../../lib/fax/model/FaxAccount";
+import ToastService from "../../../lib/alerts/service/ToastService";
+import {SYSTEM_PROPERTIES} from "../../../common/services/systemPreferenceServiceConstants";
 
 angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
@@ -25,66 +26,50 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 		{
 			const ctrl = this;
 			ctrl.faxAccountService = new FaxAccountService();
+			ctrl.toastService = new ToastService();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;
 			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 			ctrl.faxAccountList = [];
+			ctrl.faxAccountSelectStates = [];
 			ctrl.loggedInProvider = null;
 			ctrl.masterFaxDisabled = true;
 			ctrl.masterFaxEnabledInbound = false;
 			ctrl.masterFaxEnabledOutbound = false;
+			ctrl.activeAccount = null;
+			ctrl.initialized = false;
 
-			ctrl.$onInit = () =>
+			ctrl.$onInit = async () =>
 			{
-				// if the current provider number is unknown, retrieve it.
-				if(ctrl.loggedInProvider == null)
-				{
-					providerService.getMe().then(
-						function success(response)
-						{
-							ctrl.loggedInProvider = response;
-						},
-						function error(error)
-						{
-							console.error(error);
-						}
-					)
-				}
-				systemPreferenceService.isPreferenceEnabled("masterFaxEnabledInbound", ctrl.masterFaxEnabledInbound).then(
-					function success(response)
-					{
-						ctrl.masterFaxEnabledInbound = response;
-						ctrl.updateMasterFaxDisabledStatus();
-					},
-					function error(error)
-					{
-						console.error(error);
-					}
-				);
-				systemPreferenceService.isPreferenceEnabled("masterFaxEnabledOutbound", ctrl.masterFaxEnabledOutbound).then(
-					function success(response)
-					{
-						ctrl.masterFaxEnabledOutbound = response;
-						ctrl.updateMasterFaxDisabledStatus();
-					},
-					function error(error)
-					{
-						console.error(error);
-					}
-				);
+				let responses = await Promise.all([
+					providerService.getMe(),
+					systemPreferenceService.isPreferenceEnabled("masterFaxEnabledInbound", ctrl.masterFaxEnabledInbound),
+					systemPreferenceService.isPreferenceEnabled("masterFaxEnabledOutbound", ctrl.masterFaxEnabledOutbound),
+					ctrl.faxAccountService.getAccounts(),
+					ctrl.faxAccountService.getActiveAccount(),
+				]);
 
-				ctrl.faxAccountService.getAccounts().then(
-					function success(response: PagedResponse<FaxAccount>)
-					{
-						ctrl.faxAccountList = response.body;
-					},
-					function error(error)
-					{
-						console.error(error);
-					}
-				)
+				ctrl.loggedInProvider = responses[0];
+				ctrl.masterFaxEnabledInbound = responses[1];
+				ctrl.masterFaxEnabledOutbound = responses[2];
+				ctrl.faxAccountList = responses[3].body;
+				ctrl.activeAccount = responses[4];
+
+				ctrl.updateMasterFaxDisabledStatus();
+
+				// initialize selection checkboxes
+				ctrl.faxAccountList.forEach((account: FaxAccount) =>
+				{
+					ctrl.faxAccountSelectStates[account.id] = false;
+				});
+
+				if(ctrl.activeAccount)
+				{
+					ctrl.faxAccountSelectStates[ctrl.activeAccount.id] = true;
+				}
+				ctrl.initialized = true;
 			};
 
 			ctrl.userCanCreate = (): boolean =>
@@ -100,6 +85,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 			{
 				ctrl.editFaxAccount(null);
 			};
+
 			ctrl.editFaxAccount = function editFaxAccount(faxAccount)
 			{
 				let isNewAcct = true;
@@ -124,17 +110,29 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 
 				modalInstance.result.then(
 					// the object passed back on closing
-					function success(updatedAccount)
+					function success(updatedAccount: FaxAccount)
 					{
 						if(isNewAcct)
 						{
 							// new accounts get added to the account list
 							ctrl.faxAccountList.push(updatedAccount);
+							if(ctrl.faxAccountList.length === 1)
+							{
+								ctrl.faxAccountSelectStates[updatedAccount.id] = true;
+								ctrl.setActiveAccount(true, updatedAccount);
+							}
 						}
 						else if(updatedAccount == null) // deleted
 						{
 							// remove deleted account from the list
 							ctrl.faxAccountList = ctrl.faxAccountList.filter((account) => (account.id !== faxAccount.id));
+
+							if(ctrl.faxAccountList.length > 0)
+							{
+								let firstActive = ctrl.faxAccountList[0];
+								ctrl.faxAccountSelectStates[firstActive.id] = true;
+								ctrl.setActiveAccount(true, firstActive);
+							}
 						}
 						else
 						{
@@ -154,11 +152,29 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 				ctrl.setSystemProperty("masterFaxEnabledInbound", ctrl.masterFaxEnabledInbound);
 				ctrl.updateMasterFaxDisabledStatus();
 			};
+
 			ctrl.saveMasterFaxEnabledStateOutbound = (value) =>
 			{
 				ctrl.masterFaxEnabledOutbound = value;
 				ctrl.setSystemProperty("masterFaxEnabledOutbound", ctrl.masterFaxEnabledOutbound);
 				ctrl.updateMasterFaxDisabledStatus();
+			};
+
+			ctrl.setActiveAccount = (value: boolean, faxAccount: FaxAccount) =>
+			{
+				if(value)
+				{
+					ctrl.activeAccount = faxAccount;
+
+					// set all other selected states to false (unchecked)
+					ctrl.faxAccountList.filter((account: FaxAccount) => account.id !== faxAccount.id)
+						.forEach((account: FaxAccount) => ctrl.faxAccountSelectStates[account.id] = false);
+					ctrl.setSystemProperty(SYSTEM_PROPERTIES.ACTIVE_FAX_ACCOUNT, faxAccount.id);
+				}
+				else
+				{
+					ctrl.activeAccount = null;
+				}
 			};
 
 			ctrl.updateMasterFaxDisabledStatus = function updateMasterFaxDisabledStatus()
@@ -168,21 +184,20 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 
 			ctrl.setSystemProperty = function setSystemProperty(key, value)
 			{
-				systemPreferenceService.setPreference(key, value).then(
-					function success(response)
-					{
-					},
-					function error(error)
-					{
-						console.error(error);
-					}
-				);
+				systemPreferenceService.setPreference(key, value)
+					.catch((error) =>
+						{
+							console.error(error);
+							ctrl.toastService.errorToast("Failed to save preference setting.");
+						}
+					);
 			};
 
 			ctrl.toRingCentralLogin = () =>
 			{
 				location.href = "../oauth"		// TODO: figure out how to bind a better name later, ie: /fax/ringcentral/oauth
 			}
+
 		}
 	]
 });

@@ -8,7 +8,7 @@ import {
 import FaxInboxResult from "../../../../../lib/fax/model/FaxInboxResult";
 import moment, {Moment} from "moment";
 import FaxInboxService from "../../../../../lib/fax/service/FaxInboxService";
-import PagedResponse from "../../../../../lib/common/response/pagedRespose";
+import PagedResponse from "../../../../../lib/common/response/PagedResponse";
 import FaxAccount from "../../../../../lib/fax/model/FaxAccount";
 import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";
 import PhoneNumber from "../../../../../lib/common/model/PhoneNumber";
@@ -160,14 +160,9 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 				return Juno.Common.Util.formatMomentDate(date) + " " + Juno.Common.Util.formatMomentTime(date);
 			}
 
-			ctrl.getFaxDisplayNumber = (number: PhoneNumber): string =>
+			ctrl.getFaxDisplayNumber = (phoneNumber: PhoneNumber): string =>
 			{
-				return number ? number.formattedForDisplay : "";
-			}
-
-			ctrl.getFaxAccountDisplayName = (faxAccountId: number) =>
-			{
-				return ctrl.faxAccountList.find((faxAccount) => faxAccountId === faxAccount.id)?.displayName;
+				return phoneNumber ? phoneNumber.formattedForDisplay : "";
 			}
 
 			ctrl.nextPullTimeDisplay = () =>

@@ -20,28 +20,25 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.transfer;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
+package org.oscarehr.integration.ringcentral;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
+import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.provider.FaxAccountProvider;
 
-@Data
-@XmlRootElement
-@JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class FaxInboxTransferOutbound implements Serializable
+public class RingcentralAccountProvider implements FaxAccountProvider
 {
-	private Long id;
-	private FaxAccountTransferOutbound faxAccount;
-	/* the received date of the document as recorded in the system */
-	private String systemDateReceived;
-	/* the id of the document in the system */
-	private Integer documentId;
+	protected FaxAccount faxAccount;
 
-	private PhoneNumberModel sentFrom;
+	public RingcentralAccountProvider(FaxAccount faxAccount)
+	{
+		this.faxAccount = faxAccount;
+	}
 
-	private Long externalReferenceId;
+	@Override
+	public boolean testConnectionStatus()
+	{
+		// TODO
+		return false;
+	}
 }

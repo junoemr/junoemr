@@ -9,7 +9,7 @@ import {
 import {FaxStatusCombinedType} from "../../../../../lib/fax/model/FaxStatusCombinedType";
 import moment, {Moment} from "moment";
 import FaxOutboxService from "../../../../../lib/fax/service/FaxOutboxService";
-import PagedResponse from "../../../../../lib/common/response/pagedRespose";
+import PagedResponse from "../../../../../lib/common/response/PagedResponse";
 import {FaxNotificationStatusType} from "../../../../../lib/fax/model/FaxNotificationStatusType";
 import FaxAccount from "../../../../../lib/fax/model/FaxAccount";
 import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";
@@ -84,7 +84,7 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 			ctrl.searchParams.startDate = null;
 			ctrl.searchParams.endDate = null;
 			ctrl.searchParams.combinedStatus = null;
-			ctrl.searchParams.archived = false;
+			ctrl.searchParams.archived = null;
 
 			ctrl.nextPushTime = null;
 			ctrl.displayNotificationColumn = false;
@@ -235,9 +235,9 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 				return ctrl.statusFilterOptions.find((option) => combinedStatus === option.value).label;
 			}
 
-			ctrl.getFaxDisplayNumber = (number: PhoneNumber): string =>
+			ctrl.getFaxDisplayNumber = (phoneNumber: PhoneNumber): string =>
 			{
-				return number ? number.formattedForDisplay : "";
+				return phoneNumber ? phoneNumber.formattedForDisplay : "";
 			}
 
 			ctrl.getStatusIcon = (combinedStatus: FaxStatusCombinedType) =>
@@ -262,11 +262,6 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 					case FaxStatusCombinedType.IntegrationFailed:return "badge-error";
 					case FaxStatusCombinedType.IntegrationSuccess:return "badge-complete";
 				}
-			}
-
-			ctrl.getFaxAccountDisplayName = (faxAccountId: number) =>
-			{
-				return ctrl.faxAccountList.find((faxAccount) => faxAccountId === faxAccount.id)?.displayName;
 			}
 
 			ctrl.formatDateForDisplay = (date: Moment): string =>

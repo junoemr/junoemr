@@ -46,9 +46,11 @@ public class FaxOutboundDao extends AbstractDao<FaxOutbound>
 						"INNER JOIN record.faxAccount acct " +
 						"WHERE record.status = :status " +
 						"AND acct.outboundEnabled = :enabled " +
+						"AND record.archived = :archived " +
 						"ORDER BY record.createdAt ASC");
 		query.setParameter("status", FaxStatusInternal.QUEUED);
 		query.setParameter("enabled", true);
+		query.setParameter("archived", false);
 		return query.getResultList();
 	}
 }

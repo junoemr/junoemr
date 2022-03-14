@@ -40,12 +40,12 @@ export default class DemographicWaitingList
 		this._note = value;
 	}
 
-	get dateAddedToWaitList(): moment.Moment
+	get dateAddedToWaitList(): Moment
 	{
 		return this._dateAddedToWaitList;
 	}
 
-	set dateAddedToWaitList(value: moment.Moment)
+	set dateAddedToWaitList(value: Moment)
 	{
 		this._dateAddedToWaitList = value;
 	}

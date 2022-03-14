@@ -30,7 +30,7 @@ import {CareTrackerItemType} from "../lib/careTracker/model/CareTrackerItemType"
 import {CareTrackerItemValueType} from "../lib/careTracker/model/CareTrackerItemValueType";
 import DxCodeModel from "../lib/dx/model/DxCodeModel";
 import {DxCodingSystem} from "../lib/dx/model/DxCodingSystem";
-import PagedResponse from "../lib/common/response/pagedRespose";
+import PagedResponse from "../lib/common/response/PagedResponse";
 import MeasurementTypeModel from "../lib/measurement/model/measurementTypeModel";
 import {JunoSelectOption} from "../lib/common/junoSelectOption";
 

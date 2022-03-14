@@ -26,7 +26,7 @@
 import {DemographicApi, MeasurementsApi} from "../../../generated";
 import MeasurementModel from "../../lib/measurement/model/measurementModel";
 import MeasurementTransferToModelConverter from "../../lib/measurement/converter/MeasurementTransferToModelConverter";
-import PagedResponse from "../../lib/common/response/pagedRespose";
+import PagedResponse from "../../lib/common/response/PagedResponse";
 import MeasurementTypeModel from "../../lib/measurement/model/measurementTypeModel";
 import MeasurementTypeTransferToModelConverter from "../../lib/measurement/converter/MeasurementTypeTransferToModelConverter";
 

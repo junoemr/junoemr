@@ -48,6 +48,15 @@ export default class FaxAccount
 		return this.connectionStatus === FaxAccountConnectionStatusType.Failure;
 	}
 
+	public equals(otherAccount: FaxAccount): boolean
+	{
+		if(!otherAccount)
+		{
+			return false;
+		}
+		return this.id === otherAccount.id;
+	}
+
 	/**
 	 * getters and setters
 	 */

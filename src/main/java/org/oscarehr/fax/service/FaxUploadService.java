@@ -28,6 +28,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.FaxStatus;
 import org.oscarehr.fax.converter.FaxOutboundToModelConverter;
+import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
@@ -42,8 +43,8 @@ import org.oscarehr.fax.model.FaxStatusInternal;
 import org.oscarehr.fax.provider.FaxProviderFactory;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.result.FaxStatusResult;
+import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
-import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
@@ -87,6 +88,9 @@ public class FaxUploadService
 	private FaxOutboundDao faxOutboundDao;
 
 	@Autowired
+	private FaxAccountDao faxAccountDao;
+
+	@Autowired
 	private FaxAccountService faxAccountService;
 
 	@Autowired
@@ -128,7 +132,7 @@ public class FaxUploadService
 	 */
 	public FaxOutboxTransferOutbound queueAndSendFax(String providerId, Integer demographicId, String faxNumber, FaxFileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
 	{
-		FaxAccount faxAccount = faxAccountService.getDefaultFaxAccount();
+		FaxAccount faxAccount = faxAccountService.getSystemActiveFaxAccount();
 		return queueAndSendFax(faxAccount, providerId, demographicId, faxNumber, fileType, fileToFax);
 	}
 
@@ -288,7 +292,24 @@ public class FaxUploadService
 	 * Ask remote sources for status updates on sent files that have not been completed.
 	 * Update any records that have status changes
 	 */
-	public void requestPendingStatusUpdates(FaxAccountTransferOutbound faxAccount)
+	public void requestAllPendingStatusUpdates()
+	{
+		FaxAccountCriteriaSearch activeAccountQuery = new FaxAccountCriteriaSearch();
+		activeAccountQuery.setIntegrationEnabledStatus(true);
+		activeAccountQuery.setOutboundEnabledStatus(true);
+
+		List<FaxAccount> activeAccounts = faxAccountDao.criteriaSearch(activeAccountQuery);
+		for (FaxAccount activeAccount : activeAccounts)
+		{
+			requestPendingStatusUpdates(activeAccount);
+		}
+	}
+
+	/**
+	 * Ask remote sources for status updates on sent files that have not been completed.
+	 * Update any records that have status changes
+	 */
+	public void requestPendingStatusUpdates(FaxAccount faxAccount)
 	{
 		FaxUploadProvider uploadProvider = FaxProviderFactory.createFaxUploadProvider(faxAccount);
 		List<String> remoteFinalStatuses = uploadProvider.getRemoteFinalStatusIndicators();
@@ -296,7 +317,7 @@ public class FaxUploadService
 		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
 		criteriaSearch.setStatus(FaxStatusInternal.SENT); // only check records with a local sent status
 		criteriaSearch.setArchived(false); // ignore archived records
-		criteriaSearch.setRemoteStatusList(remoteFinalStatuses, false);
+		criteriaSearch.setExternalStatusList(remoteFinalStatuses, false);
 
 		List<FaxOutbound> pendingList = faxOutboundDao.criteriaSearch(criteriaSearch);
 
@@ -317,12 +338,14 @@ public class FaxUploadService
 					if(uploadProvider.isFaxInRemoteSentState(apiResult.getRemoteSentStatus()))
 					{
 						apiResult.getRemoteSendTime().ifPresent(faxOutbound::setExternalDeliveryDate);
+						faxOutbound.setRemoteStatusSent();
 						faxOutbound.setStatusMessage(STATUS_MESSAGE_COMPLETED);
 						faxOutbound.setArchived(true);
 					}
-					else
+					else if(apiResult.getError().isPresent())
 					{
-						apiResult.getError().ifPresent(faxOutbound::setStatusMessage);
+						faxOutbound.setRemoteStatusError();
+						faxOutbound.setStatusMessage(apiResult.getError().get());
 					}
 					faxOutboundDao.merge(faxOutbound);
 					logger.info("Updated Status to: " + remoteSentStatus);

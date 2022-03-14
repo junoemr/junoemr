@@ -20,28 +20,10 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.transfer;
+package org.oscarehr.fax.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
-
-import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
-
-@Data
-@XmlRootElement
-@JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class FaxInboxTransferOutbound implements Serializable
+public enum FaxStatusRemote
 {
-	private Long id;
-	private FaxAccountTransferOutbound faxAccount;
-	/* the received date of the document as recorded in the system */
-	private String systemDateReceived;
-	/* the id of the document in the system */
-	private Integer documentId;
-
-	private PhoneNumberModel sentFrom;
-
-	private Long externalReferenceId;
+	ERROR,
+	SENT
 }

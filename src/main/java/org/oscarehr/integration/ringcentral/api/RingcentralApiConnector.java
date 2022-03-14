@@ -20,28 +20,30 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.transfer;
+package org.oscarehr.integration.ringcentral.api;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
-
-@Data
-@XmlRootElement
-@JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class FaxInboxTransferOutbound implements Serializable
+public class RingcentralApiConnector
 {
-	private Long id;
-	private FaxAccountTransferOutbound faxAccount;
-	/* the received date of the document as recorded in the system */
-	private String systemDateReceived;
-	/* the id of the document in the system */
-	private Integer documentId;
+	public static final String RESPONSE_STATUS_RECEIVED="Received";
+	public static final String RESPONSE_STATUS_QUEUED="Queued";
+	public static final String RESPONSE_STATUS_SENT="Sent";
+	public static final String RESPONSE_STATUS_DELIVERED="Delivered";
+	public static final String RESPONSE_STATUS_SEND_FAILED="SendingFailed";
+	public static final String RESPONSE_STATUS_DELIVERY_FAILED="DeliveryFailed";
 
-	private PhoneNumberModel sentFrom;
+	public static final List<String> RESPONSE_STATUSES_FINAL = new ArrayList<String>(3) {{
+		add(RESPONSE_STATUS_DELIVERED);
+		add(RESPONSE_STATUS_SEND_FAILED);
+		add(RESPONSE_STATUS_DELIVERY_FAILED);
+	}};
 
-	private Long externalReferenceId;
+	public static final List<String> RESPONSE_STATUSES_FAILED = new ArrayList<String>(2) {{
+		add(RESPONSE_STATUS_SEND_FAILED);
+		add(RESPONSE_STATUS_DELIVERY_FAILED);
+	}};
+
+	//TODO
 }

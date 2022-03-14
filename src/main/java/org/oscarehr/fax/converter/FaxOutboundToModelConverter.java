@@ -24,30 +24,29 @@ package org.oscarehr.fax.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
-import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
-import org.oscarehr.fax.provider.FaxProviderFactory;
-import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 @Component
 public class FaxOutboundToModelConverter extends AbstractModelConverter<FaxOutbound, FaxOutboxTransferOutbound>
 {
+	@Autowired
+	private FaxAccountToModelConverter faxAccountToModelConverter;
+
 	@Override
 	public FaxOutboxTransferOutbound convert(FaxOutbound entity)
 	{
-		FaxAccount faxAccount = entity.getFaxAccount();
-		FaxUploadProvider uploadProvider = FaxProviderFactory.createFaxUploadProvider(faxAccount);
-
 		FaxOutboxTransferOutbound model = new FaxOutboxTransferOutbound();
 		model.setId(entity.getId());
-		model.setFaxAccountId(faxAccount.getId());
+		model.setFaxAccount(faxAccountToModelConverter.convert(entity.getFaxAccount()));
 		model.setProviderId(entity.getProviderNo());
 		model.setProviderName(entity.getProvider().getDisplayName());
 		model.setDemographicId(entity.getDemographicNo());
 		model.setSystemStatus(entity.getStatus());
+		model.setRemoteStatus(entity.getStatusRemote());
 		model.setSystemStatusMessage(entity.getStatusMessage());
 		model.setArchived(entity.getArchived());
 		model.setNotificationStatus(entity.getNotificationStatus());
@@ -57,7 +56,6 @@ public class FaxOutboundToModelConverter extends AbstractModelConverter<FaxOutbo
 		model.setIntegrationStatus(entity.getExternalStatus());
 		model.setIntegrationQueuedDateTime(ConversionUtils.toNullableLocalDateTime(entity.getCreatedAt()));
 		model.setIntegrationSentDateTime(ConversionUtils.toNullableLocalDateTime(entity.getExternalDeliveryDate()));
-		model.setCombinedStatus(entity.getCombinedStatus(uploadProvider));
 
 		return model;
 	}

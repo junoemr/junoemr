@@ -26,11 +26,11 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
-import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
 import org.oscarehr.fax.model.FaxFileType;
 import org.oscarehr.fax.model.FaxNotificationStatus;
-import org.oscarehr.fax.model.FaxStatusInternal;
 import org.oscarehr.fax.model.FaxStatusCombined;
+import org.oscarehr.fax.model.FaxStatusInternal;
+import org.oscarehr.fax.model.FaxStatusRemote;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -50,12 +50,13 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 	private Integer demographicNo;
 	private FaxFileType fileType;
 	private FaxStatusInternal status;
+	private FaxStatusRemote remoteStatus;
 	private FaxNotificationStatus notificationStatus;
 	private Long faxAccountId;
 	private LocalDate startDate;
 	private LocalDate endDate;
 	private Boolean archived;
-	private List<String> remoteStatusList;
+	private List<String> externalStatusList;
 	private boolean includeExternalStatuses;
 	private FaxStatusCombined combinedStatus;
 
@@ -114,9 +115,13 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 			{
 				criteria.add(Restrictions.eq("status", getStatus()));
 			}
-			if(getRemoteStatusList() != null && !getRemoteStatusList().isEmpty())
+			if(getRemoteStatus() != null)
 			{
-				Criterion criterion = Restrictions.in("externalStatus", getRemoteStatusList());
+				criteria.add(Restrictions.eq("statusRemote", getRemoteStatus()));
+			}
+			if(getExternalStatusList() != null && !getExternalStatusList().isEmpty())
+			{
+				Criterion criterion = Restrictions.in("externalStatus", getExternalStatusList());
 				if(!includeExternalStatuses)
 				{
 					criterion = Restrictions.or(Restrictions.not(criterion), Restrictions.isNull("externalStatus"));
@@ -157,8 +162,8 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 				criterion = Restrictions.and(
 						Restrictions.eq("status", FaxStatusInternal.SENT),
 						Restrictions.or(
-								Restrictions.not(Restrictions.in("externalStatus", SRFaxApiConnector.RESPONSE_STATUSES_FINAL)),
-								Restrictions.isNull("externalStatus")
+								Restrictions.not(Restrictions.in("statusRemote", FaxStatusRemote.SENT, FaxStatusRemote.ERROR)),
+								Restrictions.isNull("statusRemote")
 						)
 				); break;
 			}
@@ -166,14 +171,14 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 			{
 				criterion = Restrictions.and(
 						Restrictions.eq("status", FaxStatusInternal.SENT),
-						Restrictions.eq("externalStatus", SRFaxApiConnector.RESPONSE_STATUS_FAILED)
+						Restrictions.eq("statusRemote", FaxStatusRemote.ERROR)
 				); break;
 			}
 			case INTEGRATION_SUCCESS:
 			{
 				criterion = Restrictions.and(
 						Restrictions.eq("status", FaxStatusInternal.SENT),
-						Restrictions.eq("externalStatus", SRFaxApiConnector.RESPONSE_STATUS_SENT)
+						Restrictions.eq("statusRemote", FaxStatusRemote.SENT)
 				); break;
 			}
 		}
@@ -230,6 +235,16 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 		this.status = status;
 	}
 
+	public FaxStatusRemote getRemoteStatus()
+	{
+		return remoteStatus;
+	}
+
+	public void setRemoteStatus(FaxStatusRemote remoteStatus)
+	{
+		this.remoteStatus = remoteStatus;
+	}
+
 	public FaxNotificationStatus getNotificationStatus() { return notificationStatus; }
 
 	public void setNotificationStatus (FaxNotificationStatus notificationStatus) { this.notificationStatus = notificationStatus; }
@@ -277,21 +292,21 @@ public class FaxOutboundCriteriaSearch extends AbstractCriteriaSearch
 	/**
 	 * the list of remote statuses values to filter.
 	 */
-	public List<String> getRemoteStatusList()
+	public List<String> getExternalStatusList()
 	{
-		return remoteStatusList;
+		return externalStatusList;
 	}
 
 	/**
-	 * set the list of remote statuses values to filter.
+	 * set the list of api statuses values to filter.
 	 * @param inclusive
-	 * if true, results will be filtered to included only statuses in the given list. (return matching remoteStatusList)
-	 * if false, results will be filtered to exclude these statuses (return matching ^remoteStatusList)
+	 * if true, results will be filtered to included only statuses in the given list. (return matching externalStatusList)
+	 * if false, results will be filtered to exclude these statuses (return matching ^externalStatusList)
 	 * this setting is ignored in the remote status list is not set or is empty
 	 */
-	public void setRemoteStatusList(List<String> remoteStatusList, boolean inclusive)
+	public void setExternalStatusList(List<String> externalStatusList, boolean inclusive)
 	{
-		this.remoteStatusList = remoteStatusList;
+		this.externalStatusList = externalStatusList;
 		this.includeExternalStatuses = inclusive;
 	}
 

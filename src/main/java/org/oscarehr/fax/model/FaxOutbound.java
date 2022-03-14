@@ -25,7 +25,6 @@ package org.oscarehr.fax.model;
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.fax.provider.FaxProvider;
-import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.provider.model.ProviderData;
 
 import javax.persistence.Column;
@@ -48,7 +47,6 @@ import java.util.Date;
 @Table(name = "fax_outbound")
 public class FaxOutbound extends AbstractModel<Long>
 {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
@@ -61,6 +59,10 @@ public class FaxOutbound extends AbstractModel<Long>
 	@Enumerated(EnumType.STRING)
 	@Column(name= "status")
 	private FaxStatusInternal status;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name= "status_remote")
+	private FaxStatusRemote statusRemote;
 
 	@Column(name= "status_message")
 	private String statusMessage;
@@ -143,6 +145,16 @@ public class FaxOutbound extends AbstractModel<Long>
 		return FaxStatusInternal.ERROR.equals(getStatus());
 	}
 
+	public void setRemoteStatusSent()
+	{
+		setStatusRemote(FaxStatusRemote.SENT);
+	}
+
+	public void setRemoteStatusError()
+	{
+		setStatusRemote(FaxStatusRemote.ERROR);
+	}
+
 	/**
 	 * determine the given account will have a record of this outbound fax.
 	 * This requires this fax to have been sent (failed faxes will have no remote record),
@@ -158,30 +170,9 @@ public class FaxOutbound extends AbstractModel<Long>
 
 	}
 
-	public FaxStatusCombined getCombinedStatus(FaxUploadProvider uploadProvider)
+	public void setProvider(ProviderData provider)
 	{
-		FaxStatusInternal systemStatus = this.getStatus();
-		FaxStatusCombined combinedStatus = null;
-		if(FaxStatusInternal.ERROR.equals(systemStatus))
-		{
-			combinedStatus = FaxStatusCombined.ERROR;
-		}
-		else if(FaxStatusInternal.QUEUED.equals(systemStatus))
-		{
-			combinedStatus = FaxStatusCombined.QUEUED;
-		}
-		else if(FaxStatusInternal.SENT.equals(systemStatus) && uploadProvider.isFaxInRemoteSentState(this.getExternalStatus()))
-		{
-			combinedStatus = FaxStatusCombined.INTEGRATION_SUCCESS;
-		}
-		else if(FaxStatusInternal.SENT.equals(systemStatus) && uploadProvider.isFaxInRemoteFailedState(this.getExternalStatus()))
-		{
-			combinedStatus = FaxStatusCombined.INTEGRATION_FAILED;
-		}
-		else if(FaxStatusInternal.SENT.equals(systemStatus))
-		{
-			combinedStatus = FaxStatusCombined.IN_PROGRESS;
-		}
-		return combinedStatus;
+		this.provider = provider;
+		this.providerNo = provider.getId();
 	}
 }

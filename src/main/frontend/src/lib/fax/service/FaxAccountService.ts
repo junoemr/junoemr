@@ -4,7 +4,7 @@ import FaxAccountToUpdateInputConverter from "../converter/FaxAccountToUpdateInp
 import FaxAccountToCreateInputConverter from "../converter/FaxAccountToCreateInputConverter";
 import FaxAccountToModelConverter from "../converter/FaxAccountToModelConverter";
 import FaxAccount from "../model/FaxAccount";
-import PagedResponse from "../../common/response/pagedRespose";
+import PagedResponse from "../../common/response/PagedResponse";
 
 export default class FaxAccountService
 {
@@ -78,5 +78,11 @@ export default class FaxAccountService
 	{
 		const transfer = (await this.faxAccountApi.listAccounts(page, perPage)).data;
 		return new PagedResponse<FaxAccount>(this.faxAccountToModelConverter.convertList(transfer.body), transfer.headers);
+	}
+
+	public async getActiveAccount(): Promise<FaxAccount>
+	{
+		return this.faxAccountToModelConverter.convert(
+			(await this.faxAccountApi.getActiveFaxAccount()).data.body);
 	}
 }

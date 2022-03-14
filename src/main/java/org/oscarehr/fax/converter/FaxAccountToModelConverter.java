@@ -34,6 +34,11 @@ public class FaxAccountToModelConverter extends AbstractModelConverter<FaxAccoun
 	@Override
 	public FaxAccountTransferOutbound convert(FaxAccount entity)
 	{
+		if(entity == null)
+		{
+			return null;
+		}
+
 		FaxAccountTransferOutbound model = new FaxAccountTransferOutbound();
 		model.setId(entity.getId());
 		model.setAccountLogin(entity.getLoginId());

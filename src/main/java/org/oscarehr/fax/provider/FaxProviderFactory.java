@@ -24,59 +24,66 @@
 package org.oscarehr.fax.provider;
 
 import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
 import org.oscarehr.integration.SRFax.SRFaxAccountProvider;
 import org.oscarehr.integration.SRFax.SRFaxDownloadProvider;
 import org.oscarehr.integration.SRFax.SRFaxUploadProvider;
+import org.oscarehr.integration.ringcentral.RingcentralAccountProvider;
+import org.oscarehr.integration.ringcentral.RingcentralDownloadProvider;
+import org.oscarehr.integration.ringcentral.RingcentralUploadProvider;
 
 public class FaxProviderFactory
 {
 	public static FaxAccountProvider createFaxAccountProvider(FaxAccount faxAccount)
 	{
+		if(faxAccount.getIntegrationType() == null)
+		{
+			throw new IllegalStateException("Fax account " + faxAccount.getId() + " is missing an integration type");
+		}
+
 		switch (faxAccount.getIntegrationType())
 		{
 			case SRFAX:
 				return new SRFaxAccountProvider(faxAccount);
 			case RINGCENTRAL:
-			case NONE:
+				return new RingcentralAccountProvider(faxAccount);
 			default:
-				return null;
+				throw new IllegalStateException("Fax account " + faxAccount.getId() + " has invalid integration type");
 		}
 	}
 
 	public static FaxDownloadProvider createFaxDownloadProvider(FaxAccount faxAccount)
 	{
+		if(faxAccount.getIntegrationType() == null)
+		{
+			throw new IllegalStateException("Fax account " + faxAccount.getId() + " is missing an integration type");
+		}
+
 		switch (faxAccount.getIntegrationType())
 		{
 			case SRFAX:
 				return new SRFaxDownloadProvider(faxAccount);
 			case RINGCENTRAL:
-			case NONE:
+				return new RingcentralDownloadProvider(faxAccount);
 			default:
-				return null;
+				throw new IllegalStateException("Fax account " + faxAccount.getId() + " has invalid integration type");
 		}
 	}
 
 	public static FaxUploadProvider createFaxUploadProvider(FaxAccount faxAccount)
 	{
-		return createFaxUploadProvider(faxAccount.getIntegrationType());
-	}
+		if(faxAccount.getIntegrationType() == null)
+		{
+			throw new IllegalStateException("Fax account " + faxAccount.getId() + " is missing an integration type");
+		}
 
-	public static FaxUploadProvider createFaxUploadProvider(FaxAccountTransferOutbound faxAccount)
-	{
-		return createFaxUploadProvider(faxAccount.getAccountType());
-	}
-
-	private static FaxUploadProvider createFaxUploadProvider(FaxProvider providerType)
-	{
-		switch (providerType)
+		switch (faxAccount.getIntegrationType())
 		{
 			case SRFAX:
 				return new SRFaxUploadProvider();
 			case RINGCENTRAL:
-			case NONE:
+				return new RingcentralUploadProvider(faxAccount);
 			default:
-				return null;
+				throw new IllegalStateException("Fax account " + faxAccount.getId() + " has invalid integration type");
 		}
 	}
 }

@@ -4,11 +4,12 @@ import {FaxStatusCombinedType} from "./FaxStatusCombinedType";
 import {FaxNotificationStatusType} from "./FaxNotificationStatusType";
 import {FaxFileType} from "./FaxFileType";
 import PhoneNumber from "../../common/model/PhoneNumber";
+import FaxAccount from "./FaxAccount";
 
 export default class FaxOutboxResult
 {
 	private _id: number;
-	private _faxAccountId: number;
+	private _faxAccount: FaxAccount;
 	private _providerId: string;
 	private _providerName: string;
 	private _demographicId: number;
@@ -91,14 +92,14 @@ export default class FaxOutboxResult
 		this._id = value;
 	}
 
-	get faxAccountId(): number
+	get faxAccount(): FaxAccount
 	{
-		return this._faxAccountId;
+		return this._faxAccount;
 	}
 
-	set faxAccountId(value: number)
+	set faxAccount(value: FaxAccount)
 	{
-		this._faxAccountId = value;
+		this._faxAccount = value;
 	}
 
 	get providerId(): string
