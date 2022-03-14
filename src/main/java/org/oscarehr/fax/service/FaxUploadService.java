@@ -317,7 +317,7 @@ public class FaxUploadService
 		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
 		criteriaSearch.setStatus(FaxStatusInternal.SENT); // only check records with a local sent status
 		criteriaSearch.setArchived(false); // ignore archived records
-		criteriaSearch.setRemoteStatusList(remoteFinalStatuses, false);
+		criteriaSearch.setExternalStatusList(remoteFinalStatuses, false);
 
 		List<FaxOutbound> pendingList = faxOutboundDao.criteriaSearch(criteriaSearch);
 
@@ -338,12 +338,14 @@ public class FaxUploadService
 					if(uploadProvider.isFaxInRemoteSentState(apiResult.getRemoteSentStatus()))
 					{
 						apiResult.getRemoteSendTime().ifPresent(faxOutbound::setExternalDeliveryDate);
+						faxOutbound.setRemoteStatusSent();
 						faxOutbound.setStatusMessage(STATUS_MESSAGE_COMPLETED);
 						faxOutbound.setArchived(true);
 					}
-					else
+					else if(apiResult.getError().isPresent())
 					{
-						apiResult.getError().ifPresent(faxOutbound::setStatusMessage);
+						faxOutbound.setRemoteStatusError();
+						faxOutbound.setStatusMessage(apiResult.getError().get());
 					}
 					faxOutboundDao.merge(faxOutbound);
 					logger.info("Updated Status to: " + remoteSentStatus);

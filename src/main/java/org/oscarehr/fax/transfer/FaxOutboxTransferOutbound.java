@@ -23,12 +23,14 @@
 package org.oscarehr.fax.transfer;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.fax.model.FaxFileType;
 import org.oscarehr.fax.model.FaxNotificationStatus;
 import org.oscarehr.fax.model.FaxStatusCombined;
 import org.oscarehr.fax.model.FaxStatusInternal;
+import org.oscarehr.fax.model.FaxStatusRemote;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
@@ -51,6 +53,8 @@ public class FaxOutboxTransferOutbound implements Serializable
 	private FaxFileType fileType;
 	/* the sent status of the document as recorded in the system */
 	private FaxStatusInternal systemStatus;
+	/* the stardardized status of the document as retrieved from the api */
+	private FaxStatusRemote remoteStatus;
 	/* a message sent along with the status, usually for error explanations */
 	private String systemStatusMessage;
 	/* the sent date of the document as recorded in the system */
@@ -67,5 +71,31 @@ public class FaxOutboxTransferOutbound implements Serializable
 	private LocalDateTime integrationSentDateTime;
 
 	/* the single combined state of the systemStatus and the integrationStatus */
-	private FaxStatusCombined combinedStatus;
+	@JsonProperty("combinedStatus")
+	public FaxStatusCombined getCombinedStatus()
+	{
+		FaxStatusInternal systemStatus = this.getSystemStatus();
+		FaxStatusCombined combinedStatus = null;
+		if(FaxStatusInternal.ERROR.equals(systemStatus))
+		{
+			combinedStatus = FaxStatusCombined.ERROR;
+		}
+		else if(FaxStatusInternal.QUEUED.equals(systemStatus))
+		{
+			combinedStatus = FaxStatusCombined.QUEUED;
+		}
+		else if(FaxStatusInternal.SENT.equals(systemStatus) && FaxStatusRemote.SENT.equals(this.getRemoteStatus()))
+		{
+			combinedStatus = FaxStatusCombined.INTEGRATION_SUCCESS;
+		}
+		else if(FaxStatusInternal.SENT.equals(systemStatus) && FaxStatusRemote.ERROR.equals(this.getRemoteStatus()))
+		{
+			combinedStatus = FaxStatusCombined.INTEGRATION_FAILED;
+		}
+		else if(FaxStatusInternal.SENT.equals(systemStatus))
+		{
+			combinedStatus = FaxStatusCombined.IN_PROGRESS;
+		}
+		return combinedStatus;
+	}
 }

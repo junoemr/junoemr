@@ -20,37 +20,10 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.dao;
+package org.oscarehr.fax.model;
 
-import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.fax.model.FaxOutbound;
-import org.oscarehr.fax.model.FaxStatusInternal;
-import org.springframework.stereotype.Repository;
-
-import javax.persistence.Query;
-import java.util.List;
-
-@Repository
-public class FaxOutboundDao extends AbstractDao<FaxOutbound>
+public enum FaxStatusRemote
 {
-	public FaxOutboundDao()
-	{
-		super(FaxOutbound.class);
-	}
-
-	public List<FaxOutbound> findActiveQueued()
-	{
-		Query query = entityManager.createQuery(
-				"SELECT record " +
-						"FROM FaxOutbound record " +
-						"INNER JOIN record.faxAccount acct " +
-						"WHERE record.status = :status " +
-						"AND acct.outboundEnabled = :enabled " +
-						"AND record.archived = :archived " +
-						"ORDER BY record.createdAt ASC");
-		query.setParameter("status", FaxStatusInternal.QUEUED);
-		query.setParameter("enabled", true);
-		query.setParameter("archived", false);
-		return query.getResultList();
-	}
+	ERROR,
+	SENT
 }
