@@ -43,20 +43,21 @@
 				</div>
 				<div class="input-group grid-flow-row grid-row-2 grid-row-gap-4">
 					<juno-input ng-model="$ctrl.faxAccount.accountLogin"
-					            disabled="$ctrl.isModalEditMode()"
+					            disabled="$ctrl.isModalEditMode() || $ctrl.faxAccountProvider.isOauth()"
 					            ng-change="$ctrl.setDefaultConnectionStatus()"
-					            invalid="$ctrl.initialSave &&!$ctrl.validations.accountLoginFilled()"
+					            invalid="$ctrl.initialSave && !$ctrl.validations.accountLoginFilled()"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.accountLogin"/>"
 					            label-position="$ctrl.LABEL_POSITION.LEFT">
 					</juno-input>
-					<juno-input ng-model="$ctrl.faxAccount.password"
+					<juno-input ng-if="$ctrl.faxAccountProvider.showPasswordField()"
+					            ng-model="$ctrl.faxAccount.password"
 					            ng-change="$ctrl.setDefaultConnectionStatus()"
-					            invalid="$ctrl.initialSave &&!$ctrl.validations.passwordFilled()"
+					            invalid="$ctrl.initialSave && !$ctrl.validations.passwordFilled()"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.password"/>"
 					            label-position="$ctrl.LABEL_POSITION.LEFT">
 					</juno-input>
 					<juno-input ng-model="$ctrl.faxAccount.displayName"
-					            invalid="$ctrl.initialSave &&!$ctrl.validations.displayNameFilled()"
+					            invalid="$ctrl.initialSave && !$ctrl.validations.displayNameFilled()"
 					            title="<bean:message bundle="ui" key="admin.fax.acct.edit.displayName-tooltip"/>"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.displayName"/>"
 					            label-position="$ctrl.LABEL_POSITION.LEFT">
@@ -78,14 +79,14 @@
 				</div>
 				<div class="input-group grid-flow-row grid-row-2 grid-row-gap-4">
 					<juno-input ng-model="$ctrl.faxAccount.accountEmail"
-					            ng-if="$ctrl.faxAccount.enableOutbound"
+					            ng-if="$ctrl.faxAccount.enableOutbound && $ctrl.faxAccountProvider.showOutboundEmailField()"
 					            invalid="$ctrl.initialSave && !$ctrl.validations.emailFilled()"
 					            title="<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail-tooltip"/>"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail"/>"
 					            label-position="$ctrl.LABEL_POSITION.LEFT">
 					</juno-input>
 					<juno-input ng-model="$ctrl.faxAccount.faxNumber"
-					            ng-if="$ctrl.faxAccount.enableOutbound"
+					            ng-if="$ctrl.faxAccount.enableOutbound && $ctrl.faxAccountProvider.showOutboundReturnFaxNoField()"
 					            invalid="$ctrl.initialSave && !$ctrl.validations.faxNumberFilled()"
 					            title="<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber-tooltip"/>"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber"/>"

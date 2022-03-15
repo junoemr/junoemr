@@ -10,6 +10,7 @@ import {
 import ToastService from "../../../../../lib/alerts/service/ToastService";
 import {FaxAccountType} from "../../../../../lib/fax/model/FaxAccountType";
 import LoadingQueue from "../../../../../lib/util/LoadingQueue";
+import FaxAccountProviderFactory from "../../../../../lib/fax/provider/FaxAccountProviderFactory";
 
 angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 	templateUrl: 'src/admin/section/fax/components/faxConfigurationEditModal/faxConfigurationEditModal.jsp',
@@ -87,6 +88,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 					ctrl.faxAccount.enableOutbound = false;
 				}
 
+				ctrl.faxAccountProvider = FaxAccountProviderFactory.creatAccountProvider(ctrl.faxAccount);
 				ctrl.setupValidations();
 			};
 
@@ -94,20 +96,10 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 			{
 				ctrl.validations = {
 					accountLoginFilled: Juno.Validations.validationFieldRequired(ctrl.faxAccount, "accountLogin"),
-
-					passwordFilled: Juno.Validations.validationFieldOr(
-						Juno.Validations.validationCustom(() => ctrl.isModalEditMode()),
-						Juno.Validations.validationFieldRequired(ctrl.faxAccount, "password")),
-
+					passwordFilled: ctrl.faxAccountProvider.passwordFieldValidation(),
 					displayNameFilled: Juno.Validations.validationFieldRequired(ctrl.faxAccount, "displayName"),
-
-					emailFilled: Juno.Validations.validationFieldOr(
-						Juno.Validations.validationCustom(() => !ctrl.faxAccount.enableOutbound),
-						Juno.Validations.validationFieldRequired(ctrl.faxAccount, "accountEmail")),
-
-					faxNumberFilled: Juno.Validations.validationFieldOr(
-						Juno.Validations.validationCustom(() => !ctrl.faxAccount.enableOutbound),
-						Juno.Validations.validationFieldRequired(ctrl.faxAccount, "faxNumber")),
+					emailFilled: ctrl.faxAccountProvider.outboundEmailFieldValidation(),
+					faxNumberFilled: ctrl.faxAccountProvider.outboundReturnFaxNoFieldValidation(),
 				};
 			}
 
