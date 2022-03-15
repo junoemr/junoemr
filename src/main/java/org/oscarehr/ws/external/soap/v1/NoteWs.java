@@ -40,7 +40,7 @@ public class NoteWs extends AbstractWs
 	@Autowired
 	private NoteService noteService;
 
-	public Long saveNote(String noteText, String demographicId)
+	public Long saveEncounterNote(String noteText, String demographicId)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		CaseManagementNote caseManagementNote = NoteFactory.buildSimpleNote(loggedInInfo, noteText, demographicId);
