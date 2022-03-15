@@ -36,6 +36,7 @@ angular.module('Common.Components').component('junoToggle', {
         toggleTrueValue: "<?",
         toggleFalseValue: "<?",
         showValueLabels: "<?",
+        labelClassList: "<?",
         round: "<?"
     },
     controller: [ "$scope", function ($scope) {
@@ -55,11 +56,6 @@ angular.module('Common.Components').component('junoToggle', {
         {
             return [ctrl.componentStyle];
         };
-
-        ctrl.labelClasses = () =>
-		{
-			return [ctrl.labelPosition, "label-style"];
-		}
 
         /**
          * Change event handler.  State of the checkbox is accessible as the checked parameter on your callback function

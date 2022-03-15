@@ -30,6 +30,7 @@ angular.module('Common.Components').component('formLabelWrapper', {
 		labelPosition: "<?",
 		disabled: "<?",
 		componentStyle: "<?",
+		labelClassList: "<?",
 	},
 	transclude: true,
 	controller: [function ()
@@ -40,6 +41,7 @@ angular.module('Common.Components').component('formLabelWrapper', {
 		{
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
+			ctrl.labelClassList = ctrl.labelClassList || [];
 		};
 
 		ctrl.componentClasses = () =>
@@ -49,7 +51,7 @@ angular.module('Common.Components').component('formLabelWrapper', {
 
 		ctrl.labelClasses = () =>
 		{
-			return [ctrl.labelPosition, "label-style"];
+			return [ctrl.labelPosition, "label-style"].concat(ctrl.labelClassList);
 		}
 	}]
 });

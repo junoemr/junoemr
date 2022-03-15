@@ -25,6 +25,7 @@
 <div class="juno-toggle">
     <form-label-wrapper label="{{$ctrl.label}}"
                         label-position="$ctrl.labelPosition"
+                        label-class-list="$ctrl.labelClassList"
                         disabled="$ctrl.disabled"
                         component-style="$ctrl.componentStyle"
     >

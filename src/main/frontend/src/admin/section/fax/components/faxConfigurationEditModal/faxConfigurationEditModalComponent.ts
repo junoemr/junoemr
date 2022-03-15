@@ -217,9 +217,20 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				switch (ctrl.faxAccount.connectionStatus)
 				{
 					case FaxAccountConnectionStatusType.Success: return "icon-check";
-					case FaxAccountConnectionStatusType.Failure: return "icon-private";
+					case FaxAccountConnectionStatusType.Failure: return "icon-critical";
 					case FaxAccountConnectionStatusType.Unknown:
 					default: return "icon-question";
+				}
+			}
+
+			ctrl.getConnectionTestText = (): string =>
+			{
+				switch (ctrl.faxAccount.connectionStatus)
+				{
+					case FaxAccountConnectionStatusType.Success: return "Fax Account Working";
+					case FaxAccountConnectionStatusType.Failure: return "Error Occurred";
+					case FaxAccountConnectionStatusType.Unknown:
+					default: return "Status Unknown";
 				}
 			}
 		}
