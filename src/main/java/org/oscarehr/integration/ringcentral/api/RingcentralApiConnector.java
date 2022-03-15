@@ -36,6 +36,7 @@ import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import lombok.Synchronized;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralSendFaxInput;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralSendFaxResult;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
@@ -44,6 +45,7 @@ import oscar.util.RESTClient;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -156,12 +158,28 @@ public class RingcentralApiConnector extends RESTClient
 
 	}
 
+	public RingCentralAccountInfoResult getAccountInfo()
+	{
+		return getAccountInfo("~");
+	}
+	public RingCentralAccountInfoResult getAccountInfo(String accountId)
+	{
+		String url = buildUrl(DEFAULT_PROTOCOL, REST_API_BASE + "account/" + accountId);
+		return doGet(url, getAuthorizationHeaders(), RingCentralAccountInfoResult.class);
+	}
+
 	public RingCentralSendFaxResult sendFax(String accountId, String extensionId, RingCentralSendFaxInput input)
 	{
 		String url = buildUrl(DEFAULT_PROTOCOL, REST_API_BASE +
 				"account/" + accountId + "/extension/" + extensionId + "/fax");
 
+		return doPost(url, getAuthorizationHeaders(), input, RingCentralSendFaxResult.class);
+	}
+
+	protected HttpHeaders getAuthorizationHeaders()
+	{
 		HttpHeaders headers = new HttpHeaders();
-		return doPost(url, input, RingCentralSendFaxResult.class);
+		headers.set("Authorization", MessageFormat.format("Bearer {0}", getCredential().getAccessToken()));
+		return headers;
 	}
 }

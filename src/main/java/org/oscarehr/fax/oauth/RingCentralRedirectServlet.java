@@ -29,6 +29,7 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.servlet.auth.oauth2.AbstractAuthorizationCodeCallbackServlet;
 import org.apache.log4j.Logger;
 import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -63,6 +64,8 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 		throws ServletException, IOException
 	{
 		apiConnector.setCredential(credential);
+		RingCentralAccountInfoResult result = apiConnector.getAccountInfo();
+
 		String contextPath = req.getContextPath();
 		resp.sendRedirect(contextPath + "/web/#!/admin/faxConfig"); // TODO: redirect back to fax page
 		// TODO: pass credential around?  RingCentalApiConnector.setCredential?
