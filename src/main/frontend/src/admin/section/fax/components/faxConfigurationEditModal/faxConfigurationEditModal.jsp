@@ -33,10 +33,11 @@
 	<modal-body>
 		<form name="form" class="fax-configuration-edit-modal-content">
 			<div class="flex-column input-fieldset">
-				<div class="m-l-48">
+				<div>
 					<juno-toggle round="true"
 					             ng-model="$ctrl.faxAccount.enabled"
 					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.acctEnabled'/>"
+					             label-class-list="['text-bold']"
 					             label-position="$ctrl.LABEL_POSITION.RIGHT">
 					</juno-toggle>
 				</div>
@@ -66,10 +67,11 @@
 			<fieldset ng-disabled="!$ctrl.masterFaxEnabledOutbound" class="input-fieldset">
 				<span ng-show="!$ctrl.masterFaxEnabledOutbound"><bean:message bundle="ui" key="admin.fax.acct.edit.outboundDisabledMessage"/></span>
 
-				<div class="grid-flow-row fax-config-grid grid-align-items-center m-l-48">
+				<div class="grid-flow-row fax-config-grid grid-align-items-center">
 					<juno-toggle round="true"
 					             ng-model="$ctrl.faxAccount.enableOutbound"
 					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.enableOutbound'/>"
+					             label-class-list="['text-bold']"
 					             label-position="$ctrl.LABEL_POSITION.RIGHT">
 					</juno-toggle>
 					<i class="icon icon-info-circle info-badge" title="<bean:message bundle='ui' key='admin.fax.acct.edit.outboundInfoMessage'/>"></i>
@@ -102,10 +104,11 @@
 			<fieldset ng-disabled="!$ctrl.masterFaxEnabledInbound" class="input-fieldset">
 				<span ng-show="!$ctrl.masterFaxEnabledInbound"><bean:message bundle="ui" key="admin.fax.acct.edit.inboundDisabledMessage"/></span>
 
-				<div class="grid-flow-row fax-config-grid grid-align-items-center m-l-48">
+				<div class="grid-flow-row fax-config-grid grid-align-items-center">
 					<juno-toggle round="true"
 					             ng-model="$ctrl.faxAccount.enableInbound"
 					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.enableInbound'/>"
+					             label-class-list="['text-bold']"
 					             label-position="$ctrl.LABEL_POSITION.RIGHT">
 					</juno-toggle>
 					<i class="icon icon-info-circle info-badge" title="<bean:message bundle='ui' key='admin.fax.acct.edit.inboundInfoMessage'/>"></i>
@@ -119,8 +122,10 @@
 					             label-position="$ctrl.LABEL_POSITION.LEFT"
 					             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 					             button-color="$ctrl.JUNO_BUTTON_COLOR_PATTERN.COLORED">
+						<div class="flex-row justify-content-center align-items-center">
 						<icon-badge class="m-r-4" icon="{{$ctrl.getConnectionIconClass()}}"></icon-badge>
-						<bean:message bundle="ui" key="admin.fax.acct.edit.btn-testConnection"/>
+						<span class="m-l-4">{{$ctrl.getConnectionTestText()}}</span>
+						</div>
 					</juno-button>
 				</div>
 			</div>
