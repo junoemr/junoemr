@@ -8,6 +8,8 @@ import {SecurityPermissions} from "../../../common/security/securityConstants";
 import FaxAccount from "../../../lib/fax/model/FaxAccount";
 import ToastService from "../../../lib/alerts/service/ToastService";
 import {SYSTEM_PROPERTIES} from "../../../common/services/systemPreferenceServiceConstants";
+import {FaxAccountType} from "../../../lib/fax/model/FaxAccountType";
+import {FaxAccountConnectionStatusType} from "../../../lib/fax/model/FaxAccountConnectionStatusType";
 
 angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
@@ -16,10 +18,12 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	},
 	controller: [
 		"$uibModal",
+		"$location",
 		"providerService",
 		"securityRolesService",
 		"systemPreferenceService",
 		function ($uibModal,
+				  $location,
 		          providerService,
 				  securityRolesService,
 		          systemPreferenceService)
@@ -68,6 +72,18 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 				if(ctrl.activeAccount)
 				{
 					ctrl.faxAccountSelectStates[ctrl.activeAccount.id] = true;
+				}
+
+				let accountIdParam = $location.search().accountId;
+				if(accountIdParam)
+				{
+					let newFaxAccount = new FaxAccount(FaxAccountType.Ringcentral);
+					newFaxAccount.accountLogin = accountIdParam;
+					newFaxAccount.connectionStatus = FaxAccountConnectionStatusType.Success;
+					ctrl.editFaxAccount(newFaxAccount);
+
+					$location.search('accountId', null);
+					$location.search('type', null);
 				}
 				ctrl.initialized = true;
 			};

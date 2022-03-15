@@ -28,6 +28,9 @@ import com.google.api.client.auth.oauth2.AuthorizationCodeResponseUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.servlet.auth.oauth2.AbstractAuthorizationCodeCallbackServlet;
 import org.apache.log4j.Logger;
+import org.oscarehr.fax.dao.FaxAccountDao;
+import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
 import org.oscarehr.util.MiscUtils;
@@ -40,6 +43,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet(name="FaxOAuthRedirectServlet",description="Ringcentral OAuth redirect servlet", value="/fax_redirect",loadOnStartup = 1)
 public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbackServlet
@@ -50,6 +54,9 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 
 	@Autowired
 	RingcentralApiConnector apiConnector;
+
+	@Autowired
+	private FaxAccountDao faxAccountDao;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException
@@ -65,10 +72,20 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 	{
 		apiConnector.setCredential(credential);
 		RingCentralAccountInfoResult result = apiConnector.getAccountInfo();
+		List<FaxAccount> faxAccounts = faxAccountDao.findByLoginId(FaxProvider.RINGCENTRAL, String.valueOf(result.getId()));
 
 		String contextPath = req.getContextPath();
-		resp.sendRedirect(contextPath + "/web/#!/admin/faxConfig"); // TODO: redirect back to fax page
-		// TODO: pass credential around?  RingCentalApiConnector.setCredential?
+		if(faxAccounts.isEmpty()) // new account setup
+		{
+			resp.sendRedirect(contextPath + "/web/#!/admin/faxConfig" +
+					"?type=" + FaxProvider.RINGCENTRAL +
+					"&accountId=" + result.getId());
+		}
+		else // existing account re-login
+		{
+			//todo - how do we handle 2 accounts linked to the same account?
+			resp.sendRedirect(contextPath + "/web/#!/admin/faxConfig");
+		}
 	}
 
 	@Override
