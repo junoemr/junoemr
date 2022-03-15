@@ -31,8 +31,8 @@ import org.apache.log4j.Logger;
 import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -45,8 +45,7 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 {
 	private static Logger logger = MiscUtils.getLogger();
 
-	@Value("${fax.ringcentral.redirect_url}")
-	String REDIRECT_URL;
+	protected String REDIRECT_URL = System.getenv("RINGCENTRAL_REDIRECT_URL");
 
 	@Autowired
 	RingcentralApiConnector apiConnector;
@@ -63,6 +62,7 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 	protected void onSuccess(HttpServletRequest req, HttpServletResponse resp, Credential credential)
 		throws ServletException, IOException
 	{
+		apiConnector.setCredential(credential);
 		String contextPath = req.getContextPath();
 		resp.sendRedirect(contextPath + "/web/#!/admin/faxConfig"); // TODO: redirect back to fax page
 		// TODO: pass credential around?  RingCentalApiConnector.setCredential?

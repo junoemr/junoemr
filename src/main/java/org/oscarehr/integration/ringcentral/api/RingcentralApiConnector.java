@@ -35,8 +35,13 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import lombok.Synchronized;
+import org.oscarehr.integration.ringcentral.api.input.RingCentralSendFaxInput;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralSendFaxResult;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import oscar.util.RESTClient;
+
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.ArrayList;
@@ -45,12 +50,13 @@ import java.util.List;
 
 @Lazy
 @Component
-public class RingcentralApiConnector
+public class RingcentralApiConnector extends RESTClient
 {
 	String FAX_CREDENTIALS_DIR = "";
 
 	public static String LOCAL_USER_ID = "com.junoemr.fax.ringcentral";
 
+	protected static final String REST_API_BASE = "platform.devtest.ringcentral.com/restapi/v1.0/";
 	private String BASE_URL = "https://platform.devtest.ringcentral.com";
 	private String AUTH_SERVER_URL = BASE_URL + "/restapi/oauth/authorize";
 	private String TOKEN_SERVER_URL = BASE_URL + "/restapi/oauth/token";
@@ -148,5 +154,14 @@ public class RingcentralApiConnector
 			httpRequest.setParser(new JsonObjectParser(new JacksonFactory()));		// Use request factory here to talk to ringcentral
 		});
 
+	}
+
+	public RingCentralSendFaxResult sendFax(String accountId, String extensionId, RingCentralSendFaxInput input)
+	{
+		String url = buildUrl(DEFAULT_PROTOCOL, REST_API_BASE +
+				"account/" + accountId + "/extension/" + extensionId + "/fax");
+
+		HttpHeaders headers = new HttpHeaders();
+		return doPost(url, input, RingCentralSendFaxResult.class);
 	}
 }

@@ -28,8 +28,8 @@ import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.extensions.servlet.auth.oauth2.AbstractAuthorizationCodeServlet;
 import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -40,8 +40,7 @@ import java.io.IOException;
 @WebServlet(name="FaxOAuthServlet",description="Ringcentral OAuth servlet", value="/oauth",loadOnStartup = 1)
 public class RingCentralAuthServlet extends AbstractAuthorizationCodeServlet
 {
-	@Value("${fax.ringcentral.redirect_url}")
-	String REDIRECT_URL;
+	protected String REDIRECT_URL = System.getenv("RINGCENTRAL_REDIRECT_URL");
 
 	@Autowired
 	private RingcentralApiConnector apiConnector;

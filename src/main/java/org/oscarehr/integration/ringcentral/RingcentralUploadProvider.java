@@ -30,12 +30,15 @@ import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.result.FaxStatusResult;
 import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
+import org.oscarehr.integration.ringcentral.api.input.RingCentralSendFaxInput;
+import org.oscarehr.util.SpringUtils;
 
 import java.util.List;
 
 public class RingcentralUploadProvider implements FaxUploadProvider
 {
 	protected FaxAccount faxAccount;
+	protected RingcentralApiConnector ringcentralApiConnector = SpringUtils.getBean(RingcentralApiConnector.class);
 
 	public RingcentralUploadProvider(FaxAccount faxAccount)
 	{
@@ -45,8 +48,12 @@ public class RingcentralUploadProvider implements FaxUploadProvider
 	@Override
 	public FaxOutbound sendQueuedFax(FaxOutbound faxOutbound, GenericFile file) throws Exception
 	{
-		//TODO
-		throw new RuntimeException("not implemented");
+		RingCentralSendFaxInput input = new RingCentralSendFaxInput();
+		input.setAttachment(file.toBase64());
+		input.setTo(new String[]{faxOutbound.getSentTo()});
+		ringcentralApiConnector.sendFax(faxAccount.getLoginId(), "~", input);
+
+		return null; //TODO
 	}
 
 	@Override
