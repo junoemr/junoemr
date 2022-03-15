@@ -22,10 +22,12 @@
  */
 package org.oscarehr.integration.ringcentral.api;
 
+import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
+import com.google.api.client.auth.oauth2.BearerToken;
+import com.google.api.client.auth.oauth2.ClientParametersAuthentication;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonObjectParser;
@@ -37,7 +39,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,11 +47,18 @@ import java.util.List;
 @Component
 public class RingcentralApiConnector
 {
-	private String FAX_CREDENTIALS_DIR = "";
+	String FAX_CREDENTIALS_DIR = "";
+
+	public static String LOCAL_USER_ID = "com.junoemr.fax.ringcentral";
+
+	private String BASE_URL = "https://platform.devtest.ringcentral.com";
+	private String AUTH_SERVER_URL = BASE_URL + "/restapi/oauth/authorize";
+	private String TOKEN_SERVER_URL = BASE_URL + "/restapi/oauth/token";
 
 	private DataStoreFactory dataStoreFactory;
 	private HttpTransport httpTransport;
 	private HttpRequestFactory requestFactory;		// TODO: can this be made each request?
+	private AuthorizationCodeFlow oauthLoginFlow;
 
 	private Credential credential;
 
@@ -72,8 +80,39 @@ public class RingcentralApiConnector
 		RESPONSE_STATUS_DELIVERY_FAILED
 	));
 
-	public RingcentralApiConnector()
+	private String getClientID()
 	{
+		// TODO, integrate with openshift secrets management
+		String clientId = System.getenv("RINGCENTRAL_CLIENT_ID");
+		if (clientId == null)
+		{
+			throw new RuntimeException("Missing required env variable $RINGCENTRAL_CLIENT_ID");
+		}
+
+		return clientId;
+	}
+
+	@Synchronized
+	public AuthorizationCodeFlow getOauthLoginFlow() {
+		if (oauthLoginFlow == null)
+		{
+			ClientParametersAuthentication clientId = new ClientParametersAuthentication(
+				getClientID(), null);
+
+			this.oauthLoginFlow = new AuthorizationCodeFlow.Builder(
+				BearerToken.formEncodedBodyAccessMethod(),
+				new NetHttpTransport(),
+				new JacksonFactory(),
+				new GenericUrl(TOKEN_SERVER_URL),
+				clientId,
+				getClientID(),
+				AUTH_SERVER_URL
+			)
+				.enablePKCE()
+				.build();
+		}
+
+		return this.oauthLoginFlow;
 	}
 
 	@Synchronized
@@ -99,19 +138,14 @@ public class RingcentralApiConnector
 	public void init() throws Exception
 	{
 		// TODO: move all this into constructor
-		dataStoreFactory = new FileDataStoreFactory(new File(FAX_CREDENTIALS_DIR));
-		httpTransport = new NetHttpTransport();
+		this.dataStoreFactory = new FileDataStoreFactory(new File(FAX_CREDENTIALS_DIR));
+		this.httpTransport = new NetHttpTransport();
 
 		// TODO: check if credential needs to be initialized by this point
 		Credential credential = getCredential();
-		requestFactory = httpTransport.createRequestFactory(new HttpRequestInitializer()
-		{
-			@Override
-			public void initialize(HttpRequest httpRequest) throws IOException
-			{
-				credential.initialize(httpRequest);
-				httpRequest.setParser(new JsonObjectParser(new JacksonFactory()));		// Use request factory here to talk to ringcentral
-			}
+		this.requestFactory = httpTransport.createRequestFactory(httpRequest -> {
+			credential.initialize(httpRequest);
+			httpRequest.setParser(new JsonObjectParser(new JacksonFactory()));		// Use request factory here to talk to ringcentral
 		});
 
 	}
