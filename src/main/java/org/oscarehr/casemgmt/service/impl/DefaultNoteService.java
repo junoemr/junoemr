@@ -37,6 +37,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
+import org.oscarehr.PMmodule.model.ProgramProvider;
+import org.oscarehr.PMmodule.service.AdmissionManager;
+import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicNote;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicNoteCompositePk;
 import org.oscarehr.casemgmt.common.EChartNoteEntry;
@@ -55,7 +58,9 @@ import org.oscarehr.common.dao.CaseManagementIssueNotesDao;
 import org.oscarehr.common.dao.GroupNoteDao;
 import org.oscarehr.common.model.BillingONCHeader1;
 import org.oscarehr.common.model.GroupNoteLink;
+import org.oscarehr.common.model.Provider;
 import org.oscarehr.encounterNote.dao.CaseManagementNoteDao;
+import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.NoteSelectionTo1;
 import org.oscarehr.ws.rest.to.model.NoteTo1;
@@ -94,6 +99,15 @@ public class DefaultNoteService implements NoteService {
 
 	@Autowired
 	private CaseManagementNoteDao cmeNotesDao;
+
+	@Autowired
+	private ProgramManager2 programManager2;
+
+	@Autowired
+	private ProgramManager programMgr;
+
+	@Autowired
+	private AdmissionManager admissionManager;
 
 	@Override
 	public NoteSelectionTo1 searchEncounterNotes(LoggedInInfo loggedInInfo, NoteSelectionCriteria criteria)
@@ -441,6 +455,54 @@ public class DefaultNoteService implements NoteService {
 		return result;
 	}
 
+	@Override
+	public CaseManagementNote saveEncounterNote(LoggedInInfo loggedInInfo, CaseManagementNote note)
+	{
+		Provider provider = loggedInInfo.getLoggedInProvider();
+		String providerNo = provider.getProviderNo();
+		String programIdString = note.getProgram_no();
+		String role = note.getReporter_caisi_role();
+		String team = note.getReporter_program_team();
+		String noteStr = note.getNote();
+		String noteHistory = note.getHistory();
+
+		noteStr = noteStr.replaceAll("\r\n", "\n");
+		noteStr = noteStr.replaceAll("\r", "\n");
+
+		if (programIdString == null)
+		{
+			programIdString = getProgram(loggedInInfo, providerNo);
+			note.setProgram_no(programIdString);
+		}
+
+		if (role == null)
+		{
+			role = getRole(providerNo, programIdString);
+			note.setReporter_caisi_role(role);
+		}
+
+		if (team == null)
+		{
+			team = getTeam(programIdString, note.getDemographic_no());
+			note.setReporter_program_team(team);
+		}
+
+		if (noteHistory == null)
+		{
+			noteHistory = noteStr;
+		}
+		else
+		{
+			noteHistory = noteStr + "\n" + "   ----------------History Record----------------   \n" + noteHistory + "\n";
+		}
+
+		note.setHistory(noteHistory);
+
+		caseManagementNoteDao.saveNote(note);
+
+		return note;
+	}
+
 	private static List<EChartNoteEntry> sliceFromStartOfList(NoteSelectionCriteria criteria,List<EChartNoteEntry> entries,NoteSelectionResult result){
 		List<EChartNoteEntry> slice = new ArrayList<EChartNoteEntry>();
 		int numToReturn = criteria.getMaxResults();
@@ -664,6 +726,58 @@ public class DefaultNoteService implements NoteService {
 			}
 		}
 		return null;
+	}
+
+	private String getProgram(LoggedInInfo loggedInInfo, String providerNo)
+	{
+		String programId = null;
+		ProgramProvider currentProgram = programManager2.getCurrentProgramInDomain(loggedInInfo, providerNo);
+
+		if (currentProgram != null && currentProgram.getProgramId() != null)
+		{
+			programId = currentProgram.getProgramId().toString();
+		}
+		else
+		{
+			// Default to the oscar program if provider hasn't been assigned to a program
+			programId = String.valueOf(programMgr.getProgramIdByProgramName("OSCAR"));
+		}
+
+		return programId;
+	}
+
+	private String getRole(String providerNo, String programId)
+	{
+		String role = null;
+
+		try
+		{
+			role = String.valueOf((programMgr.getProgramProvider(providerNo, programId)).getRole().getId());
+		}
+		catch (Exception e)
+		{
+			logger.error("Error", e);
+			role = "0";
+		}
+
+		return role;
+	}
+
+	private String getTeam(String programId, String demographicId)
+	{
+		String team = null;
+
+		try
+		{
+			team = String.valueOf((admissionManager.getAdmission(programId, Integer.parseInt(demographicId))).getTeamId());
+		}
+		catch (Exception e)
+		{
+			logger.error("Error", e);
+			team = "0";
+		}
+
+		return team;
 	}
 
 }

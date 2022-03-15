@@ -21,37 +21,33 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.casemgmt.service;
+package org.oscarehr.ws.external.soap.v1;
 
+import org.apache.cxf.annotations.GZIP;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
+import org.oscarehr.casemgmt.service.NoteService;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.ws.rest.to.model.NoteSelectionTo1;
+import org.oscarehr.ws.external.soap.v1.transfer.NoteFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import javax.jws.WebService;
 
-/**
- * Defines contract for retrieving notes for a demographic record.
- */
-public interface NoteService {
+@WebService
+@Component
+@GZIP(threshold = AbstractWs.GZIP_THRESHOLD)
+public class NoteWs extends AbstractWs
+{
+	@Autowired
+	private NoteService noteService;
 
-	/**
-	 * Searches for demographic notes. 
-	 * 
-	 * @param criteria
-	 * 		Criteria to be used during the search.
-	 * @return
-	 * 		Returns all notes satisfying the search criteria.
-	 */
-	NoteSelectionResult findNotes(LoggedInInfo loggedInInfo, NoteSelectionCriteria criteria);
+	public Long saveNote(String noteText, String demographicId)
+	{
+		LoggedInInfo loggedInInfo = getLoggedInInfo();
+		CaseManagementNote caseManagementNote = NoteFactory.buildSimpleNote(loggedInInfo, noteText, demographicId);
 
+		noteService.saveEncounterNote(loggedInInfo, caseManagementNote);
 
-	NoteSelectionTo1 searchEncounterNotes(LoggedInInfo loggedInInfo, NoteSelectionCriteria criteria);
+		return caseManagementNote.getId();
+	}
 
-	/**
-	 * Saves an encounter note for a demographic
-	 *
-	 * @param note
-	 * 		The CaseManagementNote to be saved.
-	 * @return
-	 * 		Returns the saved CaseManagementNote.
-	 */
-	CaseManagementNote saveEncounterNote(LoggedInInfo loggedInInfo, CaseManagementNote note);
 }
