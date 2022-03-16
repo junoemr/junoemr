@@ -28,10 +28,7 @@ import com.google.api.client.auth.oauth2.AuthorizationCodeResponseUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.servlet.auth.oauth2.AbstractAuthorizationCodeCallbackServlet;
 import org.apache.log4j.Logger;
-import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
 import org.oscarehr.util.MiscUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -44,12 +41,6 @@ import java.io.IOException;
 public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbackServlet
 {
 	private static Logger logger = MiscUtils.getLogger();
-
-	@Value("${fax.ringcentral.redirect_url}")
-	String REDIRECT_URL;
-
-	@Autowired
-	RingcentralApiConnector apiConnector;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException
@@ -64,34 +55,36 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 		throws ServletException, IOException
 	{
 		String contextPath = req.getContextPath();
-		resp.sendRedirect(contextPath + "/web/#!/admin/faxConfig"); // TODO: redirect back to fax page
-		// TODO: pass credential around?  RingCentalApiConnector.setCredential?
+		resp.sendRedirect(contextPath + "/web/#!/admin/faxConfig");
 	}
 
 	@Override
 	protected void onError(HttpServletRequest req, HttpServletResponse resp, AuthorizationCodeResponseUrl errorResponse)
 		throws ServletException, IOException
 	{
-		logger.error(errorResponse.getError());  // TODO: redirect back to fax page
+		logger.error(errorResponse.getError());
+
+		String contextPath = req.getContextPath();
+		resp.sendRedirect(contextPath + "/web/#!/admin/faxConfig");
 	}
 
 	@Override
 	protected AuthorizationCodeFlow initializeFlow() throws ServletException, IOException
 	{
-		return apiConnector.getOauthLoginFlow();
+		return RingCentralCredentialStore.getFlow(RingCentralCredentialStore.getUserId());
 	}
 
 	@Override
 	protected String getRedirectUri(HttpServletRequest httpServletRequest)
 		throws ServletException, IOException
 	{
-		return REDIRECT_URL;
+		return RingCentralCredentialStore.getRedirectURL();
 	}
 
 	@Override
 	protected String getUserId(HttpServletRequest httpServletRequest)
 		throws ServletException, IOException
 	{
-		return RingcentralApiConnector.LOCAL_USER_ID;
+		return RingCentralCredentialStore.getUserId();
 	}
 }
