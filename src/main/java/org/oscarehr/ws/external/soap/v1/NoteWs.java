@@ -24,10 +24,11 @@
 package org.oscarehr.ws.external.soap.v1;
 
 import org.apache.cxf.annotations.GZIP;
-import org.oscarehr.casemgmt.model.CaseManagementNote;
-import org.oscarehr.casemgmt.service.NoteService;
+import org.oscarehr.encounterNote.model.CaseManagementNote;
+import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
-import org.oscarehr.ws.external.soap.v1.transfer.NoteFactory;
+import org.oscarehr.ws.external.soap.v1.transfer.NoteTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.jws.WebService;
@@ -38,16 +39,20 @@ import javax.jws.WebService;
 public class NoteWs extends AbstractWs
 {
 	@Autowired
-	private NoteService noteService;
+	private EncounterNoteService encounterNoteService;
 
-	public Long saveEncounterNote(String noteText, String demographicId)
+	public NoteTransfer saveEncounterNote(String noteText, Integer demographicId)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		CaseManagementNote caseManagementNote = NoteFactory.buildSimpleNote(loggedInInfo, noteText, demographicId);
+		String providerNo = loggedInInfo.getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(providerNo, demographicId, Permission.ENCOUNTER_NOTE_CREATE);
 
-		noteService.saveEncounterNote(loggedInInfo, caseManagementNote);
+		CaseManagementNote note = new CaseManagementNote();
+		note.setNote(noteText);
 
-		return caseManagementNote.getId();
+		encounterNoteService.saveChartNote(note, providerNo, demographicId);
+
+		return NoteTransfer.toTransfer(note);
 	}
 
 }

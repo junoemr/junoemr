@@ -23,7 +23,6 @@
  */
 package org.oscarehr.casemgmt.service;
 
-import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.NoteSelectionTo1;
 
@@ -44,14 +43,4 @@ public interface NoteService {
 
 
 	NoteSelectionTo1 searchEncounterNotes(LoggedInInfo loggedInInfo, NoteSelectionCriteria criteria);
-
-	/**
-	 * Saves an encounter note for a demographic
-	 *
-	 * @param note
-	 * 		The CaseManagementNote to be saved.
-	 * @return
-	 * 		Returns the saved CaseManagementNote.
-	 */
-	CaseManagementNote saveEncounterNote(LoggedInInfo loggedInInfo, CaseManagementNote note);
 }
