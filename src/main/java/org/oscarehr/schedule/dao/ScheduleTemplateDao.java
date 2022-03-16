@@ -395,7 +395,7 @@ public class ScheduleTemplateDao extends AbstractDao<ScheduleTemplate>
 				"      AND st.provider_no IN (:providerNo, :publicCode))\n" +
 				"    LEFT JOIN scheduletemplatecode stc ON BINARY stc.code = \n " +
 				"      SUBSTRING(st.timecode, seq + 1, 1)\n" +
-				"    WHERE stc.code IN (:appointmentTypes)\n" +
+				"    WHERE BINARY stc.code IN (:appointmentTypes)\n" +
 				"    AND CONCAT(sd.sdate, ' ', SEC_TO_TIME(ROUND( \n " +
 				"      (24 * 60 * 60) * seq / LENGTH(st.timecode)))) \n " +
 				"      BETWEEN :startDate AND (:endDate + INTERVAL 1 DAY)\n" +
