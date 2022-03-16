@@ -215,48 +215,6 @@ public class ScheduleWs extends AbstractWs {
 						Collections.singletonList(BookingRuleFactory.createAvailableRule()));
 	}
 
-	// TODO: Temporary for backwards compatibility. Remove once released to all Juno instances
-	@SkipContentLoggingOutbound
-	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots (String providerNo,
-	                                                                      @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate startDate,
-	                                                                      @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate endDate,
-	                                                                      String templateDurations,
-	                                                                      String demographicNo,
-	                                                                      String jsonRules)
-	{
-		MiscUtils.getLogger().info("Start Get Provider Schedule Service: " + LocalDateTime.now().toString());
-		HashMap<String, DayTimeSlots[]> scheduleTransfer = new HashMap<>();
-
-
-		try
-		{
-			List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = ScheduleCodeDurationTransfer.parse(templateDurations);
-			BookingRules bookingRules = new BookingRules(jsonRules);
-
-
-			ProviderScheduleTransfer providerScheduleTransfer =
-					scheduleTemplateDao.getValidProviderScheduleSlots(
-							providerNo,
-							startDate,
-							endDate,
-							scheduleDurationTransfers,
-							demographicNo,
-							bookingRules.getMultipleBookingsRule(),
-							bookingRules.getBlackoutRule(),
-							bookingRules.getCutoffRule()
-					);
-
-			scheduleTransfer = providerScheduleTransfer.toTransfer();
-		}
-		catch(ParseException e)
-		{
-			MiscUtils.getLogger().error("Exception: " + e);
-		}
-
-		MiscUtils.getLogger().info("End Get Provider Schedule Service: " + LocalDateTime.now().toString());
-		return scheduleTransfer;
-	}
-
 	public ValidatedAppointmentBookingTransfer addAppointmentValidated(
 			AppointmentTransfer appointmentTransfer, String jsonRules) throws ParseException
 	{
