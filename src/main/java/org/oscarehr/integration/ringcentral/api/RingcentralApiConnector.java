@@ -87,6 +87,7 @@ public class RingcentralApiConnector extends RESTClient
 	public static final String RESPONSE_STATUS_DELIVERY_FAILED="DeliveryFailed";
 
 	public static final List<String> RESPONSE_STATUSES_FINAL = new ArrayList<>(Arrays.asList(
+		RESPONSE_STATUS_SENT,
 		RESPONSE_STATUS_DELIVERED,
 		RESPONSE_STATUS_SEND_FAILED,
 		RESPONSE_STATUS_DELIVERY_FAILED
@@ -95,6 +96,11 @@ public class RingcentralApiConnector extends RESTClient
 	public static final List<String> RESPONSE_STATUSES_FAILED = new ArrayList<>(Arrays.asList(
 		RESPONSE_STATUS_SEND_FAILED,
 		RESPONSE_STATUS_DELIVERY_FAILED
+	));
+
+	public static final List<String> RESPONSE_STATUSES_SUCCESS = new ArrayList<>(Arrays.asList(
+			RESPONSE_STATUS_SENT,
+			RESPONSE_STATUS_DELIVERED
 	));
 
 	private String getClientID()
@@ -200,7 +206,7 @@ public class RingcentralApiConnector extends RESTClient
 
 	public RingCentralMessageInfoResult getMessage(String accountId, String extensionId, String messageId)
 	{
-		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/message/{2}";
+		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/message-store/{2}";
 		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId, messageId));
 		return doGet(url, getAuthorizationHeaders(), RingCentralMessageInfoResult.class);
 	}

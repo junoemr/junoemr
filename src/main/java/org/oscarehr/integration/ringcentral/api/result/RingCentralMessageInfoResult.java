@@ -47,7 +47,7 @@ public class RingCentralMessageInfoResult implements RingCentralResult, FaxStatu
 	private String extensionId;
 
 	@JsonProperty("attachments")
-	private Object[] attachments;
+	private RingCentralAttachment[] attachments;
 
 	@JsonProperty("availability")
 	private Availability availability;

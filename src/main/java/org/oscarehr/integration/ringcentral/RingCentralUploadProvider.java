@@ -79,7 +79,7 @@ public class RingCentralUploadProvider implements FaxUploadProvider
 	@Override
 	public boolean isFaxInRemoteSentState(String externalStatus)
 	{
-		return RingcentralApiConnector.RESPONSE_STATUS_DELIVERED.equals(externalStatus);
+		return RingcentralApiConnector.RESPONSE_STATUSES_SUCCESS.contains(externalStatus);
 	}
 
 	@Override

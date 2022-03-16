@@ -22,14 +22,22 @@
  */
 package org.oscarehr.integration.ringcentral.api.result;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class RingCentralSendFaxResult implements RingCentralResult
+public class RingCentralAttachment
 {
+	enum AttachmentType
+	{
+		AudioRecording,
+		AudioTranscription,
+		Text,
+		SourceDocument,
+		RenderedDocument,
+		MmsAttachment,
+	}
+
 	@JsonProperty("id")
 	private Long id;
 
@@ -37,47 +45,23 @@ public class RingCentralSendFaxResult implements RingCentralResult
 	private String uri;
 
 	@JsonProperty("type")
-	private String type;
+	private AttachmentType type;
 
-	@JsonProperty("from")
-	private Object from;
+	@JsonProperty("contentType")
+	private String contentType;
 
-	@JsonProperty("to")
-	private Object[] to; //todo custom objects
+	@JsonProperty("vmDuration")
+	private Integer vmDuration;
 
-	@JsonProperty("creationTime")
-	private String creationTime;
+	@JsonProperty("fileName")
+	private String fileName;
 
-	@JsonProperty("readStatus")
-	private ReadStatus readStatus;
+	@JsonProperty("size")
+	private Long size;
 
-	@JsonProperty("priority")
-	private Priority priority;
+	@JsonProperty("height")
+	private Integer height;
 
-	@JsonProperty("attachments")
-	private RingCentralAttachment[] attachments;
-
-	@JsonProperty("direction")
-	private Direction direction;
-
-	@JsonProperty("availability")
-	private String availability;
-
-	@JsonProperty("messageStatus")
-	private MessageStatus messageStatus;
-
-	@JsonProperty("faxResolution")
-	private FaxResolution faxResolution;
-
-	@JsonProperty("faxPageCount")
-	private Integer faxPageCount;
-
-	@JsonProperty("lastModifiedTime")
-	private String lastModifiedTime;
-
-	@JsonProperty("coverIndex")
-	private Integer coverIndex;
-
-	@JsonProperty("coverPageText")
-	private String coverPageText;
+	@JsonProperty("width")
+	private Integer width;
 }
