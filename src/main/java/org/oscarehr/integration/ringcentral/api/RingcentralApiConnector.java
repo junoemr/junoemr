@@ -34,17 +34,25 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.Synchronized;
+import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralSendFaxInput;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralSendFaxResult;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import oscar.util.RESTClient;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -168,12 +176,25 @@ public class RingcentralApiConnector extends RESTClient
 		return doGet(url, getAuthorizationHeaders(), RingCentralAccountInfoResult.class);
 	}
 
-	public RingCentralSendFaxResult sendFax(String accountId, String extensionId, RingCentralSendFaxInput input)
+	public RingCentralSendFaxResult sendFax(String accountId, String extensionId, RingCentralSendFaxInput input) throws IOException
 	{
 		String url = buildUrl(DEFAULT_PROTOCOL, REST_API_BASE +
 				"account/" + accountId + "/extension/" + extensionId + "/fax");
 
-		return doPost(url, getAuthorizationHeaders(), input, RingCentralSendFaxResult.class);
+		GenericFile attachment = input.getAttachment();
+		Gson gson = new GsonBuilder().create();
+
+		HttpHeaders headers = getAuthorizationHeaders();
+		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+
+		FileSystemResource fileSystemResource = new FileSystemResource(attachment.getFileObject());
+
+		//todo add other fields and maybe move this to the input somehow? can we construct from object using annotations?
+		body.add("attachment", fileSystemResource);
+		body.add("to", gson.toJson(input.getTo()));
+
+		return doPost(url, headers, body, RingCentralSendFaxResult.class);
 	}
 
 	protected HttpHeaders getAuthorizationHeaders()

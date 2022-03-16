@@ -36,7 +36,7 @@ public class RingCentralSendFaxResult implements RingCentralResult
 	}
 
 	@JsonProperty("id")
-	private Integer id;
+	private Long id;
 
 	@JsonProperty("uri")
 	private String uri;

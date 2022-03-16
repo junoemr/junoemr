@@ -25,10 +25,14 @@ package org.oscarehr.integration.ringcentral;
 
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxAccountProvider;
+import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
+import org.oscarehr.util.SpringUtils;
 
 public class RingcentralAccountProvider implements FaxAccountProvider
 {
 	protected FaxAccount faxAccount;
+	protected RingcentralApiConnector ringcentralApiConnector = SpringUtils.getBean(RingcentralApiConnector.class); //todo how to access in pojo?
 
 	public RingcentralAccountProvider(FaxAccount faxAccount)
 	{
@@ -38,7 +42,7 @@ public class RingcentralAccountProvider implements FaxAccountProvider
 	@Override
 	public boolean testConnectionStatus()
 	{
-		// TODO
-		return false;
+		RingCentralAccountInfoResult accountInfo = ringcentralApiConnector.getAccountInfo(faxAccount.getLoginId());
+		return (accountInfo != null);
 	}
 }

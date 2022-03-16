@@ -24,12 +24,13 @@ package org.oscarehr.integration.ringcentral.api.input;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.oscarehr.common.io.GenericFile;
 
 @Data
 public class RingCentralSendFaxInput
 {
 	@JsonProperty("attachment")
-	private String attachment; // required
+	private GenericFile attachment; // required
 
 	/* Resolution of Fax (High, Low) */
 	@JsonProperty("faxResolution")
