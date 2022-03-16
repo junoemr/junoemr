@@ -30,11 +30,6 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RingCentralSendFaxResult implements RingCentralResult
 {
-	enum FaxResolution {
-		High,
-		Low,
-	}
-
 	@JsonProperty("id")
 	private Long id;
 

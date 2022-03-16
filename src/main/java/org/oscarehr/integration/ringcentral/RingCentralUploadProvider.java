@@ -24,12 +24,12 @@
 package org.oscarehr.integration.ringcentral;
 
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxIntegrationException;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.result.FaxStatusResult;
+import org.oscarehr.fax.service.FaxUploadService;
 import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralSendFaxInput;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralSendFaxResult;
@@ -38,12 +38,12 @@ import org.springframework.web.client.RestClientResponseException;
 
 import java.util.List;
 
-public class RingcentralUploadProvider implements FaxUploadProvider
+public class RingCentralUploadProvider implements FaxUploadProvider
 {
 	protected FaxAccount faxAccount;
 	protected RingcentralApiConnector ringcentralApiConnector = SpringUtils.getBean(RingcentralApiConnector.class); //todo how to access in pojo?
 
-	public RingcentralUploadProvider(FaxAccount faxAccount)
+	public RingCentralUploadProvider(FaxAccount faxAccount)
 	{
 		this.faxAccount = faxAccount;
 	}
@@ -59,6 +59,7 @@ public class RingcentralUploadProvider implements FaxUploadProvider
 		{
 			RingCentralSendFaxResult result = ringcentralApiConnector.sendFax(faxAccount.getLoginId(), "~", input);
 			faxOutbound.setStatusSent();
+			faxOutbound.setStatusMessage(FaxUploadService.STATUS_MESSAGE_IN_TRANSIT);
 			faxOutbound.setExternalStatus(result.getMessageStatus().name());
 			faxOutbound.setExternalReferenceId(result.getId());
 		}
@@ -87,11 +88,9 @@ public class RingcentralUploadProvider implements FaxUploadProvider
 		return RingcentralApiConnector.RESPONSE_STATUSES_FAILED.contains(externalStatus);
 	}
 
-
 	@Override
 	public FaxStatusResult getFaxStatus(FaxOutbound faxOutbound) throws Exception
 	{
-		//TODO
-		throw new FaxApiConnectionException("not implemented");
+		return ringcentralApiConnector.getMessage(faxAccount.getLoginId(), "~", String.valueOf(faxOutbound.getExternalReferenceId()));
 	}
 }

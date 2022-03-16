@@ -24,10 +24,17 @@ package org.oscarehr.integration.ringcentral.api.result;
 
 public interface RingCentralResult
 {
+	enum Availability
+	{
+		Alive,
+		Deleted,
+		Purged,
+	}
+
 	enum ReadStatus {
 		Read,
 		Unread,
-	};
+	}
 
 	enum Priority {
 		High,
@@ -42,7 +49,22 @@ public interface RingCentralResult
 	enum MessageStatus {
 		Queued,
 		Sent,
+		Delivered,
+		DeliveryFailed,
 		SendingFailed,
 		Received,
+	}
+
+	enum MessageType {
+		Fax,
+		SMS,
+		VoiceMail,
+		Pager,
+		Text,
+	}
+
+	enum FaxResolution {
+		High,
+		Low,
 	}
 }

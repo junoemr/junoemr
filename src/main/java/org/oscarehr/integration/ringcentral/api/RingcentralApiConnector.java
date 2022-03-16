@@ -40,6 +40,7 @@ import lombok.Synchronized;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralSendFaxInput;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageInfoResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralSendFaxResult;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.FileSystemResource;
@@ -178,8 +179,8 @@ public class RingcentralApiConnector extends RESTClient
 
 	public RingCentralSendFaxResult sendFax(String accountId, String extensionId, RingCentralSendFaxInput input) throws IOException
 	{
-		String url = buildUrl(DEFAULT_PROTOCOL, REST_API_BASE +
-				"account/" + accountId + "/extension/" + extensionId + "/fax");
+		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/fax";
+		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId));
 
 		GenericFile attachment = input.getAttachment();
 		Gson gson = new GsonBuilder().create();
@@ -195,6 +196,20 @@ public class RingcentralApiConnector extends RESTClient
 		body.add("to", gson.toJson(input.getTo()));
 
 		return doPost(url, headers, body, RingCentralSendFaxResult.class);
+	}
+
+	public RingCentralMessageInfoResult getMessage(String accountId, String extensionId, String messageId)
+	{
+		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/message/{2}";
+		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId, messageId));
+		return doGet(url, getAuthorizationHeaders(), RingCentralMessageInfoResult.class);
+	}
+
+	public String getMessageContent(String accountId, String extensionId, String messageId, String attachmentId)
+	{
+		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/message-store/{2}/content/{3}";
+		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId, messageId, attachmentId));
+		return doGet(url, getAuthorizationHeaders(), String.class);
 	}
 
 	protected HttpHeaders getAuthorizationHeaders()

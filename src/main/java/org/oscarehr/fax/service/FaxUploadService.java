@@ -318,6 +318,7 @@ public class FaxUploadService
 		criteriaSearch.setStatus(FaxStatusInternal.SENT); // only check records with a local sent status
 		criteriaSearch.setArchived(false); // ignore archived records
 		criteriaSearch.setExternalStatusList(remoteFinalStatuses, false);
+		criteriaSearch.setFaxAccountId(faxAccount.getId()); // limit results to specified account
 
 		List<FaxOutbound> pendingList = faxOutboundDao.criteriaSearch(criteriaSearch);
 

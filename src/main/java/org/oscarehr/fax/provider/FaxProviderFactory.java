@@ -29,7 +29,7 @@ import org.oscarehr.integration.SRFax.SRFaxDownloadProvider;
 import org.oscarehr.integration.SRFax.SRFaxUploadProvider;
 import org.oscarehr.integration.ringcentral.RingcentralAccountProvider;
 import org.oscarehr.integration.ringcentral.RingcentralDownloadProvider;
-import org.oscarehr.integration.ringcentral.RingcentralUploadProvider;
+import org.oscarehr.integration.ringcentral.RingCentralUploadProvider;
 
 public class FaxProviderFactory
 {
@@ -81,7 +81,7 @@ public class FaxProviderFactory
 			case SRFAX:
 				return new SRFaxUploadProvider();
 			case RINGCENTRAL:
-				return new RingcentralUploadProvider(faxAccount);
+				return new RingCentralUploadProvider(faxAccount);
 			default:
 				throw new IllegalStateException("Fax account " + faxAccount.getId() + " has invalid integration type");
 		}
