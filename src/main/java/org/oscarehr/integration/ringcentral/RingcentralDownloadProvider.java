@@ -34,7 +34,6 @@ import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageUpdateIn
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAttachment;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageInfoResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageListResult;
-import org.oscarehr.util.SpringUtils;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
@@ -45,12 +44,13 @@ import static org.oscarehr.integration.ringcentral.api.RingcentralApiConnector.C
 
 public class RingcentralDownloadProvider implements FaxDownloadProvider
 {
-	protected FaxAccount faxAccount;
-	protected RingcentralApiConnector ringcentralApiConnector = SpringUtils.getBean(RingcentralApiConnector.class); //todo how to access in pojo?
+	protected final FaxAccount faxAccount;
+	protected final RingcentralApiConnector ringcentralApiConnector;
 
 	public RingcentralDownloadProvider(FaxAccount faxAccount)
 	{
 		this.faxAccount = faxAccount;
+		this.ringcentralApiConnector = new RingcentralApiConnector();
 	}
 
 	/**

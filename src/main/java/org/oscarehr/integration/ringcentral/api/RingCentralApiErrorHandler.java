@@ -20,29 +20,24 @@
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.integration.ringcentral.api;
 
-package org.oscarehr.integration.ringcentral;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.web.client.ResponseErrorHandler;
 
-import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.provider.FaxAccountProvider;
-import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
-import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
+import java.io.IOException;
 
-public class RingcentralAccountProvider implements FaxAccountProvider
+public class RingCentralApiErrorHandler implements ResponseErrorHandler
 {
-	protected final FaxAccount faxAccount;
-	protected final RingcentralApiConnector ringcentralApiConnector;
-
-	public RingcentralAccountProvider(FaxAccount faxAccount)
+	@Override
+	public boolean hasError(ClientHttpResponse response) throws IOException
 	{
-		this.faxAccount = faxAccount;
-		this.ringcentralApiConnector = new RingcentralApiConnector();
+		return false;
 	}
 
 	@Override
-	public boolean testConnectionStatus()
+	public void handleError(ClientHttpResponse response) throws IOException
 	{
-		RingCentralAccountInfoResult accountInfo = ringcentralApiConnector.getAccountInfo(faxAccount.getLoginId());
-		return (accountInfo != null);
+
 	}
 }

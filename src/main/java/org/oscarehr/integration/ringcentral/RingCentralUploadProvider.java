@@ -33,7 +33,6 @@ import org.oscarehr.fax.service.FaxUploadService;
 import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralSendFaxInput;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralSendFaxResult;
-import org.oscarehr.util.SpringUtils;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.util.List;
@@ -42,12 +41,13 @@ import static org.oscarehr.integration.ringcentral.api.RingcentralApiConnector.C
 
 public class RingCentralUploadProvider implements FaxUploadProvider
 {
-	protected FaxAccount faxAccount;
-	protected RingcentralApiConnector ringcentralApiConnector = SpringUtils.getBean(RingcentralApiConnector.class); //todo how to access in pojo?
+	protected final FaxAccount faxAccount;
+	protected final RingcentralApiConnector ringcentralApiConnector;
 
 	public RingCentralUploadProvider(FaxAccount faxAccount)
 	{
 		this.faxAccount = faxAccount;
+		this.ringcentralApiConnector = new RingcentralApiConnector();
 	}
 
 	@Override

@@ -27,6 +27,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.exception.FaxApiResultException;
+import org.oscarehr.fax.exception.FaxIntegrationException;
 import org.oscarehr.fax.oauth.RingCentralCredentialStore;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageListInput;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageUpdateInput;
@@ -80,6 +81,11 @@ public class RingcentralApiConnector extends RESTClient
 		RESPONSE_STATUS_SEND_FAILED,
 		RESPONSE_STATUS_DELIVERY_FAILED
 	));
+
+	public RingcentralApiConnector()
+	{
+		this.setErrorHandler(new RingCentralApiErrorHandler());
+	}
 
 	public Credential getCredential() throws IOException
 	{
@@ -163,8 +169,7 @@ public class RingcentralApiConnector extends RESTClient
 		}
 		catch (IOException e)
 		{
-			// TODO: Robert handle me
-			return null;
+			throw new FaxIntegrationException("Missing or invalid access token:\n" + e.getMessage());
 		}
 	}
 }
