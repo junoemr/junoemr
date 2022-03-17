@@ -27,6 +27,7 @@ import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.AuthorizationCodeResponseUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.servlet.auth.oauth2.AbstractAuthorizationCodeCallbackServlet;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.model.FaxAccount;
@@ -43,18 +44,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @WebServlet(name="FaxOAuthRedirectServlet",description="Ringcentral OAuth redirect servlet", value="/fax_redirect",loadOnStartup = 1)
 public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbackServlet
 {
 	private static Logger logger = MiscUtils.getLogger();
-
 	protected String REDIRECT_URL = System.getenv("RINGCENTRAL_REDIRECT_URL");
-
-	@Autowired
-	RingcentralApiConnector apiConnector;
-
 	@Autowired
 	private FaxAccountDao faxAccountDao;
 
@@ -70,21 +68,29 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 	protected void onSuccess(HttpServletRequest req, HttpServletResponse resp, Credential credential)
 		throws ServletException, IOException
 	{
-		apiConnector.setCredential(credential);
+		RingcentralApiConnector apiConnector = new RingcentralApiConnector();
 		RingCentralAccountInfoResult result = apiConnector.getAccountInfo();
+
 		List<FaxAccount> faxAccounts = faxAccountDao.findByLoginId(FaxProvider.RINGCENTRAL, String.valueOf(result.getId()));
 
 		String contextPath = req.getContextPath();
-		if(faxAccounts.isEmpty()) // new account setup
+		String redirectPath = contextPath + "/oauth";
+		// Per library documentation, this should redirect back to the AuthServlet onSuccess
+		// The Oauth servlet will then redirect us back to the fax admin page
+		try
 		{
-			resp.sendRedirect(contextPath + "/web/#!/admin/faxConfig" +
-					"?type=" + FaxProvider.RINGCENTRAL +
-					"&accountId=" + result.getId());
+			URIBuilder redirect = new URIBuilder(redirectPath);
+			if(faxAccounts.isEmpty())
+			{
+				// new account setup parameters
+				redirect.addParameter("type", FaxProvider.RINGCENTRAL.name());
+				redirect.addParameter("accountID", result.getId().toString());
+			}
+			resp.sendRedirect(redirect.toString());
 		}
-		else // existing account re-login
+		catch (URISyntaxException e)
 		{
-			//todo - how do we handle 2 accounts linked to the same account?
-			resp.sendRedirect(contextPath + "/web/#!/admin/faxConfig");
+			throw new MalformedURLException(e.getMessage());
 		}
 	}
 
@@ -92,26 +98,29 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 	protected void onError(HttpServletRequest req, HttpServletResponse resp, AuthorizationCodeResponseUrl errorResponse)
 		throws ServletException, IOException
 	{
-		logger.error(errorResponse.getError());  // TODO: redirect back to fax page
+		logger.error(errorResponse.getError());
+
+		String contextPath = req.getContextPath();
+		resp.sendRedirect(contextPath + "/web/#!/admin/faxConfig");
 	}
 
 	@Override
 	protected AuthorizationCodeFlow initializeFlow() throws ServletException, IOException
 	{
-		return apiConnector.getOauthLoginFlow();
+		return RingCentralCredentialStore.getFlow();
 	}
 
 	@Override
 	protected String getRedirectUri(HttpServletRequest httpServletRequest)
 		throws ServletException, IOException
 	{
-		return REDIRECT_URL;
+		return RingCentralCredentialStore.getRedirectURL();
 	}
 
 	@Override
 	protected String getUserId(HttpServletRequest httpServletRequest)
 		throws ServletException, IOException
 	{
-		return RingcentralApiConnector.LOCAL_USER_ID;
+		return RingCentralCredentialStore.getUserId();
 	}
 }
