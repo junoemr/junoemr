@@ -31,7 +31,9 @@ import org.oscarehr.fax.result.FaxStatusResult;
 import oscar.util.ConversionUtils;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Data
@@ -151,14 +153,22 @@ public class RingCentralMessageInfoResult implements RingCentralResult, FaxStatu
 	}
 
 	@Override
+	@JsonIgnore
 	public String getDetailsId()
 	{
 		return String.valueOf(this.getId());
 	}
 
 	@Override
+	@JsonIgnore
 	public String getCallerId()
 	{
 		return from.getPhoneNumber();
+	}
+
+	@JsonIgnore
+	public List<RingCentralAttachment> getAttachmentsList()
+	{
+		return Arrays.asList(attachments);
 	}
 }

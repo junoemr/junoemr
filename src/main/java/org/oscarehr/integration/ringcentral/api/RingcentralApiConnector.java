@@ -40,6 +40,7 @@ import lombok.Synchronized;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.exception.FaxApiResultException;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageListInput;
+import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageUpdateInput;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralSendFaxInput;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageInfoResult;
@@ -235,6 +236,13 @@ public class RingcentralApiConnector extends RESTClient
 		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/message-store/{2}/content/{3}";
 		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId, messageId, attachmentId));
 		return doGet(url, getAuthorizationHeaders(), String.class);
+	}
+
+	public RingCentralMessageInfoResult updateMessage(String accountId, String extensionId, String messageId, RingCentralMessageUpdateInput input)
+	{
+		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/message-store/{2}";
+		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId, messageId));
+		return doPut(url, getAuthorizationHeaders(), input.getParameterMap(), input, RingCentralMessageInfoResult.class);
 	}
 
 	protected HttpHeaders getAuthorizationHeaders()

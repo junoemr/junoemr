@@ -24,11 +24,15 @@
 package org.oscarehr.integration.ringcentral;
 
 import org.oscarehr.fax.exception.FaxApiResultException;
+import org.oscarehr.fax.exception.FaxIntegrationException;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxDownloadProvider;
 import org.oscarehr.fax.result.FaxInboxResult;
 import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageListInput;
+import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageUpdateInput;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralAttachment;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageInfoResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageListResult;
 import org.oscarehr.util.SpringUtils;
 
@@ -79,8 +83,22 @@ public class RingcentralDownloadProvider implements FaxDownloadProvider
 	@Override
 	public String retrieveFax(String referenceIdStr) throws FaxApiResultException
 	{
-		//TODO
-		throw new FaxApiResultException("not implemented");
+		RingCentralMessageInfoResult messageResult = ringcentralApiConnector.getMessage(faxAccount.getLoginId(), CURRENT_SESSION_INDICATOR, referenceIdStr);
+
+		List<RingCentralAttachment> attachments = messageResult.getAttachmentsList();
+		if(attachments.isEmpty())
+		{
+			throw new FaxIntegrationException("Message has no attachments");
+		}
+		else if(attachments.size() > 1)
+		{
+			throw new FaxIntegrationException("Multi-attachment faxes not currently supported"); //TODO how to handle this?
+		}
+		else
+		{
+			RingCentralAttachment attachment = attachments.get(0);
+			return ringcentralApiConnector.getMessageContent(faxAccount.getLoginId(), CURRENT_SESSION_INDICATOR, referenceIdStr, String.valueOf(attachment.getId()));
+		}
 	}
 
 	/**
@@ -91,7 +109,9 @@ public class RingcentralDownloadProvider implements FaxDownloadProvider
 	@Override
 	public void markAsDownloaded(String referenceIdStr) throws FaxApiResultException
 	{
-		//TODO
-		throw new FaxApiResultException("not implemented");
+		RingCentralMessageUpdateInput input = new RingCentralMessageUpdateInput();
+		input.setMessageType("Fax");
+		input.setReadStatus("Read");
+		ringcentralApiConnector.updateMessage(faxAccount.getLoginId(), CURRENT_SESSION_INDICATOR, referenceIdStr, input);
 	}
 }
