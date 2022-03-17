@@ -55,7 +55,8 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 		throws ServletException, IOException
 	{
 		String contextPath = req.getContextPath();
-		resp.sendRedirect(contextPath + "/web/#!/admin/faxConfig");
+		// Per library documentation, this should redirect back to the AuthServlet onSuccess
+		resp.sendRedirect(contextPath + "/oauth");
 	}
 
 	@Override
@@ -71,7 +72,7 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 	@Override
 	protected AuthorizationCodeFlow initializeFlow() throws ServletException, IOException
 	{
-		return RingCentralCredentialStore.getFlow(RingCentralCredentialStore.getUserId());
+		return RingCentralCredentialStore.getFlow();
 	}
 
 	@Override

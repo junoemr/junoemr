@@ -27,24 +27,19 @@ import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.BearerToken;
 import com.google.api.client.auth.oauth2.ClientParametersAuthentication;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.auth.oauth2.StoredCredential;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.store.DataStore;
-import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import lombok.Synchronized;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class RingCentralCredentialStore
 {
-	private static Map<String, AuthorizationCodeFlow> oAuthFlows = new HashMap<String, AuthorizationCodeFlow>(1);
+	private static AuthorizationCodeFlow oAuthWorkFlow;
 	public static final String LOCAL_USER_ID = "com.junoemr.fax.ringcentral";
 
 	private static final String BASE_URL = "https://platform.devtest.ringcentral.com";
@@ -52,7 +47,6 @@ public class RingCentralCredentialStore
 	private static final String TOKEN_SERVER_URL = BASE_URL + "/restapi/oauth/token";
 
 	private static final File DATASTORE_DIR = new File("/tmp/com.junoemr.fax.datastore");
-	private static DataStoreFactory DATASTORE_FACTORY;
 
 	private static Logger logger = MiscUtils.getLogger();
 
@@ -60,7 +54,18 @@ public class RingCentralCredentialStore
 	{
 		try
 		{
-			DATASTORE_FACTORY = new FileDataStoreFactory(DATASTORE_DIR);
+			oAuthWorkFlow = new AuthorizationCodeFlow.Builder(
+				BearerToken.formEncodedBodyAccessMethod(),
+				new NetHttpTransport(),
+				new JacksonFactory(),
+				new GenericUrl(TOKEN_SERVER_URL),
+				makeClientParams(),
+				getClientID(),
+				AUTH_SERVER_URL
+			)
+				.setDataStoreFactory(new FileDataStoreFactory(DATASTORE_DIR))
+				.enablePKCE()
+				.build();
 		}
 		catch (IOException e)
 		{
@@ -70,8 +75,7 @@ public class RingCentralCredentialStore
 
 	public static Credential getCredential(String id) throws IOException
 	{
-		AuthorizationCodeFlow flow = getFlow(id);
-		return flow.loadCredential(id);
+		return oAuthWorkFlow.loadCredential(id);
 	}
 
 	private static ClientParametersAuthentication makeClientParams()
@@ -81,7 +85,6 @@ public class RingCentralCredentialStore
 
 	private static String getClientID()
 	{
-		// TODO, integrate with openshift secrets management
 		String clientId = System.getenv("FAX.RINGCENTRAL.CLIENT_ID");
 		if (clientId == null)
 		{
@@ -93,7 +96,6 @@ public class RingCentralCredentialStore
 
 	protected static String getRedirectURL()
 	{
-		// TODO, integrate with openshift
 		String clientId = System.getenv("FAX.RINGCENTRAL.REDIRECT_URL");
 		if (clientId == null)
 		{
@@ -108,34 +110,9 @@ public class RingCentralCredentialStore
 		return LOCAL_USER_ID;
 	}
 
-	public DataStore<StoredCredential> getDataStore() throws IOException
-	{
-		return DATASTORE_FACTORY.getDataStore(StoredCredential.DEFAULT_DATA_STORE_ID);
-	}
-
 	@Synchronized
-	protected static AuthorizationCodeFlow getFlow(String userId)
+	protected static AuthorizationCodeFlow getFlow()
 	{
-		return oAuthFlows.getOrDefault(userId, null);
-	}
-
-	@Synchronized
-	protected static AuthorizationCodeFlow newFlow(String userId) throws IOException
-	{
-		AuthorizationCodeFlow flow = new AuthorizationCodeFlow.Builder(
-			BearerToken.formEncodedBodyAccessMethod(),
-			new NetHttpTransport(),
-			new JacksonFactory(),
-			new GenericUrl(TOKEN_SERVER_URL),
-			makeClientParams(),
-			getClientID(),
-			AUTH_SERVER_URL
-		)
-			.setDataStoreFactory(DATASTORE_FACTORY)
-			.enablePKCE()
-			.build();
-
-		oAuthFlows.put(userId, flow);
-		return flow;
+		return oAuthWorkFlow;
 	}
 }

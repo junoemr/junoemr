@@ -35,9 +35,16 @@ import java.io.IOException;
 public class RingCentralAuthServlet extends AbstractAuthorizationCodeServlet
 {
 	@Override
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException
+	{
+		String contextPath = req.getContextPath();
+		resp.sendRedirect(contextPath + "/web/#!/admin/faxConfig");
+	}
+
+	@Override
 	protected AuthorizationCodeFlow initializeFlow() throws ServletException, IOException
 	{
-		return RingCentralCredentialStore.newFlow(RingCentralCredentialStore.getUserId());
+		return RingCentralCredentialStore.getFlow();
 	}
 
 	@Override
@@ -56,7 +63,6 @@ public class RingCentralAuthServlet extends AbstractAuthorizationCodeServlet
 
 	@Override protected void onAuthorization(HttpServletRequest req, HttpServletResponse resp, AuthorizationCodeRequestUrl authorizationUrl) throws ServletException, IOException
 	{
-		// Thanks google, to set the state this method has to be overridden
 		authorizationUrl.setState("foobar1234"); // TODO, send instance context here
 		super.onAuthorization(req, resp, authorizationUrl);
 	}
