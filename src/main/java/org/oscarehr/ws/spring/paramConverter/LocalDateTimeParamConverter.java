@@ -20,11 +20,26 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.model;
+package org.oscarehr.ws.spring.paramConverter;
 
-public enum FaxStatusRemote
+import oscar.util.ConversionUtils;
+
+import javax.ws.rs.ext.ParamConverter;
+import java.time.LocalDateTime;
+
+/**
+ * for serializing/deserializing LocalDateTime object as a @QueryParam
+ * maybe this can be removed with a newer version of something
+ */
+public class LocalDateTimeParamConverter implements ParamConverter<LocalDateTime>
 {
-	PENDING,
-	ERROR,
-	SENT
+	public LocalDateTime fromString(String value)
+	{
+		return ConversionUtils.toLocalDateTime(value, ConversionUtils.DEFAULT_TS_PATTERN);
+	}
+
+	public String toString(LocalDateTime value)
+	{
+		return ConversionUtils.toDateTimeString(value, ConversionUtils.DEFAULT_TS_PATTERN);
+	}
 }

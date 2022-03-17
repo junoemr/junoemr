@@ -68,7 +68,7 @@
 			<fieldset ng-disabled="!$ctrl.masterFaxEnabledOutbound" class="input-fieldset">
 				<span ng-show="!$ctrl.masterFaxEnabledOutbound"><bean:message bundle="ui" key="admin.fax.acct.edit.outboundDisabledMessage"/></span>
 
-				<div class="grid-flow-row fax-config-grid grid-align-items-center">
+				<div class="flex-row align-items-center justify-content-between">
 					<juno-toggle round="true"
 					             ng-model="$ctrl.faxAccount.enableOutbound"
 					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.enableOutbound'/>"
@@ -105,7 +105,7 @@
 			<fieldset ng-disabled="!$ctrl.masterFaxEnabledInbound" class="input-fieldset">
 				<span ng-show="!$ctrl.masterFaxEnabledInbound"><bean:message bundle="ui" key="admin.fax.acct.edit.inboundDisabledMessage"/></span>
 
-				<div class="grid-flow-row fax-config-grid grid-align-items-center">
+				<div class="flex-row align-items-center justify-content-between">
 					<juno-toggle round="true"
 					             ng-model="$ctrl.faxAccount.enableInbound"
 					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.enableInbound'/>"

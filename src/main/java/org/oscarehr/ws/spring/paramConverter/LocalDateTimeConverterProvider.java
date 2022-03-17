@@ -20,11 +20,28 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.model;
+package org.oscarehr.ws.spring.paramConverter;
 
-public enum FaxStatusRemote
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
+import javax.ws.rs.ext.Provider;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.time.LocalDateTime;
+
+@Provider
+public class LocalDateTimeConverterProvider implements ParamConverterProvider
 {
-	PENDING,
-	ERROR,
-	SENT
+
+	private final ParamConverter converter = new LocalDateTimeParamConverter();
+
+	@Override
+	public <T> ParamConverter<T> getConverter(Class<T> rawType,
+	                                          Type genericType,
+	                                          Annotation[] annotations)
+	{
+		if(!rawType.equals(LocalDateTime.class)) return null;
+
+		return converter;
+	}
 }

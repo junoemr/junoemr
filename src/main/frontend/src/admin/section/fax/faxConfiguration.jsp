@@ -69,10 +69,13 @@
 						<tbody>
 						<tr ng-repeat="faxAccount in $ctrl.faxAccountList">
 							<td class="w-32">
-								<juno-check-box ng-model="$ctrl.faxAccountSelectStates[faxAccount.id]"
-								                readonly="faxAccount.equals($ctrl.activeAccount)"
-								                change="$ctrl.setActiveAccount(value, faxAccount)">
-								</juno-check-box>
+								<div class="flex-column justify-content-center h-100">
+									<juno-check-box ng-model="$ctrl.faxAccountSelectStates[faxAccount.id]"
+									                readonly="faxAccount.equals($ctrl.activeAccount)"
+									                class="round-checkbox"
+									                change="$ctrl.setActiveAccount(value, faxAccount)">
+									</juno-check-box>
+								</div>
 							</td>
 							<td data-title="'Account Name'">
 								<div class="flex-column">

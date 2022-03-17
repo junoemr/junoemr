@@ -40,6 +40,7 @@ import org.oscarehr.fax.model.FaxNotificationStatus;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.model.FaxStatusCombined;
 import org.oscarehr.fax.model.FaxStatusInternal;
+import org.oscarehr.fax.model.FaxStatusRemote;
 import org.oscarehr.fax.provider.FaxProviderFactory;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.result.FaxStatusResult;
@@ -312,12 +313,11 @@ public class FaxUploadService
 	public void requestPendingStatusUpdates(FaxAccount faxAccount)
 	{
 		FaxUploadProvider uploadProvider = FaxProviderFactory.createFaxUploadProvider(faxAccount);
-		List<String> remoteFinalStatuses = uploadProvider.getRemoteFinalStatusIndicators();
 
 		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
 		criteriaSearch.setStatus(FaxStatusInternal.SENT); // only check records with a local sent status
+		criteriaSearch.setRemoteStatus(FaxStatusRemote.PENDING); // only check records that have not completed remotely
 		criteriaSearch.setArchived(false); // ignore archived records
-		criteriaSearch.setExternalStatusList(remoteFinalStatuses, false);
 		criteriaSearch.setFaxAccountId(faxAccount.getId()); // limit results to specified account
 
 		List<FaxOutbound> pendingList = faxOutboundDao.criteriaSearch(criteriaSearch);
@@ -423,6 +423,7 @@ public class FaxUploadService
 				{
 					logStatus = LogConst.STATUS_SUCCESS;
 					logData = "Faxed To: " + faxOutbound.getSentTo();
+					faxOutbound.setRemoteStatusPending();
 					fileToFax.moveToOutgoingFaxSent();
 				}
 				else
