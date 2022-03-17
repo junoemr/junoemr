@@ -35,11 +35,9 @@ import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoRes
 import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageInfoResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageListResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralSendFaxResult;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import oscar.util.RESTClient;
@@ -51,8 +49,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Lazy
-@Component
 public class RingcentralApiConnector extends RESTClient
 {
 	public static final String CURRENT_SESSION_INDICATOR = "~";
