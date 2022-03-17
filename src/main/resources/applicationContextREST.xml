@@ -48,6 +48,8 @@
 	<bean id="rateLimitExceptionMapper"             class="org.oscarehr.ws.rest.exceptionMapping.RateLimitExceptionMapper"/>
 
 	<bean id="objectMapperProvider" class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
+	<bean id="localDateConverterProvider" class="org.oscarehr.ws.spring.paramConverter.LocalDateConverterProvider"/>
+	<bean id="localDateTimeConverterProvider" class="org.oscarehr.ws.spring.paramConverter.LocalDateTimeConverterProvider"/>
 
 	<jaxrs:server id="oauthService" address="/oauth">
 
@@ -130,6 +132,8 @@
 
 			<!-- Custom ContextResolver to apply settings to the Jackson ObjectMapper -->
 			<bean class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
+			<bean class="org.oscarehr.ws.spring.paramConverter.LocalDateConverterProvider"/>
+			<bean class="org.oscarehr.ws.spring.paramConverter.LocalDateTimeConverterProvider"/>
 
 		</jaxrs:providers>
 

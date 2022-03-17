@@ -346,6 +346,9 @@
 
 			<!-- Custom ContextResolver to apply settings to the Jackson ObjectMapper -->
 			<bean class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
+			<bean class="org.oscarehr.ws.spring.paramConverter.LocalDateConverterProvider"/>
+			<bean class="org.oscarehr.ws.spring.paramConverter.LocalDateTimeConverterProvider"/>
+
 		</jaxrs:providers>
 
 		<jaxrs:features>
