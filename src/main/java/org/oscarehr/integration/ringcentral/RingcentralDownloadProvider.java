@@ -36,6 +36,7 @@ import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageInfoRes
 import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageListResult;
 import org.oscarehr.util.SpringUtils;
 
+import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -69,7 +70,10 @@ public class RingcentralDownloadProvider implements FaxDownloadProvider
 		input.setReadStatus(new String[] {"Unread"});
 		input.setMessageType(new String[] {"Fax"});
 
-		RingCentralMessageListResult result = ringcentralApiConnector.getMessageList(faxAccount.getLoginId(), CURRENT_SESSION_INDICATOR, input);
+		RingCentralMessageListResult result = ringcentralApiConnector.getMessageList(
+				faxAccount.getLoginId(),
+				CURRENT_SESSION_INDICATOR,
+				input);
 		return Arrays.asList(result.getRecords());
 	}
 
@@ -77,13 +81,16 @@ public class RingcentralDownloadProvider implements FaxDownloadProvider
 	/**
 	 * Retrieves a fax from Ringcentral
 	 * @param referenceIdStr Ringcentral fax reference Id of the fax to retrieve
-	 * @return Fax document as a base64 encoded string
+	 * @return Fax document as an input stream
 	 * @throws FaxApiResultException if result is not success
 	 */
 	@Override
-	public String retrieveFax(String referenceIdStr) throws FaxApiResultException
+	public InputStream retrieveFax(String referenceIdStr) throws FaxApiResultException
 	{
-		RingCentralMessageInfoResult messageResult = ringcentralApiConnector.getMessage(faxAccount.getLoginId(), CURRENT_SESSION_INDICATOR, referenceIdStr);
+		RingCentralMessageInfoResult messageResult = ringcentralApiConnector.getMessage(
+				faxAccount.getLoginId(),
+				CURRENT_SESSION_INDICATOR,
+				referenceIdStr);
 
 		List<RingCentralAttachment> attachments = messageResult.getAttachmentsList();
 		if(attachments.isEmpty())
@@ -97,7 +104,11 @@ public class RingcentralDownloadProvider implements FaxDownloadProvider
 		else
 		{
 			RingCentralAttachment attachment = attachments.get(0);
-			return ringcentralApiConnector.getMessageContent(faxAccount.getLoginId(), CURRENT_SESSION_INDICATOR, referenceIdStr, String.valueOf(attachment.getId()));
+			return ringcentralApiConnector.getMessageContent(
+					faxAccount.getLoginId(),
+					CURRENT_SESSION_INDICATOR,
+					referenceIdStr,
+					String.valueOf(attachment.getId()));
 		}
 	}
 

@@ -58,6 +58,7 @@ import oscar.util.RESTClient;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -231,11 +232,11 @@ public class RingcentralApiConnector extends RESTClient
 		return doGet(url, getAuthorizationHeaders(), RingCentralMessageInfoResult.class);
 	}
 
-	public String getMessageContent(String accountId, String extensionId, String messageId, String attachmentId)
+	public InputStream getMessageContent(String accountId, String extensionId, String messageId, String attachmentId)
 	{
 		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/message-store/{2}/content/{3}";
 		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId, messageId, attachmentId));
-		return doGet(url, getAuthorizationHeaders(), String.class);
+		return doGet(url, getAuthorizationHeaders(), InputStream.class);
 	}
 
 	public RingCentralMessageInfoResult updateMessage(String accountId, String extensionId, String messageId, RingCentralMessageUpdateInput input)

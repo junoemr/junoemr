@@ -23,18 +23,19 @@
 
 package org.oscarehr.integration.SRFax;
 
+import org.apache.commons.codec.binary.Base64;
 import org.oscarehr.fax.exception.FaxApiResultException;
-
+import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.provider.FaxDownloadProvider;
+import org.oscarehr.fax.result.FaxInboxResult;
 import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
 import org.oscarehr.integration.SRFax.api.result.GetFaxInboxResult;
 import org.oscarehr.integration.SRFax.api.resultWrapper.ListWrapper;
 import org.oscarehr.integration.SRFax.api.resultWrapper.SingleWrapper;
-
-import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.provider.FaxDownloadProvider;
-import org.oscarehr.fax.result.FaxInboxResult;
 import oscar.util.ConversionUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -76,11 +77,11 @@ public class SRFaxDownloadProvider implements FaxDownloadProvider
 	/**
 	 * Retrieves a fax from SRFax
 	 * @param referenceIdStr SRFax fax reference Id of the fax to retrieve
-	 * @return Fax document as a base64 encoded string
+	 * @return Fax document as an input stream
 	 * @throws FaxApiResultException if result is not success
 	 */
 	@Override
-	public String retrieveFax(String referenceIdStr) throws FaxApiResultException
+	public InputStream retrieveFax(String referenceIdStr) throws FaxApiResultException
 	{
 		SingleWrapper<String> inboxResultList = srFaxApiConnector.retrieveFax(null,
 			referenceIdStr, SRFaxApiConnector.RETRIEVE_DIRECTION_IN);
@@ -88,7 +89,7 @@ public class SRFaxDownloadProvider implements FaxDownloadProvider
 		{
 			throw new FaxApiResultException(inboxResultList.getError());
 		}
-		return inboxResultList.getResult();
+		return base64ToStream(inboxResultList.getResult());
 	}
 
 	/**
@@ -107,5 +108,10 @@ public class SRFaxDownloadProvider implements FaxDownloadProvider
 		{
 			throw new FaxApiResultException("Failed to mark fax as read: " + updateViewedStatusResult.getError());
 		}
+	}
+
+	private InputStream base64ToStream(String base64String)
+	{
+		return new ByteArrayInputStream(Base64.decodeBase64(base64String));
 	}
 }

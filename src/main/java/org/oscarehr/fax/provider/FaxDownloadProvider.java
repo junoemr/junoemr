@@ -25,6 +25,8 @@ package org.oscarehr.fax.provider;
 
 import org.oscarehr.fax.exception.FaxApiResultException;
 import org.oscarehr.fax.result.FaxInboxResult;
+
+import java.io.InputStream;
 import java.util.List;
 
 public interface FaxDownloadProvider
@@ -41,10 +43,10 @@ public interface FaxDownloadProvider
 	/**
 	 * Retrieves a single fax document identified by the referenceIdStr
 	 * @param referenceIdStr Reference Id of the fax to retrieve
-	 * @return Fax document as a base64 encoded string
+	 * @return Fax document as an input stream
 	 * @throws FaxApiResultException on result error
 	 */
-	String retrieveFax(String referenceIdStr);
+	InputStream retrieveFax(String referenceIdStr);
 
 	/**
 	 * Marks a fax identified by the referenceIdStr as downloaded
