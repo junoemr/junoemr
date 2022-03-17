@@ -74,6 +74,8 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 
 					ctrl.nextPullTime = await ctrl.faxInboxService.getNextPullTime();
 					ctrl.masterFaxEnabledInbound = await systemPreferenceService.isPreferenceEnabled("masterFaxEnabledInbound", ctrl.masterFaxEnabledInbound);
+
+					ctrl.loadInboxItems();
 				}
 				catch (error)
 				{

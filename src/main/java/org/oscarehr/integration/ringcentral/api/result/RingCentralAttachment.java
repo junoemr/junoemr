@@ -20,29 +20,48 @@
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.integration.ringcentral.api.result;
 
-package org.oscarehr.integration.ringcentral;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
-import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.provider.FaxAccountProvider;
-import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
-import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
-import org.oscarehr.util.SpringUtils;
-
-public class RingcentralAccountProvider implements FaxAccountProvider
+@Data
+public class RingCentralAttachment
 {
-	protected FaxAccount faxAccount;
-	protected RingcentralApiConnector ringcentralApiConnector = SpringUtils.getBean(RingcentralApiConnector.class); //todo how to access in pojo?
-
-	public RingcentralAccountProvider(FaxAccount faxAccount)
+	enum AttachmentType
 	{
-		this.faxAccount = faxAccount;
+		AudioRecording,
+		AudioTranscription,
+		Text,
+		SourceDocument,
+		RenderedDocument,
+		MmsAttachment,
 	}
 
-	@Override
-	public boolean testConnectionStatus()
-	{
-		RingCentralAccountInfoResult accountInfo = ringcentralApiConnector.getAccountInfo(faxAccount.getLoginId());
-		return (accountInfo != null);
-	}
+	@JsonProperty("id")
+	private Long id;
+
+	@JsonProperty("uri")
+	private String uri;
+
+	@JsonProperty("type")
+	private AttachmentType type;
+
+	@JsonProperty("contentType")
+	private String contentType;
+
+	@JsonProperty("vmDuration")
+	private Integer vmDuration;
+
+	@JsonProperty("fileName")
+	private String fileName;
+
+	@JsonProperty("size")
+	private Long size;
+
+	@JsonProperty("height")
+	private Integer height;
+
+	@JsonProperty("width")
+	private Integer width;
 }

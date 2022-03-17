@@ -27,12 +27,15 @@ import org.oscarehr.fax.exception.FaxApiResultException;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxDownloadProvider;
 import org.oscarehr.fax.result.FaxInboxResult;
+import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
+import org.oscarehr.util.SpringUtils;
 
 import java.util.List;
 
 public class RingcentralDownloadProvider implements FaxDownloadProvider
 {
 	protected FaxAccount faxAccount;
+	protected RingcentralApiConnector ringcentralApiConnector = SpringUtils.getBean(RingcentralApiConnector.class); //todo how to access in pojo?
 
 	public RingcentralDownloadProvider(FaxAccount faxAccount)
 	{

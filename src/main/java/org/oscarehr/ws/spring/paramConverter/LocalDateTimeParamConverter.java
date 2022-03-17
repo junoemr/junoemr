@@ -20,29 +20,26 @@
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.ws.spring.paramConverter;
 
-package org.oscarehr.integration.ringcentral;
+import oscar.util.ConversionUtils;
 
-import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.provider.FaxAccountProvider;
-import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
-import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
-import org.oscarehr.util.SpringUtils;
+import javax.ws.rs.ext.ParamConverter;
+import java.time.LocalDateTime;
 
-public class RingcentralAccountProvider implements FaxAccountProvider
+/**
+ * for serializing/deserializing LocalDateTime object as a @QueryParam
+ * maybe this can be removed with a newer version of something
+ */
+public class LocalDateTimeParamConverter implements ParamConverter<LocalDateTime>
 {
-	protected FaxAccount faxAccount;
-	protected RingcentralApiConnector ringcentralApiConnector = SpringUtils.getBean(RingcentralApiConnector.class); //todo how to access in pojo?
-
-	public RingcentralAccountProvider(FaxAccount faxAccount)
+	public LocalDateTime fromString(String value)
 	{
-		this.faxAccount = faxAccount;
+		return ConversionUtils.toLocalDateTime(value, ConversionUtils.DEFAULT_TS_PATTERN);
 	}
 
-	@Override
-	public boolean testConnectionStatus()
+	public String toString(LocalDateTime value)
 	{
-		RingCentralAccountInfoResult accountInfo = ringcentralApiConnector.getAccountInfo(faxAccount.getLoginId());
-		return (accountInfo != null);
+		return ConversionUtils.toDateTimeString(value, ConversionUtils.DEFAULT_TS_PATTERN);
 	}
 }

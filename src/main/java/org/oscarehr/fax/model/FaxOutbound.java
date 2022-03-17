@@ -145,6 +145,11 @@ public class FaxOutbound extends AbstractModel<Long>
 		return FaxStatusInternal.ERROR.equals(getStatus());
 	}
 
+	public void setRemoteStatusPending()
+	{
+		setStatusRemote(FaxStatusRemote.PENDING);
+	}
+
 	public void setRemoteStatusSent()
 	{
 		setStatusRemote(FaxStatusRemote.SENT);

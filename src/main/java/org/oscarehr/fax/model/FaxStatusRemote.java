@@ -24,6 +24,7 @@ package org.oscarehr.fax.model;
 
 public enum FaxStatusRemote
 {
+	PENDING,
 	ERROR,
 	SENT
 }

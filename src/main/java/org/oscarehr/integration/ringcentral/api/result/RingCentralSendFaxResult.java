@@ -30,13 +30,8 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RingCentralSendFaxResult implements RingCentralResult
 {
-	enum FaxResolution {
-		High,
-		Low,
-	}
-
 	@JsonProperty("id")
-	private Integer id;
+	private Long id;
 
 	@JsonProperty("uri")
 	private String uri;
@@ -60,7 +55,7 @@ public class RingCentralSendFaxResult implements RingCentralResult
 	private Priority priority;
 
 	@JsonProperty("attachments")
-	private Object[] attachments;
+	private RingCentralAttachment[] attachments;
 
 	@JsonProperty("direction")
 	private Direction direction;
