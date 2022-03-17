@@ -22,15 +22,10 @@
  */
 
 package org.oscarehr.fax.oauth;
-
 import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.extensions.servlet.auth.oauth2.AbstractAuthorizationCodeServlet;
-import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -40,42 +35,43 @@ import java.io.IOException;
 @WebServlet(name="FaxOAuthServlet",description="Ringcentral OAuth servlet", value="/oauth",loadOnStartup = 1)
 public class RingCentralAuthServlet extends AbstractAuthorizationCodeServlet
 {
-	protected String REDIRECT_URL = System.getenv("RINGCENTRAL_REDIRECT_URL");
-
-	@Autowired
-	private RingcentralApiConnector apiConnector;
-
 	@Override
-	public void init(ServletConfig config) throws ServletException
+	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException
 	{
-		super.init(config);
-		SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+		String contextPath = req.getContextPath();
+		String redirectPath = contextPath + "/web/#!/admin/faxConfig";
+
+		if (req.getQueryString() != null)
+		{
+			redirectPath += "?" + req.getQueryString();
+		}
+
+		resp.sendRedirect(redirectPath);
 	}
 
 	@Override
 	protected AuthorizationCodeFlow initializeFlow() throws ServletException, IOException
 	{
-		return apiConnector.getOauthLoginFlow();
+		return RingCentralCredentialStore.getFlow();
 	}
 
 	@Override
 	protected String getRedirectUri(HttpServletRequest httpServletRequest)
 		throws ServletException, IOException
 	{
-		return REDIRECT_URL;
+		return RingCentralCredentialStore.getRedirectURL();
 	}
 
 	@Override
 	protected String getUserId(HttpServletRequest httpServletRequest)
 		throws ServletException, IOException
 	{
-		return RingcentralApiConnector.LOCAL_USER_ID;
+		return RingCentralCredentialStore.getUserId();
 	}
 
 	@Override protected void onAuthorization(HttpServletRequest req, HttpServletResponse resp, AuthorizationCodeRequestUrl authorizationUrl) throws ServletException, IOException
 	{
-		// Thanks google, to set the state this method has to be overridden
-		authorizationUrl.setState("foobar1234"); // TODO, send instance context here'
+		authorizationUrl.setState("foobar1234"); // TODO, send instance context here
 		super.onAuthorization(req, resp, authorizationUrl);
 	}
 }
