@@ -30,11 +30,9 @@ import org.oscarehr.integration.ringcentral.api.input.RingCentralSendFaxInput;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageInfoResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralSendFaxResult;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import oscar.util.RESTClient;
@@ -46,8 +44,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Lazy
-@Component
 public class RingcentralApiConnector extends RESTClient
 {
 	protected static final String REST_API_BASE = "platform.devtest.ringcentral.com/restapi/v1.0/";
