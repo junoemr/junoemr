@@ -38,9 +38,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Synchronized;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.fax.exception.FaxApiResultException;
+import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageListInput;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralSendFaxInput;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageInfoResult;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageListResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralSendFaxResult;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.FileSystemResource;
@@ -66,6 +69,7 @@ public class RingcentralApiConnector extends RESTClient
 	String FAX_CREDENTIALS_DIR = "";
 
 	public static String LOCAL_USER_ID = "com.junoemr.fax.ringcentral";
+	public static final String CURRENT_SESSION_INDICATOR = "~";
 
 	protected static final String REST_API_BASE = "platform.devtest.ringcentral.com/restapi/v1.0/";
 	private String BASE_URL = "https://platform.devtest.ringcentral.com";
@@ -202,6 +206,21 @@ public class RingcentralApiConnector extends RESTClient
 		body.add("to", gson.toJson(input.getTo()));
 
 		return doPost(url, headers, body, RingCentralSendFaxResult.class);
+	}
+
+	public RingCentralMessageListResult getMessageList(String accountId, String extensionId, RingCentralMessageListInput input)
+	{
+		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/message-store";
+		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId));
+
+		try
+		{
+			return doGet(url, getAuthorizationHeaders(), input.toParameterMap(), RingCentralMessageListResult.class);
+		}
+		catch(Exception e)
+		{
+			throw new FaxApiResultException(e.getMessage());
+		}
 	}
 
 	public RingCentralMessageInfoResult getMessage(String accountId, String extensionId, String messageId)

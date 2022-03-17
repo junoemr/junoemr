@@ -38,6 +38,8 @@ import org.springframework.web.client.RestClientResponseException;
 
 import java.util.List;
 
+import static org.oscarehr.integration.ringcentral.api.RingcentralApiConnector.CURRENT_SESSION_INDICATOR;
+
 public class RingCentralUploadProvider implements FaxUploadProvider
 {
 	protected FaxAccount faxAccount;
@@ -57,7 +59,7 @@ public class RingCentralUploadProvider implements FaxUploadProvider
 
 		try
 		{
-			RingCentralSendFaxResult result = ringcentralApiConnector.sendFax(faxAccount.getLoginId(), "~", input);
+			RingCentralSendFaxResult result = ringcentralApiConnector.sendFax(faxAccount.getLoginId(), CURRENT_SESSION_INDICATOR, input);
 			faxOutbound.setStatusSent();
 			faxOutbound.setStatusMessage(FaxUploadService.STATUS_MESSAGE_IN_TRANSIT);
 			faxOutbound.setExternalStatus(result.getMessageStatus().name());
@@ -91,6 +93,6 @@ public class RingCentralUploadProvider implements FaxUploadProvider
 	@Override
 	public FaxStatusResult getFaxStatus(FaxOutbound faxOutbound) throws Exception
 	{
-		return ringcentralApiConnector.getMessage(faxAccount.getLoginId(), "~", String.valueOf(faxOutbound.getExternalReferenceId()));
+		return ringcentralApiConnector.getMessage(faxAccount.getLoginId(), CURRENT_SESSION_INDICATOR, String.valueOf(faxOutbound.getExternalReferenceId()));
 	}
 }

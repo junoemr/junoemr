@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.oscarehr.fax.result.FaxInboxResult;
 import org.oscarehr.fax.result.FaxStatusResult;
 import oscar.util.ConversionUtils;
 
@@ -35,7 +36,7 @@ import java.util.Optional;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RingCentralMessageInfoResult implements RingCentralResult, FaxStatusResult
+public class RingCentralMessageInfoResult implements RingCentralResult, FaxStatusResult, FaxInboxResult
 {
 	@JsonProperty("id")
 	private Long id;
@@ -74,7 +75,7 @@ public class RingCentralMessageInfoResult implements RingCentralResult, FaxStatu
 	private FaxResolution faxResolution;
 
 	@JsonProperty("from")
-	private Object from;
+	private RingCentralSenderInformation from;
 
 	@JsonProperty("lastModifiedTime")
 	private ZonedDateTime lastModifiedTime;
@@ -147,5 +148,17 @@ public class RingCentralMessageInfoResult implements RingCentralResult, FaxStatu
 			return Optional.of(MessageStatus.SendingFailed.name());
 		}
 		return Optional.empty();
+	}
+
+	@Override
+	public String getDetailsId()
+	{
+		return String.valueOf(this.getId());
+	}
+
+	@Override
+	public String getCallerId()
+	{
+		return from.getPhoneNumber();
 	}
 }

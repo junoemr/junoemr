@@ -28,9 +28,15 @@ import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxDownloadProvider;
 import org.oscarehr.fax.result.FaxInboxResult;
 import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
+import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageListInput;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageListResult;
 import org.oscarehr.util.SpringUtils;
 
+import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.List;
+
+import static org.oscarehr.integration.ringcentral.api.RingcentralApiConnector.CURRENT_SESSION_INDICATOR;
 
 public class RingcentralDownloadProvider implements FaxDownloadProvider
 {
@@ -52,8 +58,15 @@ public class RingcentralDownloadProvider implements FaxDownloadProvider
 	@Override
 	public List<? extends FaxInboxResult> getFaxInbox(int faxDaysPast) throws FaxApiResultException
 	{
-		//TODO
-		throw new FaxApiResultException("not implemented");
+		RingCentralMessageListInput input = new RingCentralMessageListInput();
+		input.setDateFrom(ZonedDateTime.now().minusDays(faxDaysPast));
+		input.setAvailability(new String[] {"Alive"});
+		input.setDirection(new String[] {"Inbound"});
+		input.setReadStatus(new String[] {"Unread"});
+		input.setMessageType(new String[] {"Fax"});
+
+		RingCentralMessageListResult result = ringcentralApiConnector.getMessageList(faxAccount.getLoginId(), CURRENT_SESSION_INDICATOR, input);
+		return Arrays.asList(result.getRecords());
 	}
 
 

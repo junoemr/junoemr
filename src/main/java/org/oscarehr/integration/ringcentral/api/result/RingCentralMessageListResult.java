@@ -28,56 +28,17 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RingCentralSendFaxResult implements RingCentralResult
+public class RingCentralMessageListResult implements RingCentralResult
 {
-	@JsonProperty("id")
-	private Long id;
-
 	@JsonProperty("uri")
 	private String uri;
 
-	@JsonProperty("type")
-	private String type;
+	@JsonProperty("records")
+	private RingCentralMessageInfoResult[] records;
 
-	@JsonProperty("from")
-	private RingCentralSenderInformation from;
+	@JsonProperty("navigation")
+	private Object navigation;
 
-	@JsonProperty("to")
-	private Object[] to; //todo custom objects
-
-	@JsonProperty("creationTime")
-	private String creationTime;
-
-	@JsonProperty("readStatus")
-	private ReadStatus readStatus;
-
-	@JsonProperty("priority")
-	private Priority priority;
-
-	@JsonProperty("attachments")
-	private RingCentralAttachment[] attachments;
-
-	@JsonProperty("direction")
-	private Direction direction;
-
-	@JsonProperty("availability")
-	private String availability;
-
-	@JsonProperty("messageStatus")
-	private MessageStatus messageStatus;
-
-	@JsonProperty("faxResolution")
-	private FaxResolution faxResolution;
-
-	@JsonProperty("faxPageCount")
-	private Integer faxPageCount;
-
-	@JsonProperty("lastModifiedTime")
-	private String lastModifiedTime;
-
-	@JsonProperty("coverIndex")
-	private Integer coverIndex;
-
-	@JsonProperty("coverPageText")
-	private String coverPageText;
+	@JsonProperty("paging")
+	private Object paging;
 }
