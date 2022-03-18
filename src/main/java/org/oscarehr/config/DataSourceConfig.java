@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class DataSourceConfig
@@ -39,6 +40,7 @@ public class DataSourceConfig
 	private oscar.OscarProperties oscarProperties = oscar.OscarProperties.getInstance();
 
 	@Bean(name="dataSource")
+	@Primary
 	public DataSource getDataSource()
 	{
 		String dbUri = oscarProperties.getDbUri();
@@ -53,4 +55,18 @@ public class DataSourceConfig
 		return dataSourceBuilder.build();
 	}
 
+	@Bean(name="dataSourceReadOnly")
+	public DataSource getDataSourceReadOnly()
+	{
+		String dbUri = oscarProperties.getDbUriReadOnly();
+		String dbName = oscarProperties.getDbNameReadOnly();
+
+		DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+		dataSourceBuilder.driverClassName(oscarProperties.getDbDriver());
+		dataSourceBuilder.url(dbUri + dbName + CONNECTION_STRING_SUFFIX);
+		dataSourceBuilder.username(oscarProperties.getDbUserNameReadOnly());
+		dataSourceBuilder.password(oscarProperties.getDbPasswordReadOnly());
+
+		return dataSourceBuilder.build();
+	}
 }

@@ -107,7 +107,7 @@ public class IndicatorBeanFactory {
 		
 		copyToBean( indicatorBean, getIndicatorTemplateXML() );
 
-		List<?> queryResultList = getIndicatorQueryHandler().execute( this.indicatorQuery );  
+		List<?> queryResultList = getIndicatorQueryHandler().executeReadOnly( this.indicatorQuery );
 	
 		if( queryResultList != null ) {
 			
