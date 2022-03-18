@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxProvider;
-import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
+import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +52,6 @@ import java.util.List;
 public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbackServlet
 {
 	private static Logger logger = MiscUtils.getLogger();
-	protected String REDIRECT_URL = System.getenv("RINGCENTRAL_REDIRECT_URL");
 	@Autowired
 	private FaxAccountDao faxAccountDao;
 
@@ -68,7 +67,7 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 	protected void onSuccess(HttpServletRequest req, HttpServletResponse resp, Credential credential)
 		throws ServletException, IOException
 	{
-		RingcentralApiConnector apiConnector = new RingcentralApiConnector();
+		RingCentralApiConnector apiConnector = new RingCentralApiConnector();
 		RingCentralAccountInfoResult result = apiConnector.getAccountInfo();
 
 		List<FaxAccount> faxAccounts = faxAccountDao.findByLoginId(FaxProvider.RINGCENTRAL, String.valueOf(result.getId()));
@@ -84,7 +83,7 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 			{
 				// new account setup parameters
 				redirect.addParameter("type", FaxProvider.RINGCENTRAL.name());
-				redirect.addParameter("accountID", result.getId().toString());
+				redirect.addParameter("accountId", result.getId().toString());
 			}
 			resp.sendRedirect(redirect.toString());
 		}

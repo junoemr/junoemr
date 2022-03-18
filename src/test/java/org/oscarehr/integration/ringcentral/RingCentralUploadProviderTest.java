@@ -27,7 +27,7 @@ import org.mockito.Mockito;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.fax.provider.FaxUploadProvider;
-import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
+import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -38,7 +38,7 @@ public class RingCentralUploadProviderTest
 	public void testIsFaxInRemoteSentState_True()
 	{
 		FaxUploadProvider uploadProvider = new RingCentralUploadProvider(mockRingcentralFaxAccount());
-		assertTrue("Status should be Delivered", uploadProvider.isFaxInRemoteSentState(RingcentralApiConnector.RESPONSE_STATUS_DELIVERED));
+		assertTrue("Status should be Delivered", uploadProvider.isFaxInRemoteSentState(RingCentralApiConnector.RESPONSE_STATUS_DELIVERED));
 	}
 
 	@Test
@@ -52,8 +52,8 @@ public class RingCentralUploadProviderTest
 	public void testIsFaxInRemoteFailedState_True()
 	{
 		FaxUploadProvider uploadProvider = new RingCentralUploadProvider(mockRingcentralFaxAccount());
-		assertTrue(uploadProvider.isFaxInRemoteFailedState(RingcentralApiConnector.RESPONSE_STATUS_SEND_FAILED));
-		assertTrue(uploadProvider.isFaxInRemoteFailedState(RingcentralApiConnector.RESPONSE_STATUS_DELIVERY_FAILED));
+		assertTrue(uploadProvider.isFaxInRemoteFailedState(RingCentralApiConnector.RESPONSE_STATUS_SEND_FAILED));
+		assertTrue(uploadProvider.isFaxInRemoteFailedState(RingCentralApiConnector.RESPONSE_STATUS_DELIVERY_FAILED));
 	}
 
 	@Test

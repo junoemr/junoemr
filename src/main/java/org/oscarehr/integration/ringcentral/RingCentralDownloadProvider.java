@@ -28,7 +28,7 @@ import org.oscarehr.fax.exception.FaxIntegrationException;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxDownloadProvider;
 import org.oscarehr.fax.result.FaxInboxResult;
-import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
+import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageListInput;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageUpdateInput;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAttachment;
@@ -40,17 +40,17 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.oscarehr.integration.ringcentral.api.RingcentralApiConnector.CURRENT_SESSION_INDICATOR;
+import static org.oscarehr.integration.ringcentral.api.RingCentralApiConnector.CURRENT_SESSION_INDICATOR;
 
-public class RingcentralDownloadProvider implements FaxDownloadProvider
+public class RingCentralDownloadProvider implements FaxDownloadProvider
 {
 	protected final FaxAccount faxAccount;
-	protected final RingcentralApiConnector ringcentralApiConnector;
+	protected final RingCentralApiConnector ringcentralApiConnector;
 
-	public RingcentralDownloadProvider(FaxAccount faxAccount)
+	public RingCentralDownloadProvider(FaxAccount faxAccount)
 	{
 		this.faxAccount = faxAccount;
-		this.ringcentralApiConnector = new RingcentralApiConnector();
+		this.ringcentralApiConnector = new RingCentralApiConnector();
 	}
 
 	/**

@@ -50,12 +50,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class RingcentralApiConnector extends RESTClient
+public class RingCentralApiConnector extends RESTClient
 {
 	public static final String CURRENT_SESSION_INDICATOR = "~";
-
 	protected static final String REST_API_BASE = "platform.devtest.ringcentral.com/restapi/v1.0/";
-	private String BASE_URL = "https://platform.devtest.ringcentral.com";
 
 	public static final String RESPONSE_STATUS_RECEIVED="Received";
 	public static final String RESPONSE_STATUS_QUEUED="Queued";
@@ -82,7 +80,7 @@ public class RingcentralApiConnector extends RESTClient
 		RESPONSE_STATUS_DELIVERY_FAILED
 	));
 
-	public RingcentralApiConnector()
+	public RingCentralApiConnector()
 	{
 		this.setErrorHandler(new RingCentralApiErrorHandler());
 	}

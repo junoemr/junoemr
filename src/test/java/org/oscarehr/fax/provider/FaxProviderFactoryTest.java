@@ -28,8 +28,8 @@ import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.integration.SRFax.SRFaxAccountProvider;
 import org.oscarehr.integration.SRFax.SRFaxDownloadProvider;
 import org.oscarehr.integration.SRFax.SRFaxUploadProvider;
-import org.oscarehr.integration.ringcentral.RingcentralAccountProvider;
-import org.oscarehr.integration.ringcentral.RingcentralDownloadProvider;
+import org.oscarehr.integration.ringcentral.RingCentralAccountProvider;
+import org.oscarehr.integration.ringcentral.RingCentralDownloadProvider;
 import org.oscarehr.integration.ringcentral.RingCentralUploadProvider;
 
 import static org.junit.Assert.assertTrue;
@@ -49,7 +49,7 @@ public class FaxProviderFactoryTest
 	{
 		FaxAccount mockFaxAccount = mockFaxAccount(FaxProvider.RINGCENTRAL);
 		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(mockFaxAccount);
-		assertTrue("Fax Provider does not match account type", faxAccountProvider instanceof RingcentralAccountProvider);
+		assertTrue("Fax Provider does not match account type", faxAccountProvider instanceof RingCentralAccountProvider);
 	}
 
 	@Test(expected = IllegalStateException.class)
@@ -72,7 +72,7 @@ public class FaxProviderFactoryTest
 	{
 		FaxAccount mockFaxAccount = mockFaxAccount(FaxProvider.RINGCENTRAL);
 		FaxDownloadProvider faxDownloadProvider = FaxProviderFactory.createFaxDownloadProvider(mockFaxAccount);
-		assertTrue("Fax Provider does not match account type", faxDownloadProvider instanceof RingcentralDownloadProvider);
+		assertTrue("Fax Provider does not match account type", faxDownloadProvider instanceof RingCentralDownloadProvider);
 	}
 
 	@Test(expected = IllegalStateException.class)

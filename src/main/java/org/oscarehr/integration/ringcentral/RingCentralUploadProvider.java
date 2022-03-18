@@ -30,24 +30,24 @@ import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.result.FaxStatusResult;
 import org.oscarehr.fax.service.FaxUploadService;
-import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
+import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralSendFaxInput;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralSendFaxResult;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.util.List;
 
-import static org.oscarehr.integration.ringcentral.api.RingcentralApiConnector.CURRENT_SESSION_INDICATOR;
+import static org.oscarehr.integration.ringcentral.api.RingCentralApiConnector.CURRENT_SESSION_INDICATOR;
 
 public class RingCentralUploadProvider implements FaxUploadProvider
 {
 	protected final FaxAccount faxAccount;
-	protected final RingcentralApiConnector ringcentralApiConnector;
+	protected final RingCentralApiConnector ringcentralApiConnector;
 
 	public RingCentralUploadProvider(FaxAccount faxAccount)
 	{
 		this.faxAccount = faxAccount;
-		this.ringcentralApiConnector = new RingcentralApiConnector();
+		this.ringcentralApiConnector = new RingCentralApiConnector();
 	}
 
 	@Override
@@ -75,19 +75,19 @@ public class RingCentralUploadProvider implements FaxUploadProvider
 	@Override
 	public List<String> getRemoteFinalStatusIndicators()
 	{
-		return RingcentralApiConnector.RESPONSE_STATUSES_FINAL;
+		return RingCentralApiConnector.RESPONSE_STATUSES_FINAL;
 	}
 
 	@Override
 	public boolean isFaxInRemoteSentState(String externalStatus)
 	{
-		return RingcentralApiConnector.RESPONSE_STATUSES_SUCCESS.contains(externalStatus);
+		return RingCentralApiConnector.RESPONSE_STATUSES_SUCCESS.contains(externalStatus);
 	}
 
 	@Override
 	public boolean isFaxInRemoteFailedState(String externalStatus)
 	{
-		return RingcentralApiConnector.RESPONSE_STATUSES_FAILED.contains(externalStatus);
+		return RingCentralApiConnector.RESPONSE_STATUSES_FAILED.contains(externalStatus);
 	}
 
 	@Override

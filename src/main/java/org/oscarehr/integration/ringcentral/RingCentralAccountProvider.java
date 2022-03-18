@@ -25,18 +25,18 @@ package org.oscarehr.integration.ringcentral;
 
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxAccountProvider;
-import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
+import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
 
-public class RingcentralAccountProvider implements FaxAccountProvider
+public class RingCentralAccountProvider implements FaxAccountProvider
 {
 	protected final FaxAccount faxAccount;
-	protected final RingcentralApiConnector ringcentralApiConnector;
+	protected final RingCentralApiConnector ringcentralApiConnector;
 
-	public RingcentralAccountProvider(FaxAccount faxAccount)
+	public RingCentralAccountProvider(FaxAccount faxAccount)
 	{
 		this.faxAccount = faxAccount;
-		this.ringcentralApiConnector = new RingcentralApiConnector();
+		this.ringcentralApiConnector = new RingCentralApiConnector();
 	}
 
 	@Override
