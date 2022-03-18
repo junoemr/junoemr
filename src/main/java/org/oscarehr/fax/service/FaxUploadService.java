@@ -448,7 +448,8 @@ public class FaxUploadService
 			faxOutbound.setStatusMessage(e.getUserFriendlyMessage());
 
 			// if the maximum sent attempts has been hit, set the error status.
-			if(faxAttemptCounterMap.get(faxOutbound.getId()) >= MAX_SEND_COUNT)
+			if(faxAttemptCounterMap.containsKey(faxOutbound.getId())
+					&& faxAttemptCounterMap.get(faxOutbound.getId()) >= MAX_SEND_COUNT)
 			{
 				faxOutbound.setStatusError();
 			}

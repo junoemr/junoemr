@@ -22,6 +22,9 @@
  */
 package org.oscarehr.fax.exception;
 
+/**
+ * Indicate that the request was invalid for the fax api.
+ */
 public class FaxApiValidationException extends FaxException
 {
 	public FaxApiValidationException(String message)

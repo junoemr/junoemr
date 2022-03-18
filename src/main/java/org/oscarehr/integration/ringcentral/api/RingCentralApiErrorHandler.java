@@ -22,6 +22,9 @@
  */
 package org.oscarehr.integration.ringcentral.api;
 
+import org.oscarehr.fax.exception.FaxApiConnectionException;
+import org.oscarehr.fax.exception.FaxApiValidationException;
+import org.oscarehr.fax.exception.FaxIntegrationException;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 
@@ -32,12 +35,42 @@ public class RingCentralApiErrorHandler implements ResponseErrorHandler
 	@Override
 	public boolean hasError(ClientHttpResponse response) throws IOException
 	{
-		return false;
+		return response.getStatusCode().isError();
 	}
 
 	@Override
 	public void handleError(ClientHttpResponse response) throws IOException
 	{
+		if(response.getStatusCode().is5xxServerError())
+		{
+			// handle server errors
+			throw new FaxApiConnectionException("Api responded with an internal error code: [" + response.getStatusCode().value() + "] "
+					+ response.getStatusCode().getReasonPhrase());
+		}
+		else if(response.getStatusCode().is4xxClientError())
+		{
+			// handle client errors
+			String errorMessage = "[" + response.getStatusCode().value() + "] "
+					+ response.getStatusCode().getReasonPhrase();
 
+			switch(response.getStatusCode())
+			{
+				case NOT_FOUND:
+				{
+					// something wrong with the system, this is a real error
+					throw new FaxIntegrationException(errorMessage);
+				}
+				case UNAUTHORIZED:
+				{
+					// connection issue, can be rectified. faxes probably can be tried again
+					throw new FaxApiConnectionException(errorMessage);
+				}
+				default:
+				{
+					// validation errors etc.
+					throw new FaxApiValidationException(errorMessage);
+				}
+			}
+		}
 	}
 }

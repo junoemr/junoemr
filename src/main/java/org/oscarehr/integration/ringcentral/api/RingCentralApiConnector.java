@@ -26,8 +26,7 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.fax.exception.FaxApiResultException;
-import org.oscarehr.fax.exception.FaxIntegrationException;
+import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.oauth.RingCentralCredentialStore;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageListInput;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageUpdateInput;
@@ -125,15 +124,7 @@ public class RingCentralApiConnector extends RESTClient
 	{
 		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/message-store";
 		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId));
-
-		try
-		{
-			return doGet(url, getAuthorizationHeaders(), input.toParameterMap(), RingCentralMessageListResult.class);
-		}
-		catch(Exception e)
-		{
-			throw new FaxApiResultException(e.getMessage());
-		}
+		return doGet(url, getAuthorizationHeaders(), input.toParameterMap(), RingCentralMessageListResult.class);
 	}
 
 	public RingCentralMessageInfoResult getMessage(String accountId, String extensionId, String messageId)
@@ -167,7 +158,7 @@ public class RingCentralApiConnector extends RESTClient
 		}
 		catch (IOException e)
 		{
-			throw new FaxIntegrationException("Missing or invalid access token:\n" + e.getMessage());
+			throw new FaxApiConnectionException("Missing or invalid access token:\n" + e.getMessage());
 		}
 	}
 }

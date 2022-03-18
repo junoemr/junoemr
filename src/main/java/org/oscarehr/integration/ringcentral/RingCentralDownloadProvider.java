@@ -66,7 +66,7 @@ public class RingCentralDownloadProvider implements FaxDownloadProvider
 		RingCentralMessageListInput input = new RingCentralMessageListInput();
 		input.setDateFrom(ZonedDateTime.now().minusDays(faxDaysPast));
 		input.setAvailability(new String[] {"Alive"});
-		input.setDirection(new String[] {"Inbound"});
+		input.setDirection(new String[] {"I am testing errors"});
 		input.setReadStatus(new String[] {"Unread"});
 		input.setMessageType(new String[] {"Fax"});
 
