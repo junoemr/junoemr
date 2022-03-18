@@ -1,4 +1,5 @@
 import {Moment} from "moment";
+import moment from "moment/moment";
 
 export default class DemographicWaitingList
 {
