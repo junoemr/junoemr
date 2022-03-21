@@ -18,15 +18,19 @@
 
 		<div class="patient-details-container flex-gap-8">
 			<div class="h-100">
-				<mha-patient-profile-details class="d-inline-block h-100 w-100"
+				<mha-patient-profile-details ng-if="$ctrl.currentProfile"
+											 class="d-inline-block h-100 w-100"
 				                             profile="$ctrl.currentProfile">
 				</mha-patient-profile-details>
+				<h5 ng-if="!$ctrl.currentProfile" class="text-grey text-center">
+					No MHA connection for this site
+				</h5>
 			</div>
 			<div class="grey-box h-100">
 				<mha-patient-connection-details class="d-inline-block h-100 w-100"
 				                                profile="$ctrl.currentProfile"
 				                                integration="$ctrl.currentIntegration"
-				                                demographic-no="$ctrl.demographic.demographicNo"
+				                                demographic-id="$ctrl.demographic.id"
 				                                disabled="$ctrl.isLoadingProfile"
 				                                on-connection-updated="$ctrl.onConnectionStatusUpdated()">
 				</mha-patient-connection-details>
