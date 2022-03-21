@@ -29,9 +29,8 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.servlet.auth.oauth2.AbstractAuthorizationCodeCallbackServlet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
-import org.oscarehr.fax.dao.FaxAccountDao;
-import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxProvider;
+import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
 import org.oscarehr.util.MiscUtils;
@@ -46,14 +45,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.util.List;
 
 @WebServlet(name="FaxOAuthRedirectServlet",description="Ringcentral OAuth redirect servlet", value="/fax_redirect",loadOnStartup = 1)
 public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbackServlet
 {
-	private static Logger logger = MiscUtils.getLogger();
+	private static final Logger logger = MiscUtils.getLogger();
+
 	@Autowired
-	private FaxAccountDao faxAccountDao;
+	private FaxAccountService faxAccountService;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException
@@ -70,7 +69,7 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 		RingCentralApiConnector apiConnector = new RingCentralApiConnector();
 		RingCentralAccountInfoResult result = apiConnector.getAccountInfo();
 
-		List<FaxAccount> faxAccounts = faxAccountDao.findByLoginId(FaxProvider.RINGCENTRAL, String.valueOf(result.getId()));
+		boolean existingAccount = faxAccountService.accountExists(FaxProvider.RINGCENTRAL, String.valueOf(result.getId()));
 
 		String contextPath = req.getContextPath();
 		String redirectPath = contextPath + "/oauth";
@@ -79,7 +78,7 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 		try
 		{
 			URIBuilder redirect = new URIBuilder(redirectPath);
-			if(faxAccounts.isEmpty())
+			if(!existingAccount)
 			{
 				// new account setup parameters
 				redirect.addParameter("type", FaxProvider.RINGCENTRAL.name());

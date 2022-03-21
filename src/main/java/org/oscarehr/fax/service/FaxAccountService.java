@@ -35,6 +35,7 @@ import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxAccountProvider;
+import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.fax.provider.FaxProviderFactory;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
@@ -148,6 +149,12 @@ public class FaxAccountService
 	public FaxAccountTransferOutbound getFaxAccount(Long id)
 	{
 		return faxAccountToModelConverter.convert(faxAccountDao.find(id));
+	}
+
+	public boolean accountExists(FaxProvider faxProvider, String loginId)
+	{
+		List<FaxAccount> faxAccounts = faxAccountDao.findByLoginId(faxProvider, loginId);
+		return !faxAccounts.isEmpty();
 	}
 
 	public boolean isFaxAccountEnabled(Long id)
