@@ -23,9 +23,6 @@
 package org.oscarehr.integration.ringcentral.api;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.oauth.RingCentralCredentialStore;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageListInput;
@@ -35,11 +32,8 @@ import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoRes
 import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageInfoResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageListResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralSendFaxResult;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import oscar.util.RESTClient;
 
 import java.io.IOException;
@@ -91,11 +85,12 @@ public class RingCentralApiConnector extends RESTClient
 
 	public RingCentralAccountInfoResult getAccountInfo()
 	{
-		return getAccountInfo("~");
+		return getAccountInfo(CURRENT_SESSION_INDICATOR);
 	}
 	public RingCentralAccountInfoResult getAccountInfo(String accountId)
 	{
-		String url = buildUrl(DEFAULT_PROTOCOL, REST_API_BASE + "account/" + accountId);
+		String endpoint = REST_API_BASE + "account/{0}";
+		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId));
 		return doGet(url, getAuthorizationHeaders(), RingCentralAccountInfoResult.class);
 	}
 
@@ -104,20 +99,10 @@ public class RingCentralApiConnector extends RESTClient
 		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/fax";
 		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId));
 
-		GenericFile attachment = input.getAttachment();
-		Gson gson = new GsonBuilder().create();
-
 		HttpHeaders headers = getAuthorizationHeaders();
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
-		FileSystemResource fileSystemResource = new FileSystemResource(attachment.getFileObject());
-
-		//todo add other fields and maybe move this to the input somehow? can we construct from object using annotations?
-		body.add("attachment", fileSystemResource);
-		body.add("to", gson.toJson(input.getTo()));
-
-		return doPost(url, headers, body, RingCentralSendFaxResult.class);
+		return doPost(url, headers, input.toMultiValueMap(), RingCentralSendFaxResult.class);
 	}
 
 	public RingCentralMessageListResult getMessageList(String accountId, String extensionId, RingCentralMessageListInput input)

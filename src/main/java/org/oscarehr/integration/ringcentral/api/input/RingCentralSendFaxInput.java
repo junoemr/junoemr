@@ -22,9 +22,15 @@
  */
 package org.oscarehr.integration.ringcentral.api.input;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.Data;
 import org.oscarehr.common.io.GenericFile;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @Data
 public class RingCentralSendFaxInput
@@ -59,4 +65,31 @@ public class RingCentralSendFaxInput
 	/* Cover page text, entered by the fax sender and printed on the cover page. Maximum length is limited to 1024 symbols */
 	@JsonProperty("coverPageText")
 	private String coverPageText;
+
+	@JsonIgnore
+	public MultiValueMap<String, Object> toMultiValueMap()
+	{
+		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+		Gson gson = new GsonBuilder().create();
+
+		body.add("attachment", new FileSystemResource(attachment.getFileObject()));
+		body.add("to", gson.toJson(to));
+
+		putOptionalParam(body, "faxResolution", faxResolution);
+		putOptionalParam(body, "sendTime", sendTime);
+		putOptionalParam(body, "isoCode", isoCode);
+		putOptionalParam(body, "coverIndex", coverIndex);
+		putOptionalParam(body, "coverPageText", coverPageText);
+
+		return body;
+	}
+
+	@JsonIgnore
+	private void putOptionalParam(MultiValueMap<String, Object> map, String key, Object value)
+	{
+		if(value != null)
+		{
+			map.add(key, value);
+		}
+	}
 }
