@@ -33,6 +33,7 @@ import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
 import org.oscarehr.fax.exception.FaxException;
+import org.oscarehr.fax.exception.FaxIntegrationException;
 import org.oscarehr.fax.exception.FaxNumberException;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxFileType;
@@ -275,7 +276,8 @@ public class FaxUploadService
 				GenericFile fileToSend;
 				try
 				{
-					fileToSend = FileFactory.getOutboundUnsentFaxFile(queuedFax.getFileName());
+					// queued fax files live in the pending folder
+					fileToSend = FileFactory.getOutboundPendingFaxFile(queuedFax.getFileName());
 				}
 				catch(IOException e)
 				{
@@ -351,10 +353,14 @@ public class FaxUploadService
 					faxOutboundDao.merge(faxOutbound);
 					logger.info("Updated Status to: " + remoteSentStatus);
 				}
+				/* Don't change fax status if there is an error here. The fax has been sent to the remote service successfully,
+				 * we just don't know what remote state it's in. */
+				catch (FaxApiConnectionException e)
+				{
+					logger.error("Api connection error", e);
+				}
 				catch (Exception e)
 				{
-					faxOutbound.setStatusError();
-					faxOutbound.setStatusMessage(e.getMessage());
 					logger.error("Unknown faxing exception", e);
 				}
 			}
@@ -454,7 +460,7 @@ public class FaxUploadService
 				faxOutbound.setStatusError();
 			}
 		}
-		catch(FaxApiValidationException e)
+		catch(FaxApiValidationException | FaxIntegrationException e)
 		{
 			logger.warn("Fax API failure: " + e.getMessage());
 			logData = e.getMessage();

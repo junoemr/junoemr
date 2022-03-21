@@ -36,12 +36,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import oscar.util.RESTClient;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class RingCentralApiConnector extends RESTClient
 {
@@ -78,9 +80,9 @@ public class RingCentralApiConnector extends RESTClient
 		this.setErrorHandler(new RingCentralApiErrorHandler());
 	}
 
-	public Credential getCredential() throws IOException
+	public Optional<Credential> getCredential() throws IOException
 	{
-		return RingCentralCredentialStore.getCredential(RingCentralCredentialStore.LOCAL_USER_ID);
+		return Optional.ofNullable(RingCentralCredentialStore.getCredential(RingCentralCredentialStore.LOCAL_USER_ID));
 	}
 
 	public RingCentralAccountInfoResult getAccountInfo()
@@ -123,7 +125,8 @@ public class RingCentralApiConnector extends RESTClient
 	{
 		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/message-store/{2}/content/{3}";
 		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId, messageId, attachmentId));
-		return doGet(url, getAuthorizationHeaders(), InputStream.class);
+		byte[] byteArray = doGet(url, getAuthorizationHeaders(), byte[].class);
+		return new ByteArrayInputStream(byteArray);
 	}
 
 	public RingCentralMessageInfoResult updateMessage(String accountId, String extensionId, String messageId, RingCentralMessageUpdateInput input)
@@ -137,13 +140,21 @@ public class RingCentralApiConnector extends RESTClient
 	{
 		try
 		{
-			HttpHeaders headers = new HttpHeaders();
-			headers.set("Authorization", MessageFormat.format("Bearer {0}", getCredential().getAccessToken()));
-			return headers;
+			Optional<Credential> oAuthCredential = getCredential();
+			if(oAuthCredential.isPresent())
+			{
+				HttpHeaders headers = new HttpHeaders();
+				headers.set("Authorization", MessageFormat.format("Bearer {0}", oAuthCredential.get().getAccessToken()));
+				return headers;
+			}
+			else
+			{
+				throw new FaxApiConnectionException("Missing oAuth credentials. Log in and try again");
+			}
 		}
 		catch (IOException e)
 		{
-			throw new FaxApiConnectionException("Missing or invalid access token:\n" + e.getMessage());
+			throw new FaxApiConnectionException("Error loading access token:\n" + e.getMessage());
 		}
 	}
 }

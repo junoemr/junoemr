@@ -31,6 +31,10 @@ import org.oscarehr.common.io.GenericFile;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import oscar.util.ConversionUtils;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 public class RingCentralSendFaxInput
@@ -48,7 +52,7 @@ public class RingCentralSendFaxInput
 
 	/* Timestamp to send fax at. If not specified (current or the past), the fax is sent immediately */
 	@JsonProperty("sendTime")
-	private String sendTime;
+	private ZonedDateTime sendTime;
 
 	/* ISO Code. e.g UK */
 	@JsonProperty("isoCode")
@@ -76,7 +80,7 @@ public class RingCentralSendFaxInput
 		body.add("to", gson.toJson(to));
 
 		putOptionalParam(body, "faxResolution", faxResolution);
-		putOptionalParam(body, "sendTime", sendTime);
+		putOptionalParam(body, "sendTime", ConversionUtils.toNullableDateTimeString(sendTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 		putOptionalParam(body, "isoCode", isoCode);
 		putOptionalParam(body, "coverIndex", coverIndex);
 		putOptionalParam(body, "coverPageText", coverPageText);
