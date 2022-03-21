@@ -123,6 +123,10 @@ public class RingCentralDownloadProvider implements FaxDownloadProvider
 		RingCentralMessageUpdateInput input = new RingCentralMessageUpdateInput();
 		input.setMessageType("Fax");
 		input.setReadStatus("Read");
-		ringcentralApiConnector.updateMessage(faxAccount.getLoginId(), CURRENT_SESSION_INDICATOR, referenceIdStr, input);
+		ringcentralApiConnector.updateMessage(
+				faxAccount.getLoginId(),
+				CURRENT_SESSION_INDICATOR,
+				referenceIdStr,
+				input);
 	}
 }

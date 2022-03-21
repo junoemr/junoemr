@@ -23,6 +23,7 @@
 package org.oscarehr.integration.ringcentral.api.input;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import oscar.util.ConversionUtils;
 
@@ -34,6 +35,7 @@ import java.util.Map;
 @Data
 public class RingCentralMessageUpdateInput
 {
+	@JsonProperty("readStatus")
 	private String readStatus;
 
 	@JsonIgnore

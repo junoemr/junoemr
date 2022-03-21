@@ -28,7 +28,11 @@ import org.oscarehr.fax.exception.FaxIntegrationException;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 public class RingCentralApiErrorHandler implements ResponseErrorHandler
 {
@@ -41,18 +45,22 @@ public class RingCentralApiErrorHandler implements ResponseErrorHandler
 	@Override
 	public void handleError(ClientHttpResponse response) throws IOException
 	{
+		String errorString = new BufferedReader(
+				new InputStreamReader(response.getBody(), StandardCharsets.UTF_8))
+				.lines()
+				.collect(Collectors.joining("\n"));
+
+		String errorMessage = "[" + response.getStatusCode().value() + "] "
+				+ response.getStatusCode().getReasonPhrase() + ":\n" + errorString;
+
 		if(response.getStatusCode().is5xxServerError())
 		{
 			// handle server errors
-			throw new FaxApiConnectionException("Api responded with an internal error code: [" + response.getStatusCode().value() + "] "
-					+ response.getStatusCode().getReasonPhrase());
+			throw new FaxApiConnectionException(errorMessage);
 		}
 		else if(response.getStatusCode().is4xxClientError())
 		{
 			// handle client errors
-			String errorMessage = "[" + response.getStatusCode().value() + "] "
-					+ response.getStatusCode().getReasonPhrase();
-
 			switch(response.getStatusCode())
 			{
 				case NOT_FOUND:
@@ -60,15 +68,15 @@ public class RingCentralApiErrorHandler implements ResponseErrorHandler
 					// something wrong with the system, this is a real error
 					throw new FaxIntegrationException(errorMessage);
 				}
-				case UNAUTHORIZED:
-				{
-					// connection issue, can be rectified. faxes probably can be tried again
-					throw new FaxApiConnectionException(errorMessage);
-				}
-				default:
+				case BAD_REQUEST:
 				{
 					// validation errors etc.
 					throw new FaxApiValidationException(errorMessage);
+				}
+				default:
+				{
+					// connection issue, can be rectified. faxes probably can be tried again
+					throw new FaxApiConnectionException(errorMessage);
 				}
 			}
 		}
