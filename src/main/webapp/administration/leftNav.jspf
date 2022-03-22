@@ -934,10 +934,11 @@ OscarProperties props = OscarProperties.getInstance();
 							<security:oscarSec roleName="<%=roleName$%>" objectName="_admin" rights="r" reverse="<%=false%>">
 								<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/web/legacyFaxConfiguration.jsp" >Fax Configuration</a></li>
 							</security:oscarSec>
-							<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/web/legacyFaxSendReceive.jsp" >Fax Sent/Received</a></li>
+							<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/web/legacyFaxInbox.jsp" >Fax Inbox</a></li>
+							<li><a href="javascript:void(0);" class="xlink" rel="${ctx}/web/legacyFaxOutbox.jsp" >Fax Outbox</a></li>
 						</ul>
 					</div>
-				</div>		
+				</div>
 </security:oscarSec>
 
 <!-- #SYSTEM REPORTS-->
