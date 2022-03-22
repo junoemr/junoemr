@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(name="FaxOAuthServlet",description="Ringcentral OAuth servlet", value="/oauth",loadOnStartup = 1)
+@WebServlet(name="FaxOAuthServlet",description="Ringcentral OAuth servlet", value="/fax/ringcentral/oauth", loadOnStartup = 1)
 public class RingCentralAuthServlet extends AbstractAuthorizationCodeServlet
 {
 	@Override

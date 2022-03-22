@@ -48,7 +48,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-@WebServlet(name="FaxOAuthRedirectServlet",description="Ringcentral OAuth redirect servlet", value="/fax_redirect",loadOnStartup = 1)
+@WebServlet(name="FaxOAuthRedirectServlet",description="Ringcentral OAuth redirect servlet", value="/fax/ringcentral/redirect", loadOnStartup = 1)
 public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbackServlet
 {
 	private static Logger logger = MiscUtils.getLogger();
@@ -73,7 +73,7 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 		List<FaxAccount> faxAccounts = faxAccountDao.findByLoginId(FaxProvider.RINGCENTRAL, String.valueOf(result.getId()));
 
 		String contextPath = req.getContextPath();
-		String redirectPath = contextPath + "/oauth";
+		String redirectPath = contextPath + "/fax/ringcentral/oauth";
 		// Per library documentation, this should redirect back to the AuthServlet onSuccess
 		// The Oauth servlet will then redirect us back to the fax admin page
 		try

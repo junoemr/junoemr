@@ -211,7 +211,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 
 			ctrl.toRingCentralLogin = () =>
 			{
-				location.href = "../oauth"		// TODO: figure out how to bind a better name later, ie: /fax/ringcentral/oauth
+				location.href = "../fax/ringcentral/oauth";
 			}
 
 		}
