@@ -25,6 +25,7 @@ package org.oscarehr.dataMigration.model.common;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 public class PhoneNumberModelTest
@@ -108,5 +109,40 @@ public class PhoneNumberModelTest
 	{
 		PhoneNumberModel phoneNumber = PhoneNumberModel.of("2505557878");
 		assertEquals("(250)555-7878", phoneNumber.getNumberFormattedHL7());
+	}
+
+	@Test
+	public void getNumber11DigitsOnly_Null()
+	{
+		PhoneNumberModel phoneNumber = new PhoneNumberModel();
+		assertFalse(phoneNumber.getNumber11DigitsOnly().isPresent());
+	}
+
+	@Test
+	public void getNumber11DigitsOnly_shortNumber()
+	{
+		PhoneNumberModel phoneNumber = PhoneNumberModel.of("1234567");
+		assertFalse(phoneNumber.getNumber11DigitsOnly().isPresent());
+	}
+
+	@Test
+	public void getNumber11DigitsOnly_longNumber()
+	{
+		PhoneNumberModel phoneNumber = PhoneNumberModel.of("123456789012");
+		assertFalse(phoneNumber.getNumber11DigitsOnly().isPresent());
+	}
+
+	@Test
+	public void getNumber11DigitsOnly_10digitValid()
+	{
+		PhoneNumberModel phoneNumber = PhoneNumberModel.of("1234567890");
+		assertEquals("11234567890", phoneNumber.getNumber11DigitsOnly().orElse(null));
+	}
+
+	@Test
+	public void getNumber11DigitsOnly_11digitValid()
+	{
+		PhoneNumberModel phoneNumber = PhoneNumberModel.of("12345678901");
+		assertEquals("12345678901", phoneNumber.getNumber11DigitsOnly().orElse(null));
 	}
 }

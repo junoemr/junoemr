@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.fax.FaxStatus;
 import org.oscarehr.fax.converter.FaxOutboundToModelConverter;
 import org.oscarehr.fax.dao.FaxAccountDao;
@@ -79,8 +80,8 @@ public class FaxUploadService
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties props = OscarProperties.getInstance();
 
-	private static HashMap<Long, Integer> faxAttemptCounterMap = new HashMap<>();
-	private static int MAX_SEND_COUNT = Integer.parseInt(props.getProperty("fax.max_send_attempts", DEFAULT_MAX_SEND_COUNT));
+	private static final HashMap<Long, Integer> faxAttemptCounterMap = new HashMap<>();
+	private static final int MAX_SEND_COUNT = Integer.parseInt(props.getProperty("fax.max_send_attempts", DEFAULT_MAX_SEND_COUNT));
 
 	@Autowired
 	private ProviderDataDao providerDataDao;
@@ -133,6 +134,11 @@ public class FaxUploadService
 	 */
 	public FaxOutboxTransferOutbound queueAndSendFax(String providerId, Integer demographicId, String faxNumber, FaxFileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
 	{
+		return queueAndSendFax(providerId, demographicId, PhoneNumberModel.of(faxNumber, PhoneNumberModel.PHONE_TYPE.FAX), fileType, fileToFax);
+	}
+
+	public FaxOutboxTransferOutbound queueAndSendFax(String providerId, Integer demographicId, PhoneNumberModel faxNumber, FaxFileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
+	{
 		FaxAccount faxAccount = faxAccountService.getSystemActiveFaxAccount();
 		return queueAndSendFax(faxAccount, providerId, demographicId, faxNumber, fileType, fileToFax);
 	}
@@ -141,7 +147,7 @@ public class FaxUploadService
 	 * Send a fax with the given fax account
 	 * @throws IOException
 	 */
-	public FaxOutboxTransferOutbound queueAndSendFax(FaxAccount faxAccount, String providerId, Integer demographicId, String faxNumber, FaxFileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
+	public FaxOutboxTransferOutbound queueAndSendFax(FaxAccount faxAccount, String providerId, Integer demographicId, PhoneNumberModel faxNumber, FaxFileType fileType, GenericFile fileToFax) throws IOException, InterruptedException
 	{
 		FaxOutboxTransferOutbound transfer;
 		// check for enabled fax routes
@@ -199,7 +205,7 @@ public class FaxUploadService
 					faxOutbound.getProviderNo(),
 					faxOutbound.getDemographicNo(),
 					faxOutbound.getFaxAccount(),
-					faxOutbound.getSentTo(),
+					PhoneNumberModel.of(faxOutbound.getSentTo(), PhoneNumberModel.PHONE_TYPE.FAX),
 					faxOutbound.getFileType(),
 					fileToResend);
 		}
@@ -382,15 +388,17 @@ public class FaxUploadService
 	 * @return - the fax objects that were added
 	 * @throws IOException - if a fax file cannot be moved to the pending folder
 	 */
-	private FaxOutbound queueNewFax(String providerId, Integer demographicId, FaxAccount faxAccount, String faxNumber,
+	private FaxOutbound queueNewFax(String providerId, Integer demographicId, FaxAccount faxAccount, PhoneNumberModel faxNumber,
 	                               FaxFileType fileType, GenericFile fileToFax) throws IOException
 	{
 		ProviderData provider = providerDataDao.find(providerId);
+		String sendTo = faxNumber.getNumber11DigitsOnly()
+				.orElseThrow(() -> new FaxNumberException("Invalid Fax Number: " + faxNumber, "fax.exception.invalidFaxNumber"));
 
 		FaxOutbound faxOutbound = new FaxOutbound();
 		faxOutbound.setStatusQueued();
 		faxOutbound.setFaxAccount(faxAccount);
-		faxOutbound.setSentTo(faxNumber);
+		faxOutbound.setSentTo(sendTo);
 		faxOutbound.setExternalAccountType(faxAccount.getIntegrationType());
 		faxOutbound.setExternalAccountId(faxAccount.getLoginId());
 		faxOutbound.setFileType(fileType);
