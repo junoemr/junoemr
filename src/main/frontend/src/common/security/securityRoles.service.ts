@@ -33,10 +33,18 @@ angular.module("Common.Security").service("securityRolesService", [
 	{
 		const service = this;
 		service.rolesData = null as UserSecurityRolesTransfer;
+		service.isLoaded = false;
 
 		service.loadUserRoles = async (): Promise<void> =>
 		{
+			service.isLoaded = false;
 			service.rolesData = await securityApiService.getCurrentUserSecurityRoles();
+			service.isLoaded = true;
+		}
+
+		service.isReady = () =>
+		{
+			return service.isLoaded;
 		}
 
 		/**
