@@ -162,6 +162,12 @@ public class FaxAccountService
 		return faxAccountDao.find(id).isIntegrationEnabled();
 	}
 
+	public List<String> getAccountCoverLetterOptions(Long id)
+	{
+		FaxAccountProvider accountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccountDao.find(id));
+		return accountProvider.getCoverLetterOptions();
+	}
+
 	public FaxAccountTransferOutbound createFaxAccount(FaxAccountCreateInput createInput)
 	{
 		FaxAccount faxAccount = faxAccountCreateToEntityConverter.convert(createInput);

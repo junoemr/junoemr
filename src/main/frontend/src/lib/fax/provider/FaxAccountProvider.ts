@@ -8,4 +8,6 @@ export default interface FaxAccountProvider
 	passwordFieldValidation(): any //todo validations typing
 	outboundEmailFieldValidation(): any
 	outboundReturnFaxNoFieldValidation(): any
+
+	getCoverLetterOptions(): Promise<object[]>
 }

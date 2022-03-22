@@ -51,5 +51,34 @@ export default class SRFaxAccountProvider implements FaxAccountProvider
 			Juno.Validations.validationFieldRequired(this.faxAccount, "faxNumber"));
 	}
 
+	getCoverLetterOptions(): Promise<object[]>
+	{
+		return new Promise((resolve, reject) =>
+		{
+			resolve([
+				{
+					label: "None",
+					value: "None",
+				},
+				{
+					label: "Basic",
+					value: "Basic",
+				},
+				{
+					label: "Standard",
+					value: "Standard",
+				},
+				{
+					label: "Company",
+					value: "Company",
+				},
+				{
+					label: "Personal",
+					value: "Personal",
+				},
+			]);
+		});
+	}
+
 
 }

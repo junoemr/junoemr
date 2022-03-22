@@ -85,4 +85,9 @@ export default class FaxAccountService
 		return this.faxAccountToModelConverter.convert(
 			(await this.faxAccountApi.getActiveFaxAccount()).data.body);
 	}
+
+	public async getCoverLetterOptions(id: number): Promise<string[]>
+	{
+		return (await this.faxAccountApi.getCoverLetterOptions(id)).data.body;
+	}
 }

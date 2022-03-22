@@ -12,7 +12,7 @@ export default class FaxAccountProviderFactory
 		{
 			case FaxAccountType.Ringcentral: return new RingCentralAccountProvider(faxAccount);
 			case FaxAccountType.Srfax: return new SRFaxAccountProvider(faxAccount);
-			default: return null;
+			default: throw "Invalid fax account type: " + faxAccount.accountType;
 		}
 	}
 }

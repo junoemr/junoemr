@@ -23,14 +23,16 @@
 
 package org.oscarehr.integration.SRFax;
 
+import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.provider.FaxAccountProvider;
 import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
 import org.oscarehr.integration.SRFax.api.result.GetUsageResult;
 import org.oscarehr.integration.SRFax.api.resultWrapper.ListWrapper;
-import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.provider.FaxAccountProvider;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 public class SRFaxAccountProvider implements FaxAccountProvider
 {
@@ -58,5 +60,11 @@ public class SRFaxAccountProvider implements FaxAccountProvider
 
 		ListWrapper<GetUsageResult> result = apiConnector.getFaxUsageByRange(currentDateStr, currentDateStr, null);
 		return (result != null && result.isSuccess());
+	}
+
+	@Override
+	public List<String> getCoverLetterOptions()
+	{
+		return Arrays.asList("None", "Basic", "Standard", "Company", "Personal");
 	}
 }

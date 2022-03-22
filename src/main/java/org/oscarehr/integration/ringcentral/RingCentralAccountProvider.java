@@ -28,6 +28,9 @@ import org.oscarehr.fax.provider.FaxAccountProvider;
 import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RingCentralAccountProvider implements FaxAccountProvider
 {
 	protected final FaxAccount faxAccount;
@@ -44,5 +47,11 @@ public class RingCentralAccountProvider implements FaxAccountProvider
 	{
 		RingCentralAccountInfoResult accountInfo = ringcentralApiConnector.getAccountInfo(faxAccount.getLoginId());
 		return (accountInfo != null);
+	}
+
+	@Override
+	public List<String> getCoverLetterOptions()
+	{
+		return new ArrayList<>(); //TODO
 	}
 }

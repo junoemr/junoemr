@@ -22,6 +22,8 @@
  */
 package org.oscarehr.fax.provider;
 
+import java.util.List;
+
 public interface FaxAccountProvider
 {
 	/**
@@ -29,4 +31,6 @@ public interface FaxAccountProvider
 	 * @return true if the account is able to make a successful connection to the external api. false otherwise.
 	 */
 	boolean testConnectionStatus();
+
+	List<String> getCoverLetterOptions();
 }

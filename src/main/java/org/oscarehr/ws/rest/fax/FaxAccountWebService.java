@@ -162,6 +162,15 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	}
 
 	@GET
+	@Path("/{id}/coverLetterOptions")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestSearchResponse<String> getCoverLetterOptions(@PathParam("id") Long id)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
+		return RestSearchResponse.successResponseOnePage(faxAccountService.getAccountCoverLetterOptions(id));
+	}
+
+	@GET
 	@Path("/active")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResponse<FaxAccountTransferOutbound> getActiveFaxAccount()

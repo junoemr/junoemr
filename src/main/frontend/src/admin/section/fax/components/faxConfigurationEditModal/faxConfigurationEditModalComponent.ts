@@ -32,33 +32,11 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-			ctrl.coverLetterOptions = [
-				{
-					label: "None",
-					value: null,
-				},
-				{
-					label: "Basic",
-					value: "Basic",
-				},
-				{
-					label: "Standard",
-					value: "Standard",
-				},
-				{
-					label: "Company",
-					value: "Company",
-				},
-				{
-					label: "Personal",
-					value: "Personal",
-				},
-			];
-
+			ctrl.coverLetterOptions = [];
 			ctrl.validations = {};
 			ctrl.initialSave = false;
 
-			ctrl.$onInit = () =>
+			ctrl.$onInit = async () =>
 			{
 				ctrl.componentStyle = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 				if (ctrl.resolve.faxAccount)
@@ -89,6 +67,12 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				}
 
 				ctrl.faxAccountProvider = FaxAccountProviderFactory.creatAccountProvider(ctrl.faxAccount);
+				ctrl.coverLetterOptions = await ctrl.faxAccountProvider.getCoverLetterOptions();
+				if(!ctrl.faxAccount.coverLetterOption && ctrl.coverLetterOptions.length > 0)
+				{
+					ctrl.faxAccount.coverLetterOption = ctrl.coverLetterOptions[0].value;
+				}
+
 				ctrl.setupValidations();
 			};
 
