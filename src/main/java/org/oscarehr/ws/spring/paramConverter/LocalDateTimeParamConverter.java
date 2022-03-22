@@ -20,25 +20,26 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.exception;
+package org.oscarehr.ws.spring.paramConverter;
+
+import oscar.util.ConversionUtils;
+
+import javax.ws.rs.ext.ParamConverter;
+import java.time.LocalDateTime;
 
 /**
- * Indicate that something failed when connecting to the fax api.
+ * for serializing/deserializing LocalDateTime object as a @QueryParam
+ * maybe this can be removed with a newer version of something
  */
-public class FaxApiConnectionException extends FaxException
+public class LocalDateTimeParamConverter implements ParamConverter<LocalDateTime>
 {
-	public FaxApiConnectionException(String message)
+	public LocalDateTime fromString(String value)
 	{
-		super(message);
+		return ConversionUtils.toLocalDateTime(value, ConversionUtils.DEFAULT_TS_PATTERN);
 	}
 
-	public FaxApiConnectionException(Exception e)
+	public String toString(LocalDateTime value)
 	{
-		super(e);
-	}
-
-	public FaxApiConnectionException(Exception e, String userMessageResourceKey)
-	{
-		super(e, userMessageResourceKey);
+		return ConversionUtils.toDateTimeString(value, ConversionUtils.DEFAULT_TS_PATTERN);
 	}
 }

@@ -115,6 +115,8 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 
 					ctrl.nextPushTime = await ctrl.faxOutboxService.getNextPushTime();
 					ctrl.masterFaxEnabledOutbound = await systemPreferenceService.isPreferenceEnabled("masterFaxEnabledOutbound", ctrl.masterFaxEnabledOutbound);
+
+					ctrl.loadOutboxItems();
 				}
 				catch (error)
 				{

@@ -69,10 +69,13 @@
 						<tbody>
 						<tr ng-repeat="faxAccount in $ctrl.faxAccountList">
 							<td class="w-32">
-								<juno-check-box ng-model="$ctrl.faxAccountSelectStates[faxAccount.id]"
-								                readonly="faxAccount.equals($ctrl.activeAccount)"
-								                change="$ctrl.setActiveAccount(value, faxAccount)">
-								</juno-check-box>
+								<div class="flex-column justify-content-center h-100">
+									<juno-check-box ng-model="$ctrl.faxAccountSelectStates[faxAccount.id]"
+									                readonly="faxAccount.equals($ctrl.activeAccount)"
+									                class="round-checkbox"
+									                change="$ctrl.setActiveAccount(value, faxAccount)">
+									</juno-check-box>
+								</div>
 							</td>
 							<td data-title="'Account Name'">
 								<div class="flex-column">
@@ -133,13 +136,20 @@
 	<div class="fax-config-footer">
 		<panel no-header="true" ng-if="!$ctrl.masterFaxDisabled">
 			<panel-body>
-				<juno-button class="w-128 d-block m-t-4" click='$ctrl.toRingCentralLogin()'>
-					Login with RingCentral
-				</juno-button>
-				<button type="button" class="btn btn-primary"
-				        ng-click="$ctrl.connectNewSRFaxAccount()">
-					<bean:message bundle="ui" key="admin.fax.acct.btn-connectSRFax"/>
-				</button>
+				<div class="grid-flow-column grid-gap-8 w-256">
+					<juno-button class="w-128 d-block"
+					             click="$ctrl.connectNewSRFaxAccount()"
+					             button-color="$ctrl.JUNO_BUTTON_COLOR.DEFAULT"
+					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
+						<bean:message bundle="ui" key="admin.fax.acct.btn-connectSRFax"/>
+					</juno-button>
+					<juno-button class="w-128 d-block"
+					             click='$ctrl.toRingCentralLogin()'
+					             button-color="$ctrl.JUNO_BUTTON_COLOR.DEFAULT"
+					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
+						<bean:message bundle="ui" key="admin.fax.acct.btn-connectRingCentral"/>
+					</juno-button>
+				</div>
 			</panel-body>
 		</panel>
 	</div>

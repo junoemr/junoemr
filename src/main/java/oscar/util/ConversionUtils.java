@@ -363,6 +363,15 @@ public class ConversionUtils {
 		return toDateTimeString(zonedDateTime, DateTimeFormatter.ISO_DATE_TIME);
 	}
 
+	public static String toNullableDateTimeString(ZonedDateTime zonedDateTime, DateTimeFormatter formatter)
+	{
+		if(zonedDateTime == null)
+		{
+			return null;
+		}
+		return toDateTimeString(zonedDateTime, formatter);
+	}
+
 	public static String toDateTimeString(ZonedDateTime zonedDateTime, DateTimeFormatter formatter)
 	{
 		return zonedDateTime.format(formatter);

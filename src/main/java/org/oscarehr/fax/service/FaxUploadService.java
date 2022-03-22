@@ -33,6 +33,7 @@ import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
 import org.oscarehr.fax.exception.FaxException;
+import org.oscarehr.fax.exception.FaxIntegrationException;
 import org.oscarehr.fax.exception.FaxNumberException;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxFileType;
@@ -40,6 +41,7 @@ import org.oscarehr.fax.model.FaxNotificationStatus;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.model.FaxStatusCombined;
 import org.oscarehr.fax.model.FaxStatusInternal;
+import org.oscarehr.fax.model.FaxStatusRemote;
 import org.oscarehr.fax.provider.FaxProviderFactory;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.result.FaxStatusResult;
@@ -274,7 +276,8 @@ public class FaxUploadService
 				GenericFile fileToSend;
 				try
 				{
-					fileToSend = FileFactory.getOutboundUnsentFaxFile(queuedFax.getFileName());
+					// queued fax files live in the pending folder
+					fileToSend = FileFactory.getOutboundPendingFaxFile(queuedFax.getFileName());
 				}
 				catch(IOException e)
 				{
@@ -312,12 +315,12 @@ public class FaxUploadService
 	public void requestPendingStatusUpdates(FaxAccount faxAccount)
 	{
 		FaxUploadProvider uploadProvider = FaxProviderFactory.createFaxUploadProvider(faxAccount);
-		List<String> remoteFinalStatuses = uploadProvider.getRemoteFinalStatusIndicators();
 
 		FaxOutboundCriteriaSearch criteriaSearch = new FaxOutboundCriteriaSearch();
 		criteriaSearch.setStatus(FaxStatusInternal.SENT); // only check records with a local sent status
+		criteriaSearch.setRemoteStatus(FaxStatusRemote.PENDING); // only check records that have not completed remotely
 		criteriaSearch.setArchived(false); // ignore archived records
-		criteriaSearch.setExternalStatusList(remoteFinalStatuses, false);
+		criteriaSearch.setFaxAccountId(faxAccount.getId()); // limit results to specified account
 
 		List<FaxOutbound> pendingList = faxOutboundDao.criteriaSearch(criteriaSearch);
 
@@ -350,10 +353,14 @@ public class FaxUploadService
 					faxOutboundDao.merge(faxOutbound);
 					logger.info("Updated Status to: " + remoteSentStatus);
 				}
+				/* Don't change fax status if there is an error here. The fax has been sent to the remote service successfully,
+				 * we just don't know what remote state it's in. */
+				catch (FaxApiConnectionException e)
+				{
+					logger.error("Api connection error", e);
+				}
 				catch (Exception e)
 				{
-					faxOutbound.setStatusError();
-					faxOutbound.setStatusMessage(e.getMessage());
 					logger.error("Unknown faxing exception", e);
 				}
 			}
@@ -422,6 +429,7 @@ public class FaxUploadService
 				{
 					logStatus = LogConst.STATUS_SUCCESS;
 					logData = "Faxed To: " + faxOutbound.getSentTo();
+					faxOutbound.setRemoteStatusPending();
 					fileToFax.moveToOutgoingFaxSent();
 				}
 				else
@@ -446,12 +454,13 @@ public class FaxUploadService
 			faxOutbound.setStatusMessage(e.getUserFriendlyMessage());
 
 			// if the maximum sent attempts has been hit, set the error status.
-			if(faxAttemptCounterMap.get(faxOutbound.getId()) >= MAX_SEND_COUNT)
+			if(faxAttemptCounterMap.containsKey(faxOutbound.getId())
+					&& faxAttemptCounterMap.get(faxOutbound.getId()) >= MAX_SEND_COUNT)
 			{
 				faxOutbound.setStatusError();
 			}
 		}
-		catch(FaxApiValidationException e)
+		catch(FaxApiValidationException | FaxIntegrationException e)
 		{
 			logger.warn("Fax API failure: " + e.getMessage());
 			logData = e.getMessage();

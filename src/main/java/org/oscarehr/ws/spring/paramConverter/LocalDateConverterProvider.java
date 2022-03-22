@@ -20,25 +20,28 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.exception;
+package org.oscarehr.ws.spring.paramConverter;
 
-/**
- * Indicate that something failed when connecting to the fax api.
- */
-public class FaxApiConnectionException extends FaxException
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
+import javax.ws.rs.ext.Provider;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.time.LocalDate;
+
+@Provider
+public class LocalDateConverterProvider implements ParamConverterProvider
 {
-	public FaxApiConnectionException(String message)
-	{
-		super(message);
-	}
 
-	public FaxApiConnectionException(Exception e)
-	{
-		super(e);
-	}
+	private final ParamConverter converter = new LocalDateParamConverter();
 
-	public FaxApiConnectionException(Exception e, String userMessageResourceKey)
+	@Override
+	public <T> ParamConverter<T> getConverter(Class<T> rawType,
+	                                          Type genericType,
+	                                          Annotation[] annotations)
 	{
-		super(e, userMessageResourceKey);
+		if(!rawType.equals(LocalDate.class)) return null;
+
+		return converter;
 	}
 }

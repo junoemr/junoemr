@@ -27,20 +27,33 @@ import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.AuthorizationCodeResponseUrl;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.servlet.auth.oauth2.AbstractAuthorizationCodeCallbackServlet;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.log4j.Logger;
+import org.oscarehr.fax.dao.FaxAccountDao;
+import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.provider.FaxProvider;
+import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.util.List;
 
 @WebServlet(name="FaxOAuthRedirectServlet",description="Ringcentral OAuth redirect servlet", value="/fax_redirect",loadOnStartup = 1)
 public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbackServlet
 {
 	private static Logger logger = MiscUtils.getLogger();
+	@Autowired
+	private FaxAccountDao faxAccountDao;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException
@@ -54,9 +67,30 @@ public class RingCentralRedirectServlet extends AbstractAuthorizationCodeCallbac
 	protected void onSuccess(HttpServletRequest req, HttpServletResponse resp, Credential credential)
 		throws ServletException, IOException
 	{
+		RingCentralApiConnector apiConnector = new RingCentralApiConnector();
+		RingCentralAccountInfoResult result = apiConnector.getAccountInfo();
+
+		List<FaxAccount> faxAccounts = faxAccountDao.findByLoginId(FaxProvider.RINGCENTRAL, String.valueOf(result.getId()));
+
 		String contextPath = req.getContextPath();
+		String redirectPath = contextPath + "/oauth";
 		// Per library documentation, this should redirect back to the AuthServlet onSuccess
-		resp.sendRedirect(contextPath + "/oauth");
+		// The Oauth servlet will then redirect us back to the fax admin page
+		try
+		{
+			URIBuilder redirect = new URIBuilder(redirectPath);
+			if(faxAccounts.isEmpty())
+			{
+				// new account setup parameters
+				redirect.addParameter("type", FaxProvider.RINGCENTRAL.name());
+				redirect.addParameter("accountId", result.getId().toString());
+			}
+			resp.sendRedirect(redirect.toString());
+		}
+		catch (URISyntaxException e)
+		{
+			throw new MalformedURLException(e.getMessage());
+		}
 	}
 
 	@Override

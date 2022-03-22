@@ -44,6 +44,7 @@ import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -128,10 +129,10 @@ public class FaxDownloadService
 				FaxDownloadProvider faxDownloadProvider = FaxProviderFactory.createFaxDownloadProvider(faxAccount);
 
 				// for each new fax to get, call api and request document.
-				String faxContent = faxDownloadProvider.retrieveFax(referenceIdStr);
+				InputStream faxContentStream = faxDownloadProvider.retrieveFax(referenceIdStr);
 
 				// save document to input stream
-				FaxInbound faxInbound = incomingFaxService.saveFaxDocument(faxAccount, result, faxContent);
+				FaxInbound faxInbound = incomingFaxService.saveFaxDocument(faxAccount, result, faxContentStream);
 				inboundId = String.valueOf(faxInbound.getId());
 				logStatus = LogConst.STATUS_SUCCESS;
 

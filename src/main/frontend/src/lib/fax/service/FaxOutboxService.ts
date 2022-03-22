@@ -33,8 +33,8 @@ export default class FaxOutboxService
 		let transfer = (await this.faxOutboundApi.getOutbox(
 			params.page,
 			params.perPage,
-			params.endDate ? Juno.Common.Util.formatMomentDate(params.endDate) : null,
-			params.startDate ? Juno.Common.Util.formatMomentDate(params.startDate) : null,
+			(params.endDate && params.endDate.isValid()) ? Juno.Common.Util.formatMomentDate(params.endDate) : null,
+			(params.startDate && params.startDate.isValid()) ? Juno.Common.Util.formatMomentDate(params.startDate) : null,
 			params.faxAccount?.id,
 			params.combinedStatus as any,
 			params.archived,

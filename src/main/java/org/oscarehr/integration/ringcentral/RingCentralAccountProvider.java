@@ -20,25 +20,29 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.exception;
 
-/**
- * Indicate that something failed when connecting to the fax api.
- */
-public class FaxApiConnectionException extends FaxException
+package org.oscarehr.integration.ringcentral;
+
+import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.provider.FaxAccountProvider;
+import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
+
+public class RingCentralAccountProvider implements FaxAccountProvider
 {
-	public FaxApiConnectionException(String message)
+	protected final FaxAccount faxAccount;
+	protected final RingCentralApiConnector ringcentralApiConnector;
+
+	public RingCentralAccountProvider(FaxAccount faxAccount)
 	{
-		super(message);
+		this.faxAccount = faxAccount;
+		this.ringcentralApiConnector = new RingCentralApiConnector();
 	}
 
-	public FaxApiConnectionException(Exception e)
+	@Override
+	public boolean testConnectionStatus()
 	{
-		super(e);
-	}
-
-	public FaxApiConnectionException(Exception e, String userMessageResourceKey)
-	{
-		super(e, userMessageResourceKey);
+		RingCentralAccountInfoResult accountInfo = ringcentralApiConnector.getAccountInfo(faxAccount.getLoginId());
+		return (accountInfo != null);
 	}
 }

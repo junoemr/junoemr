@@ -25,6 +25,7 @@ package org.oscarehr.fax.oauth;
 import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.extensions.servlet.auth.oauth2.AbstractAuthorizationCodeServlet;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +39,14 @@ public class RingCentralAuthServlet extends AbstractAuthorizationCodeServlet
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException
 	{
 		String contextPath = req.getContextPath();
-		resp.sendRedirect(contextPath + "/web/#!/admin/faxConfig");
+		String redirectPath = contextPath + "/web/#!/admin/faxConfig";
+
+		if (req.getQueryString() != null)
+		{
+			redirectPath += "?" + req.getQueryString();
+		}
+
+		resp.sendRedirect(redirectPath);
 	}
 
 	@Override

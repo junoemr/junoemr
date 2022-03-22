@@ -20,25 +20,28 @@
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.ws.spring.paramConverter;
 
-package org.oscarehr.integration.ringcentral;
+import javax.ws.rs.ext.ParamConverter;
+import javax.ws.rs.ext.ParamConverterProvider;
+import javax.ws.rs.ext.Provider;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 
-import org.oscarehr.fax.model.FaxAccount;
-import org.oscarehr.fax.provider.FaxAccountProvider;
-
-public class RingcentralAccountProvider implements FaxAccountProvider
+@Provider
+public class LocalDateTimeConverterProvider implements ParamConverterProvider
 {
-	protected FaxAccount faxAccount;
 
-	public RingcentralAccountProvider(FaxAccount faxAccount)
-	{
-		this.faxAccount = faxAccount;
-	}
+	private final ParamConverter converter = new LocalDateTimeParamConverter();
 
 	@Override
-	public boolean testConnectionStatus()
+	public <T> ParamConverter<T> getConverter(Class<T> rawType,
+	                                          Type genericType,
+	                                          Annotation[] annotations)
 	{
-		// TODO
-		return false;
+		if(!rawType.equals(LocalDateTime.class)) return null;
+
+		return converter;
 	}
 }

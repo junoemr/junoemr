@@ -20,25 +20,51 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.exception;
+package org.oscarehr.integration.ringcentral.api.result;
 
-/**
- * Indicate that something failed when connecting to the fax api.
- */
-public class FaxApiConnectionException extends FaxException
+public interface RingCentralResult
 {
-	public FaxApiConnectionException(String message)
+	enum Availability
 	{
-		super(message);
+		Alive,
+		Deleted,
+		Purged,
 	}
 
-	public FaxApiConnectionException(Exception e)
-	{
-		super(e);
+	enum ReadStatus {
+		Read,
+		Unread,
 	}
 
-	public FaxApiConnectionException(Exception e, String userMessageResourceKey)
-	{
-		super(e, userMessageResourceKey);
+	enum Priority {
+		High,
+		Normal,
+	}
+
+	enum Direction {
+		Inbound,
+		Outbound,
+	}
+
+	enum MessageStatus {
+		Queued,
+		Sent,
+		Delivered,
+		DeliveryFailed,
+		SendingFailed,
+		Received,
+	}
+
+	enum MessageType {
+		Fax,
+		SMS,
+		VoiceMail,
+		Pager,
+		Text,
+	}
+
+	enum FaxResolution {
+		High,
+		Low,
 	}
 }

@@ -24,54 +24,66 @@
 package org.oscarehr.integration.ringcentral;
 
 import org.oscarehr.common.io.GenericFile;
-import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxOutbound;
 import org.oscarehr.fax.provider.FaxUploadProvider;
 import org.oscarehr.fax.result.FaxStatusResult;
-import org.oscarehr.integration.ringcentral.api.RingcentralApiConnector;
+import org.oscarehr.fax.service.FaxUploadService;
+import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
+import org.oscarehr.integration.ringcentral.api.input.RingCentralSendFaxInput;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralSendFaxResult;
 
 import java.util.List;
 
-public class RingcentralUploadProvider implements FaxUploadProvider
-{
-	protected FaxAccount faxAccount;
+import static org.oscarehr.integration.ringcentral.api.RingCentralApiConnector.CURRENT_SESSION_INDICATOR;
 
-	public RingcentralUploadProvider(FaxAccount faxAccount)
+public class RingCentralUploadProvider implements FaxUploadProvider
+{
+	protected final FaxAccount faxAccount;
+	protected final RingCentralApiConnector ringcentralApiConnector;
+
+	public RingCentralUploadProvider(FaxAccount faxAccount)
 	{
 		this.faxAccount = faxAccount;
+		this.ringcentralApiConnector = new RingCentralApiConnector();
 	}
 
 	@Override
 	public FaxOutbound sendQueuedFax(FaxOutbound faxOutbound, GenericFile file) throws Exception
 	{
-		//TODO
-		throw new RuntimeException("not implemented");
+		RingCentralSendFaxInput input = new RingCentralSendFaxInput();
+		input.setAttachment(file);
+		input.setTo(new String[]{faxOutbound.getSentTo()});
+
+		RingCentralSendFaxResult result = ringcentralApiConnector.sendFax(faxAccount.getLoginId(), CURRENT_SESSION_INDICATOR, input);
+		faxOutbound.setStatusSent();
+		faxOutbound.setStatusMessage(FaxUploadService.STATUS_MESSAGE_IN_TRANSIT);
+		faxOutbound.setExternalStatus(result.getMessageStatus().name());
+		faxOutbound.setExternalReferenceId(result.getId());
+		return faxOutbound;
 	}
 
 	@Override
 	public List<String> getRemoteFinalStatusIndicators()
 	{
-		return RingcentralApiConnector.RESPONSE_STATUSES_FINAL;
+		return RingCentralApiConnector.RESPONSE_STATUSES_FINAL;
 	}
 
 	@Override
 	public boolean isFaxInRemoteSentState(String externalStatus)
 	{
-		return RingcentralApiConnector.RESPONSE_STATUS_DELIVERED.equals(externalStatus);
+		return RingCentralApiConnector.RESPONSE_STATUSES_SUCCESS.contains(externalStatus);
 	}
 
 	@Override
 	public boolean isFaxInRemoteFailedState(String externalStatus)
 	{
-		return RingcentralApiConnector.RESPONSE_STATUSES_FAILED.contains(externalStatus);
+		return RingCentralApiConnector.RESPONSE_STATUSES_FAILED.contains(externalStatus);
 	}
-
 
 	@Override
 	public FaxStatusResult getFaxStatus(FaxOutbound faxOutbound) throws Exception
 	{
-		//TODO
-		throw new FaxApiConnectionException("not implemented");
+		return ringcentralApiConnector.getMessage(faxAccount.getLoginId(), CURRENT_SESSION_INDICATOR, String.valueOf(faxOutbound.getExternalReferenceId()));
 	}
 }
