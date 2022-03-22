@@ -95,6 +95,7 @@
 					<juno-select ng-model="$ctrl.faxAccount.coverLetterOption"
 					             options="$ctrl.coverLetterOptions"
 					             ng-if="$ctrl.faxAccount.enableOutbound"
+					             disabled="!$ctrl.initialized"
 					             title="<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption-tooltip"/>"
 					             label="<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption"/>"
 					             label-position="$ctrl.LABEL_POSITION.LEFT">

@@ -27,9 +27,12 @@ import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxAccountProvider;
 import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralCoverLetterListResult;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralCoverLetterResult;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RingCentralAccountProvider implements FaxAccountProvider
 {
@@ -52,6 +55,9 @@ public class RingCentralAccountProvider implements FaxAccountProvider
 	@Override
 	public List<String> getCoverLetterOptions()
 	{
-		return new ArrayList<>(); //TODO
+		RingCentralCoverLetterListResult result = ringcentralApiConnector.getFaxCoverPageList();
+		return Arrays.stream(result.getRecords())
+				.map(RingCentralCoverLetterResult::getName)
+				.collect(Collectors.toList());
 	}
 }

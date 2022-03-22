@@ -29,6 +29,7 @@ import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageListInpu
 import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageUpdateInput;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralSendFaxInput;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
+import org.oscarehr.integration.ringcentral.api.result.RingCentralCoverLetterListResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageInfoResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralMessageListResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralSendFaxResult;
@@ -83,6 +84,13 @@ public class RingCentralApiConnector extends RESTClient
 	public Optional<Credential> getCredential() throws IOException
 	{
 		return Optional.ofNullable(RingCentralCredentialStore.getCredential(RingCentralCredentialStore.LOCAL_USER_ID));
+	}
+
+	public RingCentralCoverLetterListResult getFaxCoverPageList()
+	{
+		String endpoint = REST_API_BASE + "dictionary/fax-cover-page";
+		String url = buildUrl(DEFAULT_PROTOCOL, endpoint);
+		return doGet(url, getAuthorizationHeaders(), RingCentralCoverLetterListResult.class);
 	}
 
 	public RingCentralAccountInfoResult getAccountInfo()

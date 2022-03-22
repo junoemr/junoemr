@@ -35,6 +35,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 			ctrl.coverLetterOptions = [];
 			ctrl.validations = {};
 			ctrl.initialSave = false;
+			ctrl.initialized = false;
 
 			ctrl.$onInit = async () =>
 			{
@@ -74,6 +75,8 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				}
 
 				ctrl.setupValidations();
+				ctrl.initialized = true;
+				$scope.$apply();
 			};
 
 			ctrl.setupValidations = () =>
