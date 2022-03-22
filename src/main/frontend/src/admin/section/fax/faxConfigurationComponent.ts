@@ -43,10 +43,12 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 
 			ctrl.$onInit = async () =>
 			{
-				// This page is iframed into the classic UI, so we need to load the user roles here in case this gets
-				// rendered as just the component without any of the page wrappers around it which normally take care
-				// of caching the user roles.
-				await securityRolesService.loadUserRoles();
+				// This page is iframed into the classic UI, which doesn't automatically load the security roles.
+				// This check will load them for us if needed.
+				if (!securityRolesService.isReady())
+				{
+					await securityRolesService.loadUserRoles();
+				}
 
 				let responses = await Promise.all([
 					providerService.getMe(),
