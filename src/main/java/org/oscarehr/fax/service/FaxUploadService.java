@@ -275,7 +275,7 @@ public class FaxUploadService
 				GenericFile fileToSend;
 				try
 				{
-					fileToSend = FileFactory.getOutboundUnsentFaxFile(queuedFax.getFileName());
+					fileToSend = FileFactory.getOutboundPendingFaxFile(queuedFax.getFileName());
 				}
 				catch(IOException e)
 				{
@@ -352,8 +352,6 @@ public class FaxUploadService
 				}
 				catch (Exception e)
 				{
-					faxOutbound.setStatusError();
-					faxOutbound.setStatusMessage(e.getMessage());
 					logger.error("Unknown faxing exception", e);
 				}
 			}
