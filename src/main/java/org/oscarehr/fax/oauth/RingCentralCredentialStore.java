@@ -34,9 +34,11 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import lombok.Synchronized;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
+import org.springframework.http.HttpHeaders;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class RingCentralCredentialStore
@@ -131,8 +133,7 @@ public class RingCentralCredentialStore
 	 */
 	public static String makeBasicAuthentication()
 	{
-		String plaintext = String.format("%s:%s", getClientID(), getClientSecret());
-		return Base64.getEncoder().encodeToString(plaintext.getBytes());
+		return HttpHeaders.encodeBasicAuth(getClientID(), getClientSecret(), StandardCharsets.UTF_8);
 	}
 
 	protected static String getUserId()

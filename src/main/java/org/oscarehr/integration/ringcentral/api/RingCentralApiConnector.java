@@ -161,7 +161,7 @@ public class RingCentralApiConnector extends RESTClient
 	protected HttpHeaders getAuthorizationBasicHeaders()
 	{
 		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", MessageFormat.format("Basic {0}", RingCentralCredentialStore.makeBasicAuthentication()));
+		headers.set(HttpHeaders.AUTHORIZATION, MessageFormat.format("Basic {0}", RingCentralCredentialStore.makeBasicAuthentication()));
 
 		return headers;
 	}
@@ -174,7 +174,7 @@ public class RingCentralApiConnector extends RESTClient
 			if(oAuthCredential.isPresent())
 			{
 				HttpHeaders headers = new HttpHeaders();
-				headers.set("Authorization", MessageFormat.format("Bearer {0}", oAuthCredential.get().getAccessToken()));
+				headers.set(HttpHeaders.AUTHORIZATION, MessageFormat.format("Bearer {0}", oAuthCredential.get().getAccessToken()));
 				return headers;
 			}
 			else
