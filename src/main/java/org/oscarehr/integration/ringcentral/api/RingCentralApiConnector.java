@@ -96,7 +96,7 @@ public class RingCentralApiConnector extends RESTClient
 	{
 		String endpoint = REST_API_BASE + "dictionary/fax-cover-page";
 		String url = buildUrl(DEFAULT_PROTOCOL, endpoint);
-		return doGet(url, getAuthorizationHeaders(), RingCentralCoverLetterListResult.class);
+		return doGet(url, getAuthorizationBearerHeaders(), RingCentralCoverLetterListResult.class);
 	}
 
 	public RingCentralAccountInfoResult getAccountInfo()
