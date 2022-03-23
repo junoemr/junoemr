@@ -37,6 +37,7 @@ import org.oscarehr.util.MiscUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Base64;
 
 public class RingCentralCredentialStore
 {
@@ -101,6 +102,17 @@ public class RingCentralCredentialStore
 		return clientId;
 	}
 
+	private static String getClientSecret()
+	{
+		String clientId = System.getenv("FAX.RINGCENTRAL.CLIENT_SECRET");
+		if (clientId == null)
+		{
+			throw new RuntimeException("Missing required env variable $FAX.RINGCENTRAL.CLIENT_SECRET");
+		}
+
+		return clientId;
+	}
+
 	protected static String getRedirectURL()
 	{
 		String clientId = System.getenv("FAX.RINGCENTRAL.REDIRECT_URL");
@@ -110,6 +122,17 @@ public class RingCentralCredentialStore
 		}
 
 		return clientId;
+	}
+
+	/**
+	 * Construct a base64 encoded string of the format client_id:clientSecret.
+	 *
+	 * @return base64 auth string suitable for Authentication: Basic header.
+	 */
+	public static String makeBasicAuthentication()
+	{
+		String plaintext = String.format("%s:%s", getClientID(), getClientSecret());
+		return Base64.getEncoder().encodeToString(plaintext.getBytes());
 	}
 
 	protected static String getUserId()
