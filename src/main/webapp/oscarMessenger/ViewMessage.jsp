@@ -29,8 +29,6 @@
 <%@page import="java.util.Set"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.HashMap"%>
-<%@page import="org.oscarehr.common.model.ResidentOscarMsg"%>
-<%@page import="org.oscarehr.common.dao.ResidentOscarMsgDao"%>
 <%@page import="org.oscarehr.common.model.OscarMsgType"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%
@@ -229,6 +227,20 @@ function fmtOscarMsg() {
     
     return txt;
 
+}
+
+function openJunoSummary(demoId)
+{
+	var url = '../web/#!/record/' + demoId + '/summary';
+	if(window.opener)
+	{
+		// change the previous/main window if possible
+		window.opener.location.href = url;
+	}
+	else
+	{
+		window.open(url, "_blank");
+	}
 }
 
 </script>
@@ -491,7 +503,7 @@ function fmtOscarMsg() {
 								value="<%=demoN%>" /> <a
 								href="javascript:popupViewAttach(700,960,'../demographic/demographiccontrol.jsp?demographic_no=<%=demoID%>&displaymode=edit&dboperation=search_detail')">M</a>
 								
-							<a href="javascript:void(0)" onclick="window.opener.location.href='../web/#/record/<%=demoID%>/summary'">E2</a>
+							<a href="javascript:void(0)" onclick="openJunoSummary('<%=demoID%>')">E2</a>
 							<%
 								//Hide old echart link
 								boolean showOldEchartLink = true;
