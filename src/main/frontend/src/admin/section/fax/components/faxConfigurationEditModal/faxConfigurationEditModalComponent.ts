@@ -7,10 +7,10 @@ import {
 	JUNO_STYLE,
 	LABEL_POSITION
 } from "../../../../../common/components/junoComponentConstants";
-import ToastService from "../../../../../lib/alerts/service/ToastService";
 import {FaxAccountType} from "../../../../../lib/fax/model/FaxAccountType";
 import LoadingQueue from "../../../../../lib/util/LoadingQueue";
 import FaxAccountProviderFactory from "../../../../../lib/fax/provider/FaxAccountProviderFactory";
+import ToastErrorHandler from "../../../../../lib/error/handler/ToastErrorHandler";
 
 angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 	templateUrl: 'src/admin/section/fax/components/faxConfigurationEditModal/faxConfigurationEditModal.jsp',
@@ -24,8 +24,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 		function ($scope, $uibModal)
 		{
 			const ctrl = this;
-			ctrl.faxAccountService = new FaxAccountService();
-			ctrl.toastService = new ToastService();
+			ctrl.faxAccountService = new FaxAccountService(new ToastErrorHandler());
 			ctrl.LoadingQueue = new LoadingQueue();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;
