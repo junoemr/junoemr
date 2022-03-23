@@ -68,8 +68,12 @@ module.exports = {
 			filename: 'legacyFaxConfiguration.jsp'
 		}),
 		new HtmlWebpackPlugin({
-			template: 'raw-loader!./legacyFaxSendReceive.jsp',
-			filename: 'legacyFaxSendReceive.jsp'
+			template: 'raw-loader!./legacyFaxInbox.jsp',
+			filename: 'legacyFaxInbox.jsp'
+		}),
+		new HtmlWebpackPlugin({
+			template: 'raw-loader!./legacyFaxOutbox.jsp',
+			filename: 'legacyFaxOutbox.jsp'
 		}),
 		new HtmlWebpackPlugin({
 			template: 'raw-loader!./Know2actConfiguration.jsp',

@@ -47,6 +47,13 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 
 			ctrl.$onInit = async () =>
 			{
+				// This page is iframed into the classic UI, which doesn't automatically load the security roles.
+				// This check will load them for us if needed.
+				if (!securityRolesService.isReady())
+				{
+					await securityRolesService.loadUserRoles();
+				}
+
 				let responses = await Promise.all([
 					providerService.getMe(),
 					systemPreferenceService.isPreferenceEnabled("masterFaxEnabledInbound", ctrl.masterFaxEnabledInbound),
@@ -211,7 +218,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 
 			ctrl.toRingCentralLogin = () =>
 			{
-				location.href = "../oauth"		// TODO: figure out how to bind a better name later, ie: /fax/ringcentral/oauth
+				location.href = "../fax/ringcentral/oauth";
 			}
 
 		}
