@@ -11,7 +11,6 @@ import ToastService from "../../../../../lib/alerts/service/ToastService";
 import {FaxAccountType} from "../../../../../lib/fax/model/FaxAccountType";
 import LoadingQueue from "../../../../../lib/util/LoadingQueue";
 import FaxAccountProviderFactory from "../../../../../lib/fax/provider/FaxAccountProviderFactory";
-import {JunoSelectOption} from "../../../../../lib/common/junoSelectOption";
 
 angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 	templateUrl: 'src/admin/section/fax/components/faxConfigurationEditModal/faxConfigurationEditModal.jsp',
@@ -33,7 +32,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-			ctrl.coverLetterOptions = <JunoSelectOption> [];
+			ctrl.coverLetterOptions = [];
 			ctrl.validations = {};
 			ctrl.initialSave = false;
 			ctrl.initialized = false;
@@ -210,7 +209,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 					case FaxAccountConnectionStatusType.Success: return "Fax Account Working";
 					case FaxAccountConnectionStatusType.Failure: return "Error Occurred";
 					case FaxAccountConnectionStatusType.Unknown:
-					default: return "Status Unknown";
+					default: return "Test Connection";
 				}
 			}
 		}

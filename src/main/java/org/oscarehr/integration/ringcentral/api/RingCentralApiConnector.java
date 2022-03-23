@@ -86,6 +86,11 @@ public class RingCentralApiConnector extends RESTClient
 		return Optional.ofNullable(RingCentralCredentialStore.getCredential(RingCentralCredentialStore.LOCAL_USER_ID));
 	}
 
+	public void revokeCredential() throws IOException
+	{
+		RingCentralCredentialStore.deleteCredential(RingCentralCredentialStore.LOCAL_USER_ID);
+	}
+
 	public RingCentralCoverLetterListResult getFaxCoverPageList()
 	{
 		String endpoint = REST_API_BASE + "dictionary/fax-cover-page";

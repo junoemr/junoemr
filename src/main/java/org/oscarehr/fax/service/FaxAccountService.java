@@ -188,6 +188,16 @@ public class FaxAccountService
 		faxAccount.setDeletedAt(new Date());
 		faxAccount.setLoginPassword(null); // wipe the password
 		faxAccountDao.merge(faxAccount);
+
+		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccount);
+		faxAccountProvider.disconnectAccount();
+		return true;
+	}
+
+	public boolean disconnectFaxAccount(Long id)
+	{
+		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccountDao.find(id));
+		faxAccountProvider.disconnectAccount();
 		return true;
 	}
 

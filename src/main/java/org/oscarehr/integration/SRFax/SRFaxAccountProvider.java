@@ -67,4 +67,9 @@ public class SRFaxAccountProvider implements FaxAccountProvider
 	{
 		return Arrays.asList("None", "Basic", "Standard", "Company", "Personal");
 	}
+
+	@Override
+	public void disconnectAccount()
+	{
+	}
 }

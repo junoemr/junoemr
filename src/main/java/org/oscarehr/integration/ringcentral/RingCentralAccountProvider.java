@@ -23,6 +23,7 @@
 
 package org.oscarehr.integration.ringcentral;
 
+import org.oscarehr.fax.exception.FaxIntegrationException;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.provider.FaxAccountProvider;
 import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
@@ -30,6 +31,7 @@ import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoRes
 import org.oscarehr.integration.ringcentral.api.result.RingCentralCoverLetterListResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralCoverLetterResult;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,5 +61,18 @@ public class RingCentralAccountProvider implements FaxAccountProvider
 		return Arrays.stream(result.getRecords())
 				.map(RingCentralCoverLetterResult::getName)
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public void disconnectAccount()
+	{
+		try
+		{
+			ringcentralApiConnector.revokeCredential();
+		}
+		catch(IOException e)
+		{
+			throw new FaxIntegrationException("Error revoking oAuth token: " + e.getMessage());
+		}
 	}
 }

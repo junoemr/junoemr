@@ -33,4 +33,6 @@ public interface FaxAccountProvider
 	boolean testConnectionStatus();
 
 	List<String> getCoverLetterOptions();
+
+	void disconnectAccount();
 }

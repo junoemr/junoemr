@@ -34,6 +34,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import lombok.Synchronized;
 import org.apache.log4j.Logger;
 import org.oscarehr.util.MiscUtils;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -44,6 +45,7 @@ public class RingCentralCredentialStore
 
 	private static final String BASE_URL = "https://platform.devtest.ringcentral.com";
 	private static final String AUTH_SERVER_URL = BASE_URL + "/restapi/oauth/authorize";
+	private static final String REVOKE_SERVER_URL = BASE_URL + "/restapi/oauth/revoke";
 	private static final String TOKEN_SERVER_URL = BASE_URL + "/restapi/oauth/token";
 
 	private static final File DATASTORE_DIR = new File("/tmp/com.junoemr.fax.datastore");
@@ -76,6 +78,11 @@ public class RingCentralCredentialStore
 	public static Credential getCredential(String id) throws IOException
 	{
 		return oAuthWorkFlow.loadCredential(id);
+	}
+
+	public static void deleteCredential(String id) throws IOException
+	{
+		oAuthWorkFlow.getCredentialDataStore().delete(id);
 	}
 
 	private static ClientParametersAuthentication makeClientParams()

@@ -41,6 +41,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -136,6 +137,16 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_DELETE);
 		return RestResponse.successResponse(faxAccountService.deleteFaxAccount(id));
+	}
+
+	@PATCH
+	@Path("/{id}/disconnect")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> disconnectAccountSettings(@PathParam("id") Long id)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_UPDATE);
+		return RestResponse.successResponse(faxAccountService.disconnectFaxAccount(id));
 	}
 
 	@POST
