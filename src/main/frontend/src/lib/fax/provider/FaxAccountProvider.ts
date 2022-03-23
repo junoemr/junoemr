@@ -12,4 +12,5 @@ export default interface FaxAccountProvider
 	outboundReturnFaxNoFieldValidation(): any
 
 	getCoverLetterOptions(): Promise<JunoSelectOption[]>
+	getIntegrationName(): string
 }

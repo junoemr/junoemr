@@ -89,14 +89,15 @@ public class RingCentralApiConnector extends RESTClient
 
 	public void revokeCredential() throws IOException
 	{
+		revokeAccessToken();
 		RingCentralCredentialStore.deleteCredential(RingCentralCredentialStore.LOCAL_USER_ID);
 	}
 
 	public RingCentralCoverLetterListResult getFaxCoverPageList()
 	{
-		String endpoint = REST_API_BASE + "dictionary/fax-cover-page";
+		String endpoint = REST_API_URL + "dictionary/fax-cover-page";
 		String url = buildUrl(DEFAULT_PROTOCOL, endpoint);
-		return doGet(url, getAuthorizationHeaders(), RingCentralCoverLetterListResult.class);
+		return doGet(url, getAuthorizationBearerHeaders(), RingCentralCoverLetterListResult.class);
 	}
 
 	public RingCentralAccountInfoResult getAccountInfo()
@@ -150,7 +151,7 @@ public class RingCentralApiConnector extends RESTClient
 		return doPut(url, getAuthorizationBearerHeaders(), input.getParameterMap(), input, RingCentralMessageInfoResult.class);
 	}
 
-	public void revokeAccessToken()
+	protected void revokeAccessToken()
 	{
 		String endpoint = REST_API_BASE + "/revoke";
 		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, ""));

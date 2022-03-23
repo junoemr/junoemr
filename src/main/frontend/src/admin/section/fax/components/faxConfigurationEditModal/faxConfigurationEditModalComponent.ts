@@ -149,6 +149,21 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				ctrl.LoadingQueue.popLoadingState();
 			}
 
+			ctrl.disconnectAccount = async () =>
+			{
+				ctrl.LoadingQueue.pushLoadingState();
+				const confirm = await Juno.Common.Util.confirmationDialog(
+					$uibModal,
+					"Confirm Action", "Are you sure you want to disconnect the integration?",
+					ctrl.componentStyle);
+				if(confirm)
+				{
+					await ctrl.faxAccountService.disconnectAccountSettings(ctrl.faxAccount.id);
+					ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Failure;
+				}
+				ctrl.LoadingQueue.popLoadingState();
+			}
+
 			ctrl.cancel = function cancel()
 			{
 				ctrl.modalInstance.dismiss('cancel');
@@ -211,6 +226,11 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 					case FaxAccountConnectionStatusType.Unknown:
 					default: return "Test Connection";
 				}
+			}
+
+			ctrl.getDisconnectText = (): string =>
+			{
+				return "Disconnect " + ctrl.faxAccountProvider.getIntegrationName();
 			}
 		}
 	]
