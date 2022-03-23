@@ -1,6 +1,7 @@
 import FaxAccountProvider from "./FaxAccountProvider";
 import FaxAccount from "../model/FaxAccount";
 import FaxAccountService from "../service/FaxAccountService";
+import {JunoSelectOption} from "../../common/junoSelectOption";
 
 export default class RingCentralAccountProvider implements FaxAccountProvider
 {
@@ -12,42 +13,42 @@ export default class RingCentralAccountProvider implements FaxAccountProvider
 		this.faxAccount = faxAccount;
 	}
 
-	isOauth(): boolean
+	public isOauth(): boolean
 	{
 		return true;
 	}
 
-	showOutboundEmailField(): boolean
+	public showOutboundEmailField(): boolean
 	{
 		return false;
 	}
 
-	showOutboundReturnFaxNoField(): boolean
+	public showOutboundReturnFaxNoField(): boolean
 	{
 		return false;
 	}
 
-	showPasswordField(): boolean
+	public showPasswordField(): boolean
 	{
 		return false;
 	}
 
-	outboundEmailFieldValidation(): any
+	public outboundEmailFieldValidation(): any
 	{
 		return Juno.Validations.validationCustom(() => true)
 	}
 
-	outboundReturnFaxNoFieldValidation(): any
+	public outboundReturnFaxNoFieldValidation(): any
 	{
 		return Juno.Validations.validationCustom(() => true)
 	}
 
-	passwordFieldValidation(): any
+	public passwordFieldValidation(): any
 	{
 		return Juno.Validations.validationCustom(() => true)
 	}
 
-	getCoverLetterOptions(): Promise<object[]>
+	public getCoverLetterOptions(): Promise<JunoSelectOption[]>
 	{
 		return new Promise(async (resolve, reject) =>
 		{

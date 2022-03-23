@@ -1,5 +1,6 @@
 import FaxAccountProvider from "./FaxAccountProvider";
 import FaxAccount from "../model/FaxAccount";
+import {JunoSelectOption} from "../../common/junoSelectOption";
 
 export default class SRFaxAccountProvider implements FaxAccountProvider
 {
@@ -10,48 +11,48 @@ export default class SRFaxAccountProvider implements FaxAccountProvider
 		this.faxAccount = faxAccount;
 	}
 
-	isOauth(): boolean
+	public isOauth(): boolean
 	{
 		return false;
 	}
 
-	showOutboundEmailField(): boolean
+	public showOutboundEmailField(): boolean
 	{
 		return true;
 	}
 
-	showOutboundReturnFaxNoField(): boolean
+	public showOutboundReturnFaxNoField(): boolean
 	{
 		return true;
 	}
 
-	showPasswordField(): boolean
+	public showPasswordField(): boolean
 	{
 		return true;
 	}
 
-	passwordFieldValidation(): any
+	public passwordFieldValidation(): any
 	{
 		return Juno.Validations.validationFieldOr(
 			Juno.Validations.validationCustom(() => Boolean(this.faxAccount.id)),
 			Juno.Validations.validationFieldRequired(this.faxAccount, "password"));
 	}
 
-	outboundEmailFieldValidation(): any
+	public outboundEmailFieldValidation(): any
 	{
 		return Juno.Validations.validationFieldOr(
 			Juno.Validations.validationCustom(() => !this.faxAccount.enableOutbound),
 			Juno.Validations.validationFieldRequired(this.faxAccount, "accountEmail"));
 	}
 
-	outboundReturnFaxNoFieldValidation(): any
+	public outboundReturnFaxNoFieldValidation(): any
 	{
 		return Juno.Validations.validationFieldOr(
 			Juno.Validations.validationCustom(() => !this.faxAccount.enableOutbound),
 			Juno.Validations.validationFieldRequired(this.faxAccount, "faxNumber"));
 	}
 
-	getCoverLetterOptions(): Promise<object[]>
+	public getCoverLetterOptions(): Promise<JunoSelectOption[]>
 	{
 		return new Promise((resolve, reject) =>
 		{

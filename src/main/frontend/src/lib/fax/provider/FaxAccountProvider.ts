@@ -1,3 +1,5 @@
+import {JunoSelectOption} from "../../common/junoSelectOption";
+
 export default interface FaxAccountProvider
 {
 	isOauth(): boolean;
@@ -9,5 +11,5 @@ export default interface FaxAccountProvider
 	outboundEmailFieldValidation(): any
 	outboundReturnFaxNoFieldValidation(): any
 
-	getCoverLetterOptions(): Promise<object[]>
+	getCoverLetterOptions(): Promise<JunoSelectOption[]>
 }
