@@ -1,0 +1,52 @@
+/**
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
+ * This software is published under the GPL GNU General Public License.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
+ */
+package org.oscarehr.fax.converter;
+
+import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
+import org.oscarehr.fax.model.FaxInbound;
+import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
+
+@Component
+public class FaxInboundToModelConverter extends AbstractModelConverter<FaxInbound, FaxInboxTransferOutbound>
+{
+	@Autowired
+	private FaxAccountToModelConverter faxAccountToModelConverter;
+
+	@Override
+	public FaxInboxTransferOutbound convert(FaxInbound entity)
+	{
+		FaxInboxTransferOutbound model = new FaxInboxTransferOutbound();
+		model.setId(entity.getId());
+		model.setDocumentId(entity.getDocument().getDocumentNo());
+		model.setFaxAccount(faxAccountToModelConverter.convert(entity.getFaxAccount()));
+		model.setSystemDateReceived(ConversionUtils.toTimestampString(entity.getCreatedAt()));
+		model.setExternalReferenceId(entity.getExternalReferenceId());
+		model.setSentFrom(PhoneNumberModel.of(entity.getSentFrom(), PhoneNumberModel.PHONE_TYPE.FAX));
+
+		return model;
+	}
+}

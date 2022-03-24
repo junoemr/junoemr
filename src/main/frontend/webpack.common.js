@@ -68,8 +68,12 @@ module.exports = {
 			filename: 'legacyFaxConfiguration.jsp'
 		}),
 		new HtmlWebpackPlugin({
-			template: 'raw-loader!./legacyFaxSendReceive.jsp',
-			filename: 'legacyFaxSendReceive.jsp'
+			template: 'raw-loader!./legacyFaxInbox.jsp',
+			filename: 'legacyFaxInbox.jsp'
+		}),
+		new HtmlWebpackPlugin({
+			template: 'raw-loader!./legacyFaxOutbox.jsp',
+			filename: 'legacyFaxOutbox.jsp'
 		}),
 		new HtmlWebpackPlugin({
 			template: 'raw-loader!./Know2actConfiguration.jsp',
@@ -154,16 +158,13 @@ module.exports = {
 			'./src/common/services/diseaseRegistryService.js',
 			'./src/common/services/errorsService.js',
 			'./src/common/services/eFormService.js',
-			'./src/common/services/labService.ts',
-			'./src/common/services/faxAccountService.js',
-			'./src/common/services/faxInboundService.js',
-			'./src/common/services/faxOutboundService.js',
 			'./src/common/services/fieldHelperService.js',
 			'./src/common/services/focusService.js',
 			'./src/common/services/formService.js',
 			'./src/common/services/globalStateService.js',
 			'./src/common/services/inboxService.js',
 			'./src/common/services/k2aService.js',
+			'./src/common/services/labService.ts',
 			'./src/common/services/measurementApi.service.ts',
 			'./src/common/services/messageService.js',
 			'./src/common/services/mhaService.js',
@@ -238,6 +239,7 @@ module.exports = {
 			'./src/common/components/module.js',
 			'./src/common/components/modalComponent.js',
 			'./src/common/components/filterPanel/filterPanelController.ts',
+			'./src/common/components/formLabelWrapper/formLabelWrapperComponent.ts',
 			'./src/common/components/junoButton/junoButtonComponent.js',
 			'./src/common/components/junoRoundButton/junoRoundButtonComponent.js',
 			'./src/common/components/junoSimpleCloseButton/junoSimpleCloseButtonComponent.ts',
@@ -267,6 +269,7 @@ module.exports = {
 			'./src/common/components/zeroStateDisplayComponent.js',
 			'./src/common/components/accordionList/accordionListComponent.js',
 			'./src/common/components/junoTypeahead/junoTypeaheadComponent.js',
+			'./src/common/components/iconBadge/iconBadgeComponent.ts',
 			'./src/common/components/iconCard/iconCardComponent.js',
 			'./src/common/components/panel/panelComponent.js',
 			'./src/common/components/security/junoSecurityCheckComponent.js',
@@ -406,9 +409,11 @@ module.exports = {
 			'./src/admin/adminController.js',
 			'./src/admin/section/module.js',
 			'./src/admin/section/fax/module.js',
-			'./src/admin/section/fax/faxConfigurationController.js',
-			'./src/admin/section/fax/faxConfigurationEditController.js',
-			'./src/admin/section/fax/faxSendReceiveController.js',
+			'./src/admin/section/fax/faxConfigurationComponent.ts',
+			'./src/admin/section/fax/faxSendReceiveComponent.ts',
+			'./src/admin/section/fax/components/faxConfigurationEditModal/faxConfigurationEditModalComponent.ts',
+			'./src/admin/section/fax/components/faxInbox/faxInboxComponent.ts',
+			'./src/admin/section/fax/components/faxOutbox/faxOutboxComponent.ts',
 			'./src/admin/section/lab/module.js',
 			'./src/admin/section/lab/config/labConfigComponent.ts',
 			'./src/admin/section/lab/config/olis/module.js',

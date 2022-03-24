@@ -16,11 +16,12 @@
 
 <%@page import="org.oscarehr.fax.model.FaxOutbound"%>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
-<%@ page import="org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound" %>
+<%@ page import="org.oscarehr.fax.transfer.FaxOutboxTransferOutbound" %>
 <%@ page import="oscar.eform.actions.FaxAction" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
+<%@ page import="org.oscarehr.fax.model.FaxStatusInternal" %>
 <html:html locale="true">
 	<%
 
@@ -37,12 +38,12 @@
 			List<FaxOutboxTransferOutbound> faxTransferList = bean.faxForms(faxRecipients, formId, providerId);
 			for(FaxOutboxTransferOutbound transfer : faxTransferList)
 			{
-				if(FaxOutbound.Status.QUEUED.equals(transfer.getSystemStatus()))
+				if(FaxStatusInternal.QUEUED.equals(transfer.getSystemStatus()))
 				{
 					errorMessages.add("Failed to send fax, it has been queued for automatic resend. " +
 							"Reason: " + transfer.getSystemStatusMessage());
 				}
-				else if(FaxOutbound.Status.ERROR.equals(transfer.getSystemStatus()))
+				else if(FaxStatusInternal.ERROR.equals(transfer.getSystemStatus()))
 				{
 					errorMessages.add("Failed to send fax. Check account settings. " +
 							"Reason: " + transfer.getSystemStatusMessage());

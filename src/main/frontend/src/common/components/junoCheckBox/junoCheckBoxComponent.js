@@ -35,6 +35,7 @@ angular.module('Common.Components').component('junoCheckBox', {
 		// alternate value returned when checkbox is true
 		trueValue: "<?",
 		disabled: "<?",
+		readonly: "<?",
 		// a dummy checkbox will never update ngModel.
 		dummy: "<?",
 		change: "&?",
@@ -53,6 +54,12 @@ angular.module('Common.Components').component('junoCheckBox', {
 
 		ctrl.onClick = () =>
 		{
+			// ng-readonly doesn't work on checkboxes, so block changes manually here
+			if(ctrl.readonly)
+			{
+				return;
+			}
+
 			let newValue = null;
 			if (ctrl.ngModel === ctrl.trueValue)
 			{

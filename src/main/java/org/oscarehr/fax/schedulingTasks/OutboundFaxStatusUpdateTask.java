@@ -23,7 +23,7 @@
 package org.oscarehr.fax.schedulingTasks;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.fax.service.OutgoingFaxService;
+import org.oscarehr.fax.service.FaxUploadService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -38,7 +38,7 @@ public class OutboundFaxStatusUpdateTask
 	private static final String cronSchedule = "0 */5 * * * *";
 
 	@Autowired
-	private OutgoingFaxService outgoingFaxService;
+	private FaxUploadService faxUploadService;
 
 	@PostConstruct
 	public void init()
@@ -51,7 +51,7 @@ public class OutboundFaxStatusUpdateTask
 	{
 		try
 		{
-			outgoingFaxService.requestPendingStatusUpdates();
+			faxUploadService.requestAllPendingStatusUpdates();
 		}
 		catch(IllegalStateException e)
 		{

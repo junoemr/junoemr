@@ -60,8 +60,8 @@ boolean isSharingCenterEnabled = SharingCenterUtil.isEnabled();
 AffinityDomainDao affDao = SpringUtils.getBean(AffinityDomainDao.class);
 List<AffinityDomainDataObject> affinityDomains = affDao.getAllAffinityDomains();
 
-    OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
-    boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
+    FaxUploadService faxUploadService = SpringUtils.getBean(FaxUploadService.class);
+    boolean faxEnabled = faxUploadService.isOutboundFaxEnabled();
 
 %>
 
@@ -75,7 +75,7 @@ List<AffinityDomainDataObject> affinityDomains = affDao.getAllAffinityDomains();
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils, oscar.OscarProperties, oscar.dms.EDoc, oscar.dms.EDocUtil, java.util.ArrayList, java.util.List"%>
-<%@ page import="org.oscarehr.fax.service.OutgoingFaxService" %>
+<%@ page import="org.oscarehr.fax.service.FaxUploadService" %>
 <%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
 <%@ page import="org.oscarehr.security.model.Permission" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" scope="request" />

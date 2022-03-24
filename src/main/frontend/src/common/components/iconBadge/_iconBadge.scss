@@ -1,0 +1,18 @@
+.icon-badge {
+  --icon-color: var(--color-neutral-white);
+  --icon-font-size: 14px;
+  --badge-color: var(--color-primary-base);
+  --badge-padding: 2px;
+
+  display: inline-block;
+
+  background-color: var(--badge-color);
+  border-radius: 50%;
+  padding: var(--badge-padding);
+
+
+  i {
+    color: var(--icon-color);
+    font-size: var(--icon-font-size);
+  }
+}

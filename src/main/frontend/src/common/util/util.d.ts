@@ -4,7 +4,7 @@ declare const Juno: {
 	Common: {
 		// @ts-ignore
 		Util: Juno.Common.Util,
-	}
+	},
 	// @ts-ignore
 	Validations: Juno.Validations,
 };

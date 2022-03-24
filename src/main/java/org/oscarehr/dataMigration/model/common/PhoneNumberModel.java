@@ -26,6 +26,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 
+import java.util.Optional;
+
 @Data
 public class PhoneNumberModel extends AbstractTransientModel
 {
@@ -33,6 +35,7 @@ public class PhoneNumberModel extends AbstractTransientModel
 		HOME,
 		WORK,
 		CELL,
+		FAX,
 	}
 
 	private String number;
@@ -100,6 +103,24 @@ public class PhoneNumberModel extends AbstractTransientModel
 		return "";
 	}
 
+	/**
+	 * @return the optional number with 11 digits, adds 1 to the front of a 10 digit number.
+	 * returns empty if the internal number is null, or does not conform to the 10 or 11 digit standard
+	 */
+	@JsonIgnore
+	public Optional<String> getNumber11DigitsOnly()
+	{
+		if(number != null && (number.length() == 10 || number.length() == 11))
+		{
+			if(number.length() == 10)
+			{
+				return Optional.of("1" + number);
+			}
+			return Optional.of(number);
+		}
+		return Optional.empty();
+	}
+
 	public void setPhoneTypeHome()
 	{
 		this.setPhoneType(PHONE_TYPE.HOME);
@@ -128,10 +149,19 @@ public class PhoneNumberModel extends AbstractTransientModel
 	{
 		return (PHONE_TYPE.CELL.equals(this.getPhoneType()));
 	}
+	@JsonIgnore
+	public boolean isTypeFax()
+	{
+		return (PHONE_TYPE.FAX.equals(this.getPhoneType()));
+	}
 
 	public static PhoneNumberModel of(String number)
 	{
 		return PhoneNumberModel.of(number, null, false, null);
+	}
+	public static PhoneNumberModel of(String number, PHONE_TYPE type)
+	{
+		return PhoneNumberModel.of(number, null, false, type);
 	}
 	public static PhoneNumberModel of(String number, String extension)
 	{

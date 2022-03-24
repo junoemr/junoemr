@@ -605,7 +605,7 @@ public class AdminNavService
 		{
 			faxManagementItems.add( new AdminNavItemTo1("Fax Configuration", "faxConfig"));
 		}
-		faxManagementItems.add( new AdminNavItemTo1("Fax Sent/Received", "faxSendReceive"));
+		faxManagementItems.add( new AdminNavItemTo1("Fax Sent/Received", "faxSendReceive/outbox"));
 
 		faxManagementGroup.setItems(faxManagementItems);
 		return faxManagementGroup;

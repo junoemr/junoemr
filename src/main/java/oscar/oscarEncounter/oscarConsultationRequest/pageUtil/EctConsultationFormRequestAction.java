@@ -55,7 +55,7 @@ import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.consultations.service.ConsultationAttachmentService;
-import org.oscarehr.fax.service.OutgoingFaxService;
+import org.oscarehr.fax.service.FaxUploadService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.DigitalSignatureUtils;
@@ -98,8 +98,8 @@ public class EctConsultationFormRequestAction extends Action {
 	private static ProfessionalSpecialistDao professionalSpecialistDao = (ProfessionalSpecialistDao) SpringUtils
 			.getBean("professionalSpecialistDao");
 	private static ConsultationAttachmentService consultationAttachmentService =  SpringUtils.getBean(ConsultationAttachmentService.class);
-	private static OutgoingFaxService outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
-	private static boolean faxEnabled = outgoingFaxService.isOutboundFaxEnabled();
+	private static FaxUploadService faxUploadService = SpringUtils.getBean(FaxUploadService.class);
+	private static boolean faxEnabled = faxUploadService.isOutboundFaxEnabled();
 	
 	private static String[] format = new String[] {"yyyy-MM-dd","yyyy/MM/dd"};
 	

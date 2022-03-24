@@ -144,14 +144,22 @@ oscarApp.config([
 		.state('admin.faxConfig',
 		{
 			url: '/faxConfig',
-			templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
-			controller: 'Admin.Section.Fax.FaxConfigurationController as faxController'
+			component: 'faxConfiguration',
 		})
 		.state('admin.faxSendReceive',
 		{
 			url: '/faxSendReceive',
-			templateUrl: 'src/admin/section/fax/faxSendReceive.jsp',
-			controller: 'Admin.Section.Fax.FaxSendReceiveController as faxSendReceiveController'
+			component: 'faxSendReceive',
+		})
+		.state('admin.faxSendReceive.inbox',
+		{
+			url: '/inbox',
+			component: 'faxInbox',
+		})
+		.state('admin.faxSendReceive.outbox',
+		{
+			url: '/outbox',
+			component: 'faxOutbox',
 		})
 		.state('admin.landingPage',
 		{
@@ -1019,14 +1027,12 @@ oscarApp.config([
 		.state('faxConfig',
 			{
 				url: '/faxConfig',
-				templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
-				controller: 'Admin.Section.Fax.FaxConfigurationController as faxController'
+				component: 'faxConfiguration',
 			})
 		.state('faxSendReceive',
 			{
 				url: '/faxSendReceive',
-				templateUrl: 'src/admin/section/fax/faxSendReceive.jsp',
-				controller: 'Admin.Section.Fax.FaxSendReceiveController as faxSendReceiveController'
+				component: 'faxSendReceive',
 			});
 	$httpProvider.interceptors.push('errorInterceptor');
 }]);

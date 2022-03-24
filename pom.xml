@@ -2022,6 +2022,9 @@
 								org.oscarehr.ws.rest.DocumentTypesWebService
 								org.oscarehr.ws.rest.DiseaseRegistryService
 								org.oscarehr.ws.rest.DocumentWebService
+								org.oscarehr.ws.rest.fax.FaxAccountWebService
+								org.oscarehr.ws.rest.fax.FaxInboundWebService
+								org.oscarehr.ws.rest.fax.FaxOutboundWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueueWebService

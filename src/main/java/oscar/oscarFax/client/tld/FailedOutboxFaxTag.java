@@ -25,10 +25,10 @@ package oscar.oscarFax.client.tld;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
-import org.oscarehr.fax.service.OutgoingFaxService;
+import org.oscarehr.fax.service.FaxUploadService;
+import org.oscarehr.fax.model.FaxStatusCombined;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
@@ -41,13 +41,13 @@ public class FailedOutboxFaxTag extends TagSupport
 
 	private final FaxAccountDao faxAccountDao;
 
-	private final OutgoingFaxService outgoingFaxService;
+	private final FaxUploadService faxUploadService;
 
 	public FailedOutboxFaxTag()
 	{
 		numFailures = 0;
 		faxAccountDao = SpringUtils.getBean(FaxAccountDao.class);
-		outgoingFaxService = SpringUtils.getBean(OutgoingFaxService.class);
+		faxUploadService = SpringUtils.getBean(FaxUploadService.class);
 	}
 
 	public int doStartTag() throws JspException
@@ -62,8 +62,10 @@ public class FailedOutboxFaxTag extends TagSupport
 			List<FaxAccount> accounts = faxAccountDao.criteriaSearch(criteriaSearch);
 			for (FaxAccount account : accounts)
 			{
-				numFailures += outgoingFaxService.getOutboxNotificationCount(account.getId(), null, null, FaxOutboxTransferOutbound.CombinedStatus.ERROR.toString(), null);
-				numFailures += outgoingFaxService.getOutboxNotificationCount(account.getId(), null, null, FaxOutboxTransferOutbound.CombinedStatus.INTEGRATION_FAILED.toString(), null);
+				numFailures += faxUploadService
+					.getOutboxNotificationCount(account.getId(), null, null, FaxStatusCombined.ERROR.toString(), null);
+				numFailures += faxUploadService
+					.getOutboxNotificationCount(account.getId(), null, null, FaxStatusCombined.INTEGRATION_FAILED.toString(), null);
 			}
 
 			JspWriter out = super.pageContext.getOut();

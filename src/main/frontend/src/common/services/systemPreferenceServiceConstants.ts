@@ -44,6 +44,9 @@ export enum SYSTEM_PROPERTIES
     // UI
     UI_CUSTOM_NAV_ICON = "ui_custom_nav",
     UI_LOCK_TO_JUNO_UI = "ui_lock",
+
+    // FAXING
+    ACTIVE_FAX_ACCOUNT = "system_active_fax_account_id",
 }
 
 export enum INSTANCE_TYPE

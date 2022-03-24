@@ -22,28 +22,34 @@
  */
 package org.oscarehr.fax.service;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.fax.converter.FaxAccountCreateToEntityConverter;
+import org.oscarehr.fax.converter.FaxAccountToModelConverter;
+import org.oscarehr.fax.converter.FaxAccountUpdateToEntityConverter;
+import org.oscarehr.fax.converter.FaxInboundToModelConverter;
+import org.oscarehr.fax.converter.FaxOutboundToModelConverter;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
-import org.oscarehr.fax.externalApi.srfax.SRFaxApiConnector;
-import org.oscarehr.fax.externalApi.srfax.result.GetUsageResult;
-import org.oscarehr.fax.externalApi.srfax.resultWrapper.ListWrapper;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.provider.FaxAccountProvider;
+import org.oscarehr.fax.provider.FaxProviderFactory;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
 import org.oscarehr.fax.search.FaxOutboundCriteriaSearch;
-import org.oscarehr.ws.rest.conversion.FaxTransferConverter;
-import org.oscarehr.ws.rest.transfer.fax.FaxAccountTransferOutbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxInboxTransferOutbound;
-import org.oscarehr.ws.rest.transfer.fax.FaxOutboxTransferOutbound;
+import org.oscarehr.fax.transfer.FaxAccountCreateInput;
+import org.oscarehr.fax.transfer.FaxAccountTransferOutbound;
+import org.oscarehr.fax.transfer.FaxAccountUpdateInput;
+import org.oscarehr.fax.transfer.FaxInboxTransferOutbound;
+import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import oscar.util.ConversionUtils;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -64,57 +70,127 @@ public class FaxAccountService
 	@Autowired
 	private FaxAccountDao faxAccountDao;
 
+	@Autowired
+	private SystemPreferenceService systemPreferenceService;
+
+	@Autowired
+	private FaxAccountCreateToEntityConverter faxAccountCreateToEntityConverter;
+
+	@Autowired
+	private FaxAccountUpdateToEntityConverter faxAccountUpdateToEntityConverter;
+
+	@Autowired
+	private FaxAccountToModelConverter faxAccountToModelConverter;
+
+	@Autowired
+	private FaxOutboundToModelConverter faxOutboundToModelConverter;
+
+	@Autowired
+	private FaxInboundToModelConverter faxInboundToModelConverter;
+
 	/**
 	 * Test the connection to the fax service based on the configuration settings
 	 *
 	 * @return true if the connection succeeded, false otherwise
 	 */
-	public boolean testConnectionStatus(String accountId, String password)
+	public boolean testConnectionStatus(FaxAccountCreateInput createInput)
 	{
-		// don't hit the api if username or password are empty/missing
-		if (StringUtils.trimToNull(accountId) == null || StringUtils.trimToNull(password) == null)
+		FaxAccount faxAccount = faxAccountCreateToEntityConverter.convert(createInput);
+		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccount);
+		return faxAccountProvider.testConnectionStatus();
+	}
+
+	public boolean testConnectionStatus(FaxAccountUpdateInput updateInput)
+	{
+		FaxAccount faxAccount = faxAccountDao.find(updateInput.getId());
+		if (StringUtils.isNotBlank(updateInput.getPassword()))
 		{
-			return false;
+			// detach entity to prevent auto saving it with updated password
+			faxAccountDao.detach(faxAccount);
+			faxAccount.setLoginPassword(updateInput.getPassword());
 		}
-
-		SRFaxApiConnector apiConnector = new SRFaxApiConnector(accountId, password);
-		String currentDateStr = ConversionUtils.toDateString(LocalDate.now(), SRFaxApiConnector.DATE_FORMAT);
-
-		ListWrapper<GetUsageResult> result = apiConnector.getFaxUsageByRange(currentDateStr, currentDateStr, null);
-		logger.debug(String.valueOf(result));
-
-		return (result != null && result.isSuccess());
+		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccount);
+		return faxAccountProvider.testConnectionStatus();
 	}
 
 	/**
 	 * get the default fax account to be used. return null if none exists
 	 */
-	public FaxAccount getDefaultFaxAccount()
+	public FaxAccount getSystemActiveFaxAccount()
 	{
-		//TODO provider specific logic etc?
-		FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
-		criteriaSearch.setIntegrationEnabledStatus(true);
-		criteriaSearch.setOutboundEnabledStatus(true);
-		criteriaSearch.setLimit(1);
-		criteriaSearch.setSortDirAscending();
-		List<FaxAccount> faxAccountList = faxAccountDao.criteriaSearch(criteriaSearch);
+		String accountIdStr = systemPreferenceService.getPreferenceValue(UserProperty.SYSTEM_ACTIVE_FAX_ACCOUNT, null);
+		if(accountIdStr != null)
+		{
+			Long accountId = Long.parseLong(accountIdStr);
+			return faxAccountDao.find(accountId);
+		}
+		else
+		{
+			// fallback to simple logic of using first active fax account.
+			// mostly for legacy purposes where some systems may not have set the active account id.
+			FaxAccountCriteriaSearch criteriaSearch = new FaxAccountCriteriaSearch();
+			criteriaSearch.setIntegrationEnabledStatus(true);
+			criteriaSearch.setOutboundEnabledStatus(true);
+			criteriaSearch.setLimit(1);
+			criteriaSearch.setSortDirAscending();
+			List<FaxAccount> faxAccountList = faxAccountDao.criteriaSearch(criteriaSearch);
 
-		return faxAccountList.isEmpty() ? null : faxAccountList.get(0);
+			return faxAccountList.isEmpty() ? null : faxAccountList.get(0);
+		}
+	}
+
+	public FaxAccountTransferOutbound getActiveFaxAccount(String providerId)
+	{
+		//todo provider specific account selection
+		return faxAccountToModelConverter.convert(getSystemActiveFaxAccount());
+	}
+
+	public FaxAccountTransferOutbound getFaxAccount(Long id)
+	{
+		return faxAccountToModelConverter.convert(faxAccountDao.find(id));
+	}
+
+	public boolean isFaxAccountEnabled(Long id)
+	{
+		return faxAccountDao.find(id).isIntegrationEnabled();
+	}
+
+	public FaxAccountTransferOutbound createFaxAccount(FaxAccountCreateInput createInput)
+	{
+		FaxAccount faxAccount = faxAccountCreateToEntityConverter.convert(createInput);
+		faxAccountDao.persist(faxAccount);
+		return faxAccountToModelConverter.convert(faxAccount);
+	}
+
+	public FaxAccountTransferOutbound updateFaxAccount(FaxAccountUpdateInput updateInput)
+	{
+		FaxAccount faxAccount = faxAccountUpdateToEntityConverter.convert(updateInput);
+		faxAccountDao.merge(faxAccount);
+		return faxAccountToModelConverter.convert(faxAccount);
+	}
+
+	public boolean deleteFaxAccount(Long id)
+	{
+		FaxAccount faxAccount = faxAccountDao.find(id);
+		faxAccount.setDeletedAt(new Date());
+		faxAccount.setLoginPassword(null); // wipe the password
+		faxAccountDao.merge(faxAccount);
+		return true;
 	}
 
 	public List<FaxAccountTransferOutbound> listAccounts(FaxAccountCriteriaSearch criteriaSearch)
 	{
-		return FaxTransferConverter.getAllAsOutboundTransferObject(faxAccountDao.criteriaSearch(criteriaSearch));
+		return faxAccountToModelConverter.convert(faxAccountDao.criteriaSearch(criteriaSearch));
 	}
 
-	public List<FaxOutboxTransferOutbound> getOutboxResults(FaxAccount faxAccount, FaxOutboundCriteriaSearch criteriaSearch)
+	public List<FaxOutboxTransferOutbound> getOutboxResults(FaxOutboundCriteriaSearch criteriaSearch)
 	{
-		return FaxTransferConverter.getAllAsOutboxTransferObject(faxAccount, faxOutboundDao.criteriaSearch(criteriaSearch));
+		return faxOutboundToModelConverter.convert(faxOutboundDao.criteriaSearch(criteriaSearch));
 	}
 
 	public List<FaxInboxTransferOutbound> getInboxResults(FaxInboundCriteriaSearch criteriaSearch)
 	{
 		// find the list of all inbound results based on the search criteria
-		return FaxTransferConverter.getAllAsInboxTransferObject(faxInboundDao.criteriaSearch(criteriaSearch));
+		return faxInboundToModelConverter.convert(faxInboundDao.criteriaSearch(criteriaSearch));
 	}
 }

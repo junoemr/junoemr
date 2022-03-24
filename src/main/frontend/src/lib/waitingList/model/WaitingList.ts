@@ -1,5 +1,6 @@
 import SimpleProvider from "../../provider/model/SimpleProvider";
 import {Moment} from "moment";
+import moment from "moment/moment";
 
 export default class WaitingList
 {

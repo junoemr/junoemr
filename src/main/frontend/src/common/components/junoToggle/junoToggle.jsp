@@ -22,19 +22,23 @@
     Canada
 
 --%>
-<div ng-class="$ctrl.componentClasses()" class="juno-toggle">
-    <label ng-if="$ctrl.label" ng-class="$ctrl.labelClasses()">
-        {{$ctrl.label}}
-    </label>
-    <div class="flex-row justify-content-center align-items-center">
-        <label ng-if="$ctrl.showValueLabels" class="toggle-value-label">{{$ctrl.toggleFalseValue}}</label>
-        <label class="switch">
-            <input id="{{$ctrl.id}}" type="checkbox"
-                   ng-disabled="$ctrl.disabled"
-                   ng-model="$ctrl.ngModel"
-                   ng-change="$ctrl.onChange()"/>
-            <span class="slider" ng-class="{'round': $ctrl.round}"></span>
-        </label>
-        <label ng-if="$ctrl.showValueLabels" class="toggle-value-label">{{$ctrl.toggleTrueValue}}</label>
-    </div>
+<div class="juno-toggle">
+    <form-label-wrapper label="{{$ctrl.label}}"
+                        label-position="$ctrl.labelPosition"
+                        label-class-list="$ctrl.labelClassList"
+                        disabled="$ctrl.disabled"
+                        component-style="$ctrl.componentStyle"
+    >
+        <div ng-class="$ctrl.componentClasses()" class="flex-row justify-content-center align-items-center">
+            <label ng-if="$ctrl.showValueLabels" class="toggle-value-label">{{$ctrl.toggleFalseValue}}</label>
+            <label class="switch">
+                <input id="{{$ctrl.id}}" type="checkbox"
+                       ng-disabled="$ctrl.disabled"
+                       ng-model="$ctrl.ngModel"
+                       ng-change="$ctrl.onChange()"/>
+                <span class="slider" ng-class="{'round': $ctrl.round}"></span>
+            </label>
+            <label ng-if="$ctrl.showValueLabels" class="toggle-value-label">{{$ctrl.toggleTrueValue}}</label>
+        </div>
+    </form-label-wrapper>
 </div>

@@ -346,6 +346,9 @@
 
 			<!-- Custom ContextResolver to apply settings to the Jackson ObjectMapper -->
 			<bean class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
+			<bean class="org.oscarehr.ws.spring.paramConverter.LocalDateConverterProvider"/>
+			<bean class="org.oscarehr.ws.spring.paramConverter.LocalDateTimeConverterProvider"/>
+
 		</jaxrs:providers>
 
 		<jaxrs:features>
@@ -383,9 +386,9 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EFormsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.EncounterSectionsService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxAccountWebService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxInboundWebService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.FaxOutboundWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.fax.FaxAccountWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.fax.FaxInboundWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.fax.FaxOutboundWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.FormsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.InboxService"/>
 			<!-- AQS (Appointment Queue Service) -->
