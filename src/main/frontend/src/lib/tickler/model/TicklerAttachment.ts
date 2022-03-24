@@ -25,6 +25,28 @@ export default class TicklerAttachment
 		this._attachmentMeta = meta;
 	}
 
+	public getLinkUrl($state)
+	{
+		switch (this.attachmentType)
+		{
+			case TicklerAttachmentType.Cml: return "../lab/CA/ON/CMLDisplay.jsp?segmentID=" + this.attachmentId;
+			case TicklerAttachmentType.Mds: return "../oscarMDS/SegmentDisplay.jsp?segmentID=" + this.attachmentId;
+			case TicklerAttachmentType.Hl7: return "../lab/CA/ALL/labDisplay.jsp?segmentID=" + this.attachmentId;
+			case TicklerAttachmentType.Doc: return "../dms/ManageDocument.do?method=display&doc_no=" + this.attachmentId;
+			case TicklerAttachmentType.Message:
+			{
+				const meta = JSON.parse(this.attachmentMeta);
+				return $state.href("messaging.view.message", {
+					messageId: this.attachmentId,
+					backend: meta.messagingBackend,
+					source: meta.source,
+					group: meta.group,
+				});
+			}
+			default: throw "Invalid attachment type: " + this.attachmentType;
+		}
+	}
+
 	// ==========================================================================
 	// Setters
 	// ==========================================================================

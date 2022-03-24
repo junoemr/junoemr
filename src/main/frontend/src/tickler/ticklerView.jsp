@@ -122,6 +122,13 @@
 	</div>
 	<div class="row">
 		<div class="col-sm-10 col-sm-offset-1">
+			<div ng-if="ticklerViewCtrl.ticklerUpdate.attachments.length > 0" class="col-sm-12 flex-row justify-content-end">
+				<div class="w-128">
+					<juno-button click="ticklerViewCtrl.viewAttachment(ticklerViewCtrl.ticklerUpdate.attachments[0])">
+						View Attachment
+					</juno-button>
+				</div>
+			</div>
 			<div class="col-sm-12">
 				<div class="tickler-edit-comments-header">
 					<strong ng-click="ticklerViewCtrl.showComments = !ticklerViewCtrl.showComments"
