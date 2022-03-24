@@ -10,6 +10,7 @@ import ToastService from "../../../lib/alerts/service/ToastService";
 import {SYSTEM_PROPERTIES} from "../../../common/services/systemPreferenceServiceConstants";
 import {FaxAccountType} from "../../../lib/fax/model/FaxAccountType";
 import {FaxAccountConnectionStatusType} from "../../../lib/fax/model/FaxAccountConnectionStatusType";
+import ToastErrorHandler from "../../../lib/error/handler/ToastErrorHandler";
 
 angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
@@ -29,7 +30,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 		          systemPreferenceService)
 		{
 			const ctrl = this;
-			ctrl.faxAccountService = new FaxAccountService();
+			ctrl.faxAccountService = new FaxAccountService(new ToastErrorHandler());
 			ctrl.toastService = new ToastService();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;

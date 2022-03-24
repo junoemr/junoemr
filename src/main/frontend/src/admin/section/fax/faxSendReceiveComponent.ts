@@ -1,4 +1,3 @@
-import FaxAccountService from "../../../lib/fax/service/FaxAccountService";
 import {LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 
 angular.module("Admin.Section.Fax").component('faxSendReceive', {
@@ -11,12 +10,11 @@ angular.module("Admin.Section.Fax").component('faxSendReceive', {
 		function ($state)
 		{
 			const ctrl = this;
-			ctrl.faxAccountService = new FaxAccountService();
 			ctrl.LABEL_POSITION = LABEL_POSITION;
 
 			ctrl.tabEnum = Object.freeze({
-				inbox:0,
-				outbox:1
+				inbox: 0,
+				outbox: 1
 			});
 			ctrl.activeTab = null;
 
@@ -37,11 +35,13 @@ angular.module("Admin.Section.Fax").component('faxSendReceive', {
 				ctrl.activeTab = tabId;
 				switch (tabId)
 				{
-					case 0: {
+					case ctrl.tabEnum.inbox:
+					{
 						$state.go("admin.faxSendReceive.inbox");
 						break;
 					}
-					case 1: {
+					case ctrl.tabEnum.outbox:
+					{
 						$state.go("admin.faxSendReceive.outbox");
 						break;
 					}
