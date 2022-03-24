@@ -39,25 +39,25 @@ import java.util.stream.Collectors;
 public class RingCentralAccountProvider implements FaxAccountProvider
 {
 	protected final FaxAccount faxAccount;
-	protected final RingCentralApiConnector ringcentralApiConnector;
+	protected final RingCentralApiConnector ringCentralApiConnector;
 
 	public RingCentralAccountProvider(FaxAccount faxAccount)
 	{
 		this.faxAccount = faxAccount;
-		this.ringcentralApiConnector = new RingCentralApiConnector();
+		this.ringCentralApiConnector = new RingCentralApiConnector();
 	}
 
 	@Override
 	public boolean testConnectionStatus()
 	{
-		RingCentralAccountInfoResult accountInfo = ringcentralApiConnector.getAccountInfo(faxAccount.getLoginId());
+		RingCentralAccountInfoResult accountInfo = ringCentralApiConnector.getAccountInfo(faxAccount.getLoginId());
 		return (accountInfo != null);
 	}
 
 	@Override
 	public List<String> getCoverLetterOptions()
 	{
-		RingCentralCoverLetterListResult result = ringcentralApiConnector.getFaxCoverPageList();
+		RingCentralCoverLetterListResult result = ringCentralApiConnector.getFaxCoverPageList();
 		return Arrays.stream(result.getRecords())
 				.map(RingCentralCoverLetterResult::getName)
 				.collect(Collectors.toList());
@@ -68,11 +68,11 @@ public class RingCentralAccountProvider implements FaxAccountProvider
 	{
 		try
 		{
-			ringcentralApiConnector.revokeCredential();
+			ringCentralApiConnector.logOut();
 		}
 		catch(IOException e)
 		{
-			throw new FaxIntegrationException("Error revoking oAuth token: " + e.getMessage());
+			throw new FaxIntegrationException("Error logging out" + e.getMessage());
 		}
 	}
 }

@@ -39,12 +39,12 @@ import org.springframework.http.HttpHeaders;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
 public class RingCentralCredentialStore
 {
 	private static AuthorizationCodeFlow oAuthWorkFlow;
 	public static final String LOCAL_USER_ID = "com.junoemr.fax.ringcentral";
+	public static final long ACCESS_TOKEN_REFRESH_THRESHOLD_SECONDS = 3600L;
 
 	private static final String BASE_URL = "https://platform.devtest.ringcentral.com";
 	private static final String AUTH_SERVER_URL = BASE_URL + "/restapi/oauth/authorize";

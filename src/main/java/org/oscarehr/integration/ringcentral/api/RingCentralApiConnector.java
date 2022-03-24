@@ -43,13 +43,15 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class RingCentralApiConnector extends RESTClient
 {
 	public static final String CURRENT_SESSION_INDICATOR = "~";
-	protected static final String REST_API_BASE = "platform.devtest.ringcentral.com/restapi/";
+	protected static final String REST_API_BASE = "platform.devtest.ringcentral.com/restapi/";		// TODO: properties file
 	protected static final String REST_API_URL = REST_API_BASE + "v1.0/";
 
 	public static final String RESPONSE_STATUS_RECEIVED="Received";
@@ -87,10 +89,17 @@ public class RingCentralApiConnector extends RESTClient
 		return Optional.ofNullable(RingCentralCredentialStore.getCredential(RingCentralCredentialStore.LOCAL_USER_ID));
 	}
 
-	public void revokeCredential() throws IOException
+	public void logOut() throws IOException
 	{
-		revokeAccessToken();
-		RingCentralCredentialStore.deleteCredential(RingCentralCredentialStore.LOCAL_USER_ID);
+		if (getCredential().isPresent())
+		{
+			Credential credential = getCredential().get();
+
+			revokeToken(credential.getAccessToken());
+			revokeToken(credential.getRefreshToken());
+
+			RingCentralCredentialStore.deleteCredential(RingCentralCredentialStore.LOCAL_USER_ID);
+		}
 	}
 
 	public RingCentralCoverLetterListResult getFaxCoverPageList()
@@ -104,6 +113,7 @@ public class RingCentralApiConnector extends RESTClient
 	{
 		return getAccountInfo(CURRENT_SESSION_INDICATOR);
 	}
+
 	public RingCentralAccountInfoResult getAccountInfo(String accountId)
 	{
 		String endpoint = REST_API_URL + "account/{0}";
@@ -151,11 +161,29 @@ public class RingCentralApiConnector extends RESTClient
 		return doPut(url, getAuthorizationBearerHeaders(), input.getParameterMap(), input, RingCentralMessageInfoResult.class);
 	}
 
-	protected void revokeAccessToken()
+	protected void revokeToken(String token) throws FaxApiConnectionException
 	{
-		String endpoint = REST_API_BASE + "/revoke";
-		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, ""));
-		doPost(url, getAuthorizationBasicHeaders(), Void.class);
+		String endpoint = REST_API_BASE + "oauth/revoke";
+		try
+		{
+			Optional<Credential> oAuthCredential = getCredential();
+			if (oAuthCredential.isPresent())
+			{
+				Credential credential = oAuthCredential.get();
+				String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, ""));
+
+				HttpHeaders headers = getAuthorizationBasicHeaders();
+				headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+
+				Map<String,Object> formEncodedToken = new HashMap<>();
+				formEncodedToken.put("token", token);
+				doPost(url, getAuthorizationBasicHeaders(), formEncodedToken, null, Void.class);
+			}
+		}
+		catch (Exception e)
+		{
+			throw new FaxApiConnectionException("Could not revoke token \n" + e.getMessage());
+		}
 	}
 
 	protected HttpHeaders getAuthorizationBasicHeaders()
@@ -173,8 +201,15 @@ public class RingCentralApiConnector extends RESTClient
 			Optional<Credential> oAuthCredential = getCredential();
 			if(oAuthCredential.isPresent())
 			{
+				Credential credential = oAuthCredential.get();
+
+				if (credential.getExpiresInSeconds() <= RingCentralCredentialStore.ACCESS_TOKEN_REFRESH_THRESHOLD_SECONDS)
+				{
+					credential.refreshToken();
+				}
+
 				HttpHeaders headers = new HttpHeaders();
-				headers.set(HttpHeaders.AUTHORIZATION, MessageFormat.format("Bearer {0}", oAuthCredential.get().getAccessToken()));
+				headers.set(HttpHeaders.AUTHORIZATION, MessageFormat.format("Bearer {0}", credential.getAccessToken()));
 				return headers;
 			}
 			else
