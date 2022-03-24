@@ -1,4 +1,5 @@
 import {TicklerAttachmentType} from "./TicklerAttachmentType";
+import ArgumentError from "../../error/ArgumentError";
 
 export default class TicklerAttachment
 {
@@ -25,7 +26,7 @@ export default class TicklerAttachment
 		this._attachmentMeta = meta;
 	}
 
-	public getLinkUrl($state)
+	public getLinkUrl($state: any): string
 	{
 		switch (this.attachmentType)
 		{
@@ -43,7 +44,7 @@ export default class TicklerAttachment
 					group: meta.group,
 				});
 			}
-			default: throw "Invalid attachment type: " + this.attachmentType;
+			default: throw new ArgumentError("Invalid attachment type: " + this.attachmentType);
 		}
 	}
 
