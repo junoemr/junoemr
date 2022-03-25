@@ -75,10 +75,7 @@ public class SendFaxPDFAction extends DispatchAction {
 		String demoNo = request.getParameter("demoId");
 		String providerNo = request.getParameter("providerId");
 
-		MiscUtils.getLogger().info("demo and provider ====================================");
-		MiscUtils.getLogger().info(demoNo);
-		MiscUtils.getLogger().info(providerNo);
-		MiscUtils.getLogger().info("======================================================");
+		MiscUtils.getLogger().info("Send fax document: demo=" +demoNo+ ", provider=" + providerNo);
 
 		Integer demographicId = Integer.parseInt(demoNo);
 
