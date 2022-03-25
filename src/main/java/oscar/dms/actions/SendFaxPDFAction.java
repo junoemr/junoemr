@@ -37,10 +37,10 @@ import org.oscarehr.fax.exception.FaxException;
 import org.oscarehr.fax.model.FaxFileType;
 import org.oscarehr.fax.model.FaxStatusInternal;
 import org.oscarehr.fax.service.FaxUploadService;
+import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import org.oscarehr.fax.transfer.FaxOutboxTransferOutbound;
 import oscar.OscarProperties;
 import oscar.dms.EDocUtil;
 import oscar.oscarEncounter.data.EctProgram;
@@ -182,13 +182,20 @@ public class SendFaxPDFAction extends DispatchAction {
 		try
 		{
 			Set<String> faxNoList = FaxUploadService.preProcessFaxNumbers(recipients);
+			GenericFile fileToCopy = FileFactory.getExistingFile(pdfPath);
+
 			for(String faxNo : faxNoList)
 			{
 				FaxOutboxTransferOutbound transfer;
 				try
 				{
-					GenericFile fileToFax = FileFactory.getExistingFile(pdfPath);
-					fileToFax.rename(GenericFile.getFormattedFileName(faxNo + "-" + tempFile.getName()));
+					GenericFile fileToFax = FileFactory.copy(fileToCopy);
+					String newName = GenericFile.getFormattedFileName(faxNo + "-" + tempFile.getName());
+					if(!newName.toLowerCase().endsWith(".pdf"))
+					{
+						newName += ".pdf";
+					}
+					fileToFax.rename(newName);
 					transfer = faxUploadService
 						.queueAndSendFax(providerNo, demographicNo, faxNo, FaxFileType.FORM, fileToFax);
 					if(transfer.getSystemStatus().equals(FaxStatusInternal.ERROR))
