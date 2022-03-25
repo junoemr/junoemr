@@ -190,12 +190,9 @@ public class SendFaxPDFAction extends DispatchAction {
 				try
 				{
 					GenericFile fileToFax = FileFactory.copy(fileToCopy);
-					String newName = GenericFile.getFormattedFileName(faxNo + "-" + tempFile.getName());
-					if(!newName.toLowerCase().endsWith(".pdf"))
-					{
-						newName += ".pdf";
-					}
-					fileToFax.rename(newName);
+
+					String faxFileName = FilenameUtils.removeExtension(tempFile.getName()) + "-" + faxNo;
+					fileToFax.rename(faxFileName + FilenameUtils.removeExtension(fileToFax.getName()) + ".pdf");
 					transfer = faxUploadService
 						.queueAndSendFax(providerNo, demographicNo, faxNo, FaxFileType.FORM, fileToFax);
 					if(transfer.getSystemStatus().equals(FaxStatusInternal.ERROR))
