@@ -1,0 +1,12 @@
+.encounter-note-container
+{
+  // un-style the pre tags used for note display
+  pre {
+    @include juno-font-default;
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+  }
+}
