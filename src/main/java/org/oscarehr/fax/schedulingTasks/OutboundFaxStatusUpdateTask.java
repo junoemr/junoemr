@@ -53,10 +53,6 @@ public class OutboundFaxStatusUpdateTask
 		{
 			faxUploadService.requestAllPendingStatusUpdates();
 		}
-		catch(IllegalStateException e)
-		{
-			logger.warn(e.getMessage());
-		}
 		catch(Exception e)
 		{
 			logger.error("Unexpected fax status update error", e);
