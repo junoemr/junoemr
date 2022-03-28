@@ -179,13 +179,22 @@ public class PreventionDao extends AbstractDao<Prevention>
 	}
 	
 
-	public List<Prevention> findUniqueByDemographicId(Integer demographicId) {
-		Query query = entityManager.createQuery("select x from "+modelClass.getSimpleName()+" x where x.demographicId=?1 and x.deleted='0' GROUP BY x.preventionType ORDER BY x.preventionDate DESC");
-		query.setParameter(1, demographicId);
+	public List<Prevention> findMostRecentByDemographic(Integer demographicId)
+	{
+		String sql = "SELECT p.* FROM (\n" +
+				"    SELECT ROW_NUMBER() OVER (PARTITION BY prevention_type ORDER BY prevention_date DESC) AS rank, p1.id\n" +
+				"    FROM preventions p1" +
+				"    WHERE p1.demographic_no=:demographicId\n" +
+				"    AND p1.deleted=:deleted) as filter\n" +
+				"JOIN preventions p ON (p.id = filter.id)\n" +
+				"WHERE filter.rank = 1";
+
+		Query query = entityManager.createNativeQuery(sql, Prevention.class);
+		query.setParameter("demographicId", demographicId);
+		query.setParameter("deleted", '0');
 
 		@SuppressWarnings("unchecked")
 		List<Prevention> results = query.getResultList();
-		
 		return (results);
 	}
 
