@@ -6,6 +6,7 @@
 
 <suppressions>
 	<suppress checks="RegexpMultiline" files="MSHSegment.java" lines="50" />
+	<suppress checks="RegexpMultiline" files="tinycolor.html" lines="1" />
 	<suppress checks="RegexpMultiline" files="OpenApiSpecBuilder.java" lines="47,48" />
 	<suppress checks="org.oscarehr.util.checkstyle.TrackingRegexpCheck" files="oscar_15.creation_db.2021.09.07.sql" />
 	<!--

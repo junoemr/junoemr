@@ -2191,7 +2191,7 @@ TR12240-8,Dihydropteridine Reductase,Dihydropteridine Reductase,,Chemistry
 TR12241-6,Amitriptyline + Nortriptyline,Amitriptyline + Nortriptyline,,Chemistry
 TR12242-4,Heparan Sulfamidase,Heparan Sulfamidase,,Chemistry
 TR12245-7,Pneumococcal Serology,Pneumococcal Serology,,Microbiology
-TR12246-5,Minimal Residual Disease Testing,Minimal Residual Disease Testing,,Chemistry
+TR12246-5,Minimal Residual Disease Testing,Minimal Residual Disease Testing,,Hematology
 TR12247-3,Adenovirus PCR,Adenovirus PCR,,Microbiology
 TR12248-1,Clostridium difficile PCR,Clostridium difficile PCR,,Microbiology
 TR12250-7,Chlamydia pneumonia PCR,Chlamydia pneumonia PCR,,Microbiology
@@ -2631,8 +2631,8 @@ TR12722-5,Contactin-Associated Protein-2 Antibody,Contactin-Associated Protein-2
 TR12723-3,"Leucine-rich, glioma-inactivated 1 protein antibody","Leucine-Rich, Glioma-Inactivated Protein 1 Antibody",,Chemistry
 TR12724-1,C3a Complement,C3a Complement,,Hematology
 TR12725-8,C4a Complement,C4a Complement,,Hematology
-TR12726-6,Blastomyces Antigen,Blastomyces Antigen,,Chemistry
-TR12727-4,Coccidioides Antigen,Coccidioides Antigen,,Chemistry
+TR12726-6,Blastomyces Antigen,Blastomyces Antigen,,Microbiology
+TR12727-4,Coccidioides Antigen,Coccidioides Antigen,,Microbiology
 TR12728-2,Coagulation factor XIII inhibitor,Factor XIII Inhibitor,,Hematology
 TR12729-0,DNA Factor VIII,DNA Factor VIII,,Pathology
 TR12730-8,Coagulation factor IX Antigen,Factor IX Antigen,,Hematology
@@ -2865,4 +2865,34 @@ TR12957-7,Immature Platelet Fraction,Immature Platelet Fraction,,Hematology
 TR12958-5,Growth+differentiation factor 15,Growth and Differentiation factor 15,,Chemistry
 TR12959-3,Sterols panel,Sterols Panel,,Chemistry
 TR12960-1,Vaccine induced thrombocytopenia panel,Vaccine Induced Thrombocytopenia Panel,,Hematology
+TR12961-9,Carnitine + Acylcarnitine,Carnitine + Acylcarnitine,,Chemistry
+TR12962-7,Neurofilament light chain,Neurofilament Light Chain,,Chemistry
+TR12963-5,Isavuconazole,Isavuconazole,,Chemistry
+TR12964-3,Matrix metallopeptidase 9,Matrix metallopeptidase 9,,Chemistry
+TR12965-0,Cytochrome P450 2C9 Genotyping,Cytochrome P450 2C9 Genotyping,,Chemistry
+TR12966-8,Cytochrome P450 2C19 Genotyping,Cytochrome P450 2C19 Genotyping,,Chemistry
+TR12967-6,Vasopressin challenge,Vasopressin Challenge,,Chemistry
+TR12968-4,Hydrogen/expired gas,Hydrogen/Expired Gas,,Chemistry
+TR12969-2,Arginine tolerance,Arginine Tolerance,,Chemistry
+TR12970-0,CD163,CD163,,Hematology
+TR12971-8,Cytochrome oxidase,Cytochrome Oxidase,,Chemistry
+TR12972-6,Phosphoenolpyruvate carboxykinase,Phosphoenolpyruvate Carboxykinase,,Chemistry
+TR12973-4,Succinate cytochrome C reductase,Succinate Cytochrome C Reductase,,Chemistry
+TR12974-2,Sialate,Sialate,,Chemistry
+TR12975-9,Gamma interferon,Gamma Interferon,,Chemistry
+TR12976-7,Hyperoxaluria,Hyperoxaluria,,Chemistry
+TR12977-5,T-cell receptor V-beta,T-cell Receptor V-beta,,Hematology
+TR12978-3,Autoimmune lymphoproliferative syndrome,Autoimmune Lymphoproliferative Syndrome,,Hematology
+TR12979-1,CD20,CD20,,Hematology
+TR12980-9,Neutrophil oxidative burst index,Neutrophil Oxidative Burst Index,,Hematology
+TR12981-7,Natural killer degranulation assay,Natural Killer Degranulation Assay,,Hematology
+TR12982-5,Perforin,Perforin,,Chemistry
+TR12983-3,Platelet-membrane glycoprotein expression,Platelet-membrane Glycoprotein Expression,,Hematology
+TR12984-1,Recent thymic emigrants,Recent Thymic Emigrants,,Hematology
+TR12985-8,Regulatory T cells,Regulatory T Cells,,Hematology
+TR12986-6,Soluble interleukin 2 receptor,Soluble Interleukin 2 Receptor,,Chemistry
+TR12987-4,Surface CD22 expression,Surface CD22 Expression,,Hematology
+TR12988-2,T-cell subset panel,T-cell Subset Panel,,Hematology
+TR12989-0,"ATPase, oligomycin sensitive","ATPase, Oligomycin Sensitive",,Chemistry
+TR12990-8,Kidney failure 5Y risk,Kidney Failure 5 Year Risk,,Chemistry
 TR99999-9,Do Not Transmit,Do Not Transmit,,Clinical

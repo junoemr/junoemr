@@ -33,7 +33,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 			ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-			ctrl.coverLetterOptions = <JunoSelectOption> [];
+			ctrl.coverLetterOptions = [];
 			ctrl.validations = {};
 			ctrl.initialSave = false;
 			ctrl.initialized = false;

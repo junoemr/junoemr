@@ -63,29 +63,67 @@ public abstract class AbstractQueryHandler extends HibernateDaoSupport {
 			logger.error("Failed to execute query.");
 			return null;
 		}
-		return execute( getQuery() );
+		return execute(getQuery(), getSession());
 	}
+
+	protected List<?> execute(String query)
+	{
+		return execute(query, getSession());
+	}
+
+	protected List<?> executeReadOnly() {
+		if( getQuery().isEmpty() ) {
+			logger.error("Failed to execute query.");
+			return null;
+		}
+
+		Session session = getReadOnlySession();
+		try
+		{
+			session.beginTransaction();
+			return execute(getQuery(), session);
+		}
+		finally
+		{
+			session.clear();
+			// Spring takes care of committing the transaction
+		}
+	}
+
+	protected List<?> executeReadOnly(String query)
+	{
+		Session session = getReadOnlySession();
+		try
+		{
+
+			session.beginTransaction();
+			return execute(query, session);
+		}
+		finally
+		{
+			session.clear();
+			// Spring takes care of committing the transaction
+		}
+
+	}
+
 	
-	protected List<?> execute( String query ) {
+	private List<?> execute(String query, Session session) {
 		
 		setResultList( null );
-		
-		Session session = getSession();
-		SQLQuery sqlQuery = session.createSQLQuery( query );
-		List<?> results = sqlQuery.setResultTransformer( Criteria.ALIAS_TO_ENTITY_MAP ).list();		
 
-		logger.debug( "Thread " + Thread.currentThread().getName() +  "[" + Thread.currentThread().getId()
+			SQLQuery sqlQuery = session.createSQLQuery( query );
+			List<?> results = sqlQuery.setResultTransformer( Criteria.ALIAS_TO_ENTITY_MAP ).list();
+
+			logger.debug( "Thread " + Thread.currentThread().getName() +  "[" + Thread.currentThread().getId()
 				+ "] Query results " + results );
 
-		//TODO-legacy work on method to detect and exclude demographic files that are
-		// defined in the securityInfoManager object.
-		
-		setResultList( results );			
-		releaseSession( session );
-
-		return results;
+			//TODO-legacy work on method to detect and exclude demographic files that are
+			// defined in the securityInfoManager object.
+			setResultList( results );
+			releaseSession( session );
+			return results;
 	}
-	
 
 	public List<Parameter> getParameters() {
 		return parameters;

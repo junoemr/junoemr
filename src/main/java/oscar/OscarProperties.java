@@ -457,6 +457,23 @@ public class OscarProperties extends Properties {
 		return getProperty("db_driver");
 	}
 
+	public String getDbNameReadOnly()
+	{
+		return getProperty("db_name_readonly");
+	}
+
+	public String getDbUserNameReadOnly() {
+		return getProperty("db_username_readonly");
+	}
+
+	public String getDbPasswordReadOnly() {
+		return getProperty("db_password_readonly");
+	}
+
+	public String getDbUriReadOnly() {
+		return getProperty("db_uri_readonly");
+	}
+
 	public static String getBuildDate() {
 		return oscarProperties.getProperty("buildDateTime");
 	}

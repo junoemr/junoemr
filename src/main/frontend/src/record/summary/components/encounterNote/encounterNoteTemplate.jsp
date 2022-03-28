@@ -64,7 +64,8 @@
 	</div>
 	<div class="row note-body"
 	     ng-hide="$ctrl.minimized || !$ctrl.allowNoteExpansion()">
-		<p>{{$ctrl.note.note}}</p>
+		<%-- use pre tags to preserve line breaks when copypasting to some places (this is browser specific) --%>
+		<pre>{{$ctrl.note.note}}</pre>
 		<hr class="note-divider">
 	</div>
 

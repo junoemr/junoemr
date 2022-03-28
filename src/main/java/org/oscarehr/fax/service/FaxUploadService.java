@@ -76,6 +76,7 @@ public class FaxUploadService
 {
 	public static final String STATUS_MESSAGE_IN_TRANSIT = "Sending";
 	private static final String STATUS_MESSAGE_COMPLETED = "Success";
+	private static final String STATUS_MESSAGE_ERROR_UNKNOWN = "See integration for details";
 	private static final String DEFAULT_MAX_SEND_COUNT = "5";
 
 	private static final Logger logger = MiscUtils.getLogger();
@@ -160,6 +161,10 @@ public class FaxUploadService
 		}
 		else
 		{
+			if(faxStatus.canSendFaxes())
+			{
+				throw new IllegalStateException("Server is not in a master state");
+			}
 			throw new IllegalStateException("No outbound fax routes enabled!");
 		}
 		return transfer;
@@ -310,7 +315,15 @@ public class FaxUploadService
 		List<FaxAccount> activeAccounts = faxAccountDao.criteriaSearch(activeAccountQuery);
 		for (FaxAccount activeAccount : activeAccounts)
 		{
-			requestPendingStatusUpdates(activeAccount);
+			try
+			{
+				requestPendingStatusUpdates(activeAccount);
+			}
+			// prevent transaction rollback if an account is not set up correctly
+			catch(FaxIntegrationException e)
+			{
+				logger.error(e.getMessage());
+			}
 		}
 	}
 
@@ -340,24 +353,25 @@ public class FaxUploadService
 				{
 					FaxStatusResult apiResult = uploadProvider.getFaxStatus(faxOutbound);
 
-					String remoteSentStatus = apiResult.getRemoteSentStatus();
-					faxOutbound.setExternalStatus(remoteSentStatus);
+					String externalStatus = apiResult.getRemoteSentStatus();
+					faxOutbound.setExternalStatus(externalStatus);
 
 					// if the remote status is sent, update accordingly.
-					if(uploadProvider.isFaxInRemoteSentState(apiResult.getRemoteSentStatus()))
+					if(uploadProvider.isFaxInRemoteSentState(externalStatus))
 					{
 						apiResult.getRemoteSendTime().ifPresent(faxOutbound::setExternalDeliveryDate);
 						faxOutbound.setRemoteStatusSent();
 						faxOutbound.setStatusMessage(STATUS_MESSAGE_COMPLETED);
 						faxOutbound.setArchived(true);
 					}
-					else if(apiResult.getError().isPresent())
+					// if the remote status is failed, update accordingly.
+					else if(uploadProvider.isFaxInRemoteFailedState(externalStatus))
 					{
 						faxOutbound.setRemoteStatusError();
-						faxOutbound.setStatusMessage(apiResult.getError().get());
+						faxOutbound.setStatusMessage(apiResult.getError().orElse(STATUS_MESSAGE_ERROR_UNKNOWN));
 					}
 					faxOutboundDao.merge(faxOutbound);
-					logger.info("Updated Status to: " + remoteSentStatus);
+					logger.info("Updated external status to: " + externalStatus);
 				}
 				/* Don't change fax status if there is an error here. The fax has been sent to the remote service successfully,
 				 * we just don't know what remote state it's in. */
