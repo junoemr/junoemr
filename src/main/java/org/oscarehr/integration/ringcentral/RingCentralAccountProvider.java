@@ -23,8 +23,10 @@
 
 package org.oscarehr.integration.ringcentral;
 
+import com.google.api.client.auth.oauth2.Credential;
 import org.oscarehr.fax.exception.FaxIntegrationException;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.model.FaxAccountConnectionStatus;
 import org.oscarehr.fax.provider.FaxAccountProvider;
 import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
@@ -48,10 +50,38 @@ public class RingCentralAccountProvider implements FaxAccountProvider
 	}
 
 	@Override
-	public boolean testConnectionStatus()
+	public FaxAccountConnectionStatus testConnectionStatus()
 	{
-		RingCentralAccountInfoResult accountInfo = ringCentralApiConnector.getAccountInfo(faxAccount.getLoginId());
-		return (accountInfo != null);
+		try
+		{
+			if (!ringCentralApiConnector.getCredential().isPresent())
+			{
+				// No credential, probably logged out and never logged back in
+				return FaxAccountConnectionStatus.SignedOut;
+			}
+			else
+			{
+				Credential authToken = ringCentralApiConnector.getCredential().get();
+				boolean refreshed = authToken.refreshToken();
+				if (!refreshed)
+				{
+					// Refresh token is expired
+					return FaxAccountConnectionStatus.SignedOut;
+				}
+
+				RingCentralAccountInfoResult accountInfo = ringCentralApiConnector.getAccountInfo(faxAccount.getLoginId());
+				if (accountInfo != null)
+				{
+					return FaxAccountConnectionStatus.Success;
+				}
+
+				return FaxAccountConnectionStatus.Unknown;
+			}
+		}
+		catch (IOException e)
+		{
+			return FaxAccountConnectionStatus.Failure;
+		}
 	}
 
 	@Override

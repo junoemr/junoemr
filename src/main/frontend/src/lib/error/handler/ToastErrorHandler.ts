@@ -1,32 +1,23 @@
-import {ErrorHandler} from "./ErrorHandler";
 import ToastService from "../../alerts/service/ToastService";
+import BasicErrorHandler from "./BasicErrorHandler";
 
 /**
  * error handler that displays errors in a toast popup
  */
-export default class ToastErrorHandler implements ErrorHandler
+export default class ToastErrorHandler extends BasicErrorHandler
 {
 	protected toastService = new ToastService();
 
-	public handleError(response: any): any
+	serviceError(response: any): void
 	{
-		console.error(response);
-		if(response && response.data && response.data.error)
+		// All non-5XX response codes
+		if(response && response.data && response.data.error && response.status && response.status < 500)
 		{
-			if(response.status >= 500) // 500 series errors
-			{
-				this.toastService.errorToast("An unknown error has occurred. please contact support");
-			}
-			else
-			{
-				this.toastService.errorToast(response.data.error.message);
-			}
-			throw response.data.error;
+			this.toastService.errorToast(response.data.error.message);
 		}
 		else
 		{
 			this.toastService.errorToast("An unknown error has occurred. please contact support");
-			throw response;
 		}
 	}
 }

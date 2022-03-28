@@ -1,4 +1,8 @@
-import {FaxAccountApi, FaxInboundApi, FaxOutboundApi} from "../../../../generated";
+import {
+	FaxAccountApi,
+	FaxInboundApi,
+	FaxOutboundApi
+} from "../../../../generated";
 import {API_BASE_PATH} from "../../constants/ApiConstants";
 import FaxAccountToUpdateInputConverter from "../converter/FaxAccountToUpdateInputConverter";
 import FaxAccountToCreateInputConverter from "../converter/FaxAccountToCreateInputConverter";
@@ -6,7 +10,8 @@ import FaxAccountToModelConverter from "../converter/FaxAccountToModelConverter"
 import FaxAccount from "../model/FaxAccount";
 import PagedResponse from "../../common/response/PagedResponse";
 import {ErrorHandler} from "../../error/handler/ErrorHandler";
-import SilentErrorHandler from "../../error/handler/SilentErrorHandler";
+import BasicErrorHandler from "../../error/handler/BasicErrorHandler";
+import {FaxAccountConnectionStatus} from "../model/FaxAccountConnectionStatus";
 
 export default class FaxAccountService
 {
@@ -23,7 +28,7 @@ export default class FaxAccountService
 	// Public Methods
 	// ==========================================================================
 
-	constructor(errorHandler: ErrorHandler = new SilentErrorHandler())
+	constructor(errorHandler: ErrorHandler = new BasicErrorHandler())
 	{
 		const $http = angular.injector(["ng"]).get("$http");
 		const $httpParamSerializer = angular.injector(["ng"]).get("$httpParamSerializer");
@@ -40,7 +45,7 @@ export default class FaxAccountService
 		{
 			return (await this.faxAccountApi.isEnabled(id)).data.body;
 		}
-		catch (error: any)
+		catch (error)
 		{
 			this.errorHandler.handleError(error);
 		}
@@ -53,7 +58,7 @@ export default class FaxAccountService
 			return this.faxAccountToModelConverter.convert(
 				(await this.faxAccountApi.getAccountSettings(id)).data.body);
 		}
-		catch (error: any)
+		catch (error)
 		{
 			this.errorHandler.handleError(error);
 		}
@@ -67,7 +72,7 @@ export default class FaxAccountService
 			return this.faxAccountToModelConverter.convert(
 				(await this.faxAccountApi.createAccountSettings(input)).data.body);
 		}
-		catch (error: any)
+		catch (error)
 		{
 			this.errorHandler.handleError(error);
 		}
@@ -81,7 +86,7 @@ export default class FaxAccountService
 			return this.faxAccountToModelConverter.convert(
 				(await this.faxAccountApi.updateAccountSettings(model.id, input)).data.body);
 		}
-		catch (error: any)
+		catch (error)
 		{
 			this.errorHandler.handleError(error);
 		}
@@ -93,7 +98,7 @@ export default class FaxAccountService
 		{
 			return (await this.faxAccountApi.deleteAccountSettings(id)).data.body;
 		}
-		catch (error: any)
+		catch (error)
 		{
 			this.errorHandler.handleError(error);
 		}
@@ -105,28 +110,33 @@ export default class FaxAccountService
 		{
 			return (await this.faxAccountApi.disconnectAccountSettings(id)).data.body;
 		}
-		catch (error: any)
+		catch (error)
 		{
 			this.errorHandler.handleError(error);
 		}
 	};
 
+	public async testExistingFaxConnection(model: FaxAccount): Promise<FaxAccountConnectionStatus>
+	{
+		try
+		{
+				let input = this.faxAccountToUpdateInputConverter.convert(model);
+				return (await this.faxAccountApi.testExistingFaxConnection(model.id, input)).data.body;
+		}
+		catch (error)
+		{
+			this.errorHandler.handleError(error);
+		}
+	}
+
 	public async testFaxConnection(model: FaxAccount): Promise<boolean>
 	{
 		try
 		{
-			if (model.id)
-			{
-				let input = this.faxAccountToUpdateInputConverter.convert(model);
-				return (await this.faxAccountApi.testExistingFaxConnection(model.id, input)).data.body;
-			}
-			else
-			{
-				let input = this.faxAccountToCreateInputConverter.convert(model);
-				return (await this.faxAccountApi.testFaxConnection(input)).data.body;
-			}
+			let input = this.faxAccountToCreateInputConverter.convert(model);
+			return (await this.faxAccountApi.testFaxConnection(input)).data.body;
 		}
-		catch (error: any)
+		catch (error)
 		{
 			this.errorHandler.handleError(error);
 		}
@@ -139,7 +149,7 @@ export default class FaxAccountService
 			const transfer = (await this.faxAccountApi.listAccounts(page, perPage)).data;
 			return new PagedResponse<FaxAccount>(this.faxAccountToModelConverter.convertList(transfer.body), transfer.headers);
 		}
-		catch (error: any)
+		catch (error)
 		{
 			this.errorHandler.handleError(error);
 		}
@@ -152,7 +162,7 @@ export default class FaxAccountService
 			return this.faxAccountToModelConverter.convert(
 				(await this.faxAccountApi.getActiveFaxAccount()).data.body);
 		}
-		catch (error: any)
+		catch (error)
 		{
 			this.errorHandler.handleError(error);
 		}
@@ -164,7 +174,7 @@ export default class FaxAccountService
 		{
 			return (await this.faxAccountApi.getCoverLetterOptions(id)).data.body;
 		}
-		catch (error: any)
+		catch (error)
 		{
 			this.errorHandler.handleError(error);
 		}

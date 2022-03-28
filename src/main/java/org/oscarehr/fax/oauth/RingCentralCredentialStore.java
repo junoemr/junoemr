@@ -46,27 +46,29 @@ public class RingCentralCredentialStore
 	public static final String LOCAL_USER_ID = "com.junoemr.fax.ringcentral";
 	public static final long ACCESS_TOKEN_REFRESH_THRESHOLD_SECONDS = 3600L;
 
-	private static final String BASE_URL = "https://platform.devtest.ringcentral.com";
-	private static final String AUTH_SERVER_URL = BASE_URL + "/restapi/oauth/authorize";
-	private static final String REVOKE_SERVER_URL = BASE_URL + "/restapi/oauth/revoke";
-	private static final String TOKEN_SERVER_URL = BASE_URL + "/restapi/oauth/token";
+	private static final String OAUTH_PATH = "/restapi/oauth";
+	private static final String AUTH_ENDPOINT = "/authorize";
+	private static final String TOKEN_ENDPOINT = "/token";
 
 	private static final File DATASTORE_DIR = new File("/tmp/com.junoemr.fax.datastore");
-
 	private static Logger logger = MiscUtils.getLogger();
 
-	static
+	public static void init(String apiLocation)
 	{
+		final String base_url = apiLocation + OAUTH_PATH;
+		final String auth_url = base_url + AUTH_ENDPOINT;
+		final String token_url = base_url + TOKEN_ENDPOINT;
+
 		try
 		{
 			oAuthWorkFlow = new AuthorizationCodeFlow.Builder(
 				BearerToken.formEncodedBodyAccessMethod(),
 				new NetHttpTransport(),
 				new JacksonFactory(),
-				new GenericUrl(TOKEN_SERVER_URL),
+				new GenericUrl(token_url),
 				makeClientParams(),
 				getClientID(),
-				AUTH_SERVER_URL
+				auth_url
 			)
 				.setDataStoreFactory(new FileDataStoreFactory(DATASTORE_DIR))
 				.enablePKCE()
@@ -74,7 +76,7 @@ public class RingCentralCredentialStore
 		}
 		catch (IOException e)
 		{
-			logger.error("Could not init datastore", e);
+			logger.error("Could not init OAuth workflow", e);
 		}
 	}
 
@@ -86,6 +88,38 @@ public class RingCentralCredentialStore
 	public static void deleteCredential(String id) throws IOException
 	{
 		oAuthWorkFlow.getCredentialDataStore().delete(id);
+	}
+
+	/**
+	 * Construct a base64 encoded string of the format client_id:clientSecret.
+	 *
+	 * @return base64 auth string suitable for Authentication: Basic header.
+	 */
+	public static String makeBasicAuthentication()
+	{
+		return HttpHeaders.encodeBasicAuth(getClientID(), getClientSecret(), StandardCharsets.UTF_8);
+	}
+
+	protected static String getRedirectURL()
+	{
+		String clientId = System.getenv("FAX.RINGCENTRAL.REDIRECT_URL");
+		if (clientId == null)
+		{
+			throw new RuntimeException("Missing required env variable $FAX.RINGCENTRAL.REDIRECT_URL");
+		}
+
+		return clientId;
+	}
+
+	protected static String getUserId()
+	{
+		return LOCAL_USER_ID;
+	}
+
+	@Synchronized
+	protected static AuthorizationCodeFlow getFlow()
+	{
+		return oAuthWorkFlow;
 	}
 
 	private static ClientParametersAuthentication makeClientParams()
@@ -113,37 +147,5 @@ public class RingCentralCredentialStore
 		}
 
 		return clientId;
-	}
-
-	protected static String getRedirectURL()
-	{
-		String clientId = System.getenv("FAX.RINGCENTRAL.REDIRECT_URL");
-		if (clientId == null)
-		{
-			throw new RuntimeException("Missing required env variable $FAX.RINGCENTRAL.REDIRECT_URL");
-		}
-
-		return clientId;
-	}
-
-	/**
-	 * Construct a base64 encoded string of the format client_id:clientSecret.
-	 *
-	 * @return base64 auth string suitable for Authentication: Basic header.
-	 */
-	public static String makeBasicAuthentication()
-	{
-		return HttpHeaders.encodeBasicAuth(getClientID(), getClientSecret(), StandardCharsets.UTF_8);
-	}
-
-	protected static String getUserId()
-	{
-		return LOCAL_USER_ID;
-	}
-
-	@Synchronized
-	protected static AuthorizationCodeFlow getFlow()
-	{
-		return oAuthWorkFlow;
 	}
 }

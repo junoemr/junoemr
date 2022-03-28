@@ -1,6 +1,5 @@
 import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";
 import FaxAccount from "../../../../../lib/fax/model/FaxAccount";
-import {FaxAccountConnectionStatusType} from "../../../../../lib/fax/model/FaxAccountConnectionStatusType";
 import {
 	JUNO_BUTTON_COLOR,
 	JUNO_BUTTON_COLOR_PATTERN,
@@ -11,6 +10,7 @@ import {FaxAccountType} from "../../../../../lib/fax/model/FaxAccountType";
 import LoadingQueue from "../../../../../lib/util/LoadingQueue";
 import FaxAccountProviderFactory from "../../../../../lib/fax/provider/FaxAccountProviderFactory";
 import ToastErrorHandler from "../../../../../lib/error/handler/ToastErrorHandler";
+import {FaxAccountConnectionStatus} from "../../../../../lib/fax/model/FaxAccountConnectionStatus";
 
 angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 	templateUrl: 'src/admin/section/fax/components/faxConfigurationEditModal/faxConfigurationEditModal.jsp',
@@ -67,7 +67,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				}
 
 				ctrl.faxAccountProvider = FaxAccountProviderFactory.creatAccountProvider(ctrl.faxAccount);
-				ctrl.coverLetterOptions = await ctrl.faxAccountProvider.getCoverLetterOptions();
+				//ctrl.coverLetterOptions = await ctrl.faxAccountProvider.getCoverLetterOptions();
 				if(!ctrl.faxAccount.coverLetterOption && ctrl.coverLetterOptions.length > 0)
 				{
 					ctrl.faxAccount.coverLetterOption = ctrl.coverLetterOptions[0].value;
@@ -111,6 +111,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 					updatedAccount.connectionStatus = ctrl.faxAccount.connectionStatus;
 					ctrl.modalInstance.close(updatedAccount);
 				};
+
 				let closeError = function (error)
 				{
 					console.error(error);
@@ -135,32 +136,66 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 
 			ctrl.deleteConfig = async () =>
 			{
-				ctrl.LoadingQueue.pushLoadingState();
-				const confirm = await Juno.Common.Util.confirmationDialog(
-					$uibModal,
-					"Confirm Action", "Are you sure you want to delete this fax integration?",
-					ctrl.componentStyle);
-				if(confirm)
+				try
 				{
-					await ctrl.faxAccountService.deleteAccountSettings(ctrl.faxAccount.id);
-					ctrl.modalInstance.close(null);
+					ctrl.LoadingQueue.pushLoadingState();
+					const confirm = await Juno.Common.Util.confirmationDialog(
+							$uibModal,
+							"Confirm Action", "Are you sure you want to delete this fax integration?",
+							ctrl.componentStyle);
+					if(confirm)
+					{
+						await ctrl.faxAccountService.deleteAccountSettings(ctrl.faxAccount.id);
+						ctrl.modalInstance.close(null);
+					}
 				}
-				ctrl.LoadingQueue.popLoadingState();
+				finally
+				{
+					ctrl.LoadingQueue.popLoadingState();
+					$scope.$apply();
+				}
+			}
+
+			ctrl.showConnectButton = () =>
+			{
+				return ctrl.isModalEditMode() &&
+						ctrl.faxAccountProvider.isOauth() &&
+						ctrl.faxAccount.connectionStatus !== FaxAccountConnectionStatus.Success;
+			}
+
+			ctrl.showDisconnectButton = () =>
+			{
+				return ctrl.isModalEditMode() &&
+						ctrl.faxAccountProvider.isOauth() &&
+						ctrl.faxAccount.connectionStatus === FaxAccountConnectionStatus.Success
+			}
+
+			ctrl.connectAccount = async () =>
+			{
+				location.href = "../fax/ringcentral/oauth";
 			}
 
 			ctrl.disconnectAccount = async () =>
 			{
-				ctrl.LoadingQueue.pushLoadingState();
-				const confirm = await Juno.Common.Util.confirmationDialog(
-					$uibModal,
-					"Confirm Action", "Are you sure you want to disconnect the integration?",
-					ctrl.componentStyle);
-				if(confirm)
+				try
 				{
-					await ctrl.faxAccountService.disconnectAccountSettings(ctrl.faxAccount.id);
-					ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Failure;
+					ctrl.LoadingQueue.pushLoadingState();
+					const confirm = await Juno.Common.Util.confirmationDialog(
+							$uibModal,
+							"Confirm Action", "Are you sure you want to disconnect the integration?",
+							ctrl.componentStyle);
+
+					if(confirm)
+					{
+						await ctrl.faxAccountService.disconnectAccountSettings(ctrl.faxAccount.id);
+						ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatus.SignedOut;
+					}
 				}
-				ctrl.LoadingQueue.popLoadingState();
+				finally
+				{
+					ctrl.LoadingQueue.popLoadingState();
+					$scope.$apply();
+				}
 			}
 
 			ctrl.cancel = function cancel()
@@ -168,40 +203,51 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				ctrl.modalInstance.dismiss('cancel');
 			};
 
-			ctrl.testConnection = async () =>
-			{
-				ctrl.faxAccountService.testFaxConnection(ctrl.faxAccount).then(
-					function success(response)
+			ctrl.testConnection = async () => {
+				try
+				{
+					ctrl.LoadingQueue.pushLoadingState();
+
+					if (ctrl.faxAccount.id)
 					{
-						if (response)
+						ctrl.faxAccount.connectionStatus = await ctrl.faxAccountService.testExistingFaxConnection(ctrl.faxAccount);
+					}
+					else
+					{
+						if (await ctrl.faxAccountService.testFaxConnection(ctrl.faxAccount))
 						{
-							ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Success;
+							ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatus.Success;
 						}
 						else
 						{
-							ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Failure;
+							ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatus.Failure;
 						}
-						$scope.$apply();
-					},
-					function error(error)
-					{
-						console.error(error);
-						ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Unknown;
 					}
-				)
-			};
+				}
+				catch (error)
+				{
+					ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatus.Failure;
+				}
+				finally
+				{
+					ctrl.LoadingQueue.popLoadingState();
+					$scope.$apply();
+				}
+			}
+
 			ctrl.setDefaultConnectionStatus = function ()
 			{
-				ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatusType.Unknown;
+				ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatus.Unknown;
 			};
 
 			ctrl.getConnectionStatusClass = (): string[] =>
 			{
 				switch (ctrl.faxAccount.connectionStatus)
 				{
-					case FaxAccountConnectionStatusType.Success: return ["connection-status-success"];
-					case FaxAccountConnectionStatusType.Failure: return ["connection-status-failure"];
-					case FaxAccountConnectionStatusType.Unknown:
+					case FaxAccountConnectionStatus.Success: return ["connection-status-success"];
+					case FaxAccountConnectionStatus.Failure:
+					case FaxAccountConnectionStatus.SignedOut: return ["connection-status-failure"];
+					case FaxAccountConnectionStatus.Unknown:
 					default: return ["connection-status-unknown"];
 				}
 			}
@@ -209,9 +255,10 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 			{
 				switch (ctrl.faxAccount.connectionStatus)
 				{
-					case FaxAccountConnectionStatusType.Success: return "icon-check";
-					case FaxAccountConnectionStatusType.Failure: return "icon-critical";
-					case FaxAccountConnectionStatusType.Unknown:
+					case FaxAccountConnectionStatus.Success: return "icon-check";
+					case FaxAccountConnectionStatus.Failure:
+					case FaxAccountConnectionStatus.SignedOut: return "icon-critical";
+					case FaxAccountConnectionStatus.Unknown:
 					default: return "icon-question";
 				}
 			}
@@ -220,11 +267,17 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 			{
 				switch (ctrl.faxAccount.connectionStatus)
 				{
-					case FaxAccountConnectionStatusType.Success: return "Fax Account Working";
-					case FaxAccountConnectionStatusType.Failure: return "Error Occurred";
-					case FaxAccountConnectionStatusType.Unknown:
+					case FaxAccountConnectionStatus.Success: return "Fax Account Working";
+					case FaxAccountConnectionStatus.Failure: return "Error Occurred";
+					case FaxAccountConnectionStatus.SignedOut: return "Not Connected";
+					case FaxAccountConnectionStatus.Unknown:
 					default: return "Test Connection";
 				}
+			}
+
+			ctrl.getConnectionText = (): string =>
+			{
+				return "Connect " + ctrl.faxAccountProvider.getIntegrationName();
 			}
 
 			ctrl.getDisconnectText = (): string =>

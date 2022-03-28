@@ -20,20 +20,13 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.provider;
 
-import org.oscarehr.fax.model.FaxAccountConnectionStatus;
-import java.util.List;
+package org.oscarehr.fax.model;
 
-public interface FaxAccountProvider
+public enum FaxAccountConnectionStatus
 {
-	/**
-	 * Test the connection status of the current account.
-	 * @return true if the account is able to make a successful connection to the external api. false otherwise.
-	 */
-	FaxAccountConnectionStatus testConnectionStatus();
-
-	List<String> getCoverLetterOptions();
-
-	void disconnectAccount();
+	Success,
+	Failure,
+	Unknown,
+	SignedOut
 }

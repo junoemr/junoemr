@@ -9,8 +9,8 @@ import FaxAccount from "../../../lib/fax/model/FaxAccount";
 import ToastService from "../../../lib/alerts/service/ToastService";
 import {SYSTEM_PROPERTIES} from "../../../common/services/systemPreferenceServiceConstants";
 import {FaxAccountType} from "../../../lib/fax/model/FaxAccountType";
-import {FaxAccountConnectionStatusType} from "../../../lib/fax/model/FaxAccountConnectionStatusType";
 import ToastErrorHandler from "../../../lib/error/handler/ToastErrorHandler";
+import {FaxAccountConnectionStatus} from "../../../lib/fax/model/FaxAccountConnectionStatus";
 
 angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
@@ -87,7 +87,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 				{
 					let newFaxAccount = new FaxAccount(FaxAccountType.Ringcentral);
 					newFaxAccount.accountLogin = accountIdParam;
-					newFaxAccount.connectionStatus = FaxAccountConnectionStatusType.Success;
+					newFaxAccount.connectionStatus = FaxAccountConnectionStatus.Success;
 					ctrl.editFaxAccount(newFaxAccount);
 
 					$location.search('accountId', null);
@@ -221,7 +221,6 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 			{
 				location.href = "../fax/ringcentral/oauth";
 			}
-
 		}
 	]
 });

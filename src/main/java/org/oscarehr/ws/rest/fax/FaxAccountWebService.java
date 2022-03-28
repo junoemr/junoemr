@@ -24,6 +24,7 @@ package org.oscarehr.ws.rest.fax;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.fax.dao.FaxAccountDao;
+import org.oscarehr.fax.model.FaxAccountConnectionStatus;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.fax.transfer.FaxAccountCreateInput;
@@ -165,7 +166,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@MaskParameter
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> testExistingFaxConnection(@PathParam("id") Long id,
+	public RestResponse<FaxAccountConnectionStatus> testExistingFaxConnection(@PathParam("id") Long id,
 	                                                       FaxAccountUpdateInput updateInput)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);

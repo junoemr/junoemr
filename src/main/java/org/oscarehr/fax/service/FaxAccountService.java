@@ -34,6 +34,7 @@ import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.model.FaxAccountConnectionStatus;
 import org.oscarehr.fax.provider.FaxAccountProvider;
 import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.fax.provider.FaxProviderFactory;
@@ -98,10 +99,10 @@ public class FaxAccountService
 	{
 		FaxAccount faxAccount = faxAccountCreateToEntityConverter.convert(createInput);
 		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccount);
-		return faxAccountProvider.testConnectionStatus();
+		return faxAccountProvider.testConnectionStatus().equals(FaxAccountConnectionStatus.Success);
 	}
 
-	public boolean testConnectionStatus(FaxAccountUpdateInput updateInput)
+	public FaxAccountConnectionStatus testConnectionStatus(FaxAccountUpdateInput updateInput)
 	{
 		FaxAccount faxAccount = faxAccountDao.find(updateInput.getId());
 		if (StringUtils.isNotBlank(updateInput.getPassword()))

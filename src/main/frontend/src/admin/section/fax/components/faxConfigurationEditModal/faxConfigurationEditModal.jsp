@@ -131,7 +131,7 @@
 					</juno-button>
 				</div>
 				<div class="input-group flex-row justify-content-center align-items-center">
-					<juno-button ng-show="$ctrl.isModalEditMode() && $ctrl.faxAccountProvider.isOauth()"
+					<juno-button ng-if="showDisconnectButton()"
 					             class="w-256"
 					             click="$ctrl.disconnectAccount()"
 					             disabled="$ctrl.LoadingQueue.isLoading"
@@ -139,6 +139,15 @@
 					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
 						{{$ctrl.getDisconnectText()}}
 					</juno-button>
+					<juno-button ng-if="showConnectButton()"
+								 class="w-256"
+								 click="$ctrl.connectAccount()"
+								 disabled="$ctrl.LoadingQueue.isLoading"
+								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
+						{{$ctrl.getConnectText()}}
+					</juno-button>
+				</div>
 				</div>
 			</div>
 		</form>
@@ -177,6 +186,3 @@
 		</div>
 	</modal-footer>
 </juno-modal>
-
-
-
