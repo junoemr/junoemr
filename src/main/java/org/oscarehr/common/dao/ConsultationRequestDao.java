@@ -29,13 +29,8 @@ import org.oscarehr.common.model.ConsultationRequest;
 
 import javax.persistence.Query;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import static org.oscarehr.common.model.ConsultationRequest.STATUS_CANCEL;
-import static org.oscarehr.common.model.ConsultationRequest.STATUS_COMPLETE;
-import static org.oscarehr.common.model.ConsultationRequest.STATUS_DELETE;
 
 @SuppressWarnings("unchecked")
 public class ConsultationRequestDao extends AbstractDao<ConsultationRequest> {
@@ -54,7 +49,7 @@ public class ConsultationRequestDao extends AbstractDao<ConsultationRequest> {
 						"where referalDate < :referralDate " +
 						"and status NOT IN :status");
 		query.setParameter("referralDate", referralDateCutoff);
-		query.setParameter("status", Arrays.asList(STATUS_COMPLETE, STATUS_CANCEL, STATUS_DELETE));
+		query.setParameter("status", ConsultationRequest.getCompletedStatusList());
 
 		return ((BigInteger) query.getSingleResult()).intValue();
 	}
@@ -68,7 +63,7 @@ public class ConsultationRequestDao extends AbstractDao<ConsultationRequest> {
 						"and status NOT IN :status " +
 						"and sendto = :sendTo");
 		query.setParameter("referralDate", referralDateCutoff);
-		query.setParameter("status", Arrays.asList(STATUS_COMPLETE, STATUS_CANCEL, STATUS_DELETE));
+		query.setParameter("status", ConsultationRequest.getCompletedStatusList());
 		query.setParameter("sendTo", sendTo);
 
 		return ((BigInteger) query.getSingleResult()).intValue();

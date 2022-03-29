@@ -23,11 +23,6 @@
  */
 package org.oscarehr.consultations.dao;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -41,9 +36,9 @@ import org.oscarehr.consultations.ConsultationRequestSearchFilter.SORTMODE;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
-import static org.oscarehr.common.model.ConsultationRequest.STATUS_CANCEL;
-import static org.oscarehr.common.model.ConsultationRequest.STATUS_COMPLETE;
-import static org.oscarehr.common.model.ConsultationRequest.STATUS_DELETE;
+import javax.persistence.Query;
+import java.util.Date;
+import java.util.List;
 
 @Repository
 public class ConsultRequestDao extends AbstractDao<ConsultationRequest>
@@ -208,7 +203,7 @@ public class ConsultRequestDao extends AbstractDao<ConsultationRequest>
 		}
 		else
 		{
-			sql.append("and cr.status NOT IN (" + String.join(",", STATUS_COMPLETE, STATUS_CANCEL, STATUS_DELETE) + ") ");
+			sql.append("and cr.status NOT IN (" + String.join(",", ConsultationRequest.getCompletedStatusList()) + ") ");
 		}
 		
 		if (StringUtils.isNotBlank(filter.getTeam())) {
