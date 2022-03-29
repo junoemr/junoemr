@@ -23,15 +23,19 @@
 
 package org.oscarehr.common.dao;
 
-import java.math.BigInteger;
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.oscarehr.common.NativeSql;
 import org.oscarehr.common.model.ConsultationRequest;
+
+import javax.persistence.Query;
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import static org.oscarehr.common.model.ConsultationRequest.STATUS_CANCEL;
+import static org.oscarehr.common.model.ConsultationRequest.STATUS_COMPLETE;
+import static org.oscarehr.common.model.ConsultationRequest.STATUS_DELETE;
 
 @SuppressWarnings("unchecked")
 public class ConsultationRequestDao extends AbstractDao<ConsultationRequest> {
@@ -44,19 +48,30 @@ public class ConsultationRequestDao extends AbstractDao<ConsultationRequest> {
 
 	public int getCountReferralsAfterCutOffDateAndNotCompleted(Date referralDateCutoff)
 	{
-		Query query = entityManager.createNativeQuery("select count(*) from consultationRequests where referalDate < ?1 and status != 4");
-		query.setParameter(1, referralDateCutoff);
+		Query query = entityManager.createNativeQuery(
+				"select count(*) " +
+						"from consultationRequests " +
+						"where referalDate < :referralDate " +
+						"and status NOT IN :status");
+		query.setParameter("referralDate", referralDateCutoff);
+		query.setParameter("status", Arrays.asList(STATUS_COMPLETE, STATUS_CANCEL, STATUS_DELETE));
 
-		return((BigInteger)query.getSingleResult()).intValue();
+		return ((BigInteger) query.getSingleResult()).intValue();
 	}
 
-	public int getCountReferralsAfterCutOffDateAndNotCompleted(Date referralDateCutoff,String sendto)
+	public int getCountReferralsAfterCutOffDateAndNotCompleted(Date referralDateCutoff, String sendTo)
 	{
-		Query query = entityManager.createNativeQuery("select count(*) from consultationRequests where referalDate < ?1 and status != 4 and sendto = ?2");
-		query.setParameter(1, referralDateCutoff);
-		query.setParameter(2, sendto);
+		Query query = entityManager.createNativeQuery(
+				"select count(*) " +
+						"from consultationRequests " +
+						"where referalDate < :referralDate " +
+						"and status NOT IN :status " +
+						"and sendto = :sendTo");
+		query.setParameter("referralDate", referralDateCutoff);
+		query.setParameter("status", Arrays.asList(STATUS_COMPLETE, STATUS_CANCEL, STATUS_DELETE));
+		query.setParameter("sendTo", sendTo);
 
-		return((BigInteger)query.getSingleResult()).intValue();
+		return ((BigInteger) query.getSingleResult()).intValue();
 	}
 
         public List<ConsultationRequest> getConsults(Integer demoNo) {
