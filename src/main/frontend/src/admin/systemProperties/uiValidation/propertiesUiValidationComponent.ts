@@ -35,27 +35,22 @@ angular.module('Admin').component('systemPropertiesUiValidation',
 		bindings: {},
 		controller: ['$scope', '$http', '$httpParamSerializer', '$state', function ($scope, $http, $httpParamSerializer, $state)
 		{
-			$scope.LABEL_POSITION = LABEL_POSITION;
-			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
-			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
-
-
 			const ctrl = this;
-			ctrl.textModel = "Input McInputFace";
+			ctrl.textModel = "CloudPractice";
 
-			ctrl.selectModel = "Farmhouse";
+			ctrl.selectModel = "Juno";
 			ctrl.selectOptions = [
 				{
-					label: "Lido",
-					value: "Lido"
+					label: "Juno EMR",
+					value: "Juno"
 				},
 				{
-					label: "Farmhouse",
-					value: "Farmhouse"
+					label: "ClinicAid",
+					value: "CA"
 				},
 				{
-					label: "Leopolds",
-					value: "Leopolds"
+					label: "MyHealthAccess",
+					value: "MHA"
 				}
 			]
 
@@ -66,7 +61,70 @@ angular.module('Admin').component('systemPropertiesUiValidation',
 				alert("Clack");
 			}
 
-			ctrl.iconList = ["icon-1",
+			ctrl.iconList = [
+				"icon-align-center",
+				"icon-align-justified",
+				"icon-align-left",
+				"icon-align-right",
+				"icon-bold",
+				"icon-check-circle",
+				"icon-contacts",
+				"icon-erlenmeyer-flask",
+				"icon-horizontal-rule",
+				"icon-indent-less",
+				"icon-indent",
+				"icon-italic",
+				"icon-list-bullet",
+				"icon-list-numbers",
+				"icon-long-arrow-down",
+				"icon-long-arrow-left",
+				"icon-long-arrow-right",
+				"icon-long-arrow-up",
+				"icon-minus",
+				"icon-smart-code",
+				"icon-strikethrough",
+				"icon-subscript",
+				"icon-superscript",
+				"icon-table",
+				"icon-tag",
+				"icon-tags",
+				"icon-underline",
+				"icon-clipboard",
+				"icon-clock",
+				"icon-pause-circle",
+				"icon-critical",
+				"icon-dashboard",
+				"icon-duplicate",
+				"icon-edit",
+				"icon-prescription-add",
+				"icon-prescription-check",
+				"icon-prescription-d-i",
+				"icon-prescription-d-ii",
+				"icon-prescription-d-iii",
+				"icon-prescription-d-iv",
+				"icon-prescription-d-v",
+				"icon-prescription-d",
+				"icon-prescription-ethical",
+				"icon-prescription-g-i",
+				"icon-prescription-g-ii",
+				"icon-prescription-g-iii",
+				"icon-prescription-g-iv",
+				"icon-prescription-g-v",
+				"icon-prescription-g",
+				"icon-prescription-homeopathic",
+				"icon-prescription-narc-i",
+				"icon-prescription-narc-ii",
+				"icon-prescription-narc-iii",
+				"icon-prescription-narc-iv",
+				"icon-prescription-narc-v",
+				"icon-prescription-narc",
+				"icon-prescription-no",
+				"icon-prescription-otc",
+				"icon-prescription-search",
+				"icon-prescription-send",
+				"icon-prescription",
+				"icon-star-outline",
+				"icon-1",
 				"icon-2",
 				"icon-3",
 				"icon-4",
@@ -95,15 +153,15 @@ angular.module('Admin').component('systemPropertiesUiValidation',
 				"icon-alarm-off",
 				"icon-alarm",
 				"icon-archive",
-				"icon-arrow-left",
 				"icon-arrow-down",
+				"icon-arrow-left",
 				"icon-arrow-right",
 				"icon-arrow-up",
 				"icon-aside-closed",
 				"icon-aside-open",
-				"icon-billed",
-				"icon-bars",
 				"icon-asterisk",
+				"icon-bars",
+				"icon-billed",
 				"icon-billing",
 				"icon-blood",
 				"icon-bloodpressure",
@@ -189,6 +247,7 @@ angular.module('Admin').component('systemPropertiesUiValidation',
 				"icon-sort-up",
 				"icon-sorted",
 				"icon-star",
+				"icon-starbill-1",
 				"icon-starbill",
 				"icon-stop",
 				"icon-support",

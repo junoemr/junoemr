@@ -65,7 +65,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="panels m-t-16"">
+		<div class="panels m-t-16">
 			<h4>Panels</h4>
 			<panel>
 				<panel-header>
