@@ -25,8 +25,8 @@ package org.oscarehr.fax.model;
 
 public enum FaxAccountConnectionStatus
 {
-	Success,
-	Failure,
-	Unknown,
-	SignedOut
+	SUCCESS,
+	FAILURE,
+	UNKNOWN,
+	SIGNED_OUT
 }

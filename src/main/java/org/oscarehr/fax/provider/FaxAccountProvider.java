@@ -28,8 +28,8 @@ import java.util.List;
 public interface FaxAccountProvider
 {
 	/**
-	 * Test the connection status of the current account.
-	 * @return true if the account is able to make a successful connection to the external api. false otherwise.
+	 * Test the connection status of the current fax account.
+	 * @return connection status
 	 */
 	FaxAccountConnectionStatus testConnectionStatus();
 

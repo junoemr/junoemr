@@ -214,14 +214,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 					}
 					else
 					{
-						if (await ctrl.faxAccountService.testFaxConnection(ctrl.faxAccount))
-						{
-							ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatus.Success;
-						}
-						else
-						{
-							ctrl.faxAccount.connectionStatus = FaxAccountConnectionStatus.Failure;
-						}
+						ctrl.faxAccount.connectionStatus = await ctrl.faxAccountService.testFaxConnection(ctrl.faxAccount);
 					}
 				}
 				catch (error)

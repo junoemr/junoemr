@@ -129,7 +129,7 @@ export default class FaxAccountService
 		}
 	}
 
-	public async testFaxConnection(model: FaxAccount): Promise<boolean>
+	public async testFaxConnection(model: FaxAccount): Promise<FaxAccountConnectionStatus>
 	{
 		try
 		{

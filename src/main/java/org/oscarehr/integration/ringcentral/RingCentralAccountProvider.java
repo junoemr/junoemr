@@ -57,7 +57,7 @@ public class RingCentralAccountProvider implements FaxAccountProvider
 			if (!ringCentralApiConnector.getCredential().isPresent())
 			{
 				// No credential, probably logged out and never logged back in
-				return FaxAccountConnectionStatus.SignedOut;
+				return FaxAccountConnectionStatus.SIGNED_OUT;
 			}
 			else
 			{
@@ -66,21 +66,21 @@ public class RingCentralAccountProvider implements FaxAccountProvider
 				if (!refreshed)
 				{
 					// Refresh token is expired
-					return FaxAccountConnectionStatus.SignedOut;
+					return FaxAccountConnectionStatus.SIGNED_OUT;
 				}
 
 				RingCentralAccountInfoResult accountInfo = ringCentralApiConnector.getAccountInfo(faxAccount.getLoginId());
 				if (accountInfo != null)
 				{
-					return FaxAccountConnectionStatus.Success;
+					return FaxAccountConnectionStatus.SUCCESS;
 				}
 
-				return FaxAccountConnectionStatus.Unknown;
+				return FaxAccountConnectionStatus.UNKNOWN;
 			}
 		}
 		catch (IOException e)
 		{
-			return FaxAccountConnectionStatus.Failure;
+			return FaxAccountConnectionStatus.FAILURE;
 		}
 	}
 

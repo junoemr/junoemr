@@ -53,7 +53,7 @@ public class SRFaxAccountProvider implements FaxAccountProvider
 		// don't hit the api if username or password are not set
 		if(accountId == null || password == null)
 		{
-			return FaxAccountConnectionStatus.SignedOut;
+			return FaxAccountConnectionStatus.SIGNED_OUT;
 		}
 
 		SRFaxApiConnector apiConnector = new SRFaxApiConnector(accountId, password);
@@ -63,10 +63,10 @@ public class SRFaxAccountProvider implements FaxAccountProvider
 
 		if (result != null)
 		{
-			return result.isSuccess() ? FaxAccountConnectionStatus.Success : FaxAccountConnectionStatus.Failure;
+			return result.isSuccess() ? FaxAccountConnectionStatus.SUCCESS : FaxAccountConnectionStatus.FAILURE;
 		}
 
-		return FaxAccountConnectionStatus.Unknown;
+		return FaxAccountConnectionStatus.UNKNOWN;
 	}
 
 	@Override

@@ -93,13 +93,13 @@ public class FaxAccountService
 	/**
 	 * Test the connection to the fax service based on the configuration settings
 	 *
-	 * @return true if the connection succeeded, false otherwise
+	 * @return connection status
 	 */
-	public boolean testConnectionStatus(FaxAccountCreateInput createInput)
+	public FaxAccountConnectionStatus testConnectionStatus(FaxAccountCreateInput createInput)
 	{
 		FaxAccount faxAccount = faxAccountCreateToEntityConverter.convert(createInput);
 		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccount);
-		return faxAccountProvider.testConnectionStatus().equals(FaxAccountConnectionStatus.Success);
+		return faxAccountProvider.testConnectionStatus();
 	}
 
 	public FaxAccountConnectionStatus testConnectionStatus(FaxAccountUpdateInput updateInput)

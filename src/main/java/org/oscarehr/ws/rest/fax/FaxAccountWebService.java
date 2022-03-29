@@ -155,7 +155,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@MaskParameter
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> testFaxConnection(FaxAccountCreateInput createInput)
+	public RestResponse<FaxAccountConnectionStatus> testFaxConnection(FaxAccountCreateInput createInput)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
 		return RestResponse.successResponse(faxAccountService.testConnectionStatus(createInput));

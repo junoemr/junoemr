@@ -10,8 +10,7 @@ export default class ToastErrorHandler extends BasicErrorHandler
 
 	serviceError(response: any): void
 	{
-		// All non-5XX response codes
-		if(response && response.data && response.data.error && response.status && response.status < 500)
+		if(response?.data?.error?.message)
 		{
 			this.toastService.errorToast(response.data.error.message);
 		}
