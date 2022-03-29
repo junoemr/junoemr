@@ -353,6 +353,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 						{
 							var consult = result.data[i];
 
+
 							//add statusDescription
 							for (var j = 0; j < controller.statuses.length; j++)
 							{

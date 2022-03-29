@@ -424,7 +424,7 @@ angular.module('Layout').component("primaryNavigation", {
 					{
 						invertStatus: true,
 						referralEndDate: endDate,
-						status: '4',
+						status: ['4', '5', '7'],
 						team: ctrl.consultationTeamWarning
 					}).then(
 					function success(results)

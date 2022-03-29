@@ -163,7 +163,7 @@ public class ConsultRequestDaoTest extends DaoTestFixtures
 		
 		ConsultationRequestSearchFilter filter = new ConsultationRequestSearchFilter();
 		filter.setDemographicNo(demoNo1);
-		filter.setStatus(Integer.valueOf(status1));
+		filter.setStatus(status1);
 		filter.setTeam(team1);
 		filter.setUrgency(urgency1);
 		
@@ -273,7 +273,7 @@ public class ConsultRequestDaoTest extends DaoTestFixtures
 		ConsultationRequestSearchFilter filter = new ConsultationRequestSearchFilter();
 		filter.setNumToReturn(99);
 		filter.setDemographicNo(demoNo1);
-		filter.setStatus(Integer.valueOf(status1));
+		filter.setStatus(status1);
 		filter.setTeam(team1);
 		filter.setUrgency(urgency1);
 		

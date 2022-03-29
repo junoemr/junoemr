@@ -41,6 +41,10 @@ import org.oscarehr.consultations.ConsultationRequestSearchFilter.SORTMODE;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Repository;
 
+import static org.oscarehr.common.model.ConsultationRequest.STATUS_CANCEL;
+import static org.oscarehr.common.model.ConsultationRequest.STATUS_COMPLETE;
+import static org.oscarehr.common.model.ConsultationRequest.STATUS_DELETE;
+
 @Repository
 public class ConsultRequestDao extends AbstractDao<ConsultationRequest>
 {
@@ -144,6 +148,10 @@ public class ConsultRequestDao extends AbstractDao<ConsultationRequest>
 		String sql = getSearchQuery(filter,true);
 		MiscUtils.getLogger().debug("sql="+sql);
 		Query query = entityManager.createQuery(sql);
+		if(filter.getStatus() != null && !filter.getStatus().isEmpty())
+		{
+			query.setParameter("status", filter.getStatus());
+		}
 		Long count = this.getCountResult(query);
 		
 		
@@ -154,6 +162,11 @@ public class ConsultRequestDao extends AbstractDao<ConsultationRequest>
 		String sql = this.getSearchQuery(filter,false);
 		MiscUtils.getLogger().debug("sql="+sql);
 		Query query = entityManager.createQuery(sql);
+		if(filter.getStatus() != null && !filter.getStatus().isEmpty())
+		{
+			query.setParameter("status", filter.getStatus());
+		}
+
 		query.setFirstResult(filter.getStartIndex());
 		query.setMaxResults(filter.getNumToReturn());
 		return query.getResultList();
@@ -181,18 +194,21 @@ public class ConsultRequestDao extends AbstractDao<ConsultationRequest>
 		if (filter.getReferralEndDate() != null) {
 			sql.append("and cr.referralDate <=  '" + DateFormatUtils.ISO_DATE_FORMAT.format(filter.getReferralEndDate()) + " 23:59:59' ");			
 		}
-		
-		if (filter.getStatus()!=null) {
-			if (filter.getInvertStatus())
+
+		if(filter.getStatus() != null && !filter.getStatus().isEmpty())
+		{
+			if(filter.getInvertStatus())
 			{
-				sql.append("and cr.status != '" + filter.getStatus() + "' ");
+				sql.append("and cr.status NOT IN :status ");
 			}
 			else
 			{
-				sql.append("and cr.status = '" + filter.getStatus() + "' ");
+				sql.append("and cr.status IN :status ");
 			}
-		} else {
-			sql.append("and cr.status!=4 and cr.status!=5 and cr.status!=7 ");
+		}
+		else
+		{
+			sql.append("and cr.status NOT IN (" + String.join(",", STATUS_COMPLETE, STATUS_CANCEL, STATUS_DELETE) + ") ");
 		}
 		
 		if (StringUtils.isNotBlank(filter.getTeam())) {
