@@ -1,0 +1,20 @@
+#system-properties-ui-validation {
+	.all-icons {
+		display: flex;
+		flex-wrap: wrap;
+		flex-direction: row;
+
+		.item {
+			flex: 0 0 15%;
+			margin: 4px 0;
+
+			i {
+				font-size: 24px;
+				margin-right: 2px;
+			}
+			span {
+				@include juno-font-body-small
+			}
+		}
+	}
+}

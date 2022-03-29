@@ -453,6 +453,7 @@ module.exports = {
 			'./src/admin/systemProperties/rx/propertiesRxComponent.js',
 			'./src/admin/systemProperties/general/propertiesGeneralComponent.js',
 			'./src/admin/systemProperties/billing/propertiesBillingComponent.js',
+			'./src/admin/systemProperties/uiValidation/propertiesUiValidationComponent.ts',
 			'./src/admin/systemProperties/components/junoSelectSave/junoSelectSaveComponent.js',
 			'./src/admin/section/rosterStatus/rosterStatusManagementComponent.js',
 			'./src/admin/section/rosterStatus/modals/editRosterStatusModalComponent.js',
