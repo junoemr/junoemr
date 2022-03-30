@@ -23,7 +23,9 @@
  */
 package org.oscarehr.consultations;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class ConsultationRequestSearchFilter {
 
@@ -39,7 +41,7 @@ public class ConsultationRequestSearchFilter {
 	private Integer id;
 	private Date referralStartDate;
 	private Date referralEndDate;
-	private Integer status;
+	private List<String> status;
 	private String team;
 	private Date appointmentStartDate;
 	private Date appointmentEndDate;
@@ -71,12 +73,22 @@ public class ConsultationRequestSearchFilter {
 	public void setReferralEndDate(Date referralEndDate) {
 		this.referralEndDate = referralEndDate;
 	}
-	public Integer getStatus() {
+
+	public List<String> getStatus()
+	{
 		return status;
 	}
-	public void setStatus(Integer status) {
+
+	public void setStatus(String... status)
+	{
+		this.status = Arrays.asList(status);
+	}
+
+	public void setStatus(List<String> status)
+	{
 		this.status = status;
 	}
+
 	public String getTeam() {
 		return team;
 	}

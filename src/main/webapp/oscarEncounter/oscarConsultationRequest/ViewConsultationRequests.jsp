@@ -593,27 +593,16 @@
 										{
 											countback = Integer.parseInt(timeperiod);
 											countback = countback * -1;
-
-
-											if ((status.equals("1") || status.equals("2") || status.equals("3")) && dateGreaterThan(date, Calendar.MONTH, countback))
-											{
-												overdue = true;
-											}
-										} else
+										}
+										else
 										{
-											countback = -7;  //7 days
-											if ((status.equals("1") || status.equals("3")) && dateGreaterThan(date, Calendar.DAY_OF_YEAR, countback))
-											{
-												overdue = true;
-											}
-
-											countback = -30;  //30 days
-											if (status.equals("2") && dateGreaterThan(date, Calendar.DAY_OF_YEAR, countback))
-											{
-												overdue = true;
-											}
+											countback = -1; // 1 month
 										}
 
+										if (!ConsultationRequest.getCompletedStatusList().contains(status) && dateGreaterThan(date, Calendar.MONTH, countback))
+										{
+											overdue = true;
+										}
 
 								%>
 								<tr <%=overdue ? "style='color:red;'" : ""%>>
