@@ -117,6 +117,7 @@
 	String ver = request.getParameter("ver");
 	String hcType = request.getParameter("hc_type");
 	String previousPatientStatus = demographic.getPatientStatus();
+	String countryOfOrigin = request.getParameter("countryOfOrigin");
 
 	demographic.setLastName(request.getParameter("last_name").trim());
 	demographic.setFirstName(request.getParameter("first_name").trim());
@@ -144,7 +145,7 @@
 			"<rd>" + StringUtils.trimToEmpty(request.getParameter("referral_doctor_name")) + "</rd>");
 	demographic.setFamilyDoctor2("<fd>" + StringUtils.trimToEmpty(request.getParameter("family_doctor_no")) + "</fd>" +
 			"<fdname>" + StringUtils.trimToEmpty(request.getParameter("family_doctor_name")) + "</fdname>");
-	demographic.setCountryOfOrigin(request.getParameter("countryOfOrigin"));
+	demographic.setCountryOfOrigin(("-1".equals(countryOfOrigin)) ? null : countryOfOrigin);
 	demographic.setNewsletter(request.getParameter("newsletter"));
 	demographic.setSin(request.getParameter("sin"));
 	demographic.setTitle(request.getParameter("title"));

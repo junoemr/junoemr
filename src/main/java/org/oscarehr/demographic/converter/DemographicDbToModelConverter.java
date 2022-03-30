@@ -63,7 +63,14 @@ public class DemographicDbToModelConverter extends
 		}
 
 		DemographicModel model = new DemographicModel();
-		BeanUtils.copyProperties(input, model, "address", "email", "dateOfBirth", "title", "sin", "officialLanguage");
+		BeanUtils.copyProperties(input, model,
+				"address",
+				"email",
+				"dateOfBirth",
+				"title",
+				"sin",
+				"officialLanguage",
+				"countryOfOrigin");
 
 		model.setId(input.getDemographicId());
 		model.setDateOfBirth(input.getDateOfBirth());
@@ -92,6 +99,9 @@ public class DemographicDbToModelConverter extends
 		model.setElectronicMessagingConsentStatus(input.getElectronicMessagingConsentStatus());
 		model.setElectronicMessagingConsentGivenAt(ConversionUtils.toNullableLocalDate(input.getElectronicMessagingConsentGivenAt()));
 		model.setElectronicMessagingConsentRejectedAt(ConversionUtils.toNullableLocalDate(input.getElectronicMessagingConsentRejectedAt()));
+
+		// handle legacy data case
+		model.setCountryOfOrigin(("-1".equals(input.getCountryOfOrigin())) ? null : input.getCountryOfOrigin());
 
 		AddressModel alternateAddress = buildAlternativeAddress(input);
 		if (alternateAddress != null)

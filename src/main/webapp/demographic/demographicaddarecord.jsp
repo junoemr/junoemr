@@ -120,6 +120,7 @@
 				String start_time2 = request.getParameter("start_time");
 				String end_time2 = request.getParameter("end_time");
 				String duration2 = request.getParameter("duration");
+				String countryOfOrigin = request.getParameter("countryOfOrigin");
 
 				String dem = null;
 				String year, month, day;
@@ -200,7 +201,7 @@
 						"<rd>" + StringUtils.trimToEmpty(request.getParameter("referral_doctor_name")) + "</rd>");
 				demographic.setFamilyDoctor2("<fd>" + StringUtils.trimToEmpty(request.getParameter("family_doctor_no")) + "</fd>" +
 						"<fdname>" + StringUtils.trimToEmpty(request.getParameter("family_doctor_name")) + "</fdname>");
-				demographic.setCountryOfOrigin(request.getParameter("countryOfOrigin"));
+				demographic.setCountryOfOrigin(("-1".equals(countryOfOrigin)) ? null : countryOfOrigin);
 				demographic.setNewsletter(request.getParameter("newsletter"));
 				demographic.setSin(request.getParameter("sin"));
 				demographic.setTitle(request.getParameter("title"));
