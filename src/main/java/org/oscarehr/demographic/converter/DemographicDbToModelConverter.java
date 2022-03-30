@@ -69,8 +69,7 @@ public class DemographicDbToModelConverter extends
 				"dateOfBirth",
 				"title",
 				"sin",
-				"officialLanguage",
-				"countryOfOrigin");
+				"officialLanguage");
 
 		model.setId(input.getDemographicId());
 		model.setDateOfBirth(input.getDateOfBirth());
@@ -99,9 +98,6 @@ public class DemographicDbToModelConverter extends
 		model.setElectronicMessagingConsentStatus(input.getElectronicMessagingConsentStatus());
 		model.setElectronicMessagingConsentGivenAt(ConversionUtils.toNullableLocalDate(input.getElectronicMessagingConsentGivenAt()));
 		model.setElectronicMessagingConsentRejectedAt(ConversionUtils.toNullableLocalDate(input.getElectronicMessagingConsentRejectedAt()));
-
-		// handle legacy data case
-		model.setCountryOfOrigin(("-1".equals(input.getCountryOfOrigin())) ? null : input.getCountryOfOrigin());
 
 		AddressModel alternateAddress = buildAlternativeAddress(input);
 		if (alternateAddress != null)

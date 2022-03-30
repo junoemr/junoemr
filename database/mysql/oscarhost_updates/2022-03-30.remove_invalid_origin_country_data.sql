@@ -1,0 +1,1 @@
+UPDATE demographic SET country_of_origin=NULL WHERE country_of_origin='-1';
