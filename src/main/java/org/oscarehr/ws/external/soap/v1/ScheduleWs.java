@@ -50,26 +50,20 @@ import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTransfer
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.AppointmentTypeTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.Appointment.ValidatedAppointmentBookingTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.DayWorkScheduleTransfer;
-import org.oscarehr.ws.external.soap.v1.transfer.ScheduleCodeDurationTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.ScheduleTemplateCodeTransfer;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.DayTimeSlots;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.ProviderScheduleTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.ScheduleSlotDto;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRule;
 import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRuleFactory;
-import org.oscarehr.ws.external.soap.v1.transfer.schedule.bookingrules.BookingRules;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.jws.WebService;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -213,48 +207,6 @@ public class ScheduleWs extends AbstractWs {
 
 		return new ValidatedAppointmentBookingTransfer(null,
 						Collections.singletonList(BookingRuleFactory.createAvailableRule()));
-	}
-
-	// TODO: Temporary for backwards compatibility. Remove once released to all Juno instances
-	@SkipContentLoggingOutbound
-	public HashMap<String, DayTimeSlots[]> getValidProviderScheduleSlots (String providerNo,
-	                                                                      @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate startDate,
-	                                                                      @XmlJavaTypeAdapter(LocalDateAdapter.class) LocalDate endDate,
-	                                                                      String templateDurations,
-	                                                                      String demographicNo,
-	                                                                      String jsonRules)
-	{
-		MiscUtils.getLogger().info("Start Get Provider Schedule Service: " + LocalDateTime.now().toString());
-		HashMap<String, DayTimeSlots[]> scheduleTransfer = new HashMap<>();
-
-
-		try
-		{
-			List<ScheduleCodeDurationTransfer> scheduleDurationTransfers = ScheduleCodeDurationTransfer.parse(templateDurations);
-			BookingRules bookingRules = new BookingRules(jsonRules);
-
-
-			ProviderScheduleTransfer providerScheduleTransfer =
-					scheduleTemplateDao.getValidProviderScheduleSlots(
-							providerNo,
-							startDate,
-							endDate,
-							scheduleDurationTransfers,
-							demographicNo,
-							bookingRules.getMultipleBookingsRule(),
-							bookingRules.getBlackoutRule(),
-							bookingRules.getCutoffRule()
-					);
-
-			scheduleTransfer = providerScheduleTransfer.toTransfer();
-		}
-		catch(ParseException e)
-		{
-			MiscUtils.getLogger().error("Exception: " + e);
-		}
-
-		MiscUtils.getLogger().info("End Get Provider Schedule Service: " + LocalDateTime.now().toString());
-		return scheduleTransfer;
 	}
 
 	public ValidatedAppointmentBookingTransfer addAppointmentValidated(
