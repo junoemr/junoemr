@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('icomoon.eot?f6lic7');
-  src:  url('icomoon.eot?f6lic7#iefix') format('embedded-opentype'),
-    url('icomoon.ttf?f6lic7') format('truetype'),
-    url('icomoon.woff?f6lic7') format('woff'),
-    url('icomoon.svg?f6lic7#icomoon') format('svg');
+  src:  url('icomoon.eot?9bcdrt');
+  src:  url('icomoon.eot?9bcdrt#iefix') format('embedded-opentype'),
+    url('icomoon.ttf?9bcdrt') format('truetype'),
+    url('icomoon.woff?9bcdrt') format('woff'),
+    url('icomoon.svg?9bcdrt#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -13,7 +13,7 @@
 [class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'icomoon' !important;
-  speak: none;
+  speak: never;
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -25,450 +25,639 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-1:before {
-  content: "\e900";
-}
-.icon-2:before {
+.icon-align-center:before {
   content: "\e901";
 }
-.icon-4:before {
-  content: "\e902";
-}
-.icon-3:before {
-  content: "\e903";
-}
-.icon-12:before {
-  content: "\e904";
-}
-.icon-5:before {
-  content: "\e905";
-}
-.icon-7:before {
+.icon-align-justified:before {
   content: "\e906";
 }
-.icon-8:before {
+.icon-align-left:before {
+  content: "\e9b9";
+}
+.icon-align-right:before {
+  content: "\e9bc";
+}
+.icon-bold:before {
+  content: "\e9bd";
+}
+.icon-check-circle:before {
+  content: "\e9be";
+}
+.icon-contacts:before {
+  content: "\e9bf";
+}
+.icon-erlenmeyer-flask:before {
+  content: "\e9c0";
+}
+.icon-horizontal-rule:before {
+  content: "\e9c1";
+}
+.icon-indent-less:before {
+  content: "\e9c2";
+}
+.icon-indent:before {
+  content: "\e9c3";
+}
+.icon-italic:before {
+  content: "\e9c4";
+}
+.icon-list-bullet:before {
+  content: "\e9c5";
+}
+.icon-list-numbers:before {
+  content: "\e9c6";
+}
+.icon-long-arrow-down:before {
+  content: "\e9c7";
+}
+.icon-long-arrow-left:before {
+  content: "\e9c8";
+}
+.icon-long-arrow-right:before {
+  content: "\e9c9";
+}
+.icon-long-arrow-up:before {
+  content: "\e9ca";
+}
+.icon-minus:before {
+  content: "\e9cb";
+}
+.icon-smart-code:before {
+  content: "\e9cc";
+}
+.icon-strikethrough:before {
+  content: "\e9cd";
+}
+.icon-subscript:before {
+  content: "\e9ce";
+}
+.icon-superscript:before {
+  content: "\e9cf";
+}
+.icon-table:before {
+  content: "\e9d0";
+}
+.icon-tag:before {
+  content: "\e9d1";
+}
+.icon-tags:before {
+  content: "\e9d2";
+}
+.icon-underline:before {
+  content: "\e9d3";
+}
+.icon-clipboard:before {
+  content: "\e9ba";
+}
+.icon-clock:before {
+  content: "\e9bb";
+}
+.icon-pause-circle:before {
+  content: "\e900";
+}
+.icon-critical:before {
+  content: "\e902";
+}
+.icon-dashboard:before {
+  content: "\e903";
+}
+.icon-duplicate:before {
+  content: "\e904";
+}
+.icon-edit:before {
+  content: "\e905";
+}
+.icon-prescription-add:before {
   content: "\e907";
 }
-.icon-15:before {
+.icon-prescription-check:before {
   content: "\e908";
 }
-.icon-14:before {
+.icon-prescription-d-i:before {
   content: "\e909";
 }
-.icon-13:before {
+.icon-prescription-d-ii:before {
   content: "\e90a";
 }
-.icon-17:before {
+.icon-prescription-d-iii:before {
   content: "\e90b";
 }
-.icon-16:before {
+.icon-prescription-d-iv:before {
   content: "\e90c";
 }
-.icon-18:before {
+.icon-prescription-d-v:before {
   content: "\e90d";
 }
-.icon-11:before {
+.icon-prescription-d:before {
   content: "\e90e";
 }
-.icon-6:before {
+.icon-prescription-ethical:before {
   content: "\e90f";
 }
-.icon-19:before {
+.icon-prescription-g-i:before {
   content: "\e910";
 }
-.icon-20:before {
+.icon-prescription-g-ii:before {
   content: "\e911";
 }
-.icon-9:before {
+.icon-prescription-g-iii:before {
   content: "\e912";
 }
-.icon-21:before {
+.icon-prescription-g-iv:before {
   content: "\e913";
 }
-.icon-10:before {
+.icon-prescription-g-v:before {
   content: "\e914";
 }
-.icon-22:before {
+.icon-prescription-g:before {
   content: "\e915";
 }
-.icon-23:before {
+.icon-prescription-homeopathic:before {
   content: "\e916";
 }
-.icon-24:before {
+.icon-prescription-narc-i:before {
   content: "\e917";
 }
-.icon-account:before {
+.icon-prescription-narc-ii:before {
   content: "\e918";
 }
-.icon-add:before {
+.icon-prescription-narc-iii:before {
   content: "\e919";
 }
-.icon-alarm-off:before {
+.icon-prescription-narc-iv:before {
   content: "\e91a";
 }
-.icon-alarm:before {
+.icon-prescription-narc-v:before {
   content: "\e91b";
 }
-.icon-archive:before {
+.icon-prescription-narc:before {
   content: "\e91c";
 }
-.icon-arrow-left:before {
+.icon-prescription-no:before {
   content: "\e91d";
 }
-.icon-arrow-down:before {
+.icon-prescription-otc:before {
   content: "\e91e";
 }
-.icon-arrow-right:before {
+.icon-prescription-search:before {
   content: "\e91f";
 }
-.icon-arrow-up:before {
+.icon-prescription-send:before {
   content: "\e920";
 }
-.icon-aside-closed:before {
+.icon-prescription:before {
   content: "\e921";
 }
-.icon-aside-open:before {
+.icon-star-outline:before {
   content: "\e922";
 }
-.icon-billed:before {
+.icon-1:before {
   content: "\e923";
 }
-.icon-bars:before {
+.icon-2:before {
   content: "\e924";
 }
-.icon-asterisk:before {
+.icon-3:before {
   content: "\e925";
 }
-.icon-billing:before {
+.icon-4:before {
   content: "\e926";
 }
-.icon-blood:before {
+.icon-5:before {
   content: "\e927";
 }
-.icon-bloodpressure:before {
+.icon-6:before {
   content: "\e928";
 }
-.icon-bookmark:before {
+.icon-7:before {
   content: "\e929";
 }
-.icon-breathing:before {
+.icon-8:before {
   content: "\e92a";
 }
-.icon-briefcase:before {
+.icon-9:before {
   content: "\e92b";
 }
-.icon-calendar-add:before {
+.icon-10:before {
   content: "\e92c";
 }
-.icon-calendar-search:before {
+.icon-11:before {
   content: "\e92d";
 }
-.icon-calendar-week:before {
+.icon-12:before {
   content: "\e92e";
 }
-.icon-calendar:before {
+.icon-13:before {
   content: "\e92f";
 }
-.icon-cancel:before {
+.icon-14:before {
   content: "\e930";
 }
-.icon-cancer:before {
+.icon-15:before {
   content: "\e931";
 }
-.icon-chat:before {
+.icon-16:before {
   content: "\e932";
 }
-.icon-check:before {
+.icon-17:before {
   content: "\e933";
 }
-.icon-chevron-down:before {
+.icon-18:before {
   content: "\e934";
 }
-.icon-chevron-left:before {
+.icon-19:before {
   content: "\e935";
 }
-.icon-chevron-right:before {
+.icon-20:before {
   content: "\e936";
 }
-.icon-chevron-up:before {
+.icon-21:before {
   content: "\e937";
 }
-.icon-clinic:before {
+.icon-22:before {
   content: "\e938";
 }
-.icon-close:before {
+.icon-23:before {
   content: "\e939";
 }
-.icon-cloud-download:before {
+.icon-24:before {
   content: "\e93a";
 }
-.icon-cloud-upload:before {
+.icon-account:before {
   content: "\e93b";
 }
-.icon-cloud:before {
+.icon-add:before {
   content: "\e93c";
 }
-.icon-comment:before {
+.icon-alarm-off:before {
   content: "\e93d";
 }
-.icon-cpx:before {
+.icon-alarm:before {
   content: "\e93e";
 }
-.icon-day-sheet:before {
+.icon-archive:before {
   content: "\e93f";
 }
-.icon-delete:before {
+.icon-arrow-down:before {
   content: "\e940";
 }
-.icon-dot:before {
+.icon-arrow-left:before {
   content: "\e941";
 }
-.icon-ellipsis-h:before {
+.icon-arrow-right:before {
   content: "\e942";
 }
-.icon-ellipsis-v:before {
+.icon-arrow-up:before {
   content: "\e943";
 }
-.icon-empty:before {
+.icon-aside-closed:before {
   content: "\e944";
 }
-.icon-exclamation:before {
+.icon-aside-open:before {
   content: "\e945";
 }
-.icon-external-link:before {
+.icon-asterisk:before {
   content: "\e946";
 }
-.icon-fax:before {
+.icon-bars:before {
   content: "\e947";
 }
-.icon-file-2:before {
+.icon-billed:before {
   content: "\e948";
 }
-.icon-file:before {
+.icon-billing:before {
   content: "\e949";
 }
-.icon-filter:before {
+.icon-blood:before {
   content: "\e94a";
 }
-.icon-find-a-clinic:before {
+.icon-bloodpressure:before {
   content: "\e94b";
 }
-.icon-flag:before {
+.icon-bookmark:before {
   content: "\e94c";
 }
-.icon-flip:before {
+.icon-breathing:before {
   content: "\e94d";
 }
-.icon-gear:before {
+.icon-briefcase:before {
   content: "\e94e";
 }
-.icon-gears:before {
+.icon-calendar-add:before {
   content: "\e94f";
 }
-.icon-genetics:before {
+.icon-calendar-search:before {
   content: "\e950";
 }
-.icon-health-data:before {
+.icon-calendar-week:before {
   content: "\e951";
 }
-.icon-health-tracker:before {
+.icon-calendar:before {
   content: "\e952";
 }
-.icon-healthcare-2:before {
+.icon-cancel:before {
   content: "\e953";
 }
-.icon-healthcare:before {
+.icon-cancer:before {
   content: "\e954";
 }
-.icon-here:before {
+.icon-chat:before {
   content: "\e955";
 }
-.icon-info-circle:before {
+.icon-check:before {
   content: "\e956";
 }
-.icon-linux:before {
+.icon-chevron-down:before {
   content: "\e957";
 }
-.icon-list:before {
+.icon-chevron-left:before {
   content: "\e958";
 }
-.icon-location-arrow:before {
+.icon-chevron-right:before {
   content: "\e959";
 }
-.icon-lock-open:before {
+.icon-chevron-up:before {
   content: "\e95a";
 }
-.icon-lock:before {
+.icon-clinic:before {
   content: "\e95b";
 }
-.icon-login:before {
+.icon-close:before {
   content: "\e95c";
 }
-.icon-logout:before {
+.icon-cloud-download:before {
   content: "\e95d";
 }
-.icon-mail:before {
+.icon-cloud-upload:before {
   content: "\e95e";
 }
-.icon-map-marker:before {
+.icon-cloud:before {
   content: "\e95f";
 }
-.icon-mha:before {
+.icon-comment:before {
   content: "\e960";
 }
-.icon-minimize:before {
+.icon-cpx:before {
   content: "\e961";
 }
-.icon-mobile-app:before {
+.icon-day-sheet:before {
   content: "\e962";
 }
-.icon-money:before {
+.icon-delete:before {
   content: "\e963";
 }
-.icon-nbox:before {
+.icon-dot:before {
   content: "\e964";
 }
-.icon-noshow:before {
+.icon-ellipsis-h:before {
   content: "\e965";
 }
-.icon-picked:before {
+.icon-ellipsis-v:before {
   content: "\e966";
 }
-.icon-play-circle:before {
+.icon-empty:before {
   content: "\e967";
 }
-.icon-plus-circle:before {
+.icon-exclamation:before {
   content: "\e968";
 }
-.icon-plus:before {
+.icon-external-link:before {
   content: "\e969";
 }
-.icon-print:before {
+.icon-fax:before {
   content: "\e96a";
 }
-.icon-private:before {
+.icon-file-2:before {
   content: "\e96b";
 }
-.icon-question:before {
+.icon-file:before {
   content: "\e96c";
 }
-.icon-refresh:before {
+.icon-filter:before {
   content: "\e96d";
 }
-.icon-reply-all:before {
+.icon-find-a-clinic:before {
   content: "\e96e";
 }
-.icon-reply:before {
+.icon-flag:before {
   content: "\e96f";
 }
-.icon-resize-max:before {
+.icon-flip:before {
   content: "\e970";
 }
-.icon-resize-min:before {
+.icon-gear:before {
   content: "\e971";
 }
-.icon-rotate:before {
+.icon-gears:before {
   content: "\e972";
 }
-.icon-search:before {
+.icon-genetics:before {
   content: "\e973";
 }
-.icon-send-round:before {
+.icon-health-data:before {
   content: "\e974";
 }
-.icon-send:before {
+.icon-health-tracker:before {
   content: "\e975";
 }
-.icon-share:before {
+.icon-healthcare-2:before {
   content: "\e976";
 }
-.icon-sort-down:before {
+.icon-healthcare:before {
   content: "\e977";
 }
-.icon-sort-up:before {
+.icon-here:before {
   content: "\e978";
 }
-.icon-sorted:before {
+.icon-info-circle:before {
   content: "\e979";
 }
-.icon-star:before {
+.icon-linux:before {
   content: "\e97a";
 }
-.icon-starbill:before {
+.icon-list:before {
   content: "\e97b";
 }
-.icon-stop:before {
+.icon-location-arrow:before {
   content: "\e97c";
 }
-.icon-support:before {
+.icon-lock-open:before {
   content: "\e97d";
 }
-.icon-tele-call:before {
+.icon-lock:before {
   content: "\e97e";
 }
-.icon-tele-camera-flip:before {
+.icon-login:before {
   content: "\e97f";
 }
-.icon-tele-camera:before {
+.icon-logout:before {
   content: "\e980";
 }
-.icon-tele-doc:before {
+.icon-mail:before {
   content: "\e981";
 }
-.icon-tele-hangup:before {
+.icon-map-marker:before {
   content: "\e982";
 }
-.icon-tele-volume-down:before {
+.icon-mha:before {
   content: "\e983";
 }
-.icon-tele-volume-mute:before {
+.icon-minimize:before {
   content: "\e984";
 }
-.icon-tele-volume-off:before {
+.icon-mobile-app:before {
   content: "\e985";
 }
-.icon-tele-volume-up:before {
+.icon-money:before {
   content: "\e986";
 }
-.icon-temperature:before {
+.icon-nbox:before {
   content: "\e987";
 }
-.icon-todo:before {
+.icon-noshow:before {
   content: "\e988";
 }
-.icon-tooth:before {
+.icon-picked:before {
   content: "\e989";
 }
-.icon-user-add:before {
+.icon-play-circle:before {
   content: "\e98a";
 }
-.icon-user-group:before {
+.icon-plus-circle:before {
   content: "\e98b";
 }
-.icon-user-md:before {
+.icon-plus:before {
   content: "\e98c";
 }
-.icon-user-search:before {
+.icon-print:before {
   content: "\e98d";
 }
-.icon-user:before {
+.icon-private:before {
   content: "\e98e";
 }
-.icon-video-2:before {
+.icon-question:before {
   content: "\e98f";
 }
-.icon-video:before {
+.icon-refresh:before {
   content: "\e990";
 }
-.icon-view-off:before {
+.icon-reply-all:before {
   content: "\e991";
 }
-.icon-view:before {
+.icon-reply:before {
   content: "\e992";
 }
-.icon-weight:before {
+.icon-resize-max:before {
   content: "\e993";
 }
-.icon-write:before {
+.icon-resize-min:before {
   content: "\e994";
+}
+.icon-rotate:before {
+  content: "\e995";
+}
+.icon-search:before {
+  content: "\e996";
+}
+.icon-send-round:before {
+  content: "\e997";
+}
+.icon-send:before {
+  content: "\e998";
+}
+.icon-share:before {
+  content: "\e999";
+}
+.icon-sort-down:before {
+  content: "\e99a";
+}
+.icon-sort-up:before {
+  content: "\e99b";
+}
+.icon-sorted:before {
+  content: "\e99c";
+}
+.icon-star:before {
+  content: "\e99d";
+}
+.icon-starbill-1:before {
+  content: "\e99e";
+}
+.icon-starbill:before {
+  content: "\e99f";
+}
+.icon-stop:before {
+  content: "\e9a0";
+}
+.icon-support:before {
+  content: "\e9a1";
+}
+.icon-tele-call:before {
+  content: "\e9a2";
+}
+.icon-tele-camera-flip:before {
+  content: "\e9a3";
+}
+.icon-tele-camera:before {
+  content: "\e9a4";
+}
+.icon-tele-doc:before {
+  content: "\e9a5";
+}
+.icon-tele-hangup:before {
+  content: "\e9a6";
+}
+.icon-tele-volume-down:before {
+  content: "\e9a7";
+}
+.icon-tele-volume-mute:before {
+  content: "\e9a8";
+}
+.icon-tele-volume-off:before {
+  content: "\e9a9";
+}
+.icon-tele-volume-up:before {
+  content: "\e9aa";
+}
+.icon-temperature:before {
+  content: "\e9ab";
+}
+.icon-todo:before {
+  content: "\e9ac";
+}
+.icon-tooth:before {
+  content: "\e9ad";
+}
+.icon-user-add:before {
+  content: "\e9ae";
+}
+.icon-user-group:before {
+  content: "\e9af";
+}
+.icon-user-md:before {
+  content: "\e9b0";
+}
+.icon-user-search:before {
+  content: "\e9b1";
+}
+.icon-user:before {
+  content: "\e9b2";
+}
+.icon-video-2:before {
+  content: "\e9b3";
+}
+.icon-video:before {
+  content: "\e9b4";
+}
+.icon-view-off:before {
+  content: "\e9b5";
+}
+.icon-view:before {
+  content: "\e9b6";
+}
+.icon-weight:before {
+  content: "\e9b7";
+}
+.icon-write:before {
+  content: "\e9b8";
 }

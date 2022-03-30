@@ -6,7 +6,6 @@ $images-root: '../images/';
 $icon-logo: $images-root + 'logo.svg';
 $icon-down-blue: $images-root + 'icon-16-chevron-down-blue.png';
 $icon-down-white: $images-root + 'icon-16-chevron-down-white.png';
-$icon-critical: $images-root + 'icon-critical.svg';
 
 $image-zero-state-background: $images-root + 'zero-state-background.svg';
 $image-zero-state-calendar: $images-root + 'zero-state-calendar.svg';
@@ -21,18 +20,12 @@ $image-spinner: $images-root + 'spinner.gif';
 	background-repeat: no-repeat;
 	background-position: center;
 }
+
 .icon-logo {
 	background-image: url($icon-logo);
 }
 .icon-down {
 	background-image: url($icon-down-blue);
-}
-
-.icon-critical {
-	background-image: url($icon-critical);
-	vertical-align: middle;
-	height: 1em;
-	width: 1em;
 }
 
 .image-zero-state-background {
