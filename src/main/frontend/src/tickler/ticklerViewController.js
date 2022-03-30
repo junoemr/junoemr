@@ -1,8 +1,10 @@
 import {SecurityPermissions} from "../common/security/securityConstants";
+import TicklerAttachment from "../lib/tickler/model/TicklerAttachment";
 
 angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 	'$scope',
+	'$state',
 	'$filter',
 	'$uibModalInstance',
 	'$timeout',
@@ -15,6 +17,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 
 	function(
 		$scope,
+		$state,
 		$filter,
 		$uibModalInstance,
 		$timeout,
@@ -67,36 +70,32 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			label: 'Deleted'
 		}];
 
-		if (ticklerNote != null)
+		controller.$onInit = () =>
 		{
-			controller.ticklerNote = ticklerNote.ticklerNote;
-		}
-
-		// Keep track of the current status as an object containing id and label
-		if (tickler != null)
-		{
-			controller.selectedStatus = controller.statuses.find(function(status)
+			if (ticklerNote != null)
 			{
-				return status.id == tickler.status;
+				controller.ticklerNote = ticklerNote.ticklerNote;
+			}
+
+			// Keep track of the current status as an object containing id and label
+			if (tickler != null)
+			{
+				controller.selectedStatus = controller.statuses.find(function (status)
+				{
+					return status.id === tickler.status;
+				});
+			}
+
+			// this will eventually just be living on the tickler model
+			controller.ticklerUpdate.attachments = controller.ticklerUpdate.ticklerLinks.map((link) =>
+			{
+				return new TicklerAttachment(
+					link.tableName,
+					link.tableId,
+					link.meta,
+				);
 			});
 		}
-
-		// $scope.$watch('controller.ticklerUpdate.serviceDate',
-		// 	function(new_value)
-		// 	{
-		// 		console.log('change', new_value);
-
-		// 		if (controller.ticklerUpdate.serviceDate instanceof Date && controller.ticklerUpdate.serviceTime instanceof Date)
-		// 		{
-
-		// 			controller.ticklerUpdate.serviceDate = new Date(controller.ticklerUpdate.serviceDate.getTime() + controller.ticklerUpdate.serviceTime.getTime());
-
-		// 			console.log('new val', controller.ticklerUpdate.serviceDate);
-		// 		}
-
-
-		// 	}
-		// );
 
 		// Watches the date input and updates serviceDate when a change is made
 		$scope.$watch(function()
@@ -261,7 +260,7 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			controller.needsUpdate = true;
 			if (controller.ticklerUpdate.ticklerComments == null)
 			{
-				controller.ticklerUpdate.ticklerComments = [];
+				controller.ticklerUpdate.comments = [];
 			}
 			var comment = {
 				message: controller.ticklerUpdate.comment,
@@ -345,6 +344,11 @@ angular.module('Tickler').controller('Tickler.TicklerViewController', [
 			}
 
 		};
+
+		controller.viewAttachment = (attachment) =>
+		{
+			window.open(attachment.getLinkUrl($state), "_blank");
+		}
 
 
 		controller.completeTickler = function()
