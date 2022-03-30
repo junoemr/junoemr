@@ -283,6 +283,11 @@ oscarApp.config([
             url: '/rx',
             component: 'systemPropertiesRx',
         })
+		.state('admin.systemProperties.uiValidation',
+		{
+			url: '/uiValidation',
+			component: 'systemPropertiesUiValidation',
+		})
 		.state('admin.mhaConfig',
 		{
 			url: "/mhaConfig",

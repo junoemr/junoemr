@@ -44,6 +44,10 @@ angular.module('Admin').component('systemProperties',
                     label: "Billing",
                     value: 'admin.systemProperties.billing'
                 },
+				{
+					label: "UI Validation",
+					value: 'admin.systemProperties.uiValidation'
+				}
             ];
 
             ctrl.currentTab = "admin.systemProperties.general";
