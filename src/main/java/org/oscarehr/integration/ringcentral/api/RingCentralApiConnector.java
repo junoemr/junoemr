@@ -43,13 +43,20 @@ import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class RingCentralApiConnector extends RESTClient
 {
 	public static final String CURRENT_SESSION_INDICATOR = "~";
-	protected static final String REST_API_BASE = "platform.devtest.ringcentral.com/restapi/v1.0/";
+
+	protected static String REST_API_URL;
+	protected static String REST_API_BASE;
+
+	protected static final String REST_API_BASE_PATH = "/restapi";
+	protected static final String REST_API_VERSION_PATH = "/v1.0";
 
 	public static final String RESPONSE_STATUS_RECEIVED="Received";
 	public static final String RESPONSE_STATUS_QUEUED="Queued";
@@ -70,11 +77,16 @@ public class RingCentralApiConnector extends RESTClient
 		RESPONSE_STATUS_DELIVERED
 	));
 
-
 	public static final List<String> RESPONSE_STATUSES_FAILED = new ArrayList<>(Arrays.asList(
 		RESPONSE_STATUS_SEND_FAILED,
 		RESPONSE_STATUS_DELIVERY_FAILED
 	));
+
+	public static void setApiLocation(String apiLocation)
+	{
+		REST_API_BASE = apiLocation + REST_API_BASE_PATH;
+		REST_API_URL = REST_API_BASE + REST_API_VERSION_PATH;
+	}
 
 	public RingCentralApiConnector()
 	{
@@ -86,30 +98,44 @@ public class RingCentralApiConnector extends RESTClient
 		return Optional.ofNullable(RingCentralCredentialStore.getCredential(RingCentralCredentialStore.LOCAL_USER_ID));
 	}
 
+	public void logOut() throws IOException
+	{
+		if (getCredential().isPresent())
+		{
+			Credential credential = getCredential().get();
+
+			revokeToken(credential.getRefreshToken());
+			revokeToken(credential.getAccessToken());
+
+			RingCentralCredentialStore.deleteCredential(RingCentralCredentialStore.LOCAL_USER_ID);
+		}
+	}
+
 	public RingCentralCoverLetterListResult getFaxCoverPageList()
 	{
-		String endpoint = REST_API_BASE + "dictionary/fax-cover-page";
+		String endpoint = REST_API_URL + "/dictionary/fax-cover-page";
 		String url = buildUrl(DEFAULT_PROTOCOL, endpoint);
-		return doGet(url, getAuthorizationHeaders(), RingCentralCoverLetterListResult.class);
+		return doGet(url, getAuthorizationBearerHeaders(), RingCentralCoverLetterListResult.class);
 	}
 
 	public RingCentralAccountInfoResult getAccountInfo()
 	{
 		return getAccountInfo(CURRENT_SESSION_INDICATOR);
 	}
+
 	public RingCentralAccountInfoResult getAccountInfo(String accountId)
 	{
-		String endpoint = REST_API_BASE + "account/{0}";
+		String endpoint = REST_API_URL + "/account/{0}";
 		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId));
-		return doGet(url, getAuthorizationHeaders(), RingCentralAccountInfoResult.class);
+		return doGet(url, getAuthorizationBearerHeaders(), RingCentralAccountInfoResult.class);
 	}
 
 	public RingCentralSendFaxResult sendFax(String accountId, String extensionId, RingCentralSendFaxInput input) throws IOException
 	{
-		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/fax";
+		String endpoint = REST_API_URL + "/account/{0}/extension/{1}/fax";
 		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId));
 
-		HttpHeaders headers = getAuthorizationHeaders();
+		HttpHeaders headers = getAuthorizationBearerHeaders();
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
 		return doPost(url, headers, input.toMultiValueMap(), RingCentralSendFaxResult.class);
@@ -117,42 +143,86 @@ public class RingCentralApiConnector extends RESTClient
 
 	public RingCentralMessageListResult getMessageList(String accountId, String extensionId, RingCentralMessageListInput input)
 	{
-		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/message-store";
+		String endpoint = REST_API_URL + "/account/{0}/extension/{1}/message-store";
 		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId));
-		return doGet(url, getAuthorizationHeaders(), input.toParameterMap(), RingCentralMessageListResult.class);
+		return doGet(url, getAuthorizationBearerHeaders(), input.toParameterMap(), RingCentralMessageListResult.class);
 	}
 
 	public RingCentralMessageInfoResult getMessage(String accountId, String extensionId, String messageId)
 	{
-		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/message-store/{2}";
+		String endpoint = REST_API_URL + "/account/{0}/extension/{1}/message-store/{2}";
 		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId, messageId));
-		return doGet(url, getAuthorizationHeaders(), RingCentralMessageInfoResult.class);
+		return doGet(url, getAuthorizationBearerHeaders(), RingCentralMessageInfoResult.class);
 	}
 
 	public InputStream getMessageContent(String accountId, String extensionId, String messageId, String attachmentId)
 	{
-		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/message-store/{2}/content/{3}";
+		String endpoint = REST_API_URL + "/account/{0}/extension/{1}/message-store/{2}/content/{3}";
 		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId, messageId, attachmentId));
-		byte[] byteArray = doGet(url, getAuthorizationHeaders(), byte[].class);
+		byte[] byteArray = doGet(url, getAuthorizationBearerHeaders(), byte[].class);
 		return new ByteArrayInputStream(byteArray);
 	}
 
 	public RingCentralMessageInfoResult updateMessage(String accountId, String extensionId, String messageId, RingCentralMessageUpdateInput input)
 	{
-		String endpoint = REST_API_BASE + "account/{0}/extension/{1}/message-store/{2}";
+		String endpoint = REST_API_URL + "/account/{0}/extension/{1}/message-store/{2}";
 		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId, messageId));
-		return doPut(url, getAuthorizationHeaders(), input.getParameterMap(), input, RingCentralMessageInfoResult.class);
+		return doPut(url, getAuthorizationBearerHeaders(), input.getParameterMap(), input, RingCentralMessageInfoResult.class);
 	}
 
-	protected HttpHeaders getAuthorizationHeaders()
+	protected void revokeToken(String token) throws FaxApiConnectionException
+	{
+		String endpoint = REST_API_BASE + "/oauth/revoke";
+		try
+		{
+			Optional<Credential> oAuthCredential = getCredential();
+			if (oAuthCredential.isPresent())
+			{
+				String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, ""));
+
+				HttpHeaders headers = getAuthorizationBasicHeaders();
+				headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+
+				Map<String,Object> formEncodedToken = new HashMap<>();
+				formEncodedToken.put("token", token);
+
+				doPost(url, getAuthorizationBasicHeaders(), formEncodedToken, null, Void.class);
+			}
+		}
+		catch (Exception e)
+		{
+			throw new FaxApiConnectionException("Could not revoke token \n" + e.getMessage());
+		}
+	}
+
+	protected HttpHeaders getAuthorizationBasicHeaders()
+	{
+		HttpHeaders headers = new HttpHeaders();
+		headers.set(HttpHeaders.AUTHORIZATION, MessageFormat.format("Basic {0}", RingCentralCredentialStore.makeBasicAuthentication()));
+
+		return headers;
+	}
+
+	protected HttpHeaders getAuthorizationBearerHeaders()
 	{
 		try
 		{
 			Optional<Credential> oAuthCredential = getCredential();
 			if(oAuthCredential.isPresent())
 			{
+				Credential credential = oAuthCredential.get();
+
+				if (credential.getExpiresInSeconds() <= RingCentralCredentialStore.ACCESS_TOKEN_REFRESH_THRESHOLD_SECONDS)
+				{
+					boolean refreshed = credential.refreshToken();
+					if (!refreshed)
+					{
+						throw new FaxApiConnectionException("Refresh token expired, cannot retrieve access token");
+					}
+				}
+
 				HttpHeaders headers = new HttpHeaders();
-				headers.set("Authorization", MessageFormat.format("Bearer {0}", oAuthCredential.get().getAccessToken()));
+				headers.set(HttpHeaders.AUTHORIZATION, MessageFormat.format("Bearer {0}", credential.getAccessToken()));
 				return headers;
 			}
 			else

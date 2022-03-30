@@ -20,20 +20,25 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.provider;
 
-import org.oscarehr.fax.model.FaxAccountConnectionStatus;
-import java.util.List;
+package org.oscarehr.config.modules;
 
-public interface FaxAccountProvider
+import org.oscarehr.fax.oauth.RingCentralCredentialStore;
+import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import javax.annotation.PostConstruct;
+
+@Configuration
+public class FaxConfiguration
 {
-	/**
-	 * Test the connection status of the current fax account.
-	 * @return connection status
-	 */
-	FaxAccountConnectionStatus testConnectionStatus();
+	@Value("${fax.ringcentral.api_location}")
+	private String ringCentralApiLocation;
 
-	List<String> getCoverLetterOptions();
-
-	void disconnectAccount();
+	@PostConstruct
+	public void configureFaxApis()
+	{
+		RingCentralCredentialStore.init(ringCentralApiLocation);
+		RingCentralApiConnector.setApiLocation(ringCentralApiLocation);
+	}
 }

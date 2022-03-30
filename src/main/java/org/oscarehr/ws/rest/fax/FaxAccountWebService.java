@@ -24,6 +24,7 @@ package org.oscarehr.ws.rest.fax;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.fax.dao.FaxAccountDao;
+import org.oscarehr.fax.model.FaxAccountConnectionStatus;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.service.FaxAccountService;
 import org.oscarehr.fax.transfer.FaxAccountCreateInput;
@@ -41,6 +42,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -138,12 +140,22 @@ public class FaxAccountWebService extends AbstractServiceImpl
 		return RestResponse.successResponse(faxAccountService.deleteFaxAccount(id));
 	}
 
+	@PATCH
+	@Path("/{id}/disconnect")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestResponse<Boolean> disconnectAccountSettings(@PathParam("id") Long id)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_UPDATE);
+		return RestResponse.successResponse(faxAccountService.disconnectFaxAccount(id));
+	}
+
 	@POST
 	@Path("/testConnection")
 	@MaskParameter
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> testFaxConnection(FaxAccountCreateInput createInput)
+	public RestResponse<FaxAccountConnectionStatus> testFaxConnection(FaxAccountCreateInput createInput)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);
 		return RestResponse.successResponse(faxAccountService.testConnectionStatus(createInput));
@@ -154,7 +166,7 @@ public class FaxAccountWebService extends AbstractServiceImpl
 	@MaskParameter
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<Boolean> testExistingFaxConnection(@PathParam("id") Long id,
+	public RestResponse<FaxAccountConnectionStatus> testExistingFaxConnection(@PathParam("id") Long id,
 	                                                       FaxAccountUpdateInput updateInput)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONFIGURE_FAX_READ);

@@ -24,6 +24,7 @@
 package org.oscarehr.integration.SRFax;
 
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.model.FaxAccountConnectionStatus;
 import org.oscarehr.fax.provider.FaxAccountProvider;
 import org.oscarehr.integration.SRFax.api.SRFaxApiConnector;
 import org.oscarehr.integration.SRFax.api.result.GetUsageResult;
@@ -44,7 +45,7 @@ public class SRFaxAccountProvider implements FaxAccountProvider
 	}
 
 	@Override
-	public boolean testConnectionStatus()
+	public FaxAccountConnectionStatus testConnectionStatus()
 	{
 		String accountId = faxAccount.getLoginId();
 		String password = faxAccount.getLoginPassword();
@@ -52,19 +53,30 @@ public class SRFaxAccountProvider implements FaxAccountProvider
 		// don't hit the api if username or password are not set
 		if(accountId == null || password == null)
 		{
-			return false;
+			return FaxAccountConnectionStatus.SIGNED_OUT;
 		}
 
 		SRFaxApiConnector apiConnector = new SRFaxApiConnector(accountId, password);
 		String currentDateStr = ConversionUtils.toDateString(LocalDate.now(), SRFaxApiConnector.DATE_FORMAT);
 
 		ListWrapper<GetUsageResult> result = apiConnector.getFaxUsageByRange(currentDateStr, currentDateStr, null);
-		return (result != null && result.isSuccess());
+
+		if (result != null)
+		{
+			return result.isSuccess() ? FaxAccountConnectionStatus.SUCCESS : FaxAccountConnectionStatus.FAILURE;
+		}
+
+		return FaxAccountConnectionStatus.UNKNOWN;
 	}
 
 	@Override
 	public List<String> getCoverLetterOptions()
 	{
 		return Arrays.asList("None", "Basic", "Standard", "Company", "Personal");
+	}
+
+	@Override
+	public void disconnectAccount()
+	{
 	}
 }

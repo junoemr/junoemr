@@ -38,6 +38,7 @@ public class JunoProperties
 	private JunoPropertiesConfig properties;
 	private RedisSessionStore redisSessionStore;
 	private Test test;
+	private Fax fax;
 
 	@Data
 	public static class JunoPropertiesConfig
@@ -58,5 +59,11 @@ public class JunoProperties
 	public static class Test
 	{
 		private boolean headless = true;
+	}
+
+	@Data
+	public static class Fax
+	{
+		private String ringCentralApiLocation;
 	}
 }

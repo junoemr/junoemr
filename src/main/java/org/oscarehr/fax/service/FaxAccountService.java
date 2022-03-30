@@ -34,6 +34,7 @@ import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.model.FaxAccountConnectionStatus;
 import org.oscarehr.fax.provider.FaxAccountProvider;
 import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.fax.provider.FaxProviderFactory;
@@ -92,16 +93,16 @@ public class FaxAccountService
 	/**
 	 * Test the connection to the fax service based on the configuration settings
 	 *
-	 * @return true if the connection succeeded, false otherwise
+	 * @return connection status
 	 */
-	public boolean testConnectionStatus(FaxAccountCreateInput createInput)
+	public FaxAccountConnectionStatus testConnectionStatus(FaxAccountCreateInput createInput)
 	{
 		FaxAccount faxAccount = faxAccountCreateToEntityConverter.convert(createInput);
 		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccount);
 		return faxAccountProvider.testConnectionStatus();
 	}
 
-	public boolean testConnectionStatus(FaxAccountUpdateInput updateInput)
+	public FaxAccountConnectionStatus testConnectionStatus(FaxAccountUpdateInput updateInput)
 	{
 		FaxAccount faxAccount = faxAccountDao.find(updateInput.getId());
 		if (StringUtils.isNotBlank(updateInput.getPassword()))
@@ -188,6 +189,16 @@ public class FaxAccountService
 		faxAccount.setDeletedAt(new Date());
 		faxAccount.setLoginPassword(null); // wipe the password
 		faxAccountDao.merge(faxAccount);
+
+		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccount);
+		faxAccountProvider.disconnectAccount();
+		return true;
+	}
+
+	public boolean disconnectFaxAccount(Long id)
+	{
+		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccountDao.find(id));
+		faxAccountProvider.disconnectAccount();
 		return true;
 	}
 

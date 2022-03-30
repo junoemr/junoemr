@@ -12,6 +12,7 @@ import PagedResponse from "../../../../../lib/common/response/PagedResponse";
 import FaxAccount from "../../../../../lib/fax/model/FaxAccount";
 import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";
 import PhoneNumber from "../../../../../lib/common/model/PhoneNumber";
+import ToastErrorHandler from "../../../../../lib/error/handler/ToastErrorHandler";
 
 angular.module("Admin.Section.Fax").component('faxInbox', {
 	templateUrl: 'src/admin/section/fax/components/faxInbox/faxInbox.jsp',
@@ -29,7 +30,7 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 		{
 			const ctrl = this;
 			ctrl.toastService = new ToastService();
-			ctrl.faxAccountService = new FaxAccountService();
+			ctrl.faxAccountService = new FaxAccountService(new ToastErrorHandler());
 			ctrl.faxInboxService = new FaxInboxService();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;

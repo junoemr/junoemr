@@ -25,12 +25,17 @@ package org.oscarehr.fax.oauth;
 import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.AuthorizationCodeRequestUrl;
 import com.google.api.client.extensions.servlet.auth.oauth2.AbstractAuthorizationCodeServlet;
+import com.google.gson.Gson;
+import org.springframework.web.util.UriUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet(name="FaxOAuthServlet",description="Ringcentral OAuth servlet", value="/fax/ringcentral/oauth", loadOnStartup = 1)
 public class RingCentralAuthServlet extends AbstractAuthorizationCodeServlet
@@ -71,7 +76,14 @@ public class RingCentralAuthServlet extends AbstractAuthorizationCodeServlet
 
 	@Override protected void onAuthorization(HttpServletRequest req, HttpServletResponse resp, AuthorizationCodeRequestUrl authorizationUrl) throws ServletException, IOException
 	{
-		authorizationUrl.setState("foobar1234"); // TODO, send instance context here
+		String domain = req.getRequestURL().toString().replace(req.getRequestURI(), "");
+
+		Map<String, String> stateMap = new HashMap<>();
+		stateMap.put("host", domain + req.getContextPath());
+		stateMap.put("path", "/fax/ringcentral/redirect");
+		stateMap.put("module", "fax.ringcentral");
+
+		authorizationUrl.setState(UriUtils.encodeQueryParam(new Gson().toJson(stateMap), StandardCharsets.UTF_8));
 		super.onAuthorization(req, resp, authorizationUrl);
 	}
 }

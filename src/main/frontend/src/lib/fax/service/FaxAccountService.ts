@@ -1,13 +1,21 @@
-import {FaxAccountApi, FaxInboundApi, FaxOutboundApi} from "../../../../generated";
+import {
+	FaxAccountApi,
+	FaxInboundApi,
+	FaxOutboundApi
+} from "../../../../generated";
 import {API_BASE_PATH} from "../../constants/ApiConstants";
 import FaxAccountToUpdateInputConverter from "../converter/FaxAccountToUpdateInputConverter";
 import FaxAccountToCreateInputConverter from "../converter/FaxAccountToCreateInputConverter";
 import FaxAccountToModelConverter from "../converter/FaxAccountToModelConverter";
 import FaxAccount from "../model/FaxAccount";
 import PagedResponse from "../../common/response/PagedResponse";
+import {ErrorHandler} from "../../error/handler/ErrorHandler";
+import BasicErrorHandler from "../../error/handler/BasicErrorHandler";
+import {FaxAccountConnectionStatus} from "../model/FaxAccountConnectionStatus";
 
 export default class FaxAccountService
 {
+	protected errorHandler: ErrorHandler;
 	protected faxAccountApi: FaxAccountApi;
 	protected faxInboundApi: FaxInboundApi;
 	protected faxOutboundApi: FaxOutboundApi;
@@ -20,11 +28,12 @@ export default class FaxAccountService
 	// Public Methods
 	// ==========================================================================
 
-	constructor()
+	constructor(errorHandler: ErrorHandler = new BasicErrorHandler())
 	{
 		const $http = angular.injector(["ng"]).get("$http");
 		const $httpParamSerializer = angular.injector(["ng"]).get("$httpParamSerializer");
 
+		this.errorHandler = errorHandler;
 		this.faxAccountApi = new FaxAccountApi($http, $httpParamSerializer, API_BASE_PATH);
 		this.faxInboundApi = new FaxInboundApi($http, $httpParamSerializer, API_BASE_PATH);
 		this.faxOutboundApi = new FaxOutboundApi($http, $httpParamSerializer, API_BASE_PATH);
@@ -32,62 +41,142 @@ export default class FaxAccountService
 
 	public async isAccountEnabled(id: number): Promise<boolean>
 	{
-		return (await this.faxAccountApi.isEnabled(id)).data.body;
+		try
+		{
+			return (await this.faxAccountApi.isEnabled(id)).data.body;
+		}
+		catch (error)
+		{
+			this.errorHandler.handleError(error);
+		}
 	};
 
 	public async getAccountSettings(id: number): Promise<FaxAccount>
 	{
-		return this.faxAccountToModelConverter.convert(
-			(await this.faxAccountApi.getAccountSettings(id)).data.body);
+		try
+		{
+			return this.faxAccountToModelConverter.convert(
+				(await this.faxAccountApi.getAccountSettings(id)).data.body);
+		}
+		catch (error)
+		{
+			this.errorHandler.handleError(error);
+		}
 	};
 
 	public async createAccountSettings(model: FaxAccount): Promise<FaxAccount>
 	{
-		let input = this.faxAccountToCreateInputConverter.convert(model);
-		return this.faxAccountToModelConverter.convert(
-			(await this.faxAccountApi.createAccountSettings(input)).data.body);
+		try
+		{
+			let input = this.faxAccountToCreateInputConverter.convert(model);
+			return this.faxAccountToModelConverter.convert(
+				(await this.faxAccountApi.createAccountSettings(input)).data.body);
+		}
+		catch (error)
+		{
+			this.errorHandler.handleError(error);
+		}
 	};
 
 	public async updateAccountSettings(model: FaxAccount): Promise<FaxAccount>
 	{
-		let input = this.faxAccountToUpdateInputConverter.convert(model);
-		return this.faxAccountToModelConverter.convert(
-			(await this.faxAccountApi.updateAccountSettings(model.id, input)).data.body);
+		try
+		{
+			let input = this.faxAccountToUpdateInputConverter.convert(model);
+			return this.faxAccountToModelConverter.convert(
+				(await this.faxAccountApi.updateAccountSettings(model.id, input)).data.body);
+		}
+		catch (error)
+		{
+			this.errorHandler.handleError(error);
+		}
 	};
 
 	public async deleteAccountSettings(id: number): Promise<boolean>
 	{
-		return (await this.faxAccountApi.deleteAccountSettings(id)).data.body;
+		try
+		{
+			return (await this.faxAccountApi.deleteAccountSettings(id)).data.body;
+		}
+		catch (error)
+		{
+			this.errorHandler.handleError(error);
+		}
 	};
 
-	public async testFaxConnection(model: FaxAccount): Promise<boolean>
+	public async disconnectAccountSettings(id: number): Promise<boolean>
 	{
-		if (model.id)
+		try
 		{
-			let input = this.faxAccountToUpdateInputConverter.convert(model);
-			return (await this.faxAccountApi.testExistingFaxConnection(model.id, input)).data.body;
+			return (await this.faxAccountApi.disconnectAccountSettings(id)).data.body;
 		}
-		else
+		catch (error)
+		{
+			this.errorHandler.handleError(error);
+		}
+	};
+
+	public async testExistingFaxConnection(model: FaxAccount): Promise<FaxAccountConnectionStatus>
+	{
+		try
+		{
+				let input = this.faxAccountToUpdateInputConverter.convert(model);
+				return (await this.faxAccountApi.testExistingFaxConnection(model.id, input)).data.body;
+		}
+		catch (error)
+		{
+			this.errorHandler.handleError(error);
+		}
+	}
+
+	public async testFaxConnection(model: FaxAccount): Promise<FaxAccountConnectionStatus>
+	{
+		try
 		{
 			let input = this.faxAccountToCreateInputConverter.convert(model);
 			return (await this.faxAccountApi.testFaxConnection(input)).data.body;
+		}
+		catch (error)
+		{
+			this.errorHandler.handleError(error);
 		}
 	}
 
 	public async getAccounts(page: number = 1, perPage: number = 10): Promise<PagedResponse<FaxAccount>>
 	{
-		const transfer = (await this.faxAccountApi.listAccounts(page, perPage)).data;
-		return new PagedResponse<FaxAccount>(this.faxAccountToModelConverter.convertList(transfer.body), transfer.headers);
+		try
+		{
+			const transfer = (await this.faxAccountApi.listAccounts(page, perPage)).data;
+			return new PagedResponse<FaxAccount>(this.faxAccountToModelConverter.convertList(transfer.body), transfer.headers);
+		}
+		catch (error)
+		{
+			this.errorHandler.handleError(error);
+		}
 	}
 
 	public async getActiveAccount(): Promise<FaxAccount>
 	{
-		return this.faxAccountToModelConverter.convert(
-			(await this.faxAccountApi.getActiveFaxAccount()).data.body);
+		try
+		{
+			return this.faxAccountToModelConverter.convert(
+				(await this.faxAccountApi.getActiveFaxAccount()).data.body);
+		}
+		catch (error)
+		{
+			this.errorHandler.handleError(error);
+		}
 	}
 
 	public async getCoverLetterOptions(id: number): Promise<string[]>
 	{
-		return (await this.faxAccountApi.getCoverLetterOptions(id)).data.body;
+		try
+		{
+			return (await this.faxAccountApi.getCoverLetterOptions(id)).data.body;
+		}
+		catch (error)
+		{
+			this.errorHandler.handleError(error);
+		}
 	}
 }

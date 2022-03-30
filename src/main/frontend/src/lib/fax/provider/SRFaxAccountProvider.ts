@@ -81,5 +81,10 @@ export default class SRFaxAccountProvider implements FaxAccountProvider
 		});
 	}
 
+	public getIntegrationName(): string
+	{
+		return "SRFax";
+	}
+
 
 }

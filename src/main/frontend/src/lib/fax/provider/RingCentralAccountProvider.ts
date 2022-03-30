@@ -76,4 +76,8 @@ export default class RingCentralAccountProvider implements FaxAccountProvider
 		});
 	}
 
+	public getIntegrationName(): string
+	{
+		return "RingCentral";
+	}
 }

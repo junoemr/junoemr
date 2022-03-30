@@ -117,8 +117,8 @@
 				</div>
 			</fieldset>
 			<hr>
-			<div class="flex-row input-fieldset" ng-class="$ctrl.getConnectionStatusClass()">
-				<div class="input-group flex-row flex-grow">
+			<div class="flex-column input-fieldset" ng-class="$ctrl.getConnectionStatusClass()">
+				<div class="input-group grid-flow-row grid-row-2 grid-row-gap-4">
 					<juno-button click="$ctrl.testConnection()"
 					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.connectionStatus'/>"
 					             label-position="$ctrl.LABEL_POSITION.LEFT"
@@ -129,6 +129,25 @@
 						<span class="m-l-4">{{$ctrl.getConnectionTestText()}}</span>
 						</div>
 					</juno-button>
+				</div>
+				<div class="input-group flex-row justify-content-center align-items-center">
+					<juno-button ng-if="showDisconnectButton()"
+					             class="w-256"
+					             click="$ctrl.disconnectAccount()"
+					             disabled="$ctrl.LoadingQueue.isLoading"
+					             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
+					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
+						{{$ctrl.getDisconnectText()}}
+					</juno-button>
+					<juno-button ng-if="showConnectButton()"
+								 class="w-256"
+								 click="$ctrl.connectAccount()"
+								 disabled="$ctrl.LoadingQueue.isLoading"
+								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
+						{{$ctrl.getConnectText()}}
+					</juno-button>
+				</div>
 				</div>
 			</div>
 		</form>
@@ -167,6 +186,3 @@
 		</div>
 	</modal-footer>
 </juno-modal>
-
-
-

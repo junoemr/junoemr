@@ -1,5 +1,5 @@
 import {FaxAccountType} from "./FaxAccountType";
-import {FaxAccountConnectionStatusType} from "./FaxAccountConnectionStatusType";
+import {FaxAccountConnectionStatus} from "./FaxAccountConnectionStatus";
 
 export default class FaxAccount
 {
@@ -16,7 +16,7 @@ export default class FaxAccount
 	private _coverLetterOption: string;
 
 	// transient properties
-	private _connectionStatus: FaxAccountConnectionStatusType;
+	private _connectionStatus: FaxAccountConnectionStatus;
 
 	constructor(type: FaxAccountType)
 	{
@@ -30,22 +30,22 @@ export default class FaxAccount
 		this.displayName = null;
 		this.coverLetterOption = null;
 		this.faxNumber = null;
-		this.connectionStatus = FaxAccountConnectionStatusType.Unknown;
+		this.connectionStatus = FaxAccountConnectionStatus.Unknown;
 	}
 
 	get connectionStatusUnknown(): boolean
 	{
-		return this.connectionStatus === FaxAccountConnectionStatusType.Unknown;
+		return this.connectionStatus === FaxAccountConnectionStatus.Unknown;
 	}
 
 	get connectionStatusSuccess(): boolean
 	{
-		return this.connectionStatus === FaxAccountConnectionStatusType.Success;
+		return this.connectionStatus === FaxAccountConnectionStatus.Success;
 	}
 
 	get connectionStatusFailure(): boolean
 	{
-		return this.connectionStatus === FaxAccountConnectionStatusType.Failure;
+		return this.connectionStatus === FaxAccountConnectionStatus.Failure;
 	}
 
 	public equals(otherAccount: FaxAccount): boolean
@@ -171,12 +171,12 @@ export default class FaxAccount
 		this._coverLetterOption = value;
 	}
 
-	get connectionStatus(): FaxAccountConnectionStatusType
+	get connectionStatus(): FaxAccountConnectionStatus
 	{
 		return this._connectionStatus;
 	}
 
-	set connectionStatus(value: FaxAccountConnectionStatusType)
+	set connectionStatus(value: FaxAccountConnectionStatus)
 	{
 		this._connectionStatus = value;
 	}

@@ -23,13 +23,17 @@
 
 package org.oscarehr.integration.ringcentral;
 
+import com.google.api.client.auth.oauth2.Credential;
+import org.oscarehr.fax.exception.FaxIntegrationException;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.model.FaxAccountConnectionStatus;
 import org.oscarehr.fax.provider.FaxAccountProvider;
 import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralCoverLetterListResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralCoverLetterResult;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,27 +41,68 @@ import java.util.stream.Collectors;
 public class RingCentralAccountProvider implements FaxAccountProvider
 {
 	protected final FaxAccount faxAccount;
-	protected final RingCentralApiConnector ringcentralApiConnector;
+	protected final RingCentralApiConnector ringCentralApiConnector;
 
 	public RingCentralAccountProvider(FaxAccount faxAccount)
 	{
 		this.faxAccount = faxAccount;
-		this.ringcentralApiConnector = new RingCentralApiConnector();
+		this.ringCentralApiConnector = new RingCentralApiConnector();
 	}
 
 	@Override
-	public boolean testConnectionStatus()
+	public FaxAccountConnectionStatus testConnectionStatus()
 	{
-		RingCentralAccountInfoResult accountInfo = ringcentralApiConnector.getAccountInfo(faxAccount.getLoginId());
-		return (accountInfo != null);
+		try
+		{
+			if (!ringCentralApiConnector.getCredential().isPresent())
+			{
+				// No credential, probably logged out and never logged back in
+				return FaxAccountConnectionStatus.SIGNED_OUT;
+			}
+			else
+			{
+				Credential authToken = ringCentralApiConnector.getCredential().get();
+				boolean refreshed = authToken.refreshToken();
+				if (!refreshed)
+				{
+					// Refresh token is expired
+					return FaxAccountConnectionStatus.SIGNED_OUT;
+				}
+
+				RingCentralAccountInfoResult accountInfo = ringCentralApiConnector.getAccountInfo(faxAccount.getLoginId());
+				if (accountInfo != null)
+				{
+					return FaxAccountConnectionStatus.SUCCESS;
+				}
+
+				return FaxAccountConnectionStatus.UNKNOWN;
+			}
+		}
+		catch (IOException e)
+		{
+			return FaxAccountConnectionStatus.FAILURE;
+		}
 	}
 
 	@Override
 	public List<String> getCoverLetterOptions()
 	{
-		RingCentralCoverLetterListResult result = ringcentralApiConnector.getFaxCoverPageList();
+		RingCentralCoverLetterListResult result = ringCentralApiConnector.getFaxCoverPageList();
 		return Arrays.stream(result.getRecords())
 				.map(RingCentralCoverLetterResult::getName)
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public void disconnectAccount()
+	{
+		try
+		{
+			ringCentralApiConnector.logOut();
+		}
+		catch(IOException e)
+		{
+			throw new FaxIntegrationException("Error logging out" + e.getMessage());
+		}
 	}
 }
