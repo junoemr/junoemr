@@ -67,7 +67,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				}
 
 				ctrl.faxAccountProvider = FaxAccountProviderFactory.creatAccountProvider(ctrl.faxAccount);
-				//ctrl.coverLetterOptions = await ctrl.faxAccountProvider.getCoverLetterOptions();
+				ctrl.coverLetterOptions = await ctrl.faxAccountProvider.getCoverLetterOptions();
 				if(!ctrl.faxAccount.coverLetterOption && ctrl.coverLetterOptions.length > 0)
 				{
 					ctrl.faxAccount.coverLetterOption = ctrl.coverLetterOptions[0].value;
