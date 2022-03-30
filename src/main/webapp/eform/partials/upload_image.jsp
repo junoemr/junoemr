@@ -38,87 +38,94 @@ String status = (String) request.getAttribute("status");
 <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/js/jquery_css/smoothness/jquery-ui-1.10.2.custom.min.css"/>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
+<title>EForm Image Upload</title>
 
-<script>
-$(function() {
-    $( document ).tooltip();
-  });
-</script>
 </head>
 
 <style>
-.message div{
-font-size: 12px;
-display:inline; 
-}
+	.message div {
+	    font-size: 12px;
+	    display: inline;
+	}
 
-h3{
-margin:0px; 
-display:inline; 
-font-weight:normal;
-font-size: 12px;
-}
+	h3 {
+	    margin: 0px;
+	    display: inline;
+	    font-weight: normal;
+	    font-size: 12px;
+	}
 
-.message ul{
-margin:0px;
-padding:0px;
-display:inline;
-}
+	.message ul {
+	    margin: 0;
+	    padding: 0;
+	    display: inline;
+	}
 
-.message li{
-list-style: none; 
-margin:0px;
-display:inline;  
-padding-left:6px;
-}
+	.message li {
+	    list-style: none;
+	    margin: 0;
+	    display: inline;
+	    padding-left: 6px;
+	}
 
+	.content-container {
+	    position: relative;
+	    width: 100%;
+	}
+	.content-container .alert-popup{
+		margin: 0;
+	}
 </style>
 <body>
+	<div class="content-container">
 
-<%if(status != null){ %>
-    <div class="alert alert-success">
-    <button type="button" class="close" data-dismiss="alert">&times;</button>
-    <strong>Success!</strong> Your image was uploaded.
-    </div>
-<%}else{%>
+		<%if(status != null)
+		{ %>
+			<div class="alert-popup alert alert-success">
+				<button type="button" class="close" data-dismiss="alert" onclick="$(this).parent().hide()">&times;</button>
+				<strong>Success!</strong> Your image was uploaded.
+			</div>
+		<%}%>
 
-		
 		<html:form action="/eform/imageUpload" enctype="multipart/form-data" method="post">
-		<bean:message key="eform.uploadimages.msgFileName" /> 
+		<bean:message key="eform.uploadimages.msgFileName" />
 		<span class="text-error message"><html:errors /></span>
 		<br>
 		<input type="file" name="image" id="image" class="check" size="40"  required>
 		<span title="<bean:message key="global.uploadWarningBody"/>" style="vertical-align:middle;font-family:arial;font-size:20px;font-weight:bold;color:#ABABAB;cursor:pointer"><img border="0" src="../../images/icon_alertsml.gif"/></span></span>
-        
-		<input type="submit" class="btn upload" name="subm" value="<bean:message key="eform.uploadimages.btnUpload"/>" disabled>
 
+		<input type="submit" class="btn upload" name="subm" value="<bean:message key="eform.uploadimages.btnUpload"/>" disabled>
 		</html:form>
-<%}%>
-<script src="<%=request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>  
+	</div>
+	<script src="<%=request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>
 
 <script>
-$( document ).ready(function() {
-$(".check").change(validate).keyup(validate);
-});
+	$(document).ready(function ()
+	{
+		$(".check").change(validate).keyup(validate);
+	});
 
 function validate()
 {
 
-var id = $(this).attr("id");
-var formHtml = $("#image").val();
-var file = $('#image')[0].files[0];
-//var filename = file.name;
-//var fileSize = file.size;
+	var id = $(this).attr("id");
+	var formHtml = $("#image").val();
+	var file = $('#image')[0].files[0];
+	//var filename = file.name;
+	//var fileSize = file.size;
 
-//var inputCheck=checkRow(filename);
+	//var inputCheck=checkRow(filename);
 
-if (formHtml!="") {
-	    $('.upload').removeAttr("disabled");
+	if (formHtml != "")
+	{
+		$('.upload').removeAttr("disabled");
 		$('.upload').addClass("btn-success");
-    }else{
-	    $('.upload').attr("disabled", "disabled");
+	}
+	else
+	{
+		$('.upload').attr("disabled", "disabled");
 		$('.upload').removeClass("btn-success");
-    } 
+	}
 }
 
 </script>

@@ -23,8 +23,9 @@
     Ontario, Canada
 
 --%>
-<%@page import="java.net.URLEncoder"%>
-<%@ page import="oscar.eform.data.*, oscar.OscarProperties, oscar.eform.*, java.util.*"%>
+<%@ page import="java.net.URLEncoder"%>
+<%@ page import="oscar.eform.EFormUtil" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
@@ -49,7 +50,9 @@
 
 <h3>Image Library</h3>
 
-<iframe id="uploadFrame" name="uploadFrame" frameborder="0" width="800" height="100" src="<%=request.getContextPath()%>/eform/partials/upload_image.jsp"></iframe>	
+	<iframe id="uploadFrame" name="uploadFrame" frameborder="0" width="800" height="100"
+	        src="<%=request.getContextPath()%>/eform/partials/upload_image.jsp">
+	</iframe>
 	
 		<table class="table table-condensed table-striped table-hover" id="tblImage">
 		<thead>
@@ -58,28 +61,27 @@
 				<th><bean:message key="eform.uploadimages.msgImgAction" /></th>
 			</tr>
 		</thead>
-		
+
 		 <tbody>
 			<%
-          //OscarProperties op = OscarProperties.getInstance();
-          //String project_home = op.getProperty("project_home");
-          ArrayList images = EFormUtil.listImages();
-          request.setAttribute("images", images);
-          for (int i=0; i<images.size(); i++) {
-              String fileURL="../eform/displayImage.do?imagefile="+ URLEncoder.encode(images.get(i).toString(), "UTF-8");
-              //String fileURL="/OscarDocument/" + project_home + "/eform/images/"+images.get(i);
-              String curimage = (String) images.get(i);
-        	%>
-       
-			<tr>
-				<td title="<%=curimage%>">
-					<a href="#"	class="viewImage" onclick="showImage('<%=fileURL%>', '<%="image" + i%>'); return false;"><%=curimage%></a>
-				</td>
-					
-				<td>
-					<a href="<%= request.getContextPath() %>/eform/deleteImage.do?filename=<%=URLEncoder.encode(curimage, "UTF-8")%>" class="contentLink"><bean:message key="eform.uploadimages.btnDelete" /></a>
-				</td>
-			</tr>
+				ArrayList<String> images = EFormUtil.listImages();
+				request.setAttribute("images", images);
+				for(int i = 0; i < images.size(); i++)
+				{
+					String fileURL = "../eform/displayImage.do?imagefile=" + URLEncoder.encode(images.get(i), "UTF-8");
+					String curimage = images.get(i);
+			%>
+				<tr>
+					<td title="<%=curimage%>">
+						<a href="#" class="viewImage"
+						   onclick="showImage('<%=fileURL%>', '<%="image" + i%>'); return false;"><%=curimage%>
+						</a>
+					</td>
+					<td>
+						<a href="<%= request.getContextPath() %>/eform/deleteImage.do?filename=<%=URLEncoder.encode(curimage, "UTF-8")%>"
+						   class="contentLink"><bean:message key="eform.uploadimages.btnDelete"/></a>
+					</td>
+				</tr>
 			<% } %>
 			</tbody>
 		</table>
