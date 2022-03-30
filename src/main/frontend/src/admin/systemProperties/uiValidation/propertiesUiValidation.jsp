@@ -87,7 +87,9 @@
 			<div class="all-icons">
 				<div ng-repeat="icon in $ctrl.iconList"
 					 class="item d-flex align-items-center">
-					<i class="{{icon}} d-inline-block"></i>
+					<i ng-class="icon"
+					   class="d-inline-block">
+					</i>
 					<span class="d-inline-block">{{ icon }}</span>
 				</div>
 			</div>
