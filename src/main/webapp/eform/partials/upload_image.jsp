@@ -80,11 +80,6 @@ padding-left:6px;
     <button type="button" class="close" data-dismiss="alert">&times;</button>
     <strong>Success!</strong> Your image was uploaded.
     </div>
-
-<script>
-window.top.location.href = "<%=request.getContextPath()%>/administration/?show=ImageUpload";
-</script>
-
 <%}else{%>
 
 		
