@@ -33,6 +33,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import lombok.Synchronized;
 import org.apache.log4j.Logger;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.http.HttpHeaders;
 
@@ -50,12 +51,18 @@ public class RingCentralCredentialStore
 	private static final String AUTH_ENDPOINT = "/authorize";
 	private static final String TOKEN_ENDPOINT = "/token";
 
+	private static String clientId;
+	private static String clientSecret;
+
 	private static final File DATASTORE_DIR = new File("/tmp/com.junoemr.fax.datastore");
 	private static Logger logger = MiscUtils.getLogger();
 
-	public static void init(String apiLocation)
+	public static void init(JunoProperties.FaxConfig faxConfig)
 	{
-		final String base_url = apiLocation + OAUTH_PATH;
+		RingCentralCredentialStore.clientId = faxConfig.getRingcentralClientId();
+		RingCentralCredentialStore.clientSecret= faxConfig.getRingcentralClientSecret();
+
+		final String base_url = faxConfig.getRingcentralApiLocation() + OAUTH_PATH;
 		final String auth_url = base_url + AUTH_ENDPOINT;
 		final String token_url = base_url + TOKEN_ENDPOINT;
 
@@ -129,10 +136,9 @@ public class RingCentralCredentialStore
 
 	private static String getClientID()
 	{
-		String clientId = System.getenv("FAX.RINGCENTRAL.CLIENT_ID");
 		if (clientId == null)
 		{
-			throw new RuntimeException("Missing required env variable $FAX.RINGCENTRAL.CLIENT_ID");
+			throw new RuntimeException("Missing ringcentral client id");
 		}
 
 		return clientId;
@@ -140,12 +146,11 @@ public class RingCentralCredentialStore
 
 	private static String getClientSecret()
 	{
-		String clientId = System.getenv("FAX.RINGCENTRAL.CLIENT_SECRET");
-		if (clientId == null)
+		if (clientSecret == null)
 		{
-			throw new RuntimeException("Missing required env variable $FAX.RINGCENTRAL.CLIENT_SECRET");
+			throw new RuntimeException("Missing ringcentral client secret");
 		}
 
-		return clientId;
+		return clientSecret;
 	}
 }

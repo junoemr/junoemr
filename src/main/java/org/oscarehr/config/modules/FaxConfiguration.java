@@ -23,22 +23,24 @@
 
 package org.oscarehr.config.modules;
 
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.fax.oauth.RingCentralCredentialStore;
 import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 
 @Configuration
 public class FaxConfiguration
 {
-	@Value("${fax.ringcentral.api_location}")
-	private String ringCentralApiLocation;
+	@Autowired
+	private JunoProperties junoProperties;
 
 	@PostConstruct
 	public void configureFaxApis()
 	{
-		RingCentralCredentialStore.init(ringCentralApiLocation);
-		RingCentralApiConnector.setApiLocation(ringCentralApiLocation);
+		JunoProperties.FaxConfig faxConfig = junoProperties.getFaxConfig();
+		RingCentralCredentialStore.init(faxConfig);
+		RingCentralApiConnector.setApiLocation(faxConfig);
 	}
 }
