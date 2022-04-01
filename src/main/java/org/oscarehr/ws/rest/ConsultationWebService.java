@@ -143,7 +143,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	public RestSearchResponse<ConsultationRequestSearchResult> searchRequests(
 			@QueryParam("demographicNo") Integer demographicNo,
 			@QueryParam("mrpNo") Integer mrpNo,
-			@QueryParam("status") Integer status,
+			@QueryParam("status") final List<String> statusList,
 			@QueryParam("page") @DefaultValue("1") Integer page,
 			@QueryParam("perPage") @DefaultValue("10") Integer perPage,
 			@QueryParam("referralStartDate") String referralStartDateString,
@@ -164,32 +164,22 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		int offset = perPage * (page-1);
 		int resultTotal;
 
-		try {
-			filter.setDemographicNo(demographicNo);
-			filter.setMrpNo(mrpNo);
-			filter.setStatus(status);
-			filter.setStartIndex(offset);
-			filter.setNumToReturn(perPage);
-			filter.setReferralStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralStartDateString)));
-			filter.setReferralEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralEndDate)));
-			filter.setAppointmentStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentStartDate)));
-			filter.setAppointmentEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentEndDate)));
-			filter.setTeam(team);
+		filter.setDemographicNo(demographicNo);
+		filter.setMrpNo(mrpNo);
+		filter.setStatus(statusList);
+		filter.setStartIndex(offset);
+		filter.setNumToReturn(perPage);
+		filter.setReferralStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralStartDateString)));
+		filter.setReferralEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralEndDate)));
+		filter.setAppointmentStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentStartDate)));
+		filter.setAppointmentEndDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(appointmentEndDate)));
+		filter.setTeam(team);
 
-			filter.setSortMode(ConsultationRequestSearchFilter.SORTMODE.valueOf(sortColumn));
-			filter.setSortDir(ConsultationRequestSearchFilter.SORTDIR.valueOf(sortDirection));
+		filter.setSortMode(ConsultationRequestSearchFilter.SORTMODE.valueOf(sortColumn));
+		filter.setSortDir(ConsultationRequestSearchFilter.SORTDIR.valueOf(sortDirection));
 
-			resultTotal = consultationManager.getConsultationCount(filter);
-			resultList = consultationManager.search(getLoggedInInfo(), filter);
-		}
-		catch(DateTimeParseException e) {
-			logger.error("Unparseable Date", e);
-			return RestSearchResponse.errorResponse("Unparseable Date");
-		}
-		catch(Exception e) {
-			logger.error("Search Error", e);
-			return RestSearchResponse.errorResponse("Search Error");
-		}
+		resultTotal = consultationManager.getConsultationCount(filter);
+		resultList = consultationManager.search(getLoggedInInfo(), filter);
 		return RestSearchResponse.successResponse(resultList, page, perPage, resultTotal);
 	}
 
@@ -199,7 +189,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	public RestResponse<Integer> getTotalRequests(
 			@QueryParam("demographicNo") Integer demographicNo,
 			@QueryParam("mrpNo") Integer mrpNo,
-			@QueryParam("status") Integer status,
+			@QueryParam("status") final List<String> statusList,
 			@QueryParam("page") @DefaultValue("1") Integer page,
 			@QueryParam("perPage") @DefaultValue("10") Integer perPage,
 			@QueryParam("referralStartDate") String referralStartDateString,
@@ -225,7 +215,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 
 		filter.setDemographicNo(demographicNo);
 		filter.setMrpNo(mrpNo);
-		filter.setStatus(status);
+		filter.setStatus(statusList);
 		filter.setStartIndex(offset);
 		filter.setNumToReturn(perPage);
 		filter.setReferralStartDate(ConversionUtils.toNullableLegacyDate(ConversionUtils.toNullableZonedLocalDate(referralStartDateString)));

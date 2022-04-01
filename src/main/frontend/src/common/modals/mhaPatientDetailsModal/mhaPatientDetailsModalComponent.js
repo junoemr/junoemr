@@ -132,7 +132,7 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 				try
 				{
 					ctrl.isLoadingProfile = true;
-					ctrl.currentProfile = await mhaPatientService.profileForDemographic(ctrl.currentIntegration.id, ctrl.demographic.demographicNo);
+					ctrl.currentProfile = await mhaPatientService.profileForDemographic(ctrl.currentIntegration.id, ctrl.demographic.id);
 				}
 				finally
 				{
@@ -156,7 +156,7 @@ angular.module('Common.Components').component('mhaPatientDetailsModal',
 						windowClass: "juno-modal sml",
 						resolve: {
 							style: () => JUNO_STYLE.GREY, //TODO regular style use when it doesn't break button/text colours
-							demographicNo: () => ctrl.demographic.demographicNo,
+							demographicNo: () => ctrl.demographic.id,
 							demographicEmail: () => ctrl.demographic.email,
 							integrationsList: () => ctrl.integrationList,
 							selectedIntegration: () => ctrl.currentIntegration,

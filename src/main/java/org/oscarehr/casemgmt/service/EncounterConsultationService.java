@@ -26,6 +26,7 @@ package org.oscarehr.casemgmt.service;
 import org.oscarehr.casemgmt.dto.EncounterNotes;
 import org.oscarehr.casemgmt.dto.EncounterSectionNote;
 import org.oscarehr.common.dao.UserPropertyDAO;
+import org.oscarehr.common.model.ConsultationRequest;
 import org.oscarehr.common.model.UserProperty;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.MiscUtils;
@@ -138,7 +139,7 @@ public class EncounterConsultationService extends EncounterSectionService
 				date = ConversionUtils.toNullableLocalDate(dateStr).atStartOfDay();
 
 				//if we are after cut off date and not completed set to red
-				if( date.isBefore(cutoffDate) && !status.equals("4") )
+				if( date.isBefore(cutoffDate) && !ConsultationRequest.getCompletedStatusList().contains(status))
 				{
 					sectionNote.setColour(COLOUR_RED);
 				}
