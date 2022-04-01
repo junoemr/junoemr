@@ -64,9 +64,9 @@ public class JunoProperties
 	@Data
 	public static class FaxConfig
 	{
+		private String dataStoreLocation;
 		private String ringcentralApiLocation;
 		private String ringcentralRedirectUrl;
-
 		private String ringcentralClientId;
 		private String ringcentralClientSecret;
 	}
