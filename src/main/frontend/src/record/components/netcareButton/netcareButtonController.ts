@@ -18,9 +18,9 @@ angular.module("Record.Components").component('netcareButton', {
 
 			ctrl.netcareService = null;
 
-			ctrl.$onInit = () =>
+			ctrl.$onInit = async () =>
 			{
-				ctrl.netcareService = new NetcareService();
+				ctrl.netcareService = await NetcareService.create();
 			}
 
 			ctrl.onOpenNetcare = (): void =>

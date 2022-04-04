@@ -37,6 +37,7 @@ public class JunoProperties
 {
 	private JunoPropertiesConfig properties;
 	private RedisSessionStore redisSessionStore;
+	private NetcareConfig netcareConfig;
 	private Test test;
 
 	@Data
@@ -52,6 +53,13 @@ public class JunoProperties
 		private String endpoint;
 		private String password;
 		private String storageKeyPrefix = "";
+	}
+
+	@Data
+	public static class NetcareConfig
+	{
+		private String conformanceCode;
+		private String launcherUrl;
 	}
 
 	@Data
