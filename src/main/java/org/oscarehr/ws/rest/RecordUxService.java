@@ -234,11 +234,6 @@ public class RecordUxService extends AbstractServiceImpl {
 			menulist.add(new MenuItemTo1(idCounter++, "CareConnect", "../integration/careConnect/careConnectForm.jsp?demoNo=" + demographicNo));
 		}
 
-		if (systemPreferenceService.isPreferenceEnabled(UserProperty.NETCARE_ENABLED, false))
-		{
-			menulist.add(new MenuItemTo1(idCounter++, "Netcare", "../integration/netcare/netcareForm.jsp?demoNo=" + demographicNo));
-		}
-
 		// END OF MORE MENU
 
 		return menulist;
