@@ -22,6 +22,7 @@
 */
 
 import {ADMIN_PAGE_EVENTS} from "../../adminConstants";
+import {SystemPreferences} from "../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Admin.Section').component('integrationModules',
 {
@@ -37,43 +38,43 @@ angular.module('Admin.Section').component('integrationModules',
 			{
 				name: "CareConnect",
 				enabled: false,
-				propertyName: "integration.CareConnect.enabled",
+				propertyName: SystemPreferences.CareConnectEnabled,
 				configUrl:""
 			},
 			{
 				name: "Netcare",
 				enabled: false,
-				propertyName: "integration.netcare.enabled",
+				propertyName: SystemPreferences.NetcareEnabled,
 				configUrl:""
 			},
 			{
 				name: "IceFall",
 				enabled: false,
-				propertyName: "icefall_enabled",
+				propertyName: SystemPreferences.IcefallEnabled,
 				configUrl: ""
 			},
 			{
 				name: "Appointment Queue",
 				enabled: false,
-				propertyName: "aqs_enabled",
+				propertyName: SystemPreferences.AQSEnabled,
 				configUrl: "#!/admin/manageAppointmentQueues",
 			},
             {
                 name: "iMD Health",
                 enabled: false,
-                propertyName: "integration.imdHealth.enabled",
+                propertyName: SystemPreferences.IMDHealthEnabled,
                 configUrl: "#!/admin/imdHealth"
             },
 			{
 				name: "Ocean ToolBar",
 				enabled: false,
-				propertyName: "integration.OceanToolBar.enabled",
+				propertyName: SystemPreferences.OceanToolbarEnabled,
 				configUrl: ""
 			},
 			{
 				name: "Know2Act",
 				enabled: false,
-				propertyName: "integration.know2Act.enabled",
+				propertyName: SystemPreferences.K2AEnabled,
 				configUrl: ""
 			}
 		];

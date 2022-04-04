@@ -49,6 +49,18 @@ export enum SYSTEM_PROPERTIES
     ACTIVE_FAX_ACCOUNT = "system_active_fax_account_id",
 }
 
+export enum SystemPreferences
+{
+    // misc integrations
+    AQSEnabled = "aqs_enabled",
+    CareConnectEnabled = "integration.CareConnect.enabled",
+    IcefallEnabled = "icefall_enabled",
+    IMDHealthEnabled = "integration.imdHealth.enabled",
+    K2AEnabled = "integration.know2Act.enabled",
+    NetcareEnabled = "integration.netcare.enabled",
+    OceanToolbarEnabled = "integration.OceanToolBar.enabled",
+}
+
 export enum INSTANCE_TYPE
 {
     BC = "BC",
