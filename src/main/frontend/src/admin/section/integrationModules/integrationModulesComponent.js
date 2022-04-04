@@ -41,6 +41,12 @@ angular.module('Admin.Section').component('integrationModules',
 				configUrl:""
 			},
 			{
+				name: "Netcare",
+				enabled: false,
+				propertyName: "integration.netcare.enabled",
+				configUrl:""
+			},
+			{
 				name: "IceFall",
 				enabled: false,
 				propertyName: "icefall_enabled",
