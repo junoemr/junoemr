@@ -3,6 +3,8 @@
 // ==========================================================================
 import {NetcareApi} from "../../../../../generated";
 import {API_BASE_PATH} from "../../../constants/ApiConstants";
+import NetcareConfig from "../model/NetcareConfig";
+import NetcareConfigModelConverter from "../converter/NetcareConfigModelConverter";
 
 export default class NetcareService
 {
@@ -11,6 +13,7 @@ export default class NetcareService
 
 	// local variables
 	protected netcareApi: NetcareApi;
+	protected config: NetcareConfig;
 
 	protected userId: string;
 	protected conformanceCode: string;
@@ -28,15 +31,15 @@ export default class NetcareService
 		this.netcareApi = new NetcareApi($http, $httpParamSerializer, API_BASE_PATH);
 	}
 
+	public async loadConfig(): Promise<NetcareConfig>
+	{
+		let modelConverter = new NetcareConfigModelConverter();
+		return modelConverter.convert((await this.netcareApi.getConfig()).data.body);
+	}
+
 	public async init(): Promise<void>
 	{
-		let response = await Promise.all([
-			this.netcareApi.getLauncherUrl(),
-			this.netcareApi.getConformanceCode(),
-		]);
-		this.launcherUrl = response[0].data.body;
-		this.conformanceCode = response[1].data.body;
-
+		this.config = await this.loadConfig();
 		this.userId = "PLBTEST1"; //todo
 	}
 
@@ -53,21 +56,21 @@ export default class NetcareService
 	public submitLoginForm(healthNumber: string): void
 	{
 		let form = this.buildForm("a1",
-			"plb.albertanetcare.ca/cha/PLBLogin.htm" +
+			this.config.loginUrl +
 			"?contextView=EMRPatient" +
 			"&userID=" + encodeURIComponent(this.userId) +
 			"&applicationName=Aligndex+EMPI" +
 			"&entryPointName=Search+for+a+Patient-EMR" +
 			"&EMRPatient.Id.idType=AB_ULI" +
 			"&EMRPatient.Id.id=" + encodeURIComponent(healthNumber) +
-			"&confCode=" + encodeURIComponent(this.conformanceCode),
+			"&confCode=" + encodeURIComponent(this.config.conformanceCode),
 			"Logon");
 		NetcareService.submitForm(form);
 	}
 
 	public submitLogoutForm(): void
 	{
-		let form = this.buildForm("a", "plb.albertanetcare.ca/concerto/Logout.htm", "Logoff");
+		let form = this.buildForm("a", this.config.logoutUrl, "Logoff");
 		NetcareService.submitForm(form);
 	}
 
@@ -83,7 +86,7 @@ export default class NetcareService
 		let form = document.createElement("form");
 		form.setAttribute('name', formName);
 		form.setAttribute('method', "GET");
-		form.setAttribute('action', this.launcherUrl);
+		form.setAttribute('action', this.config.launcherUrl);
 		form.setAttribute('target', this.commonWindowName);
 
 		let applicationInput = document.createElement("input");

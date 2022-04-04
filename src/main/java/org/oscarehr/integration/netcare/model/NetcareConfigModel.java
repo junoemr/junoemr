@@ -20,34 +20,15 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.integrations.netcare;
+package org.oscarehr.integration.netcare.model;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.integration.netcare.model.NetcareConfigModel;
-import org.oscarehr.integration.netcare.service.NetcareService;
-import org.oscarehr.ws.rest.AbstractServiceImpl;
-import org.oscarehr.ws.rest.response.RestResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.Data;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-@Path("/integrations/netcare")
-@Component("NetcareWebService")
-@Tag(name = "netcare")
-public class NetcareWebService extends AbstractServiceImpl
+@Data
+public class NetcareConfigModel
 {
-	@Autowired
-	private NetcareService netcareService;
-
-	@GET
-	@Path("/config")
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<NetcareConfigModel> getConfig()
-	{
-		return RestResponse.successResponse(netcareService.getConfig());
-	}
+	private String conformanceCode;
+	private String launcherUrl;
+	private String loginUrl;
+	private String logoutUrl;
 }

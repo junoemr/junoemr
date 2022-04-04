@@ -20,34 +20,26 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest.integrations.netcare;
+package org.oscarehr.integration.netcare.service;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.integration.netcare.model.NetcareConfigModel;
-import org.oscarehr.integration.netcare.service.NetcareService;
-import org.oscarehr.ws.rest.AbstractServiceImpl;
-import org.oscarehr.ws.rest.response.RestResponse;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-@Path("/integrations/netcare")
-@Component("NetcareWebService")
-@Tag(name = "netcare")
-public class NetcareWebService extends AbstractServiceImpl
+@Service
+public class NetcareService
 {
 	@Autowired
-	private NetcareService netcareService;
+	private JunoProperties junoProperties;
 
-	@GET
-	@Path("/config")
-	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<NetcareConfigModel> getConfig()
+	public NetcareConfigModel getConfig()
 	{
-		return RestResponse.successResponse(netcareService.getConfig());
+		JunoProperties.NetcareConfig netcareConfig = junoProperties.getNetcareConfig();
+
+		NetcareConfigModel model = new NetcareConfigModel();
+		BeanUtils.copyProperties(netcareConfig, model);
+		return model;
 	}
 }

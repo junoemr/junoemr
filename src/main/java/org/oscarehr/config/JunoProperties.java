@@ -60,6 +60,8 @@ public class JunoProperties
 	{
 		private String conformanceCode;
 		private String launcherUrl;
+		private String loginUrl;
+		private String logoutUrl;
 	}
 
 	@Data
