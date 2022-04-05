@@ -1,7 +1,8 @@
-import {NetcareApi} from "../../../../../generated";
+import {NetcareApi, SystemPreferenceApi} from "../../../../../generated";
 import {API_BASE_PATH} from "../../../constants/ApiConstants";
 import NetcareConfig from "../model/NetcareConfig";
 import NetcareConfigModelConverter from "../converter/NetcareConfigModelConverter";
+import {SystemPreferences} from "../../../../common/services/systemPreferenceServiceConstants";
 
 export default class NetcareService
 {
@@ -10,12 +11,13 @@ export default class NetcareService
 
 	// local variables
 	protected netcareApi: NetcareApi;
+	protected systemPreferenceApi: SystemPreferenceApi;
 	protected config: NetcareConfig;
 	protected initialized: boolean = false;
+	protected netcareEnabled: boolean = false;
+	protected loggedIn: boolean = false; // track if we are possibly logged in
 
 	protected userId: string;
-	protected conformanceCode: string;
-	protected launcherUrl: string;
 
 	/**
 	 * constructor
@@ -27,6 +29,7 @@ export default class NetcareService
 		const $httpParamSerializer = angular.injector(["ng"]).get("$httpParamSerializer");
 
 		this.netcareApi = new NetcareApi($http, $httpParamSerializer, API_BASE_PATH);
+		this.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, API_BASE_PATH);
 	}
 
 	// ==========================================================================
@@ -37,6 +40,11 @@ export default class NetcareService
 	{
 		let modelConverter = new NetcareConfigModelConverter();
 		return modelConverter.convert((await this.netcareApi.getConfig()).data.body);
+	}
+
+	public async loadEnabledState(): Promise<boolean>
+	{
+		return (await this.systemPreferenceApi.getPreferenceEnabled(SystemPreferences.NetcareEnabled, false)).data.body;
 	}
 
 	public async submitLoginForm(healthNumber: string): Promise<void>
@@ -57,16 +65,24 @@ export default class NetcareService
 			"&confCode=" + encodeURIComponent(this.config.conformanceCode),
 			"Logon");
 		NetcareService.submitForm(form);
+		this.loggedIn = true;
 	}
 
 	public async submitLogoutForm(): Promise<void>
 	{
-		// only submit logout form if initialized
-		if(this.initialized)
+		if(!this.initialized)
 		{
-			let form = this.buildForm("a", this.config.logoutUrl, "Logoff");
-			NetcareService.submitForm(form);
+			await this.init();
 		}
+
+		let form = this.buildForm("a", this.config.logoutUrl, "Logoff");
+		NetcareService.submitForm(form);
+		this.loggedIn = false;
+	}
+
+	public isLoggedIn(): boolean
+	{
+		return this.loggedIn;
 	}
 
 	// ==========================================================================

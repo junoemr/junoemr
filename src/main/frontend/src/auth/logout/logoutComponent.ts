@@ -13,7 +13,10 @@ angular.module("Auth").component('logout', {
 
 			ctrl.$onInit = () =>
 			{
-				netcareService.submitLogoutForm();
+				if(netcareService.isLoggedIn())
+				{
+					netcareService.submitLogoutForm();
+				}
 				window.location.href = "../logout.jsp";
 			}
 		}

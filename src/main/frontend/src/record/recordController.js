@@ -29,9 +29,9 @@ import MhaPatientService from "../lib/integration/myhealthaccess/service/MhaPati
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../common/components/junoComponentConstants";
 import {MhaCallPanelEvents} from "./components/mhaCallPanel/mhaCallPanelEvents";
-import {SystemPreferences} from "../common/services/systemPreferenceServiceConstants";
 import {SystemPreferenceApi} from "../../generated";
 import {API_BASE_PATH} from "../lib/constants/ApiConstants";
+import {netcareService} from "../lib/integration/netcare/service/NetcareService";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -191,7 +191,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 			}
 
-			controller.netcareModuleEnabled = (await controller.systemPreferenceApi.getPreferenceEnabled(SystemPreferences.NetcareEnabled, false)).data.body;
+			controller.netcareModuleEnabled = await netcareService.loadEnabledState();
 		}
 
 		/**
