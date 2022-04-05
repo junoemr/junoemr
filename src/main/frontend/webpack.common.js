@@ -459,6 +459,9 @@ module.exports = {
 			'./src/admin/section/rosterStatus/rosterStatusManagementComponent.js',
 			'./src/admin/section/rosterStatus/modals/editRosterStatusModalComponent.js',
 
+			'./src/auth/module.js',
+			'./src/auth/logout/logoutComponent.ts',
+
 			'./src/billing/billingController.js',
 
 			'./src/consults/module.js',

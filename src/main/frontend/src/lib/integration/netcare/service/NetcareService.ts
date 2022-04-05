@@ -61,12 +61,12 @@ export default class NetcareService
 
 	public async submitLogoutForm(): Promise<void>
 	{
-		if(!this.initialized)
+		// only submit logout form if initialized
+		if(this.initialized)
 		{
-			await this.init();
+			let form = this.buildForm("a", this.config.logoutUrl, "Logoff");
+			NetcareService.submitForm(form);
 		}
-		let form = this.buildForm("a", this.config.logoutUrl, "Logoff");
-		NetcareService.submitForm(form);
 	}
 
 	// ==========================================================================
