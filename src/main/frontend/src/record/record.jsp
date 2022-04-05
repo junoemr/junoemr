@@ -66,7 +66,7 @@
             <div class="flex-row align-items-center justify-content-end">
                 <div ng-if="recordCtrl.netcareModuleEnabled" class="w-128 m-l-4 m-r-4">
                     <netcare-button ng-if="recordCtrl.demographic"
-                                    demographic="recordCtrl.demographic">
+                                    phn="recordCtrl.demographic.healthNumber">
                     </netcare-button>
                 </div>
             </div>

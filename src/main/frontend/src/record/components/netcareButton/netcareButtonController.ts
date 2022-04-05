@@ -1,10 +1,10 @@
-import NetcareService from "../../../lib/integration/netcare/service/NetcareService";
+import {netcareService} from "../../../lib/integration/netcare/service/NetcareService";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../../../common/components/junoComponentConstants";
 
 angular.module("Record.Components").component('netcareButton', {
 	templateUrl: 'src/record/components/netcareButton/netcareButton.jsp',
 	bindings: {
-		demographic: "<",
+		phn: "<",
 	},
 	controller: [
 		"$scope",
@@ -20,22 +20,22 @@ angular.module("Record.Components").component('netcareButton', {
 
 			ctrl.$onInit = async () =>
 			{
-				ctrl.netcareService = await NetcareService.create();
+				ctrl.netcareService = netcareService;
 			}
 
 			ctrl.onOpenNetcare = (): void =>
 			{
-				ctrl.netcareService.submitLoginForm(ctrl.demographic.healthNumber);
+				ctrl.netcareService.submitLoginForm(ctrl.phn);
 			}
 
 			ctrl.netcareDisabled = (): string =>
 			{
-				return Juno.Common.Util.isBlank(ctrl.demographic.healthNumber);
+				return Juno.Common.Util.isBlank(ctrl.phn);
 			}
 
 			ctrl.netcareTitle = (): string =>
 			{
-				if(Juno.Common.Util.isBlank(ctrl.demographic.healthNumber))
+				if(Juno.Common.Util.isBlank(ctrl.phn))
 				{
 					return "Netcare requires patients to have a valid health number";
 				}

@@ -1,6 +1,3 @@
-// ==========================================================================
-// Public Methods
-// ==========================================================================
 import {NetcareApi} from "../../../../../generated";
 import {API_BASE_PATH} from "../../../constants/ApiConstants";
 import NetcareConfig from "../model/NetcareConfig";
@@ -14,6 +11,7 @@ export default class NetcareService
 	// local variables
 	protected netcareApi: NetcareApi;
 	protected config: NetcareConfig;
+	protected initialized: boolean = false;
 
 	protected userId: string;
 	protected conformanceCode: string;
@@ -31,30 +29,23 @@ export default class NetcareService
 		this.netcareApi = new NetcareApi($http, $httpParamSerializer, API_BASE_PATH);
 	}
 
+	// ==========================================================================
+	// Public Methods
+	// ==========================================================================
+
 	public async loadConfig(): Promise<NetcareConfig>
 	{
 		let modelConverter = new NetcareConfigModelConverter();
 		return modelConverter.convert((await this.netcareApi.getConfig()).data.body);
 	}
 
-	public async init(): Promise<void>
+	public async submitLoginForm(healthNumber: string): Promise<void>
 	{
-		this.config = await this.loadConfig();
-		this.userId = "PLBTEST1"; //todo
-	}
+		if(!this.initialized)
+		{
+			await this.init();
+		}
 
-	/**
-	 * async constructor method to ensure init has completed before returnig a new instance of the service
-	 */
-	public static async create(): Promise<NetcareService>
-	{
-		let service = new NetcareService();
-		await service.init();
-		return service;
-	}
-
-	public submitLoginForm(healthNumber: string): void
-	{
 		let form = this.buildForm("a1",
 			this.config.loginUrl +
 			"?contextView=EMRPatient" +
@@ -68,10 +59,25 @@ export default class NetcareService
 		NetcareService.submitForm(form);
 	}
 
-	public submitLogoutForm(): void
+	public async submitLogoutForm(): Promise<void>
 	{
+		if(!this.initialized)
+		{
+			await this.init();
+		}
 		let form = this.buildForm("a", this.config.logoutUrl, "Logoff");
 		NetcareService.submitForm(form);
+	}
+
+	// ==========================================================================
+	// Private Methods
+	// ==========================================================================
+
+	private async init(): Promise<void>
+	{
+		this.config = await this.loadConfig();
+		this.userId = "PLBTEST1"; //todo
+		this.initialized = true;
 	}
 
 	private static submitForm(form: HTMLFormElement): void
@@ -110,3 +116,5 @@ export default class NetcareService
 		return form as HTMLFormElement;
 	}
 }
+// service is meant to be a singleton
+export const netcareService = new NetcareService();
