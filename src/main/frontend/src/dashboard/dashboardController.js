@@ -24,10 +24,12 @@
 
 */
 import {SecurityPermissions} from "../common/security/securityConstants";
+import TicklerAttachment from "../lib/tickler/model/TicklerAttachment";
 
 angular.module('Dashboard').controller('Dashboard.DashboardController', [
 
     '$scope',
+	'$state',
     '$uibModal',
     '$interval',
     'NgTableParams',
@@ -42,6 +44,7 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
     'personaService',
 
     function($scope,
+             $state,
              $uibModal,
              $interval,
              NgTableParams,
@@ -265,6 +268,20 @@ angular.module('Dashboard').controller('Dashboard.DashboardController', [
 					        arr[0] = results.content;
 					        controller.ticklers = arr;
 				        }
+
+				        // eventually this will just exist on the tickler model
+				        controller.ticklers.forEach((tickler) =>
+				        {
+					        if (tickler.ticklerLinks && tickler.ticklerLinks.length > 0)
+					        {
+						        tickler.attachment = new TicklerAttachment(
+							        tickler.ticklerLinks[0].tableName,
+							        tickler.ticklerLinks[0].tableId,
+							        tickler.ticklerLinks[0].meta,
+						        );
+						        tickler.ticklerLinkUrl = tickler.attachment.getLinkUrl($state);
+					        }
+				        });
 			        },
 			        function error(errors)
 			        {

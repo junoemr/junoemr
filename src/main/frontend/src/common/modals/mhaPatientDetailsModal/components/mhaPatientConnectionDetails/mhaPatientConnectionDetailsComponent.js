@@ -31,7 +31,7 @@ angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatient
 		bindings: {
 			profile: "<", // Type MhaPatient
 			integration: "<", // Type MhaIntegration
-			demographicNo: "<",
+			demographicId: "<",
 			disabled: "<?",
 			onConnectionUpdated: "&?",
 		},
@@ -105,7 +105,7 @@ angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatient
 						await patientAccessService.verifyPatientByAccountIdCode(
 							ctrl.integration.id,
 							ctrl.verificationProfile,
-							ctrl.demographicNo,
+							ctrl.demographicId,
 							ctrl.verificationCode);
 
 						ctrl.notifyListenerOfConnectionUpdate();
@@ -151,7 +151,7 @@ angular.module('Common.Components.MhaPatientDetailsModal').component('mhaPatient
 				{
 					try
 					{
-						await patientAccessService.confirmPatient(ctrl.integration.id, ctrl.profile.id, ctrl.demographicNo);
+						await patientAccessService.confirmPatient(ctrl.integration.id, ctrl.profile.id, ctrl.demographicId);
 						ctrl.notifyListenerOfConnectionUpdate();
 					}
 					catch(error)

@@ -3,6 +3,10 @@
   // un-style the pre tags used for note display
   pre {
     @include juno-font-default;
+    // very important to have this pre-wrap property in note pre tag.
+    // it keeps long single-line notes from forcing width
+    white-space: pre-wrap;
+
     padding: 0;
     margin: 0;
     background-color: transparent;

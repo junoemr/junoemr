@@ -231,7 +231,7 @@ public class PreventionManager
 
 	public List<Prevention> getPreventionsByDemographicNo(LoggedInInfo loggedInInfo, Integer demographicNo)
 	{
-		List<Prevention> results = preventionDao.findUniqueByDemographicId(demographicNo);
+		List<Prevention> results = preventionDao.findMostRecentByDemographic(demographicNo);
 		return (results);
 	}
 

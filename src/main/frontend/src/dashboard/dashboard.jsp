@@ -269,7 +269,13 @@
 										</td>
 										<td>{{item.demographicName}}</td>
 										<td>{{item.serviceDate | date:'yyyy-MM-dd'}}</td>
-										<td>{{item.message | cut:true:200 }}</td>
+										<td>{{item.message | cut:true:200 }}
+											<span ng-if="item.ticklerLinks !== null && item.ticklerLinks.length > 0">
+												<a target="lab"
+												   href="{{item.ticklerLinkUrl}}"
+												   ng-click="$event.stopPropagation();">ATT</a>
+											</span>
+										</td>
 									</tr>
 									</tbody>
 									<tfoot>

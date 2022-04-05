@@ -86,13 +86,13 @@ angular.module('Layout').component("primaryNavigation", {
 			ctrl.consultationLookbackPeriod = 1;
 			ctrl.SecurityPermissions = SecurityPermissions;
 
-			systemPreferenceService.isPreferenceEnabled(SYSTEM_PROPERTIES.UI_CUSTOM_NAV_ICON)
+			systemPreferenceService.isPreferenceEnabled(SYSTEM_PROPERTIES.UI_CUSTOM_NAV_ICON, false)
 			.then(pref =>
 			{
 				ctrl.customNavIcon = pref;
 			})
 
-			systemPreferenceService.isPreferenceEnabled(SYSTEM_PROPERTIES.UI_LOCK_TO_JUNO_UI)
+			systemPreferenceService.isPreferenceEnabled(SYSTEM_PROPERTIES.UI_LOCK_TO_JUNO_UI, false)
 			.then(pref =>
 			{
 				ctrl.uiLock = pref;
@@ -424,7 +424,7 @@ angular.module('Layout').component("primaryNavigation", {
 					{
 						invertStatus: true,
 						referralEndDate: endDate,
-						status: '4',
+						status: ['4', '5', '7'],
 						team: ctrl.consultationTeamWarning
 					}).then(
 					function success(results)

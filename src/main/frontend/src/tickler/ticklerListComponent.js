@@ -2,6 +2,7 @@ import {SecurityPermissions} from "../common/security/securityConstants";
 
 import {TicklerAttachmentType} from "../lib/tickler/model/TicklerAttachmentType";
 import ToastService from "../lib/alerts/service/ToastService";
+import TicklerAttachment from "../lib/tickler/model/TicklerAttachment";
 
 angular.module('Tickler').component('ticklerListController', {
 	templateUrl: 'src/tickler/ticklerList.jsp',
@@ -159,7 +160,14 @@ angular.module('Tickler').component('ticklerListController', {
 									// Grab URLs for tickler links
 									for (var i = 0; i < ticklerList.length; i++){
 										if (ticklerList[i].ticklerLinks.length > 0 )
-											ticklerList[i].ticklerLinkUrl = controller.getLinkUrl(ticklerList[i].ticklerLinks[0]);
+										{
+											let attachment = new TicklerAttachment(
+												ticklerList[i].ticklerLinks[0].tableName,
+												ticklerList[i].ticklerLinks[0].tableId,
+												ticklerList[i].ticklerLinks[0].meta,
+												);
+											ticklerList[i].ticklerLinkUrl = attachment.getLinkUrl($state);
+										}
 									}
 
 									return data.content;
@@ -354,40 +362,6 @@ angular.module('Tickler').component('ticklerListController', {
 				window.print();
 			};
 
-			controller.getLinkUrl = function getLinkUrl(input)
-			{
-				if (input !== null && input.id !== null)
-				{
-					var url = "";
-					if (input.tableName === TicklerAttachmentType.Cml)
-					{
-						url = "../lab/CA/ON/CMLDisplay.jsp?segmentID=" + input.tableId;
-					}
-					else if (input.tableName === TicklerAttachmentType.Mds)
-					{
-						url = "../oscarMDS/SegmentDisplay.jsp?segmentID=" + input.tableId;
-					}
-					else if (input.tableName === TicklerAttachmentType.Hl7)
-					{
-						url = "../lab/CA/ALL/labDisplay.jsp?segmentID=" + input.tableId;
-					}
-					else if (input.tableName === TicklerAttachmentType.Doc)
-					{
-						url = "../dms/ManageDocument.do?method=display&doc_no=" + input.tableId;
-					}
-					else if (input.tableName === TicklerAttachmentType.Message)
-					{
-						const meta = JSON.parse(input.meta);
-						url = $state.href("messaging.view.message", {
-							messageId: input.tableId,
-							backend: meta.messagingBackend,
-							source: meta.source,
-							group: meta.group,
-						});
-					}
-					return url;
-				}
-			};
 			controller.inDemographicView = function()
 			{
 				return ($state.params.demographicNo != null);

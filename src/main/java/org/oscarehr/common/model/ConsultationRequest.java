@@ -25,9 +25,11 @@
 
 package org.oscarehr.common.model;
 
-import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.oscarehr.util.MiscUtils;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -43,12 +45,11 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.oscarehr.util.MiscUtils;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "consultationRequests")
@@ -405,5 +406,10 @@ public class ConsultationRequest extends AbstractModel<Integer> implements Seria
 			logger.error("Invalid appointment datetime", e);
 		}
 		return appointmentDateTime;
+	}
+
+	public static List<String> getCompletedStatusList()
+	{
+		return Arrays.asList(STATUS_COMPLETE, STATUS_CANCEL, STATUS_DELETE);
 	}
 }

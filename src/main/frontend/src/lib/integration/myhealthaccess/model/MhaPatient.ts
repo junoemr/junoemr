@@ -252,7 +252,11 @@ export default class MhaPatient
 
 	get fullAddress(): string
 	{
-		return `${this.address ? this._address : ''} ${this.city ? this.city : ''}, ${this.province ? this.province : ''}`
+		if (this.address || this.city || this.province)
+		{
+			return `${this.address ? this.address : ''} ${this.city ? this.city : ''}, ${this.province ? this.province : ''}`
+		}
+		return null;
 	}
 
 	get hasVoipToken(): boolean
