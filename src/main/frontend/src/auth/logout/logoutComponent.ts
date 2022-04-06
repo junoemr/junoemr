@@ -1,4 +1,4 @@
-import {netcareService} from "../../lib/integration/netcare/service/NetcareService";
+import {authService} from "../../lib/auth/AuthService";
 
 angular.module("Auth").component('logout', {
 	templateUrl: 'src/auth/logout/logout.jsp',
@@ -9,15 +9,14 @@ angular.module("Auth").component('logout', {
 		function ()
 		{
 			const ctrl = this;
-			ctrl.netcareService = netcareService;
 
 			ctrl.$onInit = () =>
 			{
-				if(netcareService.isLoggedIn())
-				{
-					netcareService.submitLogoutForm();
-				}
-				window.location.href = "../logout.jsp";
+				authService.logout();
+			}
+			ctrl.triggerLogout = () =>
+			{
+				authService.logout();
 			}
 		}
 	]
