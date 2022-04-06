@@ -33,8 +33,11 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import lombok.Synchronized;
 import org.apache.log4j.Logger;
+import org.oscarehr.config.JunoProperties;
+import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.http.HttpHeaders;
+import oscar.util.ConversionUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,17 +53,28 @@ public class RingCentralCredentialStore
 	private static final String AUTH_ENDPOINT = "/authorize";
 	private static final String TOKEN_ENDPOINT = "/token";
 
-	private static final File DATASTORE_DIR = new File("/tmp/com.junoemr.fax.datastore");
+	private static String apiLocation;
+	private static String clientId;
+	private static String clientSecret;
+	private static String redirectUrl;
+	private static String dataStoreDir;
+
 	private static Logger logger = MiscUtils.getLogger();
 
-	public static void init(String apiLocation)
+	public static void init(JunoProperties.FaxConfig faxConfig)
 	{
-		final String base_url = apiLocation + OAUTH_PATH;
-		final String auth_url = base_url + AUTH_ENDPOINT;
-		final String token_url = base_url + TOKEN_ENDPOINT;
+		apiLocation = faxConfig.getRingcentralApiLocation();
+		clientId = faxConfig.getRingcentralClientId();
+		clientSecret= faxConfig.getRingcentralClientSecret();
+		redirectUrl = faxConfig.getRingcentralRedirectUrl();
+		dataStoreDir = faxConfig.getDataStoreLocation();
 
 		try
 		{
+			final String base_url = getApiLocation() + OAUTH_PATH;
+			final String auth_url = base_url + AUTH_ENDPOINT;
+			final String token_url = base_url + TOKEN_ENDPOINT;
+
 			oAuthWorkFlow = new AuthorizationCodeFlow.Builder(
 				BearerToken.formEncodedBodyAccessMethod(),
 				new NetHttpTransport(),
@@ -70,11 +84,11 @@ public class RingCentralCredentialStore
 				getClientID(),
 				auth_url
 			)
-				.setDataStoreFactory(new FileDataStoreFactory(DATASTORE_DIR))
+				.setDataStoreFactory(new FileDataStoreFactory(new File(faxConfig.getDataStoreLocation())))
 				.enablePKCE()
 				.build();
 		}
-		catch (IOException e)
+		catch (IOException | FaxApiConnectionException e)
 		{
 			logger.error("Could not init OAuth workflow", e);
 		}
@@ -102,13 +116,22 @@ public class RingCentralCredentialStore
 
 	protected static String getRedirectURL()
 	{
-		String clientId = System.getenv("FAX.RINGCENTRAL.REDIRECT_URL");
-		if (clientId == null)
+		if (!requiredVarSet(redirectUrl))
 		{
-			throw new RuntimeException("Missing required env variable $FAX.RINGCENTRAL.REDIRECT_URL");
+			throw new FaxApiConnectionException("Missing ringcentral redirect url");
 		}
 
-		return clientId;
+		return redirectUrl;
+	}
+
+	protected static File getDataStoreDir()
+	{
+		if (!requiredVarSet(dataStoreDir))
+		{
+			throw new FaxApiConnectionException("Missing fax datastore directory");
+		}
+
+		return new File(dataStoreDir);
 	}
 
 	protected static String getUserId()
@@ -127,12 +150,21 @@ public class RingCentralCredentialStore
 		return new ClientParametersAuthentication(getClientID(), null);
 	}
 
+	private static String getApiLocation()
+	{
+		if (!requiredVarSet(apiLocation))
+		{
+			throw new FaxApiConnectionException("Missing ringcentral api location");
+		}
+
+		return apiLocation;
+	}
+
 	private static String getClientID()
 	{
-		String clientId = System.getenv("FAX.RINGCENTRAL.CLIENT_ID");
-		if (clientId == null)
+		if (!requiredVarSet(clientId))
 		{
-			throw new RuntimeException("Missing required env variable $FAX.RINGCENTRAL.CLIENT_ID");
+			throw new FaxApiConnectionException("Missing ringcentral client id");
 		}
 
 		return clientId;
@@ -140,12 +172,17 @@ public class RingCentralCredentialStore
 
 	private static String getClientSecret()
 	{
-		String clientId = System.getenv("FAX.RINGCENTRAL.CLIENT_SECRET");
-		if (clientId == null)
+		if (!requiredVarSet(clientId))
 		{
-			throw new RuntimeException("Missing required env variable $FAX.RINGCENTRAL.CLIENT_SECRET");
+			throw new FaxApiConnectionException("Missing ringcentral client secret");
 		}
 
-		return clientId;
+		return clientSecret;
+	}
+
+	private static boolean requiredVarSet(String param)
+	{
+		// $ENV_VAR will parse out as "$ENV_VAR" if not found
+		return (ConversionUtils.hasContent(param) && !param.startsWith("$"));
 	}
 }

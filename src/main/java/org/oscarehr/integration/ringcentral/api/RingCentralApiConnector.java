@@ -23,6 +23,7 @@
 package org.oscarehr.integration.ringcentral.api;
 
 import com.google.api.client.auth.oauth2.Credential;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.oauth.RingCentralCredentialStore;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageListInput;
@@ -82,9 +83,9 @@ public class RingCentralApiConnector extends RESTClient
 		RESPONSE_STATUS_DELIVERY_FAILED
 	));
 
-	public static void setApiLocation(String apiLocation)
+	public static void setApiLocation(JunoProperties.FaxConfig faxConfig)
 	{
-		REST_API_BASE = apiLocation + REST_API_BASE_PATH;
+		REST_API_BASE = faxConfig.getRingcentralApiLocation() + REST_API_BASE_PATH;
 		REST_API_URL = REST_API_BASE + REST_API_VERSION_PATH;
 	}
 
