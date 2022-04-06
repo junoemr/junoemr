@@ -37,8 +37,8 @@ import java.util.Map;
 
 public class DemographicSetManager {
 
-	private DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
-	private DemographicSetsDao demographicSetsDao = SpringUtils.getBean(DemographicSetsDao.class);
+	private final DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+	private final DemographicSetsDao demographicSetsDao = SpringUtils.getBean(DemographicSetsDao.class);
 
 	public DemographicSetManager() {
 	}
@@ -53,11 +53,20 @@ public class DemographicSetManager {
 	{
 		for(String demographicNo : demoList)
 		{
-			DemographicSets ds = new DemographicSets();
-			ds.setName(setName);
-			ds.setDemographic(demographicDao.getDemographic(demographicNo));
-			ds.setArchive("0");
-			demographicSetsDao.persist(ds);
+			DemographicSets existingSet = demographicSetsDao.findBySetNameAndDemographicNo(setName, Integer.parseInt(demographicNo));
+			if(existingSet != null)
+			{
+				existingSet.setArchive("0");
+				demographicSetsDao.merge(existingSet);
+			}
+			else
+			{
+				DemographicSets ds = new DemographicSets();
+				ds.setName(setName);
+				ds.setDemographic(demographicDao.getDemographic(demographicNo));
+				ds.setArchive("0");
+				demographicSetsDao.persist(ds);
+			}
 		}
 	}
 
@@ -117,31 +126,27 @@ public class DemographicSetManager {
 		return retval;
 	}
 
-	public List<String> setDemographicIneligible(String setName, String demoNo) {
-		List<String> retval = new ArrayList<String>();
-		List<DemographicSets> dss = demographicSetsDao.findBySetNameAndDemographicNo(setName, Integer.parseInt(demoNo));
-		for (DemographicSets ds : dss) {
-			ds.setEligibility("1");
-			demographicSetsDao.merge(ds);
-		}
-		return retval;
+	public void setDemographicIneligible(String setName, String demoNo)
+	{
+		DemographicSets demographicSets = demographicSetsDao.findBySetNameAndDemographicNo(setName, Integer.parseInt(demoNo));
+		demographicSets.setEligibility("1");
+		demographicSetsDao.merge(demographicSets);
 	}
 
-	public List<String> setDemographicDelete(String setName, String demoNo) {
-		List<String> retval = new ArrayList<String>();
-		List<DemographicSets> dss = demographicSetsDao.findBySetNameAndDemographicNo(setName, Integer.parseInt(demoNo));
-		for (DemographicSets ds : dss) {
-			ds.setArchive("1");
-			demographicSetsDao.merge(ds);
-		}
-		return retval;
+	public void setDemographicDelete(String setName, String demoNo)
+	{
+		DemographicSets demographicSets = demographicSetsDao.findBySetNameAndDemographicNo(setName, Integer.parseInt(demoNo));
+		demographicSets.setArchive("1");
+		demographicSetsDao.merge(demographicSets);
 	}
 
-	public List<String> getDemographicSets(String demoNo) {
+	public List<String> getDemographicSets(String demoNo)
+	{
 		return demographicSetsDao.findSetNamesByDemographicNo(Integer.parseInt(demoNo));
 	}
 
-	public List<String> getDemographicSets() {
+	public List<String> getDemographicSets()
+	{
 		return demographicSetsDao.findSetNames();
 	}
 }
