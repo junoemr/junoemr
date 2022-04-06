@@ -25,15 +25,15 @@
 
 package oscar.oscarReport.data;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.DemographicSetsDao;
 import org.oscarehr.common.model.DemographicSets;
 import org.oscarehr.util.SpringUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DemographicSetManager {
 
@@ -49,17 +49,16 @@ public class DemographicSetManager {
 		addDemographicSet(setName, list);
 	}
 
-	public void addDemographicSet(String setName, List<String> demoList) {
-
-		for (int i = 0; i < demoList.size(); i++) {
-			String demographicNo = demoList.get(i);
+	public void addDemographicSet(String setName, List<String> demoList)
+	{
+		for(String demographicNo : demoList)
+		{
 			DemographicSets ds = new DemographicSets();
 			ds.setName(setName);
 			ds.setDemographic(demographicDao.getDemographic(demographicNo));
 			ds.setArchive("0");
 			demographicSetsDao.persist(ds);
 		}
-
 	}
 
 	public List<String> getDemographicSet(String setName) {

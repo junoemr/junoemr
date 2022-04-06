@@ -26,10 +26,12 @@
 package oscar.oscarReport.pageUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -41,30 +43,43 @@ import oscar.oscarReport.data.DemographicSetManager;
  *
  * @author Jay Gallagher
  */
-public class RptCreateDemographicSetAction extends Action {
-   
+public class RptCreateDemographicSetAction extends Action
+{
 
-   public RptCreateDemographicSetAction() {
+   public RptCreateDemographicSetAction()
+   {
    }
-   
+
    public ActionForward execute(ActionMapping mapping,
-				 ActionForm form,
-				 HttpServletRequest request,
-				 HttpServletResponse response){
-	
-      String setName = request.getParameter("setName");      
-      String sizestr = request.getParameter("size");      
-      ArrayList list = new ArrayList();      
-      int size = Integer.parseInt(sizestr);
-                                      
-      for (int i = 0 ; i < size; i++){
-         list.add(request.getParameter("demoNo"+i));         
+                                ActionForm form,
+                                HttpServletRequest request,
+                                HttpServletResponse response)
+   {
+      String setName = request.getParameter("setName");
+      int size = Integer.parseInt(request.getParameter("size"));
+
+      if(StringUtils.isBlank(setName))
+      {
+         throw new IllegalArgumentException("setName cannot be blank");
       }
-            
-      if (list.size() > 0 ){
+
+      List<String> demographicIds = new ArrayList<>(size);
+      for(int i = 0; i < size; i++)
+      {
+         String demographicId = request.getParameter("demoNo" + i);
+         if(StringUtils.isBlank(demographicId))
+         {
+            // may trigger when set sizes exceed parameter size restrictions
+            throw new IllegalArgumentException("demoNo" + i + " is missing a value");
+         }
+         demographicIds.add(demographicId);
+      }
+
+      if(!demographicIds.isEmpty())
+      {
          DemographicSetManager demoSet = new DemographicSetManager();
-         demoSet.addDemographicSet(setName,list);
-      }                                       
+         demoSet.addDemographicSet(setName, demographicIds);
+      }
       return (mapping.findForward("success"));
-   }   
+   }
 }
