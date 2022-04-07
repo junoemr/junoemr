@@ -23,9 +23,13 @@
     Ontario, Canada
 
 --%>
-
-<%@page import="java.util.HashMap, oscar.log.*,oscar.OscarProperties,java.net.*, javax.xml.parsers.*,org.w3c.dom.*,org.oscarehr.util.MiscUtils"
-	errorPage="errorpage.jsp"%>
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="oscar.log.LogAction" %>
+<%@ page import="oscar.log.LogConst" %>
+<%@ page import="java.net.HttpURLConnection" %>
+<%@ page import="java.net.URL" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page errorPage="errorpage.jsp" %>
 <%
   OscarProperties props = OscarProperties.getInstance();
 
