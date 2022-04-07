@@ -68,11 +68,6 @@ export default class NetcareService
 		this.loggedIn = true;
 	}
 
-	public async submitUpdateForm(healthNumber: string): Promise<void>
-	{
-		return this.submitLoginForm(healthNumber); // todo is this different?
-	}
-
 	public async submitLogoutForm(): Promise<void>
 	{
 		if(!this.initialized)
@@ -87,7 +82,6 @@ export default class NetcareService
 
 	public isLoggedIn(): boolean
 	{
-		//todo read something from session.
 		return this.loggedIn;
 	}
 

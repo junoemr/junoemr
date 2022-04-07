@@ -123,19 +123,10 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.$onInit = async () =>
 		{
-			controller.netcareModuleEnabled = await netcareService.loadEnabledState();
-
 			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.DemographicRead))
 			{
 				controller.page.cannotChange = !securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterNoteCreate);
 				controller.demographic = await demographicService.getDemographic(controller.demographicNo);
-
-				if(controller.netcareModuleEnabled
-					&& !Juno.Common.Util.isBlank(controller.demographic.healthNumber)
-					&& netcareService.isLoggedIn())
-				{
-					netcareService.submitUpdateForm(controller.demographic.healthNumber);
-				}
 			}
 
 			if(securityRolesService.hasSecurityPrivileges(SecurityPermissions.EncounterNoteCreate))
@@ -199,6 +190,8 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 
 			}
+
+			controller.netcareModuleEnabled = await netcareService.loadEnabledState();
 		}
 
 		/**

@@ -16,13 +16,16 @@ angular.module("Record.Components").component('netcareButton', {
 			$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 			$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-			ctrl.$onInit = () =>
+			ctrl.netcareService = null;
+
+			ctrl.$onInit = async () =>
 			{
+				ctrl.netcareService = netcareService;
 			}
 
 			ctrl.onOpenNetcare = (): void =>
 			{
-				netcareService.submitLoginForm(ctrl.phn);
+				ctrl.netcareService.submitLoginForm(ctrl.phn);
 			}
 
 			ctrl.netcareDisabled = (): string =>
