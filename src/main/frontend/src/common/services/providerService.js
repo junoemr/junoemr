@@ -104,7 +104,7 @@ angular.module("Common.Services").service("providerService", [
 			return deferred.promise;
 		};
 
-		//TODO move to its own service
+		//TODO move to ProviderPreferenceService
 		service.getSettings = function getSettings()
 		{
 			var deferred = $q.defer();
@@ -171,7 +171,7 @@ angular.module("Common.Services").service("providerService", [
 			return deferred.promise;
 		};
 
-		//TODO move to its own service
+		//TODO move to ProviderPreferenceService
 		service.saveSettings = function saveSettings(providerNo, settings)
 		{
 			var deferred = $q.defer();

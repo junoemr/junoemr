@@ -1,5 +1,7 @@
 import {netcareService} from "../../../lib/integration/netcare/service/NetcareService";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../../../common/components/junoComponentConstants";
+import {providerPreferenceService} from "../../../lib/provider/service/ProviderPreferenceService";
+import {ProviderPreferences} from "../../../lib/provider/service/ProviderPreferenceServiceConstants";
 
 angular.module("Record.Components").component('netcareButton', {
 	templateUrl: 'src/record/components/netcareButton/netcareButton.jsp',
@@ -20,7 +22,7 @@ angular.module("Record.Components").component('netcareButton', {
 
 			ctrl.$onInit = async () =>
 			{
-				// ctrl.netcareUserId = await
+				ctrl.netcareUserId = await providerPreferenceService.getPreference(ProviderPreferences.NetcareUserId);
 			}
 
 			ctrl.onOpenNetcare = (): void =>
