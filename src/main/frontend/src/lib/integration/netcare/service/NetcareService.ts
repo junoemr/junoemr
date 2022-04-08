@@ -4,6 +4,8 @@ import NetcareConfig from "../model/NetcareConfig";
 import NetcareConfigModelConverter from "../converter/NetcareConfigModelConverter";
 import {SystemPreferences} from "../../../../common/services/systemPreferenceServiceConstants";
 
+declare var $: any;
+
 export default class NetcareService
 {
 	// constants
@@ -122,8 +124,8 @@ export default class NetcareService
 		commandLineInput.setAttribute('value', commandLineValue);
 
 		let submitInput = document.createElement("input");
-		commandLineInput.setAttribute('type', "submit");
-		commandLineInput.setAttribute('value', submitValue);
+		submitInput.setAttribute('type', "submit");
+		submitInput.setAttribute('value', submitValue);
 
 		form.appendChild(applicationInput);
 		form.appendChild(commandLineInput);
