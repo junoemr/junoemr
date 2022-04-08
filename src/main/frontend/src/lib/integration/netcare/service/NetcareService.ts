@@ -17,8 +17,6 @@ export default class NetcareService
 	protected config: NetcareConfig;
 	protected initialized: boolean = false;
 
-	protected userId: string;
-
 	/**
 	 * constructor
 	 * ensure init completes before use of the service
@@ -47,17 +45,19 @@ export default class NetcareService
 		return (await this.systemPreferenceApi.getPreferenceEnabled(SystemPreferences.NetcareEnabled, false)).data.body;
 	}
 
-	public async submitLoginForm(healthNumber: string): Promise<void>
+	public async submitLoginForm(healthNumber: string, userId: string = null): Promise<void>
 	{
 		if(!this.initialized)
 		{
 			await this.init();
 		}
 
+		let userIdParam = Juno.Common.Util.isBlank(userId) ? "" : "&userID=" + encodeURIComponent(userId);
+
 		let form = this.buildForm("a1",
 			this.config.loginUrl +
 			"?contextView=EMRPatient" +
-			"&userID=" + encodeURIComponent(this.userId) +
+			userIdParam +
 			"&applicationName=Aligndex+EMPI" +
 			"&entryPointName=Search+for+a+Patient-EMR" +
 			"&EMRPatient.Id.idType=AB_ULI" +
@@ -94,7 +94,6 @@ export default class NetcareService
 	private async init(): Promise<void>
 	{
 		this.config = await this.loadConfig();
-		this.userId = "PLBTEST1"; //todo
 		this.initialized = true;
 	}
 

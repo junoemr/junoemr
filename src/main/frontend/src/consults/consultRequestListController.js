@@ -336,7 +336,7 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 
 						params.total(parseInt(result.meta.total));
 						let numMonthsOutstanding = 1;
-						let providerPreferences = await providerPreferenceApi.getProviderSettings();
+						let providerPreferences = await providerPreferenceApi.getAllProviderSettings();
 
 						if (providerPreferences.data.content[0].consultationTimePeriodWarning
 							&& Juno.Common.Util.isIntegerString(providerPreferences.data.content[0].consultationTimePeriodWarning))

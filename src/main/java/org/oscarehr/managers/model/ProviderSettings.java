@@ -162,6 +162,8 @@ public class ProviderSettings
 	private boolean appointmentCountIncludeNoShow;
 	private boolean appointmentCountIncludeNoDemographic;
 
+	private String netcareUserId;
+
 	// when counting the number of unread messages how the value should be calculated.
 	public enum MESSAGE_COUNT_SUM_MODE
 	{

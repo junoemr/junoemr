@@ -111,7 +111,7 @@ angular.module("Common.Services").service("providerService", [
 
 			$http(
 			{
-				url: '../ws/rs/providerSettings/get',
+				url: '../ws/rs/providerSettings/all',
 				method: "GET"
 			}).then(
 				function success(results)

@@ -95,6 +95,13 @@
 				<button class="btn btn-default" ng-click="$ctrl.openMyOscarUsernamePopup()">Set PHR Username</button>
 			</div>
 		</div>
+
+		<div class="form-group col-sm-12">
+			<juno-input ng-model="$ctrl.pref.netcareUserId"
+			            label="Netcare User Id"
+			            label-position="$ctrl.LABEL_POSITION.LEFT">
+			</juno-input>
+		</div>
 	</div>
 </div>
 

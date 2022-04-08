@@ -201,7 +201,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 
 		controller.$onInit = () =>
 		{
-			controller.providerPreferenceApi.getProviderSettings().then((response) =>
+			controller.providerPreferenceApi.getAllProviderSettings().then((response) =>
 			{
 				const prefs = response.data.content[0];
 				controller.appointmentCountOptions = {
