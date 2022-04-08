@@ -4,8 +4,6 @@ import NetcareConfig from "../model/NetcareConfig";
 import NetcareConfigModelConverter from "../converter/NetcareConfigModelConverter";
 import {SystemPreferences} from "../../../../common/services/systemPreferenceServiceConstants";
 
-declare var $: any;
-
 export default class NetcareService
 {
 	// constants

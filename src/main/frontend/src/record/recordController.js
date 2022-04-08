@@ -29,7 +29,6 @@ import MhaPatientService from "../lib/integration/myhealthaccess/service/MhaPati
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../common/components/junoComponentConstants";
 import {MhaCallPanelEvents} from "./components/mhaCallPanel/mhaCallPanelEvents";
-import {SystemPreferenceApi} from "../../generated";
 import {API_BASE_PATH} from "../lib/constants/ApiConstants";
 import {netcareService} from "../lib/integration/netcare/service/NetcareService";
 
@@ -87,7 +86,6 @@ angular.module('Record').controller('Record.RecordController', [
 		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 		controller.appointmentApi = new AppointmentApi($http, $httpParamSerializer, API_BASE_PATH);
-		controller.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, API_BASE_PATH);
 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.demographic = null;
