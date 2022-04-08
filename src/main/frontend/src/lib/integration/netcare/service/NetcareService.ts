@@ -8,14 +8,14 @@ export default class NetcareService
 {
 	// constants
 	protected commonWindowName: string = "NetcareLoginWindow";
+	protected sessionKey: string = "LoggedInNetcare";
+	protected sessionValue: string = "true";
 
 	// local variables
 	protected netcareApi: NetcareApi;
 	protected systemPreferenceApi: SystemPreferenceApi;
 	protected config: NetcareConfig;
 	protected initialized: boolean = false;
-	protected netcareEnabled: boolean = false;
-	protected loggedIn: boolean = false; // track if we are possibly logged in
 
 	protected userId: string;
 
@@ -65,7 +65,9 @@ export default class NetcareService
 			"&confCode=" + encodeURIComponent(this.config.conformanceCode),
 			"Logon");
 		NetcareService.submitForm(form);
-		this.loggedIn = true;
+
+		// assume that the user has logged in to netcare, we may need to log them out
+		sessionStorage.setItem(this.sessionKey, this.sessionValue);
 	}
 
 	public async submitLogoutForm(): Promise<void>
@@ -77,12 +79,12 @@ export default class NetcareService
 
 		let form = this.buildForm("a", this.config.logoutUrl, "Logoff");
 		NetcareService.submitForm(form);
-		this.loggedIn = false;
+		sessionStorage.removeItem(this.sessionKey);
 	}
 
 	public isLoggedIn(): boolean
 	{
-		return this.loggedIn;
+		return (sessionStorage.getItem(this.sessionKey) === this.sessionValue);
 	}
 
 	// ==========================================================================
@@ -98,7 +100,7 @@ export default class NetcareService
 
 	private static submitForm(form: HTMLFormElement): void
 	{
-		document.getElementsByTagName('body')[0].appendChild(form);
+		document.body.appendChild(form);
 		form.submit();
 		form.remove();
 	}
