@@ -48,6 +48,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.oscarehr.util.CppUtils.cppCodes;
+
 @SuppressWarnings("unchecked")
 @Transactional
 @Repository("encounterNote.dao.CaseManagementNoteDao")
@@ -329,7 +331,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 			"LEFT JOIN casemgmt_issue cmi ON cmin.id = cmi.id\n" +
 			"LEFT JOIN issue i\n" +
 			"  ON i.issue_id = cmi.issue_id\n" +
-			"  AND i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors','OcularMedication')\n" +
+			"  AND i.code IN :cppCodes \n" +
 			"LEFT JOIN casemgmt_note_link cnl ON cnl.note_id = cmn.note_id\n" +
 			"WHERE " +
 			"cmn_filter.note_id IS NULL\n" +
@@ -354,6 +356,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 
 		query.setParameter("demographicNo", demographicNo);
 		query.setParameter("providerNo", providerNo);
+		query.setParameter("cppCodes", Arrays.asList(cppCodes));
 
 		query.setMaxResults(1);
 
@@ -611,7 +614,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"LEFT JOIN (\n" +
 				"  SELECT " +
 				"    note.note_id, \n" +
-				"    SUM(i.code IN ('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors','OcularMedication','TicklerNote')) > 0 as is_cpp_note, \n" +
+				"    SUM(i.code IN :cppCodes ) > 0 as is_cpp_note, \n" +
 				// This uses a non-character separator because it is is going to be separated
 				// below.  This is not ideal and is done for performance.
 				"    GROUP_CONCAT(i.description SEPARATOR 0x1D) AS issue_descriptions\n" +
@@ -708,6 +711,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 		query.setParameter("documentTableName", CaseManagementNoteLink.DOCUMENT);
 		query.setParameter("drugsTableName", CaseManagementNoteLink.DRUGS);
 		query.setParameter("demographicNo", demographicNo);
+		query.setParameter("cppCodes", Arrays.asList(cppCodes));
 
 		if(providers != null && providers.size() > 0)
 		{
@@ -1041,9 +1045,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 				"JOIN issue i ON ci.issue_id = i.issue_id\n" +
 				"WHERE note.demographic_no = :demographicNo\n" +
 				"GROUP BY note.note_id\n" +
-				"HAVING SUM(COALESCE(i.code IN\n" +
-				"('OMeds', 'SocHistory', 'MedHistory', 'Concerns', 'FamHistory', 'Reminders', 'RiskFactors', 'OcularMedication', 'TicklerNote')\n" +
-				", 0)) > 0\n" +
+				"HAVING SUM(COALESCE(i.code IN :cppCodes, 0)) > 0\n" +
 				")\n" +
 			"AS is_cpp_note ON is_cpp_note.note_id = cm.note_id\n" +
 			"LEFT JOIN casemgmt_note_ext cme " +
@@ -1071,6 +1073,7 @@ public class CaseManagementNoteDao extends AbstractDao<CaseManagementNote>
 
 		Query query = entityManager.createNativeQuery(queryString, CaseManagementNote.class);
 		query.setParameter("demographicNo", demographicNo);
+		query.setParameter("cppCodes", Arrays.asList(cppCodes));
 
 		List<CaseManagementNote> results = query.getResultList();
 
