@@ -228,7 +228,7 @@ public class RingCentralApiConnector extends RESTClient
 			}
 			else
 			{
-				throw new FaxApiConnectionException("Missing oAuth credentials. Log in and try again");
+				throw new FaxApiConnectionException("Missing oAuth credentials. Log in and try again", "fax.exception.connectionError.oAuthLoggedOut");
 			}
 		}
 		catch (IOException e)
