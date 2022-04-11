@@ -29,7 +29,7 @@ import org.oscarehr.fax.provider.FaxProvider;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;
-import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class FaxAccountDao extends AbstractDao<FaxAccount>
@@ -40,7 +40,7 @@ public class FaxAccountDao extends AbstractDao<FaxAccount>
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<FaxAccount> findByLoginId(FaxProvider faxProvider, String loginId)
+	public Optional<FaxAccount> findByLoginId(FaxProvider faxProvider, String loginId)
 	{
 		Query query = entityManager.createQuery(
 				"SELECT x FROM FaxAccount x " +
@@ -49,6 +49,6 @@ public class FaxAccountDao extends AbstractDao<FaxAccount>
 		query.setParameter("loginId", loginId);
 		query.setParameter("type", faxProvider);
 
-		return query.getResultList();
+		return Optional.ofNullable(getSingleResultOrNull(query));
 	}
 }

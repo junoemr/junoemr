@@ -53,6 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This service should be responsible for handling all logic around fax setup and configuration
@@ -154,8 +155,7 @@ public class FaxAccountService
 
 	public boolean accountExists(FaxProvider faxProvider, String loginId)
 	{
-		List<FaxAccount> faxAccounts = faxAccountDao.findByLoginId(faxProvider, loginId);
-		return !faxAccounts.isEmpty();
+		return faxAccountDao.findByLoginId(faxProvider, loginId).isPresent();
 	}
 
 	public boolean isFaxAccountEnabled(Long id)
@@ -181,6 +181,28 @@ public class FaxAccountService
 		FaxAccount faxAccount = faxAccountUpdateToEntityConverter.convert(updateInput);
 		faxAccountDao.merge(faxAccount);
 		return faxAccountToModelConverter.convert(faxAccount);
+	}
+
+	/**
+	 * find an existing account based on the type and loginId, or create a new one with a default name
+	 * @param faxProvider the account provider type
+	 * @param loginId the id for the account
+	 * @return new or existing account record
+	 */
+	public FaxAccountTransferOutbound findOrCreateByLoginId(FaxProvider faxProvider, String loginId)
+	{
+		Optional<FaxAccount> faxAccountOptional = faxAccountDao.findByLoginId(faxProvider, loginId);
+		return faxAccountOptional
+				.map((account) -> faxAccountToModelConverter.convert(account))
+				.orElseGet(() ->
+				{
+					FaxAccountCreateInput createInput = new FaxAccountCreateInput();
+					createInput.setAccountType(faxProvider);
+					createInput.setAccountLogin(loginId);
+					createInput.setDisplayName(StringUtils.capitalize(faxProvider.name()) + " " + loginId);
+					createInput.setEnabled(true);
+					return createFaxAccount(createInput);
+				});
 	}
 
 	public boolean deleteFaxAccount(Long id)
