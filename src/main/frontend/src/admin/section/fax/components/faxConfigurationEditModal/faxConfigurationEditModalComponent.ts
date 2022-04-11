@@ -35,6 +35,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 			ctrl.validations = {};
 			ctrl.initialSave = false;
 			ctrl.initialized = false;
+			ctrl.coverLetterOptionsInitialized = false;
 
 			ctrl.$onInit = async () =>
 			{
@@ -67,7 +68,15 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 				}
 
 				ctrl.faxAccountProvider = FaxAccountProviderFactory.creatAccountProvider(ctrl.faxAccount);
-				ctrl.coverLetterOptions = await ctrl.faxAccountProvider.getCoverLetterOptions();
+				try
+				{
+					ctrl.coverLetterOptions = await ctrl.faxAccountProvider.getCoverLetterOptions();
+					ctrl.coverLetterOptionsInitialized = true;
+				}
+				catch (error)
+				{
+					//noop, error is handled in the faxAccountProvider service call
+				}
 				if(!ctrl.faxAccount.coverLetterOption && ctrl.coverLetterOptions.length > 0)
 				{
 					ctrl.faxAccount.coverLetterOption = ctrl.coverLetterOptions[0].value;

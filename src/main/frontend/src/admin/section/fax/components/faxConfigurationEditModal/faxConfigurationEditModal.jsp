@@ -95,7 +95,7 @@
 					<juno-select ng-model="$ctrl.faxAccount.coverLetterOption"
 					             options="$ctrl.coverLetterOptions"
 					             ng-if="$ctrl.faxAccount.enableOutbound"
-					             disabled="!$ctrl.initialized"
+					             disabled="!$ctrl.initialized || !$ctrl.coverLetterOptionsInitialized"
 					             title="<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption-tooltip"/>"
 					             label="<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption"/>"
 					             label-position="$ctrl.LABEL_POSITION.LEFT">
@@ -131,7 +131,7 @@
 					</juno-button>
 				</div>
 				<div class="input-group flex-row justify-content-center align-items-center">
-					<juno-button ng-if="showDisconnectButton()"
+					<juno-button ng-if="$ctrl.showDisconnectButton()"
 					             class="w-256"
 					             click="$ctrl.disconnectAccount()"
 					             disabled="$ctrl.LoadingQueue.isLoading"
@@ -139,13 +139,13 @@
 					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
 						{{$ctrl.getDisconnectText()}}
 					</juno-button>
-					<juno-button ng-if="showConnectButton()"
+					<juno-button ng-if="$ctrl.showConnectButton()"
 								 class="w-256"
 								 click="$ctrl.connectAccount()"
 								 disabled="$ctrl.LoadingQueue.isLoading"
 								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
-						{{$ctrl.getConnectText()}}
+						{{$ctrl.getConnectionText()}}
 					</juno-button>
 				</div>
 				</div>

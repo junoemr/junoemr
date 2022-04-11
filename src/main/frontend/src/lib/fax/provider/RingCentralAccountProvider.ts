@@ -2,11 +2,12 @@ import FaxAccountProvider from "./FaxAccountProvider";
 import FaxAccount from "../model/FaxAccount";
 import FaxAccountService from "../service/FaxAccountService";
 import {JunoSelectOption} from "../../common/junoSelectOption";
+import ToastErrorHandler from "../../error/handler/ToastErrorHandler";
 
 export default class RingCentralAccountProvider implements FaxAccountProvider
 {
 	protected faxAccount: FaxAccount;
-	protected faxAccountService = new FaxAccountService();
+	protected faxAccountService = new FaxAccountService(new ToastErrorHandler());
 
 	constructor(faxAccount: FaxAccount)
 	{
