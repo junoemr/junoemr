@@ -169,14 +169,14 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 			{
 				return ctrl.isModalEditMode() &&
 						ctrl.faxAccountProvider.isOauth() &&
-						ctrl.faxAccount.connectionStatus !== FaxAccountConnectionStatus.Success;
+						ctrl.faxAccount.connectionStatus === FaxAccountConnectionStatus.SignedOut;
 			}
 
 			ctrl.showDisconnectButton = () =>
 			{
 				return ctrl.isModalEditMode() &&
 						ctrl.faxAccountProvider.isOauth() &&
-						ctrl.faxAccount.connectionStatus === FaxAccountConnectionStatus.Success
+						ctrl.faxAccount.connectionStatus !== FaxAccountConnectionStatus.SignedOut
 			}
 
 			ctrl.connectAccount = async () =>
