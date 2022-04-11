@@ -25,7 +25,7 @@ package org.oscarehr.integration.ringcentral.api;
 import com.google.api.client.auth.oauth2.Credential;
 import org.oscarehr.config.JunoProperties;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
-import org.oscarehr.fax.oauth.RingCentralCredentialStore;
+import org.oscarehr.integration.ringcentral.oauth.RingCentralCredentialStore;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageListInput;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralMessageUpdateInput;
 import org.oscarehr.integration.ringcentral.api.input.RingCentralSendFaxInput;

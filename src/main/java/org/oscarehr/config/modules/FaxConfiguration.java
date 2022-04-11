@@ -24,7 +24,7 @@
 package org.oscarehr.config.modules;
 
 import org.oscarehr.config.JunoProperties;
-import org.oscarehr.fax.oauth.RingCentralCredentialStore;
+import org.oscarehr.integration.ringcentral.oauth.RingCentralCredentialStore;
 import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

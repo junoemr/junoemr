@@ -21,7 +21,7 @@
  * Canada
  */
 
-package org.oscarehr.fax.oauth;
+package org.oscarehr.integration.ringcentral.oauth;
 
 import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.AuthorizationCodeResponseUrl;
