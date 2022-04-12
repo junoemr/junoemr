@@ -52,17 +52,21 @@ export default class NetcareService
 			await this.init();
 		}
 
-		let userIdParam = Juno.Common.Util.isBlank(userId) ? "" : "&userID=" + encodeURIComponent(userId);
+		let params: URLSearchParams = new URLSearchParams();
+		params.set("contextView", "EMRPatient");
+		params.set("applicationName", "Aligndex EMPI");
+		params.set("entryPointName", "Search for a Patient-EMR");
+		params.set("EMRPatient.Id.idType", "AB_ULI");
+		params.set("EMRPatient.Id.id", healthNumber);
+		params.set("confCode", this.config.conformanceCode);
+
+		if(!Juno.Common.Util.isBlank(userId))
+		{
+			params.set("userID", userId);
+		}
 
 		let form = this.buildForm("a1",
-			this.config.loginUrl +
-			"?contextView=EMRPatient" +
-			userIdParam +
-			"&applicationName=Aligndex+EMPI" +
-			"&entryPointName=Search+for+a+Patient-EMR" +
-			"&EMRPatient.Id.idType=AB_ULI" +
-			"&EMRPatient.Id.id=" + encodeURIComponent(healthNumber) +
-			"&confCode=" + encodeURIComponent(this.config.conformanceCode),
+			this.config.loginUrl + "?" + params.toString(),
 			"Logon");
 		NetcareService.submitForm(form);
 
