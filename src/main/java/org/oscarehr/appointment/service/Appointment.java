@@ -66,6 +66,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedMap;
 
@@ -505,20 +506,26 @@ public class Appointment
 	 * Validates the new updated appointment against the original
 	 * @param oldRecord - the old appointment to validate against
 	 * @param newRecord - the updated appointment
-	 * @throws IllegalArgumentException
+	 * @throws IllegalArgumentException if the update is not valid
 	 */
-	private void validateAppointmentUpdate(org.oscarehr.common.model.Appointment oldRecord, org.oscarehr.common.model.Appointment newRecord) throws IllegalArgumentException
+	private void validateAppointmentUpdate(
+			org.oscarehr.common.model.Appointment oldRecord,
+			org.oscarehr.common.model.Appointment newRecord)
+			throws IllegalArgumentException
 	{
-		// Virtual appointments can not have their locations changed
+		// Virtual appointments can not have their locations or linked demographics changed
 		if (newRecord.getIsVirtual())
 		{
-			if(!newRecord.getLocation().equals(oldRecord.getLocation()))
+			// use Objects.equals to handle null cases
+			if(!Objects.equals(newRecord.getLocation(), oldRecord.getLocation()))
 			{
-				throw new IllegalArgumentException("Appointment ID: " + newRecord.getId() + " can't be updated. Virtual appointments can not change location.");
+				throw new IllegalArgumentException("Appointment ID: " + newRecord.getId() +
+						" can't be updated. Virtual appointments can not change location.");
 			}
-			if(newRecord.getDemographicNo() != oldRecord.getDemographicNo())
+			if(!Objects.equals(newRecord.getDemographicNo(), oldRecord.getDemographicNo()))
 			{
-				throw new IllegalArgumentException("Appointment ID: " + newRecord.getId() + " can't be updated. Virtual appointments can not change demographic.");
+				throw new IllegalArgumentException("Appointment ID: " + newRecord.getId() +
+						" can't be updated. Virtual appointments can not change demographic.");
 			}
 		}
 	}

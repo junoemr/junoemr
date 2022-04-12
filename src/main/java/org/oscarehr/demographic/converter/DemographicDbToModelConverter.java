@@ -63,7 +63,13 @@ public class DemographicDbToModelConverter extends
 		}
 
 		DemographicModel model = new DemographicModel();
-		BeanUtils.copyProperties(input, model, "address", "email", "dateOfBirth", "title", "sin", "officialLanguage");
+		BeanUtils.copyProperties(input, model,
+				"address",
+				"email",
+				"dateOfBirth",
+				"title",
+				"sin",
+				"officialLanguage");
 
 		model.setId(input.getDemographicId());
 		model.setDateOfBirth(input.getDateOfBirth());
