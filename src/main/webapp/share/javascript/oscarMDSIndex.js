@@ -1753,15 +1753,18 @@ function replaceQueryString(url,param,value) {
         return url + '&' + param + "=" + value;
 }
 
-var CATEGORY_ALL = 1,
-CATEGORY_DOCUMENTS = 2,
-CATEGORY_HL7 = 3,
-CATEGORY_NORMAL = 4,
-CATEGORY_ABNORMAL = 5,
-CATEGORY_PATIENT = 6,
-CATEGORY_PATIENT_SUB = 7,
-CATEGORY_TYPE_DOC = 'DOC',
-CATEGORY_TYPE_HL7 = 'HL7';
+var CATEGORY_ALL = 1;
+var CATEGORY_DOCUMENTS = 2;
+var CATEGORY_HL7 = 3;
+var CATEGORY_NORMAL = 4;
+var CATEGORY_ABNORMAL = 5;
+var CATEGORY_PATIENT = 6;
+var CATEGORY_PATIENT_SUB = 7;
+var CATEGORY_HRM = 8;
+var CATEGORY_TYPE_DOC = 'DOC';
+var CATEGORY_TYPE_HL7 = 'HL7';
+var CATEGORY_TYPE_HRM = 'HRM';
+
 
 function reloadChangeView() {
     resetCurrentFirstDocLab();
@@ -2051,4 +2054,3 @@ function getDocComment(docId, providerNo, inQueueB) {
    }                    	
 	
 }
-

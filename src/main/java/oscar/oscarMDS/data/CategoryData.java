@@ -38,9 +38,11 @@ public class CategoryData {
 
 	private int totalDocs = 0;
 	private int totalLabs = 0;
+	private int totalHRM = 0;
 	private int unmatchedLabs = 0;
 	private int unmatchedDocs = 0;
-    private int totalNumDocs = 0;
+    private int unmatchedHRM = 0;
+	private int totalNumDocs = 0;
     private int abnormalCount = 0;
     private int normalCount = 0;
     private HashMap<Integer,PatientInfo> patients;
@@ -77,6 +79,26 @@ public class CategoryData {
 		return patients;
 	}
 
+	public int getTotalHRM()
+	{
+		return totalHRM;
+	}
+
+	public void setTotalHRM(int totalHRM)
+	{
+		this.totalHRM = totalHRM;
+	}
+
+	public int getUnmatchedHRM()
+	{
+		return unmatchedHRM;
+	}
+
+	public void setUnmatchedHRM(int unmatchedHRM)
+	{
+		this.unmatchedHRM = unmatchedHRM;
+	}
+
 	private String patientLastName;
 	private String searchProviderNo;
 	private String status;
@@ -100,14 +122,6 @@ public class CategoryData {
 		this.startDate = startDate;
 		this.endDate = endDate;
 
-    	totalDocs = 0;
-		totalLabs = 0;
-		unmatchedLabs = 0;
-	    unmatchedDocs = 0;
-	    totalNumDocs = 0;
-	    abnormalCount = 0;
-	    normalCount = 0;
-
         patients = new HashMap<Integer,PatientInfo>();
 
 	}
@@ -123,16 +137,19 @@ public class CategoryData {
 		// Retrieving documents and labs.
 		totalDocs = result.getDocumentCount();
         totalLabs = result.getLabCount();
+		totalHRM = result.getHrmCount();
 
         // If this is not a patient search, then we need to find the unmatched documents.
         if (!patientSearch) {
             unmatchedDocs += result.getUnmatchedDocumentCount();
             unmatchedLabs += result.getUnmatchedLabCount();
-            totalDocs += unmatchedDocs;
+			unmatchedHRM += result.getUnmatchedHrmCount();
+			totalDocs += unmatchedDocs;
             totalLabs += unmatchedLabs;
+			totalHRM += unmatchedHRM;
         }
 
-        // The total overall items is the sum of docs and labs.
+        // The total overall items is the sum of docs + labs + hrm
         totalNumDocs = result.getTotalCount();
 
         // Retrieving abnormal labs.

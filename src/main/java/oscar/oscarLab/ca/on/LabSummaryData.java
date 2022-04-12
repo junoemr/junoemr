@@ -33,8 +33,10 @@ public class LabSummaryData {
 	private int demographicNo;
 	private int documentCount;
 	private int labCount;
+	private int hrmCount;
 	private int unmatchedDocumentCount;
 	private int unmatchedLabCount;
+	private int unmatchedHrmCount;
 	private int abnormalCount;
 	private int totalCount;
 
@@ -97,5 +99,25 @@ public class LabSummaryData {
 	
 	public int getTotalCount() {
 		return this.totalCount;
+	}
+
+	public int getHrmCount()
+	{
+		return hrmCount;
+	}
+
+	public void setHrmCount(int hrmCount)
+	{
+		this.hrmCount = hrmCount;
+	}
+
+	public int getUnmatchedHrmCount()
+	{
+		return unmatchedHrmCount;
+	}
+
+	public void setUnmatchedHrmCount(int unmatchedHrmCount)
+	{
+		this.unmatchedHrmCount = unmatchedHrmCount;
 	}
 }
