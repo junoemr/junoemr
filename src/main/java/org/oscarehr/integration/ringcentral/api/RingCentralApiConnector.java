@@ -23,6 +23,7 @@
 package org.oscarehr.integration.ringcentral.api;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.TokenResponseException;
 import org.oscarehr.config.JunoProperties;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.integration.ringcentral.oauth.RingCentralCredentialStore;
@@ -212,13 +213,17 @@ public class RingCentralApiConnector extends RESTClient
 			if(oAuthCredential.isPresent())
 			{
 				Credential credential = oAuthCredential.get();
+				if (credential.getAccessToken() == null || credential.getExpiresInSeconds() == null)
+				{
+					throw new FaxApiConnectionException("Expired oAuth credentials. Log in and try again", "fax.exception.connectionError.oAuthLoggedOut");
+				}
 
 				if (credential.getExpiresInSeconds() <= RingCentralCredentialStore.ACCESS_TOKEN_REFRESH_THRESHOLD_SECONDS)
 				{
 					boolean refreshed = credential.refreshToken();
 					if (!refreshed)
 					{
-						throw new FaxApiConnectionException("Refresh token expired, cannot retrieve access token");
+						throw new FaxApiConnectionException("Refresh token expired, cannot retrieve access token", "fax.exception.connectionError.oAuthLoggedOut");
 					}
 				}
 
@@ -230,6 +235,10 @@ public class RingCentralApiConnector extends RESTClient
 			{
 				throw new FaxApiConnectionException("Missing oAuth credentials. Log in and try again", "fax.exception.connectionError.oAuthLoggedOut");
 			}
+		}
+		catch (TokenResponseException e)
+		{
+			throw new FaxApiConnectionException("Refresh token expired:\n" + e.getMessage(), "fax.exception.connectionError.oAuthLoggedOut");
 		}
 		catch (IOException e)
 		{

@@ -23,9 +23,12 @@
 
 package org.oscarehr.config.modules;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.config.JunoProperties;
 import org.oscarehr.integration.ringcentral.oauth.RingCentralCredentialStore;
+import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
@@ -36,11 +39,20 @@ public class FaxConfiguration
 	@Autowired
 	private JunoProperties junoProperties;
 
+	private static Logger logger = MiscUtils.getLogger();
+
 	@PostConstruct
 	public void configureFaxApis()
 	{
-		JunoProperties.FaxConfig faxConfig = junoProperties.getFaxConfig();
-		RingCentralCredentialStore.init(faxConfig);
-		RingCentralApiConnector.setApiLocation(faxConfig);
+		try
+		{
+			JunoProperties.FaxConfig faxConfig = junoProperties.getFaxConfig();
+			RingCentralCredentialStore.init(faxConfig);
+			RingCentralApiConnector.setApiLocation(faxConfig);
+		}
+		catch (FaxApiConnectionException e)
+		{
+			logger.error("Fax config could not be completed successfully, faxing systems may not work properly");
+		}
 	}
 }
