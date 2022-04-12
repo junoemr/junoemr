@@ -25,10 +25,7 @@
 */
 import {SecurityPermissions} from "../../common/security/securityConstants";
 import {SystemPreferenceApi} from "../../../generated";
-import {
-	INSTANCE_TYPE,
-	SYSTEM_PROPERTIES
-} from "../../common/services/systemPreferenceServiceConstants";
+import {INSTANCE_TYPE, SystemProperties} from "../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Record.Summary').controller('Record.Summary.SummaryController', [
 
@@ -109,7 +106,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				controller.getRightItems();
 
 				systemPreferenceApi.getPropertyValue(
-					SYSTEM_PROPERTIES.INSTANCE_TYPE, INSTANCE_TYPE.BC).then(
+					SystemProperties.InstanceType, INSTANCE_TYPE.BC).then(
 					function success(result)
 					{
 						if (result.data.body === INSTANCE_TYPE.ON)

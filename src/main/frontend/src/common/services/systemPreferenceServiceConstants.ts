@@ -21,36 +21,45 @@
 * Canada
 */
 
-export enum SYSTEM_PROPERTIES
+/**
+ * keys for the instance properties file
+ */
+export enum SystemProperties
 {
-    INSTANCE_TYPE = "instance_type",
-    BILLING_TYPE = "billing_type",
-
-    // GENERAL PREFERENCES
-    DEFAULT_PHONE_PREFIX = "phone_prefix",
-    ROSTERING_MODULE = "enable_family_doctor_and_rostering",
-    EXTRA_ADDRESS_FIELD = "enable_additional_address",
-
-    // RX PREFERENCES
-    AUTO_STAMP_RX_SIGNATURES = "rx_preset_signatures",
-
-    // BILLING PREFERENCES
-    SERVICE_LOCATION_CODE = "service_location_code",
-
-    // AQS
-    AQS_ORGANIZATION_ID = "aqs_organization_id",
-    AQS_ORGANIZATION_SECRET = "aqs_api_secret_key",
-
-    // UI
-    UI_CUSTOM_NAV_ICON = "ui_custom_nav",
-    UI_LOCK_TO_JUNO_UI = "ui_lock",
-
-    // FAXING
-    ACTIVE_FAX_ACCOUNT = "system_active_fax_account_id",
+    InstanceType = "instance_type",
+    BillingType = "billing_type",
+    DefaultTicklerProvider = "default_tickler_provider",
+    Multisites = "multisites",
+    MHATelehealthEnabled = "myhealthaccess_telehealth_enabled",
 }
 
+/**
+ * keys for the property table, associated with the system provider.
+ */
 export enum SystemPreferences
 {
+    // GENERAL PREFERENCES
+    DefaultPhonePrefix = "phone_prefix",
+    RosteringModule = "enable_family_doctor_and_rostering",
+    ExtraAddressField = "enable_additional_address",
+
+    // RX PREFERENCES
+    AytoStampRxSignatures = "rx_preset_signatures",
+
+    // BILLING PREFERENCES
+    ServiceLocationCode = "service_location_code",
+
+    // AQS
+    AqsOrganizationId = "aqs_organization_id",
+    AqsOrganizationSecret = "aqs_api_secret_key",
+
+    // UI
+    UiCustomNavIcon = "ui_custom_nav",
+    UiLockToJunoUi = "ui_lock",
+
+    // FAXING
+    ActiveFaxAccount = "system_active_fax_account_id",
+
     // misc integrations
     AQSEnabled = "aqs_enabled",
     CareConnectEnabled = "integration.CareConnect.enabled",

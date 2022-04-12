@@ -22,10 +22,10 @@
  */
 import {EDIT_PROVIDER_MODE} from "./editProviderAdminConstants";
 import {SystemPreferenceApi} from "../../../../generated/api/SystemPreferenceApi";
-import {ProvidersServiceApi} from "../../../../generated";
-import {SitesApi} from "../../../../generated";
+import {ProvidersServiceApi, SitesApi} from "../../../../generated";
 import {BILLING_REGION} from "../../../billing/billingConstants";
 import {LABEL_POSITION} from "../../../common/components/junoComponentConstants";
+import {SystemProperties} from "../../../common/services/systemPreferenceServiceConstants";
 
 
 angular.module('Admin.Section').component('editProviderAdmin',
@@ -379,13 +379,13 @@ angular.module('Admin.Section').component('editProviderAdmin',
 					}
 			);
 
-			systemPreferenceApi.getPropertyValue("billing_type", BILLING_REGION.BC).then(
+			systemPreferenceApi.getPropertyValue(SystemProperties.BillingType, BILLING_REGION.BC).then(
 					function success(result)
 					{
 						ctrl.billingRegion = result.data.body;
 						if (ctrl.billingRegion === BILLING_REGION.CLINICAID)
 						{
-							systemPreferenceApi.getPropertyValue("instance_type", BILLING_REGION.BC).then((result) =>
+							systemPreferenceApi.getPropertyValue(SystemProperties.InstanceType, BILLING_REGION.BC).then((result) =>
 							{
 								ctrl.billingRegion = result.data.body;
 							})
@@ -403,7 +403,7 @@ angular.module('Admin.Section').component('editProviderAdmin',
 					}
 			);
 
-			systemPreferenceApi.getPropertyEnabled("multisites").then(
+			systemPreferenceApi.getPropertyEnabled(SystemProperties.Multisites).then(
 				(response) =>
 				{
 					ctrl.isMultisiteEnabled = response.data.body;

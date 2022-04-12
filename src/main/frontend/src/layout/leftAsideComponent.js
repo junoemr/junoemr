@@ -29,6 +29,7 @@ import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import {SystemPreferenceApi} from "../../generated/api/SystemPreferenceApi";
 import {JUNO_BACKGROUND_STYLE, JUNO_STYLE} from "../common/components/junoComponentConstants";
 import {SecurityPermissions} from "../common/security/securityConstants";
+import {SystemProperties} from "../common/services/systemPreferenceServiceConstants";
 
 angular.module('Layout').component('leftAside', {
 	bindings: {
@@ -213,7 +214,7 @@ angular.module('Layout').component('leftAside', {
 
 		ctrl.loadTelehealthEnabled = function loadTelehealthEnabled()
 		{
-			ctrl.systemPreferenceApi.getPropertyEnabled("myhealthaccess_telehealth_enabled").then(
+			ctrl.systemPreferenceApi.getPropertyEnabled(SystemProperties.MHATelehealthEnabled).then(
 				function success(rawResults)
 				{
 					ctrl.telehealthEnabled = rawResults.data.body;

@@ -1,4 +1,5 @@
 import {SitesApi, SystemPreferenceApi} from "../../../generated";
+import {SystemProperties} from "../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Record.Summary').controller('Record.Summary.RecordPrintController', [
 
@@ -50,7 +51,7 @@ angular.module('Record.Summary').controller('Record.Summary.RecordPrintControlle
 
 		controller.$onInit = async () =>
 		  {
-		  	controller.isMultisiteEnabled = (await controller.systemPreferenceApi.getPropertyEnabled("multisites")).data.body;
+		  	controller.isMultisiteEnabled = (await controller.systemPreferenceApi.getPropertyEnabled(SystemProperties.Multisites)).data.body;
 
 			if(controller.isMultisiteEnabled)
 			{

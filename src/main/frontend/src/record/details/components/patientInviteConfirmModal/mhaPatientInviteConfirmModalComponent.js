@@ -24,6 +24,7 @@
 
 import {MhaDemographicApi, SystemPreferenceApi} from "../../../../../generated";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../../common/components/junoComponentConstants";
+import {SystemProperties} from "../../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Common.Components').component('mhaPatientInviteConfirmModal',
 {
@@ -65,7 +66,7 @@ angular.module('Common.Components').component('mhaPatientInviteConfirmModal',
 			ctrl.initialIntegration = ctrl.resolve.selectedIntegration;
 			ctrl.hideIntegrationSelect = ctrl.resolve.hideIntegrationSelect || false;
 
-			systemPreferenceApi.getPropertyEnabled("multisites").then((response) =>
+			systemPreferenceApi.getPropertyEnabled(SystemProperties.Multisites).then((response) =>
 			{
 				ctrl.isMultisiteEnabled = response.data.body;
 

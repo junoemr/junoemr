@@ -21,9 +21,9 @@
 * Canada
 */
 
-import {BILLING_REGION} from "../../../billing/billingConstants";
-import {AppointmentApi, SystemPreferenceApi} from "../../../../generated";
+import {AppointmentApi} from "../../../../generated";
 import SystemPreferenceService from "../../../lib/system/service/SystemPreferenceService";
+import {SystemProperties} from "../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Integration.Mha').component('billingRedirect', {
     bindings: {
@@ -61,7 +61,7 @@ angular.module('Integration.Mha').component('billingRedirect', {
         {
             try
             {
-                const billingRegion = (await systemPreferenceService.getProperty("billing_type"));
+                const billingRegion = (await systemPreferenceService.getProperty(SystemProperties.BillingType));
                 const appointment = (await appointmentApi.getAppointment($stateParams.appointmentNo)).data.body;
                 const appointmentStartTime = Juno.Common.Util.getDatetimeNoTimezoneMoment(`${appointment.appointmentDate}T${appointment.startTime}`);
 

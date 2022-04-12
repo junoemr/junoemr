@@ -6,6 +6,7 @@ import {SystemPreferenceApi} from "../../generated/api/SystemPreferenceApi";
 import {MhaAppointmentApi, MhaIntegrationApi, ProviderSettings, ProvidersServiceApi} from "../../generated";
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {VirtualAppointmentType} from "../lib/appointment/model/VirtualAppointmentType";
+import {SystemProperties} from "../common/services/systemPreferenceServiceConstants";
 
 angular.module('Schedule').controller('Schedule.ScheduleController', [
 
@@ -2019,7 +2020,7 @@ angular.module('Schedule').controller('Schedule.ScheduleController', [
 		controller.loadTelehealthEnabled = function loadTelehealthEnabled()
 		{
 			let deferred = $q.defer();
-			controller.systemPreferencesApi.getPropertyEnabled("myhealthaccess_telehealth_enabled").then(
+			controller.systemPreferencesApi.getPropertyEnabled(SystemProperties.MHATelehealthEnabled).then(
 				function success(rawResults)
 				{
 					var enabled = rawResults.data.body;

@@ -1,13 +1,9 @@
 import FaxAccountService from "../../../lib/fax/service/FaxAccountService";
-import {
-	JUNO_BUTTON_COLOR,
-	JUNO_BUTTON_COLOR_PATTERN,
-	LABEL_POSITION
-} from "../../../common/components/junoComponentConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 import {SecurityPermissions} from "../../../common/security/securityConstants";
 import FaxAccount from "../../../lib/fax/model/FaxAccount";
 import ToastService from "../../../lib/alerts/service/ToastService";
-import {SYSTEM_PROPERTIES} from "../../../common/services/systemPreferenceServiceConstants";
+import {SystemPreferences} from "../../../common/services/systemPreferenceServiceConstants";
 
 angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
@@ -176,7 +172,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 					// set all other selected states to false (unchecked)
 					ctrl.faxAccountList.filter((account: FaxAccount) => account.id !== faxAccount.id)
 						.forEach((account: FaxAccount) => ctrl.faxAccountSelectStates[account.id] = false);
-					ctrl.setSystemProperty(SYSTEM_PROPERTIES.ACTIVE_FAX_ACCOUNT, faxAccount.id);
+					ctrl.setSystemProperty(SystemPreferences.ActiveFaxAccount, faxAccount.id);
 				}
 				else
 				{

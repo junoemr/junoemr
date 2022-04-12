@@ -24,7 +24,7 @@
 
 */
 
-import {BILLING_TYPE, INSTANCE_TYPE, SYSTEM_PROPERTIES} from "../../common/services/systemPreferenceServiceConstants";
+import {BILLING_TYPE, INSTANCE_TYPE, SystemPreferences, SystemProperties} from "../../common/services/systemPreferenceServiceConstants";
 import {DemographicApi, SystemPreferenceApi} from "../../../generated";
 import {JUNO_STYLE} from "../../common/components/junoComponentConstants";
 import {SecurityPermissions} from "../../common/security/securityConstants";
@@ -104,8 +104,8 @@ angular.module('Record.Details').component('detailsCtrl', {
 						demographicService.getDemographic($stateParams.demographicNo),
 						demographicApi.getDemographicContacts($stateParams.demographicNo, "professional"),
 						patientDetailStatusService.getStatus($stateParams.demographicNo),
-						systemPreferenceApi.getPropertyValue(SYSTEM_PROPERTIES.INSTANCE_TYPE, INSTANCE_TYPE.BC),
-						systemPreferenceApi.getPreferenceEnabled(SYSTEM_PROPERTIES.ROSTERING_MODULE, false),
+						systemPreferenceApi.getPropertyValue(SystemProperties.InstanceType, INSTANCE_TYPE.BC),
+						systemPreferenceApi.getPreferenceEnabled(SystemPreferences.RosteringModule, false),
 					]);
 
 					controller.page.demo = results[0];
@@ -138,7 +138,7 @@ angular.module('Record.Details').component('detailsCtrl', {
 				{
 					controller.showEligibility = true;
 					let billingType = (
-						await systemPreferenceApi.getPropertyValue(SYSTEM_PROPERTIES.BILLING_TYPE, BILLING_TYPE.CLINICAID)
+						await systemPreferenceApi.getPropertyValue(SystemProperties.BillingType, BILLING_TYPE.CLINICAID)
 					).data.body;
 					if (billingType === BILLING_TYPE.CLINICAID)
 					{

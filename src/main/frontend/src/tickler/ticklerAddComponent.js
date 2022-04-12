@@ -1,5 +1,6 @@
 import {SystemPreferenceApi} from "../../generated";
 import TicklerAttachmentToTicklerLinkDtoConverter from "../lib/tickler/converter/TicklerAttachmentToTicklerLinkDtoConverter";
+import {SystemProperties} from "../common/services/systemPreferenceServiceConstants";
 
 angular.module('Tickler').component('ticklerAddComponent', {
 	templateUrl: 'src/tickler/ticklerAdd.jsp',
@@ -281,7 +282,7 @@ angular.module('Tickler').component('ticklerAddComponent', {
 		{
 			try
 			{
-				let systemPrefApiResponse = await systemPreferenceApi.getPropertyValue("default_tickler_provider");
+				let systemPrefApiResponse = await systemPreferenceApi.getPropertyValue(SystemProperties.DefaultTicklerProvider);
 				controller.defaultTicklerProviderNo = parseInt(systemPrefApiResponse.data.body);
 
 				if (systemPrefApiResponse.data.body !== null)

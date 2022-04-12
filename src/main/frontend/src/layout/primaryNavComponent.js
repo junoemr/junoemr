@@ -1,5 +1,5 @@
 import {SecurityPermissions} from "../common/security/securityConstants";
-import {SYSTEM_PROPERTIES} from "../common/services/systemPreferenceServiceConstants";
+import {SystemPreferences} from "../common/services/systemPreferenceServiceConstants";
 import {BILLING_REGION} from "../billing/billingConstants";
 import {MessagingServiceType} from "../lib/messaging/model/MessagingServiceType";
 import MessagingServiceFactory from "../lib/messaging/factory/MessagingServiceFactory";
@@ -86,13 +86,13 @@ angular.module('Layout').component("primaryNavigation", {
 			ctrl.consultationLookbackPeriod = 1;
 			ctrl.SecurityPermissions = SecurityPermissions;
 
-			systemPreferenceService.isPreferenceEnabled(SYSTEM_PROPERTIES.UI_CUSTOM_NAV_ICON, false)
+			systemPreferenceService.isPreferenceEnabled(SystemPreferences.UiCustomNavIcon, false)
 			.then(pref =>
 			{
 				ctrl.customNavIcon = pref;
 			})
 
-			systemPreferenceService.isPreferenceEnabled(SYSTEM_PROPERTIES.UI_LOCK_TO_JUNO_UI, false)
+			systemPreferenceService.isPreferenceEnabled(SystemPreferences.UiLockToJunoUi, false)
 			.then(pref =>
 			{
 				ctrl.uiLock = pref;

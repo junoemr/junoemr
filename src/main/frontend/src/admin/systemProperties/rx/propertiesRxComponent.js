@@ -22,7 +22,7 @@
 */
 
 import {SystemPreferenceApi} from "../../../../generated/api/SystemPreferenceApi";
-import {SYSTEM_PROPERTIES} from "../../../common/services/systemPreferenceServiceConstants";
+import {SystemPreferences} from "../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Admin').component('systemPropertiesRx',
     {
@@ -42,7 +42,7 @@ angular.module('Admin').component('systemPropertiesRx',
                 {
                     name: "Signature stamping",
                     description: "Enable automatic signing of prescriptions when faxing.  Valid provider signatures must be uploaded",
-                    propertyName: SYSTEM_PROPERTIES.AUTO_STAMP_RX_SIGNATURES,
+                    propertyName: SystemPreferences.AytoStampRxSignatures,
                     type: property_types.boolean,
                     value: false
                 }
