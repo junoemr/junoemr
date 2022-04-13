@@ -200,10 +200,10 @@ public class CLSHandler extends AHSHandler
 	    // Glucose labs come back with different accession numbers, but the same filler number.
 	    // We are going to replace any successive accession numbers with the originals as
 	    // suggested in the CLS conformance documentation
-	    if(hl7TextInfo != null && hl7TextInfo.getFillerOrderNum().equals(fillerOrderNumber) &&
-			    !hl7TextInfo.getAccessionNumber().equals(accessionNumber)) {
+	    if(hl7TextInfo != null && hl7TextInfo.getUniqueVersionIdentifier().equals(fillerOrderNumber) &&
+			    !hl7TextInfo.getUniqueIdentifier().equals(accessionNumber)) {
 
-		    hl7Message = this.ReplaceAccessionNumber(hl7Message, accessionNumber, hl7TextInfo.getAccessionNumber());
+		    hl7Message = this.ReplaceAccessionNumber(hl7Message, accessionNumber, hl7TextInfo.getUniqueIdentifier());
 	    }
 
 	    if(hl7TextInfo != null) {

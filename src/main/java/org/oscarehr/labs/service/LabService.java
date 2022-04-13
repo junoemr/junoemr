@@ -94,8 +94,8 @@ public class LabService
 		String priority = messageHandler.getMsgPriority();
 		String requestingClient = messageHandler.getDocName();
 		String reportStatus = messageHandler.getOrderStatus();
-		String accessionNum = messageHandler.getUniqueIdentifier();
-		String fillerOrderNum = messageHandler.getUniqueVersionIdentifier();
+		String uniqueIdentifier = messageHandler.getUniqueIdentifier();
+		String uniqueVersionIdentifier = messageHandler.getUniqueVersionIdentifier();
 		int finalResultCount = messageHandler.getOBXFinalResultCount();
 		String obrDate = ConversionUtils.toTimestampString(ConversionUtils.getLegacyDateFromDateString(messageHandler.getMsgDate()));
 		String discipline = findDiscipline(messageHandler);
@@ -120,8 +120,8 @@ public class LabService
 		hl7TextInfo.setRequestingProvider(requestingClient);
 		hl7TextInfo.setDiscipline(discipline);
 		hl7TextInfo.setReportStatus(reportStatus);
-		hl7TextInfo.setAccessionNumber(accessionNum);
-		hl7TextInfo.setFillerOrderNum(fillerOrderNum);
+		hl7TextInfo.setUniqueIdentifier(uniqueIdentifier);
+		hl7TextInfo.setUniqueVersionIdentifier(uniqueVersionIdentifier);
 
 		//TODO additional logic for lab uploads. Most of the lab specific stuff that should get moved to the handler
 
