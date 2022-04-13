@@ -109,13 +109,9 @@ public class AHSRuralHandler extends AHSHandler
 	/* ===================================== PID ====================================== */
 
 	@Override
-	public String getHealthNum()
+	public String getHealthNumProvince()
 	{
-		// conformance requires province is displayed
-		String hin = getString(get("/.PID-2-1"));
-		String province = getString(get("/.PID-2-4"));
-
-		return String.join(" ", hin, "(" + province + ")");
+		return "(" + getString(get("/.PID-2-4")) + ")";
 	}
 
 	/* ===================================== OBR ====================================== */

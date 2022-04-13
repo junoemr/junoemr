@@ -255,6 +255,14 @@ public abstract class MessageHandler
 	}
 
 	/**
+	 *  Return the patients health number province code (ie: AB, BC, ON, etc.)
+	 */
+	public String getHealthNumProvince()
+	{
+		return "";
+	}
+
+	/**
 	 * Return the family name of the patient
 	 */
 	public String getLastName()

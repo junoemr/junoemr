@@ -970,9 +970,10 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                                         <div class="FieldData" nowrap="nowrap">
 																			<%
 																				String hin = handler.getHealthNum();
-																				if (ConnectCareHandler.isConnectCareHandler(handler))
+																				String hinProvince = handler.getHealthNumProvince();
+																				if(StringUtils.isNotBlank(hinProvince))
 																				{
-																					hin += " ABH";
+																					hin += " " + hinProvince;
 																				}
 																			%>
                                                                             <%=hin%>
