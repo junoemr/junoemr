@@ -173,6 +173,13 @@ public class AHSRuralHandler extends AHSHandler
 		}
 	}
 
+	@Override
+	public String getSubHeader(int i)
+	{
+		// specimen source
+		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-15-2"));
+	}
+
 	/* ===================================== OBX ====================================== */
 
 	@Override

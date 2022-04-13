@@ -512,6 +512,14 @@ public abstract class MessageHandler
 		return new ArrayList<>(headers);
 	}
 
+	/**
+	 * an optional subheader that displays for each header based on OBR index
+	 */
+	public String getSubHeader(int i)
+	{
+		return "";
+	}
+
 
 	protected String getClientRef(int i, int k) throws HL7Exception
 	{

@@ -377,6 +377,13 @@ div.Title2 a:link { color: black }
 div.Title2 a:hover { color: black }
 div.Title2 a:visited { color: black }
 div.Title2 a:active { color: black }
+div.subheader2 {
+	font-size: 8px;
+    color: black;
+    font-family: Verdana, Arial, Helvetica;
+    padding: 0 15pt 2pt 2pt;
+    text-indent: 5pt;
+}
 .Cell        { background-color: #9999CC; border-left: thin solid #CCCCFF;
                border-right: thin solid #6666CC;
                border-top: thin solid #CCCCFF;
@@ -1388,14 +1395,17 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	                           </tr>
 	                           <tr>
 	                               <td bgcolor="#FFCC00" width="300" valign="bottom">
-	                                   <div class="Title2">
-	                                       <%=headers.get(i)%>
+	                                   <div class="Title2"><%=headers.get(i)%>
 									   <% if (handler.isOBRBlocked(i))
 									   {%>
 										   <br/>
 										   <span style="font-size:8px; color:red;">(Do Not Disclose Without Explicit Patient Consent)</span>
 									   <% } %>
 	                                   </div>
+		                               <% if (StringUtils.isNotBlank(handler.getSubHeader(i)))
+		                               {%>
+		                               <div class="subheader2"><%=handler.getSubHeader(i)%></div>
+		                               <% } %>
 	                               </td>
 	                               <%--<td align="right" bgcolor="#FFCC00" width="100">&nbsp;</td>--%>
 	                               <td width="9">&nbsp;</td>
