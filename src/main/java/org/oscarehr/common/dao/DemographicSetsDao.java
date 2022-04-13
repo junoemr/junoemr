@@ -89,15 +89,13 @@ public class DemographicSetsDao extends AbstractDao<DemographicSets>{
 		return results;
 	}
 
-	public List<DemographicSets> findBySetNameAndDemographicNo(String setName, int demographicNo) {
-		String sql = "SELECT x FROM DemographicSets x WHERE x.archive != :archive AND x.name = :setName AND x.demographic.DemographicNo = :demoNo";
+	public DemographicSets findBySetNameAndDemographicNo(String setName, int demographicNo)
+	{
+		String sql = "SELECT x FROM DemographicSets x WHERE x.name = :setName AND x.demographic.DemographicNo = :demoNo";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter("archive", "1");
 		query.setParameter("setName", setName);
 		query.setParameter("demoNo", demographicNo);
-		@SuppressWarnings("unchecked")
-		List<DemographicSets> results = query.getResultList();
-		return results;
+		return getSingleResultOrNull(query);
 	}
 	public void deletePatientSet(String setName) {
 		String sql = "DELETE FROM DemographicSets x WHERE x.name = :setName";

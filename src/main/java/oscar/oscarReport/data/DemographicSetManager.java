@@ -25,20 +25,20 @@
 
 package oscar.oscarReport.data;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.DemographicSetsDao;
 import org.oscarehr.common.model.DemographicSets;
 import org.oscarehr.util.SpringUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class DemographicSetManager {
 
-	private DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
-	private DemographicSetsDao demographicSetsDao = SpringUtils.getBean(DemographicSetsDao.class);
+	private final DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+	private final DemographicSetsDao demographicSetsDao = SpringUtils.getBean(DemographicSetsDao.class);
 
 	public DemographicSetManager() {
 	}
@@ -49,17 +49,25 @@ public class DemographicSetManager {
 		addDemographicSet(setName, list);
 	}
 
-	public void addDemographicSet(String setName, List<String> demoList) {
-
-		for (int i = 0; i < demoList.size(); i++) {
-			String demographicNo = demoList.get(i);
-			DemographicSets ds = new DemographicSets();
-			ds.setName(setName);
-			ds.setDemographic(demographicDao.getDemographic(demographicNo));
-			ds.setArchive("0");
-			demographicSetsDao.persist(ds);
+	public void addDemographicSet(String setName, List<String> demoList)
+	{
+		for(String demographicNo : demoList)
+		{
+			DemographicSets existingSet = demographicSetsDao.findBySetNameAndDemographicNo(setName, Integer.parseInt(demographicNo));
+			if(existingSet != null)
+			{
+				existingSet.setArchive("0");
+				demographicSetsDao.merge(existingSet);
+			}
+			else
+			{
+				DemographicSets ds = new DemographicSets();
+				ds.setName(setName);
+				ds.setDemographic(demographicDao.getDemographic(demographicNo));
+				ds.setArchive("0");
+				demographicSetsDao.persist(ds);
+			}
 		}
-
 	}
 
 	public List<String> getDemographicSet(String setName) {
@@ -118,31 +126,27 @@ public class DemographicSetManager {
 		return retval;
 	}
 
-	public List<String> setDemographicIneligible(String setName, String demoNo) {
-		List<String> retval = new ArrayList<String>();
-		List<DemographicSets> dss = demographicSetsDao.findBySetNameAndDemographicNo(setName, Integer.parseInt(demoNo));
-		for (DemographicSets ds : dss) {
-			ds.setEligibility("1");
-			demographicSetsDao.merge(ds);
-		}
-		return retval;
+	public void setDemographicIneligible(String setName, String demoNo)
+	{
+		DemographicSets demographicSets = demographicSetsDao.findBySetNameAndDemographicNo(setName, Integer.parseInt(demoNo));
+		demographicSets.setEligibility("1");
+		demographicSetsDao.merge(demographicSets);
 	}
 
-	public List<String> setDemographicDelete(String setName, String demoNo) {
-		List<String> retval = new ArrayList<String>();
-		List<DemographicSets> dss = demographicSetsDao.findBySetNameAndDemographicNo(setName, Integer.parseInt(demoNo));
-		for (DemographicSets ds : dss) {
-			ds.setArchive("1");
-			demographicSetsDao.merge(ds);
-		}
-		return retval;
+	public void setDemographicDelete(String setName, String demoNo)
+	{
+		DemographicSets demographicSets = demographicSetsDao.findBySetNameAndDemographicNo(setName, Integer.parseInt(demoNo));
+		demographicSets.setArchive("1");
+		demographicSetsDao.merge(demographicSets);
 	}
 
-	public List<String> getDemographicSets(String demoNo) {
+	public List<String> getDemographicSets(String demoNo)
+	{
 		return demographicSetsDao.findSetNamesByDemographicNo(Integer.parseInt(demoNo));
 	}
 
-	public List<String> getDemographicSets() {
+	public List<String> getDemographicSets()
+	{
 		return demographicSetsDao.findSetNames();
 	}
 }
