@@ -116,6 +116,14 @@ public class FaxAccountService
 		return faxAccountProvider.testConnectionStatus();
 	}
 
+	public List<FaxAccount> getActiveFaxAccounts()
+	{
+		FaxAccountCriteriaSearch activeAccountParams = new FaxAccountCriteriaSearch();
+		activeAccountParams.setIntegrationEnabledStatus(true);
+
+		return faxAccountDao.criteriaSearch(activeAccountParams);
+	}
+
 	/**
 	 * get the default fax account to be used. return null if none exists
 	 */

@@ -24,6 +24,7 @@
 package org.oscarehr.integration.ringcentral;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.auth.oauth2.TokenResponseException;
 import org.oscarehr.fax.exception.FaxIntegrationException;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxAccountConnectionStatus;
@@ -56,7 +57,7 @@ public class RingCentralAccountProvider implements FaxAccountProvider
 		{
 			if (!ringCentralApiConnector.getCredential().isPresent())
 			{
-				// No credential, probably logged out and never logged back in
+				// No credential, probably logged out and never logged back in.
 				return FaxAccountConnectionStatus.SIGNED_OUT;
 			}
 			else
@@ -65,7 +66,7 @@ public class RingCentralAccountProvider implements FaxAccountProvider
 				boolean refreshed = authToken.refreshToken();
 				if (!refreshed)
 				{
-					// Refresh token is expired
+					// Could not refresh for some reason that isn't a 4XX response or disk IO
 					return FaxAccountConnectionStatus.SIGNED_OUT;
 				}
 
@@ -78,8 +79,14 @@ public class RingCentralAccountProvider implements FaxAccountProvider
 				return FaxAccountConnectionStatus.UNKNOWN;
 			}
 		}
+		catch (TokenResponseException e)
+		{
+			// 4XX response to refresh request
+			return FaxAccountConnectionStatus.SIGNED_OUT;
+		}
 		catch (IOException e)
 		{
+			// Probably due to accessing credential store on disk
 			return FaxAccountConnectionStatus.FAILURE;
 		}
 	}
