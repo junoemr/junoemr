@@ -2059,7 +2059,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                	 %>
                                <%for (k=0; k < handler.getOBRCommentCount(j); k++){
                                    // the obrName should only be set if it has not been
-                                   // set already which will only have occured if the
+                                   // set already which will only have occurred if the
                                    // obx name is "" or if it is the same as the obr name
                                    if(!obrFlag && handler.getOBXName(j, 0).equals("")){  %>
                                        <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" >

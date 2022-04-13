@@ -106,6 +106,18 @@ public class AHSRuralHandler extends AHSHandler
 		return AHS_RURAL_LAB_TYPE;
 	}
 
+	/* ===================================== PID ====================================== */
+
+	@Override
+	public String getHealthNum()
+	{
+		// conformance requires province is displayed
+		String hin = getString(get("/.PID-2-1"));
+		String province = getString(get("/.PID-2-4"));
+
+		return String.join(" ", hin, "(" + province + ")");
+	}
+
 	/* ===================================== OBR ====================================== */
 
 	/**
@@ -175,6 +187,31 @@ public class AHSRuralHandler extends AHSHandler
 			case "D": return "Delete";
 			default: return resultStatusCode;
 		}
+	}
+
+	/**
+	 *  Return the result from the jth OBX segment of the ith OBR group
+	 */
+	@Override
+	public String getOBXResult(int i, int j)
+	{
+		// conformance: use obx-2 for micro-bio culture labs
+		if(isMicroLabResult(i))
+		{
+			String result = getOBXResult(i, j, 2);
+			if(StringUtils.isNotBlank(result))
+			{
+				return result;
+			}
+		}
+		return getOBXResult(i, j, 1);
+	}
+
+	/* ===================================== private methods etc. ====================================== */
+
+	private boolean isMicroLabResult(int i)
+	{
+		return "MC".equals(get("/.ORDER_OBSERVATION("+i+")/OBR-24-1"));
 	}
 
 }
