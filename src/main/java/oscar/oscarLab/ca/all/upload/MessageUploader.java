@@ -166,8 +166,8 @@ public final class MessageUploader {
 			{
 				reportStatus = messageHandler.getOrderStatus();
 			}
-			String accessionNum = messageHandler.getAccessionNum();
-			String fillerOrderNum = messageHandler.getFillerOrderNumber();
+			String accessionNum = messageHandler.getUniqueIdentifier();
+			String fillerOrderNum = messageHandler.getUniqueVersionIdentifier();
 			String sendingFacility = messageHandler.getPatientLocation();
 			List<String> docNums = messageHandler.getDocNums();
 			int finalResultCount = messageHandler.getOBXFinalResultCount();

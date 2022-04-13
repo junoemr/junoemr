@@ -624,7 +624,7 @@ public class HHSEmrDownloadHandler extends DefaultGenericHandler {
 //    }
 
 
-public String getAccessionNum(){
+public String getUniqueIdentifier(){
 	String useOrderNumber = OscarProperties.getInstance().getProperty("hhs.emr.handler.accession.use_order_number","false");
 	if(useOrderNumber.equals("true")) {
 		try{

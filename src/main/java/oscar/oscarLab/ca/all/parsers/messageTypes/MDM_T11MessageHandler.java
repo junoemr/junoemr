@@ -64,7 +64,7 @@ public abstract class MDM_T11MessageHandler extends MessageHandler
 	}
 
 	@Override
-	public String getFillerOrderNumber()
+	public String getUniqueVersionIdentifier()
 	{
 		return getString(get("/.EVN-2"));
 	}
@@ -94,7 +94,7 @@ public abstract class MDM_T11MessageHandler extends MessageHandler
 	/* ===================================== TXA ====================================== */
 
 	@Override
-	public String getAccessionNum()
+	public String getUniqueIdentifier()
 	{
 		return get("/.TXA-12");
 	}

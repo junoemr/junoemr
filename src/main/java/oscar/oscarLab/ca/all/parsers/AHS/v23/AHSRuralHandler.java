@@ -127,12 +127,19 @@ public class AHSRuralHandler extends AHSHandler
 	 * signifies 2018, S14-104 where 14 signifies 2014 etc.
 	 */
 	@Override
-	public String getAccessionNum()
+	public String getUniqueIdentifier()
 	{
 		// append the hin and service year/month/day to the accession number to make it unique
 		String dateStr = formatDate(getString(get("/.OBR-7-1"))); // yyyy-MM-dd
 		String hinStr = getHealthNum();
 		return get("/.OBR-20") + "|" + hinStr + "|" + dateStr;
+	}
+
+	@Override
+	public String getAccessionNumber()
+	{
+		// not unique, for display use only
+		return get("/.OBR-20");
 	}
 
 	@Override

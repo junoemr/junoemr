@@ -111,7 +111,7 @@ public class JunoGenericLabHandler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public String getAccessionNum()
+	public String getUniqueIdentifier()
 	{
 		return get("/.ORC-3");
 	}

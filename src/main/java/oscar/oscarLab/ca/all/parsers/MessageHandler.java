@@ -381,10 +381,22 @@ public abstract class MessageHandler
 	/* ===================================== OBR ====================================== */
 
 	/**
+	 * this determines a unique identification string for a lab. This is used for grouping lab versions.
+	 * It is assumed that two labs with the same unique identifier are different versions of the same lab.
+	 * This field is usually the accession number, but may include multiple fields in order to guarantee uniqueness.
+	 * the lab type does not need to be considered, as identifiers are only expected to be unique to the same lab type.
+	 * @return lab unique identifier
+	 */
+	public abstract String getUniqueIdentifier();
+
+	/**
 	 * get lab accession number
 	 * @return accession number
 	 */
-	public abstract String getAccessionNum();
+	public String getAccessionNumber()
+	{
+		return getUniqueIdentifier();
+	}
 
 	/**
 	 *  Return the number of OBR Segments in the message
@@ -394,10 +406,21 @@ public abstract class MessageHandler
 		return 0;
 	}
 
+	/**
+	 * this determines a unique version identification string for a lab.
+	 * This may be used for duplicate checking lab uploads with the same unique identifier.
+	 * It is assumed that two labs with the same unique identifier and version identifier are the same, and thus duplicates.
+	 * This field is usually the filler order number, but may include multiple fields in order to guarantee uniqueness.
+	 * @return lab unique version identifier
+	 */
+	public String getUniqueVersionIdentifier()
+	{
+		return "";
+	}
 
 	public String getFillerOrderNumber()
 	{
-		return "";
+		return getUniqueVersionIdentifier();
 	}
 
 	/**

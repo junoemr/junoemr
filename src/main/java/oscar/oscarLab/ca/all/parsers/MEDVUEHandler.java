@@ -512,7 +512,7 @@ public class MEDVUEHandler extends ORU_R01MessageHandler
 		return "00000000";
 	}
 
-	public String getAccessionNum() {
+	public String getUniqueIdentifier() {
 		/*try {
 			return msg.getMSH().getMessageControlID().getValue().toString();
 		} catch (Exception e) {
@@ -608,7 +608,7 @@ public class MEDVUEHandler extends ORU_R01MessageHandler
 		return "";
 	}
 
-	public String getFillerOrderNumber(){
+	public String getUniqueVersionIdentifier(){
 		
 		return "";
 	}

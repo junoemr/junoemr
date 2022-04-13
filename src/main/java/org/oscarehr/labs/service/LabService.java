@@ -94,8 +94,8 @@ public class LabService
 		String priority = messageHandler.getMsgPriority();
 		String requestingClient = messageHandler.getDocName();
 		String reportStatus = messageHandler.getOrderStatus();
-		String accessionNum = messageHandler.getAccessionNum();
-		String fillerOrderNum = messageHandler.getFillerOrderNumber();
+		String accessionNum = messageHandler.getUniqueIdentifier();
+		String fillerOrderNum = messageHandler.getUniqueVersionIdentifier();
 		int finalResultCount = messageHandler.getOBXFinalResultCount();
 		String obrDate = ConversionUtils.toTimestampString(ConversionUtils.getLegacyDateFromDateString(messageHandler.getMsgDate()));
 		String discipline = findDiscipline(messageHandler);

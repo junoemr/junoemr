@@ -1000,7 +1000,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
         rInfoTable.addCell(cell);
         cell.setPhrase(new Phrase("Accession #: ", boldFont));
         rInfoTable.addCell(cell);
-        cell.setPhrase(new Phrase(handler.getAccessionNum(), font));
+        cell.setPhrase(new Phrase(handler.getAccessionNumber(), font));
         rInfoTable.addCell(cell);
 
         // add additional result info fields
@@ -1124,7 +1124,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
         
         clientPhrase = new Phrase();
         clientPhrase.add(new Chunk("Accession #: ", boldFont));
-        clientPhrase.add(new Chunk(handler.getAccessionNum()+"\t\t\t\t\t", font));
+        clientPhrase.add(new Chunk(handler.getAccessionNumber()+"\t\t\t\t\t", font));
         patientInfo.add(clientPhrase);
         
         clientPhrase = new Phrase();

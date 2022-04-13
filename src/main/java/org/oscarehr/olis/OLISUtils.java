@@ -96,8 +96,8 @@ public class OLISUtils
 	{
 		String sendingFacility = h.getPlacerGroupNumber();
 		logger.debug("SENDING FACILITY: " + sendingFacility);
-		String accessionNumber = h.getAccessionNum();
-		String fillerOrderNo = h.getFillerOrderNumber();
+		String accessionNumber = h.getUniqueIdentifier();
+		String fillerOrderNo = h.getUniqueVersionIdentifier();
 		String hin = h.getHealthNum();
 		String collectionDate = h.getCollectionDateTime(0);
 		collectionDate = (StringUtils.isNotBlank(collectionDate)) ? collectionDate.substring(0, 10).replaceAll("-", "") : null;

@@ -691,7 +691,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                             </td>
                                             <td>
                                                 <div class="FieldData" nowrap="nowrap">
-                                                    <%= handler.getAccessionNum()%>
+                                                    <%= handler.getUniqueIdentifier()%>
                                                 </div>
                                             </td>
                                         </tr>

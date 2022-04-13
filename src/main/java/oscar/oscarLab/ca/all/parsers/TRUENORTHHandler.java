@@ -532,7 +532,7 @@ public class TRUENORTHHandler extends ORU_R01MessageHandler
         return("F");
     }
     
-    public String getAccessionNum(){
+    public String getUniqueIdentifier(){
     	return getAccessionNum(msg);
     }
     
@@ -639,7 +639,7 @@ public class TRUENORTHHandler extends ORU_R01MessageHandler
         return "";
     }
     
-    public String getFillerOrderNumber(){
+    public String getUniqueVersionIdentifier(){
 		return "";
 	}
 

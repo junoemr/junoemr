@@ -44,7 +44,7 @@ public abstract class ORM_O01MessageHandler extends MessageHandler
 	}
 
 	@Override
-	public String getAccessionNum()
+	public String getUniqueIdentifier()
 	{
 		return get("/.ORDER/ORC-3-1");
 	}
@@ -154,7 +154,7 @@ public abstract class ORM_O01MessageHandler extends MessageHandler
 	}
 
 	@Override
-	public String getFillerOrderNumber()
+	public String getUniqueVersionIdentifier()
 	{
 		return getString(get("/.ORDER/ORDER_DETAIL/OBR-3"));
 	}

@@ -1148,7 +1148,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                             </td>
                                             <td>
                                                 <div class="FieldData" nowrap="nowrap">
-                                                    <%= handler.getAccessionNum()%>
+                                                    <%= handler.getAccessionNumber()%>
                                                 </div>
                                             </td>
                                         </tr>

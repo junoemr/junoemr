@@ -256,7 +256,7 @@ public abstract class ChainnedMessageAdapter<T extends AbstractMessage> extends 
 		return (null);
 	}
 
-	public String getAccessionNum()
+	public String getUniqueIdentifier()
 	{
 		return(null);
 	}

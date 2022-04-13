@@ -124,8 +124,8 @@ public class OLISResultsAction extends DispatchAction
 
 				OLISSearchResultTransfer transfer = new OLISSearchResultTransfer();
 				transfer.setUuid(resultUuid);
-				transfer.setAccessionId(handler.getAccessionNum());
-				transfer.setVersionId(handler.getFillerOrderNumber());
+				transfer.setAccessionId(handler.getUniqueIdentifier());
+				transfer.setVersionId(handler.getUniqueVersionIdentifier());
 				transfer.setDuplicate(OLISUtils.isDuplicate(LoggedInInfo.getLoggedInInfoFromRequest(request), handler, message));
 				transfer.setHiddenByUser(removedResultSet.contains(transfer.getAccessionId()+transfer.getVersionId()));
 				resultList.add(transfer);

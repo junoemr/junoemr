@@ -686,7 +686,7 @@
 								<td>
 									<input type="button" onClick="preview('<%=resultUuid %>'); return false;" id="<%=resultUuid %>_preview" value="Preview" />
 								</td>
-								<td><%=result.getAccessionNum()%></td>
+								<td><%=result.getUniqueIdentifier()%></td>
 								<td><%=result.getSpecimenReceivedDateTime()%></td>
 								<td><%=result.getLastUpdateInOLIS()%></td>
 								<td><%=result.getOBRCategory(obrRep)%></td>

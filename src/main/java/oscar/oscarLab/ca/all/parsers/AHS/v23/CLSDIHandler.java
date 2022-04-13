@@ -82,7 +82,7 @@ public class CLSDIHandler extends CLSHandler {
 	@Override
 	public boolean canUpload()
 	{
-		String accessionNumber = this.getAccessionNum();
+		String accessionNumber = this.getUniqueIdentifier();
 		Hl7TextInfo hl7TextInfo = hl7TextInfoDao.findLatestVersionByAccessionNo(accessionNumber);
 
 		// if the report exists the new version must be a correction
@@ -135,13 +135,13 @@ public class CLSDIHandler extends CLSHandler {
 	}
 
 	@Override
-	public String getFillerOrderNumber() {
+	public String getUniqueVersionIdentifier() {
 		/* CLS-DI switches accession number and order number positions */
 		return get("/.OBR-20");
 	}
 
 	@Override
-	public String getAccessionNum() {
+	public String getUniqueIdentifier() {
 		/* CLS-DI switches accession number and order number positions */
 		return get("/.OBR-3-1");
 	}
