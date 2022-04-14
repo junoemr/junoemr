@@ -699,10 +699,24 @@ public class InboxResultsDao
 					lbData.labType = LabResultData.HRM;
 
 					lbData.priority = "----";
-					lbData.requestingClient = "";
+
 					lbData.discipline = "HRM";
 
 					hrmReport = HRMReportParser.parseRelativeLocation(getStringValue(r[hrmReportFileLoc]), getStringValue(r[schemaVersion]));
+
+					if (!hrmReport.getDeliverToUserFirstName().isEmpty() && !hrmReport.getDeliverToUserLastName().isEmpty())
+					{
+						lbData.requestingClient = hrmReport.getDeliverToUserFirstName() + " " + hrmReport.getDeliverToUserLastName();
+					}
+					else if (!hrmReport.getDeliverToUserId().isEmpty())
+					{
+						lbData.requestingClient = hrmReport.getDeliverToUserId();
+					}
+					else
+					{
+						lbData.requestingClient = "Unknown";
+					}
+
 					lbData.reportStatus = hrmReport.getResultStatus();
 				}
 

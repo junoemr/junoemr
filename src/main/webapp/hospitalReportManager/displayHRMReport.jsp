@@ -689,6 +689,13 @@
 
 		function setDescription(reportId) {
 			var comment = jQuery("#descriptionField_" + reportId + "_hrm").val();
+
+			if (!comment.trim())
+			{
+				alert("Description cannot be empty");
+				return;
+			}
+
 			jQuery.ajax({
 				type: "POST",
 				url: "<%=request.getContextPath() %>/hospitalReportManager/Modify.do",

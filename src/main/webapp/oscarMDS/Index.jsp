@@ -12,6 +12,7 @@
 <%@ page import="java.util.*" %>
 <%@ page import="oscar.oscarMDS.data.*, oscar.OscarProperties" %>
 <%@ page import="org.apache.commons.lang.math.NumberUtils" %>
+<%@ page import="static org.oscarehr.sharingcenter.util.CDADocumentUtil.oscarProperties" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
@@ -132,11 +133,13 @@
 		</a>
 	</div>
 
+	<% if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM) && totalHRM > 0) { %>
 	<div>
 		<a id="totalHRM" href="javascript:void(0);" onclick="un_bold(this);changeView(CATEGORY_HRM);" title="HRM Reports">
 			HRM (<%= totalHRM %>)
 		</a>
 	</div>
+	<% } %>
 
 	<dl id="patientsdoclabs">
 
@@ -193,7 +196,7 @@
 				</dt>
 			<%
 				}
-				if (info.getHrmCount() > 0)
+				if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM) && info.getHrmCount() > 0)
 				{
 			%>
 				<dt>
@@ -265,7 +268,7 @@
 				</dt>
 			<%
 				}
-				if (unmatchedHrm > 0)
+				if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM) && unmatchedHrm > 0)
 				{
 			%>
 				<dt>
