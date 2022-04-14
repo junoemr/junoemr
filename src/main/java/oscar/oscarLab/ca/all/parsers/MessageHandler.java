@@ -710,6 +710,16 @@ public abstract class MessageHandler
 		return false;
 	}
 
+	/**
+	 * is the specific OBR unstructured. similar to the unstructured check except for specific OBR segments
+	 * @param obr segment index
+	 * @return true if unstructured
+	 */
+	public boolean isOBRUnstructured(int obr)
+	{
+		return false;
+	}
+
 	/* ===================================== OBX ====================================== */
 
 	/**

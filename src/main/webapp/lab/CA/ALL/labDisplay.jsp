@@ -63,12 +63,10 @@
 <%@ page import="org.oscarehr.labs.dao.Hl7DocumentLinkDao" %>
 <%@ page import="org.oscarehr.labs.model.Hl7DocumentLink" %>
 <%@ page import="java.util.regex.Pattern" %>
-<%@ page import="java.util.regex.Matcher" %>
-<%@ page import="org.apache.commons.lang3.tuple.Pair" %>
-<%@ page import="oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler" %>
 <%@ page import="org.oscarehr.labs.service.Hl7TextInfoService" %>
 <%@ page import="oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler" %>
 <%@ page import="static org.apache.commons.lang.StringEscapeUtils.escapeHtml" %>
+<%@ page import="static oscar.oscarLab.ca.all.parsers.AHS.v23.AHSRuralHandler.AHS_RURAL_LAB_TYPE" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -317,6 +315,9 @@
 .AbnormalRollRes a:hover { color: red }
 .AbnormalRollRes a:visited { color: red }
 .AbnormalRollRes a:active { color: red }
+.Abnormal {
+	color: red;
+}
 .CorrectedRollRes { font-weight: 700; font-size: 8pt; color: yellow; font-family:
                Verdana, Arial, Helvetica }
 .CorrectedRollRes a:link { color: yellow }
@@ -1440,7 +1441,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
 						<%
 							}
-							else if(isUnstructuredDoc)
+							else if(isUnstructuredDoc || handler.isOBRUnstructured(i))
 							{
 						%>
 	                       <table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3" name="tblDiscs" id="tblDiscs">
@@ -1828,7 +1829,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										%>
 						   			<%
 										}
-										else if(isUnstructuredDoc)
+										else if(isUnstructuredDoc || handler.isOBRUnstructured(j))
 										{
 											if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
 											{
@@ -1901,7 +1902,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 											else if (handler.getMsgType().equals("CCLAB") && handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.TEXT)
 											{
 												String abnormalFlag = handler.getOBXAbnormalFlag(j, k);
-												if (!"N".equals(abnormalFlag))
+												if (handler.isOBXAbnormal(j, k))
 												{
 													%> <td align="left"><%= handler.getOBXResult( j, k)  + "(" + abnormalFlag + ")" %></td> <%
 												}
@@ -1909,6 +1910,20 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 												{
 													%> <td align="left"><%= handler.getOBXResult( j, k) %></td><%
 												}
+											}
+											else if (handler.getMsgType().equals(AHS_RURAL_LAB_TYPE))
+											{
+												String result = handler.getOBXResult( j, k);
+												String abnormalFlag = handler.getOBXAbnormalFlag( j, k);
+												if(StringUtils.isBlank(result))
+												{
+													result = abnormalFlag;
+												}
+												else if (StringUtils.isNotBlank(abnormalFlag))
+												{
+													result += " (" + abnormalFlag + ")";
+												}
+												%> <td align="left" class="<%=handler.isOBXAbnormal(j, k) ? "Abnormal" : ""%>"><%= result %></td> <%
 											}
 											else {%>
                                            		<td align="left"><%= handler.getOBXResult( j, k) %></td><%

@@ -96,6 +96,12 @@ public class AHSRuralHandler extends AHSHandler
 		return true;
 	}
 
+	@Override
+	public boolean isUnstructured()
+	{
+		return false;
+	}
+
     /* ===================================== Hl7 Parsing ====================================== */
 
 	/* ===================================== MSH ====================================== */
@@ -183,6 +189,12 @@ public class AHSRuralHandler extends AHSHandler
 		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-15-2"));
 	}
 
+	@Override
+	public boolean isOBRUnstructured(int obr)
+	{
+		return isMicroLabResult(obr);
+	}
+
 	/* ===================================== OBX ====================================== */
 
 	@Override
@@ -215,6 +227,13 @@ public class AHSRuralHandler extends AHSHandler
 			}
 		}
 		return getOBXResult(i, j, 1);
+	}
+
+	@Override
+	public boolean isOBXAbnormal(int i, int j)
+	{
+		String abnormalFlags = getOBXAbnormalFlag(i,j);
+		return "A".equals(abnormalFlags);
 	}
 
 	/* ===================================== private methods etc. ====================================== */
