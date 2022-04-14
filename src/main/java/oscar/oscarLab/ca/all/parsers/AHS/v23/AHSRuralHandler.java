@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -192,7 +193,19 @@ public class AHSRuralHandler extends AHSHandler
 	@Override
 	public boolean isOBRUnstructured(int obr)
 	{
-		return isMicroLabResult(obr);
+		return isMicroLabResult(obr) || isBloodBankProductsResult(obr);
+	}
+
+	@Override
+	public ArrayList<String> getHeaders()
+	{
+		// order must match obr order if some obr segments are unstructured. for... reasons?
+		ArrayList<String> headers = new ArrayList<>();
+		for(int i = 0; i < getOBRCount(); i++)
+		{
+			headers.add(getOBRName(i));
+		}
+		return headers;
 	}
 
 	/* ===================================== OBX ====================================== */
@@ -238,9 +251,19 @@ public class AHSRuralHandler extends AHSHandler
 
 	/* ===================================== private methods etc. ====================================== */
 
-	private boolean isMicroLabResult(int i)
+	private String getDiagnosticServicesCode(int obr)
 	{
-		return "MC".equals(get("/.ORDER_OBSERVATION("+i+")/OBR-24-1"));
+		return get("/.ORDER_OBSERVATION("+obr+")/OBR-24-1");
+	}
+
+	private boolean isMicroLabResult(int obr)
+	{
+		return "MC".equals(getDiagnosticServicesCode(obr));
+	}
+
+	private boolean isBloodBankProductsResult(int obr)
+	{
+		return "BB-BP".equals(getDiagnosticServicesCode(obr));
 	}
 
 }
