@@ -137,4 +137,10 @@ public class ProviderModel extends AbstractTransientModel implements Person, Con
 		}
 		return null;
 	}
+
+	@Override
+	public String getDisplayName()
+	{
+		return String.join(", ", this.getLastName(), this.getFirstName());
+	}
 }

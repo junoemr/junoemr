@@ -226,6 +226,7 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 		return TYPE.DEMOGRAPHIC;
 	}
 
+	@Override
 	public String getDisplayName()
 	{
 		return this.getLastName() + ", " + this.getFirstName() + (StringUtils.isBlank(this.getMiddleName()) ? "" : " " + this.getMiddleName());
