@@ -203,7 +203,11 @@ public class AHSRuralHandler extends AHSHandler
 		ArrayList<String> headers = new ArrayList<>();
 		for(int i = 0; i < getOBRCount(); i++)
 		{
-			headers.add(getOBRName(i));
+			String obrName = getOBRName(i);
+			if(!headers.contains(obrName))
+			{
+				headers.add(obrName);
+			}
 		}
 		return headers;
 	}
