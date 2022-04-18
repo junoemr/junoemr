@@ -23,36 +23,31 @@
 
 package integration.tests;
 
-import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.AppointmentUtil;
-import integration.tests.util.seleniumUtil.ActionUtil;
-import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.oscarehr.JunoApplication;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Set;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import static integration.tests.AddPatientsIT.dad;
 import static integration.tests.AddPatientsIT.dadFullName;
 import static integration.tests.AddPatientsIT.mom;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
+
+import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.junoUtil.AppointmentUtil;
+import integration.tests.util.seleniumUtil.ActionUtil;
+import integration.tests.util.seleniumUtil.PageUtil;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Set;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.oscarehr.JunoApplication;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -96,27 +91,8 @@ public class EditAppointmentsIT extends SeleniumTestBase
 		return option.getText();
 	}
 
-	/*
-	-------------------------------------------------------------------------------
-Test set: integration.tests.EditAppointmentsIT
--------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 33.489 s <<< FAILURE! - in integration.tests.EditAppointmentsIT
-editAppointmentTestsClassicUI  Time elapsed: 12.743 s  <<< ERROR!
-org.openqa.selenium.NoSuchElementException:
-Unable to locate element: .//td[contains(., 'Momfname')]
-For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
-Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
-System info: host: 'fedora', ip: '127.0.0.1', os.name: 'Linux', os.arch: 'amd64', os.version: '5.13.8-200.fc34.x86_64', java.version: '1.8.0_302'
-Driver info: org.openqa.selenium.firefox.FirefoxDriver
-Capabilities {acceptInsecureCerts: true, browserName: firefox, browserVersion: 90.0.2, javascriptEnabled: true, moz:accessibilityChecks: false, moz:buildID: 20210804102508, moz:geckodriverVersion: 0.29.0, moz:headless: true, moz:processID: 2353279, moz:profile: /tmp/rust_mozprofile2qebiT, moz:shutdownTimeout: 60000, moz:useNonSpecCompliantPointerOrigin: false, moz:webdriverClick: true, pageLoadStrategy: normal, platform: LINUX, platformName: LINUX, platformVersion: 5.13.8-200.fc34.x86_64, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify}
-Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
-*** Element info: {Using=xpath, value=.//td[contains(., 'Momfname')]}
-    at integration.tests.EditAppointmentsIT.editAppointmentTestsClassicUI(EditAppointmentsIT.java:98)
-	 */
-	@Ignore
 	@Test
 	public void editAppointmentTestsClassicUI()
-			throws InterruptedException
 	{
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
 		String currWindowHandle = driver.getWindowHandle();
@@ -153,8 +129,7 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 		Assert.assertTrue("Patient is NOT updated successfully.", PageUtil.isExistsBy(By.partialLinkText(dad.lastName), driver));
 
 		driver.findElement(By.partialLinkText(dad.lastName)).click();
-		PageUtil.switchToNewWindow(driver, By.className("apptLink"), oldWindowHandles,
-			webDriverWait);
+		PageUtil.switchToLastWindow(driver);
 		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@type='submit']")));
 		String name = driver.findElement(By.xpath("//input[@name='keyword']")).getAttribute("value");
 		String apptDuration = driver.findElement(By.xpath("//input[@name='duration']")).getAttribute("value");
@@ -176,7 +151,7 @@ Session ID: 98044904-ce86-40b1-bb52-a4f1942d6de7
 	}
 
 	@Test
-	public void changeAppointmentStatusTestsJUNOUI() throws InterruptedException
+	public void changeAppointmentStatusTestsJUNOUI()
 	{
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEEE MMM d");
 		LocalDate dateToday = LocalDate.now();

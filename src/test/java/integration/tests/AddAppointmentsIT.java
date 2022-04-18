@@ -23,29 +23,6 @@
 
 package integration.tests;
 
-import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.seleniumUtil.ActionUtil;
-import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.oscarehr.JunoApplication;
-import org.oscarehr.common.dao.utils.AuthUtils;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import static integration.tests.AddGroupIT.valueOfDrApple;
 import static integration.tests.AddGroupIT.valueOfDrBerry;
 import static integration.tests.AddPatientsIT.mom;
@@ -56,11 +33,31 @@ import static integration.tests.ScheduleSettingIT.setupSchedule;
 import static integration.tests.ScheduleSettingIT.setupTemplate;
 import static integration.tests.ScheduleSettingIT.templateTitleGeneral;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
 import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
+
+import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.seleniumUtil.ActionUtil;
+import integration.tests.util.seleniumUtil.PageUtil;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
+import org.oscarehr.common.dao.utils.AuthUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -104,11 +101,10 @@ public class AddAppointmentsIT extends SeleniumTestBase
 
 	public void	addAppointmentWithNODemo(By timeFrame, Set<String> oldWindowHandles, String currWindowHandle, String status)
 	{
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(timeFrame));
 		driver.findElement(timeFrame).click();
 		List<String> newWindows = PageUtil.getNewWindowHandles(oldWindowHandles, driver);
 		PageUtil.switchToWindow(newWindows.get(newWindows.size() - 1), driver);
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@name='status']")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@name='status']")));
 		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='status']"), status);
 		findWaitClickById(driver, webDriverWait, "addButton");
 		PageUtil.switchToWindow(currWindowHandle, driver);
@@ -156,8 +152,8 @@ public class AddAppointmentsIT extends SeleniumTestBase
 				PageUtil.isExistsBy(By.linkText("."), driver));
 	}
 
+
 	@Test
-	@Ignore
 	public void addAppointmentsSchedulePageWeeklyViewTest()
 	{
 		//Weekly View - next week
@@ -185,7 +181,6 @@ public class AddAppointmentsIT extends SeleniumTestBase
 	}
 
 	@Test
-	@Ignore
 	public void addAppointmentsSchedulePageFlipViewTest() throws InterruptedException {
 		//Flip View - next Month
 		driver.findElement(By.xpath("//input[@name='flipview']")).click();
@@ -280,7 +275,6 @@ public class AddAppointmentsIT extends SeleniumTestBase
 	}
 
 	@Test
-	@Ignore
 	public void addAppointmentsGroupViewTest() throws InterruptedException
 	{
 		String groupName = "TestGroup";
@@ -316,12 +310,12 @@ public class AddAppointmentsIT extends SeleniumTestBase
 				PageUtil.isExistsBy(By.partialLinkText(mom.lastName), driver));
 
 		//Add an appointment at 10:00-10:15 with NO demographic selected under the second provider.
-		driver.findElement(By.linkText("Group View")).click();
 		String xpathAt10 =
 				"//a[contains(.,'" + drBerry.lastName + "')]" +
 						"/ancestor::tr/following-sibling::tr" +
 						"/descendant::td//a[@title='10:00 a.m. - 10:15 a.m.']";
 		addAppointmentWithNODemo(By.xpath(xpathAt10),oldWindowHandles, currWindowHandle, "t");//To Do
+		driver.findElement(By.linkText("Group View")).click();
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(".")));
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",
 				PageUtil.isExistsBy(By.linkText("."), driver));
@@ -332,5 +326,4 @@ public class AddAppointmentsIT extends SeleniumTestBase
 				"Appointment with NO demographic selected is NOT added successfully under the second provider.",
 				PageUtil.isExistsBy(By.linkText("."), driver));
 	}
-
 }
