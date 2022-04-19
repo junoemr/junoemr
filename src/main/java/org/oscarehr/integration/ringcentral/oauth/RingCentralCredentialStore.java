@@ -47,7 +47,8 @@ public class RingCentralCredentialStore
 {
 	private static AuthorizationCodeFlow oAuthWorkFlow;
 	public static final String LOCAL_USER_ID = "com.junoemr.fax.ringcentral";
-	public static final long ACCESS_TOKEN_REFRESH_THRESHOLD_SECONDS = 3600L;
+	// Half the interval of the keepalive task, as a fallback
+	public static final long ACCESS_TOKEN_REFRESH_THRESHOLD_SECONDS = 900L;
 
 	private static final String OAUTH_PATH = "/restapi/oauth";
 	private static final String AUTH_ENDPOINT = "/authorize";
