@@ -38,7 +38,6 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import oscar.OscarProperties;
 
-import javax.annotation.PostConstruct;
 import java.time.Duration;
 
 @Configuration
