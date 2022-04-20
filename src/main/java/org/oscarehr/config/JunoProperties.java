@@ -37,6 +37,7 @@ public class JunoProperties
 {
 	private JunoPropertiesConfig properties;
 	private RedisSessionStore redisSessionStore;
+	private Olis olis;
 	private Test test;
 
 	@Data
@@ -58,5 +59,22 @@ public class JunoProperties
 	public static class Test
 	{
 		private boolean headless = true;
+	}
+
+	@Data
+	public static class Olis
+	{
+		private String keystore;
+		private String sslKeystore;
+		private String sslKeystorePassword;
+		private String sslKeystoreAlias;
+		private String truststore;
+		private String truststorePassword;
+		private String returnedCert;
+		private String sendingApplication;
+		private String requestUrl;
+		private Integer pollingIntervalSec;
+		private String responseSchema;
+		private Boolean enableSearchResultRemoval;
 	}
 }
