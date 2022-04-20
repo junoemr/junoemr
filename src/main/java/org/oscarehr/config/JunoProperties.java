@@ -73,10 +73,10 @@ public class JunoProperties
 		private String returnedCert;
 		private String sendingApplication;
 		private String requestUrl;
-		private Integer pollingIntervalSec;
+		private int defaultPollingIntervalMin;
 		private String responseSchema;
 		private boolean enableSearchResultRemoval;
-		private Integer maxFetchMonths;
+		private int maxFetchMonths;
 
 		private boolean simulate;
 		private String processingId;

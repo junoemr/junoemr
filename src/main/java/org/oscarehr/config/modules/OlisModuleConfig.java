@@ -24,6 +24,7 @@
 package org.oscarehr.config.modules;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.config.scheduling.FixedPeriodicAdjustableTrigger;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
@@ -37,6 +38,7 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import oscar.OscarProperties;
 
+import javax.annotation.PostConstruct;
 import java.time.Duration;
 
 @Configuration
@@ -53,6 +55,9 @@ public class OlisModuleConfig implements SchedulingConfigurer
 
 	@Autowired
 	private OLISSystemPreferencesDao olisSystemPrefDao;
+
+	@Autowired
+	protected JunoProperties junoProperties;
 
 	public OlisModuleConfig()
 	{
@@ -74,7 +79,7 @@ public class OlisModuleConfig implements SchedulingConfigurer
 		scheduledTaskRegistrar.addTriggerTask(olisPollingService, new FixedPeriodicAdjustableTrigger(() ->
 		{
 			OLISSystemPreferences olisPrefs = olisSystemPrefDao.getPreferences();
-			Integer frequency = olisPrefs.getPollFrequency().orElse(OLISSystemPreferences.DEFAULT_POLLING_FREQUENCY_MIN);
+			Integer frequency = olisPrefs.getPollFrequency().orElse(junoProperties.getOlis().getDefaultPollingIntervalMin());
 			return Duration.ofMinutes(frequency);
 		}));
 	}
