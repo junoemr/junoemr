@@ -57,7 +57,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.upload.handlers.LabHandlerService;
 import oscar.util.ConversionUtils;
 
@@ -84,7 +83,6 @@ public class OLISPollingService implements Runnable
 	public static final String OLIS_DATE_FORMAT = "yyyyMMddHHmmssZ";
 
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final OscarProperties props = OscarProperties.getInstance();
 	private static final int DEFAULT_FETCH_PERIOD_MONTHS = 1;
 
 	@Autowired
@@ -122,7 +120,8 @@ public class OLISPollingService implements Runnable
 	@Override
 	public void run()
 	{
-		if(systemPreferenceService.isPreferenceEnabled(UserProperty.OLIS_POLLING_ENABLED, false))
+		if(systemPreferenceService.isPreferenceEnabled(UserProperty.OLIS_INTEGRATION_ENABLED, false)
+		&& systemPreferenceService.isPreferenceEnabled(UserProperty.OLIS_POLLING_ENABLED, false))
 		{
 			OLISSystemPreferences olisPrefs = olisSystemPreferencesDao.getPreferences();
 

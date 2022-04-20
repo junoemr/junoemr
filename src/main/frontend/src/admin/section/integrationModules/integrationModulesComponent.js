@@ -22,6 +22,7 @@
 */
 
 import {ADMIN_PAGE_EVENTS} from "../../adminConstants";
+import {SystemPreferences} from "../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Admin.Section').component('integrationModules',
 {
@@ -38,6 +39,12 @@ angular.module('Admin.Section').component('integrationModules',
 				name: "CareConnect",
 				enabled: false,
 				propertyName: "integration.CareConnect.enabled",
+				configUrl:""
+			},
+			{
+				name: "OLIS",
+				enabled: false,
+				propertyName: SystemPreferences.OlisIntegrationEnabled,
 				configUrl:""
 			},
 			{
