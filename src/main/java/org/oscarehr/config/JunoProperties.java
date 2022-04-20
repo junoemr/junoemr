@@ -75,6 +75,11 @@ public class JunoProperties
 		private String requestUrl;
 		private Integer pollingIntervalSec;
 		private String responseSchema;
-		private Boolean enableSearchResultRemoval;
+		private boolean enableSearchResultRemoval;
+		private Integer maxFetchMonths;
+
+		private boolean simulate;
+		private String processingId;
+		private String pollingFacilityId;
 	}
 }

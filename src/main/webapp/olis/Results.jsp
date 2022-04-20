@@ -16,9 +16,10 @@
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
 <%@ page import="java.util.stream.Collectors" %>
 <%@ page import="org.oscarehr.olis.transfer.OLISSearchResultTransfer" %>
-<%@ page import="oscar.OscarProperties" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.stream.IntStream" %>
+<%@ page import="org.oscarehr.config.JunoProperties" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -283,7 +284,8 @@
 		<td colspan="2">
 			<%
 			DemographicModel demographic = (DemographicModel) request.getAttribute("demographic");
-			boolean removeSearchResults = OscarProperties.getInstance().isPropertyActive("olis.enable_search_result_removal");
+			final JunoProperties junoProperties = SpringUtils.getBean(JunoProperties.class);
+			boolean removeSearchResults = junoProperties.getOlis().isEnableSearchResultRemoval();
 
 			if (request.getAttribute("searchException") != null) {
 			%>

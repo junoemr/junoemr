@@ -42,6 +42,7 @@ import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.olis.dao.OLISProviderPreferencesDao;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.exception.OLISAckFailedException;
@@ -85,7 +86,6 @@ public class OLISPollingService implements Runnable
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarProperties props = OscarProperties.getInstance();
 	private static final int DEFAULT_FETCH_PERIOD_MONTHS = 1;
-	private static final int MAX_FETCH_PERIOD_MONTHS = Integer.parseInt(props.getProperty("olis_max_fetch_months", "12")); //max 12
 
 	@Autowired
 	private ProviderDataDao providerDao;
@@ -110,6 +110,9 @@ public class OLISPollingService implements Runnable
 
 	@Autowired
 	private SecurityDao securityDao;
+
+	@Autowired
+	private JunoProperties junoProperties;
 
 	public OLISPollingService()
 	{
@@ -140,8 +143,8 @@ public class OLISPollingService implements Runnable
 	{
 	    pollZ04Query(loggedInInfo);
 	    
-	    String facilityId = props.getProperty("olis_polling_facility"); //Most of the time this will default to null.
-		if(facilityId != null)
+	    String facilityId = junoProperties.getOlis().getPollingFacilityId(); //Most of the time this will default to null.
+		if(StringUtils.isNotBlank(facilityId))
 		{
 			pollZ06Query(loggedInInfo, facilityId);
 		}
@@ -315,7 +318,7 @@ public class OLISPollingService implements Runnable
 	private String queryAndImportNextDateRange(LoggedInInfo loggedInInfo, DateRangeQuery query, ZonedDateTime startDateTime, ZonedDateTime endDateTime) throws Exception
 	{
 		String timeStampForNextStartDate = null;
-		ZonedDateTime nextStartDateTime = Optional.ofNullable(endDateTime).orElse(startDateTime.plusMonths(MAX_FETCH_PERIOD_MONTHS));
+		ZonedDateTime nextStartDateTime = Optional.ofNullable(endDateTime).orElse(startDateTime.plusMonths(junoProperties.getOlis().getMaxFetchMonths()));
 		if(nextStartDateTime.isBefore(ZonedDateTime.now()))
 		{
 			logger.info("OLIS response returned no new data, checking next date range...");
@@ -410,14 +413,14 @@ public class OLISPollingService implements Runnable
 		return obr22;
 	}
 
-	private static ZonedDateTime calcEndDate(@NotNull ZonedDateTime zonedStartTime)
+	private ZonedDateTime calcEndDate(@NotNull ZonedDateTime zonedStartTime)
 	{
-		ZonedDateTime maxFetchPeriod = ZonedDateTime.now().minusMonths(MAX_FETCH_PERIOD_MONTHS);
+		ZonedDateTime maxFetchPeriod = ZonedDateTime.now().minusMonths(junoProperties.getOlis().getMaxFetchMonths());
 		if(zonedStartTime.isBefore(maxFetchPeriod))
 		{
 			// subtract a day to avoid 'max 12 months' error response.
 			// not 100% sure why OLIS sends this if the period is exactly 1 year, but probably timezones somehow
-			return zonedStartTime.plusMonths(MAX_FETCH_PERIOD_MONTHS).minusDays(1);
+			return zonedStartTime.plusMonths(junoProperties.getOlis().getMaxFetchMonths()).minusDays(1);
 		}
 		return null;
 	}
