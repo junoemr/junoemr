@@ -165,8 +165,8 @@ public class HRMModifyDocumentAction extends DispatchAction {
 				hrmDocumentToProvider.setSignedOffTimestamp(new Date());
 				hrmDocumentToProviderDao.persist(hrmDocumentToProvider);
 
-				// Once the provider has signed off for the first time, try to file the report in their inbox.
-				CommonLabResultData.updateReportStatus(Integer.parseInt(reportId), providerNo, ProviderInboxItem.FILE, "Signed Off", InboxManager.INBOX_TYPE_HRM);
+				// Once the provider has signed off for the first time, try to ack the report in their inbox
+				CommonLabResultData.updateReportStatus(Integer.parseInt(reportId), providerNo, ProviderInboxItem.ACK, "", InboxManager.INBOX_TYPE_HRM);
 			}
 
 			request.setAttribute("success", true);

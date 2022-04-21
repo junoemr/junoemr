@@ -225,30 +225,12 @@ String curUser_no = (String) session.getAttribute("user");
                         				<jsp:param name="status" value="<%=status%>"/>
                         			</jsp:include>
 								</div>
-                        		<%
-                                		}
-                                		else if (result.isHRM()) {
-
-                                			StringBuilder duplicateLabIds=new StringBuilder();
-                                        	for (Integer duplicateLabId : result.getDuplicateLabIds())
-                                        	{
-                                        		if (duplicateLabIds.length()>0) duplicateLabIds.append(',');
-                                        		duplicateLabIds.append(duplicateLabId);
-                                        	}
-                                		%>
-
-                                	<jsp:include page="../hospitalReportManager/Display.do" flush="true">
-                                		<jsp:param name="id" value="<%=segmentID %>" />
-                                		<jsp:param name="segmentID" value="<%=segmentID %>" />
-                                		<jsp:param name="providerNo" value="<%=providerNo %>" />
-                                		<jsp:param name="searchProviderNo" value="<%=searchProviderNo %>" />
-                                		<jsp:param name="status" value="<%=status %>" />
-                                		<jsp:param name="demoName" value="<%=result.getPatientName() %>" />
-                                		<jsp:param name="duplicateLabIds" value="<%=duplicateLabIds.toString() %>" />
+                        		<%} else if (result.isHRM()) { %>
+                                	<jsp:include page="../hospitalReportManager/displayHRMReport.jsp" flush="true">
+                                		<jsp:param name="id" value="<%=segmentID%>" />
+										<jsp:param name="preview" value="<%=true%>" />
                                 	</jsp:include>
-		                        		<% } else {
-
-		                        		%>
+		                        		<% } else {%>
 		                        		<%--
 		                        				<iframe src="../lab/CA/ALL/labDisplayAjax.jsp?segmentID=<%=segmentID %>" style="height:100%;width:100%;border:0;"></iframe>
 		                        		--%>
@@ -329,15 +311,8 @@ String curUser_no = (String) session.getAttribute("user");
                                     
                                     <a href="javascript:void(0);" onclick="reportWindow('<%=url.toString()%>',screen.availHeight, screen.availWidth); return false;" ><%=labRead + StringEscapeUtils.escapeHtml(result.getPatientName())%></a>
                                     
-                                    <% }else if(result.isHRM()){
-                                    	StringBuilder duplicateLabIds=new StringBuilder();
-                                    	for (Integer duplicateLabId : result.getDuplicateLabIds())
-                                    	{
-                                    		if (duplicateLabIds.length()>0) duplicateLabIds.append(',');
-                                    		duplicateLabIds.append(duplicateLabId);
-                                    	}
-                                    %>
-                                    <a href="javascript:reportWindow('../hospitalReportManager/Display.do?id=<%=segmentID%>&segmentID=<%=segmentID%>&providerNo=<%=providerNo%>&searchProviderNo=<%=searchProviderNo%>&status=<%=status%>&demoName=<%=demoName%>&duplicateLabIds=<%=duplicateLabIds.toString()%> ',850,1020)"><%=labRead%><%=result.getPatientName()%></a>
+                                    <% }else if(result.isHRM()){%>
+                                    <a href="javascript:reportWindow('../hospitalReportManager/displayHRMReport.jsp?id=<%=segmentID%>',850,1020)"><%=labRead%><%=result.getPatientName()%></a>
                                     <% }else {%>
                                     <a href="javascript:parent.reportWindow('<%=request.getContextPath()%>/lab/CA/BC/labDisplay.jsp?segmentID=<%=segmentID%>&providerNo=<%=providerNo%>&searchProviderNo=<%=searchProviderNo%>&status=<%=status%>')"><%=labRead%><%=StringEscapeUtils.escapeJavaScript(result.getPatientName())%></a>
                                     <% }%>
@@ -458,4 +433,3 @@ String curUser_no = (String) session.getAttribute("user");
             </tr>
         </table>
     <% } // End if (pageNum == 1) %>
-
