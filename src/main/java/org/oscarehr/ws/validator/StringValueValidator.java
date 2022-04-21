@@ -36,11 +36,13 @@ public class StringValueValidator implements ConstraintValidator<StringValueCons
 {
 
 	private Set<String> allowedValues;
+	private boolean caseInsensitive;
 
 	@Override
 	public void initialize(StringValueConstraint stringValueConstraint)
 	{
 		allowedValues = Arrays.stream(stringValueConstraint.allows()).collect(toSet());
+		caseInsensitive = stringValueConstraint.caseInsensitive();
 	}
 
 	@Override
@@ -48,6 +50,11 @@ public class StringValueValidator implements ConstraintValidator<StringValueCons
 	{
 		//TODO-legacy set custom validation error message
 //		String invalidMessage = "Invalid String value. Allowed values: [" + String.join(",", allowedValues) + "]";
+
+		if(caseInsensitive)
+		{
+			return (value == null || allowedValues.stream().anyMatch(value::equalsIgnoreCase));
+		}
 		return (value == null || allowedValues.contains(value));
 	}
 }

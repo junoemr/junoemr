@@ -30,7 +30,9 @@ import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.DemographicArchive;
 import org.oscarehr.demographic.converter.DemographicCreateInputToEntityConverter;
 import org.oscarehr.demographic.converter.DemographicDbToModelConverter;
+import org.oscarehr.demographic.converter.DemographicUpdateTransferToUpdateInputConverter;
 import org.oscarehr.demographic.converter.DemographicModelToDbConverter;
+import org.oscarehr.demographic.converter.DemographicModelToExternalApiTransferConverter;
 import org.oscarehr.demographic.converter.DemographicUpdateInputToEntityConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
@@ -54,6 +56,7 @@ import org.oscarehr.waitList.service.WaitListService;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicUpdateTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicIntegrationTransfer;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.beans.BeanUtils;
@@ -117,6 +120,12 @@ public class DemographicService
 
 	@Autowired
 	private DemographicUpdateInputToEntityConverter demographicUpdateInputToEntityConverter;
+
+	@Autowired
+	private DemographicUpdateTransferToUpdateInputConverter demographicUpdateTransferToUpdateInputConverter;
+
+	@Autowired
+	private DemographicModelToExternalApiTransferConverter demographicModelToExternalApiTransferConverter;
 
 	@Autowired
 	private WaitListService waitListService;
@@ -356,6 +365,7 @@ public class DemographicService
 	 * @param legacyDemographic - legacy demographic object to convert
 	 * @return - modern demographic object
 	 */
+	@Deprecated
 	public Demographic demographicFromLegacyDemographic(org.oscarehr.common.model.Demographic legacyDemographic)
 	{
 		Demographic demographic = new Demographic();
@@ -368,14 +378,19 @@ public class DemographicService
 		return demographic;
 	}
 
-	public Demographic addNewDemographicRecord(String providerNoStr, DemographicTransferInbound demographicTransferInbound)
+	/**
+	 * demographic creation for external API use
+	 */
+	public DemographicTransferOutbound addNewDemographicRecord(String providerNoStr, DemographicTransferInbound demographicTransferInbound)
 	{
 		Demographic demographic = DemographicConverter.getAsDomainObject(demographicTransferInbound);
 		DemographicCust demoCustom = DemographicConverter.getCustom(demographicTransferInbound);
 		List<DemographicExt> demographicExtensions = DemographicConverter.getExtensionList(demographicTransferInbound);
 		Set<DemographicExt> demographicExtSet = new HashSet<>(demographicExtensions);
 
-		return addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtSet);
+		return demographicModelToExternalApiTransferConverter.convert(
+				demographicDbToModelConverter.convert(addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtSet)
+				));
 	}
 	public DemographicModel addNewDemographicRecord(String providerNoStr, DemographicCreateInput demographicInput)
 	{
@@ -470,8 +485,10 @@ public class DemographicService
 	 * Apply a demographic update (save changes to demo + create a demographic archive record)
 	 * @param demographic - the demographic to update.
 	 * @param loggedInInfo - logged in info
+	 * @deprecated use the model version
 	 * @return - the updated demographic (un changed object, save that it has been persisted to the database)
 	 */
+	@Deprecated
 	public Demographic updateDemographicRecord(Demographic demographic, LoggedInInfo loggedInInfo)
 	{
 		Demographic oldDemographic = demographicDao.find(demographic.getId());
@@ -483,6 +500,21 @@ public class DemographicService
 		return demographic;
 	}
 
+	/**
+	 * update method for external API use
+	 */
+	public DemographicTransferOutbound updateDemographicRecord(DemographicUpdateTransfer transfer, LoggedInInfo loggedInInfo)
+	{
+		DemographicUpdateInput input = demographicUpdateTransferToUpdateInputConverter.convert(transfer);
+		return demographicModelToExternalApiTransferConverter.convert(updateDemographicRecord(input, loggedInInfo));
+	}
+
+	/**
+	 * apply the update input params to an existing demographic
+	 * @param updateInput the update input model
+	 * @param loggedInInfo current user info
+	 * @return an updated model
+	 */
 	public DemographicModel updateDemographicRecord(DemographicUpdateInput updateInput, LoggedInInfo loggedInInfo)
 	{
 		Demographic oldDemographic = demographicDao.find(updateInput.getId());
@@ -519,6 +551,7 @@ public class DemographicService
 	 * @param loggedInInfo - logged in info
 	 * @return - the save demographic
 	 */
+	@Deprecated
 	public org.oscarehr.common.model.Demographic updateLegacyDemographicRecord(org.oscarehr.common.model.Demographic demographic,
 																			   List<DemographicExt> extensions,
 																			   LoggedInInfo loggedInInfo)
