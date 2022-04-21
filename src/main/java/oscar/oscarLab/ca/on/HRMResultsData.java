@@ -121,7 +121,7 @@ public class HRMResultsData {
 
 			lbData.reportStatus = hrmReport.getResultStatus();
 			lbData.priority = "----";
-			lbData.requestingClient = hrmReport.getDeliverToUserFirstName() + " " + hrmReport.getDeliverToUserFirstName();
+			lbData.requestingClient = hrmReport.getDeliverToUserFirstName() + " " + hrmReport.getDeliverToUserLastName();
 			lbData.discipline = "HRM";
 			lbData.resultStatus = hrmReport.getResultStatus();
 
