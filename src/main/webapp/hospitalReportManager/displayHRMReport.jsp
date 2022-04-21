@@ -381,7 +381,7 @@
 			background-color: #FFFFFF;
 		}
 
-		#hrmReport > input, select {
+		#hrmReport input[type="text"], select {
 			appearance: none;
 			border: 1px solid #70778C;
 			border-radius: 2px;
@@ -485,13 +485,13 @@
 			margin-right: 2px;
 		}
 
-		#hrmReport > .infoBox hr {
+		.infoBox hr {
 			border: 1px solid #D0D5E3;
 			border-bottom: none;
 			height: 0;
 		}
 
-		#hrmReport > .add-comments {
+		#hrmReport .add-comments {
 			margin: 8px;
 		}
 
