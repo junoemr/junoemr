@@ -152,7 +152,7 @@ public class AHSRuralHandler extends AHSHandler
 	@Override
 	public String getServiceDate()
 	{
-		return formatDateTime(getString(get("/.OBR-7-1")));
+		return formatDateTime(getString(get("/.MSH-7-1")));
 	}
 
 	@Override
@@ -186,8 +186,10 @@ public class AHSRuralHandler extends AHSHandler
 	@Override
 	public String getSubHeader(int i)
 	{
-		// specimen source
-		return getString(get("/.ORDER_OBSERVATION("+i+")/OBR-15-2"));
+		String specimenSource = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-15-2"));
+		String collectionDate = formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBR-7-1"));
+
+		return specimenSource + (StringUtils.isNotBlank(collectionDate) ? (" (Collected: " + collectionDate) + ")" : "");
 	}
 
 	@Override
@@ -244,6 +246,18 @@ public class AHSRuralHandler extends AHSHandler
 			}
 		}
 		return getOBXResult(i, j, 1);
+	}
+
+	@Override
+	public String getTimeStamp(int i, int j)
+	{
+		if (i < 0 || j < 0)
+		{
+			// some fun peaces of code like to ask for negative values
+			return null;
+		}
+		// rural labs want you to use OBR-14 instead of obx-14
+		return formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBR-14"));
 	}
 
 	@Override
