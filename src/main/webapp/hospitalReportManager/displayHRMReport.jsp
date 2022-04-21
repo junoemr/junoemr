@@ -548,8 +548,8 @@
         }
 
 		.attention {
-            background-color: #FFEA17;
-            color: #EB0000;
+            background-color: #fff7cc;
+            color: #cc2929;
             font-weight: bold;
         }
 
