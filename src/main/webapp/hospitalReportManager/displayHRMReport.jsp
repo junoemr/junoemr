@@ -476,6 +476,15 @@
 			font-weight: normal;
 		}
 
+		.infoBox a {
+			margin-left: 4px;
+		}
+
+		.infoBox input {
+			box-sizing: border-box;
+			margin-right: 2px;
+		}
+
 		#hrmReport > .infoBox hr {
 			border: 1px solid #D0D5E3;
 			border-bottom: none;
@@ -486,27 +495,27 @@
 			margin: 8px;
 		}
 
-		#hrmReport > .add-comments > .label {
+		.add-comments > .label {
 			display: block;
 		}
 
-		#hrmReport > .add-comments > textarea {
+		.add-comments > textarea {
             margin: 4px 0 8px 0;
 			height: 128px;
 			width: 360px;
 			display: block;
         }
 
-		#hrmReport > .comments-list {
+		.comments-list {
 			margin-top: 16px;
 		}
 
-		#hrmReport > .comments-list > .hrm-info-header {
+		.comments-list > .hrm-info-header {
 			margin-bottom: 8px;
 			background: unset;
 		}
 
-		#hrmReport > .comment {
+		.comment {
 			border-top: 1px solid #D0D5E3;
 			display: block;
 		}
@@ -553,16 +562,16 @@
             overflow-x: scroll;
         }
 
-		#hrmReport > .description-container .label {
+		.description-container .label {
             width: 30%;
             display: inline-block;
         }
 
-		#hrmReport > .description-container .input {
+		.description-container .input {
             width: 30%;
         }
 
-		#hrmReport > .description-container select {
+		.description-container select {
             width: 30%;
         }
 

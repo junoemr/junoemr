@@ -144,7 +144,7 @@ public class EncounterHRMService extends EncounterSectionService
 			}
 
 			int hash = Math.abs(this.getWinName(sectionParams).hashCode());
-			String url = sectionParams.getContextPath() + "/hospitalReportManager/Display.do?id=" + encodeUrlParam(dispDocNo);
+			String url = sectionParams.getContextPath() + "/hospitalReportManager/displayHRMReport.jsp?id=" + encodeUrlParam(dispDocNo);
 
 			String onClickString = "junoEncounter.popupPageAndReload(700,800,'" + hash + "', '" + url +"', '" + SECTION_ID + "');";
 			sectionNote.setOnClick(onClickString);
