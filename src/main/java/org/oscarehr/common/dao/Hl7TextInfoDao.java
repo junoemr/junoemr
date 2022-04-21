@@ -51,14 +51,6 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
 		super(Hl7TextInfo.class);
 	}
 
-	
-	@SuppressWarnings("unchecked")
-	@Deprecated
-	public List<Hl7TextInfo> findAll() {
-		Query query = createQuery("x", null);
-		return query.getResultList();
-	}
-
 	/**
 	 * LabId is also refereed to as Lab_no, and segmentId.
 	 */
@@ -157,28 +149,6 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
 		return  results.get(0).intValue();
 	}
 
-    @SuppressWarnings("unchecked")
-    public List<Hl7TextInfo> findByHealthCardNo(String hin) {
-    	String sql = "select hl7 from Hl7TextInfo hl7 where hl7.healthNumber = :hin";
-    	Query query = entityManager.createQuery(sql);
-    	query.setParameter("hin", hin);
-    	List<Hl7TextInfo> list = query.getResultList();
-    	return list;
-    }
-
-    public List<Hl7TextInfo> searchByAccessionNumber(String acc) {
-
-    	String sqlCommand="select x from Hl7TextInfo x where x.uniqueIdentifier = ?1";
-
-    	Query query = entityManager.createQuery(sqlCommand);
-		query.setParameter(1,acc);
-
-		@SuppressWarnings("unchecked")
-		List<Hl7TextInfo> results = query.getResultList();
-
-		return results;
-    }
-
 	public List<Hl7TextInfo> searchByAccessionNumber(String accession, String labType)
 	{
 		String sqlCommand="select x from Hl7TextInfo x where x.uniqueIdentifier = :accession AND x.hl7TextMessage.type = :type";
@@ -193,12 +163,14 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
 		return results;
 	}
 
-	public Hl7TextInfo findLatestVersionByAccessionNo(String acc) {
-		String sqlCommand="SELECT x FROM Hl7TextInfo x WHERE x.uniqueIdentifier = :accession " +
+	public Hl7TextInfo findLatestVersionByAccessionNo(String acc, String labType)
+	{
+		String sqlCommand="SELECT x FROM Hl7TextInfo x WHERE x.uniqueIdentifier = :accession AND x.hl7TextMessage.type = :type " +
 				"ORDER BY x.obrDate DESC, x.labNumber DESC";
 
 		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter("accession", acc);
+		query.setParameter("type", labType);
 
 		return (getSingleResultOrNull(query));
 	}

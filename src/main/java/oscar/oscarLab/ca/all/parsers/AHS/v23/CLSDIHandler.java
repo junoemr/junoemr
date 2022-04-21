@@ -83,7 +83,7 @@ public class CLSDIHandler extends CLSHandler {
 	public boolean canUpload()
 	{
 		String accessionNumber = this.getUniqueIdentifier();
-		Hl7TextInfo hl7TextInfo = hl7TextInfoDao.findLatestVersionByAccessionNo(accessionNumber);
+		Hl7TextInfo hl7TextInfo = hl7TextInfoDao.findLatestVersionByAccessionNo(accessionNumber, this.getMsgType());
 
 		// if the report exists the new version must be a correction
 		return (hl7TextInfo == null || this.getOrderStatus().equals("C"));

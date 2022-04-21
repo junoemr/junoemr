@@ -119,14 +119,16 @@
 	Hl7TextMessage hl7TextMessage = hl7TxtMsgDao.find(Integer.parseInt(segmentID));
 	Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
 
+	String labType = null;
 	String dateLabReceived = "n/a";
 	if (hl7TextMessage != null)
 	{
 		java.util.Date date = hl7TextMessage.getCreated();
 		String stringFormat = "yyyy-MM-dd HH:mm";
 		dateLabReceived = UtilDateUtilities.DateToString(date, stringFormat);
+		labType = hl7TextMessage.getType();
 
-		if(OLISHL7Handler.OLIS_MESSAGE_TYPE.equals(hl7TextMessage.getType()))
+		if(OLISHL7Handler.OLIS_MESSAGE_TYPE.equals(labType))
 		{
 			%>
 			<jsp:forward page="labDisplayOLIS.jsp" />
@@ -143,7 +145,7 @@
 	String reqID = null, reqTableID = null;
 	String remoteFacilityIdQueryString = "";
 
-	boolean bShortcutForm = OscarProperties.getInstance().getProperty("appt_formview", "").equalsIgnoreCase("on") ? true : false;
+	boolean bShortcutForm = OscarProperties.getInstance().getProperty("appt_formview", "").equalsIgnoreCase("on");
 	String formName = bShortcutForm ? OscarProperties.getInstance().getProperty("appt_formview_name") : "";
 	String formNameShort = formName.length() > 3 ? (formName.substring(0,2)+".") : formName;
 	String formName2 = bShortcutForm ? OscarProperties.getInstance().getProperty("appt_formview_name2", "") : "";
