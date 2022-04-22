@@ -72,6 +72,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service("demographic.service.DemographicService")
@@ -129,6 +130,9 @@ public class DemographicService
 
 	@Autowired
 	private WaitListService waitListService;
+
+	@Autowired
+	private HinValidationService hinValidationService;
 
 	public enum SEARCH_MODE
 	{
@@ -410,6 +414,8 @@ public class DemographicService
 	public Demographic addNewDemographicRecord(String providerNoStr, Demographic demographic,
 	                                    DemographicCust demoCustom, Set<DemographicExt> demographicExtensions)
 	{
+		hinValidationService.validateNoDuplication(demographic.getHin(), demographic.getVer(), demographic.getHcType());
+
 		// save the base demographic object
 		addNewDemographicRecord(providerNoStr, demographic);
 		Integer demographicNo = demographic.getDemographicId();
@@ -517,6 +523,12 @@ public class DemographicService
 	{
 		Demographic oldDemographic = demographicDao.find(updateInput.getId());
 		demographicDao.detach(oldDemographic); // so it won't update when we set new values
+
+		// if hin changes, check duplication before update
+		if(!Objects.equals(oldDemographic.getHin(), updateInput.getHealthNumber()))
+		{
+			hinValidationService.validateNoDuplication(updateInput.getHealthNumber(), updateInput.getHealthNumberVersion(), updateInput.getHealthNumberProvinceCode());
+		}
 
 		archiveDemographicRecord(oldDemographic);
 

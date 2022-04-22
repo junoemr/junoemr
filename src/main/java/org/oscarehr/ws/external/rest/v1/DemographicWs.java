@@ -26,7 +26,6 @@ package org.oscarehr.ws.external.rest.v1;
 import io.swagger.v3.oas.annotations.Operation;
 import org.apache.log4j.Logger;
 import org.oscarehr.demographic.service.DemographicService;
-import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.document.service.DocumentService;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.eform.service.EFormDataService;
@@ -73,9 +72,6 @@ public class DemographicWs extends AbstractExternalRestWs
 	private DemographicService demographicService;
 
 	@Autowired
-	private HinValidationService hinValidationService;
-
-	@Autowired
 	private DocumentService documentService;
 
 	@Autowired
@@ -111,7 +107,6 @@ public class DemographicWs extends AbstractExternalRestWs
 		String providerNo = getOAuthProviderNo();
 		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), demographicNo, Permission.DEMOGRAPHIC_UPDATE);
 
-		hinValidationService.validateNoDuplication(demographicTo.getHin(), demographicTo.getHcVersion(), demographicTo.getHcType());
 		DemographicTransferOutbound demographicTransfer = demographicService.updateDemographicRecord(demographicTo, loggedInInfo);
 
 		LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, loggedInInfo.getIp());
@@ -129,7 +124,6 @@ public class DemographicWs extends AbstractExternalRestWs
 		String ip = getHttpServletRequest().getRemoteAddr();
 
 		securityInfoManager.requireAllPrivilege(providerNo, Permission.DEMOGRAPHIC_CREATE);
-		hinValidationService.validateNoDuplication(demographicTo.getHin(), demographicTo.getHcVersion(), demographicTo.getHcType());
 		DemographicTransferOutbound demographicTransfer = demographicService.addNewDemographicRecord(providerNo, demographicTo);
 
 		// log the action and update the access record
