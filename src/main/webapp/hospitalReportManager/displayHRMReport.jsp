@@ -19,38 +19,84 @@
 
 <%
     SecurityInfoManager securityService = SpringUtils.getBean(SecurityInfoManager.class);
+	HRMDocumentService hrmDocumentService = SpringUtils.getBean(HRMDocumentService.class);
+	HRMDocumentToDemographicDao hrmDocumentToDemographicDao = SpringUtils.getBean(HRMDocumentToDemographicDao.class);
+	HRMDocumentToProviderDao hrmDocumentToProviderDao = SpringUtils.getBean(HRMDocumentToProviderDao.class);
+	HRMDocumentCommentDao hrmDocumentCommentDao = SpringUtils.getBean(HRMDocumentCommentDao.class);
+	HRMProviderConfidentialityStatementDao hrmProviderConfidentialityStatementDao = SpringUtils.getBean(HRMProviderConfidentialityStatementDao.class);
+	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
 
     LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
     String providerNo = loggedInInfo.getLoggedInProviderNo();
+	String documentId = request.getParameter("id");
+	String remoteIp = request.getRemoteAddr();
 
-    HRMDocumentToDemographic demographicLink = (HRMDocumentToDemographic) request.getAttribute("demographicLink");
+	boolean previewMode = request.getParameter("preview") != null && request.getParameter("preview").equals("true");
+
+	if (!securityService.hasPrivileges(providerNo, Permission.HRM_READ))
+	{
+		LogAction.addLogEntry(providerNo, LogConst.ACTION_READ, LogConst.CON_HRM, LogConst.STATUS_FAILURE, documentId, remoteIp);
+		response.sendRedirect("../securityError.jsp?type=HRM_READ");
+		return;
+	}
+
+	if (documentId == null) {
 %>
-
+		<h1>HRM report not found! Please check the report ID.</h1>
 <%
-    if ((demographicLink == null || demographicLink.getDemographicNo() == null)
-        && !securityService.hasPrivileges(providerNo, Permission.HRM_READ))
-    {
-        response.sendRedirect("../securityError.jsp?type=HRM_READ");
-        return;
-    }
-    else if ((demographicLink != null && demographicLink.getDemographicNo() != null)
-            && !securityService.hasPrivileges(providerNo, demographicLink.getDemographicNo(), Permission.HRM_READ))
-    {
-        String demoQueryComponent = URLEncoder.encode("demographic " + demographicLink.getDemographicNo());
-        response.sendRedirect("../securityError.jsp?type=HRM_READ," + demoQueryComponent);
-        return;
-    }
+		return;
+	}
 
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	HrmDocument hrmDocument = hrmDocumentService.getHrmDocument(Integer.parseInt(documentId));
+	if (hrmDocument == null) {
+%>
+	<h1>HRM report not found! Please check the report ID.</h1>
+<%
+		return;
+	}
 
-    HrmDocument hrmDocument = (HrmDocument) request.getAttribute("hrmDocument");
-    HRMReport hrmReport = (HRMReport) request.getAttribute("hrmReport");
-    Integer hrmReportId = (Integer) request.getAttribute("hrmReportId");
+	List<HRMDocumentToDemographic> demoLinks = hrmDocumentToDemographicDao.findByHrmDocumentId(hrmDocument.getId());
+	HRMDocumentToDemographic demographicLink = (demoLinks != null && demoLinks.size() > 0 ? demoLinks.get(0) : null);
 
-    List<HRMDocumentToProvider> providerLinkList = (List<HRMDocumentToProvider>) request.getAttribute("providerLinkList");
+	Integer demoNo = null;
+	if (demographicLink != null)
+	{
+		demoNo = demographicLink.getDemographicNo();
+		if (!securityService.hasPrivileges(providerNo, demoNo))
+		{
+			LogAction.addLogEntry(providerNo, demoNo, LogConst.ACTION_READ, LogConst.CON_HRM, LogConst.STATUS_FAILURE, documentId, remoteIp);
+			// Load both values into type query key
+			String demoQueryComponent = URLEncoder.encode("demographic " + demoNo);
+			response.sendRedirect("../securityError.jsp?type=HRM_READ," + demoQueryComponent);
+			return;
+		}
+	}
 
-    ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
-    DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+
+	HRMReport hrmReport = HRMReportParser.parseReport(hrmDocument.getReportFile().getPath(), hrmDocument.getReportFileSchemaVersion());
+	if (hrmReport == null) {
+		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), demoNo, LogConst.ACTION_READ, LogConst.CON_HRM, LogConst.STATUS_FAILURE, documentId, remoteIp);
+
+%>
+	<h1>HRM report has invalid format, please contact support.</h1>
+<%
+		return;
+	}
+
+	HRMDocumentToProvider linkForThisProvider = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(hrmDocument.getId(), providerNo);
+	if (linkForThisProvider != null && !linkForThisProvider.isViewed())
+	{
+		linkForThisProvider.setViewed(true);
+		hrmDocumentToProviderDao.merge(linkForThisProvider);
+	}
+	LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), demoNo, LogConst.ACTION_READ, LogConst.CON_HRM, LogConst.STATUS_SUCCESS, documentId, remoteIp);
+
+	List<HRMDocumentToProvider> providerLinkList = hrmDocumentToProviderDao.findByHrmDocumentIdNoSystemUser(hrmDocument.getId());
+	List<HRMDocumentComment> documentComments = hrmDocumentCommentDao.getCommentsForDocument(Integer.parseInt(documentId));
+
+	String confidentialityStatement = hrmProviderConfidentialityStatementDao.getConfidentialityStatementForProvider(loggedInInfo.getLoggedInProviderNo());
+	Integer duplicateCount = hrmDocument.getMatchingData().getNumDuplicatesReceived();
 
     // These are all elements which will be flagged with an attention class if they are missing
     String lastName = hrmReport.getLegalLastName();
@@ -79,14 +125,13 @@
     String deliverToId = hrmReport.getDeliverToUserId();
 
     String sendingFacilityId = hrmReport.getSendingFacilityId();
+	String facilityName = hrmDocument.getSendingFacility();
     String reportNumber = hrmReport.getSendingFacilityReportNo();
 
     LocalDateTime reportTime = findReportTime(hrmReport);
 
     // I think author is an optional field
     String author = hrmReport.getAuthorPhysician();
-
-    String facilityName = (String) request.getAttribute("facilityName");
 %>
 
 <%@page import="java.util.List, org.oscarehr.util.SpringUtils, org.oscarehr.PMmodule.dao.ProviderDao, java.util.Date" %>
@@ -99,7 +144,6 @@
 <%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocumentComment" %>
 <%@ page import="org.oscarehr.hospitalReportManager.HRMReport" %>
 <%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider" %>
-<%@ page import="org.oscarehr.hospitalReportManager.HRMDisplayReportAction" %>
 <%@ page import="org.oscarehr.managers.SecurityInfoManager" %>
 <%@ page import="org.oscarehr.security.model.Permission" %>
 <%@ page import="java.net.URLEncoder" %>
@@ -107,6 +151,16 @@
 <%@ page import="org.oscarehr.hospitalReportManager.service.HRMCategoryService" %>
 <%@ page import="org.oscarehr.dataMigration.model.hrm.HrmCategoryModel" %>
 <%@ page import="java.time.LocalDateTime" %>
+<%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocument" %>
+<%@ page import="org.oscarehr.hospitalReportManager.service.HRMDocumentService" %>
+<%@ page import="oscar.log.LogAction" %>
+<%@ page import="oscar.log.LogConst" %>
+<%@ page import="org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao" %>
+<%@ page import="org.oscarehr.hospitalReportManager.HRMReportParser" %>
+<%@ page import="org.oscarehr.hospitalReportManager.dao.HRMDocumentCommentDao" %>
+<%@ page import="org.oscarehr.hospitalReportManager.model.HRMProviderConfidentialityStatement" %>
+<%@ page import="org.oscarehr.hospitalReportManager.dao.HRMProviderConfidentialityStatementDao" %>
+<%@ page import="org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%!
@@ -321,12 +375,13 @@
     <link rel="stylesheet" href="../js/jquery_css/smoothness/jquery-ui-1.7.3.custom.css" type="text/css" />
 
     <style type="text/css">
-		body {
+		#hrmReport {
 			font-family: "Helvetica", "Arial", sans-serif;
 			font-size: 10px;
+			background-color: #FFFFFF;
 		}
 
-		input, select {
+		#hrmReport input[type="text"], select {
 			appearance: none;
 			border: 1px solid #70778C;
 			border-radius: 2px;
@@ -334,6 +389,7 @@
 			box-sizing: border-box;
 			height: 24px;
 			font-size: 12px;
+			font: unset;
 			background: #FFFFFF;
 			padding-left: 6px;
 			margin-right: 4px;
@@ -362,7 +418,7 @@
 			cursor: not-allowed;
 		}
 
-        #hrmReportContent {
+		#hrmReportContent {
             position: relative;
             padding: 24px;
             margin: 24px auto;
@@ -388,7 +444,7 @@
 			text-align: left;
 		}
 
-        .infoBox {
+		.infoBox {
             overflow: hidden;
 			border-width: 1px;
             padding: 16px;
@@ -398,13 +454,13 @@
 			color: #45474D;
         }
 
-        .infoBox table {
+		.infoBox table {
             margin: 8px 0;
 			font-size: 10px;
 			font-style: normal;
         }
 
-        .infoBox th {
+		.infoBox th {
             text-align: left;
 			color: #45474D;
 			font-weight: bold;
@@ -414,10 +470,19 @@
 			padding: 2px 0;
 		}
 
-		.infoBox .header {
+		.infoBox .hrm-info-header {
 			width: 72px;
 			color: #737780;
 			font-weight: normal;
+		}
+
+		.infoBox a {
+			margin-left: 4px;
+		}
+
+		.infoBox input {
+			box-sizing: border-box;
+			margin-right: 2px;
 		}
 
 		.infoBox hr {
@@ -426,7 +491,7 @@
 			height: 0;
 		}
 
-		.add-comments {
+		#hrmReport .add-comments {
 			margin: 8px;
 		}
 
@@ -445,8 +510,9 @@
 			margin-top: 16px;
 		}
 
-		.comments-list > .header {
+		.comments-list > .hrm-info-header {
 			margin-bottom: 8px;
+			background: unset;
 		}
 
 		.comment {
@@ -469,11 +535,11 @@
 			margin-bottom: 4px;
 		}
 
-        #hrmHeader {
+		#hrmHeader {
             display: none;
         }
 
-        #hrmNotice {
+		#hrmNotice {
             border-bottom: 1px solid #D0D5E3;
             padding-bottom: 16px;
             font-style: normal;
@@ -481,13 +547,13 @@
 			font-weight: 700;
         }
 
-        .attention {
-            background-color: #FFEA17;
-            color: #EB0000;
+		.attention {
+            background-color: #fff7cc;
+            color: #cc2929;
             font-weight: bold;
         }
 
-        .hrm-content {
+		.hrm-content {
             width: 70%;
             float: left;
             white-space: pre-wrap;
@@ -496,18 +562,22 @@
             overflow-x: scroll;
         }
 
-        .description-container .label {
+		.description-container .label {
             width: 30%;
             display: inline-block;
         }
 
-        .description-container .input {
+		.description-container .input {
             width: 30%;
         }
 
-        .description-container select {
+		.description-container select {
             width: 30%;
         }
+
+		.hide-on-preview {
+			display: none;
+		}
 
         @media print {
             .hide-on-print {
@@ -689,6 +759,13 @@
 
 		function setDescription(reportId) {
 			var comment = jQuery("#descriptionField_" + reportId + "_hrm").val();
+
+			if (!comment.trim())
+			{
+				alert("Description cannot be empty");
+				return;
+			}
+
 			jQuery.ajax({
 				type: "POST",
 				url: "<%=request.getContextPath() %>/hospitalReportManager/Modify.do",
@@ -714,12 +791,7 @@
 		}
     </script>
 </head>
-<body>
-
-<% if (hrmReport==null) { %>
-<h1>HRM report not found! Please check the file location.</h1>
-<%  return; } %>
-
+<body id="hrmReport">
 <%
     String btnDisabled = "disabled";
     String demographicNo = "";
@@ -735,18 +807,16 @@
         <b>DOB: </b><span class="<%=getFieldClass(dateOfBirth)%>"><%=getFieldDisplayValue(dateOfBirth)%></span><br>
         <b>HCN: </b><span class="<%=getFieldClass(HCN)%>"><%=getFieldDisplayValue(HCN)%></span> <span class="<%=getFieldClass(HCNVersion)%>"><%=getFieldDisplayValue(HCNVersion)%></span><br/>
     </div>
-    <div id="hrmNotice">
+    <div id="hrmNotice" class="<%= previewMode ? "hide-on-preview" : ""%>">
         This report was received from the Hospital Report Manager (HRM) at <%= ConversionUtils.toDateTimeString(hrmDocument.getReceivedDateTime()) %>.
 
 	Message Unique ID: <%=hrmReport.getMessageUniqueId()%>
-	<% if (request.getAttribute("hrmDuplicateNum") != null && ((Integer) request.getAttribute("hrmDuplicateNum")) > 0) { %>Juno has received <%=request.getAttribute("hrmDuplicateNum") %> duplicates of this report.<% } %>
+	<% if (duplicateCount != null && duplicateCount > 0) { %>Juno has received <%=duplicateCount%> duplicates of this report.<% } %>
     </div>
     <div class="hrm-container">
         <%-- Document content --%>
         <div class="hrm-content">
             <% if(hrmReport.isBinary()) {
-
-                Integer documentId = hrmDocument.getId();
                 List<String> imageFormats = Arrays.asList(".gif", ".jpg", ".jpeg", ".png", ".jpeg");    // *.tiff is not supported on modern browsers
 
                 if (hrmReport.getFileExtension() != null && imageFormats.contains(hrmReport.getFileExtension())) {
@@ -763,11 +833,10 @@
             <div class="<%=getFieldClass(hrmReport.getTextContent())%>"><%=ConversionUtils.hasContent(hrmReport.getTextContent()) ? hrmReport.getTextContent() : "NO CONTENT"%></div>
             <% } %>
             <%
-                String confidentialityStatement = (String) request.getAttribute("confidentialityStatement");
                 if (confidentialityStatement != null && confidentialityStatement.trim().length() > 0) {
             %>
             <hr/>
-            <em><strong>Provider Confidentiality Statement</strong><br /><%--<%=confidentialityStatement %>--%> CONFIDENTIALITY STATEMENT</em>
+            <em><strong>Provider Confidentiality Statement</strong><br /><<%=confidentialityStatement%></em>
             <% } %>
         </div>
         <%-- Right side infobox --%>
@@ -778,21 +847,21 @@
                 </tr>
                 <tr></tr>
                 <tr>
-                    <td class="header">Date:</td>
+                    <td class="hrm-info-header">Date:</td>
                     <td><span class="<%=getFieldDisplayClass(reportTime)%>"><%=getFieldDisplayValue(reportTime)%></span></td>
                 </tr>
                 <%if (author != null) {%>
                 <tr>
-                    <td class="header">Author:</td>
+                    <td class="hrm-info-header">Author:</td>
                     <td><%=author%></td>
                 </tr>
                 <% } %>
                 <tr>
-                    <td class="header">Facility:</td>
+                    <td class="hrm-info-header">Facility:</td>
                     <td><span class="<%=getFieldClass(facilityName)%>"><%=getFieldDisplayValue(facilityName)%></span> <span class="<%=getFieldClass(sendingFacilityId)%>">(<%=getFieldDisplayValue(sendingFacilityId)%>)</span></td>
                 </tr>
                 <tr>
-                    <td class="header">Status:</td>
+                    <td class="hrm-info-header">Status:</td>
                     <% if (hrmDocument.getReportStatus().equals(HrmDocument.ReportStatus.SIGNED)) { %>
                     <td>Signed by author</td>
                     <% } else if (hrmDocument.getReportStatus().equals(HrmDocument.ReportStatus.CANCELLED)) { %>
@@ -802,7 +871,7 @@
                     <% } %>
                 </tr>
                 <tr>
-                    <td class="header">Category:</td>
+                    <td class="hrm-info-header">Category:</td>
                     <td><%= hrmDocument.getCategory() != null ? hrmDocument.getCategory().getName() : "Unmatched to category" %></td>
                 </tr>
             </table>
@@ -812,19 +881,19 @@
                     <th colspan="2">Embedded HRM Patient Record</th>
                 </tr>
                 <tr>
-                    <td class="header" style="min-width: 64px">Name:</td>
+                    <td class="hrm-info-header" style="min-width: 64px">Name:</td>
                     <td><span class="<%=getFieldClass(lastName)%>"><%=getFieldDisplayValue(lastName)%></span>, <span class="<%=getFieldClass(firstName)%>"><%=getFieldDisplayValue(firstName)%></span> <span class="<%=getFieldClass(gender)%>">(<%=getFieldDisplayValue(gender)%>)</span></td>
                 </tr>
                 <tr>
-                    <td class="header">HCN:</td>
+                    <td class="hrm-info-header">HCN:</td>
                     <td><span class="<%=getFieldClass(HCN)%>"><%=getFieldDisplayValue(HCN)%></span> <span class="<%=getFieldClass(HCNVersion)%>"><%=getFieldDisplayValue(HCNVersion)%></span> <span class="<%=getFieldClass(HCNProvince)%>"><%=getFieldDisplayValue(HCNProvince)%></span></td>
                 </tr>
                 <tr>
-                    <td class="header">DOB:</td>
+                    <td class="hrm-info-header">DOB:</td>
                     <td><span class="<%=getFieldClass(dateOfBirth)%>"><%=getFieldDisplayValue(dateOfBirth)%></span></td>
                 </tr>
                 <tr>
-                    <td class="header">Address:</td>
+                    <td class="hrm-info-header">Address:</td>
                     <td><span class="<%=getFieldClass(address1)%>"><%=getFieldDisplayValue(address1)%></span></td>
                 </tr>
                 <% if (ConversionUtils.hasContent(address2)) { %>
@@ -846,7 +915,7 @@
                     Demographic demographic = demographicDao.find(demographicLink.getDemographicNo());
                 %>
                 <tr>
-                    <td><%=demographic.getFormattedName()%> (<%=demographic.getSex()%>) <a href="#" onclick="removeDemoFromHrm('<%=hrmReportId %>')">(remove)</a></td>
+                    <td><%=demographic.getFormattedName()%> (<%=demographic.getSex()%>) <a class="<%= previewMode ? "hide-on-preview" : ""%>" href="#" onclick="removeDemoFromHrm('<%=hrmDocument.getId()%>')">(remove)</a></td>
                 </tr>
                 <tr>
                     <td><%=demographic.getHin()%> <%=demographic.getVer()%> <%=demographic.getHcType()%></td>
@@ -858,16 +927,16 @@
                 <tr>
                     <td><i class="attention">Not currently linked</i></td>
                 </tr>
-                <tr>
+                <tr class="<%= previewMode ? "hide-on-preview" : ""%>">
                     <td>Search Demographics by Name</td>
                 </tr>
-                <tr>
+                <tr class="<%= previewMode ? "hide-on-preview" : ""%>">
                     <td>
                         <input type="hidden" id="demographic-no" name="demographicNo">
                         <input type="text" autocomplete="off" id="demographic-search"<%--onchange="checkSave('<%=hrmReportId%>hrm')"--%>>
                     </td>
                     <td>
-                        <a href="#" onclick="addDemoToHrm('<%=hrmReportId %>')">(link)</a>
+                        <a href="#" onclick="addDemoToHrm('<%=hrmDocument.getId()%>')">(link)</a>
                     </td>
                 </tr>
                 <% } %>
@@ -883,11 +952,11 @@
                 </tr>
                 <% } else { %>
                 <tr>
-                    <td class="header">Name:</td>
+                    <td class="hrm-info-header">Name:</td>
                     <td><span class="<%=getFieldClass(deliverToLastName)%>"><%=getFieldDisplayValue(deliverToLastName)%></span>, <span class="<%=getFieldClass(deliverToFirstName)%>"><%=getFieldDisplayValue(deliverToFirstName)%></span></td>
                 </tr>
                 <tr>
-                    <td class="header"><%=deliverToId.startsWith("N") ? "CNO:" : "CPSID:"%></td>
+                    <td class="hrm-info-header"><%=deliverToId.startsWith("N") ? "CNO:" : "CPSID:"%></td>
                     <td><span class="<%=getFieldClass(deliverToId)%>"><%=getFieldDisplayValue(deliverToId)%></span></td>
                 </tr>
                 <% } %>
@@ -907,27 +976,27 @@
                 <tr>
                     <td><%=providerName%></td>
                     <td><%= providerLink.isSignedOff() ? "(Signed-off " + providerLink.getSignedOffTimestamp() + ")" : "" %></td>
-                    <td><a href="#" onclick="removeProvFromHrm('<%=providerLink.getId() %>', '<%=hrmReportId %>')">(remove)</a></td>
+                    <td class="<%= previewMode ? "hide-on-preview" : ""%>"><a href="#" onclick="removeProvFromHrm('<%=providerLink.getId() %>', '<%=hrmDocument.getId()%>')">(remove)</a></td>
                 </tr>
                 <% } %>
                 <% } %>
             </table>
-            <table>
+            <table class="<%= previewMode ? "hide-on-preview" : ""%>">
                 <tr><th>Search Providers by Name</th></tr>
                 <tr>
                     <td>
-                        <div id="providerList<%=hrmReportId %>hrm"></div>
+                        <div id="providerList<%=hrmDocument.getId()%>hrm"></div>
                         <input type="hidden" name="providerNo" id="provider-no"/>
                         <input type="text" style="width: 100%" id="provider-search" autocomplete="off" name="providerKeyword"/>
                     </td>
-                    <td><a href="#" onclick="addProvToHrm(<%=hrmReportId%>, $('#provider-no').val())">(assign)</a></td>
+                    <td><a href="#" onclick="addProvToHrm(<%=hrmDocument.getId()%>, $('#provider-no').val())">(assign)</a></td>
                 </tr>
             </table>
             <hr>
             <table>
                 <tr><th colspan="2">Embedded Report Information</th></tr>
                 <tr>
-                    <td class="header">Report Class:</td>
+                    <td class="hrm-info-header">Report Class:</td>
                     <td><%=hrmReport.getClassName()%></td>
                 </tr>
                 <% if (hrmReport.getClassName().equals(HrmDocument.ReportClass.DIAGNOSTIC_IMAGING.getValue()) ||
@@ -936,7 +1005,7 @@
                         List<HrmObservation> hrmObservations = hrmReport.getObservations();
                     %>
                     <tr>
-                        <td class="header" colspan="2">Accompanying SubClasses:</td>
+                        <td class="hrm-info-header" colspan="2">Accompanying SubClasses:</td>
                     </tr>
                     <% for (HrmObservation observation: hrmObservations) { %>
                         <%
@@ -964,34 +1033,33 @@
                         }
                 %>
                     <tr>
-                        <td class="header">Subclass:</td>
+                        <td class="hrm-info-header">Subclass:</td>
                         <td><%=subClassDisplay%></td>
                     </tr>
                     <% } %>
                 <% } %>
                 <tr>
-                    <td class="header">Report No:</td>
+                    <td class="hrm-info-header">Report No:</td>
                     <td><span class="<%=getFieldClass(reportNumber)%>"><%=getFieldDisplayValue(reportNumber)%></span></td>
                 </tr>
             </table>
-            <table>
+            <table class="<%= previewMode ? "hide-on-preview" : ""%>">
                 <tr>
                     <td>
-                        <input type="button" class="input-button" style="display: none" value="Save" id="save<%=hrmReportId %>hrm" />
+                        <input type="button" class="input-button" style="display: none" value="Save" id="save<%=documentId%>hrm" />
                     </td>
                     <td>
                         <input type="button" class="input-button" value="Print" onClick="window.print()" />
                     </td>
                     <td>
                         <%
-                            HRMDocumentToProvider hrmDocumentToProvider = HRMDisplayReportAction.getHRMDocumentFromProvider(loggedInInfo.getLoggedInProviderNo(), hrmReportId);
-                            if (hrmDocumentToProvider != null && hrmDocumentToProvider.isSignedOff()) {
+                            if (linkForThisProvider != null && linkForThisProvider.isSignedOff()) {
                         %>
-                        <input type="button" class="input-button danger" id="signoff<%=hrmReportId %>" value="Revoke Sign-Off" onClick="revokeSignOffHrm('<%=hrmReportId %>')"/>
+                        <input type="button" class="input-button danger" id="signoff<%=documentId%>" value="Revoke Sign-Off" onClick="revokeSignOffHrm('<%=documentId%>')"/>
                         <%
                         } else {
                         %>
-                        <input type="button" class="input-button" id="signoff<%=hrmReportId %>" value="Sign-Off" onClick="signOffHrm('<%=hrmReportId %>')"/>
+                        <input type="button" class="input-button" id="signoff<%=documentId%>" value="Sign-Off" onClick="signOffHrm('<%=documentId%>')"/>
                         <%
                             }
                         %>
@@ -1000,11 +1068,11 @@
             </table>
         </div>
     </div>
-    <div class="container hrm-action-container hide-on-print">
+    <div class="container hrm-action-container hide-on-print <%= previewMode ? "hide-on-preview" : ""%>">
         <div style="padding: 8px 8px 4px 8px">
 			<div class="label">Change Report Description:</div>
-            <input class="input" type="text" id="descriptionField_<%=hrmReportId %>_hrm" value="<%=StringEscapeUtils.escapeHtml(hrmDocument.getDescription())%>"/>
-			<input class="input-button" type="button" onClick="setDescription('<%=hrmReportId %>')" value="Save"/><span id="descriptionstatus<%=hrmReportId %>"></span>
+            <input class="input" type="text" id="descriptionField_<%=hrmDocument.getId()%>_hrm" value="<%=StringEscapeUtils.escapeHtml(hrmDocument.getDescription())%>"/>
+			<input class="input-button" type="button" onClick="setDescription('<%=hrmDocument.getId()%>')" value="Save"/><span id="descriptionstatus<%=hrmDocument.getId()%>"></span>
         </div>
 		<div style="padding: 0 8px 8px 8px">
 			<div class="label">Change Report Category:</div>
@@ -1025,26 +1093,25 @@
                 <option value="<%=category.getId()%>" <%= isSelected ? "selected" : ""%>><%=category.getName()%></option>
                 <% } %>
             </select>
-            <input class="input-button" type="button" onClick="reclassifyReport('<%=hrmReportId%>')" value="This Report"/>
-            <input class="input-button" id="recategorize-future" type="button" onClick="reclassifyFutureReports('<%=hrmReportId%>')" value="Future Reports"/>
+            <input class="input-button" type="button" onClick="reclassifyReport('<%=hrmDocument.getId()%>')" value="This Report"/>
+            <input class="input-button" id="recategorize-future" type="button" onClick="reclassifyFutureReports('<%=hrmDocument.getId()%>')" value="Future Reports"/>
         </div>
     </div>
-    <div class="container hrm-action-container hide-on-print">
+    <div class="container hrm-action-container hide-on-print <%= previewMode ? "hide-on-preview" : ""%>">
         <div class="add-comments">
             <div class="label">Add a comment to this report:</div>
-            <textarea rows="10" cols="50" id="commentField_<%=hrmReportId %>_hrm"></textarea>
-            <input class="input-button" type="button" onClick="addComment('<%=hrmReportId %>')" value="Add Comment" /><span id="commentstatus<%=hrmReportId %>"></span>
+            <textarea rows="10" cols="50" id="commentField_<%=hrmDocument.getId()%>_hrm"></textarea>
+            <input class="input-button" type="button" onClick="addComment('<%=hrmDocument.getId()%>')" value="Add Comment" /><span id="commentstatus<%=hrmDocument.getId()%>"></span>
 		<div class="comments-list">
 			<%
-				List<HRMDocumentComment> documentComments = (List<HRMDocumentComment>) request.getAttribute("hrmDocumentComments");
 				if (documentComments != null) {
 			%>
-			<div class="header">Displaying <%=documentComments.size() %> comment<%=documentComments.size() != 1 ? "s:" : ":" %></div>
+			<div class="hrm-info-header">Displaying <%=documentComments.size() %> comment<%=documentComments.size() != 1 ? "s:" : ":" %></div>
 			<% for (HRMDocumentComment comment : documentComments) { %>
 			<div class="comment">
 				<span class="author"><%=providerDao.getProviderName(comment.getProvider().getId()) %> on <%=comment.getCommentTime().toString() %> wrote...</span>
 				<span class="message"><%=comment.getComment()%></span>
-				<a class="delete-message" href="#" onClick="deleteComment('<%=comment.getId() %>', '<%=hrmReportId %>'); return false;">(delete comment)</a>
+				<a class="delete-message" href="#" onClick="deleteComment('<%=comment.getId() %>', '<%=hrmDocument.getId()%>'); return false;">(delete comment)</a>
 			</div>
 			<% } %>
 			<% } %>

@@ -258,6 +258,8 @@ public class DmsInboxManageAction extends DispatchAction {
 				request.setAttribute("normalCount", cData.getNormalCount());
 				request.setAttribute("totalNumDocs", cData.getTotalNumDocs());
 				request.setAttribute("categoryHash", cData.getCategoryHash());
+				request.setAttribute("totalHRM", cData.getTotalHRM());
+				request.setAttribute("unmatchedHRM", cData.getUnmatchedHRM());
 			}
 			request.setAttribute("patientFirstName", patientFirstName);
 			request.setAttribute("patientLastName", patientLastName);

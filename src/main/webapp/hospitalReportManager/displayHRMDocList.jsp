@@ -154,7 +154,7 @@ function updateAjax() {
 					<tr bgcolor="<%=((i % 2) == 1)?"#F2F2F2":"white"%>">
 						
 						<td><a href="#"
-							ONCLICK="popupPage('<%=request.getContextPath() %>/hospitalReportManager/Display.do?id=<%=curhrmdoc.get("id")%>&duplicateLabIds=<%=curhrmdoc.get("duplicateLabIds")%>', 'HRM Report'); return false;"
+							ONCLICK="popupPage('<%=request.getContextPath() %>/hospitalReportManager/displayHRMReport.jsp?id=<%=curhrmdoc.get("id")%>', 'HRM Report'); return false;"
 							TITLE="<bean:message key="hrm.displayHRMDocList."/>"><%=curhrmdoc.get("report_type")%></a></td>
 						<td><%=curhrmdoc.get("description")%></td>
 						<td><%=curhrmdoc.get("report_status")%></td>

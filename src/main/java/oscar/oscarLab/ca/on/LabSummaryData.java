@@ -26,76 +26,21 @@
 package oscar.oscarLab.ca.on;
 
 import java.util.HashMap;
-import oscar.oscarMDS.data.PatientInfo;	
+import lombok.Data;
+import oscar.oscarMDS.data.PatientInfo;
 
+@Data
 public class LabSummaryData {
 	
 	private int demographicNo;
 	private int documentCount;
 	private int labCount;
+	private int hrmCount;
 	private int unmatchedDocumentCount;
 	private int unmatchedLabCount;
+	private int unmatchedHrmCount;
 	private int abnormalCount;
 	private int totalCount;
 
 	private HashMap<Integer,PatientInfo> patients;
-	
-	public LabSummaryData() {
-	}
-	
-	public void setPatients(HashMap<Integer,PatientInfo> value) {
-		this.patients = value;
-	}
-	
-	public HashMap<Integer, PatientInfo> getPatients() {
-		return this.patients;
-	}
-	
-	public void setDocumentCount(int value) {
-		this.documentCount = value;
-	}
-	
-	public int getDocumentCount() {
-		return this.documentCount;
-	}
-	
-	public void setLabCount(int value) {
-		this.labCount = value;
-	}
-	
-	public int getLabCount() {
-		return this.labCount;
-	}
-	
-	public void setUnmatchedDocumentCount(int value) {
-		this.unmatchedDocumentCount = value;
-	}
-	
-	public int getUnmatchedDocumentCount() {
-		return this.unmatchedDocumentCount;
-	}
-	
-	public void setUnmatchedLabCount(int value) {
-		this.unmatchedLabCount = value;
-	}
-	
-	public int getUnmatchedLabCount() {
-		return this.unmatchedLabCount;
-	}
-	
-	public void setAbnormalCount(int value) {
-		this.abnormalCount = value;
-	}
-	
-	public int getAbnormalCount() {
-		return this.abnormalCount;
-	}
-
-	public void setTotalCount(int value) {
-		this.totalCount = value;
-	}
-	
-	public int getTotalCount() {
-		return this.totalCount;
-	}
 }

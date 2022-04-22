@@ -72,7 +72,6 @@ public abstract class AbstractCDSReportImportMapper<E> extends AbstractCDSImport
 			if(format.equals(ReportFormat.BINARY)) //Document file
 			{
 				String filePath = importStructure.getFilePath();
-
 				if(filePath != null) // external document
 				{
 					filePath = filePath.replace('\\','/');

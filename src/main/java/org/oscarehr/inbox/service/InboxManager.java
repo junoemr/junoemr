@@ -52,6 +52,7 @@ public class InboxManager
 
 	public static final String INBOX_TYPE_HL7 = "HL7";
 	public static final String INBOX_TYPE_DOCUMENT = "DOC";
+	public static final String INBOX_TYPE_HRM = "HRM";
 
 	public static final String STATUS_NEW = "N";
 
@@ -60,6 +61,7 @@ public class InboxManager
 	public static final String ABNORMAL = "abnormal";
 	public static final String LABS = "labs";
 	public static final String DOCUMENTS = "documents";
+	public static final String HRM = "hrm";
 
 	@Autowired
 	private InboxResultsDao inboxResultsDao;
@@ -128,6 +130,11 @@ public class InboxManager
 		{
 			labType = INBOX_TYPE_DOCUMENT;
 		}
+		else if (HRM.equals(view))
+		{
+			labType = INBOX_TYPE_HRM;
+		}
+
 
 		ArrayList<LabResultData> labdocs = inboxResultsDao.getInboxResults(
 				loggedInInfo,
@@ -272,5 +279,3 @@ public class InboxManager
 		}
 	}
 }
-
-
