@@ -82,10 +82,8 @@ public class DemographicModelToExternalApiTransferConverter
 		transfer.setPrimaryPhone(Optional.ofNullable(model.getHomePhone()).map(PhoneNumberModel::getNumber).orElse(null));
 		transfer.setSecondaryPhone(Optional.ofNullable(model.getWorkPhone()).map(PhoneNumberModel::getNumber).orElse(null));
 		transfer.setCellPhone(Optional.ofNullable(model.getCellPhone()).map(PhoneNumberModel::getNumber).orElse(null));
-
-		//todo not in model
-		transfer.setPreviousAddress(null);
-		transfer.setPcnIndicator(null);
+		transfer.setPreviousAddress(model.getPreviousAddress());
+		transfer.setPcnIndicator(model.getPcnIndicator());
 
 		// roster info
 		RosterData rosterData = model.getCurrentRosterData();
@@ -115,17 +113,15 @@ public class DemographicModelToExternalApiTransferConverter
 
 		transfer.setChartNo(model.getChartNumber());
 		transfer.setAlias(model.getAlias());
-
-		// todo not in model
-		transfer.setChildren(null);
-		transfer.setSourceOfIncome(null);
+		transfer.setChildren(model.getChildren());
+		transfer.setSourceOfIncome(model.getSourceOfIncome());
 
 		transfer.setCitizenship(model.getCitizenship());
 		transfer.setCountryOfOrigin(model.getCountryOfOrigin());
 		transfer.setSpokenLanguage(model.getSpokenLanguage());
 		transfer.setOfficialLanguage(model.getOfficialLanguage().getValue());
 		transfer.setNewsletter(model.getNewsletter());
-		transfer.setAnonymous(null);
+		transfer.setAnonymous(model.getAnonymous());
 		transfer.setNotes(model.getPatientNote());
 		transfer.setAlert(model.getPatientAlert());
 

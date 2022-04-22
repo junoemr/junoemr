@@ -36,6 +36,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_FEE_SERVICE;
+import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_NOT_ROSTERED;
+import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_ROSTERED;
+import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_TERMINATED;
+
 @Data
 @XmlRootElement
 @Schema(description = "Demographic record data transfer object")
@@ -55,12 +60,12 @@ public class DemographicTransferBasic implements Serializable
 	@Size(max=10)
 	@Schema(description = "patient title (Mr, Mrs, Dr, etc.)",
 			allowableValues = {"MISS", "MRS", "MS", "MR", "MSSR", "DR", "PROF", "REEVE", "REV", "RT_HON", "SEN", "SGT", "SR"})
-	@StringValueConstraint(allows = {"MISS", "MRS", "MS", "MR", "MSSR", "DR", "PROF", "REEVE", "REV", "RT_HON", "SEN", "SGT", "SR"}, caseInsensitive = true)
+	@StringValueConstraint(allows = {"MISS", "MRS", "MS", "MR", "MSSR", "DR", "PROF", "REEVE", "REV", "RT_HON", "SEN", "SGT", "SR"}, caseSensitive = false)
 	private String title;
 	@NotNull
 	@Size(min=1,max=1)
 	@Schema(description = "patient gender", allowableValues = {"M", "F", "T", "O", "U"})
-	@StringValueConstraint(allows = {"M","F","T","O","U"})
+	@StringValueConstraint(allows = {"M","F","T","O","U"}, caseSensitive = false)
 	private String sex;
 	@Size(max=12)
 	@Schema(description = "patient health insurance number")
@@ -127,7 +132,18 @@ public class DemographicTransferBasic implements Serializable
 
 	// roster info
 	@Size(max=20)
-	@Schema(description = "patient roster status")
+	@StringValueConstraint(allows = {
+			ROSTER_STATUS_FEE_SERVICE,
+			ROSTER_STATUS_ROSTERED,
+			ROSTER_STATUS_NOT_ROSTERED,
+			ROSTER_STATUS_TERMINATED
+	})
+	@Schema(description = "patient roster status code", allowableValues = {
+			ROSTER_STATUS_FEE_SERVICE,
+			ROSTER_STATUS_ROSTERED,
+			ROSTER_STATUS_NOT_ROSTERED,
+			ROSTER_STATUS_TERMINATED
+	})
 	private String rosterStatus;
 	@Size(max=2)
 	@Schema(description = "roster termination 2 digit code")
@@ -186,7 +202,7 @@ public class DemographicTransferBasic implements Serializable
 	@Size(max=60)
 	private String spokenLanguage;
 	@Size(max=60)
-	@StringValueConstraint(allows = {"English", "French", "Other"}, caseInsensitive = true)
+	@StringValueConstraint(allows = {"English", "French", "Other"}, caseSensitive = false)
 	@Schema(description = "official language", allowableValues = {"English", "French", "Other"})
 	private String officialLanguage;
 	@Size(max=32)

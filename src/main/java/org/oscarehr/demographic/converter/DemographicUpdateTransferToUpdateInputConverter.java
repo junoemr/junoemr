@@ -60,7 +60,7 @@ public class DemographicUpdateTransferToUpdateInputConverter
 		input.setLastName(transfer.getLastName());
 		input.setFirstName(transfer.getFirstName());
 		input.setTitle(Person.TITLE.fromStringIgnoreCase(transfer.getTitle()));
-		input.setSex(Person.SEX.fromStringIgnoreCase(transfer.getSex()));
+		input.setSex(Person.SEX.getIgnoreCase(transfer.getSex()));
 		input.setHealthNumber(transfer.getHin());
 		input.setSin(transfer.getSin());
 		input.setHealthNumberProvinceCode(transfer.getHcType());
@@ -93,6 +93,8 @@ public class DemographicUpdateTransferToUpdateInputConverter
 		input.setHomePhone(PhoneNumberModel.of(transfer.getPrimaryPhone()));
 		input.setWorkPhone(PhoneNumberModel.of(transfer.getSecondaryPhone()));
 		input.setCellPhone(PhoneNumberModel.of(transfer.getCellPhone()));
+		input.setPreviousAddress(transfer.getPreviousAddress());
+		input.setPcnIndicator(transfer.getPcnIndicator());
 
 		// roster info
 		if(!StringUtils.isAnyBlank(transfer.getRosterStatus(), transfer.getRosterTerminationReason())
@@ -102,6 +104,7 @@ public class DemographicUpdateTransferToUpdateInputConverter
 			RosterData rosterData = new RosterData();
 			rosterData.setStatusCode(transfer.getRosterStatus());
 			rosterData.setRosterDateTime(Optional.ofNullable(transfer.getRosterDate()).map(LocalDate::atStartOfDay).orElse(null));
+			rosterData.setTerminationDateTime(Optional.ofNullable(transfer.getRosterTerminationDate()).map(LocalDate::atStartOfDay).orElse(null));
 			if(transfer.getRosterTerminationReason() != null)
 			{
 				rosterData.setTerminationReason(DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(Integer.parseInt(transfer.getRosterTerminationReason())));
@@ -150,15 +153,15 @@ public class DemographicUpdateTransferToUpdateInputConverter
 		input.setChartNumber(transfer.getChartNo());
 		input.setAlias(transfer.getAlias());
 
-//		input.setChildren(null);
-//		input.setSourceOfIncome(null);
+		input.setChildren(transfer.getChildren());
+		input.setSourceOfIncome(transfer.getSourceOfIncome());
 
 		input.setCitizenship(transfer.getCitizenship());
 		input.setCountryOfOrigin(transfer.getCountryOfOrigin());
 		input.setSpokenLanguage(transfer.getSpokenLanguage());
 		input.setOfficialLanguage(DemographicModel.OFFICIAL_LANGUAGE.fromValueString(transfer.getOfficialLanguage()));
 		input.setNewsletter(transfer.getNewsletter());
-//		input.setAnonymous(null);
+		input.setAnonymous(transfer.getAnonymous());
 		input.setPatientNote(transfer.getNotes());
 		input.setPatientAlert(transfer.getAlert());
 

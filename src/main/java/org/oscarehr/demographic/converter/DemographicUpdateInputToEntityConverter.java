@@ -94,6 +94,7 @@ public class DemographicUpdateInputToEntityConverter
 		dbDemographic.setOfficialLanguage(Optional.ofNullable(input.getOfficialLanguage())
 				.map(DemographicModel.OFFICIAL_LANGUAGE::getValue).orElse(null));
 		dbDemographic.updateElectronicMessagingConsentStatus(input.getElectronicMessagingConsentStatus());
+		dbDemographic.setVeteranNo(input.getVeteranNumber());
 
 		dbDemographic.setPatientStatusDate(ConversionUtils.toNullableLegacyDate(input.getPatientStatusDate()));
 		if(!dbDemographic.getPatientStatus().equals(input.getPatientStatus()))
