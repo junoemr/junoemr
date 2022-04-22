@@ -98,6 +98,7 @@ public class DemographicDbToModelConverter extends
 		model.setElectronicMessagingConsentStatus(input.getElectronicMessagingConsentStatus());
 		model.setElectronicMessagingConsentGivenAt(ConversionUtils.toNullableLocalDate(input.getElectronicMessagingConsentGivenAt()));
 		model.setElectronicMessagingConsentRejectedAt(ConversionUtils.toNullableLocalDate(input.getElectronicMessagingConsentRejectedAt()));
+		model.setLastUpdateDateTime(ConversionUtils.toLocalDateTime(input.getLastUpdateDate()));
 
 		AddressModel alternateAddress = buildAlternativeAddress(input);
 		if (alternateAddress != null)

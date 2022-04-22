@@ -30,10 +30,10 @@ import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.DemographicArchive;
 import org.oscarehr.demographic.converter.DemographicCreateInputToEntityConverter;
 import org.oscarehr.demographic.converter.DemographicDbToModelConverter;
-import org.oscarehr.demographic.converter.DemographicUpdateTransferToUpdateInputConverter;
 import org.oscarehr.demographic.converter.DemographicModelToDbConverter;
 import org.oscarehr.demographic.converter.DemographicModelToExternalApiTransferConverter;
 import org.oscarehr.demographic.converter.DemographicUpdateInputToEntityConverter;
+import org.oscarehr.demographic.converter.DemographicUpdateTransferToUpdateInputConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicIntegrationDao;
@@ -140,14 +140,12 @@ public class DemographicService
 		all, active, inactive,
 	}
 
+	/**
+	 * demographic fetch for external API
+	 */
 	public DemographicTransferOutbound getDemographicTransferOutbound(Integer demographicNo)
 	{
-		Demographic demographic = demographicDao.find(demographicNo);
-		Set<DemographicExt> demoExtras = demographic.getDemographicExtSet();
-		List<DemographicExt> demographicExtList = new ArrayList<>(demoExtras);
-		DemographicCust demoCustom = demographic.getDemographicCust();
-
-		return DemographicConverter.getAsTransferObject(demographic, demographicExtList, demoCustom);
+		return demographicModelToExternalApiTransferConverter.convert(getDemographicModel(demographicNo));
 	}
 
 	public DemographicModel getDemographicModel(Integer demographicId)
