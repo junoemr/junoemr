@@ -738,6 +738,17 @@ public class ConversionUtils {
 		return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 	}
 
+	public static Date toNullableLegacyDateTime(ZonedDateTime zonedDateTime)
+	{
+		if(zonedDateTime == null) return null;
+		return toLegacyDateTime(zonedDateTime);
+	}
+
+	public static Date toLegacyDateTime(ZonedDateTime zonedDateTime)
+	{
+		return Date.from(zonedDateTime.toInstant());
+	}
+
 	public static LocalDate toNullableLocalDate(String dateString)
 	{
 		if(dateString == null || dateString.isEmpty()) return null;

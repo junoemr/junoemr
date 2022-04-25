@@ -36,6 +36,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static org.oscarehr.integration.ringcentral.api.RingCentralApiConnector.RESPONSE_STATUSES_SUCCESS;
+
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RingCentralMessageInfoResult implements RingCentralResult, FaxStatusResult, FaxInboxResult
@@ -130,9 +132,9 @@ public class RingCentralMessageInfoResult implements RingCentralResult, FaxStatu
 	@JsonIgnore
 	public Optional<Date> getRemoteSendTime()
 	{
-		if(this.getMessageStatus().equals(MessageStatus.Delivered))
+		if(RESPONSE_STATUSES_SUCCESS.contains(this.getRemoteSentStatus()))
 		{
-			return Optional.of(ConversionUtils.toLegacyDateTime(this.getLastModifiedTime().toLocalDateTime()));//TODO timezone conversion?
+			return Optional.of(ConversionUtils.toLegacyDateTime(this.getLastModifiedTime()));
 		}
 		return Optional.empty();
 	}
