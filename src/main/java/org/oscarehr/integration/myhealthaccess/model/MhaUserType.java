@@ -30,7 +30,8 @@ public enum MhaUserType
 	// ==== MHA types ====
 	MHA_CLINIC("Clinic::Profile"),
 	MHA_CLINIC_USER("Clinic::User"),
-	MHA_PATIENT_USER("Patient::User");
+	MHA_PATIENT_USER("Patient::User"),
+	MHA_SYSTEM_USER("system");
 
 	// other types here... demographic, provider...
 
