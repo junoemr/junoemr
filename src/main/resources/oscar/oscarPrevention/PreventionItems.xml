@@ -495,8 +495,11 @@ Varicella Immunoglobulin	VarIg
 
 	<item 
 		resultDesc=""
-		desc="Fecal Occult Blood Test or Fecal Immunochemical Test" name="FOBT" link="" layout="PAPMAM"
-		minAge="49" maxAge="80" showIfMinRecordNum="1" />
+		desc="Fecal Occult Blood Test or Fecal Immunochemical Test"
+		name="FOBT"
+		link=""
+		layout="PAPMAM"
+		showIfMinRecordNum="1" />
 
 	<item 
 		resultDesc=""
@@ -656,6 +659,8 @@ Varicella Immunoglobulin	VarIg
 		name="FIT"
 		healthCanadaType="FIT"
 		layout="PAPMAM"
+		minAge="49"
+		maxAge="80"
 		showIfMinRecordNum="1" />
 
 	<item
