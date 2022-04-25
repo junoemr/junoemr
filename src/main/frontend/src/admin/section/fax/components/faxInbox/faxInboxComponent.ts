@@ -174,7 +174,10 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 				{
 					let now = moment();
 					let minutes = ctrl.nextPullTime.diff(now, 'minutes');
-					minutes = (minutes < 0) ? 0 : minutes;
+					if(minutes < 0)
+					{
+						return "several minutes";
+					}
 					return (minutes + 1) + " minutes";
 				}
 			}

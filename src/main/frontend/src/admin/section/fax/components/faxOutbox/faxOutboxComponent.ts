@@ -290,7 +290,11 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 				{
 					let now = moment();
 					let minutes = ctrl.nextPushTime.diff(now, 'minutes');
-					minutes = (minutes < 0) ? 0 : minutes;
+
+					if(minutes < 0)
+					{
+						return "several minutes";
+					}
 					return (minutes + 1) + " minutes";
 				}
 			}

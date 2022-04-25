@@ -209,7 +209,16 @@ public class FaxAccountService
 					createInput.setAccountLogin(loginId);
 					createInput.setDisplayName(StringUtils.capitalize(faxProvider.name()) + " " + loginId);
 					createInput.setEnabled(true);
-					return createFaxAccount(createInput);
+					FaxAccountTransferOutbound transferOutbound = createFaxAccount(createInput);
+
+					// default the new account to active if there is not an active account
+					String activeFaxAccountId = systemPreferenceService.getPreferenceValue(UserProperty.SYSTEM_ACTIVE_FAX_ACCOUNT, null);
+					if(activeFaxAccountId == null)
+					{
+						systemPreferenceService.setPreferenceValue(UserProperty.SYSTEM_ACTIVE_FAX_ACCOUNT, String.valueOf(transferOutbound.getId()));
+					}
+
+					return transferOutbound;
 				});
 	}
 
