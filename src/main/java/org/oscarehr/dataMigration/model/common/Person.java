@@ -114,4 +114,5 @@ public interface Person
 
 	String getSexString();
 	String getTitleString();
+	String getDisplayName();
 }

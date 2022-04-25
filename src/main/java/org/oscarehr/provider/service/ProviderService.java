@@ -24,21 +24,22 @@ package org.oscarehr.provider.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.security.dao.SecUserRoleDao;
-import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.common.dao.ProviderSiteDao;
-import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.exception.NoSuchRecordException;
 import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.Security;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.dataMigration.converter.out.ProviderDbToModelConverter;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.providerBilling.dao.ProviderBillingDao;
 import org.oscarehr.providerBilling.model.ProviderBilling;
+import org.oscarehr.security.dao.SecUserRoleDao;
+import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.site.service.SiteService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
@@ -82,9 +83,6 @@ public class ProviderService
 	private SecUserRoleDao secUserRoleDao;
 
 	@Autowired
-	private SecRoleDao secRoleDao;
-
-	@Autowired
 	private ProviderSiteDao providerSiteDao;
 
 	@Autowired
@@ -93,14 +91,12 @@ public class ProviderService
 	@Autowired
 	private ProviderManager2 providerManager;
 
+	@Autowired
+	private ProviderDbToModelConverter providerDbToModelConverter;
+
 	public ProviderData getProvider(String providerNo)
 	{
 		return providerDataDao.findByProviderNo(providerNo);
-	}
-
-	public void saveProvider(ProviderData provider)
-	{
-		providerDataDao.merge(provider);
 	}
 
 	/**
@@ -113,6 +109,16 @@ public class ProviderService
 	public ProviderData getProviderEager(String providerNo)
 	{
 		return providerDataDao.eagerFindByProviderNo(providerNo);
+	}
+
+	public void saveProvider(ProviderData provider)
+	{
+		providerDataDao.merge(provider);
+	}
+
+	public List<ProviderModel> getActiveProviders()
+	{
+		return providerDbToModelConverter.convert(providerDataDao.findByActiveStatus(true));
 	}
 
 	public ProviderData addNewProvider(String creatingProviderNo, ProviderData provider, String billCenterCode)
