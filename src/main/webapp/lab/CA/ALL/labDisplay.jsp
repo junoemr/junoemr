@@ -200,7 +200,7 @@
 		}
 		else
 		{
-			multiLabId = Hl7textResultsData.getMatchingLabs(segmentID);
+			multiLabId = Hl7textResultsData.getMatchingLabs(segmentID, !AHS_RURAL_LAB_TYPE.equals(labType));
 			segmentIDs = multiLabId.split(",");
 
 			List<String> segmentIdList = new ArrayList<String>();
