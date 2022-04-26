@@ -1,0 +1,1 @@
+CREATE OR REPLACE INDEX `msgDemoMap_demographic_no` ON msgDemoMap (`demographic_no`);
