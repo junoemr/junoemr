@@ -24,6 +24,7 @@ package org.oscarehr.demographic.converter;
 
 import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
 import org.oscarehr.dataMigration.model.common.AddressModel;
+import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.ProviderModel;
@@ -52,7 +53,7 @@ public class DemographicModelToExternalApiTransferConverter
 
 		transfer.setLastName(model.getLastName());
 		transfer.setFirstName(model.getFirstName());
-		transfer.setTitle(model.getTitle().name());
+		transfer.setTitle(Optional.ofNullable(model.getTitle()).map(Person.TITLE::name).orElse(null));
 		transfer.setSex(model.getSexString());
 		transfer.setHin(model.getHealthNumber());
 		transfer.setSin(model.getSin());
@@ -119,7 +120,7 @@ public class DemographicModelToExternalApiTransferConverter
 		transfer.setCitizenship(model.getCitizenship());
 		transfer.setCountryOfOrigin(model.getCountryOfOrigin());
 		transfer.setSpokenLanguage(model.getSpokenLanguage());
-		transfer.setOfficialLanguage(model.getOfficialLanguage().getValue());
+		transfer.setOfficialLanguage(Optional.ofNullable(model.getOfficialLanguage()).map(DemographicModel.OFFICIAL_LANGUAGE::getValue).orElse(null));
 		transfer.setNewsletter(model.getNewsletter());
 		transfer.setAnonymous(model.getAnonymous());
 		transfer.setNotes(model.getPatientNote());
