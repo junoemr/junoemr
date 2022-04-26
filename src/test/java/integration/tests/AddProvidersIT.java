@@ -23,27 +23,25 @@
 
 package integration.tests;
 
+import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
+
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.ProviderTestCollection;
 import integration.tests.util.data.ProviderTestData;
 import integration.tests.util.seleniumUtil.PageUtil;
 import junit.framework.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
-import org.oscarehr.JunoApplication;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -62,27 +60,8 @@ public class AddProvidersIT extends SeleniumTestBase
 		};
 	}
 
-	/*
-	-------------------------------------------------------------------------------
-Test set: integration.tests.AddProvidersIT
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 10.452 s <<< FAILURE! - in integration.tests.AddProvidersIT
-addProvidersClassicUITest  Time elapsed: 9.524 s  <<< ERROR!
-org.openqa.selenium.NoSuchElementException:
-Unable to locate element: .//h1[contains(.,'Successful Addition of a Provider Record.')]
-For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
-Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
-System info: host: 'fedora', ip: '127.0.0.1', os.name: 'Linux', os.arch: 'amd64', os.version: '5.13.8-200.fc34.x86_64', java.version: '1.8.0_302'
-Driver info: org.openqa.selenium.firefox.FirefoxDriver
-Capabilities {acceptInsecureCerts: true, browserName: firefox, browserVersion: 90.0.2, javascriptEnabled: true, moz:accessibilityChecks: false, moz:buildID: 20210804102508, moz:geckodriverVersion: 0.29.0, moz:headless: true, moz:processID: 2348078, moz:profile: /tmp/rust_mozprofiledrzUIc, moz:shutdownTimeout: 60000, moz:useNonSpecCompliantPointerOrigin: false, moz:webdriverClick: true, pageLoadStrategy: normal, platform: LINUX, platformName: LINUX, platformVersion: 5.13.8-200.fc34.x86_64, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify}
-Session ID: 7004a14c-aa65-4887-8c95-fcd555918f3b
-*** Element info: {Using=xpath, value=.//h1[contains(.,'Successful Addition of a Provider Record.')]}
-    at integration.tests.AddProvidersIT.addProvidersClassicUITest(AddProvidersIT.java:124)
-	 */
-	@Ignore
 	@Test
 	public void addProvidersClassicUITest()
-			throws Exception
 	{
 		// open administration panel
 		findWaitClickById(driver, webDriverWait, "admin-panel");

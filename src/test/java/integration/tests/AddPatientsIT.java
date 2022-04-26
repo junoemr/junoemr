@@ -23,22 +23,6 @@
 
 package integration.tests;
 
-import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.data.PatientTestCollection;
-import integration.tests.util.data.PatientTestData;
-import integration.tests.util.seleniumUtil.PageUtil;
-import junit.framework.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
-import org.oscarehr.JunoApplication;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import static integration.tests.util.data.PatientTestCollection.patientLNames;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByIndex;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
@@ -46,6 +30,21 @@ import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysById;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
+
+import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.data.PatientTestCollection;
+import integration.tests.util.data.PatientTestData;
+import integration.tests.util.seleniumUtil.PageUtil;
+import junit.framework.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -91,8 +90,7 @@ public class AddPatientsIT extends SeleniumTestBase
 		findWaitSendKeysById(driver, webDriverWait, "first_name", mom.firstName);
 		dropdownSelectByValue(driver, webDriverWait, By.id("official_lang"), mom.language);
 		dropdownSelectByValue(driver, webDriverWait, By.id("title"), mom.title);
-		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='spoken_lang']"), mom.spoken
-		);
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='spoken_lang']"), mom.spoken);
 		driver.findElement(By.id("address")).sendKeys(mom.address);
 		driver.findElement(By.id("city")).sendKeys(mom.city);
 		dropdownSelectByValue(driver, webDriverWait, By.id("province"), mom.province);
@@ -103,10 +101,8 @@ public class AddPatientsIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='wPhoneExt']")).sendKeys(mom.workPhoneExt);
 		driver.findElement(By.xpath("//input[@name='demo_cell']")).sendKeys(mom.cellPhone);
 		driver.findElement(By.xpath("//textarea[@name='phoneComment']")).sendKeys(mom.phoneComment);
-		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='newsletter']"), mom.newsletter
-		);
-		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='aboriginal']"), mom.aboriginal
-		);
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='newsletter']"), mom.newsletter);
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='aboriginal']"), mom.aboriginal);
 		driver.findElement(By.id("email")).sendKeys(mom.email);
 		driver.findElement(By.xpath("//input[@name='myOscarUserName']")).sendKeys(mom.phrUserName);
 		driver.findElement(By.id("year_of_birth")).sendKeys(mom.dobYear);
@@ -152,7 +148,7 @@ public class AddPatientsIT extends SeleniumTestBase
 				By.xpath("//input[@class='wideInput']"),
 				By.xpath("//tr[@class='odd']")));
 	}
-
+	//@Ignore
 	@Test
 	public void addPatientsClassicUIQuickFormTest()
 	{
@@ -166,14 +162,11 @@ public class AddPatientsIT extends SeleniumTestBase
 		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='last_name']", dad.lastName);
 		driver.findElement(By.xpath("//input[@name='first_name']")).sendKeys(dad.firstName);
 		driver.findElement(By.xpath("//input[@name='year_of_birth']")).sendKeys(dad.dobYear);
-		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='month_of_birth']"), dad.dobMonth
-		);
-		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='date_of_birth']"), dad.dobDate
-		);
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='month_of_birth']"), dad.dobMonth);
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='date_of_birth']"), dad.dobDate);
 		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='sex']"), dad.sex);
 		driver.findElement(By.xpath("//input[@name='hin']")).sendKeys(dad.hin);
-		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='patient_status']"), dad.patientStatus
-		);
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//select[@name='patient_status']"), dad.patientStatus);
 		dropdownSelectByIndex(driver, By.xpath("//select[@name='staff']"), 0);
 		driver.findElement(By.xpath("//input[@name='submit']")).click();
 
@@ -185,29 +178,8 @@ public class AddPatientsIT extends SeleniumTestBase
 				By.xpath("//tr[@class='odd']")));
 	}
 
-	/*
-	-------------------------------------------------------------------------------
-Test set: integration.tests.AddPatientsIT
--------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 162.2 s <<< FAILURE! - in integration.tests.AddPatientsIT
-addPatientsJUNOUITest  Time elapsed: 129.334 s  <<< ERROR!
-org.openqa.selenium.TimeoutException: Expected condition failed: waiting for visibility of element located by By.xpath: //button[@ng-click='$ctrl.clickHandler()'] (tried for 120 second(s) with 500 milliseconds interval)
-    at integration.tests.AddPatientsIT.addPatientsJUNOUITest(AddPatientsIT.java:243)
-Caused by: org.openqa.selenium.NoSuchElementException:
-Unable to locate element: //button[@ng-click='$ctrl.clickHandler()']
-For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
-Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
-System info: host: 'fedora', ip: '127.0.0.1', os.name: 'Linux', os.arch: 'amd64', os.version: '5.13.8-200.fc34.x86_64', java.version: '1.8.0_302'
-Driver info: org.openqa.selenium.firefox.FirefoxDriver
-Capabilities {acceptInsecureCerts: true, browserName: firefox, browserVersion: 90.0.2, javascriptEnabled: true, moz:accessibilityChecks: false, moz:buildID: 20210804102508, moz:geckodriverVersion: 0.29.0, moz:headless: true, moz:processID: 2356765, moz:profile: /tmp/rust_mozprofileJnsTv2, moz:shutdownTimeout: 60000, moz:useNonSpecCompliantPointerOrigin: false, moz:webdriverClick: true, pageLoadStrategy: normal, platform: LINUX, platformName: LINUX, platformVersion: 5.13.8-200.fc34.x86_64, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify}
-Session ID: 0d4f748a-5686-499b-bfe9-a6b482d75e62
-*** Element info: {Using=xpath, value=//button[@ng-click='$ctrl.clickHandler()']}
-    at integration.tests.AddPatientsIT.addPatientsJUNOUITest(AddPatientsIT.java:243)
-	 */
-	@Ignore
 	@Test
 	public void addPatientsJUNOUITest()
-			throws Exception
 	{
 		// open JUNO UI page
 		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
@@ -215,29 +187,27 @@ Session ID: 0d4f748a-5686-499b-bfe9-a6b482d75e62
 
 		// Add a demographic record page
 		driver.findElement(By.xpath("//button[@title=\"Add a new Patient\"]")).click();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("input-lastName")));
-		driver.findElement(By.id("input-lastName")).sendKeys(son.lastName);
-		driver.findElement(By.id("input-firstName")).sendKeys(son.firstName);
-		dropdownSelectByValue(driver, webDriverWait, By.id("input-gender"), "string:" + son.sex);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//juno-input[@label='Last Name']//input")));
+		driver.findElement(By.xpath("//juno-input[@label='Last Name']//input")).sendKeys(son.lastName);
+		driver.findElement(By.xpath("//juno-input[@label='First Name']//input")).sendKeys(son.firstName);
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//juno-select[@label='Gender']//select"), "string:" + son.sex);
 		driver.findElement(By.id("input-dob")).sendKeys(son.dobYear + "-" + son.dobMonth + "-" + son.dobDate);
-		driver.findElement(By.id("input-address")).click();
-		driver.findElement(By.id("input-hin")).sendKeys(son.hin);
-		dropdownSelectByValue(driver, webDriverWait, By.id("input-hcType"), "string:" + son.hcType);
-		driver.findElement(By.id("input-address")).sendKeys(son.address);
-		driver.findElement(By.id("input-city")).sendKeys(son.city);
-		dropdownSelectByValue(driver, webDriverWait, By.id("input-province"), "string:" + son.province
-		);
-		driver.findElement(By.id("input-postal-code")).sendKeys(son.postal);
-		driver.findElement(By.id("input-email")).sendKeys(son.email);
-		driver.findElement(By.id("input-phone")).sendKeys(son.homePhone);
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@ng-click=\"$ctrl.clickHandler($event)\"]")));
-		driver.findElement(By.xpath("//button[@ng-click=\"$ctrl.clickHandler($event)\"]")).click();
-
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//h4[contains(.,' Demographic ')]")));
-		Assert.assertTrue(isPatientAdded(son.lastName, son.firstName,
-				By.xpath("//button[@title='Search']"),
-				By.xpath("//input[@placeholder='Search Term']"),
-				By.xpath("//tr[@class='ng-scope']")));
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//juno-select-text[@label='Health Insurance Number']//select"), "string:" + son.hcType);
+		driver.findElement(By.xpath("//input[@class='ng-pristine ng-untouched ng-valid ng-empty']")).sendKeys(son.hin);
+		driver.findElement(By.xpath("//juno-input[@label='Address']//input")).sendKeys(son.address);
+		driver.findElement(By.xpath("//juno-input[@label='City']//input")).sendKeys(son.city);
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//juno-select[@label='Province']//select"), "string:" + son.province);
+		driver.findElement(By.xpath("//juno-input[@label='Postal Code']//input")).sendKeys(son.postal);
+		driver.findElement(By.xpath("//juno-input[@label='Email']//input")).sendKeys(son.email);
+		dropdownSelectByValue(driver, webDriverWait, By.xpath("//juno-select-text[@label='Preferred Phone']//select"), "string:" + son.preferredPhone);
+		driver.findElement(By.xpath("//juno-select-text[@label='Preferred Phone']//input")).sendKeys(son.homePhone);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//juno-button[@click='$ctrl.onAdd()']")));
+		driver.findElement(By.xpath("//juno-button[@click='$ctrl.onAdd()']")).click();
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//h4[contains(.,'Demographic')]")));
+		Assert.assertTrue("Demographic is NOT added successfully.", isPatientAdded(son.lastName, son.firstName,
+				By.xpath("//i[@class='icon icon-user-search']"),
+				By.xpath("//input[@ng-model='$ctrl.search.term']"),
+				By.xpath("//td[contains(., son.lastName)]")));
 	}
 }
 
