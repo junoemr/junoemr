@@ -585,8 +585,7 @@
             }
 
             .hrm-content {
-                width: 100%;
-                background-color:red;
+                width: 100%
             }
 
             #hrmHeader {
@@ -807,7 +806,7 @@
         <b>DOB: </b><span class="<%=getFieldClass(dateOfBirth)%>"><%=getFieldDisplayValue(dateOfBirth)%></span><br>
         <b>HCN: </b><span class="<%=getFieldClass(HCN)%>"><%=getFieldDisplayValue(HCN)%></span> <span class="<%=getFieldClass(HCNVersion)%>"><%=getFieldDisplayValue(HCNVersion)%></span><br/>
     </div>
-    <div id="hrmNotice" class="<%= previewMode ? "hide-on-preview" : ""%>">
+    <div id="hrmNotice" class="hide-on-print <%= previewMode ? "hide-on-preview" : ""%>">
         This report was received from the Hospital Report Manager (HRM) at <%= ConversionUtils.toDateTimeString(hrmDocument.getReceivedDateTime()) %>.
 
 	Message Unique ID: <%=hrmReport.getMessageUniqueId()%>
