@@ -32,7 +32,7 @@ import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.transfer.DemographicUpdateInput;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
-import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicUpdateTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.ApiDemographicUpdateTransfer;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -43,11 +43,11 @@ import java.util.Optional;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.COUNTRY_CODE_CANADA;
 
 @Component
-public class DemographicUpdateTransferToUpdateInputConverter
-		extends BaseModelToDbConverter<DemographicUpdateTransfer, DemographicUpdateInput>
+public class ApiDemographicUpdateTransferToUpdateInputConverter
+		extends BaseModelToDbConverter<ApiDemographicUpdateTransfer, DemographicUpdateInput>
 {
 	@Override
-	public DemographicUpdateInput convert(DemographicUpdateTransfer transfer)
+	public DemographicUpdateInput convert(ApiDemographicUpdateTransfer transfer)
 	{
 		if(transfer == null)
 		{

@@ -28,7 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.entity.DemographicExt;
-import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.ApiDemographicCreateTransfer;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ import java.util.List;
 
 public class DemographicConverter
 {
-	public static Demographic getAsDomainObject(DemographicTransferInbound transfer)
+	public static Demographic getAsDomainObject(ApiDemographicCreateTransfer transfer)
 	{
 		Demographic demographic = new Demographic();
 
@@ -98,7 +98,7 @@ public class DemographicConverter
 
 		return demographic;
 	}
-	public static List<DemographicExt> getExtensionList(DemographicTransferInbound transfer)
+	public static List<DemographicExt> getExtensionList(ApiDemographicCreateTransfer transfer)
 	{
 		List<DemographicExt> extensionList = new ArrayList<>(1);
 
@@ -112,7 +112,7 @@ public class DemographicConverter
 		}
 		return extensionList;
 	}
-	public static DemographicCust getCustom(DemographicTransferInbound transfer)
+	public static DemographicCust getCustom(ApiDemographicCreateTransfer transfer)
 	{
 		DemographicCust demographicCustom = null;
 		if (transfer.getNurse() != null || transfer.getResident() != null || transfer.getAlert() != null || transfer.getMidwife() != null || transfer.getNotes() != null)

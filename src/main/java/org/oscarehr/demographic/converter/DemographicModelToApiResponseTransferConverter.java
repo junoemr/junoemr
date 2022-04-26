@@ -29,25 +29,25 @@ import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographic.model.DemographicModel;
-import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.ApiDemographicResponseTransfer;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
-public class DemographicModelToExternalApiTransferConverter
-		extends BaseModelToDbConverter<DemographicModel, DemographicTransferOutbound>
+public class DemographicModelToApiResponseTransferConverter
+		extends BaseModelToDbConverter<DemographicModel, ApiDemographicResponseTransfer>
 {
 	@Override
-	public DemographicTransferOutbound convert(DemographicModel model)
+	public ApiDemographicResponseTransfer convert(DemographicModel model)
 	{
 		if(model == null)
 		{
 			return null;
 		}
 
-		DemographicTransferOutbound transfer = new DemographicTransferOutbound();
+		ApiDemographicResponseTransfer transfer = new ApiDemographicResponseTransfer();
 		transfer.setDemographicNo(model.getId());
 		transfer.setLastUpdateDate(model.getLastUpdateDateTime().toLocalDate());
 

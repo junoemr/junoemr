@@ -35,9 +35,9 @@ import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
-import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
-import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
-import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicUpdateTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.ApiDemographicCreateTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.ApiDemographicResponseTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.ApiDemographicUpdateTransfer;
 import org.oscarehr.ws.external.rest.v1.transfer.eform.EFormTransferInbound;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.validator.DemographicNoConstraint;
@@ -83,12 +83,12 @@ public class DemographicWs extends AbstractExternalRestWs
 	@GET
 	@Path("/{demographicId}")
 	@Operation(summary = "Retrieve an existing patient demographic record by demographic id.")
-	public RestResponse<DemographicTransferOutbound> getDemographic(@DemographicNoConstraint @PathParam("demographicId") Integer demographicNo)
+	public RestResponse<ApiDemographicResponseTransfer> getDemographic(@DemographicNoConstraint @PathParam("demographicId") Integer demographicNo)
 	{
 		String providerNo = getOAuthProviderNo();
 
 		securityInfoManager.requireAllPrivilege(providerNo, demographicNo, Permission.DEMOGRAPHIC_READ);
-		DemographicTransferOutbound demographicTransfer = demographicService.getDemographicTransferOutbound(demographicNo);
+		ApiDemographicResponseTransfer demographicTransfer = demographicService.getDemographicTransferOutbound(demographicNo);
 
 		LogAction.addLogEntry(providerNo, demographicTransfer.getDemographicNo(), LogConst.ACTION_READ, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, getLoggedInInfo().getIp());
 		recentDemographicAccessService.updateAccessRecord(providerNo, demographicTransfer.getDemographicNo());
@@ -100,14 +100,14 @@ public class DemographicWs extends AbstractExternalRestWs
 	@Path("/{demographicId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Update an existing patient demographic record by demographic id.")
-	public RestResponse<DemographicTransferOutbound> putDemographic(@DemographicNoConstraint @PathParam("demographicId") Integer demographicNo,
-	                                                                @Valid DemographicUpdateTransfer demographicTo)
+	public RestResponse<ApiDemographicResponseTransfer> putDemographic(@DemographicNoConstraint @PathParam("demographicId") Integer demographicNo,
+	                                                                   @Valid ApiDemographicUpdateTransfer demographicTo)
 	{
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		String providerNo = getOAuthProviderNo();
 		securityInfoManager.requireAllPrivilege(getOAuthProviderNo(), demographicNo, Permission.DEMOGRAPHIC_UPDATE);
 
-		DemographicTransferOutbound demographicTransfer = demographicService.updateDemographicRecord(demographicTo, loggedInInfo);
+		ApiDemographicResponseTransfer demographicTransfer = demographicService.updateDemographicRecord(demographicTo, loggedInInfo);
 
 		LogAction.addLogEntry(providerNo, demographicNo, LogConst.ACTION_UPDATE, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, loggedInInfo.getIp());
 		recentDemographicAccessService.updateAccessRecord(providerNo, demographicNo);
@@ -118,13 +118,13 @@ public class DemographicWs extends AbstractExternalRestWs
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Add a new patient demographic record to the system.")
-	public RestResponse<Integer> postDemographic(@Valid DemographicTransferInbound demographicTo)
+	public RestResponse<Integer> postDemographic(@Valid ApiDemographicCreateTransfer demographicTo)
 	{
 		String providerNo = getOAuthProviderNo();
 		String ip = getHttpServletRequest().getRemoteAddr();
 
 		securityInfoManager.requireAllPrivilege(providerNo, Permission.DEMOGRAPHIC_CREATE);
-		DemographicTransferOutbound demographicTransfer = demographicService.addNewDemographicRecord(providerNo, demographicTo);
+		ApiDemographicResponseTransfer demographicTransfer = demographicService.addNewDemographicRecord(providerNo, demographicTo);
 
 		// log the action and update the access record
 		LogAction.addLogEntry(providerNo, demographicTransfer.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, null, ip);

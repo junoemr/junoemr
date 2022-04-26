@@ -31,9 +31,9 @@ import org.oscarehr.common.model.DemographicArchive;
 import org.oscarehr.demographic.converter.DemographicCreateInputToEntityConverter;
 import org.oscarehr.demographic.converter.DemographicDbToModelConverter;
 import org.oscarehr.demographic.converter.DemographicModelToDbConverter;
-import org.oscarehr.demographic.converter.DemographicModelToExternalApiTransferConverter;
+import org.oscarehr.demographic.converter.DemographicModelToApiResponseTransferConverter;
 import org.oscarehr.demographic.converter.DemographicUpdateInputToEntityConverter;
-import org.oscarehr.demographic.converter.DemographicUpdateTransferToUpdateInputConverter;
+import org.oscarehr.demographic.converter.ApiDemographicUpdateTransferToUpdateInputConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicIntegrationDao;
@@ -54,9 +54,9 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.waitList.service.WaitListService;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicConverter;
-import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
-import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
-import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicUpdateTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.ApiDemographicCreateTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.ApiDemographicResponseTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.ApiDemographicUpdateTransfer;
 import org.oscarehr.ws.external.soap.v1.transfer.DemographicIntegrationTransfer;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.beans.BeanUtils;
@@ -123,10 +123,10 @@ public class DemographicService
 	private DemographicUpdateInputToEntityConverter demographicUpdateInputToEntityConverter;
 
 	@Autowired
-	private DemographicUpdateTransferToUpdateInputConverter demographicUpdateTransferToUpdateInputConverter;
+	private ApiDemographicUpdateTransferToUpdateInputConverter apiDemographicUpdateTransferToUpdateInputConverter;
 
 	@Autowired
-	private DemographicModelToExternalApiTransferConverter demographicModelToExternalApiTransferConverter;
+	private DemographicModelToApiResponseTransferConverter demographicModelToApiResponseTransferConverter;
 
 	@Autowired
 	private WaitListService waitListService;
@@ -147,9 +147,9 @@ public class DemographicService
 	/**
 	 * demographic fetch for external API
 	 */
-	public DemographicTransferOutbound getDemographicTransferOutbound(Integer demographicNo)
+	public ApiDemographicResponseTransfer getDemographicTransferOutbound(Integer demographicNo)
 	{
-		return demographicModelToExternalApiTransferConverter.convert(getDemographicModel(demographicNo));
+		return demographicModelToApiResponseTransferConverter.convert(getDemographicModel(demographicNo));
 	}
 
 	public DemographicModel getDemographicModel(Integer demographicId)
@@ -383,14 +383,14 @@ public class DemographicService
 	/**
 	 * demographic creation for external API use
 	 */
-	public DemographicTransferOutbound addNewDemographicRecord(String providerNoStr, DemographicTransferInbound demographicTransferInbound)
+	public ApiDemographicResponseTransfer addNewDemographicRecord(String providerNoStr, ApiDemographicCreateTransfer demographicTransferInbound)
 	{
 		Demographic demographic = DemographicConverter.getAsDomainObject(demographicTransferInbound);
 		DemographicCust demoCustom = DemographicConverter.getCustom(demographicTransferInbound);
 		List<DemographicExt> demographicExtensions = DemographicConverter.getExtensionList(demographicTransferInbound);
 		Set<DemographicExt> demographicExtSet = new HashSet<>(demographicExtensions);
 
-		return demographicModelToExternalApiTransferConverter.convert(
+		return demographicModelToApiResponseTransferConverter.convert(
 				demographicDbToModelConverter.convert(addNewDemographicRecord(providerNoStr, demographic, demoCustom, demographicExtSet)
 				));
 	}
@@ -507,10 +507,10 @@ public class DemographicService
 	/**
 	 * update method for external API use
 	 */
-	public DemographicTransferOutbound updateDemographicRecord(DemographicUpdateTransfer transfer, LoggedInInfo loggedInInfo)
+	public ApiDemographicResponseTransfer updateDemographicRecord(ApiDemographicUpdateTransfer transfer, LoggedInInfo loggedInInfo)
 	{
-		DemographicUpdateInput input = demographicUpdateTransferToUpdateInputConverter.convert(transfer);
-		return demographicModelToExternalApiTransferConverter.convert(updateDemographicRecord(input, loggedInInfo));
+		DemographicUpdateInput input = apiDemographicUpdateTransferToUpdateInputConverter.convert(transfer);
+		return demographicModelToApiResponseTransferConverter.convert(updateDemographicRecord(input, loggedInInfo));
 	}
 
 	/**

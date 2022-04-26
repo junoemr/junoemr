@@ -46,7 +46,7 @@ import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_TERMINA
 @Schema(description = "Demographic record data transfer object")
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
 @DemographicTransferHinConstraint(allowNull = true)
-public class DemographicTransferBasic implements Serializable
+public class ApiDemographicBaseTransfer implements Serializable
 {
 	// demographic base info
 	@NotNull
