@@ -23,29 +23,26 @@
 
 package integration.tests;
 
+import static integration.tests.AddProvidersIT.drApple;
+import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
+import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
+import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
+
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.seleniumUtil.PageUtil;
+import java.sql.SQLException;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.oscarehr.JunoApplication;
-
-import java.sql.SQLException;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import static integration.tests.AddProvidersIT.drApple;
-import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeys;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
-import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -60,7 +57,7 @@ public class AssignRolesIT extends SeleniumTestBase
     protected String[] getTablesToRestore()
     {
         return new String[]{
-            "admission", "log", "property", "program_provider", "provider", "providerbillcenter", "secUserRole"
+            "admission", "log", "property", "program_provider", "provider", "providerbillcenter", "recyclebin", "secUserRole"
         };
     }
 
@@ -73,8 +70,8 @@ public class AssignRolesIT extends SeleniumTestBase
 
     public static void assignRoles(String xpathDropdown, String xpathProviderNo, String role, String xpathAction)
     {
-        dropdownSelectByValue(driver, webDriverWait, By.xpath(xpathDropdown), role);
-        String xpath = xpathProviderNo + xpathAction;
+        dropdownSelectByVisibleText(driver, webDriverWait, By.xpath(xpathDropdown), role);
+		String xpath = xpathProviderNo + xpathAction;
 		findWaitClickByXpath(driver, webDriverWait, xpath);
     }
 
@@ -86,13 +83,10 @@ public class AssignRolesIT extends SeleniumTestBase
         return primaryRoleSelected;
     }
 
-	@Ignore
     @Test
     public void assignRolesClassicUITest()
-            throws InterruptedException
     {
-        accessAdministrationSectionClassicUI(driver, webDriverWait, "User Management", "Assign Role to Provider"
-		);
+        accessAdministrationSectionClassicUI(driver, webDriverWait, "User Management", "Assign Role to Provider");
         webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='keyword']")));
         driver.findElement(By.xpath("//input[@name='keyword']")).sendKeys(drApple.lastName);
         driver.findElement(By.xpath("//input[@name='search']")).click();
@@ -100,7 +94,7 @@ public class AssignRolesIT extends SeleniumTestBase
         //Add admin role
         String xpathAdd = "//following-sibling::td/input[@value='Add']";
         assignRoles(xpathDropdown, xpathProvider, "admin", xpathAdd);
-        String messageAdd = "Role admin is added. (" + drApple.providerNo + ")";
+        String messageAdd = "Role 3 is added. (" + drApple.providerNo + ")";//For some reason it was changed to show the role value.
         Assert.assertTrue("Admin is NOT assigned to the provider successfully.",
                 PageUtil.isExistsBy(By.xpath("//font[contains(., '" + messageAdd + "')]"), driver));
 
@@ -114,9 +108,8 @@ public class AssignRolesIT extends SeleniumTestBase
         Assert.assertEquals("Nurse is NOT updated to the provider successfully.", "nurse", roleUpdated);
 
         //Set primary role
-        dropdownSelectByValue(driver, webDriverWait, By.id("primaryRoleProvider"), drApple.providerNo
-		);
-        dropdownSelectByValue(driver, webDriverWait, By.id("primaryRoleRole"), "admin");
+        dropdownSelectByValue(driver, webDriverWait, By.id("primaryRoleProvider"), drApple.providerNo);
+        dropdownSelectByVisibleText(driver, webDriverWait, By.id("primaryRoleRole"), "admin");
         driver.findElement(By.xpath("//input[@value='Set Primary Role']")).click();
 		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='keyword']", drApple.lastName);
 		findWaitClickByXpath(driver, webDriverWait, "//input[@name='search']");
