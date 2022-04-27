@@ -41,11 +41,11 @@ import org.oscarehr.common.dao.OscarLogDao;
 import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.common.model.OscarMsgType;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.olis.OLISProtocolSocketFactory;
 import org.oscarehr.olis.OLISUtils;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import oscar.OscarProperties;
 import oscar.oscarMessenger.data.MsgProviderData;
 
 import javax.validation.constraints.NotNull;
@@ -70,6 +70,7 @@ public class Driver
 {
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
+	private static final JunoProperties junoProperties = SpringUtils.getBean(JunoProperties.class);
 
 	public static DriverResponse submitOLISQuery(@NotNull Provider loggedInProvider, @NotNull Query query)
 	{
@@ -82,12 +83,12 @@ public class Driver
 		{
 			OLISMessage message = new OLISMessage(loggedInProvider, query, continuationPointer);
 
-			System.setProperty("javax.net.ssl.trustStore", OscarProperties.getInstance().getProperty("olis_truststore").trim());
-			System.setProperty("javax.net.ssl.trustStorePassword", OscarProperties.getInstance().getProperty("olis_truststore_password").trim());
+			System.setProperty("javax.net.ssl.trustStore", junoProperties.getOlis().getTruststore());
+			System.setProperty("javax.net.ssl.trustStorePassword", junoProperties.getOlis().getTruststorePassword());
 			
 			OLISRequest olisRequest = new OLISRequest();
 			olisRequest.setHIALRequest(new HIALRequest());
-			String olisRequestURL = OscarProperties.getInstance().getProperty("olis_request_url", "https://olis.ssha.ca/ssha.olis.webservices.ER7/OLIS.asmx");
+			String olisRequestURL = junoProperties.getOlis().getRequestUrl();
 			OLISStub olis = new OLISStub(olisRequestURL);
 			olis._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, new Protocol("https",(ProtocolSocketFactory)  new OLISProtocolSocketFactory(),443));
 			
@@ -98,7 +99,7 @@ public class Driver
 			String msgInXML = String.format("<Request xmlns=\"http://www.ssha.ca/2005/HIAL\"><Content><![CDATA[%s]]></Content></Request>", olisHL7String);
 
 			String signedRequest;
-			if(OscarProperties.getInstance().getProperty("olis_returned_cert") != null)
+			if(junoProperties.getOlis().getReturnedCert() != null)
 			{
 				signedRequest = Driver.signData2(msgInXML);
 			}
@@ -127,7 +128,7 @@ public class Driver
 					"\nrequest URL: " + olisRequestURL +
 					"\nhl7 request query:\n" + olisHL7String.replaceAll("\r", "\n"));
 
-			if (OscarProperties.getInstance().getProperty("olis_simulate", "no").equals("yes"))
+			if (junoProperties.getOlis().isSimulate())
 			{
 				//TODO how to handle this without request object?
 //				String olisResponseContent = (String) request.getSession().getAttribute("olisResponseContent");
@@ -240,15 +241,15 @@ public class Driver
 		X509Certificate cert = null;
 		PrivateKey priv = null;
 		KeyStore keystore = null;
-		String pwd = OscarProperties.getInstance().getProperty("olis_ssl_keystore_password", "changeit");
-		String keystoreAlias = OscarProperties.getInstance().getProperty("olis_ssl_keystore_alias", "olis");
+		String pwd = junoProperties.getOlis().getSslKeystorePassword();
+		String keystoreAlias = junoProperties.getOlis().getSslKeystoreAlias();
 		String result = null;
 		try {
 			Security.addProvider(new BouncyCastleProvider());
 
 			keystore = KeyStore.getInstance("JKS");
 			// Load the keystore
-			keystore.load(new FileInputStream(OscarProperties.getInstance().getProperty("olis_keystore")), pwd.toCharArray());
+			keystore.load(new FileInputStream(junoProperties.getOlis().getKeystore()), pwd.toCharArray());
 
 			Enumeration<String> e = keystore.aliases();
 
@@ -264,7 +265,7 @@ public class Driver
 			// Get the private key and the certificate
 			priv = (PrivateKey) keystore.getKey(keystoreAlias, pwd.toCharArray());
 
-			FileInputStream is = new FileInputStream(OscarProperties.getInstance().getProperty("olis_returned_cert"));
+			FileInputStream is = new FileInputStream(junoProperties.getOlis().getReturnedCert());
 			CertificateFactory cf = CertificateFactory.getInstance("X.509");
 			cert = (X509Certificate) cf.generateCertificate(is);
 
@@ -311,7 +312,7 @@ public class Driver
 
 			keystore = KeyStore.getInstance("PKCS12", "SunJSSE");
 			// Load the keystore
-			keystore.load(new FileInputStream(OscarProperties.getInstance().getProperty("olis_keystore")), pwd.toCharArray());
+			keystore.load(new FileInputStream(junoProperties.getOlis().getKeystore()), pwd.toCharArray());
 
 			Enumeration e = keystore.aliases();
 			String name = "";

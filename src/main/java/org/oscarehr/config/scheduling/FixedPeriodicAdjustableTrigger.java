@@ -49,16 +49,18 @@ public class FixedPeriodicAdjustableTrigger implements Trigger
 
 	private final AdjustablePeriod adjustablePeriod;
 	private final TemporalAmount initialDelay;
+	private final String triggerName;
 
-	public FixedPeriodicAdjustableTrigger(AdjustablePeriod adjustablePeriod)
+	public FixedPeriodicAdjustableTrigger(String triggerName, AdjustablePeriod adjustablePeriod)
 	{
-		this(adjustablePeriod, Duration.ofMinutes(0));
+		this(triggerName, adjustablePeriod, Duration.ofMinutes(0));
 	}
 
-	public FixedPeriodicAdjustableTrigger(AdjustablePeriod adjustablePeriod, TemporalAmount initialDelay)
+	public FixedPeriodicAdjustableTrigger(String triggerName, AdjustablePeriod adjustablePeriod, TemporalAmount initialDelay)
 	{
 		this.adjustablePeriod = adjustablePeriod;
 		this.initialDelay = initialDelay;
+		this.triggerName = triggerName;
 	}
 
 	@Override
@@ -75,7 +77,7 @@ public class FixedPeriodicAdjustableTrigger implements Trigger
 			nextExecutionTime = nextExecutionTime.plus(period);
 		}
 
-		logger.info("nextExecutionTime -> " + Date.from(nextExecutionTime));
+		logger.info(triggerName + ": nextExecutionTime -> " + Date.from(nextExecutionTime));
 		return Date.from(nextExecutionTime);
 	}
 }

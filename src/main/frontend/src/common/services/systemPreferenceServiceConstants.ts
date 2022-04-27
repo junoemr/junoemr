@@ -49,6 +49,12 @@ export enum SYSTEM_PROPERTIES
     ACTIVE_FAX_ACCOUNT = "system_active_fax_account_id",
 }
 
+export enum SystemPreferences
+{
+    OlisIntegrationEnabled = "integration.olis.enabled",
+    OlisPollingEnabled = "olis_polling_enabled",
+}
+
 export enum INSTANCE_TYPE
 {
     BC = "BC",

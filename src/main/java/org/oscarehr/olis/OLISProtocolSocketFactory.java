@@ -1,5 +1,3 @@
-package org.oscarehr.olis;
-
 /**
  * Copyright (c) 2001-2002. Department of Family Medicine, McMaster University. All Rights Reserved.
  * This software is published under the GPL GNU General Public License.
@@ -23,11 +21,19 @@ package org.oscarehr.olis;
  * Hamilton
  * Ontario, Canada
  */
+package org.oscarehr.olis;
 
+import org.apache.commons.httpclient.params.HttpConnectionParams;
+import org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory;
+import org.oscarehr.config.JunoProperties;
+import org.oscarehr.util.SpringUtils;
+
+import javax.net.SocketFactory;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -35,24 +41,16 @@ import java.net.SocketAddress;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 
-import javax.net.SocketFactory;
+public class OLISProtocolSocketFactory implements SecureProtocolSocketFactory
+{
+	private static final JunoProperties junoProperties = SpringUtils.getBean(JunoProperties.class);
 
-
-import org.apache.commons.httpclient.params.HttpConnectionParams;
-import org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory;
-
-import oscar.OscarProperties;
-
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-
-public class OLISProtocolSocketFactory implements SecureProtocolSocketFactory{
 	SSLContext context = null;
 	
-	public  OLISProtocolSocketFactory() throws Exception{
-	
-		String pKeyFile = OscarProperties.getInstance().getProperty("olis_ssl_keystore").trim();
-		String pKeyPassword = OscarProperties.getInstance().getProperty("olis_ssl_keystore_password").trim();
+	public OLISProtocolSocketFactory() throws Exception
+	{
+		String pKeyFile = junoProperties.getOlis().getSslKeystore();
+		String pKeyPassword = junoProperties.getOlis().getSslKeystorePassword();
 
 			
 		KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");

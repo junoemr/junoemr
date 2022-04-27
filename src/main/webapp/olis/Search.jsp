@@ -19,13 +19,14 @@
 <%@ page import="org.oscarehr.demographic.dao.DemographicDao" %>
 <%@ page import="org.apache.commons.lang3.StringUtils" %>
 <%@ page import="org.oscarehr.demographic.entity.Demographic" %>
-<%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="org.oscarehr.config.JunoProperties" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 	<%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 
 	<% 
 	if(session.getValue("user") == null) response.sendRedirect("../../logout.jsp");
 	LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
+	final JunoProperties junoProperties = SpringUtils.getBean(JunoProperties.class);
 
 	ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
 	DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
@@ -937,15 +938,15 @@
 		</tbody>
 	</table>
 	</form>
-	
-	
-	
-	<oscar:oscarPropertiesCheck value="yes" property="olis_simulate">
+
+
+	<%
+		if(junoProperties.getOlis().isSimulate())
+		{ %>
 
 		<iframe src="Simulate.jsp" width="500" height="300" frameborder="0" scrolling="no"></iframe>
-
-	</oscar:oscarPropertiesCheck>
-		
+				<%
+		} %>
 			</td>
 		</tr>
 	</tbody></table>
