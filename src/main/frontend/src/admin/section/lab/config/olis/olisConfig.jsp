@@ -1,4 +1,8 @@
 <div class="lab-config-olis">
+	<div ng-if="!$ctrl.olisIntegrationEnabled"
+	     class="flex-row flex-grow-1 m-t-8">
+		<span class="alert alert-warning w-100">Warning: Integration Disabled</span>
+	</div>
 	<panel>
 		<panel-header>
 			<h6>OLIS Polling Settings</h6>
@@ -47,6 +51,7 @@
 						<div>
 							<juno-check-box ng-model="$ctrl.pollingEnabled"
 							                change="$ctrl.setPollingEnabled(value)"
+							                disabled="$ctrl.loadingQueue.isLoading || !$ctrl.olisIntegrationEnabled"
 							                label="Automatic Downloads Enabled"
 											title="If checked, the system will periodically check for new labs using provider specific credentials">
 							</juno-check-box>
@@ -56,7 +61,7 @@
 					<div class="flex-row align-items-center justify-content-between m-b-8">
 						<div class="button-wrapper">
 							<juno-button click="$ctrl.manualLabPull()"
-							             disabled="$ctrl.loadingQueue.isLoading"
+							             disabled="$ctrl.loadingQueue.isLoading || !$ctrl.olisIntegrationEnabled"
 							             title="Download new labs to the inbox immediately (same action as the automatic polling)">
 								Fetch Labs Now!
 							</juno-button>
@@ -65,6 +70,7 @@
 					<div class="flex-row align-items-center justify-content-between">
 						<div class="button-wrapper">
 							<juno-button click="$ctrl.labSearch()"
+							             disabled="$ctrl.loadingQueue.isLoading || !$ctrl.olisIntegrationEnabled"
 							             title="open the OLIS manual search window">
 								OLIS Lab Search
 							</juno-button>
