@@ -84,6 +84,7 @@ public class JunoProperties
 		private String pollingFacilityId;
 	}
 
+	@Data
 	public static class FaxConfig
 	{
 		private String dataStoreLocation;
