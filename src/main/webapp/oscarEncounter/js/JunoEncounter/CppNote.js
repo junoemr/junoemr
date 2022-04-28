@@ -337,11 +337,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 		// Build position dropdown
 
 		// Remove any existing options
-		var numOptions = $("position").length;
-		for(var i = 1; i <= numOptions; i++)
-		{
-			Element.remove("popt" + i)
-		}
+		junoJQuery("#position").children("option").remove();
 
 		// Add options for this list
 		var numNotes = junoJQuery("#" + summaryCode + "list li.cpp").length;
@@ -356,7 +352,7 @@ if (!Juno.OscarEncounter.JunoEncounter.CppNote) Juno.OscarEncounter.JunoEncounte
 				option.id = optId;
 				option.text = "" + opttxt;
 				option.value = j;
-				$("position").options.add(option, j);
+				junoJQuery("#position").append(option);
 				if(position === j)
 				{
 					option.selected = "selected";
