@@ -54,16 +54,7 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 				controller.page.title = controller.resolve.mod.displayName;
 				controller.page.items = controller.resolve.mod.summaryItem;
 				controller.page.code = controller.resolve.mod.summaryCode;
-
 				controller.action = controller.resolve.action;
-
-				controller.displayIssueId(controller.page.code);
-
-				//action is NULL when new , action is some id when not
-				if (controller.action != null)
-				{
-					controller.displayGroupNote(controller.page.items, controller.action);
-				}
 
 				diseaseRegistryService.getIssueQuickLists().then(
 					function success(results)
@@ -72,7 +63,8 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 					},
 					function error(errors)
 					{
-						console.log(errors);
+						console.error(errors);
+						new ToastService().errorToast("unknown error loading quick lists");
 					});
 
 				controller.displayIssueId(controller.page.code);
@@ -85,6 +77,7 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 				else
 				{
 					//new entry
+					controller.setAvailablePositions();
 				}
 			}
 
@@ -231,7 +224,7 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 		controller.setAvailablePositions = function setAvailablePositions()
 		{
 			controller.availablePositions = [];
-			if (controller.page.items == null || controller.page.items.length == 0)
+			if (controller.page.items == null || controller.page.items.length === 0)
 			{
 				controller.availablePositions.push(1);
 			}
@@ -248,8 +241,6 @@ angular.module('Record.Summary').component('groupNotesComponent', {
 				}
 			}
 		};
-
-		controller.setAvailablePositions();
 
 		controller.changeNote = function changeNote(item, itemId)
 		{
