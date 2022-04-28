@@ -272,6 +272,19 @@
 		</jaxws:features>
 	</jaxws:endpoint>
 
+	<jaxws:endpoint implementor="#noteWs" address="/NoteService" >
+		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
+	</jaxws:endpoint>
+
 	<!-- ========================================================================================-->
 	<!-- Settings for the internal REST web services -->
 	<!-- ========================================================================================-->
