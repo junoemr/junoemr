@@ -41,9 +41,10 @@ if(!authed) {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page
-	import="oscar.oscarDemographic.data.*,java.util.*"%>
 <%@ page import="oscar.oscarReport.data.ManageLetters" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Hashtable" %>
+<%@ page import="oscar.oscarDemographic.data.DemographicNameAgeString" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
@@ -226,7 +227,7 @@ function disableifchecked(ele,nextDate){
 			<%if ( demos != null){%>
 			<table>
 
-				<%  DemographicNameAgeString deName = DemographicNameAgeString.getInstance();                       
+				<%  DemographicNameAgeString deName = DemographicNameAgeString.getInstance();
                         for ( int i =0; i < demos.length;i++){     
                             Hashtable h = deName.getNameAgeSexHashtable(LoggedInInfo.getLoggedInInfoFromSession(request), demos[i]);
                     %>

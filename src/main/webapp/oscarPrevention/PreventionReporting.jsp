@@ -41,6 +41,7 @@
 <%@ page import="oscar.oscarReport.data.RptSearchData" %>
 <%@ page import="org.oscarehr.contact.entity.DemographicContact" %>
 <%@ page import="org.oscarehr.contact.entity.Contact" %>
+<%@ page import="java.util.List" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
@@ -65,7 +66,7 @@ if(!authed) {
 
 <%
   oscar.oscarReport.data.RptSearchData searchData  = new oscar.oscarReport.data.RptSearchData();
-  ArrayList queryArray = searchData.getQueryTypes();
+  List<RptSearchData.SearchCriteria> queryArray = searchData.getQueryTypes();
 
   BillingONCHeader1Dao bCh1Dao = (BillingONCHeader1Dao)SpringUtils.getBean("billingONCHeader1Dao");
 %>
@@ -393,8 +394,9 @@ table.ele thead {
                    Saved Query:
                   <html:select property="patientSet">
                       <html:option value="-1" >--Select Query--</html:option>
-                      <%for (int i =0 ; i < queryArray.size(); i++){
-                        RptSearchData.SearchCriteria sc = (RptSearchData.SearchCriteria) queryArray.get(i);
+                      <%for (int i =0 ; i < queryArray.size(); i++)
+                      {
+                        RptSearchData.SearchCriteria sc = queryArray.get(i);
                         String qId = sc.id;
                         String qName = sc.queryName;%>
                         <html:option value="<%=qId%>"><%=qName%></html:option>
@@ -685,21 +687,6 @@ table.ele thead {
                     </form>
 
                   <%}%>
-                  <%--
-                  <% if ( overDueList.size() > 0 ) {
-                        String queryStr = getUrlParamList(overDueList, "demo");
-                        %>
-                        <a target="_blank" href="../report/GenerateEnvelopes.do?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode(request.getAttribute("prevType")+" is due","UTF-8")%>">Add Tickler for Overdue</a>
-                  <%}%>
-                  --%>
-
-                 <%-- if ( firstLetter.size() > 0 ) {
-                        String queryStr = getUrlParamList(firstLetter, "demo");
-                        %>
-                    <a target="_blank" href="../report/GenerateEnvelopes.do?<%=queryStr%>&message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>">Generate First Envelopes</a>
-                  <%}
-                    --%>
-
 
                   <% if ( firstLetter.size() > 0 ) {
                         String queryStr = getUrlParamList(firstLetter, "demo");
@@ -718,16 +705,6 @@ table.ele thead {
                         %>
                     <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1&amp;lastDate=<%=lastDate%>">Generate Refused Letter</a>
                   <%}%>
-
-
-                  <%--
-                  <% if ( phoneCall.size() > 0 ) {
-                        String queryStr = getUrlParamList(phoneCall, "demo");
-                        %>
-                        <a target="_blank" href="../report/GenerateSpreadsheet.do?<%=queryStr%>&message=<%=java.net.URLEncoder.encode("Phone call 1 made for : "+request.getAttribute("prevType"),"UTF-8")%>followupType=<%=followUpType%>&followupValue=P1">Generate Phone Call list</a>
-                  <%}%>
-                  --%>
-
                </div>
 
 <script type="text/javascript">

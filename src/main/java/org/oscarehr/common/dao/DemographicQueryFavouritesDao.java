@@ -31,16 +31,18 @@ import org.oscarehr.common.model.DemographicQueryFavourite;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class DemographicQueryFavouritesDao extends AbstractDao<DemographicQueryFavourite>{
-
-	public DemographicQueryFavouritesDao() {
+public class DemographicQueryFavouritesDao extends AbstractDao<DemographicQueryFavourite>
+{
+	public DemographicQueryFavouritesDao()
+	{
 		super(DemographicQueryFavourite.class);
 	}
 
-	public List<DemographicQueryFavourite> findByArchived(String archived) {
-		String sql = "select x from DemographicQueryFavourite x where x.archived=?1 order by x.queryName";
+	public List<DemographicQueryFavourite> findByArchived(String archived)
+	{
+		String sql = "SELECT x FROM DemographicQueryFavourite x WHERE x.archived=:archived ORDER BY x.queryName";
 		Query query = entityManager.createQuery(sql);
-		query.setParameter(1, archived);
+		query.setParameter("archived", archived);
 		@SuppressWarnings("unchecked")
 		List<DemographicQueryFavourite> results = query.getResultList();
 		return results;
