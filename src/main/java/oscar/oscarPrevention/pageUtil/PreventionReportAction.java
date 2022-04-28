@@ -85,12 +85,12 @@ public class PreventionReportAction extends Action
 		try {
 			log.debug("setting prevention type to " + prevention);
 
-			PreventionReportModel transfer = preventionReportService.runPreventionReport(
+			PreventionReportModel model = preventionReportService.runPreventionReport(
 					loggedInInfo,
 					setName,
 					ConversionUtils.fromDateString(asofDate),
 					PreventionReport.PreventionReportType.fromStringIgnoreCase(prevention));
-			request.setAttribute("report", transfer);
+			request.setAttribute("report", model);
 		}
 		catch(Exception e)
 		{

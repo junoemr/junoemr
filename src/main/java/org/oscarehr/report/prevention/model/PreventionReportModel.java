@@ -27,6 +27,13 @@ import oscar.oscarPrevention.pageUtil.PreventionReportDisplay;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static oscar.oscarPrevention.reports.PreventionReport.FIRST_LETTER;
+import static oscar.oscarPrevention.reports.PreventionReport.OVERDUE;
+import static oscar.oscarPrevention.reports.PreventionReport.PHONE_CALL;
+import static oscar.oscarPrevention.reports.PreventionReport.REFUSED;
+import static oscar.oscarPrevention.reports.PreventionReport.SECOND_LETTER;
 
 @Data
 public class PreventionReportModel
@@ -44,4 +51,41 @@ public class PreventionReportModel
 	private String patientSet;
 	private String prevention;
 	private List<PreventionReportDisplay> returnReport;
+
+	public List<Integer> getL1LetterDemographicIds()
+	{
+		return demographicsByProcedure(FIRST_LETTER);
+	}
+	public List<Integer> getL2LetterDemographicIds()
+	{
+		return demographicsByProcedure(SECOND_LETTER);
+	}
+	public List<Integer> getP1LetterDemographicIds()
+	{
+		return demographicsByProcedure(PHONE_CALL);
+	}
+	public List<Integer> getRefusedLetterDemographicIds()
+	{
+		return demographicsByState(REFUSED);
+	}
+	public List<Integer> getOverdueLetterDemographicIds()
+	{
+		return demographicsByState(OVERDUE);
+	}
+
+	private List<Integer> demographicsByProcedure(String procedure)
+	{
+		return returnReport.stream()
+				.filter((display) -> procedure.equals(display.nextSuggestedProcedure))
+				.map((display) -> display.demographicNo)
+				.collect(Collectors.toList());
+	}
+
+	private List<Integer> demographicsByState(String state)
+	{
+		return returnReport.stream()
+				.filter((display) -> state.equals(display.state))
+				.map((display) -> display.demographicNo)
+				.collect(Collectors.toList());
+	}
 }
