@@ -42,6 +42,8 @@
 <%@ page import="org.oscarehr.contact.entity.DemographicContact" %>
 <%@ page import="org.oscarehr.contact.entity.Contact" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.oscarehr.report.prevention.model.PreventionReportModel" %>
+<%@ page import="oscar.util.ConversionUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
@@ -443,16 +445,35 @@ table.ele thead {
                   ArrayList secondLetter = new ArrayList();
                   ArrayList refusedLetter = new ArrayList();
                   ArrayList phoneCall = new ArrayList();
-                  String type = (String) request.getAttribute("ReportType");
-                  String ineligible = (String) request.getAttribute("inEligible");
-                  String done = (String) request.getAttribute("up2date");
-                  String percentage = (String) request.getAttribute("percent");
-                  String percentageWithGrace = (String) request.getAttribute("percentWithGrace");
-                  String followUpType = (String) request.getAttribute("followUpType");
-                  String billCode =  (String) request.getAttribute("BillCode");
-                  ArrayList list = (ArrayList) request.getAttribute("returnReport");
-                  Date asDate = (Date) request.getAttribute("asDate");
-                  if (asDate == null){ asDate = Calendar.getInstance().getTime(); }
+
+
+                    String type = null;
+                    String ineligible = null;
+                    String done = null;
+                    String percentage = null;
+                    String percentageWithGrace = null;
+                    String followUpType = null;
+                    String billCode = null;
+                    List<PreventionReportDisplay> list = null;
+                    Date asDate = null;
+
+                    PreventionReportModel model = (PreventionReportModel) request.getAttribute("report");
+                    if(model != null)
+                    {
+                        type = model.getReportType();
+                        ineligible = model.getInEligible();
+                        done = model.getUpToDate();
+                        percentage = model.getPercent();
+                        percentageWithGrace = model.getPercentWithGrace();
+                        followUpType = model.getFollowUpType();
+                        billCode = model.getBillCode();
+                        list = model.getReturnReport();
+                        asDate = model.getAsOfDateTime();
+                    }
+                    if(asDate == null)
+                    {
+                        asDate = Calendar.getInstance().getTime();
+                    }
                   String lastDate = null;
                   
                   String error = (String) request.getAttribute("error");

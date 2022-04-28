@@ -30,63 +30,48 @@
 
 package oscar.oscarPrevention.pageUtil;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Hashtable;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.report.prevention.model.PreventionReportModel;
+import org.oscarehr.report.prevention.service.PreventionReportService;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.oscarPrevention.reports.PreventionReport;
-import oscar.oscarPrevention.reports.PreventionReportFactory;
-import oscar.oscarReport.data.RptDemographicQueryBuilder;
-import oscar.oscarReport.data.RptDemographicQueryLoader;
-import oscar.oscarReport.pageUtil.RptDemographicReportForm;
 import oscar.util.ConversionUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  *
  * @author Jay Gallagher
  */
-public class PreventionReportAction extends Action {
-	private static Logger log = MiscUtils.getLogger();
-
-	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+public class PreventionReportAction extends Action
+{
+	private static final Logger log = MiscUtils.getLogger();
+	private static final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private static final PreventionReportService preventionReportService = SpringUtils.getBean(PreventionReportService.class);
 
 	public PreventionReportAction() {
 	}
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-			HttpServletResponse response) {
-
+			HttpServletResponse response)
+	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
-
-		if (!securityInfoManager.hasPrivilege(loggedInInfo, "_report", "r", null)) {
-			throw new SecurityException("missing required security object (_report)");
-		}
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.REPORT_READ, Permission.PREVENTION_READ);
 		log.info("PREVENTION REPORT");
 
 		String setName = request.getParameter("patientSet");
 		String prevention = request.getParameter("prevention");
 		String asofDate = ((PreventionReportForm) form).asofDate;
-		Date asofDateDate = ConversionUtils.fromDateString(asofDate);
 
-		if (asofDateDate == null) {
-			Calendar today = Calendar.getInstance();
-			asofDateDate = today.getTime();
-		}
-		
 		/* some fast error checking */
 		if("-1".equals(setName)) {
 			request.setAttribute("error", "No patient set selected");
@@ -98,43 +83,17 @@ public class PreventionReportAction extends Action {
 		}
 		
 		try {
-			RptDemographicReportForm frm = new RptDemographicReportForm();
-			frm.setSavedQuery(setName);
-			RptDemographicQueryLoader demoL = new RptDemographicQueryLoader();
-			frm = demoL.queryLoader(frm);
-			frm.addDemoIfNotPresent();
-			frm.setAsofDate(asofDate);
-			RptDemographicQueryBuilder demoQ = new RptDemographicQueryBuilder();
-			ArrayList<ArrayList<String>> list = demoQ.buildQuery(loggedInInfo, frm, asofDate);
+			log.debug("setting prevention type to " + prevention);
 
-			log.debug("set size " + list.size());
-
-			
-			PreventionReport report = PreventionReportFactory.getPreventionReport(prevention);
-			Hashtable h = report.runReport(loggedInInfo, list, asofDateDate);
-
-			if (report.displayNumShots())
-			{
-				request.setAttribute("ReportType", "yes");
-			}
-
-			request.setAttribute("asDate", asofDateDate);
-			request.setAttribute("up2date", h.get("up2date"));
-			request.setAttribute("percent", h.get("percent"));
-			request.setAttribute("percentWithGrace", h.get("percentWithGrace"));
-			request.setAttribute("returnReport", h.get("returnReport"));
-			request.setAttribute("inEligible", h.get("inEligible"));
-			request.setAttribute("eformSearch", h.get("eformSearch"));
-			request.setAttribute("followUpType", h.get("followUpType"));
-			request.setAttribute("BillCode", h.get("BillCode"));
-
-			request.setAttribute("prevType", prevention);
-			request.setAttribute("patientSet", setName);
-			request.setAttribute("prevention", prevention);
-
-			log.debug("setting prevention type to " + prevention);	
+			PreventionReportModel transfer = preventionReportService.runPreventionReport(
+					loggedInInfo,
+					setName,
+					ConversionUtils.fromDateString(asofDate),
+					PreventionReport.PreventionReportType.fromStringIgnoreCase(prevention));
+			request.setAttribute("report", transfer);
 		}
-		catch(Exception e) {
+		catch(Exception e)
+		{
 			log.error("Prevention Report Error", e);
 			request.setAttribute("error", "An unknown error has occured");
 			return (mapping.findForward("failure"));
