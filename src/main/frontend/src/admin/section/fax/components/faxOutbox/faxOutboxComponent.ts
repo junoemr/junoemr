@@ -14,6 +14,7 @@ import {FaxNotificationStatusType} from "../../../../../lib/fax/model/FaxNotific
 import FaxAccount from "../../../../../lib/fax/model/FaxAccount";
 import FaxAccountService from "../../../../../lib/fax/service/FaxAccountService";
 import PhoneNumber from "../../../../../lib/common/model/PhoneNumber";
+import ToastErrorHandler from "../../../../../lib/error/handler/ToastErrorHandler";
 
 angular.module("Admin.Section.Fax").component('faxOutbox', {
 	templateUrl: 'src/admin/section/fax/components/faxOutbox/faxOutbox.jsp',
@@ -29,7 +30,7 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 		{
 			const ctrl = this;
 			ctrl.toastService = new ToastService();
-			ctrl.faxAccountService = new FaxAccountService();
+			ctrl.faxAccountService = new FaxAccountService(new ToastErrorHandler());
 			ctrl.faxOutboxService = new FaxOutboxService();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;
@@ -289,7 +290,11 @@ angular.module("Admin.Section.Fax").component('faxOutbox', {
 				{
 					let now = moment();
 					let minutes = ctrl.nextPushTime.diff(now, 'minutes');
-					minutes = (minutes < 0) ? 0 : minutes;
+
+					if(minutes < 0)
+					{
+						return "several minutes";
+					}
 					return (minutes + 1) + " minutes";
 				}
 			}

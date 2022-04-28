@@ -22,11 +22,19 @@
  */
 package org.oscarehr.fax.exception;
 
+/**
+ * Indicate that something failed when connecting to the fax api.
+ */
 public class FaxApiConnectionException extends FaxException
 {
 	public FaxApiConnectionException(String message)
 	{
 		super(message);
+	}
+
+	public FaxApiConnectionException(String message, String userFriendlyMessage)
+	{
+		super(message, userFriendlyMessage);
 	}
 
 	public FaxApiConnectionException(Exception e)

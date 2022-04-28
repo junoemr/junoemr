@@ -25,7 +25,11 @@ package org.oscarehr.fax.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.provider.FaxProvider;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.Optional;
 
 @Repository
 public class FaxAccountDao extends AbstractDao<FaxAccount>
@@ -33,5 +37,18 @@ public class FaxAccountDao extends AbstractDao<FaxAccount>
 	public FaxAccountDao()
 	{
 		super(FaxAccount.class);
+	}
+
+	@SuppressWarnings("unchecked")
+	public Optional<FaxAccount> findByLoginId(FaxProvider faxProvider, String loginId)
+	{
+		Query query = entityManager.createQuery(
+				"SELECT x FROM FaxAccount x " +
+						"WHERE x.loginId=:loginId " +
+						"AND x.integrationType=:type");
+		query.setParameter("loginId", loginId);
+		query.setParameter("type", faxProvider);
+
+		return Optional.ofNullable(getSingleResultOrNull(query));
 	}
 }

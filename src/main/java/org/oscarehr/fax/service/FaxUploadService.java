@@ -287,6 +287,7 @@ public class FaxUploadService
 				GenericFile fileToSend;
 				try
 				{
+					// queued fax files live in the pending folder
 					fileToSend = FileFactory.getOutboundPendingFaxFile(queuedFax.getFileName());
 				}
 				catch(IOException e)
@@ -338,7 +339,7 @@ public class FaxUploadService
 		criteriaSearch.setStatus(FaxStatusInternal.SENT); // only check records with a local sent status
 		criteriaSearch.setRemoteStatus(FaxStatusRemote.PENDING); // only check records that have not completed remotely
 		criteriaSearch.setArchived(false); // ignore archived records
-		criteriaSearch.setFaxAccountId(faxAccount.getId());
+		criteriaSearch.setFaxAccountId(faxAccount.getId()); // limit results to specified account
 
 		List<FaxOutbound> pendingList = faxOutboundDao.criteriaSearch(criteriaSearch);
 
@@ -371,6 +372,12 @@ public class FaxUploadService
 					}
 					faxOutboundDao.merge(faxOutbound);
 					logger.info("Updated external status to: " + externalStatus);
+				}
+				/* Don't change fax status if there is an error here. The fax has been sent to the remote service successfully,
+				 * we just don't know what remote state it's in. */
+				catch (FaxApiConnectionException e)
+				{
+					logger.error("Api connection error", e);
 				}
 				catch (Exception e)
 				{
@@ -469,12 +476,13 @@ public class FaxUploadService
 			faxOutbound.setStatusMessage(e.getUserFriendlyMessage());
 
 			// if the maximum sent attempts has been hit, set the error status.
-			if(faxAttemptCounterMap.get(faxOutbound.getId()) >= MAX_SEND_COUNT)
+			if(faxAttemptCounterMap.containsKey(faxOutbound.getId())
+					&& faxAttemptCounterMap.get(faxOutbound.getId()) >= MAX_SEND_COUNT)
 			{
 				faxOutbound.setStatusError();
 			}
 		}
-		catch(FaxApiValidationException e)
+		catch(FaxApiValidationException | FaxIntegrationException e)
 		{
 			logger.warn("Fax API failure: " + e.getMessage());
 			logData = e.getMessage();

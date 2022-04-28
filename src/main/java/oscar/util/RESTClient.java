@@ -191,7 +191,15 @@ public class RESTClient
 		{
 			for (Map.Entry<String, Object> param : queryParams.entrySet())
 			{
-				uriBuilder.queryParam(param.getKey(), param.getValue());
+				Object value = param.getValue();
+				if(value instanceof Object[])
+				{
+					uriBuilder.queryParam(param.getKey(), (Object[]) value);
+				}
+				else
+				{
+					uriBuilder.queryParam(param.getKey(), value);
+				}
 			}
 		}
 		return uriBuilder;

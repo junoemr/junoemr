@@ -43,20 +43,21 @@
 				</div>
 				<div class="input-group grid-flow-row grid-row-2 grid-row-gap-4">
 					<juno-input ng-model="$ctrl.faxAccount.accountLogin"
-					            disabled="$ctrl.isModalEditMode()"
+					            disabled="$ctrl.isModalEditMode() || $ctrl.faxAccountProvider.isOauth()"
 					            ng-change="$ctrl.setDefaultConnectionStatus()"
-					            invalid="$ctrl.initialSave &&!$ctrl.validations.accountLoginFilled()"
+					            invalid="$ctrl.initialSave && !$ctrl.validations.accountLoginFilled()"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.accountLogin"/>"
 					            label-position="$ctrl.LABEL_POSITION.LEFT">
 					</juno-input>
-					<juno-input ng-model="$ctrl.faxAccount.password"
+					<juno-input ng-if="$ctrl.faxAccountProvider.showPasswordField()"
+					            ng-model="$ctrl.faxAccount.password"
 					            ng-change="$ctrl.setDefaultConnectionStatus()"
-					            invalid="$ctrl.initialSave &&!$ctrl.validations.passwordFilled()"
+					            invalid="$ctrl.initialSave && !$ctrl.validations.passwordFilled()"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.password"/>"
 					            label-position="$ctrl.LABEL_POSITION.LEFT">
 					</juno-input>
 					<juno-input ng-model="$ctrl.faxAccount.displayName"
-					            invalid="$ctrl.initialSave &&!$ctrl.validations.displayNameFilled()"
+					            invalid="$ctrl.initialSave && !$ctrl.validations.displayNameFilled()"
 					            title="<bean:message bundle="ui" key="admin.fax.acct.edit.displayName-tooltip"/>"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.displayName"/>"
 					            label-position="$ctrl.LABEL_POSITION.LEFT">
@@ -78,14 +79,14 @@
 				</div>
 				<div class="input-group grid-flow-row grid-row-2 grid-row-gap-4">
 					<juno-input ng-model="$ctrl.faxAccount.accountEmail"
-					            ng-if="$ctrl.faxAccount.enableOutbound"
+					            ng-if="$ctrl.faxAccount.enableOutbound && $ctrl.faxAccountProvider.showOutboundEmailField()"
 					            invalid="$ctrl.initialSave && !$ctrl.validations.emailFilled()"
 					            title="<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail-tooltip"/>"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.accountEmail"/>"
 					            label-position="$ctrl.LABEL_POSITION.LEFT">
 					</juno-input>
 					<juno-input ng-model="$ctrl.faxAccount.faxNumber"
-					            ng-if="$ctrl.faxAccount.enableOutbound"
+					            ng-if="$ctrl.faxAccount.enableOutbound && $ctrl.faxAccountProvider.showOutboundReturnFaxNoField()"
 					            invalid="$ctrl.initialSave && !$ctrl.validations.faxNumberFilled()"
 					            title="<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber-tooltip"/>"
 					            label="<bean:message bundle="ui" key="admin.fax.acct.edit.faxNumber"/>"
@@ -94,6 +95,7 @@
 					<juno-select ng-model="$ctrl.faxAccount.coverLetterOption"
 					             options="$ctrl.coverLetterOptions"
 					             ng-if="$ctrl.faxAccount.enableOutbound"
+					             disabled="!$ctrl.initialized || !$ctrl.coverLetterOptionsInitialized"
 					             title="<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption-tooltip"/>"
 					             label="<bean:message bundle="ui" key="admin.fax.acct.edit.coverLetterOption"/>"
 					             label-position="$ctrl.LABEL_POSITION.LEFT">
@@ -115,8 +117,8 @@
 				</div>
 			</fieldset>
 			<hr>
-			<div class="flex-row input-fieldset" ng-class="$ctrl.getConnectionStatusClass()">
-				<div class="input-group flex-row flex-grow">
+			<div class="flex-column input-fieldset" ng-class="$ctrl.getConnectionStatusClass()">
+				<div class="input-group grid-flow-row grid-row-2 grid-row-gap-4">
 					<juno-button click="$ctrl.testConnection()"
 					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.connectionStatus'/>"
 					             label-position="$ctrl.LABEL_POSITION.LEFT"
@@ -127,6 +129,25 @@
 						<span class="m-l-4">{{$ctrl.getConnectionTestText()}}</span>
 						</div>
 					</juno-button>
+				</div>
+				<div class="input-group flex-row justify-content-center align-items-center">
+					<juno-button ng-if="$ctrl.showDisconnectButton()"
+					             class="w-256"
+					             click="$ctrl.disconnectAccount()"
+					             disabled="$ctrl.LoadingQueue.isLoading"
+					             button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
+					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
+						{{$ctrl.getDisconnectText()}}
+					</juno-button>
+					<juno-button ng-if="$ctrl.showConnectButton()"
+								 class="w-256"
+								 click="$ctrl.connectAccount()"
+								 disabled="$ctrl.LoadingQueue.isLoading"
+								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.TRANSPARENT">
+						{{$ctrl.getConnectionText()}}
+					</juno-button>
+				</div>
 				</div>
 			</div>
 		</form>
@@ -165,6 +186,3 @@
 		</div>
 	</modal-footer>
 </juno-modal>
-
-
-

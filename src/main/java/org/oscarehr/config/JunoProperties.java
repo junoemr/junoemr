@@ -39,6 +39,7 @@ public class JunoProperties
 	private RedisSessionStore redisSessionStore;
 	private Olis olis;
 	private Test test;
+	private FaxConfig faxConfig;
 
 	@Data
 	public static class JunoPropertiesConfig
@@ -81,5 +82,14 @@ public class JunoProperties
 		private boolean simulate;
 		private String processingId;
 		private String pollingFacilityId;
+	}
+
+	public static class FaxConfig
+	{
+		private String dataStoreLocation;
+		private String ringcentralApiLocation;
+		private String ringcentralRedirectUrl;
+		private String ringcentralClientId;
+		private String ringcentralClientSecret;
 	}
 }

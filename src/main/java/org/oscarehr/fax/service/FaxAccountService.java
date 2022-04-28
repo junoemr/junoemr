@@ -34,7 +34,9 @@ import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxInboundDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.model.FaxAccount;
+import org.oscarehr.fax.model.FaxAccountConnectionStatus;
 import org.oscarehr.fax.provider.FaxAccountProvider;
+import org.oscarehr.fax.provider.FaxProvider;
 import org.oscarehr.fax.provider.FaxProviderFactory;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
 import org.oscarehr.fax.search.FaxInboundCriteriaSearch;
@@ -51,6 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This service should be responsible for handling all logic around fax setup and configuration
@@ -91,16 +94,16 @@ public class FaxAccountService
 	/**
 	 * Test the connection to the fax service based on the configuration settings
 	 *
-	 * @return true if the connection succeeded, false otherwise
+	 * @return connection status
 	 */
-	public boolean testConnectionStatus(FaxAccountCreateInput createInput)
+	public FaxAccountConnectionStatus testConnectionStatus(FaxAccountCreateInput createInput)
 	{
 		FaxAccount faxAccount = faxAccountCreateToEntityConverter.convert(createInput);
 		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccount);
 		return faxAccountProvider.testConnectionStatus();
 	}
 
-	public boolean testConnectionStatus(FaxAccountUpdateInput updateInput)
+	public FaxAccountConnectionStatus testConnectionStatus(FaxAccountUpdateInput updateInput)
 	{
 		FaxAccount faxAccount = faxAccountDao.find(updateInput.getId());
 		if (StringUtils.isNotBlank(updateInput.getPassword()))
@@ -111,6 +114,14 @@ public class FaxAccountService
 		}
 		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccount);
 		return faxAccountProvider.testConnectionStatus();
+	}
+
+	public List<FaxAccount> getActiveFaxAccounts()
+	{
+		FaxAccountCriteriaSearch activeAccountParams = new FaxAccountCriteriaSearch();
+		activeAccountParams.setIntegrationEnabledStatus(true);
+
+		return faxAccountDao.criteriaSearch(activeAccountParams);
 	}
 
 	/**
@@ -150,9 +161,20 @@ public class FaxAccountService
 		return faxAccountToModelConverter.convert(faxAccountDao.find(id));
 	}
 
+	public boolean accountExists(FaxProvider faxProvider, String loginId)
+	{
+		return faxAccountDao.findByLoginId(faxProvider, loginId).isPresent();
+	}
+
 	public boolean isFaxAccountEnabled(Long id)
 	{
 		return faxAccountDao.find(id).isIntegrationEnabled();
+	}
+
+	public List<String> getAccountCoverLetterOptions(Long id)
+	{
+		FaxAccountProvider accountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccountDao.find(id));
+		return accountProvider.getCoverLetterOptions();
 	}
 
 	public FaxAccountTransferOutbound createFaxAccount(FaxAccountCreateInput createInput)
@@ -169,12 +191,53 @@ public class FaxAccountService
 		return faxAccountToModelConverter.convert(faxAccount);
 	}
 
+	/**
+	 * find an existing account based on the type and loginId, or create a new one with a default name
+	 * @param faxProvider the account provider type
+	 * @param loginId the id for the account
+	 * @return new or existing account record
+	 */
+	public FaxAccountTransferOutbound findOrCreateByLoginId(FaxProvider faxProvider, String loginId)
+	{
+		Optional<FaxAccount> faxAccountOptional = faxAccountDao.findByLoginId(faxProvider, loginId);
+		return faxAccountOptional
+				.map((account) -> faxAccountToModelConverter.convert(account))
+				.orElseGet(() ->
+				{
+					FaxAccountCreateInput createInput = new FaxAccountCreateInput();
+					createInput.setAccountType(faxProvider);
+					createInput.setAccountLogin(loginId);
+					createInput.setDisplayName(StringUtils.capitalize(faxProvider.name()) + " " + loginId);
+					createInput.setEnabled(true);
+					FaxAccountTransferOutbound transferOutbound = createFaxAccount(createInput);
+
+					// default the new account to active if there is not an active account
+					String activeFaxAccountId = systemPreferenceService.getPreferenceValue(UserProperty.SYSTEM_ACTIVE_FAX_ACCOUNT, null);
+					if(activeFaxAccountId == null)
+					{
+						systemPreferenceService.setPreferenceValue(UserProperty.SYSTEM_ACTIVE_FAX_ACCOUNT, String.valueOf(transferOutbound.getId()));
+					}
+
+					return transferOutbound;
+				});
+	}
+
 	public boolean deleteFaxAccount(Long id)
 	{
 		FaxAccount faxAccount = faxAccountDao.find(id);
 		faxAccount.setDeletedAt(new Date());
 		faxAccount.setLoginPassword(null); // wipe the password
 		faxAccountDao.merge(faxAccount);
+
+		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccount);
+		faxAccountProvider.disconnectAccount();
+		return true;
+	}
+
+	public boolean disconnectFaxAccount(Long id)
+	{
+		FaxAccountProvider faxAccountProvider = FaxProviderFactory.createFaxAccountProvider(faxAccountDao.find(id));
+		faxAccountProvider.disconnectAccount();
 		return true;
 	}
 
