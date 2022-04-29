@@ -47,7 +47,7 @@
 <%@ page import="static oscar.oscarPrevention.reports.PreventionReport.FIRST_LETTER" %>
 <%@ page import="static oscar.oscarPrevention.reports.PreventionReport.PHONE_CALL" %>
 <%@ page import="static oscar.oscarPrevention.reports.PreventionReport.REFUSED" %>
-<%@ page import="static oscar.oscarPrevention.reports.PreventionReport.OVERDUE" %>
+<%@ page import="static oscar.oscarPrevention.reports.PreventionReport.SECOND_LETTER" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
@@ -701,14 +701,13 @@ table.ele thead {
 
                     </form>
 
-                  <%}%>
-
-                  <% if(!firstLetter.isEmpty())
+                  <%}
+                  if(!firstLetter.isEmpty())
                   {
                         %>
-                    <form name="frmL1Generate" action="<%=request.getContextPath()%>/oscarPrevention/PreventionReport.do" method="POST">
+                    <form name="frmL1Generate" target="_blank" method="POST" action="<%=request.getContextPath()%>/oscarPrevention/PreventionReport.do">
                         <input type="hidden" name="method" value="generateLetter">
-                        <input type="hidden" name="formType" value="L1">
+                        <input type="hidden" name="letterType" value="<%=FIRST_LETTER%>">
                         <input type="hidden" name="message" value="<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>">
                         <input type="hidden" name="followupType" value="<%=followUpType%>">
                         <input type="hidden" name="followupValue" value="L1">
@@ -719,20 +718,43 @@ table.ele thead {
                         <input type="hidden" name="asofDate" value="<%=ConversionUtils.toDateString(model.getAsOfDateTime())%>">
 
                         <button type="submit">Generate First Letter</button>
-<%--                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1&amp;lastDate=<%=lastDate%>">Generate First Letter</a>--%>
                     </form>
-                  <%}%>
-
-                  <% if ( secondLetter.size() > 0 ) {
-                        String queryStr = getUrlParamList(secondLetter, "demo");
+                  <%}
+                  if ( secondLetter.size() > 0 )
+                  {
                         %>
-                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 2 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L2&amp;lastDate=<%=lastDate%>">Generate Second Letter</a>
-                  <%}%>
+                    <form name="frmL2Generate" target="_blank" method="POST" action="<%=request.getContextPath()%>/oscarPrevention/PreventionReport.do">
+                        <input type="hidden" name="method" value="generateLetter">
+                        <input type="hidden" name="letterType" value="<%=SECOND_LETTER%>">
+                        <input type="hidden" name="message" value="<%=java.net.URLEncoder.encode("Letter 2 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>">
+                        <input type="hidden" name="followupType" value="<%=followUpType%>">
+                        <input type="hidden" name="followupValue" value="L2">
+                        <input type="hidden" name="lastDate" value="<%=lastDate%>">
 
-                  <% if ( refusedLetter.size() > 0 ) {
-                        String queryStr = getUrlParamList(refusedLetter, "demo");
+                        <input type="hidden" name="queryName" value="<%=model.getPatientSet()%>">
+                        <input type="hidden" name="prevention" value="<%=model.getPreventionType()%>">
+                        <input type="hidden" name="asofDate" value="<%=ConversionUtils.toDateString(model.getAsOfDateTime())%>">
+
+                        <button type="submit">Generate Second Letter</button>
+                    </form>
+                  <%}
+                  if ( refusedLetter.size() > 0 )
+                  {
                         %>
-                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1&amp;lastDate=<%=lastDate%>">Generate Refused Letter</a>
+                    <form name="frmRefusedGenerate" target="_blank" method="POST" action="<%=request.getContextPath()%>/oscarPrevention/PreventionReport.do">
+                        <input type="hidden" name="method" value="generateLetter">
+                        <input type="hidden" name="letterType" value="<%=REFUSED%>">
+                        <input type="hidden" name="message" value="<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>">
+                        <input type="hidden" name="followupType" value="<%=followUpType%>">
+                        <input type="hidden" name="followupValue" value="L1">
+                        <input type="hidden" name="lastDate" value="<%=lastDate%>">
+
+                        <input type="hidden" name="queryName" value="<%=model.getPatientSet()%>">
+                        <input type="hidden" name="prevention" value="<%=model.getPreventionType()%>">
+                        <input type="hidden" name="asofDate" value="<%=ConversionUtils.toDateString(model.getAsOfDateTime())%>">
+
+                        <button type="submit">Generate Refused Letter</button>
+                    </form>
                   <%}%>
                </div>
 
@@ -743,17 +765,3 @@ table.ele thead {
 </body>
 </html:html>
 
-<%!
-    String getUrlParamList(List list,String paramName){
-        String queryStr = "";
-        for (int i = 0; i < list.size(); i++){
-            String demo = String.valueOf(list.get(i));
-            if (i == 0){
-              queryStr += paramName+"="+demo;
-            }else{
-              queryStr += "&amp;"+paramName+"="+demo;
-            }
-        }
-        return queryStr;
-  }
-%>

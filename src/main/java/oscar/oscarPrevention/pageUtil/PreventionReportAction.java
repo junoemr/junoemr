@@ -47,6 +47,12 @@ import oscar.util.ConversionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
+
+import static oscar.oscarPrevention.reports.PreventionReport.FIRST_LETTER;
+import static oscar.oscarPrevention.reports.PreventionReport.REFUSED;
+import static oscar.oscarPrevention.reports.PreventionReport.SECOND_LETTER;
 
 /**
  *
@@ -95,7 +101,7 @@ public class PreventionReportAction extends DispatchAction
 		catch(Exception e)
 		{
 			log.error("Prevention Report Error", e);
-			request.setAttribute("error", "An unknown error has occured");
+			request.setAttribute("error", "An unknown error has occurred");
 			return (mapping.findForward("failure"));
 		}
 		return (mapping.findForward("success"));
@@ -112,6 +118,8 @@ public class PreventionReportAction extends DispatchAction
 		String prevention = request.getParameter("prevention");
 		String asofDate = request.getParameter("asofDate");
 
+		String letterType = request.getParameter("letterType");
+
 		// pass through some parameters
 		request.setAttribute("message", request.getParameter("message"));
 		request.setAttribute("followupType", request.getParameter("followUpType"));
@@ -125,8 +133,15 @@ public class PreventionReportAction extends DispatchAction
 				ConversionUtils.fromDateString(asofDate),
 				PreventionReport.PreventionReportType.fromStringIgnoreCase(prevention));
 
-		//todo switch list type
-		request.setAttribute("demographicIds", model.getL1LetterDemographicIds());
+		List<Integer> demographicIds;
+		switch(letterType)
+		{
+			case FIRST_LETTER: demographicIds = model.getL1LetterDemographicIds(); break;
+			case SECOND_LETTER: demographicIds = model.getL2LetterDemographicIds(); break;
+			case REFUSED: demographicIds = model.getRefusedLetterDemographicIds(); break;
+			default: demographicIds = new ArrayList<>(0); break;
+		}
+		request.setAttribute("demographicIds", demographicIds);
 
 		return (mapping.findForward("letterGeneration"));
 	}
