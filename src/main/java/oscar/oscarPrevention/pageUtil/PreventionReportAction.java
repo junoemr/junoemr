@@ -122,7 +122,7 @@ public class PreventionReportAction extends DispatchAction
 
 		// pass through some parameters
 		request.setAttribute("message", request.getParameter("message"));
-		request.setAttribute("followupType", request.getParameter("followUpType"));
+		request.setAttribute("followupType", request.getParameter("followupType"));
 		request.setAttribute("followupValue", request.getParameter("followupValue"));
 		request.setAttribute("lastDate", request.getParameter("lastDate"));
 

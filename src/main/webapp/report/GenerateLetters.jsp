@@ -185,7 +185,8 @@ function disableifchecked(ele,nextDate){
 	</tr>
 	<tr>
 		<td class="MainTableLeftColumn" valign="top">&nbsp;</td>
-		<td valign="top" class="MainTableRightColumn"><html:form
+		<td valign="top" class="MainTableRightColumn">
+			<html:form
 			action="/report/GenerateLetters" method="POST"
 			styleId="listDemographic">
 

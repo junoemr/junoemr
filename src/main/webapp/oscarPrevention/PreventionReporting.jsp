@@ -708,7 +708,7 @@ table.ele thead {
                     <form name="frmL1Generate" target="_blank" method="POST" action="<%=request.getContextPath()%>/oscarPrevention/PreventionReport.do">
                         <input type="hidden" name="method" value="generateLetter">
                         <input type="hidden" name="letterType" value="<%=FIRST_LETTER%>">
-                        <input type="hidden" name="message" value="<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>">
+                        <input type="hidden" name="message" value="<%="Letter 1 Reminder Letter sent for: "+model.getPreventionType()%>">
                         <input type="hidden" name="followupType" value="<%=followUpType%>">
                         <input type="hidden" name="followupValue" value="L1">
                         <input type="hidden" name="lastDate" value="<%=lastDate%>">
@@ -726,7 +726,7 @@ table.ele thead {
                     <form name="frmL2Generate" target="_blank" method="POST" action="<%=request.getContextPath()%>/oscarPrevention/PreventionReport.do">
                         <input type="hidden" name="method" value="generateLetter">
                         <input type="hidden" name="letterType" value="<%=SECOND_LETTER%>">
-                        <input type="hidden" name="message" value="<%=java.net.URLEncoder.encode("Letter 2 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>">
+                        <input type="hidden" name="message" value="<%="Letter 2 Reminder Letter sent for: "+model.getPreventionType()%>">
                         <input type="hidden" name="followupType" value="<%=followUpType%>">
                         <input type="hidden" name="followupValue" value="L2">
                         <input type="hidden" name="lastDate" value="<%=lastDate%>">
@@ -744,7 +744,7 @@ table.ele thead {
                     <form name="frmRefusedGenerate" target="_blank" method="POST" action="<%=request.getContextPath()%>/oscarPrevention/PreventionReport.do">
                         <input type="hidden" name="method" value="generateLetter">
                         <input type="hidden" name="letterType" value="<%=REFUSED%>">
-                        <input type="hidden" name="message" value="<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>">
+                        <input type="hidden" name="message" value="<%="Letter 1 Reminder Letter sent for: "+model.getPreventionType()%>">
                         <input type="hidden" name="followupType" value="<%=followUpType%>">
                         <input type="hidden" name="followupValue" value="L1">
                         <input type="hidden" name="lastDate" value="<%=lastDate%>">
