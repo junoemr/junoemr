@@ -31,7 +31,7 @@ import lombok.Data;
 public class RingCentralAccountInfoResult implements RingCentralResult
 {
 	@JsonProperty("id")
-	private Integer id;
+	private String id;
 
 	@JsonProperty("uri")
 	private String uri;

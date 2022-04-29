@@ -38,6 +38,7 @@ import org.oscarehr.JunoApplication;
 
 import java.sql.SQLException;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.AddPatientsIT.mom;
@@ -46,6 +47,7 @@ import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 
 @RunWith(SpringRunner.class)
+@TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class EditTicklersClassicUIIT extends SeleniumTestBase
 {

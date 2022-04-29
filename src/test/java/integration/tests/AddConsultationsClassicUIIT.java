@@ -36,6 +36,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.Consultation_URL;
@@ -45,6 +46,7 @@ import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpat
 import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 
 @RunWith(SpringRunner.class)
+@TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddConsultationsClassicUIIT extends SeleniumTestBase
 {
@@ -89,4 +91,3 @@ public class AddConsultationsClassicUIIT extends SeleniumTestBase
 				PageUtil.isExistsBy(By.linkText(serviceName), driver));
 	}
 }
-

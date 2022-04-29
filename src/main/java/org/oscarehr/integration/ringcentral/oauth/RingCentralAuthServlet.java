@@ -59,7 +59,7 @@ public class RingCentralAuthServlet extends AbstractAuthorizationCodeServlet
 		RingCentralApiConnector apiConnector = new RingCentralApiConnector();
 		RingCentralAccountInfoResult result = apiConnector.getAccountInfo();
 
-		FaxAccountTransferOutbound faxAccountTransferOutbound = faxAccountService.findOrCreateByLoginId(FaxProvider.RINGCENTRAL, String.valueOf(result.getId()));
+		FaxAccountTransferOutbound faxAccountTransferOutbound = faxAccountService.findOrCreateByLoginId(FaxProvider.RINGCENTRAL, result.getId());
 
 		try
 		{

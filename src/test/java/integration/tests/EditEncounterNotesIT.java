@@ -42,11 +42,13 @@ import java.sql.SQLException;
 import java.util.regex.Pattern;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.util.junoUtil.Navigation.SUMMARY_URL;
 
 @RunWith(SpringRunner.class)
+@TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = WebEnvironment.DEFINED_PORT)
 public class EditEncounterNotesIT extends SeleniumTestBase
 {
