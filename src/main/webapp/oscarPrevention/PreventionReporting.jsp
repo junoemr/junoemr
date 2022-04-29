@@ -395,7 +395,8 @@ table.ele thead {
                &nbsp;
             </td>
             <td valign="top" class="MainTableRightColumn">
-               <html:form action="/oscarPrevention/PreventionReport" method="get">
+               <html:form action="/oscarPrevention/PreventionReport.do" method="get">
+                   <input type="hidden" name="method" value="runReport">
                <div>
                    Saved Query:
                   <html:select property="patientSet">
@@ -702,10 +703,24 @@ table.ele thead {
 
                   <%}%>
 
-                  <% if ( firstLetter.size() > 0 ) {
-                        String queryStr = getUrlParamList(firstLetter, "demo");
+                  <% if(!firstLetter.isEmpty())
+                  {
                         %>
-                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1&amp;lastDate=<%=lastDate%>">Generate First Letter</a>
+                    <form name="frmL1Generate" action="<%=request.getContextPath()%>/oscarPrevention/PreventionReport.do" method="POST">
+                        <input type="hidden" name="method" value="generateLetter">
+                        <input type="hidden" name="formType" value="L1">
+                        <input type="hidden" name="message" value="<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>">
+                        <input type="hidden" name="followupType" value="<%=followUpType%>">
+                        <input type="hidden" name="followupValue" value="L1">
+                        <input type="hidden" name="lastDate" value="<%=lastDate%>">
+
+                        <input type="hidden" name="queryName" value="<%=model.getPatientSet()%>">
+                        <input type="hidden" name="prevention" value="<%=model.getPreventionType()%>">
+                        <input type="hidden" name="asofDate" value="<%=ConversionUtils.toDateString(model.getAsOfDateTime())%>">
+
+                        <button type="submit">Generate First Letter</button>
+<%--                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1&amp;lastDate=<%=lastDate%>">Generate First Letter</a>--%>
+                    </form>
                   <%}%>
 
                   <% if ( secondLetter.size() > 0 ) {

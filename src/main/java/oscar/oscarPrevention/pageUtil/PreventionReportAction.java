@@ -31,10 +31,10 @@
 package oscar.oscarPrevention.pageUtil;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.report.prevention.model.PreventionReportModel;
 import org.oscarehr.report.prevention.service.PreventionReportService;
@@ -52,7 +52,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Jay Gallagher
  */
-public class PreventionReportAction extends Action
+public class PreventionReportAction extends DispatchAction
 {
 	private static final Logger log = MiscUtils.getLogger();
 	private static final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
@@ -61,7 +61,7 @@ public class PreventionReportAction extends Action
 	public PreventionReportAction() {
 	}
 
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	public ActionForward runReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 			HttpServletResponse response)
 	{
 		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
@@ -99,6 +99,36 @@ public class PreventionReportAction extends Action
 			return (mapping.findForward("failure"));
 		}
 		return (mapping.findForward("success"));
+	}
+
+	public ActionForward generateLetter(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	                                    HttpServletResponse response)
+	{
+		log.info("generate prevention report letter");
+		LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.REPORT_READ, Permission.PREVENTION_READ);
+
+		String queryName = request.getParameter("queryName");
+		String prevention = request.getParameter("prevention");
+		String asofDate = request.getParameter("asofDate");
+
+		// pass through some parameters
+		request.setAttribute("message", request.getParameter("message"));
+		request.setAttribute("followupType", request.getParameter("followUpType"));
+		request.setAttribute("followupValue", request.getParameter("followupValue"));
+		request.setAttribute("lastDate", request.getParameter("lastDate"));
+
+
+		PreventionReportModel model = preventionReportService.runPreventionReport(
+				loggedInInfo,
+				queryName,
+				ConversionUtils.fromDateString(asofDate),
+				PreventionReport.PreventionReportType.fromStringIgnoreCase(prevention));
+
+		//todo switch list type
+		request.setAttribute("demographicIds", model.getL1LetterDemographicIds());
+
+		return (mapping.findForward("letterGeneration"));
 	}
 
 }

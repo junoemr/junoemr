@@ -45,6 +45,7 @@ if(!authed) {
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Hashtable" %>
 <%@ page import="oscar.oscarDemographic.data.DemographicNameAgeString" %>
+<%@ page import="java.util.List" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
@@ -52,8 +53,12 @@ if(!authed) {
 	scope="session" />
 
 <%
+	List<Integer> demographicIds = (List<Integer>) request.getAttribute("demographicIds");
 
-  String[] demos = request.getParameterValues("demo");
+	String followUpType = (String)  request.getAttribute("followupType");//"FLUF";
+	String followUpValue = (String) request.getAttribute("followupValue"); //"L1";
+	String comment = (String) request.getAttribute("message");
+	String preventionLastDate = (String) request.getAttribute("lastDate");
   
 %>
 
@@ -198,10 +203,6 @@ function disableifchecked(ele,nextDate){
 				<%}%>
 			</select> <%
                   //MARK IN MEASUREMENTS????
-                  String followUpType =  request.getParameter("followupType");//"FLUF";
-                  String followUpValue = request.getParameter("followupValue"); //"L1";
-                  String comment = request.getParameter("message");
-                  String preventionLastDate = request.getParameter("lastDate");
 
                   if ( followUpType != null && followUpValue != null ){ %>
 			Mark in patients Records: <input type="checkbox" name="addFollowUp"
@@ -224,22 +225,28 @@ function disableifchecked(ele,nextDate){
 			<%}%>
 
 
-			<%if ( demos != null){%>
+			<%
+				if(demographicIds != null && !demographicIds.isEmpty())
+			{%>
 			<table>
-
-				<%  DemographicNameAgeString deName = DemographicNameAgeString.getInstance();
-                        for ( int i =0; i < demos.length;i++){     
-                            Hashtable h = deName.getNameAgeSexHashtable(LoggedInInfo.getLoggedInInfoFromSession(request), demos[i]);
+				<%
+					DemographicNameAgeString deName = DemographicNameAgeString.getInstance();
+					int count = 1;
+					for(Integer demographicId : demographicIds)
+					{
+						Hashtable h = deName.getNameAgeSexHashtable(LoggedInInfo.getLoggedInInfoFromSession(request), String.valueOf(demographicId));
                     %>
 				<tr>
-					<td><%=i+1%></td>
-					<td><input type="checkbox" name="demos" value="<%=demos[i]%>"
+					<td><%=count%></td>
+					<td><input type="checkbox" name="demos" value="<%=demographicId%>"
 						checked /></td>
 					<td><%=h.get("lastName")%>, <%=h.get("firstName")%></td>
 					<td><%=h.get("sex")%></td>
 					<td><%=h.get("age")%></td>
 				</tr>
-				<%}%>
+				<%
+						count++;
+					}%>
 			</table>
 			<%}%>
 
@@ -251,16 +258,6 @@ function disableifchecked(ele,nextDate){
 	</tr>
 </table>
 
-<div>
-<%// if ( firstLetter.size() > 0 ) {
-                    //    String queryStr = getUrlParamList(firstLetter, "demo");
-                    //
-                    //&message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")
-                    //&followupType=
-                    //&followupValue=L1
-                  %>
-</div>
-
 <script type="text/javascript">
    function genEnvelopes(form){
        window.location = "../report/GenerateEnvelopes.do?"+Form.serialize('listDemographic');
@@ -270,18 +267,3 @@ function disableifchecked(ele,nextDate){
 
 </body>
 </html:html>
-
-<%!
-    String getUrlParamList(ArrayList list,String paramName){
-        String queryStr = "";
-        for (int i = 0; i < list.size(); i++){
-            String demo = (String) list.get(i);
-            if (i == 0){
-              queryStr += paramName+"="+demo;
-            }else{
-              queryStr += "&"+paramName+"="+demo;  
-            }
-        }
-        return queryStr;
-  } 
-%>
