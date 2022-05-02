@@ -648,18 +648,21 @@ public final class MessageUploader {
 	 * @return a Demographic object matching the search parameters
 	 * @throws ParseException only thrown if the DOB can't be parsed
 	 */
-	public static Demographic getDemographicFromLabInfo(String lastName, String firstName, String sex, String dob, String hin)
+	private static Demographic getDemographicFromLabInfo(String lastName, String firstName, String sex, String dob, String hin)
 			throws ParseException
 	{
 		GregorianCalendar dateOfBirth = null;
 
-		if (hin != null)
+		// never match a patient without a hin to match on
+		if(StringUtils.isBlank(hin))
 		{
-			// This is for one of the Ontario labs I think??
-			if (hin.length() == 12)
-			{
-				hin = hin.substring(0, 10);
-			}
+			return null;
+		}
+
+		// This is for one of the Ontario labs I think??
+		if (hin.length() == 12)
+		{
+			hin = hin.substring(0, 10);
 		}
 
 		if (dob != null && !dob.trim().equals(""))
