@@ -648,7 +648,7 @@ public final class MessageUploader {
 	 * @return a Demographic object matching the search parameters
 	 * @throws ParseException only thrown if the DOB can't be parsed
 	 */
-	private static Demographic getDemographicFromLabInfo(String lastName, String firstName, String sex, String dob, String hin)
+	public static Demographic getDemographicFromLabInfo(String lastName, String firstName, String sex, String dob, String hin)
 			throws ParseException
 	{
 		GregorianCalendar dateOfBirth = null;
