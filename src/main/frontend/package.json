@@ -24,7 +24,6 @@
     "gulp-clean-css": "^3.2.0",
     "gulp-concat-filenames": "^1.2.0",
     "gulp-rename": "^1.2.2",
-    "gulp-sass": "^3.1.0",
     "gulp-typescript": "^4.0.2",
     "gulp-usemin": "^0.3.28",
     "html-webpack-plugin": "^3.2.0",
