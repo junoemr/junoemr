@@ -33,13 +33,10 @@ import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.validator.GenericValidator;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.labs.service.Hl7TextInfoService;
-import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
@@ -48,10 +45,13 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -59,8 +59,6 @@ import java.util.List;
 public abstract class MessageHandler
 {
 	protected static Logger logger = Logger.getLogger(MessageHandler.class);
-
-	protected Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
 
 	protected Terser terser;
 	protected Message message;
@@ -1224,7 +1222,6 @@ public abstract class MessageHandler
 	 * @param dateInput
 	 * @param outputFormat
 	 * @return formated date based on @param outputFormat.
-	 * 		   if error, log error and return ""
 	 */
 	protected String getHL7V2DateTime(String dateInput, String outputFormat)
 	{
@@ -1233,15 +1230,7 @@ public abstract class MessageHandler
 		if(dateInput != null && !dateInput.trim().isEmpty())
 		{
 			String datePattern = matchHL7V2DateTimePattern(dateInput);
-
-			if (datePattern != null)
-			{
-				dateOutput = formatDateTime(dateInput, datePattern, outputFormat);
-			}
-			else
-			{
-				logger.error("Date " + dateInput + " format is not handled");
-			}
+			dateOutput = formatDateTime(dateInput, datePattern, outputFormat);
 		}
 
 		return dateOutput;
@@ -1258,18 +1247,8 @@ public abstract class MessageHandler
 
 		if(datePattern.length() > dateInput.length())
 		{
-			// For this format YYYY[MM[DD[HH[MM[SS[.S[S[S[S]]]]]]]]][+/-ZZZZ]
+			// For this format YYYYMMDD[HH[MM[SS[.S[S[S[S]]]]]]][+/-ZZZZ]
 			datePattern = datePattern.substring(0, dateInput.length());
-		}
-		else if(datePattern.length() < dateInput.length())
-		{
-			//handle this format 2013-10-19 15:23:00 -0700
-			datePattern = ConversionUtils.DATE_TIME_ZONE_OFFSET_X_PATTERN;
-		}
-
-		if(!GenericValidator.isDate(dateInput, datePattern, false))
-		{
-			datePattern = null;
 		}
 
 		return datePattern;
@@ -1293,9 +1272,27 @@ public abstract class MessageHandler
 						.parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
 						.toFormatter();
 
-				LocalDateTime parsedDate = LocalDateTime.parse(plain, customFormatter);
+				// attempt to parse as a zonedDateTime, otherwise a LocalDateTime
+				TemporalAccessor parsed = customFormatter.parseBest(plain, ZonedDateTime::from, LocalDateTime::from);
+				ZonedDateTime zonedDateTime;
 
-				formatted = parsedDate.format(outFormatter);
+				if(parsed instanceof ZonedDateTime)
+				{
+					zonedDateTime = (ZonedDateTime) parsed;
+				}
+				else if(parsed instanceof LocalDateTime)
+				{
+					LocalDateTime dt = (LocalDateTime) parsed;
+					zonedDateTime = dt.atZone(ZoneId.systemDefault());
+				}
+				else
+				{
+					// shouldn't be possible
+					throw new RuntimeException("Unknown Temporal type: " + parsed.getClass().getName());
+				}
+
+				formatted = ConversionUtils.toDateTimeString(zonedDateTime,
+						DateTimeFormatter.ofPattern(outFormat).withZone(ZoneId.systemDefault()));
 			}
 			catch (DateTimeParseException exception)
 			{
