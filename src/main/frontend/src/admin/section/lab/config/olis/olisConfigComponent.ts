@@ -25,6 +25,7 @@ import LoadingQueue from "../../../../../lib/util/LoadingQueue";
 import ToastService from "../../../../../lib/alerts/service/ToastService";
 import {Moment} from "moment/moment";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../../../../../common/components/junoComponentConstants";
+import {SystemPreferences} from "../../../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 	{
@@ -45,8 +46,8 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 
 			ctrl.loadingQueue = new LoadingQueue();
 			ctrl.toastService = new ToastService();
+			ctrl.olisIntegrationEnabled = false;
 
-			ctrl.pollingPropName = "olis_polling_enabled";
 			ctrl.labType = "OLIS_HL7"
 			ctrl.frequencySelectOptions = [
 				{
@@ -73,13 +74,15 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 				{
 					ctrl.loadingQueue.pushLoadingState();
 					const responseArray = await Promise.all([
-						systemPreferenceService.isPreferenceEnabled(ctrl.pollingPropName, false),
+						systemPreferenceService.isPreferenceEnabled(SystemPreferences.OlisIntegrationEnabled, false),
+						systemPreferenceService.isPreferenceEnabled(SystemPreferences.OlisPollingEnabled, false),
 						labService.getOlisSystemSettings(),
 						labService.getOlisProviderSettings(),
 					]);
-					ctrl.pollingEnabled = responseArray[0];
-					ctrl.systemSettings = responseArray[1];
-					ctrl.providerSettingsList = responseArray[2];
+					ctrl.olisIntegrationEnabled = responseArray[0];
+					ctrl.pollingEnabled = responseArray[1];
+					ctrl.systemSettings = responseArray[2];
+					ctrl.providerSettingsList = responseArray[3];
 
 					ctrl.loadingQueue.popLoadingState();
 				}
@@ -92,7 +95,7 @@ angular.module('Admin.Section.Lab.Olis').component('olisConfig',
 
 			ctrl.setPollingEnabled = (value: boolean): void =>
 			{
-				systemPreferenceService.setPreference(ctrl.pollingPropName, value.toString());
+				systemPreferenceService.setPreference(SystemPreferences.OlisPollingEnabled, value.toString());
 			}
 
 			ctrl.manualLabPull = async (): Promise<void> =>

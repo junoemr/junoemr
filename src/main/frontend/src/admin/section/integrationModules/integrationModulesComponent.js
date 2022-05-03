@@ -45,7 +45,7 @@ angular.module('Admin.Section').component('integrationModules',
 				name: "OLIS",
 				enabled: false,
 				propertyName: SystemPreferences.OlisIntegrationEnabled,
-				configUrl:""
+				configUrl:"#!/admin/labConfig/olis",
 			},
 			{
 				name: "IceFall",

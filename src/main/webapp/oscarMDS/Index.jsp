@@ -8,11 +8,14 @@
     and "gnu.org/licenses/gpl-2.0.html".
 
 --%>
-<%@ page language="java" %>
-<%@ page import="java.util.*" %>
-<%@ page import="oscar.oscarMDS.data.*, oscar.OscarProperties" %>
-<%@ page import="org.apache.commons.lang.math.NumberUtils" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="oscar.oscarMDS.data.PatientInfo" %>
+<%@ page import="oscar.OscarProperties" %>
 <%@ page import="static org.oscarehr.sharingcenter.util.CDADocumentUtil.oscarProperties" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
+<%@ page import="org.oscarehr.common.model.UserProperty" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
@@ -34,6 +37,7 @@
 %>
 
 <%
+	SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
 
 	boolean ajax = "true".equals(request.getParameter("ajax"));
 
@@ -772,8 +776,14 @@
 							<a href="javascript:popupStart(700,1100,'../dms/inboxManage.do?method=getDocumentsInQueues')" style="color: #FFFFFF;"><bean:message key="inboxmanager.document.pendingDocs"/></a>
 							| <a href="javascript:popupStart(800,1200,'<%=request.getContextPath() %>/dms/incomingDocs.jsp')" style="color: #FFFFFF;" ><bean:message key="inboxmanager.document.incomingDocs"/></a>
 							| <a href="javascript:popupStart(800,1000, '<%=request.getContextPath() %>/oscarMDS/CreateLab.jsp')" style="color: #FFFFFF;"><bean:message key="global.createLab" /></a>
-							<a href="javascript:popupStart(800,1000, '<%=request.getContextPath() %>/olis/Search.jsp')" style="color: #FFFFFF;"><bean:message key="olis.olisSearch" />
+							<% if (systemPreferenceService.isPreferenceEnabled(UserProperty.OLIS_INTEGRATION_ENABLED, false))
+							{%>
+
+							| <a href="javascript:popupStart(800,1000, '<%=request.getContextPath() %>/olis/Search.jsp')" style="color: #FFFFFF;"><bean:message key="olis.olisSearch" />
 							</a>
+							<%
+							}%>
+
 							<!--- Hiding this for now until we decide to get the HRM integration working properly
                                 | <a href="javascript:popupPage(400, 400,'< html:rewrite page="/hospitalReportManager/hospitalReportManager.jsp"/>')" style="color: #FFFFFF;">HRM Status/Upload</a>
 								-->
