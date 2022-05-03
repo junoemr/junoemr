@@ -407,7 +407,7 @@ public class HRMXMLHandler extends ORU_R01MessageHandler
 		return "00000000";
 	}
 
-	public String getAccessionNum() {
+	public String getUniqueIdentifier() {
 
 		return new Random().nextInt() + "";
 	}
@@ -435,7 +435,7 @@ public class HRMXMLHandler extends ORU_R01MessageHandler
 		return date.getYear() + "-" + date.getMonth() + "-" + date.getDay() + (!omitTime ? date.getHour() + ":" + date.getMinute() : "");
 	}
 
-	 public String getFillerOrderNumber(){
+	 public String getUniqueVersionIdentifier(){
 
 
 			return "";

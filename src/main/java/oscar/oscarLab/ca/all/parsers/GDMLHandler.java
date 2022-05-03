@@ -536,7 +536,7 @@ public class GDMLHandler extends ORU_R01MessageHandler
         }
     }
 
-    public String getAccessionNum(){
+    public String getUniqueIdentifier(){
         try{
             return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientIDInternalID(0).getID().getValue()));
         }catch(Exception e){
@@ -641,7 +641,7 @@ public class GDMLHandler extends ORU_R01MessageHandler
         return "";
     }
     
-    public String getFillerOrderNumber(){
+    public String getUniqueVersionIdentifier(){
 		return "";
 	}
 
@@ -692,7 +692,7 @@ public class GDMLHandler extends ORU_R01MessageHandler
 		try {
 			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 	        java.util.Date dateB = formatter.parse(getServiceDate());
-			List<Hl7TextMessageInfo2> matchingLabs = hl7TextInfoDao.getMatchingLabsByAccessionNo(getAccessionNum());
+			List<Hl7TextMessageInfo2> matchingLabs = hl7TextInfoDao.getMatchingLabsByAccessionNo(getUniqueIdentifier());
 			for ( Hl7TextMessageInfo2 l: matchingLabs ) {
 				Date dateA = UtilDateUtilities.StringToDate(l.labDate_A,"yyyy-MM-dd hh:mm:ss");
 				

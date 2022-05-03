@@ -110,7 +110,7 @@ public class ICLHandler extends DefaultGenericHandler {
     /*
      *  OBC METHODS
      */
-    public String getAccessionNum(){
+    public String getUniqueIdentifier(){
         try{
             int obrCount = msg.getRESPONSE().getORDER_OBSERVATIONReps();
             String accessionNum = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getOBR().getFillerOrderNumber().getEntityIdentifier().getValue());
@@ -505,7 +505,7 @@ public class ICLHandler extends DefaultGenericHandler {
         return super.getString(retrieve).replaceAll("\\\\\\.br\\\\", "<br />");
     }
 
-    public String getFillerOrderNumber(){
+    public String getUniqueVersionIdentifier(){
 		return "";
 	}
     public String getEncounterId(){

@@ -74,8 +74,8 @@ public final class OscarToOscarHl7V2Handler extends ORU_R01MessageHandler
 	    return chainnedMessageAdapter.audit();
     }
 
-	public String getAccessionNum() {
-	    return chainnedMessageAdapter.getAccessionNum();
+	public String getUniqueIdentifier() {
+	    return chainnedMessageAdapter.getUniqueIdentifier();
     }
 
 	public String getAge() {
@@ -246,7 +246,7 @@ public final class OscarToOscarHl7V2Handler extends ORU_R01MessageHandler
 	    return chainnedMessageAdapter.isOBXAbnormal(i, j);
     }
 	
-	public String getFillerOrderNumber(){
+	public String getUniqueVersionIdentifier(){
 		return "";
 	}
     public String getEncounterId(){

@@ -97,13 +97,13 @@ public class OLISUtils
 	{
 		String sendingFacility = h.getPlacerGroupNumber();
 		logger.debug("SENDING FACILITY: " + sendingFacility);
-		String accessionNumber = h.getAccessionNum();
-		String fillerOrderNo = h.getFillerOrderNumber();
+		String uniqueIdentifier = h.getUniqueIdentifier();
+		String uniqueVersionIdentifier = h.getUniqueVersionIdentifier();
 		String hin = h.getHealthNum();
 		String collectionDate = h.getCollectionDateTime(0);
 		collectionDate = (StringUtils.isNotBlank(collectionDate)) ? collectionDate.substring(0, 10).replaceAll("-", "") : null;
 
-		return isDuplicate(loggedInInfo, sendingFacility, accessionNumber, fillerOrderNo, msg, hin, collectionDate);
+		return isDuplicate(loggedInInfo, sendingFacility, uniqueIdentifier, uniqueVersionIdentifier, msg, hin, collectionDate);
 	}
 
 	public static boolean isDuplicate(LoggedInInfo loggedInInfo, String sendingFacility, String accessionNumber, String fillerOrderNo, String msg, String hin, String olisCollectionDate)
@@ -142,7 +142,7 @@ public class OLISUtils
 
 				for(Hl7TextInfo dupResult : dupResults)
 				{
-					logger.debug("LIFELABS " + dupResult.getAccessionNumber() + " " + accessionNumber + " == " + dupResult.getAccessionNumber().equals(accessionNumber.substring(5)));
+					logger.debug("LIFELABS " + dupResult.getUniqueIdentifier() + " " + accessionNumber + " == " + dupResult.getUniqueIdentifier().equals(accessionNumber.substring(5)));
 
 					if(hin.equals(dupResult.getHealthNumber()))
 					{
@@ -209,7 +209,7 @@ public class OLISUtils
 
 				for(Hl7TextInfo dupResult : dupResults)
 				{
-					logger.debug("AlphaLabs " + dupResult.getAccessionNumber() + " " + accessionNumber + " == " + dupResult.getAccessionNumber().equals(accessionNumber.substring(5)));
+					logger.debug("AlphaLabs " + dupResult.getUniqueIdentifier() + " " + accessionNumber + " == " + dupResult.getUniqueIdentifier().equals(accessionNumber.substring(5)));
 					if(hin.equals(dupResult.getHealthNumber()))
 					{
 						OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate AlphaLabs lab skipped - accession " + accessionNumber + "\n" + msg);
@@ -224,7 +224,7 @@ public class OLISUtils
 
 				Optional<Hl7TextInfo> duplicate = dupResults
 						.stream()
-						.filter((result -> fillerOrderNo.equals(result.getFillerOrderNum())))
+						.filter((result -> fillerOrderNo.equals(result.getUniqueVersionIdentifier())))
 						.findFirst();
 				return duplicate.isPresent();
 			}

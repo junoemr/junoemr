@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -96,6 +97,12 @@ public class AHSRuralHandler extends AHSHandler
 		return true;
 	}
 
+	@Override
+	public boolean isUnstructured()
+	{
+		return false;
+	}
+
     /* ===================================== Hl7 Parsing ====================================== */
 
 	/* ===================================== MSH ====================================== */
@@ -104,6 +111,14 @@ public class AHSRuralHandler extends AHSHandler
 	public String getMsgType()
 	{
 		return AHS_RURAL_LAB_TYPE;
+	}
+
+	/* ===================================== PID ====================================== */
+
+	@Override
+	public String getHealthNumProvince()
+	{
+		return "(" + getString(get("/.PID-2-4")) + ")";
 	}
 
 	/* ===================================== OBR ====================================== */
@@ -119,7 +134,7 @@ public class AHSRuralHandler extends AHSHandler
 	 * signifies 2018, S14-104 where 14 signifies 2014 etc.
 	 */
 	@Override
-	public String getAccessionNum()
+	public String getUniqueIdentifier()
 	{
 		// append the hin and service year/month/day to the accession number to make it unique
 		String dateStr = formatDate(getString(get("/.OBR-7-1"))); // yyyy-MM-dd
@@ -128,9 +143,16 @@ public class AHSRuralHandler extends AHSHandler
 	}
 
 	@Override
+	public String getAccessionNumber()
+	{
+		// not unique, for display use only
+		return get("/.OBR-20");
+	}
+
+	@Override
 	public String getServiceDate()
 	{
-		return formatDateTime(getString(get("/.OBR-7-1")));
+		return formatDateTime(getString(get("/.MSH-7-1")));
 	}
 
 	@Override
@@ -161,6 +183,37 @@ public class AHSRuralHandler extends AHSHandler
 		}
 	}
 
+	@Override
+	public String getSubHeader(int i)
+	{
+		String specimenSource = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-15-2"));
+		String collectionDate = formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBR-7-1"));
+
+		return specimenSource + (StringUtils.isNotBlank(collectionDate) ? (" (Collected: " + collectionDate) + ")" : "");
+	}
+
+	@Override
+	public boolean isOBRUnstructured(int obr)
+	{
+		return isMicroLabResult(obr) || isBloodBankProductsResult(obr);
+	}
+
+	@Override
+	public ArrayList<String> getHeaders()
+	{
+		// order must match obr order if some obr segments are unstructured. for... reasons?
+		ArrayList<String> headers = new ArrayList<>();
+		for(int i = 0; i < getOBRCount(); i++)
+		{
+			String obrName = getOBRName(i);
+			if(!headers.contains(obrName))
+			{
+				headers.add(obrName);
+			}
+		}
+		return headers;
+	}
+
 	/* ===================================== OBX ====================================== */
 
 	@Override
@@ -175,6 +228,60 @@ public class AHSRuralHandler extends AHSHandler
 			case "D": return "Delete";
 			default: return resultStatusCode;
 		}
+	}
+
+	/**
+	 *  Return the result from the jth OBX segment of the ith OBR group
+	 */
+	@Override
+	public String getOBXResult(int i, int j)
+	{
+		// conformance: use obx-2 for micro-bio culture labs
+		if(isMicroLabResult(i))
+		{
+			String result = getOBXResult(i, j, 2);
+			if(StringUtils.isNotBlank(result))
+			{
+				return result;
+			}
+		}
+		return getOBXResult(i, j, 1);
+	}
+
+	@Override
+	public String getTimeStamp(int i, int j)
+	{
+		if (i < 0 || j < 0)
+		{
+			// some fun peaces of code like to ask for negative values
+			return null;
+		}
+		// rural labs want you to use OBR-14 instead of obx-14
+		return formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBR-14"));
+	}
+
+	@Override
+	public boolean isOBXAbnormal(int i, int j)
+	{
+		String abnormalFlags = getOBXAbnormalFlag(i,j);
+		return "A".equals(abnormalFlags);
+	}
+
+	/* ===================================== private methods etc. ====================================== */
+
+	private String getDiagnosticServicesCode(int obr)
+	{
+		return get("/.ORDER_OBSERVATION("+obr+")/OBR-24-1");
+	}
+
+	private boolean isMicroLabResult(int obr)
+	{
+		return "MC".equals(getDiagnosticServicesCode(obr));
+	}
+
+	private boolean isBloodBankProductsResult(int obr)
+	{
+		return "BB-BP".equals(getDiagnosticServicesCode(obr));
 	}
 
 }

@@ -516,7 +516,7 @@ public class AlphaHandler extends DefaultGenericHandler
 		}
 	}
 
-    public String getAccessionNum(){
+    public String getUniqueIdentifier(){
         try{
         	int obrCount;
         	String accessionNum;

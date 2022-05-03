@@ -83,10 +83,10 @@ public class Hl7TextInfo extends AbstractModel<Integer> implements Serializable 
 	private String reportStatus;
 
 	@Column(name = "accessionNum")
-	private String accessionNumber;
+	private String uniqueIdentifier;
 	
 	@Column(name = "filler_order_num")
-	private String fillerOrderNum;
+	private String uniqueVersionIdentifier;
 
 	@Column(name = "sending_facility")
 	private String sendingFacility;
@@ -216,21 +216,25 @@ public class Hl7TextInfo extends AbstractModel<Integer> implements Serializable 
 		this.reportStatus = StringUtils.trimToEmpty(reportStatus);
 	}
 
-	public String getAccessionNumber() {
-		return accessionNumber;
+	public String getUniqueIdentifier()
+	{
+		return uniqueIdentifier;
 	}
 
-	public void setAccessionNumber(String accessionNumber) {
-		this.accessionNumber = StringUtils.trimToNull(accessionNumber);
+	public void setUniqueIdentifier(String uniqueIdentifier)
+	{
+		this.uniqueIdentifier = StringUtils.trimToNull(uniqueIdentifier);
 	}
-	
-	public String getFillerOrderNum() {
-    	return fillerOrderNum;
-    }
 
-	public void setFillerOrderNum(String fillerOrderNum) {
-    	this.fillerOrderNum = fillerOrderNum;
-    }
+	public String getUniqueVersionIdentifier()
+	{
+		return uniqueVersionIdentifier;
+	}
+
+	public void setUniqueVersionIdentifier(String uniqueVersionIdentifier)
+	{
+		this.uniqueVersionIdentifier = uniqueVersionIdentifier;
+	}
 
 	public String getSendingFacility() {
     	return sendingFacility;

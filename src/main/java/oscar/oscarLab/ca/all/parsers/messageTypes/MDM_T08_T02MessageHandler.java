@@ -224,7 +224,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 
 
 	@Override
-	public String getFillerOrderNumber()
+	public String getUniqueVersionIdentifier()
 	{
 		return getString(get("/.EVN-2"));
 	}
@@ -237,7 +237,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	 * @return the Document Unique id.
 	 */
 	@Override
-	public String getAccessionNum()
+	public String getUniqueIdentifier()
 	{
 		return get("/.TXA-12");
 	}

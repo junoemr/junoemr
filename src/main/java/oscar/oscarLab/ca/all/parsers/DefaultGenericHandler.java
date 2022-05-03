@@ -488,7 +488,7 @@ public class DefaultGenericHandler extends ORU_R01MessageHandler
         }
     }
 
-    public String getAccessionNum(){
+    public String getUniqueIdentifier(){
         //usually a message type specific location
         return("");
     }
@@ -620,7 +620,7 @@ public class DefaultGenericHandler extends ORU_R01MessageHandler
         return super.getString(retrieve).replaceAll("\\\\\\.br\\\\", "<br />");
     }
 
- public String getFillerOrderNumber(){
+ public String getUniqueVersionIdentifier(){
 
 
 		return "";

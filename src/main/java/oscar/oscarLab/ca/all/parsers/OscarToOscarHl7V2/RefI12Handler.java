@@ -114,7 +114,7 @@ public final class RefI12Handler extends ChainnedMessageAdapter<REF_I12> {
 	}
 
 	@Override
-    public String getFillerOrderNumber() {
+    public String getUniqueVersionIdentifier() {
 	    // TODO-legacy Auto-generated method stub
 	    return null;
     }

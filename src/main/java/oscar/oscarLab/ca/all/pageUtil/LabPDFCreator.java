@@ -50,6 +50,7 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfPageEventHelper;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.rtf.RtfWriter2;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.model.Hl7TextMessage;
@@ -76,6 +77,9 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import static oscar.oscarLab.ca.all.parsers.AHS.v23.AHSRuralHandler.AHS_RURAL_LAB_TYPE;
+
 /**
  *
  * @author wrighd
@@ -248,7 +252,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 			ArrayList<String> headers = handler.getHeaders();
 			for (int i = 0; i < headers.size(); i++)
 			{
-				addLabCategory(headers.get(i), null);
+				addLabCategory(headers.get(i), i, null);
 			}
 
 			for (MessageHandler extraHandler : handlers)
@@ -256,7 +260,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 				ArrayList<String> extraHeaders = extraHandler.getHeaders();
 				for (int i = 0; i < extraHeaders.size(); i++)
 				{
-					addLabCategory(extraHeaders.get(i), extraHandler);
+					addLabCategory(extraHeaders.get(i), i, extraHandler);
 				}
 			}
 			// add end of report table
@@ -292,7 +296,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 	 * Given the name of a lab category this method will add the category
 	 * header, the test result headers and the test results for that category.
 	 */
-	private void addLabCategory(String header, MessageHandler extraHandler) throws DocumentException {
+	private void addLabCategory(String header, int headerIndex, MessageHandler extraHandler) throws DocumentException {
 		MessageHandler handler = (extraHandler != null) ? extraHandler : this.handler;
 		boolean isUnstructuredDoc;
 		boolean hasEmbeddedPDF;
@@ -303,7 +307,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 		}
 		else
 		{
-			isUnstructuredDoc = handler.isUnstructured();
+			isUnstructuredDoc = handler.isUnstructured() || handler.isOBRUnstructured(headerIndex);
 		}
 		
 		float[] mainTableWidths;
@@ -335,18 +339,29 @@ public class LabPDFCreator extends PdfPageEventHelper {
 
 		PdfPCell cell = new PdfPCell();
 		// category name
-		if (!isUnstructuredDoc)
+		cell.setPadding(3);
+		cell.setPhrase(new Phrase("  "));
+		cell.setBorder(0);
+		cell.setColspan(7);
+		table.addCell(cell);
+		cell.setBorder(15);
+		cell.setPadding(3);
+		cell.setColspan(2);
+		cell.setPhrase(new Phrase(header.replaceAll("<br\\s*/*>", "\n"),
+				new Font(bf, 12, Font.BOLD)));
+		table.addCell(cell);
+		cell.setPhrase(new Phrase("  "));
+		cell.setBorder(0);
+		cell.setColspan(5);
+		table.addCell(cell);
+
+		String subheader = handler.getSubHeader(headerIndex);
+		if(StringUtils.isNotBlank(subheader))
 		{
-			cell.setPadding(3);
-			cell.setPhrase(new Phrase("  "));
-			cell.setBorder(0);
-			cell.setColspan(7);
-			table.addCell(cell);
 			cell.setBorder(15);
 			cell.setPadding(3);
 			cell.setColspan(2);
-			cell.setPhrase(new Phrase(header.replaceAll("<br\\s*/*>", "\n"),
-					new Font(bf, 12, Font.BOLD)));
+			cell.setPhrase(new Phrase(subheader, new Font(bf, 8, Font.BOLD)));
 			table.addCell(cell);
 			cell.setPhrase(new Phrase("  "));
 			cell.setBorder(0);
@@ -485,8 +500,10 @@ public class LabPDFCreator extends PdfPageEventHelper {
 							}
 
 							// add the obx results and info
-							Font lineFont = new Font(bf, 8, Font.NORMAL, getTextColor(handler.getOBXAbnormalFlag(j, k)));
-							if (isUnstructuredDoc)
+							String abnormalFlag = handler.getOBXAbnormalFlag(j, k);
+
+							Font lineFont = new Font(bf, 8, Font.NORMAL, getTextColor(abnormalFlag));
+							if (isUnstructuredDoc || handler.isOBRUnstructured(j))
 							{
 								cell.setHorizontalAlignment(Element.ALIGN_LEFT);
 								//if there are duplicate obxNames, display only the first 
@@ -501,14 +518,27 @@ public class LabPDFCreator extends PdfPageEventHelper {
 									table.addCell(cell);
 								}
 
-								String abnormalFlag = handler.getOBXAbnormalFlag(j, k);
+								String result = handler.getOBXResult( j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0");
 								if (!abnormalFlag.equals("N") && handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.TEXT && "CCLAB".equals(handler.getMsgType()))
 								{
-									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0") + "(" + abnormalFlag + ")", lineFont));
+									cell.setPhrase(new Phrase(result + "(" + abnormalFlag + ")", lineFont));
+								}
+								if(AHS_RURAL_LAB_TYPE.equals(handler.getMsgType()))
+								{
+									String resultPhrase = result;
+									if(StringUtils.isBlank(resultPhrase))
+									{
+										resultPhrase = abnormalFlag;
+									}
+									else if(StringUtils.isNotBlank(abnormalFlag))
+									{
+										resultPhrase += " (" + abnormalFlag + ")";
+									}
+									cell.setPhrase(new Phrase(resultPhrase, lineFont));
 								}
 								else
 								{
-									cell.setPhrase(new Phrase(handler.getOBXResult(j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0"), lineFont));
+									cell.setPhrase(new Phrase(result, lineFont));
 								}
 								table.addCell(cell);
 								cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -1000,7 +1030,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
         rInfoTable.addCell(cell);
         cell.setPhrase(new Phrase("Accession #: ", boldFont));
         rInfoTable.addCell(cell);
-        cell.setPhrase(new Phrase(handler.getAccessionNum(), font));
+        cell.setPhrase(new Phrase(handler.getAccessionNumber(), font));
         rInfoTable.addCell(cell);
 
         // add additional result info fields
@@ -1124,7 +1154,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
         
         clientPhrase = new Phrase();
         clientPhrase.add(new Chunk("Accession #: ", boldFont));
-        clientPhrase.add(new Chunk(handler.getAccessionNum()+"\t\t\t\t\t", font));
+        clientPhrase.add(new Chunk(handler.getAccessionNumber()+"\t\t\t\t\t", font));
         patientInfo.add(clientPhrase);
         
         clientPhrase = new Phrase();

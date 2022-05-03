@@ -202,7 +202,7 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 	}
 
 	@Override
-	public String getFillerOrderNumber()
+	public String getUniqueVersionIdentifier()
 	{
 		return getString(get("/.OBR-3"));
 	}
@@ -684,7 +684,7 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 							embeddedDocument.setBase64Data(embeddedPdf);
 							embeddedDocument.setMimeType("application/pdf");
 
-							String fileName = "-" + getAccessionNum() + "-" + getFillerOrderNumber() + "-" + count + "-" + (int)(Math.random()*1000000000) + ".pdf";
+							String fileName = "-" + getUniqueIdentifier() + "-" + getUniqueVersionIdentifier() + "-" + count + "-" + (int)(Math.random()*1000000000) + ".pdf";
 							embeddedDocument.setFileName(fileName);
 							embeddedDocument.setDescription("embedded_pdf");
 							embeddedDocument.setSourceFacility("HL7Upload");
