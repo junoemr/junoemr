@@ -20,26 +20,27 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.validator;
+package org.oscarehr.ws.external.rest.v1.transfer.demographic;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import org.oscarehr.ws.validator.DemographicNoConstraint;
 
-@Documented
-@Constraint(validatedBy = StringValueValidator.class)
-@Target({ElementType.METHOD, ElementType.FIELD})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface StringValueConstraint
+import javax.xml.bind.annotation.XmlRootElement;
+
+@Data
+@XmlRootElement
+@Schema(description = "Demographic record data transfer object")
+@JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
+public class ApiDemographicUpdateTransfer extends ApiDemographicBaseTransfer
 {
-	String message() default "Invalid String Value";
-	Class<?>[] groups() default{};
-	Class<? extends Payload>[] payload() default{};
+	@Schema(description = "patient demographic record identifier")
+	@DemographicNoConstraint
+	private Integer demographicNo;
 
-	String[] allows();
-	boolean caseSensitive() default true;
+	public ApiDemographicUpdateTransfer()
+	{
+		super();
+	}
 }

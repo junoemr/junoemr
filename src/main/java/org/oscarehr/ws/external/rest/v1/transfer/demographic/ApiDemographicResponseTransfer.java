@@ -24,15 +24,25 @@ package org.oscarehr.ws.external.rest.v1.transfer.demographic;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import org.oscarehr.ws.validator.DemographicNoConstraint;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.time.LocalDate;
 
+@Data
 @XmlRootElement
 @Schema(description = "Demographic record data transfer object")
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class DemographicTransferInbound extends DemographicTransferBasic
+public class ApiDemographicResponseTransfer extends ApiDemographicBaseTransfer
 {
-	public DemographicTransferInbound()
+	@Schema(description = "patient demographic record identifier")
+	@DemographicNoConstraint
+	private Integer demographicNo;
+	@Schema(description = "record last update date")
+	private LocalDate lastUpdateDate;
+
+	public ApiDemographicResponseTransfer()
 	{
 		super();
 	}
