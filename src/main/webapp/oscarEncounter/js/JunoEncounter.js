@@ -385,10 +385,10 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 						note.updateDateFormatted = updateMoment.format("DD-MMM-YYYY");
 					}
 
-					note.rowClass = "encounterNoteOdd";
+					note.rowClass = "cpp encounterNoteOdd";
 					if (index % 2 === 0)
 					{
-						note.rowClass = "encounterNoteEven";
+						note.rowClass = "cpp encounterNoteEven";
 					}
 
 					// Show the close arrow on the first and last row

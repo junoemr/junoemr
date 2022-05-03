@@ -24,12 +24,6 @@
 package org.oscarehr.ws.rest.conversion.summary;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.commons.lang3.ObjectUtils;
 import org.oscarehr.casemgmt.model.CaseManagementIssue;
 import org.oscarehr.casemgmt.model.CaseManagementNote;
 import org.oscarehr.casemgmt.model.Issue;
@@ -40,6 +34,11 @@ import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.to.model.SummaryItemTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 
 @Component
@@ -62,6 +61,7 @@ public class OngoingConcernDxRegSummary extends IssueNoteSummary implements Summ
 
 		String cppExts = "";
 
+		int count = 0;
 		for(CaseManagementNote note : notes) {
 			String classification = null;
 			Set<CaseManagementIssue> issuesForNote = note.getIssues();
@@ -84,7 +84,7 @@ public class OngoingConcernDxRegSummary extends IssueNoteSummary implements Summ
 				cppExts = preferenceManager.getCppExtsItem(loggedInInfo, caseManagementMgr.getExtByNote(note.getId()), issueString);
 			}
 
-			SummaryItemTo1 summaryItem = new SummaryItemTo1(0, note.getNote() + cppExts,"action","notes"+issueString);
+			SummaryItemTo1 summaryItem = new SummaryItemTo1(count, note.getNote() + cppExts,"action","notes"+issueString);
 			summaryItem.setDate(note.getObservation_date());
 			summaryItem.setEditor(note.getProviderName());
 			summaryItem.setNoteId(note.getId());
@@ -93,14 +93,7 @@ public class OngoingConcernDxRegSummary extends IssueNoteSummary implements Summ
 			}
 
 			list.add(summaryItem);
+			count++;
 		}
-
-		// Reverse date sorting with null having lowest priority (ie: will be last).
-		list.sort((SummaryItemTo1 i1, SummaryItemTo1 i2) -> ObjectUtils.compare(i2.getDate(), i1.getDate()));
-		
-		for(int i = 0; i < list.size(); i++){
-			list.get(i).setId(i);
-		}
-
 	}
 }
