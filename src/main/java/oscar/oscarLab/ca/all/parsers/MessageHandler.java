@@ -191,6 +191,26 @@ public abstract class MessageHandler
 		return new ArrayList<>(0);
 	}
 
+	protected EmbeddedDocument toEmbeddedPdf(String base64String, int index)
+	{
+		return toEmbeddedDocument(base64String, "application/pdf", "pdf", index, "embedded_pdf");
+	}
+
+	protected EmbeddedDocument toEmbeddedDocument(String base64String, String mimeType, String extension, int index, String description)
+	{
+		EmbeddedDocument embeddedDocument = new EmbeddedDocument();
+		embeddedDocument.setBase64Data(base64String);
+		embeddedDocument.setMimeType(mimeType);
+
+		String fileName = "-" + getAccessionNum() + "-" + getFillerOrderNumber() + "-" + index + "-" + (int) (Math.random() * 1000000000) + "." + extension;
+		embeddedDocument.setFileName(fileName);
+		embeddedDocument.setDescription(description);
+		embeddedDocument.setSourceFacility("HL7Upload");
+		embeddedDocument.setSource("Embedded Lab Data");
+
+		return embeddedDocument;
+	}
+
 	/* ===================================== MSH ====================================== */
 
 	/**

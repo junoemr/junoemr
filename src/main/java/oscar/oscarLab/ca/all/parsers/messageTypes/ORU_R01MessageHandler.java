@@ -680,17 +680,7 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 						if (embeddedPdf.startsWith(MessageHandler.embeddedPdfPrefix))
 						{
 							logger.info("Found embedded PDF in lab upload, pulling it out");
-							EmbeddedDocument embeddedDocument = new EmbeddedDocument();
-							embeddedDocument.setBase64Data(embeddedPdf);
-							embeddedDocument.setMimeType("application/pdf");
-
-							String fileName = "-" + getAccessionNum() + "-" + getFillerOrderNumber() + "-" + count + "-" + (int)(Math.random()*1000000000) + ".pdf";
-							embeddedDocument.setFileName(fileName);
-							embeddedDocument.setDescription("embedded_pdf");
-							embeddedDocument.setSourceFacility("HL7Upload");
-							embeddedDocument.setSource("Embedded Lab Data");
-
-							embeddedDocuments.add(embeddedDocument);
+							embeddedDocuments.add(toEmbeddedPdf(embeddedPdf, count));
 							count++;
 						}
 					}
