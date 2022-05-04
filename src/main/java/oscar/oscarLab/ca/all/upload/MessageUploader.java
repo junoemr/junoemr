@@ -653,13 +653,16 @@ public final class MessageUploader {
 	{
 		GregorianCalendar dateOfBirth = null;
 
-		if (hin != null)
+		// never match a patient without a hin to match on
+		if(StringUtils.isBlank(hin))
 		{
-			// This is for one of the Ontario labs I think??
-			if (hin.length() == 12)
-			{
-				hin = hin.substring(0, 10);
-			}
+			return null;
+		}
+
+		// This is for one of the Ontario labs I think??
+		if (hin.length() == 12)
+		{
+			hin = hin.substring(0, 10);
 		}
 
 		if (dob != null && !dob.trim().equals(""))
