@@ -509,7 +509,7 @@ function openJunoSummary(demoId)
 								boolean showOldEchartLink = true;
 							    UserPropertyDAO propDao =(UserPropertyDAO)SpringUtils.getBean("UserPropertyDAO");
 								UserProperty oldEchartLink = propDao.getProp(curUser_no, UserProperty.HIDE_OLD_ECHART_LINK_IN_APPT);
-								if (oldEchartLink!=null && "Y".equals(oldEchartLink.getValue())) showOldEchartLink = false;
+								if (oldEchartLink == null || "Y".equals(oldEchartLink.getValue())) showOldEchartLink = false;
 								CaseManagementNoteDAO caseManagementNoteDAO = SpringUtils.getBean(CaseManagementNoteDAO.class);
 							if (showOldEchartLink) {
                                                             String params = "";

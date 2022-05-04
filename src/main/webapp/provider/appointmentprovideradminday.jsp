@@ -341,7 +341,7 @@ public boolean isBirthday(String schedDate,String demBday){
 	//Hide old echart link
 	boolean showOldEchartLink = true;
 	UserProperty oldEchartLink = propDao.getProp(curUser_no, UserProperty.HIDE_OLD_ECHART_LINK_IN_APPT);
-	if (oldEchartLink!=null && "Y".equals(oldEchartLink.getValue())) showOldEchartLink = false;
+	if (oldEchartLink == null || "Y".equals(oldEchartLink.getValue())) showOldEchartLink = false;
 
 	if (org.oscarehr.common.IsPropertiesOn.isCaisiEnable() && org.oscarehr.common.IsPropertiesOn.isTicklerPlusEnable()){
 		newticklerwarningwindow = (String) session.getAttribute("newticklerwarningwindow");
