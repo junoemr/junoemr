@@ -25,10 +25,13 @@ package oscar.oscarLab.ca.all.parsers.messageTypes;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import org.oscarehr.common.model.Hl7TextInfo;
+import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -362,6 +365,35 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 		ArrayList<String> res = new ArrayList<>();
 		res.add(getString(get("/.TXA-2")));
 		return res;
+	}
+
+	@Override
+	public List<EmbeddedDocument> getEmbeddedDocuments()
+	{
+		List<EmbeddedDocument> embeddedDocuments = new LinkedList<>();
+		String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
+		// Every PDF should be prefixed with this due to b64 encoding of PDF header
+
+		int count = 0;
+		for(int j = 0; j < getOBXCount(0); j++)
+		{
+			if(getOBXValueType(0, j).equals("ED"))
+			{
+				// Some embedded PDFs simply have the lab as-is, some have it split up like above
+				for (int k = 1; k <= referenceStrings.length; k++)
+				{
+					String embeddedPdf = getOBXResult(0, j, k);
+					if (embeddedPdf.startsWith(MessageHandler.embeddedPdfPrefix))
+					{
+						logger.info("Found embedded PDF in lab upload, pulling it out");
+						embeddedDocuments.add(toEmbeddedPdf(embeddedPdf, count));
+						count++;
+					}
+				}
+			}
+		}
+
+		return embeddedDocuments;
 	}
 
 
