@@ -23,28 +23,28 @@
 
 package integration.tests;
 
+import static integration.tests.AddPatientsIT.mom;
+import static integration.tests.AddProvidersIT.drBerry;
+import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
+
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import java.io.IOException;
+import java.sql.SQLException;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-
-import java.sql.SQLException;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import static integration.tests.AddPatientsIT.mom;
-import static integration.tests.AddProvidersIT.drBerry;
-import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
-import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")
@@ -57,9 +57,9 @@ public class EditTicklersClassicUIIT extends SeleniumTestBase
 		return new String[] {
 			"admission", "caisi_role", "casemgmt_issue", "casemgmt_issue_notes", "casemgmt_note",
 			"casemgmt_note_link", "demographic", "documentDescriptionTemplate", "Facility", "issue",
-			"log", "LookupList", "LookupListItem", "measurementType", "OscarJob", "OscarJobType",
+			"log", "log_ws_rest", "LookupList", "LookupListItem", "measurementType", "OscarJob", "OscarJobType",
 			"provider", "providerbillcenter", "ProviderPreference", "providersite", "secUserRole",
-			"site", "tickler", "tickler_comments", "tickler_text_suggest", "validations", "property"
+			"site", "tickler", "tickler_comments", "tickler_text_suggest", "tickler_update", "validations", "property"
 		};
 	}
 
@@ -72,19 +72,8 @@ public class EditTicklersClassicUIIT extends SeleniumTestBase
 		databaseUtil.createProviderSite();
 	}
 
-	/*
-	-------------------------------------------------------------------------------
-Test set: integration.tests.EditTicklersClassicUIIT
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 77.925 s <<< FAILURE! - in integration.tests.EditTicklersClassicUIIT
-editTicklerTest  Time elapsed: 35.713 s  <<< FAILURE!
-java.lang.AssertionError: Tickler note is Not added Successfully.
-    at integration.tests.EditTicklersClassicUIIT.editTicklerTest(EditTicklersClassicUIIT.java:110)
-	 */
-	@Ignore
 	@Test
 	public void editTicklerTest()
-			throws InterruptedException
 	{
 		String priority = "High";
 		String clinic = "Test Clinic";
@@ -93,17 +82,15 @@ java.lang.AssertionError: Tickler note is Not added Successfully.
 
 		// *** Add Tickler Note ***
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
-		Thread.sleep(2000);
 		String currWindowHandle = driver.getWindowHandle();
-		driver.findElement(By.id("menuTitletickler")).click();
-		Thread.sleep(2000);
+		findWaitClickById(driver, webDriverWait, "menuTitletickler");
 		PageUtil.switchToLastWindow(driver);
 		dropdownSelectByVisibleText(driver, webDriverWait, By.xpath("//select[@name='priority']"), priority);
 		dropdownSelectByVisibleText(driver, webDriverWait, By.id("site"), clinic);
 		driver.findElement(By.xpath("//textarea[@name='textarea']")).sendKeys(reminderMessage);
 		driver.findElement(By.xpath("//input[@value='Submit & Write to Encounter']")).click();
 		PageUtil.switchToWindow(currWindowHandle, driver);
-		Thread.sleep(1000);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(reminderMessage)));
 
 		//*** Verify the update on Echart page ***
 		Assert.assertTrue("Tickler note is NOT added Successfully.",
@@ -133,7 +120,7 @@ java.lang.AssertionError: Tickler note is Not added Successfully.
 		driver.findElement(By.xpath("//input[@name='updateTicklerAndSaveEncounter']")).click();
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
-		Thread.sleep(1000);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + suggestedText + "')]")));
 
 		//*** Verify the update on Echart page ***
 		Assert.assertTrue("Suggested Text is NOT updated to Encounter Successfully",

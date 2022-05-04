@@ -25,13 +25,14 @@ package integration.tests;
 
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.After;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.UUID;
+import java.util.regex.Pattern;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -39,21 +40,11 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
-import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.UUID;
-import java.util.regex.Pattern;
-
-import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")
@@ -67,7 +58,7 @@ public class EchartIT extends SeleniumTestBase
 	{
 		return new String[]{
 			"admission", "demographic",
-			"demographicArchive", "demographiccust", "log", "program", "provider_recent_demographic_access",
+			"demographicArchive", "demographiccust", "log", "log_ws_rest", "program", "provider_recent_demographic_access",
 			"casemgmt_note", "casemgmt_cpp", "casemgmt_issue", "casemgmt_note_ext", "casemgmt_note_link", "casemgmt_note_lock",
 			"casemgmt_tmpsave", "validations", "measurementType", "eChart", "hash_audit", "property"
 		};
@@ -80,16 +71,6 @@ public class EchartIT extends SeleniumTestBase
 		databaseUtil.createTestDemographic();
 	}
 
-	/*
-	-------------------------------------------------------------------------------
-Test set: integration.tests.EchartIT
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 10.061 s <<< FAILURE! - in integration.tests.EchartIT
-testWritingNote  Time elapsed: 9.789 s  <<< FAILURE!
-org.junit.ComparisonFailure: Create new note. FAIL expected:<caseNote_note0[1]> but was:<caseNote_note0[]>
-    at integration.tests.EchartIT.testWritingNote(EchartIT.java:129)
-	 */
-	@Ignore
 	@Test
 	public void testWritingNote()
 			throws InterruptedException
@@ -147,17 +128,15 @@ org.junit.ComparisonFailure: Create new note. FAIL expected:<caseNote_note0[1]> 
 		// test auto save
 		Thread.sleep(10000); // oscar auto saves every 5 seconds
 		driver.navigate().refresh();
-		Thread.sleep(5000);
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//textarea[@name='caseNote_note']")));
 		newNote = driver.findElement(By.xpath("//textarea[@name='caseNote_note']"));
 		Assert.assertTrue("Auto save note. FAIL", Pattern.compile(myUUID.toString()).matcher(newNote.getText()).find());
 		logger.info("Auto save note. OK");
 
 		// sign and save
-		String currentUrl = driver.getCurrentUrl();
 		driver.findElement(By.id("signSaveImg")).click();
-		Thread.sleep(2000);
 		driver.get(Navigation.getOscarUrl(Integer.toString(randomTomcatPort)) + ECHART_URL);
-		Thread.sleep(5000);
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[contains(., '" + myUUID + "') and contains(., 'Signed on') and contains(@id, 'txt')]")));
 		Assert.assertTrue("Sign and save note. FAILED",
 				PageUtil.isExistsBy(By.xpath("//*[contains(., '" + myUUID + "') and contains(., 'Signed on') and contains(@id, 'txt')]"), driver));
 		logger.info("Sign and save note. OK");
