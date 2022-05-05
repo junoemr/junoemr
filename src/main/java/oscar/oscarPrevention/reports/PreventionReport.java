@@ -25,6 +25,7 @@
 
 package oscar.oscarPrevention.reports;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.util.LoggedInInfo;
 
 import java.util.ArrayList;
@@ -55,8 +56,26 @@ public interface PreventionReport {
     String INELIGIBLE = "Ineligible";
     String PENDING = "Pending";
 
-    public boolean displayNumShots();
+    enum PreventionReportType
+    {
+        PAP,
+        MAMMOGRAM,
+        FLU,
+        CHILD_IMMUNIZATIONS,
+	FIT;
 
-    public Hashtable runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate);
+        public static PreventionReportType fromStringIgnoreCase(String enumString)
+        {
+            if(EnumUtils.isValidEnumIgnoreCase(PreventionReportType.class, enumString))
+            {
+                return PreventionReportType.valueOf(enumString.toUpperCase());
+            }
+            return null;
+        }
+    }
+
+    boolean displayNumShots();
+
+    Hashtable<String, Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list, Date asofDate);
 }
 
