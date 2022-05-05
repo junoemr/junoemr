@@ -10,15 +10,20 @@ package com.indivica.olis.segments;
 
 import com.indivica.olis.queries.QueryType;
 import org.oscarehr.config.JunoProperties;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.SpringUtils;
 
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
+import static org.oscarehr.common.model.UserProperty.OLIS_EMR_ID;
+
 public class MSHSegment implements Segment
 {
 	private static final JunoProperties junoProperties = SpringUtils.getBean(JunoProperties.class);
+	private static final SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
 
 	private final QueryType queryType;
 	private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMddHHmmssZZZZZ");
@@ -33,10 +38,13 @@ public class MSHSegment implements Segment
 	}
 	
 	@Override
-	public String getSegmentHL7String() {
-		
-		String sendingApplication  = junoProperties.getOlis().getSendingApplication();
+	public String getSegmentHL7String()
+	{
+		String vendorId = junoProperties.getOlis().getVendorId();
+		String emrId = systemPreferenceService.getPreferenceValue(OLIS_EMR_ID, "");
 		String processingId = junoProperties.getOlis().getProcessingId();
+
+		String sendingApplication = MessageFormat.format("^{0}:{1}^ISO", vendorId, emrId);
 		
 		return "MSH|^~\\&|"+sendingApplication+"|MCMUN2|" +
 			"^OLIS^X500||" + dateFormatter.format(new Date()) + "||SPQ^" + queryType.toString() + "^SPQ_Q08|" + uuidString + "|"+processingId+"|2.3.1||||||8859/1";
