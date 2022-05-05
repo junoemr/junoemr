@@ -107,7 +107,7 @@ public class MessageHandlerFormatDateTimeTest
 		}
 
 		@Override
-		public String getAccessionNum()
+		public String getUniqueIdentifier()
 		{
 			return null;
 		}
