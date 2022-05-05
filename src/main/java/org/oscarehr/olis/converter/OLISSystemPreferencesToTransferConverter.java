@@ -68,6 +68,7 @@ public class OLISSystemPreferencesToTransferConverter extends AbstractModelConve
 		{
 			transfer.setFrequency(junoProperties.getOlis().getDefaultPollingIntervalMin());
 		}
+		transfer.setVendorId(junoProperties.getOlis().getVendorId());
 
 		return transfer;
 	}

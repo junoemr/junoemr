@@ -35,4 +35,5 @@ public class OLISSystemSettingsTransfer
 	private boolean filterPatients;
 	private Integer frequency;
 	private List<String> warnings;
+	private String vendorId;
 }
