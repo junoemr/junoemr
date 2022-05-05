@@ -126,6 +126,19 @@
 		</jaxws:features>
 	</jaxws:endpoint>
 
+	<jaxws:endpoint implementor="#demographicDocumentWs" address="/DemographicDocumentService" >
+		<jaxws:inInterceptors>
+			<ref bean="IPInWSS4JInterceptor"/>
+			<ref bean="authenticationInWSS4JInterceptor"/>
+		</jaxws:inInterceptors>
+		<jaxws:outInterceptors>
+			<ref bean="bornSOAPHeaderInterceptor"/>
+		</jaxws:outInterceptors>
+		<jaxws:features>
+			<ref bean="soapLoggingPackage"/>
+		</jaxws:features>
+	</jaxws:endpoint>
+
 	<jaxws:endpoint implementor="#userMetricsWs" address="/UserMetricsService" >
 		<jaxws:inInterceptors>
 			<ref bean="IPInWSS4JInterceptor"/>

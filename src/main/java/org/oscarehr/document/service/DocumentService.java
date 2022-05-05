@@ -36,6 +36,7 @@ import org.oscarehr.common.model.Provider;
 import org.oscarehr.dataMigration.converter.in.DocumentModelToDbConverter;
 import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.dao.DocumentDao;
+import org.oscarehr.document.factory.DocumentFactory;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
@@ -57,6 +58,7 @@ import oscar.log.LogConst;
 import oscar.util.ConversionUtils;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
@@ -78,6 +80,9 @@ public class DocumentService
 
 	@Autowired
 	private CtlDocumentDao ctlDocumentDao;
+
+	@Autowired
+	private DocumentFactory documentFactory;
 
 	@Autowired
 	private PatientLabRoutingDao patientLabRoutingDao;
@@ -198,7 +203,7 @@ public class DocumentService
 	 * upload (add) a new document to a demographics chart.
 	 * @param loggedInInfo - the logged in info of the provider performing the upload
 	 * @param document - the document to upload
-	 * @param demographic - the demogrpahic to attach this document to.
+	 * @param demographic - the demographic to attach this document to.
 	 * @param base64Data - base64 data to be contained in the document.
 	 * @return - the newly uploaded document
 	 */
@@ -229,6 +234,33 @@ public class DocumentService
 				String.valueOf(document.getDocumentNo()), loggedInInfo.getIp(), document.getDocfilename());
 
 		return newDocument;
+	}
+
+	/**
+	 * upload a new document to a demographic
+	 * @param loggedInInfo - the loggedin user.
+	 * @param demographicId - the demographic to assign the document to
+	 * @param documentName - the document name
+	 * @param base64Data - the document data base64 encoded.
+	 * @return - the newly uploaded document
+	 */
+	public Document uploadNewDemographicDocument(LoggedInInfo loggedInInfo,
+												 String demographicId,
+												 String documentName,
+												 String base64Data)
+		throws IOException, InterruptedException
+	{
+		byte[] docContents = Base64.getDecoder().decode(base64Data);
+
+		if(docContents.length == 0)
+		{
+			throw new IllegalArgumentException("document data is empty");
+		}
+
+		InputStream fileInputStream = new ByteArrayInputStream(docContents);
+		final Document document = this.documentFactory.create(loggedInInfo, documentName);
+
+		return this.uploadNewDemographicDocument(document, fileInputStream, Integer.parseInt(demographicId));
 	}
 
 	/**
