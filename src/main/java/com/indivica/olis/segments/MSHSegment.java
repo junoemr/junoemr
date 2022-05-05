@@ -9,6 +9,7 @@
 package com.indivica.olis.segments;
 
 import com.indivica.olis.queries.QueryType;
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.config.JunoProperties;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.SpringUtils;
@@ -41,10 +42,10 @@ public class MSHSegment implements Segment
 	public String getSegmentHL7String()
 	{
 		String vendorId = junoProperties.getOlis().getVendorId();
-		String emrId = systemPreferenceService.getPreferenceValue(OLIS_EMR_ID, "");
+		String emrId = systemPreferenceService.getPreferenceValue(OLIS_EMR_ID, null);
 		String processingId = junoProperties.getOlis().getProcessingId();
 
-		String sendingApplication = MessageFormat.format("^{0}:{1}^ISO", vendorId, emrId);
+		String sendingApplication = MessageFormat.format("^{0}:{1}^ISO", vendorId, StringUtils.trimToEmpty(emrId));
 		
 		return "MSH|^~\\&|"+sendingApplication+"|MCMUN2|" +
 			"^OLIS^X500||" + dateFormatter.format(new Date()) + "||SPQ^" + queryType.toString() + "^SPQ_Q08|" + uuidString + "|"+processingId+"|2.3.1||||||8859/1";
