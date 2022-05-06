@@ -126,5 +126,17 @@ angular.module('Admin.Section').component('hrmSettings',
 
 					ctrl.userSettings = settings;
 				}
+
+				ctrl.getKeyForDisplay = () =>
+				{
+					if (ctrl.isReadOnly)
+					{
+						return "**********";
+					}
+
+					// This holds a placeholder key.
+					// The real key is never sent to the frontend.
+					return ctrl.userSettings.decryptionKey;
+				}
 			}]
 	});

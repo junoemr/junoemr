@@ -80,6 +80,12 @@
 							disabled="$ctrl.isReadOnly"
 				>
 				</juno-input>
+				<juno-input class="m-t-16"
+							label="Decryption Key (32 digits)"
+							label-position="$ctrl.LABEL_POSITION"
+							ng-model="$ctrl.getKeyForDisplay()"
+							disabled="$ctrl.isReadOnly"
+				>
 			</div>
 		</panel-body>
 	</panel>
