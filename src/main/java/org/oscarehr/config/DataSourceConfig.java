@@ -24,6 +24,7 @@
 package org.oscarehr.config;
 
 import javax.sql.DataSource;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +42,7 @@ public class DataSourceConfig
 
 	@Bean(name="dataSource")
 	@Primary
+	@ConfigurationProperties(prefix = "spring.datasource.hikari")
 	public DataSource getDataSource()
 	{
 		String dbUri = oscarProperties.getDbUri();
@@ -51,7 +53,6 @@ public class DataSourceConfig
 		dataSourceBuilder.url(dbUri + dbName + CONNECTION_STRING_SUFFIX);
 		dataSourceBuilder.username(oscarProperties.getDbUserName());
 		dataSourceBuilder.password(oscarProperties.getDbPassword());
-
 		return dataSourceBuilder.build();
 	}
 
