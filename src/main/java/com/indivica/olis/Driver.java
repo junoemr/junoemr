@@ -153,6 +153,14 @@ public class Driver
 				response.setHl7Request(olisHL7String);
 			}
 		}
+		catch(MissingArgumentException e)
+		{
+			logger.warn("Can't perform OLIS query due to missing arguments: " + e.getMessage());
+			response = new DriverResponse();
+			response.setSearchException(e);
+			notifyOlisError(loggedInProvider.getProviderNo(), e.getMessage());
+			logData = e.getMessage();
+		}
 		catch(Exception e)
 		{
 			logger.error("Can't perform OLIS query due to exception.", e);
