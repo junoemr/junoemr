@@ -1920,6 +1920,12 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 													%> <td align="left"><%= handler.getOBXResult( j, k) %></td><%
 												}
 											}
+											else if (handler.getMsgType().equals(AHS_RURAL_LAB_TYPE))
+											{%>
+												<td align="left" class="<%=handler.isOBXAbnormal(j, k) ? "Abnormal" : ""%>">
+													<%= handler.getOBXResult( j, k) %>
+												</td><%
+											}
 											else {%>
                                            		<td align="left"><%= handler.getOBXResult( j, k) %></td><%
 											} %>
@@ -1934,21 +1940,30 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
 					                       if(handler.hasChildOBR(j, k))
 					                       {
-											   List<Integer> childOBRList = handler.getChildOBRIndexList(j, k);
-											   for(Integer childObrIndex : childOBRList)
-											   {
                                                 %>
-							                       <tr>
+	                                                <tr>
 	                                                <td></td>
 	                                                <td align="left" colspan="2">
 		                                                <table border="1" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
 		                                                <thead>
 			                                                <tr>
-				                                                <th>Test</th>
+				                                                <th>Description</th>
 				                                                <th>Result</th>
 			                                                </tr>
 		                                                </thead>
 		                                                <tbody><%
+                                                List<Integer> childOBRList = handler.getChildOBRIndexList(j, k);
+                                                for(Integer childObrIndex : childOBRList)
+                                                {
+													// if no obx results in child, display warning
+													if(handler.getOBXCount(childObrIndex) <= 0)
+													{
+		                                                %>
+		                                                <tr>
+			                                                <td align="left" colspan="2" class="red">Missing Result Data</td>
+		                                                </tr>
+		                                                <%
+													}
 							                       for(int childObxIndex = 0; childObxIndex < handler.getOBXCount(childObrIndex); childObxIndex++)
 							                       {
 							                       %>
@@ -1962,11 +1977,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 			                                            </tr>
 							                       <%
 							                       }
+						                       }
 							                        %>  </tbody>
 		                                                </table>
 	                                                </td>
                                                 </tr><%
-					                            }
 										   }
 										}//end of isUnstructuredDoc
                                    			
