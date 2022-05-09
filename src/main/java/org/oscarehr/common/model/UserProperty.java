@@ -69,6 +69,7 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String PROVIDER_COLOUR = "ProviderColour";
 
     public static final String OLIS_INTEGRATION_ENABLED = "integration.olis.enabled";
+    public static final String OLIS_EMR_ID="integration.olis.emr_id";
     public static final String OLIS_POLLING_ENABLED="olis_polling_enabled";
     public static final String OFFICIAL_FIRST_NAME="official_first_name";
     public static final String OFFICIAL_SECOND_NAME="official_second_name";

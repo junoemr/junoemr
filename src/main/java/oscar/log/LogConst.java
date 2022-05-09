@@ -44,6 +44,7 @@ public class LogConst {
 	public static final String ACTION_ACCESS = "access";
 	public static final String ACTION_UNLOCK = "unlock";
 	public static final String ACTION_ASSIGN = "assign";
+	public static final String ACTION_QUERY = "query";
 	public static final String DISCONTINUE = "discontinue";
 	public static final String ARCHIVE = "archive";
 	public static final String REPRINT = "reprint";

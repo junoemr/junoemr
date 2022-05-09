@@ -72,7 +72,7 @@ public class JunoProperties
 		private String truststore;
 		private String truststorePassword;
 		private String returnedCert;
-		private String sendingApplication;
+		private String vendorId;
 		private String requestUrl;
 		private int defaultPollingIntervalMin;
 		private String responseSchema;
