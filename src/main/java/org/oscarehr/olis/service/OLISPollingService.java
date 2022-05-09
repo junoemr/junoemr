@@ -133,6 +133,9 @@ public class OLISPollingService implements Runnable
 			loggedInInfo.setLoggedInProvider(legacyProviderDao.getProvider(ProviderData.SYSTEM_PROVIDER_NO));
 			loggedInInfo.setLoggedInSecurity(securityDao.getByProviderNo(ProviderData.SYSTEM_PROVIDER_NO));
 
+			// set practitioner number, as it cannot be blank in ZSH segment
+			loggedInInfo.getLoggedInProvider().setPractitionerNo(ProviderData.SYSTEM_PROVIDER_NO);
+
 			requestResults(loggedInInfo);
 			logger.info("OLIS POLLING TASK COMPLETE....");
 		}
