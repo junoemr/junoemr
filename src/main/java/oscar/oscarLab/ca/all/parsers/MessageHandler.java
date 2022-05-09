@@ -738,6 +738,15 @@ public abstract class MessageHandler
 		return false;
 	}
 
+	/**
+	 * @param obr segment index - 0 indexed
+	 * @return true if a mapped value exists
+	 */
+	public boolean isChildOBR(int obr)
+	{
+		return false;
+	}
+
 	/* ===================================== OBX ====================================== */
 
 	/**
@@ -974,6 +983,26 @@ public abstract class MessageHandler
 	}
 
 	public abstract String getNteForOBX(int i,int j);
+
+	/**
+	 * @param obr segment index - 0 indexed
+	 * @param obx segment index - 0 indexed
+	 * @return true if the given segment has a linked OBR child segment
+	 */
+	public boolean hasChildOBR(int obr, int obx)
+	{
+		return false;
+	}
+
+	/**
+	 * @param obr segment index - 0 indexed
+	 * @param obx segment index - 0 indexed
+	 * @return index of linked OBR child segment, or -1
+	 */
+	public int getChildOBR(int obr, int obx)
+	{
+		return -1;
+	}
 
 	/* ============================== Specimen ============================= */
 	/**

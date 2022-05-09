@@ -1888,7 +1888,8 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 													<%
 												}
 											}%>
-											<%if(isVIHARtf) {
+											<%
+											if(isVIHARtf) {
 											    //create bytes from the rtf string
 										    	byte[] rtfBytes = handler.getOBXResult(j, k).getBytes();
 										    	ByteArrayInputStream rtfStream = new ByteArrayInputStream(rtfBytes);
@@ -1913,20 +1914,6 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 													%> <td align="left"><%= handler.getOBXResult( j, k) %></td><%
 												}
 											}
-											else if (handler.getMsgType().equals(AHS_RURAL_LAB_TYPE))
-											{
-												String result = handler.getOBXResult( j, k);
-												String abnormalFlag = handler.getOBXAbnormalFlag( j, k);
-												if(StringUtils.isBlank(result))
-												{
-													result = abnormalFlag;
-												}
-												else if (StringUtils.isNotBlank(abnormalFlag))
-												{
-													result += " (" + abnormalFlag + ")";
-												}
-												%> <td align="left" class="<%=handler.isOBXAbnormal(j, k) ? "Abnormal" : ""%>"><%= result %></td> <%
-											}
 											else {%>
                                            		<td align="left"><%= handler.getOBXResult( j, k) %></td><%
 											} %>
@@ -1937,6 +1924,40 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 				                                    <td align="center"><%= handler.getTimeStamp(j, k) %></td><%
 	                                            }
 											}
+										    %></tr><%
+
+					                       if(handler.hasChildOBR(j, k))
+					                       {
+                                                %><tr>
+	                                                <td></td>
+	                                                <td align="left" colspan="2">
+		                                                <table border="1" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
+		                                                <thead>
+			                                                <tr>
+				                                                <th>Test</th>
+				                                                <th>Result</th>
+			                                                </tr>
+		                                                </thead>
+		                                                <tbody><%
+							                       int childObrIndex = handler.getChildOBR(j, k);
+							                       for(int childObxIndex = 0; childObxIndex < handler.getOBXCount(childObrIndex); childObxIndex++)
+							                       {
+							                       %>
+			                                            <tr>
+								                            <td align="right">
+									                            <%= handler.getOBXName( childObrIndex, childObxIndex) %>
+								                            </td>
+				                                            <td align="left">
+									                            <%= handler.getOBXAbnormalFlag( childObrIndex, childObxIndex) %>
+								                            </td>
+			                                            </tr>
+							                       <%
+							                       }
+							                        %>  </tbody>
+		                                                </table>
+	                                                </td>
+                                                </tr><%
+					                       }
 										}//end of isUnstructuredDoc
                                    			
                                    			else{//if it isn't a PATHL7 doc%>
@@ -1989,7 +2010,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                            		align="left";
                                            	}%>
 
-                                           	
+
                                            <td align="<%=align%>"><%= handler.getOBXResult( j, k) %></td>
                                           
                                            <td align="center">
@@ -2000,10 +2021,13 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                            
                                            <td align="center"><%= handler.getTimeStamp(j, k) %></td>
                                            <td align="center"><%= handler.getOBXResultStatusDisplayValue( j, k) %></td>
-                                      		<td align="center" valign="top">                                           <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
+                                      		<td align="center" valign="top">
+		                                        <a href="javascript:void(0);"
+		                                           title="Annotation"
+		                                           onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
 	                                                	<%if(!isPrevAnnotation){ %><img src="../../../images/notes.gif" alt="rxAnnotation" height="16" width="13" border="0"/><%}else{ %><img src="../../../images/filledNotes.gif" alt="rxAnnotation" height="16" width="13" border="0"/> <%} %>
-	                                                </a>
-                                                </td>
+                                                </a>
+                                            </td>
                                        </tr>
                                         <%
 											}

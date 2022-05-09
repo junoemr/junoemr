@@ -27,6 +27,7 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import com.google.common.collect.Sets;
+import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
@@ -59,6 +60,8 @@ public class AHSRuralHandler extends AHSHandler
 		"PHR-"
 	);
 
+	private MultiKeyMap<Integer, Integer> obrParentMap;
+
 	public static boolean handlerTypeMatch(Message message)
 	{
 		String version = message.getVersion();
@@ -89,6 +92,45 @@ public class AHSRuralHandler extends AHSHandler
 	public AHSRuralHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
+		obrParentMap = new MultiKeyMap<>();
+		int obrCount = getOBRCount();
+
+		for(int i = 0; i < obrCount; i++)
+		{
+			String parentPlacerNo = getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-29-1"));
+			String parentResultId = getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-26-2"));
+
+			if(StringUtils.isNotBlank(parentPlacerNo) && StringUtils.isNotBlank(parentResultId))
+			{
+				// find index of parent based on matching placer order number (child obr.29 matches parent obr.2)
+				Integer parentObr = null;
+				Integer parentObx = null;
+				for(int ii = 0; ii < obrCount; ii++)
+				{
+					String placerOrderNo = get("/.ORDER_OBSERVATION(" + ii + ")/OBR-2-1");
+					if(parentPlacerNo.equals(placerOrderNo))
+					{
+						parentObr = ii;
+						// find the index of the parent result. (child obr.26 matches parent obx.4)
+						for(int jj = 0; jj < getOBXCount(ii); jj++)
+						{
+							String serviceId = get("/.ORDER_OBSERVATION(" + ii + ")/OBSERVATION(" + jj + ")/OBX-4-1");
+							if(parentResultId.equals(serviceId))
+							{
+								parentObx = jj;
+								break;
+							}
+						}
+						break;
+					}
+				}
+				if(parentObr != null && parentObx != null)
+				{
+					// multi-key map, map obr+obx to this obr segment. All 0 indexed to match regular index lookups
+					obrParentMap.put(parentObr, parentObx, i);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -214,6 +256,11 @@ public class AHSRuralHandler extends AHSHandler
 		return headers;
 	}
 
+	public boolean isChildOBR(int obr)
+	{
+		return obrParentMap.containsValue(obr);
+	}
+
 	/* ===================================== OBX ====================================== */
 
 	@Override
@@ -265,6 +312,23 @@ public class AHSRuralHandler extends AHSHandler
 	{
 		String abnormalFlags = getOBXAbnormalFlag(i,j);
 		return "A".equals(abnormalFlags);
+	}
+
+
+	@Override
+	public boolean hasChildOBR(int obr, int obx)
+	{
+		return obrParentMap.containsKey(obr, obx);
+	}
+
+	@Override
+	public int getChildOBR(int obr, int obx)
+	{
+		if(hasChildOBR(obr, obx))
+		{
+			return obrParentMap.get(obr, obx);
+		}
+		return -1;
 	}
 
 	/* ===================================== private methods etc. ====================================== */

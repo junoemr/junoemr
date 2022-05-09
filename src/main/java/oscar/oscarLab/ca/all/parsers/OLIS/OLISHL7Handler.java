@@ -917,6 +917,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	 * @param obx segment index - 0 indexed
 	 * @return index of linked OBR child segment, or -1
 	 */
+	@Override
 	public int getChildOBR(int obr, int obx)
 	{
 		if(hasChildOBR(obr, obx))
@@ -932,6 +933,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	 * @param obx segment index - 0 indexed
 	 * @return true if the given segment has a linked OBR child segment
 	 */
+	@Override
 	public boolean hasChildOBR(int obr, int obx)
 	{
 		return obrParentMap.containsKey(obr, obx);
@@ -941,6 +943,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	 * @param obr segment index - 0 indexed
 	 * @return true if a mapped value exists
 	 */
+	@Override
 	public boolean isChildOBR(int obr)
 	{
 		return obrParentMap.containsValue(obr);
