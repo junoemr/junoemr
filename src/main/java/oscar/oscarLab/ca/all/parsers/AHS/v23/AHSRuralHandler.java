@@ -34,6 +34,8 @@ import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Handler for:
@@ -60,7 +62,7 @@ public class AHSRuralHandler extends AHSHandler
 		"PHR-"
 	);
 
-	private MultiKeyMap<Integer, Integer> obrParentMap;
+	private MultiKeyMap<Integer, List<Integer>> obrParentMap;
 
 	public static boolean handlerTypeMatch(Message message)
 	{
@@ -127,7 +129,16 @@ public class AHSRuralHandler extends AHSHandler
 				if(parentObr != null && parentObx != null)
 				{
 					// multi-key map, map obr+obx to this obr segment. All 0 indexed to match regular index lookups
-					obrParentMap.put(parentObr, parentObx, i);
+					if(obrParentMap.containsKey(parentObr, parentObx))
+					{
+						obrParentMap.get(parentObr, parentObx).add(i);
+					}
+					else
+					{
+						List<Integer> obrIndexList = new LinkedList<>();
+						obrIndexList.add(i);
+						obrParentMap.put(parentObr, parentObx, obrIndexList);
+					}
 				}
 			}
 		}
@@ -258,7 +269,10 @@ public class AHSRuralHandler extends AHSHandler
 
 	public boolean isChildOBR(int obr)
 	{
-		return obrParentMap.containsValue(obr);
+		String parentPlacerNo = getString(get("/.ORDER_OBSERVATION(" + obr + ")/OBR-29-1"));
+		String parentResultId = getString(get("/.ORDER_OBSERVATION(" + obr + ")/OBR-26-2"));
+
+		return (StringUtils.isNotBlank(parentPlacerNo) && StringUtils.isNotBlank(parentResultId));
 	}
 
 	/* ===================================== OBX ====================================== */
@@ -314,7 +328,6 @@ public class AHSRuralHandler extends AHSHandler
 		return "A".equals(abnormalFlags);
 	}
 
-
 	@Override
 	public boolean hasChildOBR(int obr, int obx)
 	{
@@ -322,13 +335,13 @@ public class AHSRuralHandler extends AHSHandler
 	}
 
 	@Override
-	public int getChildOBR(int obr, int obx)
+	public List<Integer> getChildOBRIndexList(int obr, int obx)
 	{
 		if(hasChildOBR(obr, obx))
 		{
 			return obrParentMap.get(obr, obx);
 		}
-		return -1;
+		return new ArrayList<>(0);
 	}
 
 	/* ===================================== private methods etc. ====================================== */

@@ -999,9 +999,9 @@ public abstract class MessageHandler
 	 * @param obx segment index - 0 indexed
 	 * @return index of linked OBR child segment, or -1
 	 */
-	public int getChildOBR(int obr, int obx)
+	public List<Integer> getChildOBRIndexList(int obr, int obx)
 	{
-		return -1;
+		return new ArrayList<>(0);
 	}
 
 	/* ============================== Specimen ============================= */

@@ -917,7 +917,6 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	 * @param obx segment index - 0 indexed
 	 * @return index of linked OBR child segment, or -1
 	 */
-	@Override
 	public int getChildOBR(int obr, int obx)
 	{
 		if(hasChildOBR(obr, obx))

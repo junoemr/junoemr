@@ -1365,8 +1365,14 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                      	 </table>
                      <% } else {
 
-                      for(i=0;i<headers.size();i++){
+                      for(i=0;i<headers.size();i++)
+					  {
                            linenum=0;
+						   if(handler.isChildOBR(i))
+	                        {
+		                        continue;
+	                        }
+
 						boolean isUnstructuredDoc = false;
 						boolean isPDF = false;
 						boolean	isVIHARtf = false;
@@ -1928,7 +1934,11 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
 					                       if(handler.hasChildOBR(j, k))
 					                       {
-                                                %><tr>
+											   List<Integer> childOBRList = handler.getChildOBRIndexList(j, k);
+											   for(Integer childObrIndex : childOBRList)
+											   {
+                                                %>
+							                       <tr>
 	                                                <td></td>
 	                                                <td align="left" colspan="2">
 		                                                <table border="1" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
@@ -1939,7 +1949,6 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 			                                                </tr>
 		                                                </thead>
 		                                                <tbody><%
-							                       int childObrIndex = handler.getChildOBR(j, k);
 							                       for(int childObxIndex = 0; childObxIndex < handler.getOBXCount(childObrIndex); childObxIndex++)
 							                       {
 							                       %>
@@ -1957,7 +1966,8 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 		                                                </table>
 	                                                </td>
                                                 </tr><%
-					                       }
+					                            }
+										   }
 										}//end of isUnstructuredDoc
                                    			
                                    			else{//if it isn't a PATHL7 doc%>
