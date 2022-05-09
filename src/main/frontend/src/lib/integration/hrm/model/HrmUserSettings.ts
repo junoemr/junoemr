@@ -4,7 +4,6 @@ export default class HrmUserSettings
 	private _mailBoxAddress: string;
 	private _remotePath: string;
 	private _port: string;
-	private _decryptionKey: string;
 
 	public constructor()
 	{
@@ -12,7 +11,6 @@ export default class HrmUserSettings
 		this._mailBoxAddress = null;
 		this._remotePath = null;
 		this._port = null;
-		this._decryptionKey = null;
 	}
 
 	get userName(): string
@@ -53,13 +51,5 @@ export default class HrmUserSettings
 	set mailBoxAddress(value: string)
 	{
 		this._mailBoxAddress = value;
-	}
-
-	get decryptionKey(): string {
-		return this._decryptionKey;
-	}
-
-	set decryptionKey(value: string) {
-		this._decryptionKey = value;
 	}
 }

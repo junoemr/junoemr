@@ -23,10 +23,10 @@
 
 import {API_BASE_PATH} from "../../../constants/ApiConstants";
 import {
-  HrmScheduleApi,
-  HrmCategoriesApi,
-  HrmCategoryApi,
-  HrmSubClassApi
+	HrmScheduleApi,
+	HrmCategoriesApi,
+	HrmCategoryApi,
+	HrmSubClassApi, HrmAccountApi
 } from "../../../../../generated";
 import HrmFetchResults from "../model/HrmFetchResults";
 import HrmCategory from "../model/HRMCategory"
@@ -37,6 +37,7 @@ import HrmSubClassFromTransferConverter from "../converter/HrmSubClassFromTransf
 import HrmCategoryFromTransferConverter from "../converter/HrmCategoryFromTransferConverter";
 import HrmFetchResultsFromTransferConverter
 	from "../converter/HrmFetchResultsFromTransferConverter";
+import HrmSubClass from "../model/HrmSubClass";
 
 export default class HrmService
 {
@@ -44,6 +45,7 @@ export default class HrmService
     protected _hrmCategoryApi: HrmCategoryApi = new HrmCategoryApi(getAngular$http(), getAngular$httpParamSerializer(), API_BASE_PATH);
     protected _hrmCategoriesApi: HrmCategoriesApi = new HrmCategoriesApi(getAngular$http(), getAngular$httpParamSerializer(), API_BASE_PATH);
     protected _hrmSubClassApi: HrmSubClassApi = new HrmSubClassApi(getAngular$http(), getAngular$httpParamSerializer(), API_BASE_PATH);
+		protected _hrmAccountApi: HrmAccountApi = new HrmAccountApi(getAngular$http(), getAngular$httpParamSerializer(), API_BASE_PATH);
 
     protected _hrmCategoryFromTransfer: HrmCategoryFromTransferConverter = new HrmCategoryFromTransferConverter();
     protected _hrmCategoryToTransfer: HrmCategoryToTransferConverter = new HrmCategoryToTransferConverter();
@@ -53,7 +55,6 @@ export default class HrmService
     // ==========================================================================
     // Public Methods
     // ==========================================================================
-
     public async fetchNewHRMDocuments(): Promise<HrmFetchResults>
     {
         const rawResponse = await this._hrmSchedulerApi.fetchNewDocuments();
@@ -110,9 +111,15 @@ export default class HrmService
       return this._hrmCategoryFromTransfer.convert(rawResponse.data.body);
     }
 
-    public async findSubClassByAttributes(facilityId, reportClass, subClassName, accompanyingSubClassName): Promise<any>
+    public async findSubClassByAttributes(facilityId, reportClass, subClassName, accompanyingSubClassName): Promise<HrmSubClass>
     {
       const rawResponse = await this._hrmSubClassApi.findActiveByAttributes(facilityId, reportClass, subClassName, accompanyingSubClassName);
       return this._hrmSubClassFromTransfer.convert(rawResponse.data.body);
     }
+
+		public async saveDecryptionKey(key : string): Promise<boolean>
+		{
+			const rawResponse = await this._hrmAccountApi.saveDecryptionKey(key);
+			return rawResponse.data.body;
+		}
 }

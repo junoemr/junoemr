@@ -26,6 +26,7 @@ import HrmUserSettings from "../../../../../lib/integration/hrm/model/HrmUserSet
 import SystemPreferenceService from "../../../../../lib/system/service/SystemPreferenceService";
 import ToastService from "../../../../../lib/alerts/service/ToastService";
 import {SecurityPermissions} from "../../../../../common/security/securityConstants";
+import HrmService from "../../../../../lib/integration/hrm/service/HrmService";
 
 angular.module('Admin.Section').component('hrmSettings',
 	{
@@ -36,14 +37,18 @@ angular.module('Admin.Section').component('hrmSettings',
 			{
 				let ctrl = this;
 				const systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
+				const hrmWebService = new HrmService();
 				const toastService = new ToastService();
 
 
 				ctrl.userSettings = new HrmUserSettings();
 				ctrl.orginalSettings = new HrmUserSettings();
 
+				ctrl.newDecryptionKey = "";
+
 				ctrl.isWorking = false;
 				ctrl.isReadOnly = true;
+				ctrl.isReadOnlyKey = true;
 
 				ctrl.USERNAME_KEY = "omd.hrm.user";
 				ctrl.MAILBOX_ADDRESS_KEY = "omd.hrm.address";
@@ -90,7 +95,7 @@ angular.module('Admin.Section').component('hrmSettings',
 							systemPreferenceService.setPreference(ctrl.USERNAME_KEY, ctrl.userSettings.userName),
 							systemPreferenceService.setPreference(ctrl.MAILBOX_ADDRESS_KEY, ctrl.userSettings.mailBoxAddress),
 							systemPreferenceService.setPreference(ctrl.REMOTE_PATH_KEY, ctrl.userSettings.remotePath),
-							systemPreferenceService.setPreference(ctrl.PORT_KEY, ctrl.userSettings.port)
+							systemPreferenceService.setPreference(ctrl.PORT_KEY, ctrl.userSettings.port),
 						]);
 
 						toastService.successToast("HRM settings updated");
@@ -127,16 +132,16 @@ angular.module('Admin.Section').component('hrmSettings',
 					ctrl.userSettings = settings;
 				}
 
-				ctrl.getKeyForDisplay = () =>
+				ctrl.onEditKey = () =>
 				{
-					if (ctrl.isReadOnly)
-					{
-						return "**********";
-					}
+					ctrl.isReadKey = false;
+				}
 
-					// This holds a placeholder key.
-					// The real key is never sent to the frontend.
-					return ctrl.userSettings.decryptionKey;
+				ctrl.onCancelKey = () =>
+				{
+					ctrl.newDecryptionKey = "";
+					ctrl.isReadOnlyKey = true;
+					$scope.$apply();
 				}
 			}]
 	});

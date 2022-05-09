@@ -93,4 +93,10 @@ public class JunoProperties
 		private String ringcentralClientId;
 		private String ringcentralClientSecret;
 	}
+
+	@Data
+	public static class Hrm
+	{
+		private String vendorKey;
+	}
 }
