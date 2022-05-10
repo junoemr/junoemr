@@ -49,6 +49,11 @@ export enum SYSTEM_PROPERTIES
     ACTIVE_FAX_ACCOUNT = "system_active_fax_account_id",
 }
 
+export enum Integrations
+{
+    HrmEnabled = "integration.hrm.enabled",
+}
+
 export enum SystemPreferences
 {
     OlisIntegrationEnabled = "integration.olis.enabled",

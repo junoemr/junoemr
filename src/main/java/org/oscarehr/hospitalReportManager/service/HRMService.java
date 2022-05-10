@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
-import org.oscarehr.dataMigration.converter.out.hrm.HrmDocumentDbToModelConverter;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.dataMigration.converter.in.hrm.HrmDocumentModelToDbConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
@@ -47,6 +46,7 @@ import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
 import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,10 +77,10 @@ public class HRMService
 	private HrmDocumentModelToDbConverter modelToEntity;
 
 	@Autowired
-	private HrmDocumentDbToModelConverter entityToModel;
+	private HRMDocumentDao hrmDocumentDao;
 
 	@Autowired
-	private HRMDocumentDao hrmDocumentDao;
+	private SystemPreferenceService systemPreferences;
 
 	@Autowired
 	private HRMDocumentToDemographicDao hrmDocumentToDemographicDao;
@@ -336,5 +336,15 @@ public class HRMService
 			original.setNumDuplicatesReceived(original.getNumDuplicatesReceived() + 1);
 			hrmDocumentDao.merge(original);
 		}
+	}
+
+	public boolean isHRMEnabled()
+	{
+		return systemPreferences.isPreferenceEnabled("integration.hrm.enabled", false);
+	}
+
+	public boolean isHRMFetchEnabled()
+	{
+		return systemPreferences.isPreferenceEnabled("integration.hrm.fetch_enabled", false);
 	}
 }

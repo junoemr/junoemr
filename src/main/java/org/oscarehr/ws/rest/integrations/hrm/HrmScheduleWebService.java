@@ -62,7 +62,7 @@ public class HrmScheduleWebService extends AbstractServiceImpl
 	public RestResponse<HrmFetchResultsModel> fetchNewDocuments() throws InterruptedException, ExecutionException, TimeoutException
 	{
 		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
-		HrmFetchResultsModel results = scheduleService.scheduleFetchNow();
+		HrmFetchResultsModel results = scheduleService.fetchNow();
 		return RestResponse.successResponse(results);
 	}
 	

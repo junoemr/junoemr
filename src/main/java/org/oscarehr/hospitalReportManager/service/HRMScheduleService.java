@@ -49,23 +49,30 @@ public class HRMScheduleService
 
 	/**
 	 * Schedule remote fetch every intervalSeconds.  Location will not be overridden by local override.
-	 * @param intervalSeconds
+	 * @param intervalSeconds seconds between HRM report queries
 	 */
-	public void scheduleRegularFetch(int intervalSeconds)
+	public void startSchedule(int intervalSeconds)
 	{
 		PeriodicTrigger fetchSchedule = new PeriodicTrigger(intervalSeconds, TimeUnit.SECONDS);
 		fetchSchedule.setInitialDelay(0L);
-		
-		scheduler.schedule(() -> hrmService.consumeRemoteHRMDocuments() , fetchSchedule);
+
+		scheduler.schedule(this::fetchOnSchedule, fetchSchedule);
 	}
-	
-	
+
+	public void fetchOnSchedule()
+	{
+		if (hrmService.isHRMEnabled() && hrmService.isHRMFetchEnabled())
+		{
+			hrmService.consumeRemoteHRMDocuments();
+		}
+	}
+
 	/**
 	 * Fetch HRM documents now.
 	 * If a local override is present, will read from that location instead of using sftp connection.
 	 */
 	@Synchronized
-	public HrmFetchResultsModel scheduleFetchNow() throws InterruptedException, ExecutionException, TimeoutException
+	public HrmFetchResultsModel fetchNow() throws InterruptedException, ExecutionException, TimeoutException
 	{
 		HrmFetchResultsModel results;
 		

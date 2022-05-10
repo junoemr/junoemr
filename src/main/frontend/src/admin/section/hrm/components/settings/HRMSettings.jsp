@@ -24,7 +24,7 @@
 <div id="hrm-settings" class="flex-col align-items-center justify-content-top h-100">
 	<panel class="w-100">
 		<panel-header class="flex-row justify-content-between align-items-center">
-			<h6 class="d-inline-block">Account Settings</h6>
+			<h6 class="d-inline-block">Connection Settings</h6>
 			<div class="flex-row">
 				<juno-button ng-if="!$ctrl.isReadOnly"
 							 class="flex-grow-0 w-256 m-r-8"
@@ -80,20 +80,22 @@
 							disabled="$ctrl.isReadOnly"
 				>
 				</juno-input>
+			</div>
 		</panel-body>
 	</panel>
 	<panel class="w-100">
 		<panel-header class="flex-row justify-content-between align-items-center">
-			<h6 class="d-inline-block">Decryption Key</h6>
+			<h6 class="d-inline-block">File Decryption Key</h6>
 			<div class="flex-row">
-				<juno-button ng-if="!$ctrl.isReadOnlyKey"
+				<juno-button ng-if="!$ctrl.isKeyReadOnly"
 							 class="flex-grow-0 w-256 m-r-8"
 							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-							 click="$ctrl.onSaveKey()">
+							 click="$ctrl.onSaveKey()"
+							 disabled="!$ctrl.decryptionKeyValid()">
 					Save
 				</juno-button>
-				<juno-button ng-if="$ctrl.isReadOnlyKey"
+				<juno-button ng-if="$ctrl.isKeyReadOnly"
 							 class="flex-grow-0 w-256"
 							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
@@ -101,23 +103,25 @@
 							 disabled="!$ctrl.canEdit()">
 					Edit
 				</juno-button>
-				<juno-button ng-if="!$ctrl.isReadOnlyKey"
+				<juno-button ng-if="!$ctrl.isKeyReadOnly"
 							 class="flex-grow-0 w-256"
 							 button-color="$ctrl.JUNO_BUTTON_COLOR.DANGER"
 							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
 							 click="$ctrl.onCancelEditKey()"
-							 disabled="$ctrl.isReadOnly">
+							 disabled="$ctrl.isKeyReadOnly">
 					Cancel
 				</juno-button>
 			</div>
 		</panel-header>
 		<panel-body>
 			<div class="flex-col">
-				<juno-input ng-if="!$ctrl.isReadOnlyKey"
-							class="m-t-16"
-							label="New Decryption Key (32 chars)"
+				<juno-input ng-if="!$ctrl.isKeyReadOnly"
+							label="New Decryption Key"
 							label-position="$ctrl.LABEL_POSITION"
 							ng-model="$ctrl.newDecryptionKey"
+							character-limit="32"
+							hide-character-limit="false"
+							invalid="!$ctrl.decryptionKeyValid()"
 				>
 			</div>
 		</panel-body>

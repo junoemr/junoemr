@@ -48,7 +48,7 @@ angular.module('Admin.Section').component('hrmSettings',
 
 				ctrl.isWorking = false;
 				ctrl.isReadOnly = true;
-				ctrl.isReadOnlyKey = true;
+				ctrl.isKeyReadOnly = true;
 
 				ctrl.USERNAME_KEY = "omd.hrm.user";
 				ctrl.MAILBOX_ADDRESS_KEY = "omd.hrm.address";
@@ -82,7 +82,6 @@ angular.module('Admin.Section').component('hrmSettings',
 				{
 					ctrl.userSettings = angular.copy(ctrl.originalSettings);
 					ctrl.isReadOnly = true;
-					$scope.$apply();
 				}
 
 				ctrl.onSave = async () =>
@@ -132,16 +131,38 @@ angular.module('Admin.Section').component('hrmSettings',
 					ctrl.userSettings = settings;
 				}
 
-				ctrl.onEditKey = () =>
+				ctrl.decryptionKeyValid  = () =>
 				{
-					ctrl.isReadKey = false;
+					const onlyLettersAndNumbers = /^[A-Za-z\d]{32}$/;
+					return onlyLettersAndNumbers.test(ctrl.newDecryptionKey);
 				}
 
-				ctrl.onCancelKey = () =>
+				ctrl.onSaveKey = async () =>
+				{
+					try
+					{
+						await hrmWebService.saveDecryptionKey(ctrl.newDecryptionKey);
+					}
+					catch (e)
+					{
+						toastService.errorToast("Could not save decryption key, please try again later");
+					}
+					finally
+					{
+						ctrl.isKeyReadOnly = true;
+						$scope.$apply();
+					}
+				}
+
+				ctrl.onEditKey = () =>
 				{
 					ctrl.newDecryptionKey = "";
-					ctrl.isReadOnlyKey = true;
-					$scope.$apply();
+					ctrl.isKeyReadOnly = false;
+				}
+
+				ctrl.onCancelEditKey = () =>
+				{
+					ctrl.isKeyReadOnly = true;
 				}
 			}]
 	});

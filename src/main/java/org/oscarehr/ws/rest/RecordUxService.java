@@ -59,6 +59,7 @@ import org.oscarehr.common.model.Dashboard;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.EncounterTemplate;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.hospitalReportManager.service.HRMService;
 import org.oscarehr.managers.ConsultationManager;
 import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.SecurityInfoManager;
@@ -104,6 +105,9 @@ public class RecordUxService extends AbstractServiceImpl {
 
 	@Autowired
 	private SystemPreferenceService systemPreferenceService;
+
+	@Autowired
+	private HRMService hrmService;
 
 	@Autowired
 	private DashboardDao dashboardDao;
@@ -358,8 +362,7 @@ public class RecordUxService extends AbstractServiceImpl {
 				summaryList.add(new SummaryTo1("Forms", count++, SummaryTo1.FORMS_CODE));
 			}
 			
-			if(properties.isModuleEnabled(OscarProperties.Module.MODULE_HRM)
-					&& securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.HRM_READ))
+			if(hrmService.isHRMEnabled() && securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.HRM_READ))
 			{
 				summaryList.add(new SummaryTo1("HRM Reports", count++, SummaryTo1.HRM_DOCUMENTS));
 			}
