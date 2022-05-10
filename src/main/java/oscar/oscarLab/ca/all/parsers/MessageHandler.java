@@ -1004,6 +1004,30 @@ public abstract class MessageHandler
 		return new ArrayList<>(0);
 	}
 
+	/**
+	 * Return the name from the jth OBX segment of the ith OBR group,
+	 * specific to obx segments within an OBR child segment, as it may map differently from regular OBXNames
+	 * @param obr segment index - 0 indexed
+	 * @param obx segment index - 0 indexed
+	 * @return the name for display
+	 */
+	public String getChildOBR_OBXName(int obr, int obx)
+	{
+		return "";
+	}
+
+	/**
+	 * Return the result from the jth OBX segment of the ith OBR group,
+	 * specific to obx segments within an OBR child segment, as it may map differently from regular OBXResults
+	 * @param obr segment index - 0 indexed
+	 * @param obx segment index - 0 indexed
+	 * @return the result for display
+	 */
+	public String getChildOBR_OBXResult(int obr, int obx)
+	{
+		return "";
+	}
+
 	/* ============================== Specimen ============================= */
 	/**
 	 * true if this order observation has at least one specimen segment

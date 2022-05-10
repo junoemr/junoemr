@@ -344,6 +344,18 @@ public class AHSRuralHandler extends AHSHandler
 		return new ArrayList<>(0);
 	}
 
+	@Override
+	public String getChildOBR_OBXName(int obr, int obx)
+	{
+		return getOBXName(obr, obx);
+	}
+
+	@Override
+	public String getChildOBR_OBXResult(int obr, int obx)
+	{
+		return getOBXAbnormalFlag(obr, obx);
+	}
+
 	/* ===================================== private methods etc. ====================================== */
 
 	private String getDiagnosticServicesCode(int obr)
