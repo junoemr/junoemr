@@ -345,6 +345,6 @@ public class HRMService
 
 	public boolean isHRMFetchEnabled()
 	{
-		return systemPreferences.isPreferenceEnabled("integration.hrm.fetch_enabled", false);
+		return systemPreferences.isPreferenceEnabled("omd.hrm.polling_enabled", false);
 	}
 }

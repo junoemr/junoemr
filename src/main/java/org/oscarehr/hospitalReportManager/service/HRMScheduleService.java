@@ -32,9 +32,7 @@ import org.springframework.stereotype.Component;
 import oscar.OscarProperties;
 
 import java.nio.file.Paths;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 @Component
 public class HRMScheduleService
@@ -72,7 +70,7 @@ public class HRMScheduleService
 	 * If a local override is present, will read from that location instead of using sftp connection.
 	 */
 	@Synchronized
-	public HrmFetchResultsModel fetchNow() throws InterruptedException, ExecutionException, TimeoutException
+	public HrmFetchResultsModel fetchNow()
 	{
 		HrmFetchResultsModel results;
 		
