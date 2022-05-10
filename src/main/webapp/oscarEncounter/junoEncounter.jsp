@@ -441,12 +441,15 @@
 								<span id="encounterHeaderExt"></span>
 								<security:oscarSec roleName="${junoEncounterForm.pageData.roleName}"
 												   objectName="_newCasemgmt.apptHistory" rights="r">
-									<a href="javascript:popupPage(400,850,'ApptHist','<bean:write name="junoEncounterForm" property="pageData.demographicAdditionalInfoUrl" />')"
+									<a href="javascript:void(0);"
+									   onclick="javascript:popupPage(400,850,'ApptHist','<bean:write name="junoEncounterForm" property="pageData.demographicAdditionalInfoUrl" />')"
 									   style="font-size: 11px;text-decoration:none;"
-									   title="<bean:message key="oscarEncounter.Header.nextApptMsg"/>"><span
-											style="margin-left:20px;"><bean:message
-											key="oscarEncounter.Header.nextAppt"/>: <oscar:nextAppt
-											demographicNo="${junoEncounterForm.pageData.demographicNo}"/></span></a>
+									   title="<bean:message key="oscarEncounter.Header.nextApptMsg"/>">
+										<span style="margin-left:20px;">
+											<bean:message key="oscarEncounter.Header.nextAppt"/>:
+											<oscar:nextAppt demographicNo="${junoEncounterForm.pageData.demographicNo}"/>
+										</span>
+									</a>
 								</security:oscarSec>
 								&nbsp;&nbsp;
 
