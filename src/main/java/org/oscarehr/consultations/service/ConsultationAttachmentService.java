@@ -24,8 +24,11 @@ package org.oscarehr.consultations.service;
 
 import org.oscarehr.consultations.dao.ConsultDocsDao;
 import org.oscarehr.consultations.model.ConsultDocs;
+import org.oscarehr.dataMigration.converter.out.hrm.HrmDocumentDbToModelConverter;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.hospitalReportManager.service.HRMDocumentService;
 import org.oscarehr.util.LoggedInInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -49,6 +53,12 @@ public class ConsultationAttachmentService
 {
 	@Autowired
 	private ConsultDocsDao consultDocsDao;
+
+	@Autowired
+	private HRMDocumentService hrmDocumentService;
+
+	@Autowired
+	protected HrmDocumentDbToModelConverter hrmDocumentDbToModelConverter;
 
 	public List<EFormData> getAttachedEForms(Integer demographicNo, Integer consultId)
 	{
@@ -173,6 +183,32 @@ public class ConsultationAttachmentService
 		return filteredLabs;
 	}
 
+	public List<HrmDocument> getAttachedHRMList(Integer demographicNo, Integer consultId)
+	{
+		List<ConsultDocs> docs = consultDocsDao.findByRequestIdAndType(consultId, ConsultDocs.DOCTYPE_HRM);
+		return hrmDocumentDbToModelConverter.convert(
+				docs.stream()
+						.map(ConsultDocs::getHrmDocument)
+						.collect(Collectors.toList())
+		);
+	}
+
+	public List<HrmDocument> getUnattachedHRMList(Integer demographicNo, Integer consultId)
+	{
+		List<HrmDocument> hrmDocuments = hrmDocumentService.findForDemographic(demographicNo);
+		List<ConsultDocs> docs = consultDocsDao.findByRequestIdAndType(consultId, ConsultDocs.DOCTYPE_HRM);
+
+		List<Integer> filterList = docs.stream().map(doc -> doc.getHrmDocument().getId()).collect(Collectors.toList());
+		return hrmDocuments.stream()
+				.filter(hrmDocument -> !filterList.contains(hrmDocument.getId()))
+				.collect(Collectors.toList());
+	}
+
+	public List<HrmDocument> getAllHRMList(Integer demographicNo)
+	{
+		return hrmDocumentService.findForDemographic(demographicNo);
+	}
+
 	public void setAttachedEForms(Integer consultId, String providerNo, List<Integer> idList)
 	{
 		setAttached(consultId, providerNo, ConsultDocs.DOCTYPE_EFORM, idList);
@@ -186,6 +222,11 @@ public class ConsultationAttachmentService
 	public void setAttachedLabs(Integer consultId, String providerNo, List<Integer> idList)
 	{
 		setAttached(consultId, providerNo, ConsultDocs.DOCTYPE_LAB, idList);
+	}
+
+	public void setAttachedHRM(Integer consultId, String providerNo, List<Integer> idList)
+	{
+		setAttached(consultId, providerNo, ConsultDocs.DOCTYPE_HRM, idList);
 	}
 
 	private void setAttached(Integer consultId, String providerNo, String docType, List<Integer> idList)

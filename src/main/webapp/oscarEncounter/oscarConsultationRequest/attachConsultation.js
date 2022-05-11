@@ -31,6 +31,7 @@ window.Oscar.AttachConsultation = {
 	DOCTYPE_DOC: 'D',
 	DOCTYPE_LAB: 'L',
 	DOCTYPE_EFORM: 'E',
+	DOCTYPE_HRM: 'H',
 
 	//if consultation has not been saved, load existing docs into proper select boxes
 	init: function init(loadFromOpener, docs)
@@ -68,6 +69,9 @@ window.Oscar.AttachConsultation = {
 					break;
 				case this.DOCTYPE_EFORM:
 					inputName = "eFormNo";
+					break;
+				case this.DOCTYPE_HRM:
+					inputName = "hrmId";
 					break;
 				default:
 					console.error("Invalid doctype: " + docs[idx].charAt(0) + " for value '" + docs[idx] + "'");
@@ -117,6 +121,14 @@ window.Oscar.AttachConsultation = {
 				let listElem = window.opener.document.createElement("li");
 				listElem.innerHTML = $(this).next().get(0).innerHTML;
 				listElem.className = "eform";
+				list.appendChild(listElem);
+			});
+			$("input[name='hrmId']:checked").each(function ()
+			{
+				saved += (saved === "" ? "" : "|") + Oscar.AttachConsultation.DOCTYPE_HRM + $(this).val();
+				let listElem = window.opener.document.createElement("li");
+				listElem.innerHTML = $(this).next().get(0).innerHTML;
+				listElem.className = "hrm";
 				list.appendChild(listElem);
 			});
 

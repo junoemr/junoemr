@@ -242,7 +242,8 @@ public class ConsultationWebService extends AbstractServiceImpl {
 				Permission.CONSULTATION_READ,
 				Permission.DOCUMENT_READ,
 				Permission.EFORM_READ,
-				Permission.LAB_READ);
+				Permission.LAB_READ,
+				Permission.HRM_READ);
 
 		ConsultationRequestTo1 request;
 		try
@@ -331,7 +332,8 @@ public class ConsultationWebService extends AbstractServiceImpl {
 				Permission.CONSULTATION_READ,
 				Permission.DOCUMENT_READ,
 				Permission.EFORM_READ,
-				Permission.LAB_READ);
+				Permission.LAB_READ,
+				Permission.HRM_READ);
 
 		List<EDoc> edocs;
 		List<EFormData> eforms;
@@ -368,7 +370,8 @@ public class ConsultationWebService extends AbstractServiceImpl {
 				Permission.CONSULTATION_CREATE,
 				Permission.DOCUMENT_READ,
 				Permission.EFORM_READ,
-				Permission.LAB_READ);
+				Permission.LAB_READ,
+				Permission.HRM_READ);
 
 		ConsultationRequest request = consultationRequestToDomainConverter.convert(data);
 		consultationManager.saveConsultationRequest(getLoggedInInfo(), request);

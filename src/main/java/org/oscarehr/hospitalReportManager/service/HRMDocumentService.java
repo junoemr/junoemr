@@ -27,11 +27,16 @@ import org.oscarehr.dataMigration.converter.in.hrm.HrmDocumentModelToDbConverter
 import org.oscarehr.dataMigration.converter.out.hrm.HrmDocumentDbToModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
+import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
+import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -39,6 +44,9 @@ public class HRMDocumentService
 {
 	@Autowired
 	protected HRMDocumentDao hrmDocumentDao;
+
+	@Autowired
+	protected HRMDocumentToDemographicDao hrmDocumentToDemographicDao;
 
 	@Autowired
 	protected HrmDocumentDbToModelConverter entityToModel;
@@ -58,5 +66,15 @@ public class HRMDocumentService
 		hrmDocumentDao.merge(entity);
 
 		return entity.getId();
+	}
+
+	public List<HrmDocument> findForDemographic(Integer demographicId)
+	{
+		List<HRMDocumentToDemographic> documentToDemographicList = hrmDocumentToDemographicDao.findByDemographicNo(demographicId);
+		return entityToModel.convert(
+				documentToDemographicList.stream()
+						.map(HRMDocumentToDemographic::getHrmDocument)
+						.collect(Collectors.toList())
+		);
 	}
 }

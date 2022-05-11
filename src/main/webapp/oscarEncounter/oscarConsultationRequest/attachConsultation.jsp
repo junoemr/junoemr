@@ -50,7 +50,7 @@ String userlastname = (String) session.getAttribute("userlastname");
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ResourceBundle" %>
-<%@ page import="java.time.LocalDate" %>
+<%@ page import="org.oscarehr.dataMigration.model.hrm.HrmDocument" %>
 
 <%
 	//preliminary JSP code
@@ -74,7 +74,7 @@ String userlastname = (String) session.getAttribute("userlastname");
 	Integer demographicNo = Integer.parseInt(demoNo);
 
 	String patientName = EDocUtil.getDemographicName(loggedInInfo, demoNo);
-	String[] docType = {ConsultDocs.DOCTYPE_DOC, ConsultDocs.DOCTYPE_LAB, ConsultDocs.DOCTYPE_EFORM};
+	String[] docType = {ConsultDocs.DOCTYPE_DOC, ConsultDocs.DOCTYPE_LAB, ConsultDocs.DOCTYPE_EFORM, ConsultDocs.DOCTYPE_HRM};
 	String http_user_agent = request.getHeader("User-Agent");
 	boolean onIPad = http_user_agent.indexOf("iPad") >= 0;
 %>
@@ -104,10 +104,12 @@ String userlastname = (String) session.getAttribute("userlastname");
 	List<EDoc> allDocuments = consultationAttachmentService.getAllDocuments(loggedInInfo, demoNo);
     List<LabResultData> allLabs = consultationAttachmentService.getAllLabs(loggedInInfo, demoNo, requestId);
     List<EFormData> allEForms = consultationAttachmentService.getAllEForms(demographicNo);
+	List<HrmDocument> allHRM = consultationAttachmentService.getAllHRMList(demographicNo);
 
 	List<EDoc> attachedDocuments;
 	List<LabResultData> attachedLabs;
 	List<EFormData> attachedEForms;
+	List<HrmDocument> attachedHrm;
 
 	boolean existingRequest = StringUtils.isNumeric(requestId);
 	if(existingRequest)
@@ -115,12 +117,14 @@ String userlastname = (String) session.getAttribute("userlastname");
 		attachedDocuments = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demoNo, requestId);
 		attachedLabs = consultationAttachmentService.getAttachedLabs(loggedInInfo, demoNo, requestId);
 		attachedEForms = consultationAttachmentService.getAttachedEForms(demographicNo, Integer.parseInt(requestId));
+		attachedHrm = consultationAttachmentService.getAttachedHRMList(demographicNo, Integer.parseInt(requestId));
 	}
 	else // new request
 	{
-		attachedDocuments = new ArrayList<EDoc>(0);
-		attachedLabs = new ArrayList<LabResultData>(0);
-		attachedEForms = new ArrayList<EFormData>(0);
+		attachedDocuments = new ArrayList<>(0);
+		attachedLabs = new ArrayList<>(0);
+		attachedEForms = new ArrayList<>(0);
+		attachedHrm = new ArrayList<>(0);
 	}
 	String attachedDocs = "";
 	if(existingRequest)
@@ -137,6 +141,10 @@ String userlastname = (String) session.getAttribute("userlastname");
 		{
 		    attachedDocs += (attachedDocs.equals("") ? "" : "|") + ConsultDocs.DOCTYPE_EFORM + eForm.getId();
 		}
+		for (HrmDocument hrmDocument : attachedHrm)
+		{
+			attachedDocs += (attachedDocs.equals("") ? "" : "|") + ConsultDocs.DOCTYPE_HRM + hrmDocument.getId();
+		}
 	}
 %>
 </head>
@@ -151,7 +159,7 @@ String userlastname = (String) session.getAttribute("userlastname");
 	<div id="contentFrame" class="flexH flexGrow">
 		<div id="tableFrame" class="flexV">
 			<%
-			if (allLabs.isEmpty() && allDocuments.isEmpty() && allEForms.isEmpty())
+			if (allLabs.isEmpty() && allDocuments.isEmpty() && allEForms.isEmpty() && allHRM.isEmpty())
 			{
 			%>
 			<span> There are no documents to attach. </span>
@@ -352,6 +360,41 @@ String userlastname = (String) session.getAttribute("userlastname");
 							</td>
 							<%
 		                    }
+							if(!allHRM.isEmpty())
+							{
+							%>
+							<tr>
+								<th>HRM Reports</th>
+							</tr>
+							<%
+							}
+							for(HrmDocument hrmDocument : allHRM)
+							{
+								String hrmDisplayName = hrmDocument.getDescription();
+								url = request.getContextPath() + "/hospitalReportManager/displayHRMReport.jsp?id=" + hrmDocument.getId();
+								date = ConversionUtils.toDateString(hrmDocument.getReportDateTime(), dateFormat);
+							%>
+							<td class="flexV">
+								<div class="hrm itemGroup flexH" title="<%=hrmDisplayName%>" id="<%=docType[3]+hrmDocument.getId()%>">
+									<div  class="flexH">
+										<input class="tightCheckbox1" type="checkbox"
+										       name="hrmId" id="hrmId<%=hrmDocument.getId()%>"
+										       value="<%=hrmDocument.getId()%>"/>
+										<div class="hiddenLabel hrm"><%=hrmDisplayName%></div>
+										<img title="<%= printTitle %>" src="<%= printImage %>" alt="<%= printAlt %>">
+										<a class="preview-link-name" href="#" onclick="Oscar.AttachConsultation.previewHTML('<%=url%>');">
+											<span class="text"><%=hrmDisplayName%></span>
+										</a>
+									</div>
+									<div class="flexH">
+										<a class="preview-link-date" href="#" onclick="Oscar.AttachConsultation.previewHTML('<%=url%>');">
+											<span>... <%=date%></span>
+										</a>
+									</div>
+								</div>
+							</td>
+							<%
+							}
 						}
 		                %>
 					</tbody>
