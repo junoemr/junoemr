@@ -23,24 +23,23 @@
 
 package org.oscarehr.config.modules;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.config.conditions.OntarioInstance;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.hospitalReportManager.service.HRMScheduleService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import oscar.OscarProperties;
 
 import javax.annotation.PostConstruct;
 
 @Configuration
-@Conditional(OntarioInstance.class)
 public class HrmModuleConfig
 {
 	@Autowired
 	private HRMScheduleService hrmScheduleService;
+
+	@Autowired
+	private JunoProperties junoProperties;
 
 	private static final Logger logger = MiscUtils.getLogger();
 	
@@ -52,7 +51,7 @@ public class HrmModuleConfig
 	@PostConstruct
 	public void startSchedule()
 	{
-		String interval = OscarProperties.getInstance().getProperty("omd.hrm.poll_interval_sec");
-		hrmScheduleService.startSchedule(Math.max(NumberUtils.toInt(interval), HRMScheduleService.HRM_MINIMUM_POLL_TIME_SEC));
+		JunoProperties.Hrm hrmConfig = junoProperties.getHrm();
+		hrmScheduleService.startSchedule(Math.max(hrmConfig.getPollingIntervalSeconds(), HRMScheduleService.HRM_MINIMUM_POLL_TIME_SEC));
 	}
 }

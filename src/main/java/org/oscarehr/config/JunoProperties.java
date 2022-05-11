@@ -40,6 +40,7 @@ public class JunoProperties
 	private Olis olis;
 	private Test test;
 	private FaxConfig faxConfig;
+	private Hrm hrm;
 
 	@Data
 	public static class JunoPropertiesConfig
@@ -97,6 +98,9 @@ public class JunoProperties
 	@Data
 	public static class Hrm
 	{
-		private String vendorKey;
+		private int pollingIntervalSeconds;
+		private int sftpTimeoutSeconds;
+		private String accessKeyLocation;
+		private String baseDirectory;
 	}
 }

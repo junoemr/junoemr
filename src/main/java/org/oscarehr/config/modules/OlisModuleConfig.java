@@ -25,14 +25,12 @@ package org.oscarehr.config.modules;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.config.JunoProperties;
-import org.oscarehr.config.conditions.OntarioInstance;
 import org.oscarehr.config.scheduling.FixedPeriodicAdjustableTrigger;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
 import org.oscarehr.olis.service.OLISPollingService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
@@ -41,7 +39,6 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import java.time.Duration;
 
 @Configuration
-@Conditional(OntarioInstance.class)
 public class OlisModuleConfig implements SchedulingConfigurer
 {
 	private static final Logger logger = MiscUtils.getLogger();
