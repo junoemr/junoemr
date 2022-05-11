@@ -40,8 +40,9 @@
 	}
 %>
 
-<%@page
-	import="oscar.oscarDemographic.data.*,java.util.*,oscar.oscarProvider.data.*,oscar.util.*,oscar.oscarReport.data.*"%>
+<%@ page import="oscar.oscarReport.data.DemographicSetManager" %>
+<%@ page import="java.util.List" %>
+
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
@@ -50,11 +51,8 @@
   if(session.getAttribute("user") == null) response.sendRedirect("../logout.jsp");
   String demographic_no = request.getParameter("demographic_no");
 
-  DemographicSetManager  ds = new DemographicSetManager();
+  DemographicSetManager ds = new DemographicSetManager();
   List<String> sets = ds.getDemographicSets();
-
-  RptSearchData searchData  = new RptSearchData();
-  ArrayList queryArray = searchData.getQueryTypes();
 
   String userRole = (String)session.getAttribute("userrole");
 %>

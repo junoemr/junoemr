@@ -35,23 +35,17 @@ public class PreventionReportFactory {
     public PreventionReportFactory() {
     }
     
-    static public PreventionReport getPreventionReport(String preventionName){
-        PreventionReport report = null;
-        if ( preventionName == null){
-          //Not sure what to do          
-        }else if (preventionName.equals("PAP")){  
-           report = new PapReport();
-        }else if (preventionName.equals("Mammogram")){          
-           report = new MammogramReport();
-        }else if (preventionName.equals("Flu")){  
-           report = new FluReport();
-        }else if (preventionName.equals("ChildImmunizations")){
-            report = new ChildImmunizationReport();     
-        }else if (preventionName.equals("FOBT")){
-            report = new FOBTReport();
+    static public PreventionReport getPreventionReport(PreventionReport.PreventionReportType preventionReportType)
+    {
+        switch(preventionReportType)
+        {
+            case FLU: return new FluReport();
+            case PAP: return new PapReport();
+            case MAMMOGRAM: return new MammogramReport();
+            case FOBT: return new FOBTReport();
+            case CHILD_IMMUNIZATIONS: return new ChildImmunizationReport();
+            default: throw new IllegalArgumentException("Invalid report type");
         }
-        
-       return report;
     }
     
 }

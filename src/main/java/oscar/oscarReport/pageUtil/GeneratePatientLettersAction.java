@@ -46,6 +46,7 @@ import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.report.PreventionLetter;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -90,11 +91,10 @@ public class GeneratePatientLettersAction extends Action {
 
     }
 
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)  {
-
-        if(!securityInfoManager.hasPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request), "_report", "r", null)) {
-            throw new SecurityException("missing required security object (_report)");
-        }
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    {
+        LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
+        securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.REPORT_READ, Permission.PREVENTION_READ);
 
         String classpath = (String) request.getSession().getServletContext().getAttribute("org.apache.catalina.jsp_classpath");
         System.setProperty("jasper.reports.compile.class.path", classpath);
@@ -202,7 +202,6 @@ public class GeneratePatientLettersAction extends Action {
 
                 // if the document was added in the context of a program
                 ProgramManager2 programManager = SpringUtils.getBean(ProgramManager2.class);
-                LoggedInInfo loggedInInfo  = LoggedInInfo.getLoggedInInfoFromSession(request);
                 ProgramProvider pp = programManager.getCurrentProgramInDomain(loggedInInfo, loggedInInfo.getLoggedInProviderNo());
                 if(pp != null && pp.getProgramId() != null) {
                     newDoc.setProgramId(pp.getProgramId().intValue());
