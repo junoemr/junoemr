@@ -34,7 +34,6 @@ public class PreventionReportFactory {
     /** Creates a new instance of PreventionReportFactory */
     public PreventionReportFactory() {
     }
-    
     static public PreventionReport getPreventionReport(PreventionReport.PreventionReportType preventionReportType)
     {
         switch(preventionReportType)
@@ -42,7 +41,7 @@ public class PreventionReportFactory {
             case FLU: return new FluReport();
             case PAP: return new PapReport();
             case MAMMOGRAM: return new MammogramReport();
-            case FOBT: return new FOBTReport();
+			case FIT: return new FITReport();
             case CHILD_IMMUNIZATIONS: return new ChildImmunizationReport();
             default: throw new IllegalArgumentException("Invalid report type");
         }

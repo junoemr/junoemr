@@ -413,12 +413,12 @@ table.ele thead {
                <div>
                   Prevention Query:
                   <html:select property="prevention">
-                      <html:option value="-1" >--Select Query--</html:option>
-                      <html:option value="PAP" >PAP</html:option>
-                      <html:option value="Mammogram" >Mammogram</html:option>
-                      <html:option value="Flu" >Flu</html:option>
-                      <html:option value="Child_Immunizations" >Child Immunizations</html:option>
-                      <html:option value="FOBT" >FOBT</html:option>
+			<html:option value="-1" >--Select Query--</html:option>
+			<html:option value="PAP" >PAP</html:option>
+			<html:option value="Mammogram" >Mammogram</html:option>
+			<html:option value="Flu" >Flu</html:option>
+			<html:option value="Child_Immunizations" >Child Immunizations</html:option>
+			<html:option value="FIT" >FIT</html:option>
                   </html:select>
                </div>
                <div>
