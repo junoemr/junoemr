@@ -123,6 +123,7 @@
 							hide-character-limit="false"
 							invalid="!$ctrl.decryptionKeyValid()"
 				>
+				</juno-input>
 			</div>
 		</panel-body>
 </div>
