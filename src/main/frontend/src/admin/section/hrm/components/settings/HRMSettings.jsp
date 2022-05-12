@@ -116,7 +116,7 @@
 		<panel-body>
 			<div class="flex-col">
 				<juno-input ng-if="!$ctrl.isKeyReadOnly"
-							label="New Decryption Key"
+							label="New Decryption Key (32 chars)"
 							label-position="$ctrl.LABEL_POSITION"
 							ng-model="$ctrl.newDecryptionKey"
 							character-limit="32"

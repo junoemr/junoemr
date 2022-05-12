@@ -50,7 +50,7 @@ angular.module('Admin.Section').component('integrationModules',
 			{
 				name: "HRM",
 				enabled: false,
-				propertyName: Integrations.HrmEnabled,
+				propertyName: SystemPreferences.HrmEnabled,
 				configUrl: "#!/admin/hrm/admin"
 			},
 			{

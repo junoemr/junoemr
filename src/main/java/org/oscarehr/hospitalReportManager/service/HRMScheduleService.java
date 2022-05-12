@@ -24,12 +24,12 @@
 package org.oscarehr.hospitalReportManager.service;
 
 import lombok.Synchronized;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.stereotype.Component;
-import oscar.OscarProperties;
 
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
@@ -42,6 +42,9 @@ public class HRMScheduleService
 	
 	@Autowired
 	HRMService hrmService;
+
+	@Autowired
+	JunoProperties junoProps;
 
 	/**
 	 * Schedule remote fetch every intervalSeconds.  Location will not be overridden by local override.
@@ -65,21 +68,22 @@ public class HRMScheduleService
 
 	/**
 	 * Fetch HRM documents now.
-	 * If a local override is present, will read from that location instead of using sftp connection.
+	 * If a local override is enabled, will read from it's location instead of using sftp connection.
 	 */
 	@Synchronized
 	public HrmFetchResultsModel fetchNow()
 	{
 		HrmFetchResultsModel results;
-		
-		if (OscarProperties.getInstance().getProperty("omd.hrm.local_download_override") == null)
+
+		JunoProperties.Hrm hrmConfig = junoProps.getHrm();
+		if (hrmConfig.isLocalOverrideEnabled())
 		{
-			results = hrmService.consumeRemoteHRMDocuments();
+			String localHrmDocs = hrmConfig.getLocalOverrideDirectory();
+			results = hrmService.consumeLocalHRMDocuments(Paths.get(localHrmDocs));
 		}
 		else
 		{
-			String localHrmDocs = OscarProperties.getInstance().getProperty("omd.hrm.local_download_override");
-			results = hrmService.consumeLocalHRMDocuments(Paths.get(localHrmDocs));
+			results = hrmService.consumeRemoteHRMDocuments();
 		}
 		
 		return results;

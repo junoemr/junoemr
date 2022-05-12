@@ -103,5 +103,9 @@ public class JunoProperties
 		private int sftpTimeoutSeconds;
 		private String accessKeyLocation;
 		private String baseDirectory;
+		private boolean decryptRemoteFiles;
+		private boolean localOverrideEnabled;
+		private String localOverrideDirectory;
+		private boolean decryptLocalFiles;
 	}
 }

@@ -28,6 +28,7 @@ import moment from "moment";
 import SystemPreferenceService from "../../../../../lib/system/service/SystemPreferenceService";
 import {SecurityPermissions} from "../../../../../common/security/securityConstants";
 import ToastService from "../../../../../lib/alerts/service/ToastService";
+import {SystemPreferences} from "../../../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Admin.Section').component('hrmAdmin',
 	{
