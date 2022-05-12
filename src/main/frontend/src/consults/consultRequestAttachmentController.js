@@ -83,7 +83,6 @@ angular.module('Consults').controller('Consults.ConsultRequestAttachmentControll
 
 		controller.done = function done()
 		{
-			console.log('CLOSE MODAL');
 			$uibModalInstance.close();
 		};
 	}

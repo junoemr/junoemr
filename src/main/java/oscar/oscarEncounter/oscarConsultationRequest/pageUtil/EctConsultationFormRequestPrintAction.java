@@ -27,6 +27,7 @@ import org.apache.tika.io.IOUtils;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.consultations.service.ConsultationAttachmentService;
 import org.oscarehr.consultations.service.ConsultationPDFCreationService;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
@@ -86,11 +87,13 @@ public class EctConsultationFormRequestPrintAction extends Action
 			List<EDoc> attachedDocuments = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demographicNo, requestId);
 			List<LabResultData> attachedLabs = consultationAttachmentService.getAttachedLabs(loggedInInfo, demographicNo, requestId);
 			List<EFormData> attachedEForms = consultationAttachmentService.getAttachedEForms(demographicNo, requestId);
+			List<HrmDocument> attachedHRM = consultationAttachmentService.getAttachedHRMList(demographicNo, requestId);
 
 			streamList.add(consultationPDFCreationService.getConsultationRequestAsStream(request, loggedInInfo));
 			streamList.addAll(consultationPDFCreationService.toEDocInputStreams(request, attachedDocuments));
 			streamList.addAll(consultationPDFCreationService.toLabInputStreams(attachedLabs));
 			streamList.addAll(consultationPDFCreationService.toEFormInputStreams(request, attachedEForms));
+			streamList.addAll(consultationPDFCreationService.toHRMInputStreams(request, attachedHRM));
 
 			ByteOutputStream bos = new ByteOutputStream();
 			excessBytes = consultationPDFCreationService.combineStreams(streamList, bos);

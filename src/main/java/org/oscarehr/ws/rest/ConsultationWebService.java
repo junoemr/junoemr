@@ -40,6 +40,7 @@ import org.oscarehr.consultations.ConsultationResponseSearchFilter;
 import org.oscarehr.consultations.model.ConsultDocs;
 import org.oscarehr.consultations.service.ConsultationAttachmentService;
 import org.oscarehr.consultations.service.ConsultationService;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.model.FaxAccount;
@@ -338,17 +339,20 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		List<EDoc> edocs;
 		List<EFormData> eforms;
 		List<LabResultData> labs;
+		List<HrmDocument> hrm;
 		if(attached)
 		{
 			edocs = consultationAttachmentService.getAttachedDocuments(getLoggedInInfo(), demographicId, requestId);
 			eforms = consultationAttachmentService.getAttachedEForms(demographicId, requestId);
 			labs = consultationAttachmentService.getAttachedLabs(getLoggedInInfo(), demographicId, requestId);
+			hrm = consultationAttachmentService.getAttachedHRMList(demographicId, requestId);
 		}
 		else
 		{
 			edocs = consultationAttachmentService.getUnattachedDocuments(getLoggedInInfo(), demographicId, requestId);
 			eforms = consultationAttachmentService.getUnattachedEForms(demographicId, requestId);
 			labs = consultationAttachmentService.getUnattachedLabs(getLoggedInInfo(), demographicId, requestId);
+			hrm = consultationAttachmentService.getUnattachedHRMList(demographicId, requestId);
 		}
 
 		List<ConsultationAttachmentTo1> attachments = new ArrayList<>();
@@ -356,6 +360,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		getDocuments(edocs, attached, attachments);
 		getEformsForRequest(eforms, attached, attachments);
 		getLabs(labs, demographicId, attached, attachments);
+		getHrm(hrm, demographicId, attached, attachments);
 
 		return RestResponse.successResponse(attachments);
 	}
@@ -682,6 +687,16 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			attachments.add(new ConsultationAttachmentTo1(ConversionUtils.fromIntString(lab.getLabPatientId()), ConsultationAttachmentTo1.TYPE_LAB, attached, displayName, url));
 		}
 	}
+
+	private void getHrm(List<HrmDocument> hrmDocuments, Integer demographicNo, boolean attached, List<ConsultationAttachmentTo1> attachments)
+	{
+		for(HrmDocument hrmDocument : hrmDocuments)
+		{
+			String displayName = hrmDocument.getDescription();
+			String url = "/hospitalReportManager/displayHRMReport.jsp?id=" + hrmDocument.getId();
+			attachments.add(new ConsultationAttachmentTo1(hrmDocument.getId(), ConsultationAttachmentTo1.TYPE_HRM, attached, displayName, url));
+		}
+	}
 	
 	private void getEformsForRequest(List<EFormData> eforms, boolean attached, List<ConsultationAttachmentTo1> attachments)
 	{
@@ -728,6 +743,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		List<Integer> eFormIdList = new ArrayList<>();
 		List<Integer> documentIdList = new ArrayList<>();
 		List<Integer> labIdList = new ArrayList<>();
+		List<Integer> hrmIdList = new ArrayList<>();
 
 		for(ConsultationAttachmentTo1 attachment : newAttachments)
 		{
@@ -736,6 +752,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 				case ConsultDocs.DOCTYPE_EFORM: eFormIdList.add(attachment.getDocumentNo()); break;
 				case ConsultDocs.DOCTYPE_DOC: documentIdList.add(attachment.getDocumentNo()); break;
 				case ConsultDocs.DOCTYPE_LAB: labIdList.add(attachment.getDocumentNo()); break;
+				case ConsultDocs.DOCTYPE_HRM: hrmIdList.add(attachment.getDocumentNo()); break;
 				default: logger.error("Invalid attachment doctype: " + attachment.getDocumentType()); break;
 			}
 		}
@@ -743,6 +760,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		consultationAttachmentService.setAttachedEForms(request.getId(), getLoggedInInfo().getLoggedInProviderNo(), eFormIdList);
 		consultationAttachmentService.setAttachedDocuments(request.getId(), getLoggedInInfo().getLoggedInProviderNo(), documentIdList);
 		consultationAttachmentService.setAttachedLabs(request.getId(), getLoggedInInfo().getLoggedInProviderNo(), labIdList);
+		consultationAttachmentService.setAttachedHRM(request.getId(), getLoggedInInfo().getLoggedInProviderNo(), hrmIdList);
 	}
 	
 	private void saveResponseAttachments(ConsultationResponseTo1 response) {

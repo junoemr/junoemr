@@ -34,6 +34,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.eform.model.EFormData;
@@ -188,6 +189,13 @@ public class ConsultationPDFCreationService
 			streamList.add(new ByteInputStream(buffer, buffer.length));
 		}
 
+		return streamList;
+	}
+
+	public List<InputStream> toHRMInputStreams(HttpServletRequest request, List<HrmDocument> attachedHRM) throws IOException, HtmlToPdfConversionException
+	{
+		List<InputStream> streamList = new ArrayList<>(attachedHRM.size());
+		//TODO
 		return streamList;
 	}
 

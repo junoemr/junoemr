@@ -29,6 +29,7 @@ public class ConsultationAttachmentTo1 implements Serializable {
 	public static final String TYPE_DOC = "D";
 	public static final String TYPE_EFORM = "E";
 	public static final String TYPE_LAB = "L";
+	public static final String TYPE_HRM = "H";
 	public static final boolean ATTACHED = true;
 
 	private static final long serialVersionUID = 1L;
@@ -70,6 +71,7 @@ public class ConsultationAttachmentTo1 implements Serializable {
 		if (TYPE_DOC.equals(documentType)) documentTypeDisplay = "Document";
 		else if (TYPE_EFORM.equals(documentType)) documentTypeDisplay = "EForm";
 		else if (TYPE_LAB.equals(documentType)) documentTypeDisplay = "Lab Result";
+		else if (TYPE_HRM.equals(documentType)) documentTypeDisplay = "HRM Report";
 	}
 
 	public String getDocumentTypeDisplay() {
