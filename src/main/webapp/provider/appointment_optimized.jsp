@@ -2022,6 +2022,7 @@ private long getAppointmentRowSpan(
 																		<c:if test="${appointmentInfo.showDollarSign}">
 																			&#124;<b style="color:#FF0000">$</b>
 																		</c:if>
+																	</oscar:oscarPropertiesCheck>
 																	<oscar:oscarPropertiesCheck property="SHOW_APPT_REASON" value="yes" defaultVal="true">
 																		<span class="toggleable reason_${appointmentInfo.scheduleProviderNo} ${appointmentInfo.hideReasonClass}">
 																			<strong>&#124;${appointmentInfo.formattedReason}</strong>
