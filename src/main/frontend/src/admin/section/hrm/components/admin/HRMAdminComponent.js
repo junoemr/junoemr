@@ -49,8 +49,8 @@ angular.module('Admin.Section').component('hrmAdmin',
 				ctrl.pollingEnabled = false;
 				ctrl.pollingInterval = 0;
 
-				const pollingEnabledPreference = "omd.hrm.polling_enabled";
-				const pollingIntervalProperty = "omd.hrm.poll_interval_sec";
+				const pollingEnabledPreference = SystemPreferences.HrmPollingEnabled;
+				const pollingIntervalProperty = SystemPreferences.HrmPollingInterval;
 
 				ctrl.$onInit = async () =>
 				{
@@ -59,7 +59,7 @@ angular.module('Admin.Section').component('hrmAdmin',
 						ctrl.COMPONENT_STYLE = ctrl.COMPONENT_STYLE || JUNO_STYLE.DEFAULT;
 
 						const results = await Promise.all([
-							systemPreferenceService.getProperty(pollingIntervalProperty),
+							systemPreferenceService.getPreference(pollingIntervalProperty, 3600),
 							systemPreferenceService.isPreferenceEnabled(pollingEnabledPreference),
 						]);
 

@@ -49,15 +49,18 @@ export enum SYSTEM_PROPERTIES
     ACTIVE_FAX_ACCOUNT = "system_active_fax_account_id",
 }
 
-export enum Integrations
-{
-    HrmEnabled = "integration.hrm.enabled",
-}
-
 export enum SystemPreferences
 {
     OlisIntegrationEnabled = "integration.olis.enabled",
     OlisPollingEnabled = "olis_polling_enabled",
+
+		HrmEnabled = "integration.hrm.enabled",
+		HrmPollingEnabled = "omd.hrm.polling_enabled",
+		HrmPollingInterval = "omd.hrm.polling_interval_sec",
+		HrmUser = "omd.hrm.user",
+		HrmMailBoxAddress = "omd.hrm.address",
+		HrmRemotePath = "omd.hrm.remote_path",
+		HrmPort = "omd.hrm.port",
 }
 
 export enum INSTANCE_TYPE

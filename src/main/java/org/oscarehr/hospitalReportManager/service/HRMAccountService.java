@@ -45,7 +45,7 @@ public class HRMAccountService
 		String encryptedKey = systemPreferences.getPreferenceValue("omd.hrm.decryption_key", null);
 		if (encryptedKey != null)
 		{
-			return	StringEncryptor.decrypt(encryptedKey);
+			return StringEncryptor.decrypt(encryptedKey);
 		}
 
 		return null;

@@ -98,7 +98,8 @@ public class JunoProperties
 	@Data
 	public static class Hrm
 	{
-		private int pollingIntervalSeconds;
+		private int defaultPollingIntervalSeconds;
+		private int minPollingIntervalSeconds;
 		private int sftpTimeoutSeconds;
 		private String accessKeyLocation;
 		private String baseDirectory;

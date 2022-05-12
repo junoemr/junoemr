@@ -27,6 +27,7 @@ import SystemPreferenceService from "../../../../../lib/system/service/SystemPre
 import ToastService from "../../../../../lib/alerts/service/ToastService";
 import {SecurityPermissions} from "../../../../../common/security/securityConstants";
 import HrmService from "../../../../../lib/integration/hrm/service/HrmService";
+import {SystemPreferences} from "../../../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Admin.Section').component('hrmSettings',
 	{
@@ -50,10 +51,10 @@ angular.module('Admin.Section').component('hrmSettings',
 				ctrl.isReadOnly = true;
 				ctrl.isKeyReadOnly = true;
 
-				ctrl.USERNAME_KEY = "omd.hrm.user";
-				ctrl.MAILBOX_ADDRESS_KEY = "omd.hrm.address";
-				ctrl.REMOTE_PATH_KEY = "omd.hrm.remote_path";
-				ctrl.PORT_KEY = "omd.hrm.port";
+				ctrl.USERNAME_KEY = SystemPreferences.HrmUser;
+				ctrl.MAILBOX_ADDRESS_KEY = SystemPreferences.HrmMailBoxAddress;
+				ctrl.REMOTE_PATH_KEY = SystemPreferences.HrmRemotePath;
+				ctrl.PORT_KEY = SystemPreferences.HrmPort;
 
 				ctrl.LABEL_POSITION = LABEL_POSITION.TOP;
 				ctrl.COMPONENT_STYLE = JUNO_STYLE.DEFAULT;

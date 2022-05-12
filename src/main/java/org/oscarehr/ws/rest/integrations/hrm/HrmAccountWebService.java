@@ -25,6 +25,8 @@ package org.oscarehr.ws.rest.integrations.hrm;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.hospitalReportManager.service.HRMAccountService;
+import org.oscarehr.security.model.Permission;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,7 +40,7 @@ import javax.ws.rs.core.MediaType;
 @Tag(name = "hrmAccount")
 @Path("/integrations/hrm/account")
 
-public class HrmAccountWebService
+public class HrmAccountWebService extends AbstractServiceImpl
 {
 	@Autowired
 	private HRMAccountService hrmAccountService;
@@ -46,6 +48,7 @@ public class HrmAccountWebService
 	@POST
 	public RestResponse<Boolean> saveDecryptionKey(String key)
 	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_CREATE, Permission.HRM_UPDATE);
 		hrmAccountService.saveDecryptionKey(key);
 		return RestResponse.successResponse(true);
 	}

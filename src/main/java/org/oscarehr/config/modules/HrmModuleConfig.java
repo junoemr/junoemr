@@ -23,9 +23,11 @@
 
 package org.oscarehr.config.modules;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.config.JunoProperties;
 import org.oscarehr.hospitalReportManager.service.HRMScheduleService;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +43,9 @@ public class HrmModuleConfig
 	@Autowired
 	private JunoProperties junoProperties;
 
+	@Autowired
+	private SystemPreferenceService systemPreferences;
+
 	private static final Logger logger = MiscUtils.getLogger();
 	
 	public HrmModuleConfig()
@@ -52,6 +57,11 @@ public class HrmModuleConfig
 	public void startSchedule()
 	{
 		JunoProperties.Hrm hrmConfig = junoProperties.getHrm();
-		hrmScheduleService.startSchedule(Math.max(hrmConfig.getPollingIntervalSeconds(), HRMScheduleService.HRM_MINIMUM_POLL_TIME_SEC));
+
+		String userInterval = systemPreferences.getPreferenceValue("omd.hrm.polling_interval_sec", null);
+		int defaultInterval = hrmConfig.getDefaultPollingIntervalSeconds();
+		int interval = NumberUtils.toInt(userInterval, defaultInterval);
+
+		hrmScheduleService.startSchedule(Math.max(interval, hrmConfig.getMinPollingIntervalSeconds()));
 	}
 }
