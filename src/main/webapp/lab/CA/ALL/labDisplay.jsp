@@ -1365,8 +1365,14 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                      	 </table>
                      <% } else {
 
-                      for(i=0;i<headers.size();i++){
+                      for(i=0;i<headers.size();i++)
+					  {
                            linenum=0;
+						   if(handler.isChildOBR(i))
+	                        {
+		                        continue;
+	                        }
+
 						boolean isUnstructuredDoc = false;
 						boolean isPDF = false;
 						boolean	isVIHARtf = false;
@@ -1888,7 +1894,8 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 													<%
 												}
 											}%>
-											<%if(isVIHARtf) {
+											<%
+											if(isVIHARtf) {
 											    //create bytes from the rtf string
 										    	byte[] rtfBytes = handler.getOBXResult(j, k).getBytes();
 										    	ByteArrayInputStream rtfStream = new ByteArrayInputStream(rtfBytes);
@@ -1914,18 +1921,10 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 												}
 											}
 											else if (handler.getMsgType().equals(AHS_RURAL_LAB_TYPE))
-											{
-												String result = handler.getOBXResult( j, k);
-												String abnormalFlag = handler.getOBXAbnormalFlag( j, k);
-												if(StringUtils.isBlank(result))
-												{
-													result = abnormalFlag;
-												}
-												else if (StringUtils.isNotBlank(abnormalFlag))
-												{
-													result += " (" + abnormalFlag + ")";
-												}
-												%> <td align="left" class="<%=handler.isOBXAbnormal(j, k) ? "Abnormal" : ""%>"><%= result %></td> <%
+											{%>
+												<td align="left" class="<%=handler.isOBXAbnormal(j, k) ? "Abnormal" : ""%>">
+													<%= handler.getOBXResult( j, k) %>
+												</td><%
 											}
 											else {%>
                                            		<td align="left"><%= handler.getOBXResult( j, k) %></td><%
@@ -1937,6 +1936,110 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 				                                    <td align="center"><%= handler.getTimeStamp(j, k) %></td><%
 	                                            }
 											}
+										    %></tr><%
+
+					                       if(handler.hasChildOBR(j, k))
+					                       {
+                                                %>
+	                                                <tr>
+	                                                <td></td>
+	                                                <td align="left">
+		                                                <table border="1" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
+		                                                <thead>
+			                                                <tr>
+				                                                <th>Description</th>
+				                                                <th>Result</th>
+			                                                </tr>
+		                                                </thead>
+		                                                <tbody><%
+                                                List<Integer> childOBRList = handler.getChildOBRIndexList(j, k);
+												boolean tableOpen = true;
+                                                for(Integer childObrIndex : childOBRList)
+                                                {
+													// if no obx results in child, display warning
+													if(handler.getOBXCount(childObrIndex) <= 0)
+													{
+		                                                %>
+		                                                <tr>
+			                                                <td align="left" colspan="2" class="red">Missing Result Data</td>
+		                                                </tr>
+		                                                <%
+													}
+							                       for(int childObxIndex = 0; childObxIndex < handler.getOBXCount(childObrIndex); childObxIndex++)
+							                       {
+							                       %>
+			                                            <tr>
+								                            <td align="right">
+									                            <%= handler.getChildOBR_OBXName( childObrIndex, childObxIndex) %>
+								                            </td>
+				                                            <td align="left">
+									                            <%= handler.getChildOBR_OBXResult( childObrIndex, childObxIndex) %>
+								                            </td>
+			                                            </tr>
+		                                                <%
+		                                                for (int n=0; n < handler.getOBXCommentCount(childObrIndex, childObxIndex); n++)
+		                                                {%>
+		                                                <tr class="NormalRes">
+			                                                <td align="left" valign="top" colspan="2">
+				                                                <span style="margin:0; text-align: left;">
+					                                                <%=escapeHtml(handler.getOBXComment(childObrIndex, childObxIndex, n))%>
+				                                                </span>
+			                                                </td>
+		                                                </tr>
+		                                                <%
+														}
+							                       }
+												   int obrCommentCount = handler.getOBRCommentCount(childObrIndex);
+												   if(obrCommentCount > 0)
+												   {
+													   tableOpen = false;
+													   //if there are obr comments, split the table
+		                                                %>  </tbody>
+		                                                </table>
+	                                                    </td>
+		                                                <td></td>
+	                                                    </tr>
+		                                                <%
+		                                                for (int n=0; n < obrCommentCount; n++)
+		                                                {%>
+			                                            <tr class="NormalRes">
+				                                            <td></td>
+			                                                <td align="left" valign="top" colspan="2">
+				                                                <span style="margin:0; text-align: left;">
+					                                                <%=escapeHtml(handler.getOBRComment(childObrIndex, n))%>
+				                                                </span>
+			                                                </td>
+			                                            </tr>
+			                                            <%
+								                       }
+														// re-open a new table if this is not that last child obr
+														if(!childObrIndex.equals(childOBRList.get(childOBRList.size()-1)))
+			                                            {
+				                                            tableOpen = true;
+														%>
+					                                    <tr>
+									                       <td></td>
+									                       <td align="left">
+										                       <table border="1" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
+											                       <thead>
+											                       <tr>
+												                       <th>Description</th>
+												                       <th>Result</th>
+											                       </tr>
+											                       </thead>
+											                       <tbody><%
+								                       }
+	                                                }
+						                       }
+												if(tableOpen)
+												{
+						                        %>  </tbody>
+	                                                </table>
+                                                </td>
+                                                <td></td>
+                                            </tr><%
+		                                        }
+										   }
 										}//end of isUnstructuredDoc
                                    			
                                    			else{//if it isn't a PATHL7 doc%>
@@ -1989,7 +2092,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                            		align="left";
                                            	}%>
 
-                                           	
+
                                            <td align="<%=align%>"><%= handler.getOBXResult( j, k) %></td>
                                           
                                            <td align="center">
@@ -2000,10 +2103,13 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                            
                                            <td align="center"><%= handler.getTimeStamp(j, k) %></td>
                                            <td align="center"><%= handler.getOBXResultStatusDisplayValue( j, k) %></td>
-                                      		<td align="center" valign="top">                                           <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
+                                      		<td align="center" valign="top">
+		                                        <a href="javascript:void(0);"
+		                                           title="Annotation"
+		                                           onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
 	                                                	<%if(!isPrevAnnotation){ %><img src="../../../images/notes.gif" alt="rxAnnotation" height="16" width="13" border="0"/><%}else{ %><img src="../../../images/filledNotes.gif" alt="rxAnnotation" height="16" width="13" border="0"/> <%} %>
-	                                                </a>
-                                                </td>
+                                                </a>
+                                            </td>
                                        </tr>
                                         <%
 											}

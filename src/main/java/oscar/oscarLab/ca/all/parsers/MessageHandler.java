@@ -738,6 +738,15 @@ public abstract class MessageHandler
 		return false;
 	}
 
+	/**
+	 * @param obr segment index - 0 indexed
+	 * @return true if a mapped value exists
+	 */
+	public boolean isChildOBR(int obr)
+	{
+		return false;
+	}
+
 	/* ===================================== OBX ====================================== */
 
 	/**
@@ -974,6 +983,50 @@ public abstract class MessageHandler
 	}
 
 	public abstract String getNteForOBX(int i,int j);
+
+	/**
+	 * @param obr segment index - 0 indexed
+	 * @param obx segment index - 0 indexed
+	 * @return true if the given segment has a linked OBR child segment
+	 */
+	public boolean hasChildOBR(int obr, int obx)
+	{
+		return false;
+	}
+
+	/**
+	 * @param obr segment index - 0 indexed
+	 * @param obx segment index - 0 indexed
+	 * @return index of linked OBR child segment, or -1
+	 */
+	public List<Integer> getChildOBRIndexList(int obr, int obx)
+	{
+		return new ArrayList<>(0);
+	}
+
+	/**
+	 * Return the name from the jth OBX segment of the ith OBR group,
+	 * specific to obx segments within an OBR child segment, as it may map differently from regular OBXNames
+	 * @param obr segment index - 0 indexed
+	 * @param obx segment index - 0 indexed
+	 * @return the name for display
+	 */
+	public String getChildOBR_OBXName(int obr, int obx)
+	{
+		return "";
+	}
+
+	/**
+	 * Return the result from the jth OBX segment of the ith OBR group,
+	 * specific to obx segments within an OBR child segment, as it may map differently from regular OBXResults
+	 * @param obr segment index - 0 indexed
+	 * @param obx segment index - 0 indexed
+	 * @return the result for display
+	 */
+	public String getChildOBR_OBXResult(int obr, int obx)
+	{
+		return "";
+	}
 
 	/* ============================== Specimen ============================= */
 	/**
