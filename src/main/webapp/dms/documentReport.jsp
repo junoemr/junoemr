@@ -196,10 +196,19 @@ boolean hasNoteCreatePermission = false;
 
 if(module.equals("demographic"))
 {
-    hasDocumentCreatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.DOCUMENT_CREATE);
-    hasDocumentUpdatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.DOCUMENT_UPDATE);
-    hasTicklerCreatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.TICKLER_CREATE);
-    hasNoteCreatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.ENCOUNTER_NOTE_CREATE);
+	Integer demoNo = Integer.parseInt(demographicNo);
+
+    hasDocumentCreatePermission = securityInfoManager.hasPrivileges(curUser, demoNo, Permission.DOCUMENT_CREATE);
+    hasDocumentUpdatePermission = securityInfoManager.hasPrivileges(curUser, demoNo, Permission.DOCUMENT_UPDATE);
+    hasTicklerCreatePermission = securityInfoManager.hasPrivileges(curUser, demoNo, Permission.TICKLER_CREATE);
+    hasNoteCreatePermission = securityInfoManager.hasPrivileges(curUser, demoNo, Permission.ENCOUNTER_NOTE_CREATE);
+}
+else
+{
+	hasDocumentCreatePermission = securityInfoManager.hasPrivileges(curUser, Permission.DOCUMENT_CREATE);
+	hasDocumentUpdatePermission = securityInfoManager.hasPrivileges(curUser, Permission.DOCUMENT_UPDATE);
+	hasTicklerCreatePermission = securityInfoManager.hasPrivileges(curUser, Permission.TICKLER_CREATE);
+	hasNoteCreatePermission = securityInfoManager.hasPrivileges(curUser, Permission.ENCOUNTER_NOTE_CREATE);
 }
 %>
 <html:html locale="true">
