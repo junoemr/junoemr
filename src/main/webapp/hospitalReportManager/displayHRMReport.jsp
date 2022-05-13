@@ -932,7 +932,7 @@
                 <tr class="<%= previewMode ? "hide-on-preview" : ""%>">
                     <td>
                         <input type="hidden" id="demographic-no" name="demographicNo">
-                        <input type="text" autocomplete="off" id="demographic-search"<%--onchange="checkSave('<%=hrmReportId%>hrm')"--%>>
+                        <input type="text" style="width: 100%" autocomplete="off" id="demographic-search"<%--onchange="checkSave('<%=hrmReportId%>hrm')"--%>>
                     </td>
                     <td>
                         <a href="#" onclick="addDemoToHrm('<%=hrmDocument.getId()%>')">(link)</a>
