@@ -28,7 +28,6 @@ import org.oscarehr.common.io.PDFFile;
 import org.oscarehr.util.WKHtmlToPdfUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 @Component
@@ -39,8 +38,8 @@ public class HtmlToPdfFileConverter extends AbstractFileConverter<PDFFile>
 	{
 		GenericFile tempHtmlFile = FileFactory.createTempFile(inputStream, ".html");
 
-		byte[] bytes = WKHtmlToPdfUtils.convertToPdf(tempHtmlFile.getPath());
-		GenericFile tempPdfFile = FileFactory.createTempFile(new ByteArrayInputStream(bytes), "-html.pdf");
+		GenericFile tempPdfFile = FileFactory.createTempFile("-html.pdf");
+		WKHtmlToPdfUtils.convertToPdf(tempHtmlFile.getPath(), tempPdfFile.getFileObject());
 		tempHtmlFile.deleteFile();
 
 		return (PDFFile) tempPdfFile;

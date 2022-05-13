@@ -144,8 +144,7 @@ public class HRMDocumentService
 				case "png":
 				{
 					String imageData = report.getBinaryContentBase64().orElseThrow(() -> new RuntimeException("Missing HRM content"));
-					htmlContent = MessageFormat.format(htmlTemplate,
-							MessageFormat.format("<img src=\"data:image/{0};base64, {1}\"></img>", fileExtension, imageData));
+					htmlContent = MessageFormat.format("<img src=\"data:image/{0};base64, {1}\"></img>", fileExtension, imageData);
 					break;
 				}
 				default:
@@ -156,10 +155,10 @@ public class HRMDocumentService
 		}
 		else
 		{
-			htmlContent = MessageFormat.format(htmlTemplate, report.getTextContent());
+			htmlContent = MessageFormat.format("<pre style=\"white-space: pre-wrap\">{0}</pre>", report.getTextContent());
 		}
 
-		byte[] textContentBytes = htmlContent.getBytes(StandardCharsets.UTF_8);
+		byte[] textContentBytes = MessageFormat.format(htmlTemplate, htmlContent).getBytes(StandardCharsets.UTF_8);
 		PDFFile pdfFile = htmlToPdfFileConverter.convert(new ByteArrayInputStream(textContentBytes));
 		return pdfFile.toFileInputStream();
 	}
