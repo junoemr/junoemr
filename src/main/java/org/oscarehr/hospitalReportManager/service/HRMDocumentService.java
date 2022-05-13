@@ -23,7 +23,6 @@
 
 package org.oscarehr.hospitalReportManager.service;
 
-import org.apache.mina.util.Base64;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
@@ -113,18 +112,18 @@ public class HRMDocumentService
 			{
 				case "pdf":
 				{
-					return new ByteArrayInputStream(report.getBase64BinaryContent());
+					return new ByteArrayInputStream(report.getBinaryContent());
 				}
 				case "html":
 				{
-					textContent = new String(report.getBase64BinaryContent(), StandardCharsets.UTF_8);
+					textContent = new String(report.getBinaryContent(), StandardCharsets.UTF_8);
 					break;
 				}
 				case "gif":
 				case "jpeg":
 				case "png":
 				{
-					String imageData = new String(Base64.encodeBase64(report.getBase64BinaryContent()), StandardCharsets.UTF_8);
+					String imageData = report.getBinaryContentBase64().orElseThrow(() -> new RuntimeException("Missing HRM content"));
 					textContent = MessageFormat.format(
 							"<html><body><img src=\"data:image/{0};base64, {1}\"></img></body></html>",
 							fileExtension, imageData);
