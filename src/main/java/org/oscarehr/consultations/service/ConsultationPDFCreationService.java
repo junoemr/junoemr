@@ -198,7 +198,7 @@ public class ConsultationPDFCreationService
 		return streamList;
 	}
 
-	public List<InputStream> toHRMInputStreams(HttpServletRequest request, List<HrmDocument> attachedHRM) throws IOException, HtmlToPdfConversionException, JAXBException, InterruptedException, SAXException
+	public List<InputStream> toHRMInputStreams(HttpServletRequest request, List<HrmDocument> attachedHRM) throws IOException, JAXBException, SAXException
 	{
 		List<InputStream> streamList = new ArrayList<>(attachedHRM.size());
 		for(HrmDocument hrmDocument : attachedHRM)

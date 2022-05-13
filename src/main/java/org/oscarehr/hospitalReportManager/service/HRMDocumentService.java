@@ -23,10 +23,11 @@
 
 package org.oscarehr.hospitalReportManager.service;
 
-import org.oscarehr.common.exception.HtmlToPdfConversionException;
-import org.oscarehr.common.io.FileFactory;
-import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.common.io.PDFFile;
 import org.oscarehr.common.io.XMLFile;
+import org.oscarehr.common.io.conversion.HtmlToPdfFileConverter;
+import org.oscarehr.common.io.conversion.RtfToPdfFileConverter;
+import org.oscarehr.common.io.conversion.TiffToPdfFileConverter;
 import org.oscarehr.dataMigration.converter.in.hrm.HrmDocumentModelToDbConverter;
 import org.oscarehr.dataMigration.converter.out.hrm.HrmDocumentDbToModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
@@ -36,7 +37,6 @@ import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
-import org.oscarehr.util.WKHtmlToPdfUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -68,6 +68,15 @@ public class HRMDocumentService
 	@Autowired
 	protected HrmDocumentModelToDbConverter modelToEntity;
 
+	@Autowired
+	protected RtfToPdfFileConverter rtfToPdfFileConverter;
+
+	@Autowired
+	protected TiffToPdfFileConverter tiffToPdfFileConverter;
+
+	@Autowired
+	protected HtmlToPdfFileConverter htmlToPdfFileConverter;
+
 	public HrmDocument getHrmDocument(int hrmDocumentId)
 	{
 		HRMDocument document = hrmDocumentDao.find(hrmDocumentId);
@@ -92,18 +101,18 @@ public class HRMDocumentService
 		);
 	}
 
-	public InputStream toPdfInputStream(HrmDocument reportModel) throws IOException, HtmlToPdfConversionException, JAXBException, SAXException, InterruptedException
+	public InputStream toPdfInputStream(HrmDocument reportModel) throws IOException, JAXBException, SAXException
 	{
 		return toPdfInputStream(HRMReportParser.parseReport(new XMLFile(reportModel.getReportFile().getFileObject()), reportModel.getReportFileSchemaVersion()));
 	}
-	public InputStream toPdfInputStream(HRMReport report) throws IOException, HtmlToPdfConversionException, InterruptedException
+	public InputStream toPdfInputStream(HRMReport report) throws IOException
 	{
-		String textContent;
+		String htmlTemplate = "<html><body>{0}</body></html>";
+		String htmlContent;
 		if(report.isBinary())
 		{
 			String fileExtension = report.getFileExtension().toLowerCase();
 			fileExtension = fileExtension.replaceAll("\\.", "");
-
 
 			// fix extension variation
 			fileExtension = ("jpg".equals(fileExtension)) ? "jpeg" : fileExtension;
@@ -116,22 +125,29 @@ public class HRMDocumentService
 				}
 				case "html":
 				{
-					textContent = new String(report.getBinaryContent(), StandardCharsets.UTF_8);
+					htmlContent = new String(report.getBinaryContent(), StandardCharsets.UTF_8);
 					break;
+				}
+				case "rtf":
+				{
+					PDFFile pdfFile = rtfToPdfFileConverter.convert(new ByteArrayInputStream(report.getBinaryContent()));
+					return pdfFile.toFileInputStream();
+				}
+				case "tif":
+				case "tiff":
+				{
+					PDFFile pdfFile = tiffToPdfFileConverter.convert(new ByteArrayInputStream(report.getBinaryContent()));
+					return pdfFile.toFileInputStream();
 				}
 				case "gif":
 				case "jpeg":
 				case "png":
 				{
 					String imageData = report.getBinaryContentBase64().orElseThrow(() -> new RuntimeException("Missing HRM content"));
-					textContent = MessageFormat.format(
-							"<html><body><img src=\"data:image/{0};base64, {1}\"></img></body></html>",
-							fileExtension, imageData);
+					htmlContent = MessageFormat.format(htmlTemplate,
+							MessageFormat.format("<img src=\"data:image/{0};base64, {1}\"></img>", fileExtension, imageData));
 					break;
 				}
-				case "rtf":
-				case "tif":
-				case "tiff":
 				default:
 				{
 					throw new IllegalArgumentException("Unsupported hrm file extension: " + fileExtension);
@@ -140,14 +156,11 @@ public class HRMDocumentService
 		}
 		else
 		{
-			textContent = MessageFormat.format("<html><body>{0}</body></html>", report.getTextContent());
+			htmlContent = MessageFormat.format(htmlTemplate, report.getTextContent());
 		}
 
-		byte[] textContentBytes = textContent.getBytes(StandardCharsets.UTF_8);
-		InputStream htmlFileStream = new ByteArrayInputStream(textContentBytes);
-		GenericFile tempFile = FileFactory.createTempFile(htmlFileStream, "-HRMReport.html");
-
-		byte[] bytes = WKHtmlToPdfUtils.convertToPdf(tempFile.getPath());
-		return new ByteArrayInputStream(bytes);
+		byte[] textContentBytes = htmlContent.getBytes(StandardCharsets.UTF_8);
+		PDFFile pdfFile = htmlToPdfFileConverter.convert(new ByteArrayInputStream(textContentBytes));
+		return pdfFile.toFileInputStream();
 	}
 }

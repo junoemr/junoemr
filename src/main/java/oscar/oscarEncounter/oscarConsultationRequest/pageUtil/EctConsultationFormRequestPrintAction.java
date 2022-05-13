@@ -123,7 +123,7 @@ public class EctConsultationFormRequestPrintAction extends Action
 			error = "DocumentException";
 			friendlyReturnMessage = "Error when attempting to read one or more of the documents.";
 		}
-		catch(InterruptedException | SAXException | JAXBException | IOException ioe)
+		catch(SAXException | JAXBException | IOException ioe)
 		{
 			error = "IOException";
 			friendlyReturnMessage = "Error attempting to access an internal file.";
