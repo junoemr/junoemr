@@ -60,6 +60,11 @@ public class DemographicMapper extends AbstractMapper
 		{
 			Demographic demographic = new Demographic();
 			demographic.setFirstName(getFirstName(0));
+			String middleName = getMiddleName(0);
+			if (middleName != null)
+			{
+				demographic.setMiddleName(middleName);
+			}
 			demographic.setLastName(getLastName(0));
 			demographic.setSex(getSex());
 			demographic.setDateOfBirth(getDOB());
@@ -123,21 +128,22 @@ public class DemographicMapper extends AbstractMapper
 			MiscUtils.getLogger().warn("demographic has no first name! using: " + DEMO_NULL_NAME);
 			firstName = DEMO_NULL_NAME;
 		}
-		// Append middle name to firstName if it exists to prevent data loss. Middle name doesn't have a place in Juno
-		String middleName = StringUtils.trimToNull(messagePID.getPatientName(rep).getSecondAndFurtherGivenNamesOrInitialsThereof().getValue());
-		if (middleName != null)
-		{
-			firstName += " " + middleName;
-		}
-		firstName = firstName.replaceAll("<", "").replaceAll(">", "");
-
-		if (firstName.length() > Demographic.FIRST_NAME_MAX_LENGTH)
-		{
-			firstName = firstName.substring(0, Demographic.FIRST_NAME_MAX_LENGTH);
-			MiscUtils.getLogger().warn("Demographic first name is too long. Will be truncated to: '" + firstName + "'");
-		}
+		
 		return firstName;
 	}
+
+	public String getMiddleName(int rep) throws HL7Exception
+	{
+		String middleName = StringUtils.trimToNull(messagePID.getPatientName(rep).getSecondAndFurtherGivenNamesOrInitialsThereof().getValue());
+		middleName = middleName.replaceAll("<", "").replaceAll(">", "");
+		if (middleName.length() > Demographic.MIDDLE_NAME_MAX_LENGTH)
+		{
+			middleName = middleName.substring(0, Demographic.MIDDLE_NAME_MAX_LENGTH);
+			MiscUtils.getLogger().warn("Demographic middle name is too long. Will be truncated to: '" + middleName + "'");
+		}
+		return middleName;
+	}
+
 	public String getLastName(int rep) throws HL7Exception
 	{
 		String lastName = StringUtils.trimToNull(messagePID.getPatientName(rep).getFamilyName().getSurname().getValue());
