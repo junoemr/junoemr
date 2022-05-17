@@ -30,7 +30,6 @@ import org.oscarehr.common.io.conversion.Base64GifToPdfFileConverter;
 import org.oscarehr.common.io.conversion.Base64JpegToPdfFileConverter;
 import org.oscarehr.common.io.conversion.Base64PngToPdfFileConverter;
 import org.oscarehr.common.io.conversion.HtmlToPdfFileConverter;
-import org.oscarehr.common.io.conversion.RtfToPdfFileConverter;
 import org.oscarehr.common.io.conversion.TextToPdfFileConverter;
 import org.oscarehr.common.io.conversion.TiffToPdfFileConverter;
 import org.oscarehr.hospitalReportManager.HRMReport;
@@ -58,9 +57,6 @@ public class HRMToPDFConverter extends AbstractModelConverter<HRMReport, PDFFile
 
 	@Autowired
 	protected HtmlToPdfFileConverter htmlToPdfFileConverter;
-
-	@Autowired
-	protected RtfToPdfFileConverter rtfToPdfFileConverter;
 
 	@Autowired
 	protected TextToPdfFileConverter textToPdfFileConverter;
@@ -100,7 +96,7 @@ public class HRMToPDFConverter extends AbstractModelConverter<HRMReport, PDFFile
 				}
 				case "rtf":
 				{
-					pdfFile = rtfToPdfFileConverter.convert(contentStream);
+					pdfFile = textToPdfFileConverter.convert("RTF content is not currently supported as a pdf file.");
 					break;
 				}
 				case "tif":
