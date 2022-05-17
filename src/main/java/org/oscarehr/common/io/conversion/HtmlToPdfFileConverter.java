@@ -33,7 +33,13 @@ import java.io.InputStream;
 @Component
 public class HtmlToPdfFileConverter extends AbstractFileConverter<InputStream, PDFFile>
 {
-	protected static final String HTML_WRAPPER_TEMPLATE = "<html><body>{0}</body></html>";
+	protected static final String HTML_WRAPPER_TEMPLATE =
+			"<html>" +
+					"<head>" +
+					"<meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />" +
+					"<meta charset=\"UTF-8\" /></head>" +
+					"<body>{0}</body>" +
+					"</html>";
 
 	@Override
 	public PDFFile toFile(InputStream inputStream) throws Exception

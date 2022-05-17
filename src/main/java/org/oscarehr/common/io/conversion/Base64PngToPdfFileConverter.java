@@ -22,28 +22,15 @@
  */
 package org.oscarehr.common.io.conversion;
 
-import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.io.PDFFile;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
-
-import static org.oscarehr.common.io.conversion.HtmlToPdfFileConverter.HTML_WRAPPER_TEMPLATE;
-
 @Component
-public abstract class ImageToPdfFileConverter extends AbstractModelConverter<String, PDFFile>
+public class Base64PngToPdfFileConverter extends Base64ImageToPdfFileConverter
 {
-	@Autowired
-	protected HtmlToPdfFileConverter htmlToPdfFileConverter;
-
-	protected PDFFile convert(String base64Content, String mimeType)
+	@Override
+	public PDFFile convert(String base64Content)
 	{
-		String htmlContent = MessageFormat.format("<img src=\"data:{0};base64, {1}\"></img>", mimeType, base64Content);
-
-		byte[] textContentBytes = MessageFormat.format(HTML_WRAPPER_TEMPLATE, htmlContent).getBytes(StandardCharsets.UTF_8);
-		return htmlToPdfFileConverter.convert(new ByteArrayInputStream(textContentBytes));
+		return this.convert(base64Content, "image/png");
 	}
 }

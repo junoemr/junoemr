@@ -23,16 +23,13 @@
 
 package org.oscarehr.hospitalReportManager.service;
 
-import org.oscarehr.common.io.PDFFile;
 import org.oscarehr.common.io.XMLFile;
-import org.oscarehr.common.io.conversion.HtmlToPdfFileConverter;
-import org.oscarehr.common.io.conversion.RtfToPdfFileConverter;
-import org.oscarehr.common.io.conversion.TiffToPdfFileConverter;
 import org.oscarehr.dataMigration.converter.in.hrm.HrmDocumentModelToDbConverter;
 import org.oscarehr.dataMigration.converter.out.hrm.HrmDocumentDbToModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
+import org.oscarehr.hospitalReportManager.converter.HRMToPDFConverter;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
@@ -44,11 +41,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,13 +63,7 @@ public class HRMDocumentService
 	protected HrmDocumentModelToDbConverter modelToEntity;
 
 	@Autowired
-	protected RtfToPdfFileConverter rtfToPdfFileConverter;
-
-	@Autowired
-	protected TiffToPdfFileConverter tiffToPdfFileConverter;
-
-	@Autowired
-	protected HtmlToPdfFileConverter htmlToPdfFileConverter;
+	protected HRMToPDFConverter hrmToPDFConverter;
 
 	public HrmDocument getHrmDocument(int hrmDocumentId)
 	{
@@ -107,59 +95,6 @@ public class HRMDocumentService
 	}
 	public InputStream toPdfInputStream(HRMReport report) throws IOException
 	{
-		String htmlTemplate = "<html><body>{0}</body></html>";
-		String htmlContent;
-		if(report.isBinary())
-		{
-			String fileExtension = report.getFileExtension().toLowerCase();
-			fileExtension = fileExtension.replaceAll("\\.", "");
-
-			// fix extension variation
-			fileExtension = ("jpg".equals(fileExtension)) ? "jpeg" : fileExtension;
-
-			switch(fileExtension)
-			{
-				case "pdf":
-				{
-					return new ByteArrayInputStream(report.getBinaryContent());
-				}
-				case "html":
-				{
-					htmlContent = new String(report.getBinaryContent(), StandardCharsets.UTF_8);
-					break;
-				}
-				case "rtf":
-				{
-					PDFFile pdfFile = rtfToPdfFileConverter.convert(new ByteArrayInputStream(report.getBinaryContent()));
-					return pdfFile.toFileInputStream();
-				}
-				case "tif":
-				case "tiff":
-				{
-					PDFFile pdfFile = tiffToPdfFileConverter.convert(new ByteArrayInputStream(report.getBinaryContent()));
-					return pdfFile.toFileInputStream();
-				}
-				case "gif":
-				case "jpeg":
-				case "png":
-				{
-					String imageData = report.getBinaryContentBase64().orElseThrow(() -> new RuntimeException("Missing HRM content"));
-					htmlContent = MessageFormat.format("<img src=\"data:image/{0};base64, {1}\"></img>", fileExtension, imageData);
-					break;
-				}
-				default:
-				{
-					throw new IllegalArgumentException("Unsupported hrm file extension: " + fileExtension);
-				}
-			}
-		}
-		else
-		{
-			htmlContent = MessageFormat.format("<pre style=\"white-space: pre-wrap\">{0}</pre>", report.getTextContent());
-		}
-
-		byte[] textContentBytes = MessageFormat.format(htmlTemplate, htmlContent).getBytes(StandardCharsets.UTF_8);
-		PDFFile pdfFile = htmlToPdfFileConverter.convert(new ByteArrayInputStream(textContentBytes));
-		return pdfFile.toFileInputStream();
+		return hrmToPDFConverter.convert(report).toFileInputStream();
 	}
 }

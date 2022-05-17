@@ -25,18 +25,12 @@ package org.oscarehr.common.io.conversion;
 import org.oscarehr.common.io.PDFFile;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
-
-import static org.oscarehr.common.io.conversion.HtmlToPdfFileConverter.HTML_WRAPPER_TEMPLATE;
-
 @Component
-public abstract class JpegToPdfFileConverter extends ImageToPdfFileConverter
+public class Base64GifToPdfFileConverter extends Base64ImageToPdfFileConverter
 {
 	@Override
 	public PDFFile convert(String base64Content)
 	{
-		return this.convert(base64Content, "image/jpeg");
+		return this.convert(base64Content, "image/gif");
 	}
 }
