@@ -36,7 +36,6 @@ import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.model.DemographicModel;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.oscarDemographic.pageUtil.Util;
@@ -294,7 +293,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 				if (middleName.length() > Demographic.MIDDLE_NAME_MAX_LENGTH)
 				{
 					middleName = middleName.substring(0, Demographic.MIDDLE_NAME_MAX_LENGTH);
-					MiscUtils.getLogger().warn("Demographic middle name is too long. Will be truncated to: '" + middleName + "'");
+					logEvent("Demographic middle name is too long. Will be truncated to: '" + middleName + "'");
 				}
 			}
 		}
