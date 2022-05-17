@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 import java.io.InputStream;
 
 @Component
-public class RtfToPdfFileConverter extends AbstractFileConverter<PDFFile>
+public class RtfToPdfFileConverter extends AbstractFileConverter<InputStream, PDFFile>
 {
 	@Override
 	public PDFFile toFile(InputStream inputStream) throws Exception

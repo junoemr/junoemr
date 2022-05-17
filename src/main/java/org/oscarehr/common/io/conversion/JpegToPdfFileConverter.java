@@ -22,28 +22,21 @@
  */
 package org.oscarehr.common.io.conversion;
 
-import org.oscarehr.common.io.FileFactory;
-import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.PDFFile;
-import org.oscarehr.util.WKHtmlToPdfUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
+
+import static org.oscarehr.common.io.conversion.HtmlToPdfFileConverter.HTML_WRAPPER_TEMPLATE;
 
 @Component
-public class HtmlToPdfFileConverter extends AbstractFileConverter<InputStream, PDFFile>
+public abstract class JpegToPdfFileConverter extends ImageToPdfFileConverter
 {
-	protected static final String HTML_WRAPPER_TEMPLATE = "<html><body>{0}</body></html>";
-
 	@Override
-	public PDFFile toFile(InputStream inputStream) throws Exception
+	public PDFFile convert(String base64Content)
 	{
-		GenericFile tempHtmlFile = FileFactory.createTempFile(inputStream, ".html");
-
-		GenericFile tempPdfFile = FileFactory.createTempFile("-html.pdf");
-		WKHtmlToPdfUtils.convertToPdf(tempHtmlFile.getPath(), tempPdfFile.getFileObject());
-		tempHtmlFile.deleteFile();
-
-		return (PDFFile) tempPdfFile;
+		return this.convert(base64Content, "image/jpeg");
 	}
 }

@@ -26,22 +26,20 @@ import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.io.GenericFile;
 import org.springframework.stereotype.Component;
 
-import java.io.InputStream;
-
 @Component
-public abstract class AbstractFileConverter<O extends GenericFile> extends AbstractModelConverter<InputStream, O>
+public abstract class AbstractFileConverter<I, O extends GenericFile> extends AbstractModelConverter<I, O>
 {
 	@Override
-	public O convert(InputStream inputStream)
+	public O convert(I input)
 	{
 		try
 		{
-			return toFile(inputStream);
+			return toFile(input);
 		}
 		catch(Exception e)
 		{
 			throw new RuntimeException("File Conversion Error", e);
 		}
 	}
-	protected abstract O toFile(InputStream inputStream) throws Exception;
+	protected abstract O toFile(I input) throws Exception;
 }
