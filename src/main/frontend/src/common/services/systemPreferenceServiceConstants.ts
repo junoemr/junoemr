@@ -52,6 +52,7 @@ export enum SYSTEM_PROPERTIES
 export enum SystemPreferences
 {
     OlisIntegrationEnabled = "integration.olis.enabled",
+    OlisEmrId = "integration.olis.emr_id",
     OlisPollingEnabled = "olis_polling_enabled",
 
 		HrmEnabled = "integration.hrm.enabled",

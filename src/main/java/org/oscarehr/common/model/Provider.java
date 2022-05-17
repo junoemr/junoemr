@@ -92,6 +92,7 @@ public class Provider implements Serializable, Comparable<Provider>
 
 	/* -- Province specific (ON) -- */
 	private String ontarioLifeLabsId;
+	private String ontarioCnoNumber;
 
 	private Boolean superAdmin = false;
 	private String imdHealthUuid;
@@ -119,37 +120,6 @@ public class Provider implements Serializable, Comparable<Provider>
 		this.setSex(sex);
 		this.setSpecialty(specialty);
 		this.setFirstName(firstName);
-	}
-	
-	public Provider(Provider provider)
-	{
-		providerNo = provider.providerNo;
-		comments = provider.comments;
-		phone = provider.phone;
-		billingNo = provider.billingNo;
-		workPhone = provider.workPhone;
-		address = provider.address;
-		team = provider.team;
-		status = provider.status;
-		lastName = provider.lastName;
-		providerType = provider.providerType;
-		sex = provider.sex;
-		ohipNo = provider.ohipNo;
-		specialty = provider.specialty;
-		dob = provider.dob;
-		hsoNo = provider.hsoNo;
-		providerActivity = provider.providerActivity;
-		firstName = provider.firstName;
-		rmaNo = provider.rmaNo;
-		SignedConfidentiality = provider.SignedConfidentiality;
-		practitionerNo = provider.practitionerNo;
-		email = provider.email;
-		title = provider.title;
-		lastUpdateUser = provider.lastUpdateUser;
-		lastUpdateDate = provider.lastUpdateDate;
-		supervisor = provider.supervisor;
-		albertaTakNo = provider.albertaTakNo;
-		superAdmin = provider.superAdmin;
 	}
 
 	/** same as getDisplayName */
@@ -430,6 +400,16 @@ public class Provider implements Serializable, Comparable<Provider>
 		this.ontarioLifeLabsId = ontarioLifeLabsId;
 	}
 
+	public String getOntarioCnoNumber()
+	{
+		return ontarioCnoNumber;
+	}
+
+	public void setOntarioCnoNumber(String ontarioCnoNumber)
+	{
+		this.ontarioCnoNumber = ontarioCnoNumber;
+	}
+
 	public String getImdHealthUuid()
 	{
 		return imdHealthUuid;
@@ -495,4 +475,13 @@ public class Provider implements Serializable, Comparable<Provider>
 		}
 	    return (providerNo.compareTo(o.providerNo));
     }
+
+	public String getOlisPractitionerNo()
+	{
+		if(PROVIDER_TYPE_NURSE.equals(this.getProviderType()))
+		{
+			return this.getOntarioCnoNumber();
+		}
+		return this.getPractitionerNo();
+	}
 }

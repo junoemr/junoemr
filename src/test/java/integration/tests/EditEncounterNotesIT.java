@@ -23,12 +23,16 @@
 
 package integration.tests;
 
+import static integration.tests.util.junoUtil.Navigation.SUMMARY_URL;
+
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.ActionUtil;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.regex.Pattern;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -36,23 +40,19 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.AuthUtils;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.regex.Pattern;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import static integration.tests.util.junoUtil.Navigation.SUMMARY_URL;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = WebEnvironment.DEFINED_PORT)
 public class EditEncounterNotesIT extends SeleniumTestBase
 {
-	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
+	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" +
+		AuthUtils.TEST_PROVIDER_ID +
+		"&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
 
 	@Override
 	protected String[] getTablesToRestore()
@@ -96,9 +96,6 @@ public class EditEncounterNotesIT extends SeleniumTestBase
 		Assert.assertTrue("Edited Note is NOT saved", Pattern.compile(editedNote).matcher(text).find());
 	}
 
-	// XXX: This test was ignored because if failed after switching Juno to run with jdk17.  It's
-	//      probably not worth fixing until juno has been fixed to officially run with that jdk.
-	@Ignore
 	@Test
 	public void editEncounterNotesJUNOUITest()
 	{
@@ -106,21 +103,18 @@ public class EditEncounterNotesIT extends SeleniumTestBase
 
 		String newNote = "Testing Note JUNO";
 		String editedNote = "Edited Testing Note JUNO";
-
+		ActionUtil.findWaitClickById(driver, webDriverWait,"note-editor-header");//add this step to make sure the encounter note editor is get focus
 		ActionUtil.findWaitSendKeysById(driver, webDriverWait, "noteEditor1", newNote);
-
-		driver.findElement(By.id("theSave")).click();
-
+		ActionUtil.findWaitClickById(driver, webDriverWait,"theSave");
 		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@ng-click='$ctrl.editButtonClick()']");
 
 		String noteId = "noteEditor1";
 		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id(noteId)));
 		driver.findElement(By.id(noteId)).clear();
 		driver.findElement(By.id(noteId)).sendKeys(editedNote);
-
 		ActionUtil.findWaitClickById(driver, webDriverWait, "theSave");
 
-		String noteXpath = "//p[@class='ng-binding']";
+		String noteXpath = "//div[@class='row note-body']";
 		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(noteXpath)));
 		String text = driver.findElement(By.xpath(noteXpath)).getText();
 

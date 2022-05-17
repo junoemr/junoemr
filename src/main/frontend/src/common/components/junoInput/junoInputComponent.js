@@ -160,7 +160,7 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.pristine = false;
 			if (ctrl.ngChange)
 			{
-				ctrl.ngChange({});
+				ctrl.ngChange({value: ctrl.ngModel});
 			}
 		}
 

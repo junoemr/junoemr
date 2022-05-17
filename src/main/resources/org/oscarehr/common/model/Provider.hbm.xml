@@ -44,5 +44,6 @@
         <property column="alberta_e_delivery_ids" name="AlbertaEDeliveryIds" not-null="false" type="string" />
 		<property column="alberta_connect_care_id" name="albertaConnectCareId" not-null="false" type="string" />
 		<property column="ontario_lifelabs_id" name="ontarioLifeLabsId" not-null="false" type="string" />
+		<property column="ontario_cno_number" name="ontarioCnoNumber" not-null="false" type="string" />
 	</class>
 </hibernate-mapping>
