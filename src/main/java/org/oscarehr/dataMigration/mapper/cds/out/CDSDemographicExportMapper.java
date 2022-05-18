@@ -118,7 +118,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		lastName.setPartType(PersonNamePartTypeCode.FAMC);
 
 		// middle name
-		if(exportStructure.getMiddleName() != null)
+		if(exportStructure.getMiddleName() != null && !exportStructure.getMiddleName().isEmpty())
 		{
 			PersonNameStandard.LegalName.OtherName middleName = objectFactory.createPersonNameStandardLegalNameOtherName();
 			middleName.setPart(exportStructure.getMiddleName());
