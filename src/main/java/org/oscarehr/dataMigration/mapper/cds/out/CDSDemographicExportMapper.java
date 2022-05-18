@@ -33,6 +33,7 @@ import static org.oscarehr.demographic.entity.Demographic.STATUS_INACTIVE;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.dataMigration.mapper.cds.CDSDemographicInterface;
 import org.oscarehr.dataMigration.model.PatientRecord;
@@ -118,7 +119,7 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		lastName.setPartType(PersonNamePartTypeCode.FAMC);
 
 		// middle name
-		if(exportStructure.getMiddleName() != null && !exportStructure.getMiddleName().isEmpty())
+		if(StringUtils.isNotBlank(exportStructure.getMiddleName()))
 		{
 			PersonNameStandard.LegalName.OtherName middleName = objectFactory.createPersonNameStandardLegalNameOtherName();
 			middleName.setPart(exportStructure.getMiddleName());
