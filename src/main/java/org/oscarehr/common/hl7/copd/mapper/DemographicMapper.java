@@ -118,47 +118,46 @@ public class DemographicMapper extends AbstractMapper
 	}
 
 	/* Methods for accessing various values in the import message */
-
 	public String getFirstName(int rep) throws HL7Exception
 	{
-		String firstName = process_name(StringUtils.trimToNull(messagePID.getPatientName(rep).getGivenName().getValue()), FIRST_NAME);
+		String firstName = processName(StringUtils.trimToNull(messagePID.getPatientName(rep).getGivenName().getValue()), FIRST_NAME);
 		return firstName;
 	}
 
 	public String getMiddleName(int rep) throws HL7Exception
 	{
-		String middleName = process_name(StringUtils.trimToNull(messagePID.getPatientName(rep).getSecondAndFurtherGivenNamesOrInitialsThereof().getValue()), MIDDLE_NAME);
+		String middleName = processName(StringUtils.trimToNull(messagePID.getPatientName(rep).getSecondAndFurtherGivenNamesOrInitialsThereof().getValue()), MIDDLE_NAME);
 		return middleName;
 	}
 
 	public String getLastName(int rep) throws HL7Exception
 	{
-		String lastName = process_name(StringUtils.trimToNull(messagePID.getPatientName(rep).getFamilyName().getSurname().getValue()), LAST_NAME);
+		String lastName = processName(StringUtils.trimToNull(messagePID.getPatientName(rep).getFamilyName().getSurname().getValue()), LAST_NAME);
 		return lastName;
 	}
 
-	public String process_name(String name, String name_type)
+	public String processName(String name, String nameType)
 	{
-		int name_length = get_default_name_length(name_type);
+		int nameLength = getDefaultNameLength(nameType);
 
 		if (name == null)
 		{
-			MiscUtils.getLogger().warn("demographic has no " + name_type + " name! using: " + DEMO_NULL_NAME);
+			MiscUtils.getLogger().warn("demographic has no " + nameType + " name! using: " + DEMO_NULL_NAME);
 			return DEMO_NULL_NAME;
 		}
 		name = name.replaceAll("<", "").replaceAll(">", "");
 
-		if (name.length() > name_length)
+		if (name.length() > nameLength)
 		{
-			name = name.substring(0, name_length);
-			MiscUtils.getLogger().warn("Demographic " + name_type + " name is too long. Will be truncated to: '" + name + "'");
+			name = name.substring(0, nameLength);
+			MiscUtils.getLogger().warn("Demographic " + nameType + " name is too long. Will be truncated to: '" + name + "'");
 		}
 		return name;
 	}
 
-	public int get_default_name_length(String name_type)
+	public int getDefaultNameLength(String nameType)
 	{
-		switch(name_type)
+		switch(nameType)
 		{
 			case MIDDLE_NAME:
 				return Demographic.MIDDLE_NAME_MAX_LENGTH;

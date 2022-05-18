@@ -118,16 +118,16 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		lastName.setPartType(PersonNamePartTypeCode.FAMC);
 
 		// middle name
-		PersonNameStandard.LegalName.OtherName middleName = objectFactory.createPersonNameStandardLegalNameOtherName();
-		if (middleName != null)
+		if(exportStructure.getMiddleName() != null)
 		{
+			PersonNameStandard.LegalName.OtherName middleName = objectFactory.createPersonNameStandardLegalNameOtherName();
 			middleName.setPart(exportStructure.getMiddleName());
 			middleName.setPartType(PersonNamePartTypeCode.GIV);
+			legalName.getOtherName().add(middleName);
 		}
 
 		legalName.setFirstName(firstName);
 		legalName.setLastName(lastName);
-		legalName.getOtherName().add(middleName);
 
 		names.setNamePrefix(getExportNamePrefix(exportStructure.getTitleString()));
 
