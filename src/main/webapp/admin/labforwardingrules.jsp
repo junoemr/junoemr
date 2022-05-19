@@ -29,7 +29,12 @@
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
 
-<%@ page import="oscar.oscarMDS.data.ProviderData, java.util.ArrayList, oscar.oscarLab.ForwardingRules, oscar.OscarProperties"%>
+<%@ page import="java.util.ArrayList, oscar.oscarLab.ForwardingRules, oscar.OscarProperties"%>
+<%@ page import="org.oscarehr.dataMigration.model.provider.ProviderModel" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.provider.service.ProviderService" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.stream.Collectors" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
@@ -52,12 +57,18 @@
 
 <%
 
-ForwardingRules fr = new ForwardingRules();
-String providerNo = request.getParameter("providerNo");
-if (providerNo == null)
-    providerNo = "0";
+	ForwardingRules fr = new ForwardingRules();
+	String providerNo = request.getParameter("providerNo");
+	if(providerNo == null)
+	{
+		providerNo = "0";
+	}
 
-ArrayList frwdProviders = fr.getProviders(providerNo);
+	ArrayList<ArrayList<String>> frwdProviders = fr.getProviders(providerNo);
+	ProviderService providerService = (ProviderService) SpringUtils.getBean("provider.service.ProviderService");
+
+	List<ProviderModel> providers = providerService.getActiveProviders();
+
 %>
 
 <html>
@@ -126,20 +137,21 @@ ArrayList frwdProviders = fr.getProviders(providerNo);
 
 <div class="well">
 <h5>Select Provider</h5>
-Please Select the provider to set fowarding rules for:
+Please select the provider to set forwarding rules for:
+	<select name="providerNo" id="provider-selection">
+		<option value="0">None Selected</option>
+		<%
+			for(ProviderModel provider : providers)
+			{
+				String selected = (provider.getId().equals(providerNo)) ? "selected" : "";
+		%>
+		<option value="<%= provider.getId() %>" <%=selected%>>
+			<%= provider.getDisplayName() %>
+		</option>
+		<% }%>
+	</select>
 
-<select name="providerNo" id="provider-selection">
-	<option value="0">None Selected</option>
-	<% ArrayList providers = ProviderData.getProviderList();
-                                            for (int i=0; i < providers.size(); i++) { 
-                                            String prov_no = (String) ((ArrayList) providers.get(i)).get(0);%>
-	<option value="<%= prov_no %>"
-		<% if (prov_no.equals(providerNo)) {%> <%="selected"%> <%}%>><%= (String) ((ArrayList) providers.get(i)).get(1) %>
-	<%= (String) ((ArrayList) providers.get(i)).get(2) %></option>
-	<% }%>
-</select> 
-
-<i class="icon-question-sign"></i> <oscar:help keywords="lab forwarding" key="app.top1"/>
+	<i class="icon-question-sign"></i> <oscar:help keywords="lab forwarding" key="app.top1"/>
 <br>
 				
 </div>
@@ -223,14 +235,25 @@ status = fr.getStatus(providerNo);
 				<select multiple name="providerNums" style="height: 200px">
 					<optgroup
 						label="&#160&#160Doctors&#160&#160&#160&#160&#160&#160&#160&#160">
-						<% //ArrayList providers = ProviderData.getProviderList();
-                                                for (int i=0; i < providers.size(); i++) { 
-                                                String prov_no = (String) ((ArrayList) providers.get(i)).get(0);
-                                                if ( !providerNo.equals(prov_no) && !frwdProviders.contains(providers.get(i))){%>
-						<option value="<%= prov_no %>"><%= (String) ((ArrayList) providers.get(i)).get(1) %>
-						<%= (String) ((ArrayList) providers.get(i)).get(2) %></option>
-						<% }
-                                                } %>
+						<%
+							List<String> frwdProviderIds = frwdProviders.stream()
+									.map((rule) -> rule.get(0))
+									.collect(Collectors.toList());
+							final String finalProviderNo = providerNo;
+							List<ProviderModel> filteredProviders = providers.stream()
+									.filter((provider) -> !provider.getId().equals(finalProviderNo))
+									.filter((provider) -> !frwdProviderIds.contains(provider.getId()))
+									.collect(Collectors.toList());
+
+						for(ProviderModel provider : filteredProviders)
+						{
+							String providerId = provider.getId();
+						%>
+						<option value="<%= providerId %>">
+							<%= provider.getDisplayName() %>
+						</option>
+						<%
+						}%>
 					</optgroup>
 				</select>
 			

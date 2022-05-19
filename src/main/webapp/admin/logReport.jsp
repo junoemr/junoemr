@@ -127,6 +127,7 @@ boolean authed=true;
 	contentTypeMap.put(LogConst.CON_FAX, "Fax");
 	contentTypeMap.put(LogConst.CON_FORM, "Form");
 	contentTypeMap.put(LogConst.CON_HL7_LAB, "Lab");
+	contentTypeMap.put(LogConst.CON_OLIS_LAB, "OLIS");
 	contentTypeMap.put(LogConst.CON_LOGIN, "Login");
 	contentTypeMap.put(LogConst.CON_MEDICATION, "Medication");
 	contentTypeMap.put(LogConst.CON_PHARMACY, "Pharmacy");
@@ -143,6 +144,7 @@ boolean authed=true;
 	actionTypeMap.put(LogConst.ACTION_READ, "Read");
 	actionTypeMap.put(LogConst.ACTION_SENT, "Sent");
 	actionTypeMap.put(LogConst.ACTION_UPDATE, "Update");
+	actionTypeMap.put(LogConst.ACTION_QUERY, "Query");
 
 %>
 <html:html locale="true">

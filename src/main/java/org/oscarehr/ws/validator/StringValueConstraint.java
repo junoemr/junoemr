@@ -41,4 +41,5 @@ public @interface StringValueConstraint
 	Class<? extends Payload>[] payload() default{};
 
 	String[] allows();
+	boolean caseSensitive() default true;
 }

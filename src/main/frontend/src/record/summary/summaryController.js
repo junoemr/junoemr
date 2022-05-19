@@ -25,7 +25,7 @@
 */
 import {SecurityPermissions} from "../../common/security/securityConstants";
 import {SystemPreferenceApi} from "../../../generated";
-import {INSTANCE_TYPE, SystemProperties} from "../../common/services/systemPreferenceServiceConstants";
+import {SystemPreferences} from "../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Record.Summary').controller('Record.Summary.SummaryController', [
 
@@ -105,14 +105,10 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 				controller.getLeftItems();
 				controller.getRightItems();
 
-				systemPreferenceApi.getPropertyValue(
-					SystemProperties.InstanceType, INSTANCE_TYPE.BC).then(
-					function success(result)
+				systemPreferenceApi.getPreferenceEnabled(SystemPreferences.OlisIntegrationEnabled, false)
+					.then((result) =>
 					{
-						if (result.data.body === INSTANCE_TYPE.ON)
-						{
-							controller.olisSearchEnabled = true;
-						}
+						controller.olisSearchEnabled = Boolean(result.data.body);
 					});
 			}
 		}

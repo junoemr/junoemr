@@ -8,9 +8,14 @@
     and "gnu.org/licenses/gpl-2.0.html".
 
 --%>
-<%@ page language="java" %>
-<%@ page import="java.util.*" %>
-<%@ page import="oscar.oscarMDS.data.*, oscar.OscarProperties" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="oscar.oscarMDS.data.PatientInfo" %>
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="static org.oscarehr.sharingcenter.util.CDADocumentUtil.oscarProperties" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
+<%@ page import="org.oscarehr.common.model.UserProperty" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
@@ -32,6 +37,7 @@
 %>
 
 <%
+	SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
 
 	boolean ajax = "true".equals(request.getParameter("ajax"));
 
@@ -62,6 +68,7 @@
 		}
 		Integer unmatchedDocs = (Integer) request.getAttribute("unmatchedDocs");
 		Integer unmatchedLabs = (Integer) request.getAttribute("unmatchedLabs");
+		Integer unmatchedHrm = (Integer) request.getAttribute("unmatchedHRM");
 		Integer totalDocs = (Integer) request.getAttribute("totalDocs");
 		Integer totalLabs = (Integer) request.getAttribute("totalLabs");
 		if (totalLabs == null)
@@ -71,6 +78,7 @@
 		Integer abnormalCount = (Integer) request.getAttribute("abnormalCount");
 		Integer normalCount = (Integer) request.getAttribute("normalCount");
 		Integer totalNumDocs = (Integer) request.getAttribute("totalNumDocs");
+		Integer totalHRM = (Integer) request.getAttribute("totalHRM");
 		Long categoryHash = (Long) request.getAttribute("categoryHash");
 %>
 <input type="hidden" id="categoryHash" value="<%=categoryHash%>" />
@@ -128,6 +136,15 @@
 			Abnormal (<%= Integer.toString(abnormalCount) %>)
 		</a>
 	</div>
+
+	<% if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM) && totalHRM > 0) { %>
+	<div>
+		<a id="totalHRM" href="javascript:void(0);" onclick="un_bold(this);changeView(CATEGORY_HRM);" title="HRM Reports">
+			HRM (<%= totalHRM %>)
+		</a>
+	</div>
+	<% } %>
+
 	<dl id="patientsdoclabs">
 
 	<%
@@ -135,7 +152,7 @@
 		{
 			String patientId= info.id + "";
 			String patientName= info.toString();
-			int numDocs= info.getDocCount() + info.getLabCount();
+			int numDocs= info.getDocCount() + info.getLabCount() + info.getHrmCount();
 	%>
 
 		<dt>
@@ -183,6 +200,19 @@
 				</dt>
 			<%
 				}
+				if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM) && info.getHrmCount() > 0)
+				{
+			%>
+				<dt>
+					<a id="patient<%=patientId%>hl7s"
+					   href="javascript:void(0);"
+					   onclick="un_bold(this);changeView(CATEGORY_PATIENT_SUB,<%=patientId%>,CATEGORY_TYPE_HRM);"
+					   title="HRM">
+						HRM (<span id="pLabNum_<%=patientId%>"><%=info.getHrmCount()%></span>)
+					</a>
+				</dt>
+			<%
+				}
 			%>
 			</dl>
 		</dt>
@@ -204,7 +234,7 @@
 			}
 		}
 
-		if (unmatchedDocs > 0 || unmatchedLabs > 0)
+		if (unmatchedDocs > 0 || unmatchedLabs > 0 || unmatchedHrm > 0)
 		{
 	%>
 
@@ -218,7 +248,7 @@
 			<a id="patient0all" href="javascript:void(0);"
 			   onclick="un_bold(this);changeView(CATEGORY_PATIENT,0)"
 			   title="Unmatched">
-				Unmatched (<span id="patientNumDocs0"><%=unmatchedDocs + unmatchedLabs%></span>)
+				Unmatched (<span id="patientNumDocs0"><%=unmatchedDocs + unmatchedLabs + unmatchedHrm%></span>)
 			</a>
 			<dl id="labdoc0showSublist" style="display:none" >
 			<%
@@ -238,6 +268,16 @@
 				<dt>
 					<a id="patient0hl7s" href="javascript:void(0);" onclick="un_bold(this);changeView(CATEGORY_PATIENT_SUB,0,CATEGORY_TYPE_HL7);" title="HL7">
 						HL7 (<span id="pLabNum_0"><%=unmatchedLabs%></span>)
+					</a>
+				</dt>
+			<%
+				}
+				if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM) && unmatchedHrm > 0)
+				{
+			%>
+				<dt>
+					<a id="patient0hrms" href="javascript:void(0);" onclick="un_bold(this);changeView(CATEGORY_PATIENT_SUB,0,CATEGORY_TYPE_HRM);" title="HRM">
+						HRM (<span id="pHRMNum_0"><%=unmatchedHrm%></span>)
 					</a>
 				</dt>
 			<%
@@ -500,7 +540,19 @@
 		}
 
 		function getQuery() {
-			var CATEGORY_ALL = 1,CATEGORY_DOCUMENTS = 2,CATEGORY_HL7 = 3,CATEGORY_NORMAL = 4,CATEGORY_ABNORMAL = 5,CATEGORY_PATIENT = 6,CATEGORY_PATIENT_SUB = 7,CATEGORY_TYPE_DOC = 'DOC',CATEGORY_TYPE_HL7 = 'HL7';
+			var CATEGORY_ALL = 1;
+			var CATEGORY_DOCUMENTS = 2;
+			var CATEGORY_HL7 = 3;
+			var CATEGORY_NORMAL = 4;
+			var CATEGORY_ABNORMAL = 5;
+			var CATEGORY_PATIENT = 6;
+			var CATEGORY_PATIENT_SUB = 7;
+			var CATEGORY_HRM = 8;
+			var CATEGORY_TYPE_DOC = 'DOC';
+			var CATEGORY_TYPE_HL7 = 'HL7';
+			var CATEGORY_TYPE_HRM = 'HRM';
+
+
 			var query = "method=prepareForContentPage";
 			query +="&searchProviderNo="+searchProviderNo+"&providerNo="+providerNo+"&status="+searchStatus+"&page="+page
 				+"&pageSize="+pageSize+"&isListView="+(isListView?"true":"false")
@@ -529,6 +581,10 @@
 				case CATEGORY_PATIENT:
 					query  += "&view=all&demographicNo=" + selected_category_patient;
 					break;
+				case CATEGORY_HRM:
+					query += "&view=hrm"
+					query += "&fname=" + firstName + "&lname=" + lastName + "&hnum=" + hin;
+					break;
 				case CATEGORY_PATIENT_SUB:
 					query  += "&demographicNo=" + selected_category_patient;
 					switch (selected_category_type) {
@@ -537,6 +593,9 @@
 							break;
 						case CATEGORY_TYPE_HL7:
 							query  += "&view=labs";
+							break;
+						case CATEGORY_TYPE_HRM:
+							query += "&view=hrm"
 							break;
 					}
 					break;
@@ -717,8 +776,14 @@
 							<a href="javascript:popupStart(700,1100,'../dms/inboxManage.do?method=getDocumentsInQueues')" style="color: #FFFFFF;"><bean:message key="inboxmanager.document.pendingDocs"/></a>
 							| <a href="javascript:popupStart(800,1200,'<%=request.getContextPath() %>/dms/incomingDocs.jsp')" style="color: #FFFFFF;" ><bean:message key="inboxmanager.document.incomingDocs"/></a>
 							| <a href="javascript:popupStart(800,1000, '<%=request.getContextPath() %>/oscarMDS/CreateLab.jsp')" style="color: #FFFFFF;"><bean:message key="global.createLab" /></a>
-							<a href="javascript:popupStart(800,1000, '<%=request.getContextPath() %>/olis/Search.jsp')" style="color: #FFFFFF;"><bean:message key="olis.olisSearch" />
+							<% if (systemPreferenceService.isPreferenceEnabled(UserProperty.OLIS_INTEGRATION_ENABLED, false))
+							{%>
+
+							| <a href="javascript:popupStart(800,1000, '<%=request.getContextPath() %>/olis/Search.jsp')" style="color: #FFFFFF;"><bean:message key="olis.olisSearch" />
 							</a>
+							<%
+							}%>
+
 							<!--- Hiding this for now until we decide to get the HRM integration working properly
                                 | <a href="javascript:popupPage(400, 400,'< html:rewrite page="/hospitalReportManager/hospitalReportManager.jsp"/>')" style="color: #FFFFFF;">HRM Status/Upload</a>
 								-->

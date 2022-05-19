@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version. 
+ * of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,6 +25,7 @@
 
 package oscar.oscarPrevention.reports;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.util.LoggedInInfo;
 
 import java.util.ArrayList;
@@ -55,8 +56,26 @@ public interface PreventionReport {
     String INELIGIBLE = "Ineligible";
     String PENDING = "Pending";
 
-    public boolean displayNumShots();
+    enum PreventionReportType
+    {
+		PAP,
+		MAMMOGRAM,
+		FLU,
+		CHILD_IMMUNIZATIONS,
+		FIT;
 
-    public Hashtable runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list,Date asofDate);
+        public static PreventionReportType fromStringIgnoreCase(String enumString)
+        {
+            if(EnumUtils.isValidEnumIgnoreCase(PreventionReportType.class, enumString))
+            {
+                return PreventionReportType.valueOf(enumString.toUpperCase());
+            }
+            return null;
+        }
+    }
+
+    boolean displayNumShots();
+
+    Hashtable<String, Object> runReport(LoggedInInfo loggedInInfo, ArrayList<ArrayList<String>> list, Date asofDate);
 }
 

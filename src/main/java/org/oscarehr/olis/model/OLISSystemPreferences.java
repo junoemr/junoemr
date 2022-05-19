@@ -18,12 +18,10 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
 import java.util.Optional;
+
 @Entity
 public class OLISSystemPreferences extends AbstractModel<Integer>
 {
-	// olis recommends 30 minute polling interval
-	public static final int DEFAULT_POLLING_FREQUENCY_MIN = 30; // minutes
-	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;

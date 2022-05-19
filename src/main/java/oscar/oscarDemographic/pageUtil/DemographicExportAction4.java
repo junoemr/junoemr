@@ -1545,7 +1545,7 @@ public class DemographicExportAction4 extends Action {
 											labMeaValues.put("datetime", h.getTimeStamp(i, j));
 											labMeaValues.put("abnormal", h.getOBXAbnormalFlag(i, j));
 											labMeaValues.put("unit", h.getOBXUnits(i, j));
-											labMeaValues.put("accession", h.getAccessionNum());
+											labMeaValues.put("accession", h.getUniqueIdentifier());
 											labMeaValues.put("range", h.getOBXReferenceRange(i, j));
 											labMeaValues.put("request_datetime", h.getRequestDate(i));
 											labMeaValues.put("olis_status", h.getOBXResultStatus(i, j));

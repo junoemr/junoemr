@@ -48,6 +48,12 @@ angular.module('Admin.Section').component('integrationModules',
 				configUrl:""
 			},
 			{
+				name: "OLIS",
+				enabled: false,
+				propertyName: SystemPreferences.OlisIntegrationEnabled,
+				configUrl:"#!/admin/labConfig/olis",
+			},
+			{
 				name: "IceFall",
 				enabled: false,
 				propertyName: SystemPreferences.IcefallEnabled,

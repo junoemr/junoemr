@@ -147,6 +147,13 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 	private LocalDate electronicMessagingConsentGivenAt;
 	private LocalDate electronicMessagingConsentRejectedAt;
 
+	// legacy properties
+	private String children;
+	private String pcnIndicator;
+	private String sourceOfIncome;
+	private String previousAddress;
+	private String anonymous;
+
 	public DemographicModel()
 	{
 		this.addressList = new ArrayList<>();
@@ -226,6 +233,7 @@ public class DemographicModel extends AbstractTransientModel implements Person, 
 		return TYPE.DEMOGRAPHIC;
 	}
 
+	@Override
 	public String getDisplayName()
 	{
 		return this.getLastName() + ", " + this.getFirstName() + (StringUtils.isBlank(this.getMiddleName()) ? "" : " " + this.getMiddleName());

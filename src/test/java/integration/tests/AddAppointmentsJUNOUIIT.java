@@ -23,24 +23,6 @@
 
 package integration.tests;
 
-import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.seleniumUtil.ActionUtil;
-import integration.tests.util.seleniumUtil.PageUtil;
-import junit.framework.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.oscarehr.JunoApplication;
-
-import java.util.List;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-
 import static integration.tests.AddPatientsIT.mom;
 import static integration.tests.util.data.SiteTestCollection.siteNames;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
@@ -50,7 +32,25 @@ import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByI
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
+import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.seleniumUtil.ActionUtil;
+import integration.tests.util.seleniumUtil.PageUtil;
+import java.util.List;
+import junit.framework.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
+
 @RunWith(SpringRunner.class)
+@TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 {
@@ -154,7 +154,8 @@ public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 	}
 
 	@Test
-	public void addAppointmentsSchedulePageTest() throws InterruptedException {
+	public void addAppointmentsSchedulePageTest()
+	{
 		// open JUNO UI page,
 		accessSectionJUNOUI(driver, webDriverWait, "Schedule");
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("schedule-select")));
@@ -179,23 +180,6 @@ public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 				PageUtil.isExistsBy(By.xpath("//i[@title='" + apptStatusAt10 + "']"), driver));
 	}
 
-	/*
-	-------------------------------------------------------------------------------
-Test set: integration.tests.AddAppointmentsJUNOUIIT
--------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 172.602 s <<< FAILURE! - in integration.tests.AddAppointmentsJUNOUIIT
-addAppointmentsSchedulePageWeeklyViewTest  Time elapsed: 133.162 s  <<< ERROR!
-org.openqa.selenium.NoSuchElementException:
-Cannot locate element with text: Test Clinic
-For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
-Build info: version: '3.141.59', revision: 'e82be7d358', time: '2018-11-14T08:17:03'
-System info: host: 'fedora', ip: '127.0.0.1', os.name: 'Linux', os.arch: 'amd64', os.version: '5.13.8-200.fc34.x86_64', java.version: '1.8.0_302'
-Driver info: driver.version: unknown
-    at integration.tests.AddAppointmentsJUNOUIIT.addAppointmentWithDemo(AddAppointmentsJUNOUIIT.java:111)
-    at integration.tests.AddAppointmentsJUNOUIIT.addAppointmentsSchedulePageWeeklyViewTest(AddAppointmentsJUNOUIIT.java:175)
-
-	 */
-	@Ignore
 	@Test
 	public void addAppointmentsSchedulePageWeeklyViewTest()
 			throws InterruptedException
@@ -219,7 +203,7 @@ Driver info: driver.version: unknown
 
 		//Add an appointment at 12:00-12:15 with NO demographic selected.
 		String startTimeExpectedNoDemo = "12:00:00";
-		String apptStatusAt12 = "Customized 3";
+		String apptStatusAt12 = "To Do";
 		addAppointmentWithNODemo(startTimeExpectedNoDemo, siteNames[0], apptStatusAt12);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//i[@title='" + apptStatusAt12 + "']")));
 		Assert.assertTrue("Appointment with NO demographic selected is NOT added successfully.",

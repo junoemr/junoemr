@@ -101,7 +101,7 @@ public class EctDisplayHRMAction extends EctDisplayAction {
 				item.setDate(date);
 				hash = Math.abs(winName.hashCode());
 
-				url = "popupPage(700,800,'" + hash + "', '" + request.getContextPath() + "/hospitalReportManager/Display.do?id=" + dispDocNo + "')";
+				url = "popupPage(700,800,'" + hash + "', '" + request.getContextPath() + "/hospitalReportManager/displayHRMReport.jsp?id=" + dispDocNo + "')";
 
 				String labRead = "";
 				if(!oscarLogDao.hasRead(( (String) request.getSession().getAttribute("user")   ),"hrm",dispDocNo)){

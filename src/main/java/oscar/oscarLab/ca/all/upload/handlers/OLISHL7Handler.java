@@ -87,7 +87,7 @@ public class OLISHL7Handler implements MessageHandler
 			// skip uploading duplicates
 			if(OLISUtils.isDuplicate(loggedInInfo, parser, msg))
 			{
-				logger.warn("Duplicate OLIS lab detected (AccessionNo: " + parser.getAccessionNum() + "). Upload skipped.");
+				logger.warn("Duplicate OLIS lab detected (AccessionNo: " + parser.getUniqueIdentifier() + "). Upload skipped.");
 				continue;
 			}
 			// always use the last obr date as the latest timestamp seen

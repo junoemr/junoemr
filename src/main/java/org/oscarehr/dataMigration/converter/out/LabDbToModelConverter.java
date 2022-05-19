@@ -72,8 +72,8 @@ public class LabDbToModelConverter extends
 		Lab exportLab = new Lab();
 
 		exportLab.setId(hl7TextMessage.getId());
-		exportLab.setAccessionNumber(labHandler.getAccessionNum());
-		exportLab.setVersion(labHandler.getFillerOrderNumber());
+		exportLab.setAccessionNumber(labHandler.getUniqueIdentifier());
+		exportLab.setVersion(labHandler.getUniqueVersionIdentifier());
 		exportLab.setMessageDateTime(ConversionUtils.toLocalDateTime(labHandler.getMsgDate()));
 		exportLab.setEmrReceivedDateTime(ConversionUtils.toLocalDateTime(hl7TextMessage.getCreated()));
 		exportLab.setSendingFacility(labHandler.getPatientLocation());

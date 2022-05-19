@@ -8,19 +8,27 @@
  */
 package com.indivica.olis.segments;
 
+import com.indivica.olis.queries.QueryType;
+import org.apache.commons.lang3.StringUtils;
+import org.oscarehr.config.JunoProperties;
+import org.oscarehr.preferences.service.SystemPreferenceService;
+import org.oscarehr.util.SpringUtils;
+
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-import oscar.OscarProperties;
+import static org.oscarehr.common.model.UserProperty.OLIS_EMR_ID;
 
-import com.indivica.olis.queries.QueryType;
+public class MSHSegment implements Segment
+{
+	private static final JunoProperties junoProperties = SpringUtils.getBean(JunoProperties.class);
+	private static final SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
 
-public class MSHSegment implements Segment {
-
-	private QueryType queryType;
-	private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMddHHmmssZZZZZ");
-	private String uuidString = UUID.randomUUID().toString();
+	private final QueryType queryType;
+	private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMddHHmmssZZZZZ");
+	private final String uuidString = UUID.randomUUID().toString();
 	
 	public MSHSegment(QueryType queryType) {
 		this.queryType = queryType;
@@ -31,10 +39,13 @@ public class MSHSegment implements Segment {
 	}
 	
 	@Override
-	public String getSegmentHL7String() {
-		
-		String sendingApplication  = OscarProperties.getInstance().getProperty("OLIS_SENDING_APPLICATION", "^CN=EMR.MCMUN2.CST,OU=Applications,OU=eHealthUsers,OU=Subscribers,DC=subscribers,DC=ssh^X500");
-		String processingId = OscarProperties.getInstance().getProperty("OLIS_PROCESSING_ID","P"); //set to "T" for testing;
+	public String getSegmentHL7String()
+	{
+		String vendorId = junoProperties.getOlis().getVendorId();
+		String emrId = systemPreferenceService.getPreferenceValue(OLIS_EMR_ID, null);
+		String processingId = junoProperties.getOlis().getProcessingId();
+
+		String sendingApplication = MessageFormat.format("^{0}:{1}^ISO", vendorId, StringUtils.trimToEmpty(emrId));
 		
 		return "MSH|^~\\&|"+sendingApplication+"|MCMUN2|" +
 			"^OLIS^X500||" + dateFormatter.format(new Date()) + "||SPQ^" + queryType.toString() + "^SPQ_Q08|" + uuidString + "|"+processingId+"|2.3.1||||||8859/1";

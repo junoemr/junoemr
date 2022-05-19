@@ -35,6 +35,7 @@ import org.oscarehr.JunoApplication;
 
 import java.sql.SQLException;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static integration.tests.AddProvidersIT.drApple;
@@ -46,6 +47,7 @@ import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdmini
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
 
 @RunWith(SpringRunner.class)
+@TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 
 public class AddGroupIT extends SeleniumTestBase
@@ -164,6 +166,3 @@ public class AddGroupIT extends SeleniumTestBase
 	}
 
 }
-
-
-

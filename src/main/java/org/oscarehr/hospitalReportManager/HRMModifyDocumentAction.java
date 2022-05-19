@@ -13,6 +13,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
+import org.oscarehr.common.model.ProviderInboxItem;
 import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument.ReportClass;
@@ -31,12 +32,14 @@ import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
 import org.oscarehr.hospitalReportManager.service.HRMCategoryService;
 import org.oscarehr.hospitalReportManager.service.HRMDocumentService;
 import org.oscarehr.hospitalReportManager.service.HRMSubClassService;
+import org.oscarehr.inbox.service.InboxManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import oscar.oscarLab.ca.on.CommonLabResultData;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -161,8 +164,11 @@ public class HRMModifyDocumentAction extends DispatchAction {
 				hrmDocumentToProvider.setSignedOff(Integer.parseInt(signedOff) == 1);
 				hrmDocumentToProvider.setSignedOffTimestamp(new Date());
 				hrmDocumentToProviderDao.persist(hrmDocumentToProvider);
+
+				// Once the provider has signed off for the first time, try to ack the report in their inbox
+				CommonLabResultData.updateReportStatus(Integer.parseInt(reportId), providerNo, ProviderInboxItem.ACK, "", InboxManager.INBOX_TYPE_HRM);
 			}
-			
+
 			request.setAttribute("success", true);
 		} catch (Exception e) {
 			MiscUtils.getLogger().error("Tried to set signed off status on document but failed.", e); 

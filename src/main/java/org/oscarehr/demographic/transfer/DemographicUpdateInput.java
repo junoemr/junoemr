@@ -85,6 +85,13 @@ public class DemographicUpdateInput extends DemographicCreateInput
 	private ElectronicMessagingConsentStatus electronicMessagingConsentStatus;
 	private DemographicWaitListUpdateInput waitList;
 
+	// legacy properties
+	private String children;
+	private String pcnIndicator;
+	private String sourceOfIncome;
+	private String previousAddress;
+	private String anonymous;
+
 	public DemographicUpdateInput()
 	{
 	}

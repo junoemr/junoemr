@@ -1013,6 +1013,14 @@ public class ConversionUtilsTest
 	}
 
 	@Test
+	public void toLegacyDateTime_ZonedLocalDateTime_ExpectDate()
+	{
+		Date expectedDate = new Date();
+		ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(expectedDate.toInstant(), ZoneId.systemDefault());
+		assertThat(expectedDate, is(ConversionUtils.toLegacyDateTime(zonedDateTime)));
+	}
+
+	@Test
 	@SuppressWarnings("ConstantConditions")
 	public void toNullableLocalDate_NullString_ExpectNull()
 	{

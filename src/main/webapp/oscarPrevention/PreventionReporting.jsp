@@ -41,6 +41,13 @@
 <%@ page import="oscar.oscarReport.data.RptSearchData" %>
 <%@ page import="org.oscarehr.contact.entity.DemographicContact" %>
 <%@ page import="org.oscarehr.contact.entity.Contact" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.oscarehr.report.prevention.model.PreventionReportModel" %>
+<%@ page import="oscar.util.ConversionUtils" %>
+<%@ page import="static oscar.oscarPrevention.reports.PreventionReport.FIRST_LETTER" %>
+<%@ page import="static oscar.oscarPrevention.reports.PreventionReport.PHONE_CALL" %>
+<%@ page import="static oscar.oscarPrevention.reports.PreventionReport.REFUSED" %>
+<%@ page import="static oscar.oscarPrevention.reports.PreventionReport.SECOND_LETTER" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar" %>
@@ -65,7 +72,7 @@ if(!authed) {
 
 <%
   oscar.oscarReport.data.RptSearchData searchData  = new oscar.oscarReport.data.RptSearchData();
-  ArrayList queryArray = searchData.getQueryTypes();
+  List<RptSearchData.SearchCriteria> queryArray = searchData.getQueryTypes();
 
   BillingONCHeader1Dao bCh1Dao = (BillingONCHeader1Dao)SpringUtils.getBean("billingONCHeader1Dao");
 %>
@@ -388,13 +395,15 @@ table.ele thead {
                &nbsp;
             </td>
             <td valign="top" class="MainTableRightColumn">
-               <html:form action="/oscarPrevention/PreventionReport" method="get">
+               <html:form action="/oscarPrevention/PreventionReport.do" method="get">
+                   <input type="hidden" name="method" value="runReport">
                <div>
                    Saved Query:
                   <html:select property="patientSet">
                       <html:option value="-1" >--Select Query--</html:option>
-                      <%for (int i =0 ; i < queryArray.size(); i++){
-                        RptSearchData.SearchCriteria sc = (RptSearchData.SearchCriteria) queryArray.get(i);
+                      <%for (int i =0 ; i < queryArray.size(); i++)
+                      {
+                        RptSearchData.SearchCriteria sc = queryArray.get(i);
                         String qId = sc.id;
                         String qName = sc.queryName;%>
                         <html:option value="<%=qId%>"><%=qName%></html:option>
@@ -404,12 +413,12 @@ table.ele thead {
                <div>
                   Prevention Query:
                   <html:select property="prevention">
-                      <html:option value="-1" >--Select Query--</html:option>
-                      <html:option value="PAP" >PAP</html:option>
-                      <html:option value="Mammogram" >Mammogram</html:option>
-                      <html:option value="Flu" >Flu</html:option>
-                      <html:option value="ChildImmunizations" >Child Immunizations</html:option>
-                      <html:option value="FOBT" >FOBT</html:option>
+			<html:option value="-1" >--Select Query--</html:option>
+			<html:option value="PAP" >PAP</html:option>
+			<html:option value="Mammogram" >Mammogram</html:option>
+			<html:option value="Flu" >Flu</html:option>
+			<html:option value="Child_Immunizations" >Child Immunizations</html:option>
+			<html:option value="FIT" >FIT</html:option>
                   </html:select>
                </div>
                <div>
@@ -436,21 +445,46 @@ table.ele thead {
     </table>
 
     <div>
-                <%ArrayList overDueList = new ArrayList();
-                  ArrayList firstLetter = new ArrayList();
-                  ArrayList secondLetter = new ArrayList();
-                  ArrayList refusedLetter = new ArrayList();
-                  ArrayList phoneCall = new ArrayList();
-                  String type = (String) request.getAttribute("ReportType");
-                  String ineligible = (String) request.getAttribute("inEligible");
-                  String done = (String) request.getAttribute("up2date");
-                  String percentage = (String) request.getAttribute("percent");
-                  String percentageWithGrace = (String) request.getAttribute("percentWithGrace");
-                  String followUpType = (String) request.getAttribute("followUpType");
-                  String billCode =  (String) request.getAttribute("BillCode");
-                  ArrayList list = (ArrayList) request.getAttribute("returnReport");
-                  Date asDate = (Date) request.getAttribute("asDate");
-                  if (asDate == null){ asDate = Calendar.getInstance().getTime(); }
+                <%List<Integer> overDueList = new ArrayList<>();
+                  List<Integer> firstLetter = new ArrayList<>();
+                  List<Integer> secondLetter = new ArrayList<>();
+                  List<Integer> refusedLetter = new ArrayList<>();
+                  List<Integer> phoneCall = new ArrayList<>();
+
+
+                    String type = null;
+                    String ineligible = null;
+                    String done = null;
+                    String percentage = null;
+                    String percentageWithGrace = null;
+                    String followUpType = null;
+                    String billCode = null;
+                    List<PreventionReportDisplay> list = null;
+                    Date asDate = null;
+
+                    PreventionReportModel model = (PreventionReportModel) request.getAttribute("report");
+                    if(model != null)
+                    {
+                        type = model.getReportType();
+                        ineligible = model.getInEligible();
+                        done = model.getUpToDate();
+                        percentage = model.getPercent();
+                        percentageWithGrace = model.getPercentWithGrace();
+                        followUpType = model.getFollowUpType();
+                        billCode = model.getBillCode();
+                        list = model.getReturnReport();
+                        asDate = model.getAsOfDateTime();
+
+                        firstLetter = model.getL1LetterDemographicIds();
+                        secondLetter = model.getL2LetterDemographicIds();
+                        phoneCall = model.getP1LetterDemographicIds();
+                        refusedLetter = model.getRefusedLetterDemographicIds();
+                        overDueList = model.getOverdueLetterDemographicIds();
+                    }
+                    if(asDate == null)
+                    {
+                        asDate = Calendar.getInstance().getTime();
+                    }
                   String lastDate = null;
                   
                   String error = (String) request.getAttribute("error");
@@ -460,22 +494,22 @@ table.ele thead {
                 	  <span class="error"><%=error%></span>
                 	  <%
                   }
-                  else if (list != null ){ %>
+                  else if (model != null && list != null ){ %>
                   <form name="frmBatchBill" action="" method="post">
                       <input type="hidden" name="clinic_view" value="<%=OscarProperties.getInstance().getProperty("clinic_view","")%>">
                       <input type="hidden" name="followUpType" value="<%=followUpType%>">
               <table class="ele" width="90%">
                        <tr>
                        <td>&nbsp;</td>
-                       <td style="10%;">Total patients: <%=list.size()%><br/>Ineligible:<%=ineligible%></td>
-                       <td style="10%;">Up to Date: <%=done%> = <%=percentage %> %
+                       <td style="width: 10%;">Total patients: <%=list.size()%><br/>Ineligible:<%=ineligible%></td>
+                       <td style="width: 10%;">Up to Date: <%=done%> = <%=percentage %> %
                          <%if (percentageWithGrace != null){  %>
                            <%-- <br/> With Grace <%=percentageWithGrace%> %
                            --%>
                          <%}%>
                        </td>
                        
-                       <td style="40%;">&nbsp;<%=request.getAttribute("patientSet")%> </td>                       
+                       <td style="width: 40%;">&nbsp;<%=request.getAttribute("patientSet")%> </td>
                        <td>	
                        		<select onchange="setNextContactMethod(this)">
                        			<option value="------">Select Contact Method</option>
@@ -489,7 +523,7 @@ table.ele thead {
                        	  	&nbsp;&nbsp;
                        	  	<input type="button" value="Save Contacts" onclick="return saveContacts();">
                        </td>                                                                                                                   
-                       <td style="10%;"><input style="float: right" type="button" value="Bill" onclick="return batchBill();"></td>
+                       <td style="width: 10%;"><input style="float: right" type="button" value="Bill" onclick="return batchBill();"></td>
                        </tr>
              </table>
              <table id="preventionTable" class="sortable ele" width="80%">
@@ -533,35 +567,18 @@ table.ele thead {
 
                          for (int i = 0; i < list.size(); i++){
                              setBill = false;
-                            PreventionReportDisplay dis = (PreventionReportDisplay) list.get(i);
+                            PreventionReportDisplay dis = list.get(i);
                             Hashtable h = deName.getNameAgeSexHashtable(LoggedInInfo.getLoggedInInfoFromSession(request), dis.demographicNo.toString());
                             org.oscarehr.common.model.Demographic demo = demoData.getDemographic(LoggedInInfo.getLoggedInInfoFromSession(request),  dis.demographicNo.toString());
                             
                             lastDate = dis.lastDate;
 
-                            if ( dis.nextSuggestedProcedure != null ){
-                                if (dis.nextSuggestedProcedure.equals("L1")){
-                                    firstLetter.add(dis.demographicNo);
-                                }else if (dis.nextSuggestedProcedure.equals("L2")){
-                                    secondLetter.add(dis.demographicNo);
-                                }else if (dis.nextSuggestedProcedure.equals("P1")){
-                                    phoneCall.add(dis.demographicNo);
-                                    setBill = true;
-                                }
-                            }
-
-                            if (dis.state != null && dis.state.equals("Refused")){
-                                refusedLetter.add(dis.demographicNo);
-                                setBill = true;
-                            }
-
-                            if (dis.state != null && dis.state.equals("Overdue")){
-                               overDueList.add(dis.demographicNo);
-                            }
-
-                            if( dis.state != null && dis.billStatus.equals("Y")) {
-                              setBill = true;
-                            }
+                             if(PHONE_CALL.equals(dis.nextSuggestedProcedure)
+                                     || REFUSED.equals(dis.state)
+                                     || "Y".equals(dis.billStatus))
+                             {
+                                 setBill = true;
+                             }
                             %>
                        <tr>
                           <td><%=i+1%></td>
@@ -684,50 +701,61 @@ table.ele thead {
 
                     </form>
 
-                  <%}%>
-                  <%--
-                  <% if ( overDueList.size() > 0 ) {
-                        String queryStr = getUrlParamList(overDueList, "demo");
-                        %>
-                        <a target="_blank" href="../report/GenerateEnvelopes.do?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode(request.getAttribute("prevType")+" is due","UTF-8")%>">Add Tickler for Overdue</a>
-                  <%}%>
-                  --%>
-
-                 <%-- if ( firstLetter.size() > 0 ) {
-                        String queryStr = getUrlParamList(firstLetter, "demo");
-                        %>
-                    <a target="_blank" href="../report/GenerateEnvelopes.do?<%=queryStr%>&message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>">Generate First Envelopes</a>
                   <%}
-                    --%>
-
-
-                  <% if ( firstLetter.size() > 0 ) {
-                        String queryStr = getUrlParamList(firstLetter, "demo");
+                  if(!firstLetter.isEmpty())
+                  {
                         %>
-                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1&amp;lastDate=<%=lastDate%>">Generate First Letter</a>
-                  <%}%>
+                    <form name="frmL1Generate" target="_blank" method="POST" action="<%=request.getContextPath()%>/oscarPrevention/PreventionReport.do">
+                        <input type="hidden" name="method" value="generateLetter">
+                        <input type="hidden" name="letterType" value="<%=FIRST_LETTER%>">
+                        <input type="hidden" name="message" value="<%="Letter 1 Reminder Letter sent for: "+model.getPreventionType()%>">
+                        <input type="hidden" name="followupType" value="<%=followUpType%>">
+                        <input type="hidden" name="followupValue" value="L1">
+                        <input type="hidden" name="lastDate" value="<%=lastDate%>">
 
-                  <% if ( secondLetter.size() > 0 ) {
-                        String queryStr = getUrlParamList(secondLetter, "demo");
+                        <input type="hidden" name="queryName" value="<%=model.getPatientSet()%>">
+                        <input type="hidden" name="prevention" value="<%=model.getPreventionType()%>">
+                        <input type="hidden" name="asofDate" value="<%=ConversionUtils.toDateString(model.getAsOfDateTime())%>">
+
+                        <button type="submit">Generate First Letter</button>
+                    </form>
+                  <%}
+                  if ( secondLetter.size() > 0 )
+                  {
                         %>
-                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 2 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L2&amp;lastDate=<%=lastDate%>">Generate Second Letter</a>
-                  <%}%>
+                    <form name="frmL2Generate" target="_blank" method="POST" action="<%=request.getContextPath()%>/oscarPrevention/PreventionReport.do">
+                        <input type="hidden" name="method" value="generateLetter">
+                        <input type="hidden" name="letterType" value="<%=SECOND_LETTER%>">
+                        <input type="hidden" name="message" value="<%="Letter 2 Reminder Letter sent for: "+model.getPreventionType()%>">
+                        <input type="hidden" name="followupType" value="<%=followUpType%>">
+                        <input type="hidden" name="followupValue" value="L2">
+                        <input type="hidden" name="lastDate" value="<%=lastDate%>">
 
-                  <% if ( refusedLetter.size() > 0 ) {
-                        String queryStr = getUrlParamList(refusedLetter, "demo");
+                        <input type="hidden" name="queryName" value="<%=model.getPatientSet()%>">
+                        <input type="hidden" name="prevention" value="<%=model.getPreventionType()%>">
+                        <input type="hidden" name="asofDate" value="<%=ConversionUtils.toDateString(model.getAsOfDateTime())%>">
+
+                        <button type="submit">Generate Second Letter</button>
+                    </form>
+                  <%}
+                  if ( refusedLetter.size() > 0 )
+                  {
                         %>
-                    <a target="_blank" href="../report/GenerateLetters.jsp?<%=queryStr%>&amp;message=<%=java.net.URLEncoder.encode("Letter 1 Reminder Letter sent for :"+request.getAttribute("prevType"),"UTF-8")%>&amp;followupType=<%=followUpType%>&amp;followupValue=L1&amp;lastDate=<%=lastDate%>">Generate Refused Letter</a>
+                    <form name="frmRefusedGenerate" target="_blank" method="POST" action="<%=request.getContextPath()%>/oscarPrevention/PreventionReport.do">
+                        <input type="hidden" name="method" value="generateLetter">
+                        <input type="hidden" name="letterType" value="<%=REFUSED%>">
+                        <input type="hidden" name="message" value="<%="Letter 1 Reminder Letter sent for: "+model.getPreventionType()%>">
+                        <input type="hidden" name="followupType" value="<%=followUpType%>">
+                        <input type="hidden" name="followupValue" value="L1">
+                        <input type="hidden" name="lastDate" value="<%=lastDate%>">
+
+                        <input type="hidden" name="queryName" value="<%=model.getPatientSet()%>">
+                        <input type="hidden" name="prevention" value="<%=model.getPreventionType()%>">
+                        <input type="hidden" name="asofDate" value="<%=ConversionUtils.toDateString(model.getAsOfDateTime())%>">
+
+                        <button type="submit">Generate Refused Letter</button>
+                    </form>
                   <%}%>
-
-
-                  <%--
-                  <% if ( phoneCall.size() > 0 ) {
-                        String queryStr = getUrlParamList(phoneCall, "demo");
-                        %>
-                        <a target="_blank" href="../report/GenerateSpreadsheet.do?<%=queryStr%>&message=<%=java.net.URLEncoder.encode("Phone call 1 made for : "+request.getAttribute("prevType"),"UTF-8")%>followupType=<%=followUpType%>&followupValue=P1">Generate Phone Call list</a>
-                  <%}%>
-                  --%>
-
                </div>
 
 <script type="text/javascript">
@@ -737,17 +765,3 @@ table.ele thead {
 </body>
 </html:html>
 
-<%!
-    String getUrlParamList(ArrayList list,String paramName){
-        String queryStr = "";
-        for (int i = 0; i < list.size(); i++){
-            String demo = String.valueOf(list.get(i));
-            if (i == 0){
-              queryStr += paramName+"="+demo;
-            }else{
-              queryStr += "&amp;"+paramName+"="+demo;
-            }
-        }
-        return queryStr;
-  }
-%>

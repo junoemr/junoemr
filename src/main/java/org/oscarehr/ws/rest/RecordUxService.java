@@ -361,7 +361,7 @@ public class RecordUxService extends AbstractServiceImpl {
 			if(properties.isModuleEnabled(OscarProperties.Module.MODULE_HRM)
 					&& securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.HRM_READ))
 			{
-				summaryList.add(new SummaryTo1("HRM Documents", count++, SummaryTo1.HRM_DOCUMENTS));
+				summaryList.add(new SummaryTo1("HRM Reports", count++, SummaryTo1.HRM_DOCUMENTS));
 			}
 		}
 		return summaryList;

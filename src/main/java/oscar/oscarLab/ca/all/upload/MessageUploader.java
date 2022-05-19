@@ -166,8 +166,8 @@ public final class MessageUploader {
 			{
 				reportStatus = messageHandler.getOrderStatus();
 			}
-			String accessionNum = messageHandler.getAccessionNum();
-			String fillerOrderNum = messageHandler.getFillerOrderNumber();
+			String uniqueIdentifier = messageHandler.getUniqueIdentifier();
+			String uniqueVersionIdentifier = messageHandler.getUniqueVersionIdentifier();
 			String sendingFacility = messageHandler.getPatientLocation();
 			List<String> docNums = messageHandler.getDocNums();
 			int finalResultCount = messageHandler.getOBXFinalResultCount();
@@ -270,7 +270,7 @@ public final class MessageUploader {
 
 			if (isTDIS)
 			{
-				List<Hl7TextInfo> matchingTdisLab =  hl7TextInfoDao.searchByFillerOrderNumber(fillerOrderNum, sendingFacility);
+				List<Hl7TextInfo> matchingTdisLab =  hl7TextInfoDao.searchByFillerOrderNumber(uniqueVersionIdentifier, sendingFacility);
 				if (matchingTdisLab.size() > 0)
 				{
 					hl7TextMessageDao.updateIfFillerOrderNumberMatches(new String(Base64.encodeBase64(hl7Body.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8),fileId,matchingTdisLab.get(0).getLabNumber());
@@ -320,8 +320,8 @@ public final class MessageUploader {
 				hl7TextInfo.setRequestingProvider(requestingClient);
 				hl7TextInfo.setDiscipline(discipline);
 				hl7TextInfo.setReportStatus(reportStatus);
-				hl7TextInfo.setAccessionNumber(accessionNum);
-				hl7TextInfo.setFillerOrderNum(fillerOrderNum);
+				hl7TextInfo.setUniqueIdentifier(uniqueIdentifier);
+				hl7TextInfo.setUniqueVersionIdentifier(uniqueVersionIdentifier);
 				hl7TextInfoDao.persist(hl7TextInfo);
 
 				if (docId > 0)
@@ -653,13 +653,16 @@ public final class MessageUploader {
 	{
 		GregorianCalendar dateOfBirth = null;
 
-		if (hin != null)
+		// never match a patient without a hin to match on
+		if(StringUtils.isBlank(hin))
 		{
-			// This is for one of the Ontario labs I think??
-			if (hin.length() == 12)
-			{
-				hin = hin.substring(0, 10);
-			}
+			return null;
+		}
+
+		// This is for one of the Ontario labs I think??
+		if (hin.length() == 12)
+		{
+			hin = hin.substring(0, 10);
 		}
 
 		if (dob != null && !dob.trim().equals(""))

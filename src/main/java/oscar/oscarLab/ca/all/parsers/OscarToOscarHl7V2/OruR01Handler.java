@@ -139,7 +139,7 @@ public final class OruR01Handler extends ChainnedMessageAdapter<ORU_R01> {
 	}
 
 	@Override
-    public String getFillerOrderNumber() {
+    public String getUniqueVersionIdentifier() {
 	    // TODO-legacy Auto-generated method stub
 	    return null;
     }

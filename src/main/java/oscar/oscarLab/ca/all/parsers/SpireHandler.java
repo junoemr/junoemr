@@ -824,7 +824,7 @@ public class SpireHandler extends ORU_R01MessageHandler
         }
     }
     
-    public String getAccessionNum(){
+    public String getUniqueIdentifier(){
         String accessionNum = "";
         try{
 			accessionNum = msg.getMSH().getMessageControlID().getValue();
@@ -945,7 +945,7 @@ public class SpireHandler extends ORU_R01MessageHandler
         }
     }
     
-    public String getFillerOrderNumber(){
+    public String getUniqueVersionIdentifier(){
 		return "";
 	}
     

@@ -22,11 +22,18 @@
  */
 package org.oscarehr.fax.provider;
 
+import org.oscarehr.fax.model.FaxAccountConnectionStatus;
+import java.util.List;
+
 public interface FaxAccountProvider
 {
 	/**
-	 * Test the connection status of the current account.
-	 * @return true if the account is able to make a successful connection to the external api. false otherwise.
+	 * Test the connection status of the current fax account.
+	 * @return connection status
 	 */
-	boolean testConnectionStatus();
+	FaxAccountConnectionStatus testConnectionStatus();
+
+	List<String> getCoverLetterOptions();
+
+	void disconnectAccount();
 }

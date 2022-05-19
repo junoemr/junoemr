@@ -38,7 +38,9 @@ public class JunoProperties
 	private JunoPropertiesConfig properties;
 	private RedisSessionStore redisSessionStore;
 	private NetcareConfig netcareConfig;
+	private Olis olis;
 	private Test test;
+	private FaxConfig faxConfig;
 
 	@Data
 	public static class JunoPropertiesConfig
@@ -68,5 +70,37 @@ public class JunoProperties
 	public static class Test
 	{
 		private boolean headless = true;
+	}
+
+	@Data
+	public static class Olis
+	{
+		private String keystore;
+		private String sslKeystore;
+		private String sslKeystorePassword;
+		private String sslKeystoreAlias;
+		private String truststore;
+		private String truststorePassword;
+		private String returnedCert;
+		private String vendorId;
+		private String requestUrl;
+		private int defaultPollingIntervalMin;
+		private String responseSchema;
+		private boolean enableSearchResultRemoval;
+		private int maxFetchMonths;
+
+		private boolean simulate;
+		private String processingId;
+		private String pollingFacilityId;
+	}
+
+	@Data
+	public static class FaxConfig
+	{
+		private String dataStoreLocation;
+		private String ringcentralApiLocation;
+		private String ringcentralRedirectUrl;
+		private String ringcentralClientId;
+		private String ringcentralClientSecret;
 	}
 }

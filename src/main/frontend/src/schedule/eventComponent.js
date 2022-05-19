@@ -244,18 +244,21 @@ angular.module('Schedule').component('eventComponent', {
 			};
 
 			controller.demographicModel = {
-				demographicNo: null,
 				data: {},
+				demographicNo: null,
+				displayName: null,
 
 				clear: function clear()
 				{
-					this.demographicNo = null;
 					this.data = {};
+					this.demographicNo = null;
+					this.displayName = null;
 				},
 				fillData: function fillData(data)
 				{
 					this.data = data;
 					this.demographicNo = data.id;
+					this.displayName = data.displayName;
 				},
 				loadData: function loadData(demographicNo)
 				{
@@ -1496,7 +1499,7 @@ angular.module('Schedule').component('eventComponent', {
 				{
 					var params = {
 						demographic_no: controller.demographicModel.demographicNo,
-						demographic_name: controller.demographicModel.fullName,
+						demographic_name: controller.demographicModel.displayName,
 						providerNo: controller.providerModel.providerNo,
 						providerview: controller.providerModel.providerNo,
 						user_no: controller.resolve.data.eventData.userProviderNo,

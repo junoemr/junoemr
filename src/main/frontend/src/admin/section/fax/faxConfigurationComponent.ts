@@ -4,6 +4,7 @@ import {SecurityPermissions} from "../../../common/security/securityConstants";
 import FaxAccount from "../../../lib/fax/model/FaxAccount";
 import ToastService from "../../../lib/alerts/service/ToastService";
 import {SystemPreferences} from "../../../common/services/systemPreferenceServiceConstants";
+import ToastErrorHandler from "../../../lib/error/handler/ToastErrorHandler";
 
 angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	templateUrl: 'src/admin/section/fax/faxConfiguration.jsp',
@@ -12,16 +13,18 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 	},
 	controller: [
 		"$uibModal",
+		"$location",
 		"providerService",
 		"securityRolesService",
 		"systemPreferenceService",
 		function ($uibModal,
+				  $location,
 		          providerService,
 				  securityRolesService,
 		          systemPreferenceService)
 		{
 			const ctrl = this;
-			ctrl.faxAccountService = new FaxAccountService();
+			ctrl.faxAccountService = new FaxAccountService(new ToastErrorHandler());
 			ctrl.toastService = new ToastService();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;
@@ -71,6 +74,23 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 				if(ctrl.activeAccount)
 				{
 					ctrl.faxAccountSelectStates[ctrl.activeAccount.id] = true;
+				}
+
+				// auto-open an account by accountId param
+				let accountIdParam = $location.search().accountId;
+				if(accountIdParam)
+				{
+					let faxAccount = ctrl.faxAccountList.find((account: FaxAccount) => (account.id === Number(accountIdParam)));
+					if(faxAccount)
+					{
+						ctrl.editFaxAccount(faxAccount);
+					}
+					else
+					{
+						console.warn("invalid account id param: " + accountIdParam);
+					}
+					// clear params from the current url
+					$location.search('accountId', null);
 				}
 				ctrl.initialized = true;
 			};
@@ -195,6 +215,11 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 						}
 					);
 			};
+
+			ctrl.toRingCentralLogin = () =>
+			{
+				location.href = "../fax/ringcentral/oauth";
+			}
 		}
 	]
 });

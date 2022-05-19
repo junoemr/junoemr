@@ -94,7 +94,7 @@ public class HRMDocumentSummary implements Summary
 			summary.setDate(hrmDocument.getReportDate());
 			
 			String utf8 = StandardCharsets.UTF_8.toString();
-			summary.setAction(String.format("../hospitalReportManager/Display.do?id=%d", hrmDocument.getId()));
+			summary.setAction(String.format("../hospitalReportManager/displayHRMReport.jsp?id=%d", hrmDocument.getId()));
 
 			summaryItems.add(summary);
 		}

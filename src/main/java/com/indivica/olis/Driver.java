@@ -21,6 +21,7 @@ import com.indivica.olis.queries.Query;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
@@ -37,15 +38,17 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.util.Store;
 import org.bouncycastle.util.encoders.Base64;
-import org.oscarehr.common.dao.OscarLogDao;
-import org.oscarehr.common.model.OscarLog;
 import org.oscarehr.common.model.OscarMsgType;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.olis.OLISProtocolSocketFactory;
 import org.oscarehr.olis.OLISUtils;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-import oscar.OscarProperties;
+import org.oscarehr.ws.rest.exception.MissingArgumentException;
+import oscar.log.LogAction;
+import oscar.log.LogConst;
 import oscar.oscarMessenger.data.MsgProviderData;
 
 import javax.validation.constraints.NotNull;
@@ -66,10 +69,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.oscarehr.common.model.UserProperty.OLIS_EMR_ID;
+
 public class Driver
 {
 	private static final Logger logger = MiscUtils.getLogger();
-	private static final OscarLogDao logDao = (OscarLogDao) SpringUtils.getBean("oscarLogDao");
+	private static final JunoProperties junoProperties = SpringUtils.getBean(JunoProperties.class);
+	private static final SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
 
 	public static DriverResponse submitOLISQuery(@NotNull Provider loggedInProvider, @NotNull Query query)
 	{
@@ -78,18 +84,27 @@ public class Driver
 	public static DriverResponse submitOLISQuery(@NotNull Provider loggedInProvider, @NotNull Query query, @Null String continuationPointer)
 	{
 		DriverResponse response;
+		String logData = null;
+		String actionStatus = LogConst.STATUS_FAILURE;
+
 		try
 		{
+			if(StringUtils.isBlank(systemPreferenceService.getPreferenceValue(OLIS_EMR_ID, null)))
+			{
+				throw new MissingArgumentException("OLIS EMR ID is not set");
+			}
+
 			OLISMessage message = new OLISMessage(loggedInProvider, query, continuationPointer);
 
-			System.setProperty("javax.net.ssl.trustStore", OscarProperties.getInstance().getProperty("olis_truststore").trim());
-			System.setProperty("javax.net.ssl.trustStorePassword", OscarProperties.getInstance().getProperty("olis_truststore_password").trim());
+			System.setProperty("javax.net.ssl.trustStore", junoProperties.getOlis().getTruststore());
+			System.setProperty("javax.net.ssl.trustStorePassword", junoProperties.getOlis().getTruststorePassword());
 			
 			OLISRequest olisRequest = new OLISRequest();
 			olisRequest.setHIALRequest(new HIALRequest());
-			String olisRequestURL = OscarProperties.getInstance().getProperty("olis_request_url", "https://olis.ssha.ca/ssha.olis.webservices.ER7/OLIS.asmx");
+			String olisRequestURL = junoProperties.getOlis().getRequestUrl();
 			OLISStub olis = new OLISStub(olisRequestURL);
-			olis._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER, new Protocol("https",(ProtocolSocketFactory)  new OLISProtocolSocketFactory(),443));
+			olis._getServiceClient().getOptions().setProperty(HTTPConstants.CUSTOM_PROTOCOL_HANDLER,
+					new Protocol("https",(ProtocolSocketFactory)  new OLISProtocolSocketFactory(),443));
 			
 			olisRequest.getHIALRequest().setClientTransactionID(message.getTransactionId());
 			olisRequest.getHIALRequest().setSignedRequest(new HIALRequestSignedRequest());
@@ -98,7 +113,7 @@ public class Driver
 			String msgInXML = String.format("<Request xmlns=\"http://www.ssha.ca/2005/HIAL\"><Content><![CDATA[%s]]></Content></Request>", olisHL7String);
 
 			String signedRequest;
-			if(OscarProperties.getInstance().getProperty("olis_returned_cert") != null)
+			if(junoProperties.getOlis().getReturnedCert() != null)
 			{
 				signedRequest = Driver.signData2(msgInXML);
 			}
@@ -107,27 +122,14 @@ public class Driver
 				signedRequest = Driver.signData(msgInXML);
 			}
 			olisRequest.getHIALRequest().getSignedRequest().setSignedData(signedRequest);
-
-			try
-			{
-				OscarLog logItem = new OscarLog();
-				logItem.setAction("OLIS");
-				logItem.setContent("query");
-				logItem.setData(olisHL7String);
-				logItem.setProviderNo(loggedInProvider.getProviderNo());
-				logDao.persist(logItem);
-			}
-			catch(Exception e)
-			{
-				logger.error("Couldn't write log message for OLIS query", e);
-			}
+			logData = olisHL7String;
 
 			logger.info("OLIS Request" +
 					"\nclientTransactionId: " + message.getTransactionId() +
 					"\nrequest URL: " + olisRequestURL +
 					"\nhl7 request query:\n" + olisHL7String.replaceAll("\r", "\n"));
 
-			if (OscarProperties.getInstance().getProperty("olis_simulate", "no").equals("yes"))
+			if (junoProperties.getOlis().isSimulate())
 			{
 				//TODO how to handle this without request object?
 //				String olisResponseContent = (String) request.getSession().getAttribute("olisResponseContent");
@@ -137,10 +139,12 @@ public class Driver
 //				DriverResponse response = new DriverResponse();
 //				response.setHl7Response(olisResponseContent);
 				response = new DriverResponse();
+				actionStatus = LogConst.STATUS_SUCCESS;
 			}
 			else
 			{
 				OLISRequestResponse olisResponse = olis.oLISRequest(olisRequest);
+				actionStatus = LogConst.STATUS_SUCCESS;
 
 				String signedData = olisResponse.getHIALResponse().getSignedResponse().getSignedData();
 				String unsignedData = Driver.unsignData(signedData);
@@ -149,12 +153,27 @@ public class Driver
 				response.setHl7Request(olisHL7String);
 			}
 		}
+		catch(MissingArgumentException e)
+		{
+			logger.warn("Can't perform OLIS query due to missing arguments: " + e.getMessage());
+			response = new DriverResponse();
+			response.setSearchException(e);
+			notifyOlisError(loggedInProvider.getProviderNo(), e.getMessage());
+			logData = e.getMessage();
+		}
 		catch(Exception e)
 		{
 			logger.error("Can't perform OLIS query due to exception.", e);
 			response = new DriverResponse();
 			response.setSearchException(e);
 			notifyOlisError(loggedInProvider.getProviderNo(), e.getMessage());
+			logData = e.getMessage();
+		}
+		finally
+		{
+			LogAction.addLogEntry(loggedInProvider.getProviderNo(), null,
+					LogConst.ACTION_QUERY, LogConst.CON_OLIS_LAB, actionStatus, null, null,
+					logData);
 		}
 		return response;
 	}
@@ -240,15 +259,15 @@ public class Driver
 		X509Certificate cert = null;
 		PrivateKey priv = null;
 		KeyStore keystore = null;
-		String pwd = OscarProperties.getInstance().getProperty("olis_ssl_keystore_password", "changeit");
-		String keystoreAlias = OscarProperties.getInstance().getProperty("olis_ssl_keystore_alias", "olis");
+		String pwd = junoProperties.getOlis().getSslKeystorePassword();
+		String keystoreAlias = junoProperties.getOlis().getSslKeystoreAlias();
 		String result = null;
 		try {
 			Security.addProvider(new BouncyCastleProvider());
 
 			keystore = KeyStore.getInstance("JKS");
 			// Load the keystore
-			keystore.load(new FileInputStream(OscarProperties.getInstance().getProperty("olis_keystore")), pwd.toCharArray());
+			keystore.load(new FileInputStream(junoProperties.getOlis().getKeystore()), pwd.toCharArray());
 
 			Enumeration<String> e = keystore.aliases();
 
@@ -264,7 +283,7 @@ public class Driver
 			// Get the private key and the certificate
 			priv = (PrivateKey) keystore.getKey(keystoreAlias, pwd.toCharArray());
 
-			FileInputStream is = new FileInputStream(OscarProperties.getInstance().getProperty("olis_returned_cert"));
+			FileInputStream is = new FileInputStream(junoProperties.getOlis().getReturnedCert());
 			CertificateFactory cf = CertificateFactory.getInstance("X.509");
 			cert = (X509Certificate) cf.generateCertificate(is);
 
@@ -311,7 +330,7 @@ public class Driver
 
 			keystore = KeyStore.getInstance("PKCS12", "SunJSSE");
 			// Load the keystore
-			keystore.load(new FileInputStream(OscarProperties.getInstance().getProperty("olis_keystore")), pwd.toCharArray());
+			keystore.load(new FileInputStream(junoProperties.getOlis().getKeystore()), pwd.toCharArray());
 
 			Enumeration e = keystore.aliases();
 			String name = "";

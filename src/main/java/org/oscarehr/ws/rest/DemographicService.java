@@ -30,7 +30,6 @@ import org.oscarehr.casemgmt.service.CaseManagementIssueService;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.demographic.model.DemographicModel;
-import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.demographic.transfer.DemographicCreateInput;
 import org.oscarehr.demographic.transfer.DemographicUpdateInput;
 import org.oscarehr.demographicRoster.service.DemographicRosterService;
@@ -98,9 +97,6 @@ public class DemographicService extends AbstractServiceImpl {
 
 	@Autowired
 	private org.oscarehr.demographic.service.DemographicService demographicService;
-
-	@Autowired
-	private HinValidationService hinValidationService;
 
 	@Deprecated // use ToTransfer/ToDomain + JPA demographic model
 	private DemographicConverter demoConverter = new DemographicConverter();
@@ -183,11 +179,6 @@ public class DemographicService extends AbstractServiceImpl {
 	public RestResponse<DemographicModel> createDemographicData(DemographicCreateInput createInput)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_CREATE);
-
-		hinValidationService.validateNoDuplication(
-				createInput.getHealthNumber(),
-				createInput.getHealthNumberVersion(),
-				createInput.getHealthNumberProvinceCode());
 		DemographicModel demographicModel = demographicService.addNewDemographicRecord(getLoggedInProviderId(), createInput);
 
 		LogAction.addLogEntry(getLoggedInProviderId(), demographicModel.getId(),

@@ -71,10 +71,12 @@ public class RptSearchData {
 		return retval;
 	}
 
-	public ArrayList getQueryTypes() {
-		ArrayList<SearchCriteria> retval = new ArrayList<SearchCriteria>();
+	public List<SearchCriteria> getQueryTypes()
+	{
+		List<SearchCriteria> retval = new ArrayList<>();
 		List<DemographicQueryFavourite> results = demographicQueryFavouritesDao.findByArchived("1");
-		for (DemographicQueryFavourite result : results) {
+		for(DemographicQueryFavourite result : results)
+		{
 			SearchCriteria sc = new SearchCriteria();
 			sc.id = String.valueOf(result.getId());
 			sc.queryName = result.getQueryName();

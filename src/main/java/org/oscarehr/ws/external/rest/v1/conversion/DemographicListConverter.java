@@ -24,7 +24,7 @@
 package org.oscarehr.ws.external.rest.v1.conversion;
 
 import org.oscarehr.demographic.entity.Demographic;
-import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicListTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.ApiDemographicListTransfer;
 import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import oscar.util.ConversionUtils;
 
@@ -33,9 +33,9 @@ import java.util.List;
 
 public class DemographicListConverter
 {
-	public static DemographicListTransfer getAsTransferObject(DemographicSearchResult demographic)
+	public static ApiDemographicListTransfer getAsTransferObject(DemographicSearchResult demographic)
 	{
-		DemographicListTransfer transfer = new DemographicListTransfer();
+		ApiDemographicListTransfer transfer = new ApiDemographicListTransfer();
 
 		// base info
 		transfer.setDemographicNo(demographic.getDemographicNo());
@@ -55,9 +55,9 @@ public class DemographicListConverter
 		return transfer;
 	}
 
-	public static DemographicListTransfer getAsTransferObject(Demographic demographic)
+	public static ApiDemographicListTransfer getAsTransferObject(Demographic demographic)
 	{
-		DemographicListTransfer transfer = new DemographicListTransfer();
+		ApiDemographicListTransfer transfer = new ApiDemographicListTransfer();
 
 		// base info
 		transfer.setDemographicNo(demographic.getDemographicId());
@@ -77,12 +77,12 @@ public class DemographicListConverter
 		return transfer;
 	}
 
-	public static List<DemographicListTransfer> getListAsTransferObjects(List<Demographic> demographics)
+	public static List<ApiDemographicListTransfer> getListAsTransferObjects(List<Demographic> demographics)
 	{
-		List<DemographicListTransfer> response = new ArrayList<>(demographics.size());
+		List<ApiDemographicListTransfer> response = new ArrayList<>(demographics.size());
 		for(Demographic searchResult : demographics)
 		{
-			DemographicListTransfer transfer = getAsTransferObject(searchResult);
+			ApiDemographicListTransfer transfer = getAsTransferObject(searchResult);
 			response.add(transfer);
 		}
 		return response;

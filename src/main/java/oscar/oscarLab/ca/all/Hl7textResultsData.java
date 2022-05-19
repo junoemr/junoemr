@@ -194,7 +194,7 @@ public class Hl7textResultsData {
 			lbData.labPatientId = ConversionUtils.toIntString(p.getLabNo());
 			lbData.dateTime = i.getObrDate();
 			lbData.discipline = i.getDiscipline();
-			lbData.accessionNumber = i.getAccessionNumber();
+			lbData.accessionNumber = i.getUniqueIdentifier();
 			lbData.finalResultsCount = i.getFinalResultCount();
 			lbData.label = i.getLabel();
 
@@ -246,7 +246,7 @@ public class Hl7textResultsData {
 			lbData.setLabPatientId("-1");
 		}
 		lbData.acknowledgedStatus = "U";
-		lbData.accessionNumber = info.getAccessionNumber();
+		lbData.accessionNumber = info.getUniqueIdentifier();
 		lbData.healthNumber = info.getHealthNumber();
 		lbData.patientName = info.getLastName() + ", " + info.getFirstName();
 		lbData.sex = info.getSex();
@@ -371,7 +371,7 @@ public class Hl7textResultsData {
 				}
 			}
 
-			lbData.accessionNumber = hl7.getAccessionNumber();
+			lbData.accessionNumber = hl7.getUniqueIdentifier();
 			lbData.healthNumber = hl7.getHealthNumber();
 			lbData.patientName = hl7.getLastName() + ", " + hl7.getFirstName();
 			lbData.sex = hl7.getSex();

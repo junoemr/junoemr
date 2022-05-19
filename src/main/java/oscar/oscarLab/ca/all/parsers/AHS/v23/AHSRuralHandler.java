@@ -27,11 +27,15 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import com.google.common.collect.Sets;
+import org.apache.commons.collections4.map.MultiKeyMap;
 import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Handler for:
@@ -57,6 +61,8 @@ public class AHSRuralHandler extends AHSHandler
 		"PCHR-",
 		"PHR-"
 	);
+
+	private MultiKeyMap<Integer, List<Integer>> obrParentMap;
 
 	public static boolean handlerTypeMatch(Message message)
 	{
@@ -88,12 +94,66 @@ public class AHSRuralHandler extends AHSHandler
 	public AHSRuralHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
+		obrParentMap = new MultiKeyMap<>();
+		int obrCount = getOBRCount();
+
+		for(int i = 0; i < obrCount; i++)
+		{
+			String parentPlacerNo = getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-29-1"));
+			String parentResultId = getString(get("/.ORDER_OBSERVATION(" + i + ")/OBR-26-2"));
+
+			if(StringUtils.isNotBlank(parentPlacerNo) && StringUtils.isNotBlank(parentResultId))
+			{
+				// find index of parent based on matching placer order number (child obr.29 matches parent obr.2)
+				Integer parentObr = null;
+				Integer parentObx = null;
+				for(int ii = 0; ii < obrCount; ii++)
+				{
+					String placerOrderNo = get("/.ORDER_OBSERVATION(" + ii + ")/OBR-2-1");
+					if(parentPlacerNo.equals(placerOrderNo))
+					{
+						parentObr = ii;
+						// find the index of the parent result. (child obr.26 matches parent obx.4)
+						for(int jj = 0; jj < getOBXCount(ii); jj++)
+						{
+							String serviceId = get("/.ORDER_OBSERVATION(" + ii + ")/OBSERVATION(" + jj + ")/OBX-4-1");
+							if(parentResultId.equals(serviceId))
+							{
+								parentObx = jj;
+								break;
+							}
+						}
+						break;
+					}
+				}
+				if(parentObr != null && parentObx != null)
+				{
+					// multi-key map, map obr+obx to this obr segment. All 0 indexed to match regular index lookups
+					if(obrParentMap.containsKey(parentObr, parentObx))
+					{
+						obrParentMap.get(parentObr, parentObx).add(i);
+					}
+					else
+					{
+						List<Integer> obrIndexList = new LinkedList<>();
+						obrIndexList.add(i);
+						obrParentMap.put(parentObr, parentObx, obrIndexList);
+					}
+				}
+			}
+		}
 	}
 
 	@Override
 	public boolean canUpload()
 	{
 		return true;
+	}
+
+	@Override
+	public boolean isUnstructured()
+	{
+		return false;
 	}
 
     /* ===================================== Hl7 Parsing ====================================== */
@@ -104,6 +164,14 @@ public class AHSRuralHandler extends AHSHandler
 	public String getMsgType()
 	{
 		return AHS_RURAL_LAB_TYPE;
+	}
+
+	/* ===================================== PID ====================================== */
+
+	@Override
+	public String getHealthNumProvince()
+	{
+		return "(" + getString(get("/.PID-2-4")) + ")";
 	}
 
 	/* ===================================== OBR ====================================== */
@@ -119,7 +187,7 @@ public class AHSRuralHandler extends AHSHandler
 	 * signifies 2018, S14-104 where 14 signifies 2014 etc.
 	 */
 	@Override
-	public String getAccessionNum()
+	public String getUniqueIdentifier()
 	{
 		// append the hin and service year/month/day to the accession number to make it unique
 		String dateStr = formatDate(getString(get("/.OBR-7-1"))); // yyyy-MM-dd
@@ -128,9 +196,16 @@ public class AHSRuralHandler extends AHSHandler
 	}
 
 	@Override
+	public String getAccessionNumber()
+	{
+		// not unique, for display use only
+		return get("/.OBR-20");
+	}
+
+	@Override
 	public String getServiceDate()
 	{
-		return formatDateTime(getString(get("/.OBR-7-1")));
+		return formatDateTime(getString(get("/.MSH-7-1")));
 	}
 
 	@Override
@@ -161,6 +236,45 @@ public class AHSRuralHandler extends AHSHandler
 		}
 	}
 
+	@Override
+	public String getSubHeader(int i)
+	{
+		String specimenSource = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-15-2"));
+		String collectionDate = formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBR-7-1"));
+
+		return specimenSource + (StringUtils.isNotBlank(collectionDate) ? (" (Collected: " + collectionDate) + ")" : "");
+	}
+
+	@Override
+	public boolean isOBRUnstructured(int obr)
+	{
+		return isMicroLabResult(obr) || isBloodBankProductsResult(obr);
+	}
+
+	@Override
+	public ArrayList<String> getHeaders()
+	{
+		// order must match obr order if some obr segments are unstructured. for... reasons?
+		ArrayList<String> headers = new ArrayList<>();
+		for(int i = 0; i < getOBRCount(); i++)
+		{
+			String obrName = getOBRName(i);
+			if(!headers.contains(obrName))
+			{
+				headers.add(obrName);
+			}
+		}
+		return headers;
+	}
+
+	public boolean isChildOBR(int obr)
+	{
+		String parentPlacerNo = getString(get("/.ORDER_OBSERVATION(" + obr + ")/OBR-29-1"));
+		String parentResultId = getString(get("/.ORDER_OBSERVATION(" + obr + ")/OBR-26-2"));
+
+		return (StringUtils.isNotBlank(parentPlacerNo) && StringUtils.isNotBlank(parentResultId));
+	}
+
 	/* ===================================== OBX ====================================== */
 
 	@Override
@@ -175,6 +289,88 @@ public class AHSRuralHandler extends AHSHandler
 			case "D": return "Delete";
 			default: return resultStatusCode;
 		}
+	}
+
+	/**
+	 *  Return the result from the jth OBX segment of the ith OBR group
+	 */
+	@Override
+	public String getOBXResult(int i, int j)
+	{
+		// conformance: use obx-2 for micro-bio culture labs
+		if(isMicroLabResult(i))
+		{
+			String result = getOBXResult(i, j, 2);
+			if(StringUtils.isNotBlank(result))
+			{
+				return result;
+			}
+		}
+		return getOBXResult(i, j, 1);
+	}
+
+	@Override
+	public String getTimeStamp(int i, int j)
+	{
+		if (i < 0 || j < 0)
+		{
+			// some fun peaces of code like to ask for negative values
+			return null;
+		}
+		// rural labs want you to use OBR-14 instead of obx-14
+		return formatDateTime(get("/.ORDER_OBSERVATION("+i+")/OBR-14"));
+	}
+
+	@Override
+	public boolean isOBXAbnormal(int i, int j)
+	{
+		String abnormalFlags = getOBXAbnormalFlag(i,j);
+		return "A".equals(abnormalFlags);
+	}
+
+	@Override
+	public boolean hasChildOBR(int obr, int obx)
+	{
+		return obrParentMap.containsKey(obr, obx);
+	}
+
+	@Override
+	public List<Integer> getChildOBRIndexList(int obr, int obx)
+	{
+		if(hasChildOBR(obr, obx))
+		{
+			return obrParentMap.get(obr, obx);
+		}
+		return new ArrayList<>(0);
+	}
+
+	@Override
+	public String getChildOBR_OBXName(int obr, int obx)
+	{
+		return getOBXName(obr, obx);
+	}
+
+	@Override
+	public String getChildOBR_OBXResult(int obr, int obx)
+	{
+		return getOBXAbnormalFlag(obr, obx);
+	}
+
+	/* ===================================== private methods etc. ====================================== */
+
+	private String getDiagnosticServicesCode(int obr)
+	{
+		return get("/.ORDER_OBSERVATION("+obr+")/OBR-24-1");
+	}
+
+	private boolean isMicroLabResult(int obr)
+	{
+		return "MC".equals(getDiagnosticServicesCode(obr));
+	}
+
+	private boolean isBloodBankProductsResult(int obr)
+	{
+		return "BB-BP".equals(getDiagnosticServicesCode(obr));
 	}
 
 }

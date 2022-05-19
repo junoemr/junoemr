@@ -277,7 +277,7 @@ public class InboxResultsDao
 				filterSql += "  ELSE 0 END = :demographic_no ";
 				qp_demographic_no = true;
 			}
-			
+
 			if (do_counts)
 			{
 				sql = "SELECT "
@@ -287,8 +287,10 @@ public class InboxResultsDao
 					+ "  CAST(SUM(IF(result_status = 'A', 1, 0)) AS int) AS abnormal, "
 					+ "  CAST(SUM(IF(has_demographic AND demographic_no NOT IN ('0', '-1') AND doctype = 'DOC', 1, 0)) AS int) AS doc_count, "
 					+ "  CAST(SUM(IF(has_demographic AND demographic_no NOT IN ('0', '-1') AND doctype = 'HL7', 1, 0)) AS int) AS lab_count, "
+					+ "  CAST(SUM(IF(has_demographic AND demographic_no NOT IN ('0', '-1') AND doctype = 'HRM', 1, 0)) AS int) AS hrm_count,"
 					+ "  CAST(SUM(IF((NOT has_demographic OR demographic_no IN ('0', '-1')) AND doctype = 'DOC', 1, 0)) AS int) AS unmatched_doc_count, "
 					+ "  CAST(SUM(IF((NOT has_demographic OR demographic_no IN ('0', '-1')) AND doctype = 'HL7', 1, 0)) AS int) AS unmatched_lab_count, "
+					+ "  CAST(SUM(IF((NOT has_demographic OR demographic_no IN ('0', '-1')) AND doctype = 'HRM', 1, 0)) AS int) AS unmatched_hrm_count,"
 					+ "  CAST(count(*) AS int) AS total_count "
 					+ "FROM ( ";
 			}
@@ -521,7 +523,6 @@ public class InboxResultsDao
 			Date startDate,
 			Date endDate)
 	{
-
 		int pos = 0;
 		int demographicLoc = pos++;
 		int firstNameLoc = pos++;
@@ -529,17 +530,21 @@ public class InboxResultsDao
 		int abnormalCountLoc = pos++;
 		int docCountLoc = pos++;
 		int labCountLoc = pos++;
+		int hrmCountLoc = pos++;
 		int unmatchedDocCountLoc = pos++;
 		int unmatchedLabCountLoc = pos++;
+		int unmatchedHrmCountLoc = pos++;
 		int totalCountLoc = pos++;
 
 		HashMap<Integer,PatientInfo> patients = new HashMap<Integer,PatientInfo>();
 
 		int docCount = 0;
 		int labCount = 0;
+		int hrmCount = 0;
 		int abnormalCount = 0;
 		int unmatchedDocCount = 0;
 		int unmatchedLabCount = 0;
+		int unmatchedHrmCount = 0;
 		int totalCount = 0;
 
 		try {
@@ -553,9 +558,11 @@ public class InboxResultsDao
 
 				docCount += getIntValue(r[docCountLoc]);
 				labCount += getIntValue(r[labCountLoc]);
+				hrmCount += getIntValue(r[hrmCountLoc]);
 				abnormalCount += getIntValue(r[abnormalCountLoc]);
 				unmatchedDocCount += getIntValue(r[unmatchedDocCountLoc]);
 				unmatchedLabCount += getIntValue(r[unmatchedLabCountLoc]);
+				unmatchedHrmCount += getIntValue(r[unmatchedHrmCountLoc]);
 				totalCount += getIntValue(r[totalCountLoc]);
 
 				if(r[demographicLoc] != null && getIntValue(r[demographicLoc]) != 0) {
@@ -564,6 +571,7 @@ public class InboxResultsDao
 
 					info.setDocCount(getIntValue(r[docCountLoc]));
 					info.setLabCount(getIntValue(r[labCountLoc]));
+					info.setHrmCount(getIntValue(r[hrmCountLoc]));
 
 					patients.put(info.id, info);
 				}
@@ -578,9 +586,11 @@ public class InboxResultsDao
 		summary.setPatients(patients);
 		summary.setDocumentCount(docCount);
 		summary.setLabCount(labCount);
+		summary.setHrmCount(hrmCount);
 		summary.setAbnormalCount(abnormalCount);
 		summary.setUnmatchedDocumentCount(unmatchedDocCount);
 		summary.setUnmatchedLabCount(unmatchedLabCount);
+		summary.setUnmatchedHrmCount(unmatchedHrmCount);
 		summary.setTotalCount(totalCount);
 
 		return summary;
@@ -689,10 +699,24 @@ public class InboxResultsDao
 					lbData.labType = LabResultData.HRM;
 
 					lbData.priority = "----";
-					lbData.requestingClient = "";
+
 					lbData.discipline = "HRM";
 
 					hrmReport = HRMReportParser.parseRelativeLocation(getStringValue(r[hrmReportFileLoc]), getStringValue(r[schemaVersion]));
+
+					if (!hrmReport.getDeliverToUserFirstName().isEmpty() && !hrmReport.getDeliverToUserLastName().isEmpty())
+					{
+						lbData.requestingClient = hrmReport.getDeliverToUserFirstName() + " " + hrmReport.getDeliverToUserLastName();
+					}
+					else if (!hrmReport.getDeliverToUserId().isEmpty())
+					{
+						lbData.requestingClient = hrmReport.getDeliverToUserId();
+					}
+					else
+					{
+						lbData.requestingClient = "Unknown";
+					}
+
 					lbData.reportStatus = hrmReport.getResultStatus();
 				}
 

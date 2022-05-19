@@ -305,7 +305,7 @@ public final class Factory {
 		if(handler == null)
 			throw new RuntimeException("Hl7 message/type does not match a known lab handler.");
 
-		logger.info("Loaded " + handler.getMsgType() + " HL7 Handler " + handler.getClass().getSimpleName() + " [" + handler.getAccessionNum() + "]");
+		logger.info("Loaded " + handler.getMsgType() + " HL7 Handler " + handler.getClass().getSimpleName() + " [" + handler.getUniqueIdentifier() + "]");
 		return handler;
 	}
 

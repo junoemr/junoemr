@@ -22,6 +22,18 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.out;
 
+import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_EMERGENCY_CONTACT_CODE;
+import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE;
+import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_FALSE;
+import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_ACTIVE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_DECEASED;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_INACTIVE;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.oscarehr.dataMigration.mapper.cds.CDSDemographicInterface;
 import org.oscarehr.dataMigration.model.PatientRecord;
@@ -29,10 +41,10 @@ import org.oscarehr.dataMigration.model.common.AddressModel;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
 import org.oscarehr.dataMigration.model.contact.DemographicContact;
-import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.pharmacy.Pharmacy;
 import org.oscarehr.dataMigration.model.provider.ProviderModel;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.springframework.stereotype.Component;
 import oscar.oscarDemographic.pageUtil.Util;
 import oscar.util.ConversionUtils;
@@ -50,18 +62,6 @@ import xml.cds.v5_0.PersonStatus;
 import xml.cds.v5_0.PhoneNumber;
 import xml.cds.v5_0.PhoneNumberType;
 import xml.cds.v5_0.PurposeEnumOrPlainText;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_EMERGENCY_CONTACT_CODE;
-import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.DEMOGRAPHIC_CONTACT_SUB_DECISION_MAKER_CODE;
-import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_FALSE;
-import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.ENROLLMENT_STATUS_TRUE;
-import static org.oscarehr.demographic.entity.Demographic.STATUS_ACTIVE;
-import static org.oscarehr.demographic.entity.Demographic.STATUS_DECEASED;
-import static org.oscarehr.demographic.entity.Demographic.STATUS_INACTIVE;
 
 @Component
 public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemographicInterface, PatientRecord>
@@ -117,6 +117,15 @@ public class CDSDemographicExportMapper extends AbstractCDSExportMapper<CDSDemog
 		PersonNameStandard.LegalName.LastName lastName = objectFactory.createPersonNameStandardLegalNameLastName();
 		lastName.setPart(exportStructure.getLastName());
 		lastName.setPartType(PersonNamePartTypeCode.FAMC);
+
+		// middle name
+		if(StringUtils.isNotBlank(exportStructure.getMiddleName()))
+		{
+			PersonNameStandard.LegalName.OtherName middleName = objectFactory.createPersonNameStandardLegalNameOtherName();
+			middleName.setPart(exportStructure.getMiddleName());
+			middleName.setPartType(PersonNamePartTypeCode.GIV);
+			legalName.getOtherName().add(middleName);
+		}
 
 		legalName.setFirstName(firstName);
 		legalName.setLastName(lastName);

@@ -46,7 +46,7 @@ if(!authed) {
 
 <%
     oscar.oscarReport.data.RptSearchData searchData  = new oscar.oscarReport.data.RptSearchData();
-    java.util.ArrayList queryArray = searchData.getQueryTypes();
+	List<RptSearchData.SearchCriteria> queryArray = searchData.getQueryTypes();
 %>
 
 
@@ -106,7 +106,7 @@ if(!authed) {
 			action="/report/DeleteDemographicReport">
 			<ul style="list-style-type: none; padding-left: 3px;">
 				<%for (int i =0 ; i < queryArray.size(); i++){
-                           RptSearchData.SearchCriteria sc = (RptSearchData.SearchCriteria) queryArray.get(i);
+                           RptSearchData.SearchCriteria sc = queryArray.get(i);
                            String qId = sc.id;
                            String qName = sc.queryName;%>
 				<li><input type="checkbox" name="queryFavourite"

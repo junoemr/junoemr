@@ -340,6 +340,7 @@
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.ScheduleExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.IntegrationExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.HrmExceptionMapper"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.FaxExceptionMapper"/>
 
 			<!-- Juno filters. -->
 			<bean class="org.oscarehr.ws.rest.filter.LoggingFilterInternal"/>

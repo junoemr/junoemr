@@ -850,12 +850,6 @@ div.logoutBox {
 			<li><a href="#" onClick="popupPage(800, 1000, '../admin/integratorPushStatus.jsp');return false;"><bean:message key="admin.admin.integratorPush" /></a></li>
 			
 			<li><a href="<%=request.getContextPath()%>/lab/CA/ALL/sendOruR01.jsp"><bean:message key="admin.admin.sendOruR01" /></a></li>
-			<%
-				String olisKeystore = OscarProperties.getInstance().getProperty("olis_keystore", "");
-				if(olisKeystore.length()>0) {
-			%>
-			<li><a href="#" onclick='popupPage(400, 400,&quot;<html:rewrite page="/olis/Preferences.jsp"/>&quot;);return false;'>OLIS Preferences</a></li>
-			<% } %>			
 			<li><a href="#" onclick='popupPage(800, 1000,&quot;<html:rewrite page="/admin/MyoscarConfiguration.jsp"/>&quot;);return false;'><bean:message key="admin.admin.phrconfig"/></a></li>
 			<%
 				if (StringUtils.trimToNull(OscarProperties.getInstance().getProperty("oscar_myoscar_sync_component_url"))!=null)

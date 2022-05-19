@@ -63,11 +63,10 @@
 <%@ page import="org.oscarehr.labs.dao.Hl7DocumentLinkDao" %>
 <%@ page import="org.oscarehr.labs.model.Hl7DocumentLink" %>
 <%@ page import="java.util.regex.Pattern" %>
-<%@ page import="java.util.regex.Matcher" %>
-<%@ page import="org.apache.commons.lang3.tuple.Pair" %>
-<%@ page import="oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler" %>
 <%@ page import="org.oscarehr.labs.service.Hl7TextInfoService" %>
 <%@ page import="oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler" %>
+<%@ page import="static org.apache.commons.lang.StringEscapeUtils.escapeHtml" %>
+<%@ page import="static oscar.oscarLab.ca.all.parsers.AHS.v23.AHSRuralHandler.AHS_RURAL_LAB_TYPE" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -120,14 +119,16 @@
 	Hl7TextMessage hl7TextMessage = hl7TxtMsgDao.find(Integer.parseInt(segmentID));
 	Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
 
+	String labType = null;
 	String dateLabReceived = "n/a";
 	if (hl7TextMessage != null)
 	{
 		java.util.Date date = hl7TextMessage.getCreated();
 		String stringFormat = "yyyy-MM-dd HH:mm";
 		dateLabReceived = UtilDateUtilities.DateToString(date, stringFormat);
+		labType = hl7TextMessage.getType();
 
-		if(OLISHL7Handler.OLIS_MESSAGE_TYPE.equals(hl7TextMessage.getType()))
+		if(OLISHL7Handler.OLIS_MESSAGE_TYPE.equals(labType))
 		{
 			%>
 			<jsp:forward page="labDisplayOLIS.jsp" />
@@ -144,7 +145,7 @@
 	String reqID = null, reqTableID = null;
 	String remoteFacilityIdQueryString = "";
 
-	boolean bShortcutForm = OscarProperties.getInstance().getProperty("appt_formview", "").equalsIgnoreCase("on") ? true : false;
+	boolean bShortcutForm = OscarProperties.getInstance().getProperty("appt_formview", "").equalsIgnoreCase("on");
 	String formName = bShortcutForm ? OscarProperties.getInstance().getProperty("appt_formview_name") : "";
 	String formNameShort = formName.length() > 3 ? (formName.substring(0,2)+".") : formName;
 	String formName2 = bShortcutForm ? OscarProperties.getInstance().getProperty("appt_formview_name2", "") : "";
@@ -199,7 +200,7 @@
 		}
 		else
 		{
-			multiLabId = Hl7textResultsData.getMatchingLabs(segmentID);
+			multiLabId = Hl7textResultsData.getMatchingLabs(segmentID, !AHS_RURAL_LAB_TYPE.equals(labType));
 			segmentIDs = multiLabId.split(",");
 
 			List<String> segmentIdList = new ArrayList<String>();
@@ -316,6 +317,9 @@
 .AbnormalRollRes a:hover { color: red }
 .AbnormalRollRes a:visited { color: red }
 .AbnormalRollRes a:active { color: red }
+.Abnormal {
+	color: red;
+}
 .CorrectedRollRes { font-weight: 700; font-size: 8pt; color: yellow; font-family:
                Verdana, Arial, Helvetica }
 .CorrectedRollRes a:link { color: yellow }
@@ -377,6 +381,13 @@ div.Title2 a:link { color: black }
 div.Title2 a:hover { color: black }
 div.Title2 a:visited { color: black }
 div.Title2 a:active { color: black }
+div.subheader2 {
+	font-size: 8px;
+    color: black;
+    font-family: Verdana, Arial, Helvetica;
+    padding: 0 15pt 2pt 2pt;
+    text-indent: 5pt;
+}
 .Cell        { background-color: #9999CC; border-left: thin solid #CCCCFF;
                border-right: thin solid #6666CC;
                border-top: thin solid #CCCCFF;
@@ -963,9 +974,10 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                                                         <div class="FieldData" nowrap="nowrap">
 																			<%
 																				String hin = handler.getHealthNum();
-																				if (ConnectCareHandler.isConnectCareHandler(handler))
+																				String hinProvince = handler.getHealthNumProvince();
+																				if(StringUtils.isNotBlank(hinProvince))
 																				{
-																					hin += " ABH";
+																					hin += " " + hinProvince;
 																				}
 																			%>
                                                                             <%=hin%>
@@ -1139,7 +1151,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                             </td>
                                             <td>
                                                 <div class="FieldData" nowrap="nowrap">
-                                                    <%= handler.getAccessionNum()%>
+                                                    <%= handler.getAccessionNumber()%>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1342,7 +1354,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 		                      	</td>
 	                     	 </tr>
 	                        <tr class="TDISRes">
-		                       	<td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><b><%=handler.getOBXComment(1, 1, 1)%></b></pre></td>
+		                       	<td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><b><%=escapeHtml(handler.getOBXComment(1, 1, 1))%></b></pre></td>
 		                       	</td>
 		                       	<td align="center" valign="top">
                                     <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(1) + "-" + String.valueOf(1) %>','anwin','width=400,height=500');">
@@ -1353,8 +1365,14 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                      	 </table>
                      <% } else {
 
-                      for(i=0;i<headers.size();i++){
+                      for(i=0;i<headers.size();i++)
+					  {
                            linenum=0;
+						   if(handler.isChildOBR(i))
+	                        {
+		                        continue;
+	                        }
+
 						boolean isUnstructuredDoc = false;
 						boolean isPDF = false;
 						boolean	isVIHARtf = false;
@@ -1388,14 +1406,17 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	                           </tr>
 	                           <tr>
 	                               <td bgcolor="#FFCC00" width="300" valign="bottom">
-	                                   <div class="Title2">
-	                                       <%=headers.get(i)%>
+	                                   <div class="Title2"><%=headers.get(i)%>
 									   <% if (handler.isOBRBlocked(i))
 									   {%>
 										   <br/>
 										   <span style="font-size:8px; color:red;">(Do Not Disclose Without Explicit Patient Consent)</span>
 									   <% } %>
 	                                   </div>
+		                               <% if (StringUtils.isNotBlank(handler.getSubHeader(i)))
+		                               {%>
+		                               <div class="subheader2"><%=handler.getSubHeader(i)%></div>
+		                               <% } %>
 	                               </td>
 	                               <%--<td align="right" bgcolor="#FFCC00" width="100">&nbsp;</td>--%>
 	                               <td width="9">&nbsp;</td>
@@ -1428,7 +1449,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
 						<%
 							}
-							else if(isUnstructuredDoc)
+							else if(isUnstructuredDoc || handler.isOBRUnstructured(i))
 							{
 						%>
 	                       <table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3" name="tblDiscs" id="tblDiscs">
@@ -1610,7 +1631,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                            <%}%>
                                            <%for (l=0; l < handler.getOBXCommentCount(j, k); l++){%>
                                                <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes" >
-                                                   <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBXComment(j, k, l)%></pre></td>
+                                                   <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=escapeHtml(handler.getOBXComment(j, k, l))%></pre></td>
                                                </tr>
                                            <%}
                                    
@@ -1651,7 +1672,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 		                                    <% }
 			                                for (l=0; l < handler.getOBXCommentCount(j, k); l++){%>
 			                                     <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
-			                                        <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBXComment(j, k, l)%></pre></td>
+			                                        <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=escapeHtml(handler.getOBXComment(j, k, l))%></pre></td>
 			                                     </tr>
 			                                <%}
 
@@ -1724,7 +1745,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										   {%>
 											   <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
 												   <td valign="top" align="left" colspan="8">
-													   <pre style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBXComment(j, k, l)%></pre>
+													   <pre style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=escapeHtml(handler.getOBXComment(j, k, l))%></pre>
 												   </td>
 											   </tr>
 									   		<%}
@@ -1781,7 +1802,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                        <%for (l=0; l < handler.getOBXCommentCount(j, k); l++){%>
                                             <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
-                                               <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBXComment(j, k, l)%></pre></td>
+                                               <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=escapeHtml(handler.getOBXComment(j, k, l))%></pre></td>
                                             </tr>
                                        <%}
 
@@ -1816,7 +1837,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										%>
 						   			<%
 										}
-										else if(isUnstructuredDoc)
+										else if(isUnstructuredDoc || handler.isOBRUnstructured(j))
 										{
 											if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
 											{
@@ -1873,7 +1894,8 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 													<%
 												}
 											}%>
-											<%if(isVIHARtf) {
+											<%
+											if(isVIHARtf) {
 											    //create bytes from the rtf string
 										    	byte[] rtfBytes = handler.getOBXResult(j, k).getBytes();
 										    	ByteArrayInputStream rtfStream = new ByteArrayInputStream(rtfBytes);
@@ -1889,7 +1911,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 											else if (handler.getMsgType().equals("CCLAB") && handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.TEXT)
 											{
 												String abnormalFlag = handler.getOBXAbnormalFlag(j, k);
-												if (!"N".equals(abnormalFlag))
+												if (handler.isOBXAbnormal(j, k))
 												{
 													%> <td align="left"><%= handler.getOBXResult( j, k)  + "(" + abnormalFlag + ")" %></td> <%
 												}
@@ -1897,6 +1919,12 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 												{
 													%> <td align="left"><%= handler.getOBXResult( j, k) %></td><%
 												}
+											}
+											else if (handler.getMsgType().equals(AHS_RURAL_LAB_TYPE))
+											{%>
+												<td align="left" class="<%=handler.isOBXAbnormal(j, k) ? "Abnormal" : ""%>">
+													<%= handler.getOBXResult( j, k) %>
+												</td><%
 											}
 											else {%>
                                            		<td align="left"><%= handler.getOBXResult( j, k) %></td><%
@@ -1908,6 +1936,110 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 				                                    <td align="center"><%= handler.getTimeStamp(j, k) %></td><%
 	                                            }
 											}
+										    %></tr><%
+
+					                       if(handler.hasChildOBR(j, k))
+					                       {
+                                                %>
+	                                                <tr>
+	                                                <td></td>
+	                                                <td align="left">
+		                                                <table border="1" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
+		                                                <thead>
+			                                                <tr>
+				                                                <th>Description</th>
+				                                                <th>Result</th>
+			                                                </tr>
+		                                                </thead>
+		                                                <tbody><%
+                                                List<Integer> childOBRList = handler.getChildOBRIndexList(j, k);
+												boolean tableOpen = true;
+                                                for(Integer childObrIndex : childOBRList)
+                                                {
+													// if no obx results in child, display warning
+													if(handler.getOBXCount(childObrIndex) <= 0)
+													{
+		                                                %>
+		                                                <tr>
+			                                                <td align="left" colspan="2" class="red">Missing Result Data</td>
+		                                                </tr>
+		                                                <%
+													}
+							                       for(int childObxIndex = 0; childObxIndex < handler.getOBXCount(childObrIndex); childObxIndex++)
+							                       {
+							                       %>
+			                                            <tr>
+								                            <td align="right">
+									                            <%= handler.getChildOBR_OBXName( childObrIndex, childObxIndex) %>
+								                            </td>
+				                                            <td align="left">
+									                            <%= handler.getChildOBR_OBXResult( childObrIndex, childObxIndex) %>
+								                            </td>
+			                                            </tr>
+		                                                <%
+		                                                for (int n=0; n < handler.getOBXCommentCount(childObrIndex, childObxIndex); n++)
+		                                                {%>
+		                                                <tr class="NormalRes">
+			                                                <td align="left" valign="top" colspan="2">
+				                                                <span style="margin:0; text-align: left;">
+					                                                <%=escapeHtml(handler.getOBXComment(childObrIndex, childObxIndex, n))%>
+				                                                </span>
+			                                                </td>
+		                                                </tr>
+		                                                <%
+														}
+							                       }
+												   int obrCommentCount = handler.getOBRCommentCount(childObrIndex);
+												   if(obrCommentCount > 0)
+												   {
+													   tableOpen = false;
+													   //if there are obr comments, split the table
+		                                                %>  </tbody>
+		                                                </table>
+	                                                    </td>
+		                                                <td></td>
+	                                                    </tr>
+		                                                <%
+		                                                for (int n=0; n < obrCommentCount; n++)
+		                                                {%>
+			                                            <tr class="NormalRes">
+				                                            <td></td>
+			                                                <td align="left" valign="top" colspan="2">
+				                                                <span style="margin:0; text-align: left;">
+					                                                <%=escapeHtml(handler.getOBRComment(childObrIndex, n))%>
+				                                                </span>
+			                                                </td>
+			                                            </tr>
+			                                            <%
+								                       }
+														// re-open a new table if this is not that last child obr
+														if(!childObrIndex.equals(childOBRList.get(childOBRList.size()-1)))
+			                                            {
+				                                            tableOpen = true;
+														%>
+					                                    <tr>
+									                       <td></td>
+									                       <td align="left">
+										                       <table border="1" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF">
+											                       <thead>
+											                       <tr>
+												                       <th>Description</th>
+												                       <th>Result</th>
+											                       </tr>
+											                       </thead>
+											                       <tbody><%
+								                       }
+	                                                }
+						                       }
+												if(tableOpen)
+												{
+						                        %>  </tbody>
+	                                                </table>
+                                                </td>
+                                                <td></td>
+                                            </tr><%
+		                                        }
+										   }
 										}//end of isUnstructuredDoc
                                    			
                                    			else{//if it isn't a PATHL7 doc%>
@@ -1960,7 +2092,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                            		align="left";
                                            	}%>
 
-                                           	
+
                                            <td align="<%=align%>"><%= handler.getOBXResult( j, k) %></td>
                                           
                                            <td align="center">
@@ -1971,10 +2103,13 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                            
                                            <td align="center"><%= handler.getTimeStamp(j, k) %></td>
                                            <td align="center"><%= handler.getOBXResultStatusDisplayValue( j, k) %></td>
-                                      		<td align="center" valign="top">                                           <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
+                                      		<td align="center" valign="top">
+		                                        <a href="javascript:void(0);"
+		                                           title="Annotation"
+		                                           onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(j) + "-" + String.valueOf(k) %>','anwin','width=400,height=500');">
 	                                                	<%if(!isPrevAnnotation){ %><img src="../../../images/notes.gif" alt="rxAnnotation" height="16" width="13" border="0"/><%}else{ %><img src="../../../images/filledNotes.gif" alt="rxAnnotation" height="16" width="13" border="0"/> <%} %>
-	                                                </a>
-                                                </td>
+                                                </a>
+                                            </td>
                                        </tr>
                                         <%
 											}
@@ -1982,7 +2117,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 
                                         for (l=0; l < handler.getOBXCommentCount(j, k); l++){%>
                                         <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="NormalRes">
-                                           <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBXComment(j, k, l)%></pre></td>
+                                           <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=escapeHtml(handler.getOBXComment(j, k, l))%></pre></td>
                                         </tr>
                                    <%}
 
@@ -1992,7 +2127,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                        			if (!handler.getOBXComment(j, k, l).equals("")) {
                                        		%>
                                             <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="TDISRes">
-                                               <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=handler.getOBXComment(j, k, l)%></pre></td>
+                                               <td valign="top" align="left" colspan="8"><pre  style="margin:0px 0px 0px 100px; white-space: pre-wrap;"><%=escapeHtml(handler.getOBXComment(j, k, l))%></pre></td>
                                             	<td align="center" valign="top">
 	                                                <a href="javascript:void(0);" title="Annotation" onclick="window.open('<%=request.getContextPath()%>/annotation/annotation.jsp?display=<%=annotation_display%>&amp;table_id=<%=segmentID%>&amp;demo=<%=demographicID%>&amp;other_id=<%=String.valueOf(1) + "-" + String.valueOf(1) %>','anwin','width=400,height=500');">
 	                                                	<%if(!isPrevAnnotation){ %><img src="../../../images/notes.gif" alt="rxAnnotation" height="16" width="13" border="0"/><%}else{ %><img src="../../../images/filledNotes.gif" alt="rxAnnotation" height="16" width="13" border="0"/> <%} %>
@@ -2059,7 +2194,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                	 %>
                                <%for (k=0; k < handler.getOBRCommentCount(j); k++){
                                    // the obrName should only be set if it has not been
-                                   // set already which will only have occured if the
+                                   // set already which will only have occurred if the
                                    // obx name is "" or if it is the same as the obr name
                                    if(!obrFlag && handler.getOBXName(j, 0).equals("")){  %>
                                        <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" >

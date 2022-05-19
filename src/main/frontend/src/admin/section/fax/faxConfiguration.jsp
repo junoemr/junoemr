@@ -136,10 +136,20 @@
 	<div class="fax-config-footer">
 		<panel no-header="true" ng-if="!$ctrl.masterFaxDisabled">
 			<panel-body>
-				<button type="button" class="btn btn-primary"
-				        ng-click="$ctrl.connectNewSRFaxAccount()">
-					<bean:message bundle="ui" key="admin.fax.acct.btn-connectSRFax"/>
-				</button>
+				<div class="grid-flow-column grid-gap-8 w-256">
+					<juno-button class="w-128 d-block"
+					             click="$ctrl.connectNewSRFaxAccount()"
+					             button-color="$ctrl.JUNO_BUTTON_COLOR.DEFAULT"
+					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
+						<bean:message bundle="ui" key="admin.fax.acct.btn-connectSRFax"/>
+					</juno-button>
+					<juno-button class="w-128 d-block"
+					             click='$ctrl.toRingCentralLogin()'
+					             button-color="$ctrl.JUNO_BUTTON_COLOR.DEFAULT"
+					             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
+						<bean:message bundle="ui" key="admin.fax.acct.btn-connectRingCentral"/>
+					</juno-button>
+				</div>
 			</panel-body>
 		</panel>
 	</div>

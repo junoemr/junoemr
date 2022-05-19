@@ -20,20 +20,19 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.external.rest.v1.transfer.demographic;
+package org.oscarehr.integration.ringcentral.api.result;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
-@Schema(description = "Demographic record data transfer object")
-@JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class DemographicTransferInbound extends DemographicTransferBasic
+@Data
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class RingCentralCoverLetterResult implements RingCentralResult
 {
-	public DemographicTransferInbound()
-	{
-		super();
-	}
+	@JsonProperty("id")
+	private Integer id;
+
+	@JsonProperty("name")
+	private String name;
 }

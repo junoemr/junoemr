@@ -53,7 +53,7 @@ if(!authed) {
     java.util.ArrayList rosterArray;
     java.util.ArrayList patientArray;
     java.util.ArrayList providerArray;
-    java.util.ArrayList queryArray;
+    java.util.List<RptSearchData.SearchCriteria> queryArray;
     rosterArray   = searchData.getRosterTypes();
     patientArray  = searchData.getPatientTypes();
     providerArray = searchData.getProvidersWithDemographics();
@@ -158,7 +158,7 @@ function checkQuery() {
                             <html:select property="savedQuery">
                             <%
                             for (int i =0 ; i < queryArray.size(); i++){
-                            RptSearchData.SearchCriteria sc = (RptSearchData.SearchCriteria) queryArray.get(i);
+                            RptSearchData.SearchCriteria sc = queryArray.get(i);
                             String qId = sc.id;
                             String qName = sc.queryName;%>
                             <html:option value="<%=qId%>"><%=qName%></html:option>

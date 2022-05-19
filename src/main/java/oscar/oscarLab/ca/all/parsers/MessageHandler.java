@@ -33,13 +33,10 @@ import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.validator.GenericValidator;
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.labs.service.Hl7TextInfoService;
-import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
@@ -48,10 +45,13 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -59,8 +59,6 @@ import java.util.List;
 public abstract class MessageHandler
 {
 	protected static Logger logger = Logger.getLogger(MessageHandler.class);
-
-	protected Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
 
 	protected Terser terser;
 	protected Message message;
@@ -191,6 +189,26 @@ public abstract class MessageHandler
 		return new ArrayList<>(0);
 	}
 
+	protected EmbeddedDocument toEmbeddedPdf(String base64String, int index)
+	{
+		return toEmbeddedDocument(base64String, "application/pdf", "pdf", index, "embedded_pdf");
+	}
+
+	protected EmbeddedDocument toEmbeddedDocument(String base64String, String mimeType, String extension, int index, String description)
+	{
+		EmbeddedDocument embeddedDocument = new EmbeddedDocument();
+		embeddedDocument.setBase64Data(base64String);
+		embeddedDocument.setMimeType(mimeType);
+
+		String fileName = "-" + getUniqueIdentifier() + "-" + getUniqueVersionIdentifier() + "-" + index + "-" + (int) (Math.random() * 1000000000) + "." + extension;
+		embeddedDocument.setFileName(fileName);
+		embeddedDocument.setDescription(description);
+		embeddedDocument.setSourceFacility("HL7Upload");
+		embeddedDocument.setSource("Embedded Lab Data");
+
+		return embeddedDocument;
+	}
+
 	/* ===================================== MSH ====================================== */
 
 	/**
@@ -250,6 +268,14 @@ public abstract class MessageHandler
 	 *  Return the patients health number
 	 */
 	public String getHealthNum()
+	{
+		return "";
+	}
+
+	/**
+	 *  Return the patients health number province code (ie: AB, BC, ON, etc.)
+	 */
+	public String getHealthNumProvince()
 	{
 		return "";
 	}
@@ -373,10 +399,22 @@ public abstract class MessageHandler
 	/* ===================================== OBR ====================================== */
 
 	/**
+	 * this determines a unique identification string for a lab. This is used for grouping lab versions.
+	 * It is assumed that two labs with the same unique identifier are different versions of the same lab.
+	 * This field is usually the accession number, but may include multiple fields in order to guarantee uniqueness.
+	 * the lab type does not need to be considered, as identifiers are only expected to be unique to the same lab type.
+	 * @return lab unique identifier
+	 */
+	public abstract String getUniqueIdentifier();
+
+	/**
 	 * get lab accession number
 	 * @return accession number
 	 */
-	public abstract String getAccessionNum();
+	public String getAccessionNumber()
+	{
+		return getUniqueIdentifier();
+	}
 
 	/**
 	 *  Return the number of OBR Segments in the message
@@ -386,10 +424,21 @@ public abstract class MessageHandler
 		return 0;
 	}
 
+	/**
+	 * this determines a unique version identification string for a lab.
+	 * This may be used for duplicate checking lab uploads with the same unique identifier.
+	 * It is assumed that two labs with the same unique identifier and version identifier are the same, and thus duplicates.
+	 * This field is usually the filler order number, but may include multiple fields in order to guarantee uniqueness.
+	 * @return lab unique version identifier
+	 */
+	public String getUniqueVersionIdentifier()
+	{
+		return "";
+	}
 
 	public String getFillerOrderNumber()
 	{
-		return "";
+		return getUniqueVersionIdentifier();
 	}
 
 	/**
@@ -510,6 +559,14 @@ public abstract class MessageHandler
 			headers.add(getOBRName(i));
 		}
 		return new ArrayList<>(headers);
+	}
+
+	/**
+	 * an optional subheader that displays for each header based on OBR index
+	 */
+	public String getSubHeader(int i)
+	{
+		return "";
 	}
 
 
@@ -667,6 +724,25 @@ public abstract class MessageHandler
 	 * @return true if blocked
 	 */
 	public boolean isOBRBlocked(int obr)
+	{
+		return false;
+	}
+
+	/**
+	 * is the specific OBR unstructured. similar to the unstructured check except for specific OBR segments
+	 * @param obr segment index
+	 * @return true if unstructured
+	 */
+	public boolean isOBRUnstructured(int obr)
+	{
+		return false;
+	}
+
+	/**
+	 * @param obr segment index - 0 indexed
+	 * @return true if a mapped value exists
+	 */
+	public boolean isChildOBR(int obr)
 	{
 		return false;
 	}
@@ -907,6 +983,50 @@ public abstract class MessageHandler
 	}
 
 	public abstract String getNteForOBX(int i,int j);
+
+	/**
+	 * @param obr segment index - 0 indexed
+	 * @param obx segment index - 0 indexed
+	 * @return true if the given segment has a linked OBR child segment
+	 */
+	public boolean hasChildOBR(int obr, int obx)
+	{
+		return false;
+	}
+
+	/**
+	 * @param obr segment index - 0 indexed
+	 * @param obx segment index - 0 indexed
+	 * @return index of linked OBR child segment, or -1
+	 */
+	public List<Integer> getChildOBRIndexList(int obr, int obx)
+	{
+		return new ArrayList<>(0);
+	}
+
+	/**
+	 * Return the name from the jth OBX segment of the ith OBR group,
+	 * specific to obx segments within an OBR child segment, as it may map differently from regular OBXNames
+	 * @param obr segment index - 0 indexed
+	 * @param obx segment index - 0 indexed
+	 * @return the name for display
+	 */
+	public String getChildOBR_OBXName(int obr, int obx)
+	{
+		return "";
+	}
+
+	/**
+	 * Return the result from the jth OBX segment of the ith OBR group,
+	 * specific to obx segments within an OBR child segment, as it may map differently from regular OBXResults
+	 * @param obr segment index - 0 indexed
+	 * @param obx segment index - 0 indexed
+	 * @return the result for display
+	 */
+	public String getChildOBR_OBXResult(int obr, int obx)
+	{
+		return "";
+	}
 
 	/* ============================== Specimen ============================= */
 	/**
@@ -1224,7 +1344,6 @@ public abstract class MessageHandler
 	 * @param dateInput
 	 * @param outputFormat
 	 * @return formated date based on @param outputFormat.
-	 * 		   if error, log error and return ""
 	 */
 	protected String getHL7V2DateTime(String dateInput, String outputFormat)
 	{
@@ -1233,15 +1352,7 @@ public abstract class MessageHandler
 		if(dateInput != null && !dateInput.trim().isEmpty())
 		{
 			String datePattern = matchHL7V2DateTimePattern(dateInput);
-
-			if (datePattern != null)
-			{
-				dateOutput = formatDateTime(dateInput, datePattern, outputFormat);
-			}
-			else
-			{
-				logger.error("Date " + dateInput + " format is not handled");
-			}
+			dateOutput = formatDateTime(dateInput, datePattern, outputFormat);
 		}
 
 		return dateOutput;
@@ -1258,18 +1369,8 @@ public abstract class MessageHandler
 
 		if(datePattern.length() > dateInput.length())
 		{
-			// For this format YYYY[MM[DD[HH[MM[SS[.S[S[S[S]]]]]]]]][+/-ZZZZ]
+			// For this format YYYYMMDD[HH[MM[SS[.S[S[S[S]]]]]]][+/-ZZZZ]
 			datePattern = datePattern.substring(0, dateInput.length());
-		}
-		else if(datePattern.length() < dateInput.length())
-		{
-			//handle this format 2013-10-19 15:23:00 -0700
-			datePattern = ConversionUtils.DATE_TIME_ZONE_OFFSET_X_PATTERN;
-		}
-
-		if(!GenericValidator.isDate(dateInput, datePattern, false))
-		{
-			datePattern = null;
 		}
 
 		return datePattern;
@@ -1293,9 +1394,27 @@ public abstract class MessageHandler
 						.parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
 						.toFormatter();
 
-				LocalDateTime parsedDate = LocalDateTime.parse(plain, customFormatter);
+				// attempt to parse as a zonedDateTime, otherwise a LocalDateTime
+				TemporalAccessor parsed = customFormatter.parseBest(plain, ZonedDateTime::from, LocalDateTime::from);
+				ZonedDateTime zonedDateTime;
 
-				formatted = parsedDate.format(outFormatter);
+				if(parsed instanceof ZonedDateTime)
+				{
+					zonedDateTime = (ZonedDateTime) parsed;
+				}
+				else if(parsed instanceof LocalDateTime)
+				{
+					LocalDateTime dt = (LocalDateTime) parsed;
+					zonedDateTime = dt.atZone(ZoneId.systemDefault());
+				}
+				else
+				{
+					// shouldn't be possible
+					throw new RuntimeException("Unknown Temporal type: " + parsed.getClass().getName());
+				}
+
+				formatted = ConversionUtils.toDateTimeString(zonedDateTime,
+						DateTimeFormatter.ofPattern(outFormat).withZone(ZoneId.systemDefault()));
 			}
 			catch (DateTimeParseException exception)
 			{
