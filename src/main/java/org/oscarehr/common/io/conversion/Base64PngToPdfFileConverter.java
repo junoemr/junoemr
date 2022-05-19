@@ -22,38 +22,15 @@
  */
 package org.oscarehr.common.io.conversion;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.pdf.PdfWriter;
-import com.lowagie.text.rtf.parser.RtfParser;
-import org.oscarehr.common.io.FileFactory;
-import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.PDFFile;
 import org.springframework.stereotype.Component;
 
-import java.io.InputStream;
-
 @Component
-public class RtfToPdfFileConverter extends AbstractFileConverter<InputStream, PDFFile>
+public class Base64PngToPdfFileConverter extends Base64ImageToPdfFileConverter
 {
 	@Override
-	public PDFFile toFile(InputStream inputStream) throws Exception
+	public PDFFile convert(String base64Content)
 	{
-		Document document = new Document();
-
-		//TODO new conversion, this library doesn't convert rtf correctly and rtf support is abandoned
-		GenericFile tempFile = FileFactory.createTempFile("-rtf.pdf");
-		PdfWriter writer = PdfWriter.getInstance(document, tempFile.asFileOutputStream());
-		// open the document for modifications
-
-		document.open();
-		// create a new parser to load the RTF file
-		RtfParser parser = new RtfParser(null);
-		// read the rtf file into a compatible document
-		parser.convertRtfDocument(inputStream, document);
-
-		// save the pdf to disk
-		document.close();
-
-		return (PDFFile) tempFile;
+		return this.convert(base64Content, "image/png");
 	}
 }

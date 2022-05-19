@@ -26,11 +26,11 @@ import org.oscarehr.common.io.PDFFile;
 import org.springframework.stereotype.Component;
 
 @Component
-public abstract class PngToPdfFileConverter extends ImageToPdfFileConverter
+public class Base64JpegToPdfFileConverter extends Base64ImageToPdfFileConverter
 {
 	@Override
 	public PDFFile convert(String base64Content)
 	{
-		return this.convert(base64Content, "image/png");
+		return this.convert(base64Content, "image/jpeg");
 	}
 }
