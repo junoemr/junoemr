@@ -189,7 +189,8 @@ angular.module('Record').controller('Record.RecordController', [
 
 			}
 
-			controller.netcareModuleEnabled = await netcareService.loadEnabledState();
+			//TODO re-enable once conformance is passed and prod credentials set
+			controller.netcareModuleEnabled = false; //await netcareService.loadEnabledState();
 		}
 
 		/**
