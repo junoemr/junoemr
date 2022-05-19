@@ -70,9 +70,9 @@ public interface HRMReport
 
 	String getTextContent();
 
-	byte[] getBinaryContent();
+	Optional<String> getBinaryContentBase64();
 
-	byte[] getBase64BinaryContent();
+	byte[] getBinaryContent();
 
 	String getClassName();
 

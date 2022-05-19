@@ -27,11 +27,14 @@ import org.apache.tika.io.IOUtils;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.consultations.service.ConsultationAttachmentService;
 import org.oscarehr.consultations.service.ConsultationPDFCreationService;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
+import org.xml.sax.SAXException;
 import oscar.dms.EDoc;
 import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.UtilDateUtilities;
@@ -39,6 +42,7 @@ import oscar.util.UtilDateUtilities;
 import javax.naming.SizeLimitExceededException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -73,7 +77,7 @@ public class EctConsultationFormRequestPrintAction extends Action
 	    }
 	    Integer requestId = Integer.parseInt(requestIdStr);
 
-	    securityInfoManager.requireOnePrivilege(loggedInInfo.getLoggedInProviderNo(), SecurityInfoManager.READ, demographicNo, "_con");
+	    securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), demographicNo, Permission.CONSULTATION_READ);
 
 		String error = "";
 		String friendlyReturnMessage = "";
@@ -86,11 +90,13 @@ public class EctConsultationFormRequestPrintAction extends Action
 			List<EDoc> attachedDocuments = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demographicNo, requestId);
 			List<LabResultData> attachedLabs = consultationAttachmentService.getAttachedLabs(loggedInInfo, demographicNo, requestId);
 			List<EFormData> attachedEForms = consultationAttachmentService.getAttachedEForms(demographicNo, requestId);
+			List<HrmDocument> attachedHRM = consultationAttachmentService.getAttachedHRMList(demographicNo, requestId);
 
 			streamList.add(consultationPDFCreationService.getConsultationRequestAsStream(request, loggedInInfo));
 			streamList.addAll(consultationPDFCreationService.toEDocInputStreams(request, attachedDocuments));
 			streamList.addAll(consultationPDFCreationService.toLabInputStreams(attachedLabs));
 			streamList.addAll(consultationPDFCreationService.toEFormInputStreams(request, attachedEForms));
+			streamList.addAll(consultationPDFCreationService.toHRMInputStreams(request, attachedHRM));
 
 			ByteOutputStream bos = new ByteOutputStream();
 			excessBytes = consultationPDFCreationService.combineStreams(streamList, bos);
@@ -117,7 +123,7 @@ public class EctConsultationFormRequestPrintAction extends Action
 			error = "DocumentException";
 			friendlyReturnMessage = "Error when attempting to read one or more of the documents.";
 		}
-		catch(IOException ioe)
+		catch(SAXException | JAXBException | IOException ioe)
 		{
 			error = "IOException";
 			friendlyReturnMessage = "Error attempting to access an internal file.";
