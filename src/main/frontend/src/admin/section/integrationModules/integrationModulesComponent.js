@@ -22,7 +22,7 @@
 */
 
 import {ADMIN_PAGE_EVENTS} from "../../adminConstants";
-import {SystemPreferences} from "../../../common/services/systemPreferenceServiceConstants";
+import {SystemPreferences, Integrations} from "../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Admin.Section').component('integrationModules',
 {
@@ -52,6 +52,12 @@ angular.module('Admin.Section').component('integrationModules',
 				enabled: false,
 				propertyName: SystemPreferences.OlisIntegrationEnabled,
 				configUrl:"#!/admin/labConfig/olis",
+			},
+			{
+				name: "HRM",
+				enabled: false,
+				propertyName: SystemPreferences.HrmEnabled,
+				configUrl: "#!/admin/hrm/admin"
 			},
 			{
 				name: "IceFall",

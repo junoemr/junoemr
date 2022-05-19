@@ -24,54 +24,32 @@
 package org.oscarehr.ws.rest.integrations.hrm;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
-import org.oscarehr.hospitalReportManager.service.HRMScheduleService;
-import org.oscarehr.hospitalReportManager.service.HRMService;
-import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.hospitalReportManager.service.HRMAccountService;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
-@Path("/integrations/hrm/schedule")
-@Component("HRMScheduleWebService")
+@Component("HRMAccountWebService")
 @Produces(MediaType.APPLICATION_JSON)
-@Tag(name = "hrmSchedule")
-public class HrmScheduleWebService extends AbstractServiceImpl
+@Tag(name = "hrmAccount")
+@Path("/integrations/hrm/account")
+
+public class HrmAccountWebService extends AbstractServiceImpl
 {
 	@Autowired
-	HRMScheduleService scheduleService;
-	
-	@Autowired
-	HRMService hrmService;
+	private HRMAccountService hrmAccountService;
 
-	@Autowired
-	SecurityInfoManager securityService;
-	
 	@POST
-	@Path("/")
-	public RestResponse<HrmFetchResultsModel> fetchNewDocuments() throws InterruptedException, ExecutionException, TimeoutException
+	public RestResponse<Boolean> saveDecryptionKey(String key)
 	{
-		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
-		HrmFetchResultsModel results = scheduleService.fetchNow();
-		return RestResponse.successResponse(results);
-	}
-	
-	@GET
-	@Path("/")
-	public RestResponse<HrmFetchResultsModel> getLastFetchStatus() throws InterruptedException, ExecutionException, TimeoutException
-	{
-		securityService.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
-		HrmFetchResultsModel results = hrmService.getLastFetchResults();
-		return RestResponse.successResponse(results);
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_CREATE, Permission.HRM_UPDATE);
+		hrmAccountService.saveDecryptionKey(key);
+		return RestResponse.successResponse(true);
 	}
 }

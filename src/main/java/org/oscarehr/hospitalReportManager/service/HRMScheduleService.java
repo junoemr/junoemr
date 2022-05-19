@@ -24,17 +24,15 @@
 package org.oscarehr.hospitalReportManager.service;
 
 import lombok.Synchronized;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.PeriodicTrigger;
 import org.springframework.stereotype.Component;
-import oscar.OscarProperties;
 
 import java.nio.file.Paths;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 @Component
 public class HRMScheduleService
@@ -45,38 +43,47 @@ public class HRMScheduleService
 	@Autowired
 	HRMService hrmService;
 
-	public static final int HRM_MINIMUM_POLL_TIME_SEC = 1200;
+	@Autowired
+	JunoProperties junoProps;
 
 	/**
 	 * Schedule remote fetch every intervalSeconds.  Location will not be overridden by local override.
-	 * @param intervalSeconds
+	 * @param intervalSeconds seconds between HRM report queries
 	 */
-	public void scheduleRegularFetch(int intervalSeconds)
+	public void startSchedule(int intervalSeconds)
 	{
 		PeriodicTrigger fetchSchedule = new PeriodicTrigger(intervalSeconds, TimeUnit.SECONDS);
 		fetchSchedule.setInitialDelay(0L);
-		
-		scheduler.schedule(() -> hrmService.consumeRemoteHRMDocuments() , fetchSchedule);
+
+		scheduler.schedule(this::fetchOnSchedule, fetchSchedule);
 	}
-	
-	
+
+	public void fetchOnSchedule()
+	{
+		if (hrmService.isHRMEnabled() && hrmService.isHRMFetchEnabled())
+		{
+			hrmService.consumeRemoteHRMDocuments();
+		}
+	}
+
 	/**
 	 * Fetch HRM documents now.
-	 * If a local override is present, will read from that location instead of using sftp connection.
+	 * If a local override is enabled, will read from it's location instead of using sftp connection.
 	 */
 	@Synchronized
-	public HrmFetchResultsModel scheduleFetchNow() throws InterruptedException, ExecutionException, TimeoutException
+	public HrmFetchResultsModel fetchNow()
 	{
 		HrmFetchResultsModel results;
-		
-		if (OscarProperties.getInstance().getProperty("omd.hrm.local_download_override") == null)
+
+		JunoProperties.Hrm hrmConfig = junoProps.getHrm();
+		if (hrmConfig.isLocalOverrideEnabled())
 		{
-			results = hrmService.consumeRemoteHRMDocuments();
+			String localHrmDocs = hrmConfig.getLocalOverrideDirectory();
+			results = hrmService.consumeLocalHRMDocuments(Paths.get(localHrmDocs));
 		}
 		else
 		{
-			String localHrmDocs = OscarProperties.getInstance().getProperty("omd.hrm.local_download_override");
-			results = hrmService.consumeLocalHRMDocuments(Paths.get(localHrmDocs));
+			results = hrmService.consumeRemoteHRMDocuments();
 		}
 		
 		return results;

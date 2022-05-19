@@ -41,6 +41,7 @@ public class JunoProperties
 	private Olis olis;
 	private Test test;
 	private FaxConfig faxConfig;
+	private Hrm hrm;
 
 	@Data
 	public static class JunoPropertiesConfig
@@ -102,5 +103,19 @@ public class JunoProperties
 		private String ringcentralRedirectUrl;
 		private String ringcentralClientId;
 		private String ringcentralClientSecret;
+	}
+
+	@Data
+	public static class Hrm
+	{
+		private int defaultPollingIntervalSeconds;
+		private int minPollingIntervalSeconds;
+		private int sftpTimeoutSeconds;
+		private String accessKeyLocation;
+		private String baseDirectory;
+		private boolean decryptRemoteFiles;
+		private boolean localOverrideEnabled;
+		private String localOverrideDirectory;
+		private boolean decryptLocalFiles;
 	}
 }

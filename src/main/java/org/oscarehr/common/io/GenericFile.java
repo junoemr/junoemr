@@ -28,7 +28,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 
 import java.io.File;
@@ -58,6 +60,7 @@ public class GenericFile
 
 	protected static final Logger logger = MiscUtils.getLogger();
 	protected static final OscarProperties props = oscar.OscarProperties.getInstance();
+	private static final JunoProperties junoProps = SpringUtils.getBean(JunoProperties.class);
 
 	public enum ALLOWED_CONTENT_TYPES
 	{
@@ -107,7 +110,7 @@ public class GenericFile
 	public static final String BILLING_REMITTANCE_FAILED_DIR = new File(BILLING_BASE_DIR, props.getProperty("BILLING_REMITTANCE_FAILED_DIR")).getPath();
 
 	public static final String RESOURCE_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("RESOURCE_BASE_DIR")).getPath();
-	public static final String HRM_BASE_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("omd.hrm.base_directory")).getPath();
+	public static final String HRM_BASE_DIR = new File(DOCUMENT_BASE_DIR, junoProps.getHrm().getBaseDirectory()).getPath();
 	public static final String LAB_BASE_DIR = new File(DOCUMENT_BASE_DIR, props.getProperty("LAB_BASE_DIR")).getPath();
 
 	public static final String LOG_BASE_DIR = new File(BASE_DIRECTORY, props.getProperty("LOG_BASE_DIR")).getPath();

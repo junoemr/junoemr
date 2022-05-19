@@ -75,6 +75,14 @@ export enum SystemPreferences
     OlisIntegrationEnabled = "integration.olis.enabled",
     OlisEmrId = "integration.olis.emr_id",
     OlisPollingEnabled = "olis_polling_enabled",
+
+		HrmEnabled = "integration.hrm.enabled",
+		HrmPollingEnabled = "omd.hrm.polling_enabled",
+		HrmPollingInterval = "omd.hrm.polling_interval_sec",
+		HrmUser = "omd.hrm.user",
+		HrmMailBoxAddress = "omd.hrm.address",
+		HrmRemotePath = "omd.hrm.remote_path",
+		HrmPort = "omd.hrm.port",
 }
 
 export enum INSTANCE_TYPE

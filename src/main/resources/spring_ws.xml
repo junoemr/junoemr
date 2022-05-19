@@ -396,11 +396,12 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueueWebService"/>
-			<!-- AQS -->
+			<!-- End AQS -->
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmCategoriesWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmCategoryWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmSubClassWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmScheduleWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmAccountWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.netcare.NetcareWebService"/>

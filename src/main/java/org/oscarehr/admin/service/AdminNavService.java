@@ -25,6 +25,7 @@ package org.oscarehr.admin.service;
 
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.hospitalReportManager.service.HRMService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.myoscar.utils.MyOscarLoggedInInfo;
 import org.oscarehr.preferences.service.SystemPreferenceService;
@@ -50,6 +51,9 @@ public class AdminNavService
 
 	@Autowired
 	private SystemPreferenceService systemPreferenceService;
+
+	@Autowired
+	private HRMService hrmService;
 
 	private OscarProperties oscarProperties = OscarProperties.getInstance();
 
@@ -652,7 +656,7 @@ public class AdminNavService
 		integrationItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.sendOruR01"), "frame?frameUrl=" + contextPath + "/lab/CA/ALL/sendOruR01.jsp"));
 		*/
 
-		if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM))
+		if (hrmService.isHRMEnabled())
 		{
 			integrationItems.add(new AdminNavItemTo1("Health Report Manager (HRM)", "hrm/admin"));
 		}

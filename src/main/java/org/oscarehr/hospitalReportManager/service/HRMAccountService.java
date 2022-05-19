@@ -21,47 +21,33 @@
  * Canada
  */
 
-package org.oscarehr.config.modules;
+package org.oscarehr.hospitalReportManager.service;
 
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.log4j.Logger;
-import org.oscarehr.config.JunoProperties;
-import org.oscarehr.hospitalReportManager.service.HRMScheduleService;
+import org.oscarehr.common.encryption.StringEncryptor;
 import org.oscarehr.preferences.service.SystemPreferenceService;
-import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-
-@Configuration
-public class HrmModuleConfig
+@Service
+public class HRMAccountService
 {
-	@Autowired
-	private HRMScheduleService hrmScheduleService;
-
-	@Autowired
-	private JunoProperties junoProperties;
-
 	@Autowired
 	private SystemPreferenceService systemPreferences;
 
-	private static final Logger logger = MiscUtils.getLogger();
-	
-	public HrmModuleConfig()
+	public void saveDecryptionKey(String key)
 	{
-		logger.info("Loaded HRM module");
+		String encryptedKey = StringEncryptor.encrypt(key);
+		systemPreferences.setPreferenceValue("omd.hrm.decryption_key", encryptedKey);
 	}
 
-	@PostConstruct
-	public void startSchedule()
+	public String retrieveDecryptionKey()
 	{
-		JunoProperties.Hrm hrmConfig = junoProperties.getHrm();
+		String encryptedKey = systemPreferences.getPreferenceValue("omd.hrm.decryption_key", null);
+		if (encryptedKey != null)
+		{
+			return StringEncryptor.decrypt(encryptedKey);
+		}
 
-		String userInterval = systemPreferences.getPreferenceValue("omd.hrm.polling_interval_sec", null);
-		int defaultInterval = hrmConfig.getDefaultPollingIntervalSeconds();
-		int interval = NumberUtils.toInt(userInterval, defaultInterval);
-
-		hrmScheduleService.startSchedule(Math.max(interval, hrmConfig.getMinPollingIntervalSeconds()));
+		return null;
 	}
 }

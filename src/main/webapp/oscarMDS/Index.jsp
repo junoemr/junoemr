@@ -16,6 +16,7 @@
 <%@ page import="org.oscarehr.util.SpringUtils" %>
 <%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
+<%@ page import="org.oscarehr.hospitalReportManager.service.HRMService" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
@@ -38,6 +39,7 @@
 
 <%
 	SystemPreferenceService systemPreferenceService = SpringUtils.getBean(SystemPreferenceService.class);
+	HRMService hrmService = SpringUtils.getBean(HRMService.class);
 
 	boolean ajax = "true".equals(request.getParameter("ajax"));
 
@@ -137,7 +139,7 @@
 		</a>
 	</div>
 
-	<% if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM) && totalHRM > 0) { %>
+	<% if (hrmService.isHRMEnabled() && totalHRM > 0) { %>
 	<div>
 		<a id="totalHRM" href="javascript:void(0);" onclick="un_bold(this);changeView(CATEGORY_HRM);" title="HRM Reports">
 			HRM (<%= totalHRM %>)

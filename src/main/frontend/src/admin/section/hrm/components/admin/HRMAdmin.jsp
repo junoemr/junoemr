@@ -42,7 +42,8 @@
 						<div class="status-text">{{ $ctrl.getSummaryText($ctrl.latestResults.getProcessingSummary()) }}</div>
 					</div>
 				</div>
-				<div class="flex-col align-items-end m-r-24">
+				<div class="flex-col align-items-end m-r-24"
+					 ng-if="$ctrl.pollingEnabled">
 					<p class="m-b-4 xs-text">{{ $ctrl.lastCheckedMessage() }}</p>
 					<p class="m-b-0 xs-text" ng-show="$ctrl.latestResults">{{ $ctrl.latestResults.reportsDownloaded }} reports downloaded, {{ $ctrl.latestResults.reportsProcessed }} reports processed</p>
 				</div>
@@ -57,7 +58,7 @@
 							 class="flex-grow-0 w-256"
 							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-							 disabled="!$ctrl.canRead()"
+							 disabled="!$ctrl.canRead() || !$ctrl.pollingEnabled"
 							 click="$ctrl.fetchHRMDocs()">
 					Check For Reports Now
 				</juno-button>
@@ -67,11 +68,20 @@
 			</div>
 		</panel-header>
 		<panel-body class="flex-col">
-			<div class="flex-row align-items-center">
-				<juno-input label="Automatic Polling Frequency (minutes)"
+			<div class="flex-row align-items-center justify-content-start">
+				<juno-toggle label="Enable Automatic Polling"
+							 label-position="$ctrl.LABEL_POSITION"
+							 ng-model="$ctrl.pollingEnabled"
+							 round="true"
+							 change="$ctrl.togglePolling(checked)"
+							 class="d-inline-block w-256 m-l-24"
+				>
+				</juno-toggle>
+				<juno-input label="Polling Frequency (minutes)"
 							label-position="$ctrl.LABEL_POSITION"
 							ng-model="$ctrl.pollingInterval"
 							disabled="true"
+							class="d-inline-block w-256"
 				>
 				</juno-input>
 			</div>
