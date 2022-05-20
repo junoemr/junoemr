@@ -51,9 +51,6 @@ public class HRMAccountService
 
 	public Optional<String> retrieveDecryptionKey()
 	{
-		String decryptionKey = systemPreferences.getOptionalPreferenceValue(HRM_DECRYPTION_KEY)
-				.map(StringEncryptor::decrypt)
-				.orElse(null);
-		return Optional.ofNullable(decryptionKey);
+		return systemPreferences.getOptionalPreferenceValue(HRM_DECRYPTION_KEY).map(StringEncryptor::decrypt);
 	}
 }

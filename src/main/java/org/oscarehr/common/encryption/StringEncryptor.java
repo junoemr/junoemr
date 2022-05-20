@@ -131,7 +131,7 @@ public class StringEncryptor
 	private static IvParameterSpec createIV(final int ivSizeBytes, final SecureRandom rng)
 	{
 		final byte[] iv = new byte[ivSizeBytes];
-		final SecureRandom theRNG = Optional.of(rng).orElse(new SecureRandom());
+		final SecureRandom theRNG = Optional.ofNullable(rng).orElse(new SecureRandom());
 		theRNG.nextBytes(iv);
 		return new IvParameterSpec(iv);
 	}
