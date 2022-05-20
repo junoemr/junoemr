@@ -33,9 +33,9 @@ import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportDemographicMatcher;
 import org.oscarehr.dataMigration.mapper.hrm.in.HRMReportImportMapper;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.demographic.entity.Demographic;
+import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.HRMReportParser;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
-import org.oscarehr.hospitalReportManager.HRMReport;
 import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
 import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 import org.oscarehr.util.MiscUtils;
@@ -70,6 +70,9 @@ public class HRMReportProcessor
 	
 	@Autowired
 	private HRMService hrmService;
+
+	@Autowired
+	private HRMAccountService hrmAccountService;
 	
 	/**
 	 * Process the list of files:  Decrypt (optional), parse, and route.
@@ -191,9 +194,10 @@ public class HRMReportProcessor
 	{
 		byte[] buffer = encryptedFile.toByteArray();
 		Hex hex = new Hex(StandardCharsets.UTF_8.toString());
-		byte[] keyBytes = hex.decode(DECRYPTION_KEY.getBytes(StandardCharsets.UTF_8));
+		String decryptionKey = hrmAccountService.retrieveDecryptionKey().orElseThrow(() -> new IllegalStateException("HRM decryption key has not been set"));
+		byte[] keyBytes = hex.decode(decryptionKey.getBytes(StandardCharsets.UTF_8));
 			
-		SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");;
+		SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");
 		Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding", "SunJCE");
 		cipher.init(Cipher.DECRYPT_MODE, key);
 			

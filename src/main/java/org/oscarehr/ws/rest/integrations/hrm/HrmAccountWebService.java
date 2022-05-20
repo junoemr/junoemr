@@ -30,6 +30,8 @@ import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -46,10 +48,19 @@ public class HrmAccountWebService extends AbstractServiceImpl
 	private HRMAccountService hrmAccountService;
 
 	@POST
+	@Path("/key")
 	public RestResponse<Boolean> saveDecryptionKey(String key)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_CREATE, Permission.HRM_UPDATE);
 		hrmAccountService.saveDecryptionKey(key);
 		return RestResponse.successResponse(true);
+	}
+
+	@GET
+	@Path("/key/exists")
+	public RestResponse<Boolean> hasDecryptionKey()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.HRM_READ);
+		return RestResponse.successResponse(hrmAccountService.hasDecryptionKey());
 	}
 }

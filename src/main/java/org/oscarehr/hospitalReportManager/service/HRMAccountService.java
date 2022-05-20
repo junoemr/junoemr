@@ -28,6 +28,10 @@ import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+import static org.oscarehr.preferences.SystemPreferenceConstants.HRM_DECRYPTION_KEY;
+
 @Service
 public class HRMAccountService
 {
@@ -37,17 +41,19 @@ public class HRMAccountService
 	public void saveDecryptionKey(String key)
 	{
 		String encryptedKey = StringEncryptor.encrypt(key);
-		systemPreferences.setPreferenceValue("omd.hrm.decryption_key", encryptedKey);
+		systemPreferences.setPreferenceValue(HRM_DECRYPTION_KEY, encryptedKey);
 	}
 
-	public String retrieveDecryptionKey()
+	public boolean hasDecryptionKey()
 	{
-		String encryptedKey = systemPreferences.getPreferenceValue("omd.hrm.decryption_key", null);
-		if (encryptedKey != null)
-		{
-			return StringEncryptor.decrypt(encryptedKey);
-		}
+		return systemPreferences.getOptionalPreferenceValue(HRM_DECRYPTION_KEY).isPresent();
+	}
 
-		return null;
+	public Optional<String> retrieveDecryptionKey()
+	{
+		String decryptionKey = systemPreferences.getOptionalPreferenceValue(HRM_DECRYPTION_KEY)
+				.map(StringEncryptor::decrypt)
+				.orElse(null);
+		return Optional.ofNullable(decryptionKey);
 	}
 }
