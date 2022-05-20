@@ -41,7 +41,6 @@ import org.oscarehr.hospitalReportManager.reportImpl.HRMReport_4_3;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import oscar.OscarProperties;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 
@@ -57,8 +56,7 @@ public class HRMReportProcessor
 {
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final String SCHEMA_VERSION = "4.3";
-	private static final String DECRYPTION_KEY = OscarProperties.getInstance().getProperty("omd.hrm.decryption_key");
-	
+
 	@Autowired
 	private HRMReportImportMapper reportMapper;
 	
