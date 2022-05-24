@@ -52,27 +52,23 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		controller.statuses = staticDataService.getConsultRequestStatuses();
 		controller.hours = staticDataService.getHours();
 		controller.minutes = staticDataService.getMinutes();
+		//monitor data changed
+		controller.consultChanged = false;
+		controller.initialized = false;
 
 		controller.loadingQueue = new LoadingQueue();
 		controller.toastService = new ToastService();
 
-		controller.parseTime = function parseTime(time)
-		{
-			var tArray = time.split(":");
-			consult.appointmentHour = tArray[0];
-			consult.appointmentMinute = tArray[1];
-		};
-		/* If appointment time is present, we must parse the hours and minutes in order to
-		   populate the hour and minute selectors */
-		if (consult.appointmentTime !== null)
-		{
-			controller.parseTime(consult.appointmentTime);
-
-		}
-
-		controller.initialize = function()
+		controller.$onInit = () =>
 		{
 			controller.labelPosition = LABEL_POSITION;
+
+			/* If appointment time is present, we must parse the hours and minutes in order to
+			populate the hour and minute selectors */
+			if (consult.appointmentTime !== null)
+			{
+				controller.parseTime(consult.appointmentTime);
+			}
 
 			//set demographic info
 			controller.loadingQueue.pushLoadingState();
@@ -162,13 +158,24 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			{
 				controller.loadingQueue.popLoadingState();
 			});
+
+			controller.setESendEnabled(); //execute once on form open
+			controller.flagUnsaved(false);
+			controller.initWatches();
+			controller.initialized = true;
 		};
-		controller.initialize();
 
 		// providerNo is what is used as the referral provider for saving
 		controller.onReferralPractitionerSelected = (provider) =>
 		{
 			controller.consult.providerNo = provider;
+		};
+
+		controller.parseTime = function parseTime(time)
+		{
+			var tArray = time.split(":");
+			consult.appointmentHour = tArray[0];
+			consult.appointmentMinute = tArray[1];
 		};
 
 		controller.changeLetterhead = function changeLetterhead(letterhead)
@@ -182,26 +189,39 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			consult.letterheadFax = consult.letterhead.fax;
 		};
 
-		//monitor data changed
-		controller.consultChanged = 0;
-		$scope.$watchCollection(function()
-			{
-				return controller.consult;
-			},
-			function(newVal, oldVal)
-			{
-				controller.consultChanged++;
-			});
+		controller.initWatches = () =>
+		{
+			$scope.$watchCollection(function()
+				{
+					return controller.consult;
+				},
+				function(newVal, oldVal)
+				{
+					controller.flagUnsaved(true);
+				});
+		}
 
 		//remind user of unsaved data
 		$scope.$on("$stateChangeStart", function(event)
 		{
-			if (controller.consultChanged > 0)
+			if (controller.isUnsaved())
 			{
 				var discard = confirm("You may have unsaved data. Are you sure to leave?");
 				if (!discard) event.preventDefault();
 			}
 		});
+
+		controller.flagUnsaved = (dirty) =>
+		{
+			console.info("unsaved flag: ", dirty);
+			controller.consultChanged = dirty;
+		}
+
+		controller.isUnsaved = () =>
+		{
+			console.info("check unsaved flag: ", controller.consultChanged);
+			return controller.consultChanged;
+		}
 
 		controller.changeService = function changeService(id)
 		{
@@ -435,7 +455,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 				{
 					if (consult.attachmentsChanged)
 					{
-						controller.consultChanged++;
+						controller.flagUnsaved(true);
 						consult.attachmentsChanged = false;
 					}
 				},
@@ -450,8 +470,6 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 		{
 			controller.eSendEnabled = consult.professionalSpecialist != null && consult.professionalSpecialist.eDataUrl != null && consult.professionalSpecialist.eDataUrl.trim() != "";
 		};
-
-		controller.setESendEnabled(); //execute once on form open
 
 		controller.save = function save()
 		{
@@ -477,6 +495,7 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 			{
 				controller.loadingQueue.pushLoadingState();
 				controller.consultSaving = true; //show saving banner
+				controller.flagUnsaved(false); //reset change count
 				controller.setAppointmentTime();
 
 				consultService.saveRequest(controller.consult).then(
@@ -499,7 +518,6 @@ angular.module('Consults').controller('Consults.ConsultRequestController', [
 						{
 							controller.setESendEnabled();
 							controller.consultSaving = false; //hide saving banner
-							controller.consultChanged = 0; //reset change count
 							controller.loadingQueue.popLoadingState();
 						}
 					);
