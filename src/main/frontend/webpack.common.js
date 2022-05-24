@@ -175,7 +175,7 @@ module.exports = {
 			'./src/common/services/providerService.js',
 			'./src/common/services/reportingService.js',
 			'./src/common/services/resultsService.js',
-			'./src/common/services/staticDataService.js',
+			'./src/common/services/staticDataService.ts',
 			'./src/common/services/summaryService.js',
 			'./src/common/services/systemPreferenceService.js',
 			'./src/common/services/ticklerService.js',
@@ -468,7 +468,7 @@ module.exports = {
 			'./src/consults/consultRequestAttachmentController.js',
 			'./src/consults/consultResponseAttachmentController.js',
 			'./src/consults/consultRequestListController.js',
-			'./src/consults/consultRequestController.js',
+			'./src/consults/consultRequestComponent.ts',
 			'./src/consults/consultResponseListController.js',
 			'./src/consults/consultResponseController.js',
 

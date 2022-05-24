@@ -30,44 +30,44 @@
 			<hr>
 		</div>
 	</div>
-	<div class="col-md-12 alert alert-success" ng-show="consultRequestCtrl.consultSaving">
+	<div class="col-md-12 alert alert-success" ng-show="$ctrl.consultSaving">
 		Saving...
 	</div>
-	<juno-security-check show-placeholder="true" permissions="consultRequestCtrl.SecurityPermissions.ConsultationRead">
+	<juno-security-check show-placeholder="true" permissions="$ctrl.SecurityPermissions.ConsultationRead">
 		<div class="row">
 			<div id="left_pane" class="col-md-2">
 				<label class="control-label">Patient Details</label>
 				<div class="demographic">
-					<p>{{consultRequestCtrl.consult.demographic.displayName}} ({{consultRequestCtrl.consult.demographic.title}})</p>
-					<p>DOB: {{consultRequestCtrl.consult.demographic.displayDateOfBirth}} ({{consultRequestCtrl.consult.demographic.displayAge}})</p>
-					<p>Sex: {{consultRequestCtrl.consult.demographic.displaySex}}</p>
-					<p>HIN: {{consultRequestCtrl.consult.demographic.healthNumber}} - {{consultRequestCtrl.consult.demographic.healthNumberVersion}}</p>
+					<p>{{$ctrl.consult.demographic.displayName}} ({{$ctrl.consult.demographic.title}})</p>
+					<p>DOB: {{$ctrl.consult.demographic.displayDateOfBirth}} ({{$ctrl.consult.demographic.displayAge}})</p>
+					<p>Sex: {{$ctrl.consult.demographic.displaySex}}</p>
+					<p>HIN: {{$ctrl.consult.demographic.healthNumber}} - {{$ctrl.consult.demographic.healthNumberVersion}}</p>
 					<p>Address:</p>
 					<address>
-					{{consultRequestCtrl.consult.demographic.address.displayLine1of2}}<br/>
-					{{consultRequestCtrl.consult.demographic.address.displayLine2of2}}
+					{{$ctrl.consult.demographic.address.displayLine1of2}}<br/>
+					{{$ctrl.consult.demographic.address.displayLine2of2}}
 					</address>
-					<p>Phone (H): {{consultRequestCtrl.consult.demographic.homePhone.formattedForDisplay}}</p>
-					<p>Phone (W): {{consultRequestCtrl.consult.demographic.workPhone.formattedForDisplay}}</p>
-					<p>Phone (C): {{consultRequestCtrl.consult.demographic.cellPhone.formattedForDisplay}}</p>
-					<p>Email: {{consultRequestCtrl.consult.demographic.email}}</p>
-					<p>MRP: {{consultRequestCtrl.consult.demographic.mrpProvider.displayName}}</p>
+					<p>Phone (H): {{$ctrl.consult.demographic.homePhone.formattedForDisplay}}</p>
+					<p>Phone (W): {{$ctrl.consult.demographic.workPhone.formattedForDisplay}}</p>
+					<p>Phone (C): {{$ctrl.consult.demographic.cellPhone.formattedForDisplay}}</p>
+					<p>Email: {{$ctrl.consult.demographic.email}}</p>
+					<p>MRP: {{$ctrl.consult.demographic.mrpProvider.displayName}}</p>
 				</div>
 				<br/>
 				<div id="consult_status">
 					<label class="control-label">Consultation Status:</label>
 					<div class="form-group">
-						<select class="form-control" ng-model="consultRequestCtrl.consult.status"
+						<select class="form-control" ng-model="$ctrl.consult.status"
 							ng-required="true"
-							    ng-options="status.value as status.name for status in consultRequestCtrl.statuses">
+							    ng-options="status.value as status.name for status in $ctrl.statuses">
 						</select>
 					</div>
 				</div>
 				<br/>
-				<button type="button" class="btn btn-small btn-primary" ng-click="consultRequestCtrl.attachFiles()">Attachments</button>
+				<button type="button" class="btn btn-small btn-primary" ng-click="$ctrl.attachFiles()">Attachments</button>
 				<ol style="padding-left:20px;">
-					<li ng-repeat="attachment in consultRequestCtrl.consult.attachments">
-						<a ng-click="consultRequestCtrl.openAttach(attachment)" title="{{attachment.displayName}}">{{attachment.shortName}}</a>
+					<li ng-repeat="attachment in $ctrl.consult.attachments">
+						<a ng-click="$ctrl.openAttach(attachment)" title="{{attachment.displayName}}">{{attachment.shortName}}</a>
 					</li>
 				</ol>
 			</div><!-- Left pane End -->
@@ -82,24 +82,24 @@
 									<%--<label class="col-sm-2 control-label">Name</label>--%>
 									<div class="col-sm-12">
 										<select id="letterhead" class="form-control"
-												ng-model="consultRequestCtrl.consult.letterhead"
-												ng-options="letterhead.name for letterhead in consultRequestCtrl.consult.letterheadList track by letterhead.id"
-												ng-change="consultRequestCtrl.changeLetterhead(consultRequestCtrl.consult.letterhead)">
+												ng-model="$ctrl.consult.letterhead"
+												ng-options="letterhead.name for letterhead in $ctrl.consult.letterheadList track by letterhead.id"
+												ng-change="$ctrl.changeLetterhead($ctrl.consult.letterhead)">
 										</select>
 									</div>
 								</div>
 								<div class="form-group">
 									<div class="col-sm-12">
 										<label>Address:</label>
-										{{consultRequestCtrl.consult.letterheadAddress}}
+										{{$ctrl.consult.letterheadAddress}}
 									</div>
 									<div class="col-sm-12">
 										<label>Phone:</label>
-										{{consultRequestCtrl.consult.letterheadPhone}}
+										{{$ctrl.consult.letterheadPhone}}
 									</div>
 									<div class="col-sm-12">
 										<label>Fax: </label>
-										{{consultRequestCtrl.consult.letterheadFax}}
+										{{$ctrl.consult.letterheadFax}}
 									</div>
 								</div>
 							</form>
@@ -113,33 +113,33 @@
 									<div class="col-sm-6">
 										<select id="serviceId" class="form-control"
 												title="Service"
-												ng-model="consultRequestCtrl.consult.serviceId"
-												ng-options="service.serviceId as service.serviceDesc for service in consultRequestCtrl.consult.serviceList"
+												ng-model="$ctrl.consult.serviceId"
+												ng-options="service.serviceId as service.serviceDesc for service in $ctrl.consult.serviceList"
 												ng-required="true"
-												ng-change="consultRequestCtrl.changeService(consultRequestCtrl.consult.serviceId)">
+												ng-change="$ctrl.changeService($ctrl.consult.serviceId)">
 										</select>
 									</div>
 
 									<div class="col-sm-6">
 										<select id="specId" class="form-control"
 												title="Consultant"
-												ng-model="consultRequestCtrl.consult.professionalSpecialist"
-												ng-options="spec.name for spec in consultRequestCtrl.specialists">
+												ng-model="$ctrl.consult.professionalSpecialist"
+												ng-options="spec.name for spec in $ctrl.specialists">
 										</select>
 									</div>
 								</div>
 								<div class="form-group">
 									<div class="col-sm-12">
 										<label>Address:</label>
-										{{consultRequestCtrl.consult.professionalSpecialist.streetAddress}}
+										{{$ctrl.consult.professionalSpecialist.streetAddress}}
 									</div>
 									<div class="col-sm-12">
 										<label>Phone:</label>
-										{{consultRequestCtrl.consult.professionalSpecialist.phoneNumber}}
+										{{$ctrl.consult.professionalSpecialist.phoneNumber}}
 									</div>
 									<div class="col-sm-12">
 										<label>Fax: </label>
-										{{consultRequestCtrl.consult.professionalSpecialist.faxNumber}}
+										{{$ctrl.consult.professionalSpecialist.faxNumber}}
 									</div>
 								</div>
 							</form>
@@ -151,38 +151,38 @@
 				<div class="col-md-12"><!-- Referral -->
 					<form class="consult-request-form">
 						<div class="form-group col-md-6">
-							<juno-select ng-model="consultRequestCtrl.consult.providerNo"
+							<juno-select ng-model="$ctrl.consult.providerNo"
 								placeholder="Referral Practitioner"
-								options="consultRequestCtrl.providers"
+								options="$ctrl.providers"
 								label="Referral Practitioner"
-								label-position="consultRequestCtrl.labelPosition.TOP"
-								on-change="consultRequestCtrl.onReferralPractitionerSelected(value)"
-								component-style="consultRequestCtrl.resolve.style">
+								label-position="$ctrl.labelPosition.TOP"
+								on-change="$ctrl.onReferralPractitionerSelected(value)"
+								component-style="$ctrl.resolve.style">
 							</juno-select>
 						</div>
 						<div class="form-group col-md-6">
 							<label class="control-label">Referral Date</label>
-							<juno-datepicker-popup juno-model="consultRequestCtrl.consult.referralDate" show-icon="true" type="Input"> </juno-datepicker-popup>
+							<juno-datepicker-popup juno-model="$ctrl.consult.referralDate" show-icon="true" type="Input"> </juno-datepicker-popup>
 						</div>
 						<div class="form-group col-md-6">
 							<label class="control-label">Urgency</label>
 							<select id="urgency" class="form-control"
-									ng-model="consultRequestCtrl.consult.urgency"
+									ng-model="$ctrl.consult.urgency"
 									ng-required="true"
-									ng-options="urgency.value as urgency.name for urgency in consultRequestCtrl.urgencies"></select>
+									ng-options="urgency.value as urgency.name for urgency in $ctrl.urgencies"></select>
 						</div>
 						<div class="form-group col-md-6">
 							<label class="control-label">Send To</label>
-							<select id="sendTo" class="form-control" ng-model="consultRequestCtrl.consult.sendTo" ng-required="true" ng-options="sendTo for sendTo in consultRequestCtrl.consult.sendToList"/>
+							<select id="sendTo" class="form-control" ng-model="$ctrl.consult.sendTo" ng-required="true" ng-options="sendTo for sendTo in $ctrl.consult.sendToList"/>
 						</div>
 						<div class="form-group col-md-6">
 							<label class="control-label">Referrer Instructions</label>
-							<textarea cols="80" rows="4" class="form-control" readOnly>{{consultRequestCtrl.consult.professionalSpecialist.annotation}}</textarea>
+							<textarea cols="80" rows="4" class="form-control" readOnly>{{$ctrl.consult.professionalSpecialist.annotation}}</textarea>
 						</div>
 
 						<div class="form-group col-md-6">
 							<label class="control-label">Last Follow-up Date</label>
-							<juno-datepicker-popup juno-model="consultRequestCtrl.consult.followUpDate" show-icon="true" type="Input"> </juno-datepicker-popup>
+							<juno-datepicker-popup juno-model="$ctrl.consult.followUpDate" show-icon="true" type="Input"> </juno-datepicker-popup>
 						</div>
 
 						<div class="form-group col-md-6">
@@ -190,31 +190,31 @@
 								<div>
 									<label class="control-label">Patient Will Book</label>
 									<input class="form-control big-checkbox" type="checkbox" id="willBook"
-									       ng-model="consultRequestCtrl.consult.patientWillBook"/>
+									       ng-model="$ctrl.consult.patientWillBook"/>
 								</div>
 								<div class="appointment-date-time-select">
 									<div class="date-select-wrapper">
 										<label class="control-label">Appointment Date</label>
-										<juno-datepicker-popup juno-model="consultRequestCtrl.consult.appointmentDate"
+										<juno-datepicker-popup juno-model="$ctrl.consult.appointmentDate"
 										                       show-icon="true" type="Input"
-										                       disable-input="consultRequestCtrl.consult.patientWillBook">
+										                       disable-input="$ctrl.consult.patientWillBook">
 										</juno-datepicker-popup>
 									</div>
 									<div class="time-select-wrapper">
 										<label class="control-label">Appointment Time</label>
 										<div class="time-select">
 											<select class="form-control"
-											        ng-model="consultRequestCtrl.consult.appointmentHour"
-											        ng-options="hour for hour in consultRequestCtrl.hours"
-											        ng-change="consultRequestCtrl.setAppointmentTime()"
-											        ng-disabled="consultRequestCtrl.consult.patientWillBook">
+											        ng-model="$ctrl.consult.appointmentHour"
+											        ng-options="hour for hour in $ctrl.hours"
+											        ng-change="$ctrl.setAppointmentTime()"
+											        ng-disabled="$ctrl.consult.patientWillBook">
 											</select>
 											<span>:</span>
 											<select class="form-control"
-											        ng-model="consultRequestCtrl.consult.appointmentMinute"
-											        ng-options="minute for minute in consultRequestCtrl.minutes"
-											        ng-change="consultRequestCtrl.setAppointmentTime()"
-											        ng-disabled="consultRequestCtrl.consult.patientWillBook">
+											        ng-model="$ctrl.consult.appointmentMinute"
+											        ng-options="minute for minute in $ctrl.minutes"
+											        ng-change="$ctrl.setAppointmentTime()"
+											        ng-disabled="$ctrl.consult.patientWillBook">
 											</select>
 										</div>
 									</div>
@@ -224,49 +224,49 @@
 
 						<div class="form-group col-md-12">
 							<label class="control-label">Appointment Notes</label>
-							<textarea rows="5" class="form-control" ng-model="consultRequestCtrl.consult.statusText"></textarea>
+							<textarea rows="5" class="form-control" ng-model="$ctrl.consult.statusText"></textarea>
 						</div>
 
 						<div class="form-group col-md-12">
 							<label class="control-label">Reason for Consultation</label>
-							<textarea rows="4" class="form-control" ng-model="consultRequestCtrl.consult.reasonForReferral"></textarea>
+							<textarea rows="4" class="form-control" ng-model="$ctrl.consult.reasonForReferral"></textarea>
 						</div>
 
 						<div class="form-group col-md-12" id="clinical-note"><!-- Clinic Notes -->
 								<label class="control-label">Pertinent clinical information</label>
 								<div class="info-add-buttons">
-									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getFamilyHistory('clinicalInfo');">
+									<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getFamilyHistory('clinicalInfo');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Family History
 									</button>
-									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getMedicalHistory('clinicalInfo');">
+									<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getMedicalHistory('clinicalInfo');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Medical History
 									</button>
-									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getSocialHistory('clinicalInfo');">
+									<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getSocialHistory('clinicalInfo');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Social History
 									</button>
-									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getOngoingConcerns('clinicalInfo');">
+									<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getOngoingConcerns('clinicalInfo');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Ongoing Concerns
 									</button>
-									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getDxRegistry('clinicalInfo');">
+									<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getDxRegistry('clinicalInfo');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Dx Registry
 									</button>
-									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getOtherMeds('clinicalInfo');">
+									<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getOtherMeds('clinicalInfo');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Other Meds
 									</button>
-									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getReminders('clinicalInfo');">
+									<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getReminders('clinicalInfo');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Reminders
 									</button>
 								</div>
 								<textarea id="clinicalInfo" cols="80" rows="5" class="form-control"
 									placeholder="Use the buttons above to insert data from the patients chart"
-									ng-model="consultRequestCtrl.consult.clinicalInfo">
+									ng-model="$ctrl.consult.clinicalInfo">
 								</textarea>
 						</div>
 
@@ -275,31 +275,31 @@
 								<label class="control-label">Significant Concurrent Problems</label>
 								<div class="info-add-buttons">
 
-									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getFamilyHistory('concurrentProblems');">
+									<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getFamilyHistory('concurrentProblems');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Family History
 									</button>
-									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getMedicalHistory('concurrentProblems');">
+									<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getMedicalHistory('concurrentProblems');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Medical History
 									</button>
-									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getSocialHistory('concurrentProblems');">
+									<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getSocialHistory('concurrentProblems');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Social History
 									</button>
-									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getOngoingConcerns('concurrentProblems');">
+									<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getOngoingConcerns('concurrentProblems');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Ongoing Concerns
 									</button>
-									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getDxRegistry('concurrentProblems');">
+									<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getDxRegistry('concurrentProblems');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Dx Registry
 									</button>
-									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getOtherMeds('concurrentProblems');">
+									<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getOtherMeds('concurrentProblems');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Other Meds
 									</button>
-									<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getReminders('concurrentProblems');">
+									<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getReminders('concurrentProblems');">
 										<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 										Reminders
 									</button>
@@ -308,7 +308,7 @@
 										  rows="5"
 										  class="form-control"
 										  placeholder="Use the buttons above to insert data from the patients chart"
-										  ng-model="consultRequestCtrl.consult.concurrentProblems">
+										  ng-model="$ctrl.consult.concurrentProblems">
 								</textarea>
 							</div>
 						</div>
@@ -316,7 +316,7 @@
 						<div class="form-group col-md-12">
 							<label class="control-label">Current Medications</label>
 							<div class="info-add-buttons">
-								<button type="button" class="btn btn-sm btn-success" ng-click="consultRequestCtrl.getOtherMeds('currentMeds');">
+								<button type="button" class="btn btn-sm btn-success" ng-click="$ctrl.getOtherMeds('currentMeds');">
 									<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 									Other Meds
 								</button>
@@ -325,14 +325,14 @@
 									  cols="80"
 									  rows="5"
 									  class="form-control"
-									  ng-model="consultRequestCtrl.consult.currentMeds"
+									  ng-model="$ctrl.consult.currentMeds"
 									  placeholder="Use the button above to insert Other Meds data from the patients chart">
 							</textarea>
 						</div>
 
 						<div class="form-group col-md-12"><!-- Alergies / Current Medications -->
 							<label class="control-label">Allergies</label>
-							<textarea id="allergies" rows="5" class="form-control" ng-model="consultRequestCtrl.consult.allergies"></textarea>
+							<textarea id="allergies" rows="5" class="form-control" ng-model="$ctrl.consult.allergies"></textarea>
 						</div>
 					</form>
 					<hr>
@@ -341,35 +341,35 @@
 		</div>
 		<div class="wrapper-action col-sm-12"><!-- Action Buttons -->
 			<button type="button" class="btn btn-large btn-success action"
-			        ng-disabled="consultRequestCtrl.loadingQueue.isLoading"
-			        ng-click="consultRequestCtrl.save()">
+			        ng-disabled="$ctrl.loadingQueue.isLoading"
+			        ng-click="$ctrl.save()">
 				Save
 			</button>&nbsp;
 			<button type="button" class="btn btn-large btn-success action"
-			        ng-disabled="consultRequestCtrl.loadingQueue.isLoading"
-			        ng-click="consultRequestCtrl.saveAndPrint()">
+			        ng-disabled="$ctrl.loadingQueue.isLoading"
+			        ng-click="$ctrl.saveAndPrint()">
 				Save & Print
 			</button>&nbsp;
 			<button type="button" class="btn btn-large btn-success action"
-			        ng-disabled="consultRequestCtrl.loadingQueue.isLoading"
-			        ng-click="consultRequestCtrl.saveAndFax()">
+			        ng-disabled="$ctrl.loadingQueue.isLoading"
+			        ng-click="$ctrl.saveAndFax()">
 				Save & Fax
 			</button>&nbsp;
 			<button type="button" class="btn btn-large btn-success action"
-			        ng-disabled="consultRequestCtrl.loadingQueue.isLoading"
-			        ng-click="consultRequestCtrl.eSend()"
-			        ng-show="consultRequestCtrl.eSendEnabled">
+			        ng-disabled="$ctrl.loadingQueue.isLoading"
+			        ng-click="$ctrl.eSend()"
+			        ng-show="$ctrl.eSendEnabled">
 				Save & Send Electronically
 			</button>&nbsp;
 			<button type="button" class="btn btn-large btn-warning action"
-			        ng-disabled="consultRequestCtrl.loadingQueue.isLoading"
-			        ng-click="consultRequestCtrl.print(consultRequestCtrl.consult.id)"
-			        ng-show="consultRequestCtrl.consult.id">
+			        ng-disabled="$ctrl.loadingQueue.isLoading"
+			        ng-click="$ctrl.print($ctrl.consult.id)"
+			        ng-show="$ctrl.consult.id">
 				Print Preview
 			</button>&nbsp;
 			<button type="button" class="btn btn-large btn-default action"
-			        ng-disabled="consultRequestCtrl.loadingQueue.isLoading"
-			        ng-click="consultRequestCtrl.close()">
+			        ng-disabled="$ctrl.loadingQueue.isLoading"
+			        ng-click="$ctrl.close()">
 				Close
 			</button>&nbsp;
 		</div>
