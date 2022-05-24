@@ -55,21 +55,22 @@ boolean authed=true;
 	String pageStr = request.getParameter("page");
 	String perPageStr = request.getParameter("perPage");
 
+	MiscUtils.getLogger().info("pageStr=" + pageStr + "; perPageStr=" + perPageStr);
+
 	int pageNo = 1;
 	int perPage = 25;
 
-	if(pageStr != null)
+	if(StringUtils.isNotBlank(pageStr))
 	{
 		pageNo = Integer.parseInt(pageStr);
 	}
-	if(perPageStr != null)
+	if(StringUtils.isNotBlank(perPageStr))
 	{
 		perPage = Integer.parseInt(perPageStr);
-
 	}
 	if(pageNo < 1) pageNo = 1;
-	int limit = (100 < perPage) ? 100 : perPage;
-	int offset = pageNo * (perPage - 1);
+	int limit = Math.min(100, perPage);
+	int offset = perPage * (pageNo - 1);
 
 	List<RestServiceLog> logEntryList = serviceLogDao.findList(offset, limit);
 	String tdTitleColor = "#CCCC99";

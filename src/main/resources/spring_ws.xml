@@ -342,9 +342,6 @@
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.HrmExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.FaxExceptionMapper"/>
 
-			<!-- Juno filters. -->
-			<bean class="org.oscarehr.ws.rest.filter.LoggingFilterInternal"/>
-
 			<!-- Custom ContextResolver to apply settings to the Jackson ObjectMapper -->
 			<bean class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
 			<bean class="org.oscarehr.ws.spring.paramConverter.LocalDateConverterProvider"/>
