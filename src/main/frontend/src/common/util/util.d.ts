@@ -7,4 +7,7 @@ declare const Juno: {
 	},
 	// @ts-ignore
 	Validations: Juno.Validations,
+
+	// @ts-ignore
+	Consults: Juno.Consults,
 };

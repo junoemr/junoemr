@@ -55,13 +55,12 @@
 				</div>
 				<br/>
 				<div id="consult_status">
-					<label class="control-label">Consultation Status:</label>
-					<div class="form-group">
-						<select class="form-control" ng-model="$ctrl.consult.status"
-							ng-required="true"
-							    ng-options="status.value as status.name for status in $ctrl.statuses">
-						</select>
-					</div>
+					<juno-select
+							ng-model="$ctrl.consult.status"
+							options="$ctrl.statusOptions"
+							label="Consultation Status"
+							label-position="$ctrl.labelPosition.TOP">
+					</juno-select>
 				</div>
 				<br/>
 				<button type="button" class="btn btn-small btn-primary" ng-click="$ctrl.attachFiles()">Attachments</button>
@@ -91,15 +90,15 @@
 								<div class="form-group">
 									<div class="col-sm-12">
 										<label>Address:</label>
-										{{$ctrl.consult.letterheadAddress}}
+										{{$ctrl.consult.letterhead.address.displayLine1of2}}
 									</div>
 									<div class="col-sm-12">
 										<label>Phone:</label>
-										{{$ctrl.consult.letterheadPhone}}
+										{{$ctrl.consult.letterhead.phone.formattedForDisplay}}
 									</div>
 									<div class="col-sm-12">
 										<label>Fax: </label>
-										{{$ctrl.consult.letterheadFax}}
+										{{$ctrl.consult.letterhead.fax.formattedForDisplay}}
 									</div>
 								</div>
 							</form>
@@ -114,16 +113,18 @@
 										<juno-select
 												ng-model="$ctrl.consult.serviceId"
 												options="$ctrl.serviceOptions"
+												on-change="$ctrl.changeService(value)"
 												title="Service">
 										</juno-select>
 									</div>
 
 									<div class="col-sm-6">
-										<select id="specId" class="form-control"
-												title="Consultant"
-												ng-model="$ctrl.consult.professionalSpecialist"
-												ng-options="spec.name for spec in $ctrl.specialists">
-										</select>
+										<juno-select
+												ng-model="$ctrl.selectedSpecialistId"
+												options="$ctrl.specilistOptions"
+												on-change="$ctrl.changeSpecialist(option.data)"
+												title="Consultant">
+										</juno-select>
 									</div>
 								</div>
 								<div class="form-group">
@@ -163,15 +164,20 @@
 							<juno-datepicker-popup juno-model="$ctrl.consult.referralDate" show-icon="true" type="Input"> </juno-datepicker-popup>
 						</div>
 						<div class="form-group col-md-6">
-							<label class="control-label">Urgency</label>
-							<select id="urgency" class="form-control"
+							<juno-select
 									ng-model="$ctrl.consult.urgency"
-									ng-required="true"
-									ng-options="urgency.value as urgency.name for urgency in $ctrl.urgencies"></select>
+									options="$ctrl.urgencyOptions"
+									label="Urgency"
+									label-position="$ctrl.labelPosition.TOP">
+							</juno-select>
 						</div>
 						<div class="form-group col-md-6">
-							<label class="control-label">Send To</label>
-							<select id="sendTo" class="form-control" ng-model="$ctrl.consult.sendTo" ng-required="true" ng-options="sendTo for sendTo in $ctrl.consult.sendToList"/>
+							<juno-select
+									ng-model="$ctrl.consult.sendTo"
+									options="$ctrl.sendOptions"
+									label="Send To"
+									label-position="$ctrl.labelPosition.TOP">
+							</juno-select>
 						</div>
 						<div class="form-group col-md-6">
 							<label class="control-label">Referrer Instructions</label>

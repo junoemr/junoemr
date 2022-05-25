@@ -49,8 +49,8 @@ angular.module('Consults').component('consultRequest',
 
 				let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
 
-				ctrl.urgencies = staticDataService.getConsultUrgencies();
-				ctrl.statuses = staticDataService.getConsultRequestStatuses();
+				ctrl.urgencyOptions = staticDataService.getConsultUrgencies();
+				ctrl.statusOptions = staticDataService.getConsultRequestStatuses();
 				ctrl.hours = staticDataService.getHours();
 				ctrl.minutes = staticDataService.getMinutes();
 				//monitor data changed
@@ -62,9 +62,17 @@ angular.module('Consults').component('consultRequest',
 				ctrl.serviceOptions = [];
 				ctrl.demographic = null;
 				ctrl.selectedLetterhead = null;
+				ctrl.selectedSpecialistId = null;
+
+				ctrl.specilistOptions = [];
+				ctrl.serviceSpecialistMap = new Map();
+
+				ctrl.sendOptions = [];
 
 				ctrl.$onInit = async () =>
 				{
+					console.info(ctrl.consult);
+
 					const results = await Promise.all([
 						demographicService.getDemographic(ctrl.consult.demographicId),
 						providersServiceApi.getActive(),
@@ -80,7 +88,7 @@ angular.module('Consults').component('consultRequest',
 						};
 					});
 
-					ctrl.letterheadOptions = results[2].map((letterhead) =>
+					ctrl.letterheadOptions = results[2].map((letterhead: Letterhead) =>
 					{
 						return {
 							label: letterhead.name,
@@ -95,6 +103,13 @@ angular.module('Consults').component('consultRequest',
 					}
 					ctrl.selectedLetterhead = ctrl.consult.letterhead.id;
 
+					ctrl.sendOptions = ctrl.consult.sendToList.map((sendTo: string) =>
+					{
+						return {
+							label: sendTo,
+							value: sendTo,
+						};
+					});
 
 					ctrl.serviceOptions = ctrl.consult.serviceList.map((service) =>
 					{
@@ -104,38 +119,35 @@ angular.module('Consults').component('consultRequest',
 						};
 					});
 
-					console.info(ctrl.consult);
-
-					/* If appointment time is present, we must parse the hours and minutes in order to
-					populate the hour and minute selectors */
-					// if (ctrl.consult.appointmentTime !== null)
-					// {
-					// 	ctrl.parseTime(ctrl.consult.appointmentTime);
-					// }
-
-					ctrl.loadingQueue.pushLoadingState();
-
-					//set specialist list
-					for (var i = 0; i < ctrl.consult.serviceList.length; i++)
+					// map specialist options to each service
+					ctrl.consult.serviceList.forEach((service) =>
 					{
-						if (ctrl.consult.serviceList[i].serviceId == ctrl.consult.serviceId)
-						{
-							ctrl.specialists = Juno.Common.Util.toArray(ctrl.consult.serviceList[i].specialists);
-							break;
-						}
-					}
-					angular.forEach(ctrl.specialists, function(spec)
-					{
-						if (ctrl.consult.professionalSpecialist && spec.id == ctrl.consult.professionalSpecialist.id)
-						{
-							ctrl.consult.professionalSpecialist = spec;
-						}
+						ctrl.serviceSpecialistMap.set(service.serviceId, service.specialists.map(
+							(specialist) =>
+							{
+								return {
+									label: specialist.name,
+									value: specialist.id,
+									data: specialist,
+								};
+							}));
 					});
+
+					if(!ctrl.consult.serviceId)
+					{
+						ctrl.consult.serviceId = ctrl.consult.serviceList[0].serviceId;
+					}
+					if(ctrl.consult.professionalSpecialist)
+					{
+						ctrl.selectedSpecialistId = ctrl.consult.professionalSpecialist.id;
+					}
+
+					ctrl.changeService(ctrl.consult.serviceId)
+					ctrl.setESendEnabled(); //execute once on form open
 
 					//set attachments
 					Juno.Consults.Common.sortAttachmentDocs(ctrl.consult.attachments);
 
-					ctrl.setESendEnabled(); //execute once on form open
 					ctrl.flagUnsaved(false);
 				};
 
@@ -175,7 +187,6 @@ angular.module('Consults').component('consultRequest',
 						},
 						function(newVal, oldVal)
 						{
-							console.info("watch", (newVal === oldVal), newVal, oldVal);
 							if(newVal !== oldVal)
 							{
 								ctrl.flagUnsaved(true);
@@ -195,26 +206,30 @@ angular.module('Consults').component('consultRequest',
 
 				ctrl.flagUnsaved = (dirty) =>
 				{
-					console.info("unsaved flag: ", dirty);
 					ctrl.consultChanged = dirty;
 				}
 
 				ctrl.isUnsaved = () =>
 				{
-					console.info("check unsaved flag: ", ctrl.consultChanged);
 					return ctrl.consultChanged;
 				}
 
-				ctrl.changeService = function changeService(id)
+				ctrl.changeService = (serviceId): void =>
 				{
-					var index = $("#serviceId")[0].selectedIndex;
-					if (index === null)
+					ctrl.specilistOptions = ctrl.serviceSpecialistMap.get(serviceId);
+
+					// clear current specialist on change if they are not in the new options
+					if(ctrl.consult.professionalSpecialist
+						&& !(ctrl.specilistOptions.map((option) => option.value).includes(ctrl.consult.professionalSpecialist.id)))
 					{
-						$scope.specialists = null;
-						return;
+						ctrl.consult.professionalSpecialist = null;
 					}
-					ctrl.specialists = Juno.Common.Util.toArray(ctrl.consult.serviceList[index].specialists);
 				};
+
+				ctrl.changeSpecialist = (specialist): void =>
+				{
+					ctrl.consult.professionalSpecialist = specialist;
+				}
 
 				ctrl.writeToBox = function writeToBox(results, boxId)
 				{
@@ -377,7 +392,7 @@ angular.module('Consults').component('consultRequest',
 						alert("Please select an Urgency");
 						return true;
 					}
-					if (!ctrl.consult.letterheadName)
+					if (!ctrl.consult.letterhead)
 					{
 						alert("Please select a Letterhead");
 						return true;
@@ -387,7 +402,7 @@ angular.module('Consults').component('consultRequest',
 						alert("Please select a Service");
 						return true;
 					}
-					if (ctrl.consult.demographic == null || ctrl.consult.demographic == "")
+					if (ctrl.consult.demographicId == null || ctrl.consult.demographicId == "")
 					{
 						alert("Error! Invalid patient!");
 						return true;

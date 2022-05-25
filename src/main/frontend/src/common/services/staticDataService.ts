@@ -4742,17 +4742,17 @@ angular.module("Common.Services").service("staticDataService", [
 			urgencies.push(
 			{
 				value: "2",
-				name: "Non-Urgent"
+				label: "Non-Urgent"
 			});
 			urgencies.push(
 			{
 				value: "1",
-				name: "Urgent"
+				label: "Urgent"
 			});
 			urgencies.push(
 			{
 				value: "3",
-				name: "Return"
+				label: "Return"
 			});
 			return urgencies;
 		};
@@ -4763,37 +4763,37 @@ angular.module("Common.Services").service("staticDataService", [
 			statuses.push(
 			{
 				value: "1",
-				name: "Not Complete"
+				label: "Not Complete"
 			});
 			statuses.push(
 			{
 				value: "2",
-				name: "Preliminary Pending Specialist"
+				label: "Preliminary Pending Specialist"
 			});
 			statuses.push(
 			{
 				value: "3",
-				name: "Pending Callback"
+				label: "Pending Callback"
 			});
 			statuses.push(
 			{
 				value: "4",
-				name: "Completed"
+				label: "Completed"
 			});
 			statuses.push(
 			{
 				value: "5",
-				name: "Cancelled"
+				label: "Cancelled"
 			});
 			statuses.push(
 			{
 				value: "6",
-				name: "Appointment Booked"
+				label: "Appointment Booked"
 			});
 			statuses.push(
 			{
 				value: "7",
-				name: "Deleted"
+				label: "Deleted"
 			});
 			return statuses;
 		};
