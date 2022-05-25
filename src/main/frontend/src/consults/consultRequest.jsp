@@ -81,11 +81,11 @@
 								<div class="form-group">
 									<%--<label class="col-sm-2 control-label">Name</label>--%>
 									<div class="col-sm-12">
-										<select id="letterhead" class="form-control"
-												ng-model="$ctrl.consult.letterhead"
-												ng-options="letterhead.name for letterhead in $ctrl.consult.letterheadList track by letterhead.id"
-												ng-change="$ctrl.changeLetterhead($ctrl.consult.letterhead)">
-										</select>
+										<juno-select
+												ng-model="$ctrl.selectedLetterhead"
+												options="$ctrl.letterheadOptions"
+												on-change="$ctrl.changeLetterhead(option.data)">
+										</juno-select>
 									</div>
 								</div>
 								<div class="form-group">
@@ -111,13 +111,11 @@
 							<form class="form-horizontal">
 								<div class="form-group">
 									<div class="col-sm-6">
-										<select id="serviceId" class="form-control"
-												title="Service"
+										<juno-select
 												ng-model="$ctrl.consult.serviceId"
-												ng-options="service.serviceId as service.serviceDesc for service in $ctrl.consult.serviceList"
-												ng-required="true"
-												ng-change="$ctrl.changeService($ctrl.consult.serviceId)">
-										</select>
+												options="$ctrl.serviceOptions"
+												title="Service">
+										</juno-select>
 									</div>
 
 									<div class="col-sm-6">

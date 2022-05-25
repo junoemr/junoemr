@@ -23,6 +23,7 @@
  */
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
@@ -92,6 +93,7 @@ import java.util.List;
 
 @Path("/consults")
 @Component("consultationWebService")
+@Tag(name = "consultation")
 public class ConsultationWebService extends AbstractServiceImpl {
 
 	private static Logger logger = Logger.getLogger(ConsultationWebService.class);

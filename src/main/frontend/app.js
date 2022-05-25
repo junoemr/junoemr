@@ -843,10 +843,6 @@ oscarApp.config([
 					}
 					return consultService.getRequest($stateParams.requestId);
 				}],
-				user: ['providerService', function(providerService)
-				{
-					return providerService.getMe();
-				}]
 			},
 			meta:
 			{

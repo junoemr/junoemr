@@ -25,17 +25,29 @@
  Ontario, Canada
 
  */
+import {ConsultationApi} from "../../../generated";
+import {API_BASE_PATH} from "../../lib/constants/ApiConstants";
+import ConsultRequestModelConverter from "../../lib/consult/request/converter/ConsultRequestModelConverter";
+import LetterheadToModelConverter from "../../lib/consult/request/converter/LetterheadToModelConverter";
+
 angular.module("Common.Services").service("consultService", [
 	'$http',
+	'$httpParamSerializer',
 	'$q',
 	'junoHttp',
 	function($http,
+	         $httpParamSerializer,
 	         $q,
 	         junoHttp)
 	{
 		var service = {};
 
 		service.apiPath = '../ws/rs/consults/';
+		service.consultationApi = new ConsultationApi($http, $httpParamSerializer, API_BASE_PATH);
+
+		service.consultRequestModelConverter = new ConsultRequestModelConverter();
+		service.letterheadToModelConverter = new LetterheadToModelConverter();
+
 
 		service.searchRequests = function searchRequests(search)
 		{
@@ -79,56 +91,15 @@ angular.module("Common.Services").service("consultService", [
 			return deferred.promise;
 		};
 
-		service.getRequest = function getRequest(requestId)
+		service.getRequest = async (requestId) =>
 		{
-			var deferred = $q.defer();
-
-			var config = Juno.Common.ServiceHelper.configHeaders();
-
-			junoHttp.get(service.apiPath + 'getRequest/' + encodeURIComponent(requestId), config).then(
-				function success(results)
-				{
-					if(results.data.referralDate) results.data.referralDate = moment(results.data.referralDate).toDate();
-					if(results.data.appointmentDate) results.data.appointmentDate = moment(results.data.appointmentDate).toDate();
-					if(results.data.followUpDate) results.data.followUpDate = moment(results.data.followUpDate).toDate();
-
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("consultService::getRequest error", errors);
-					deferred.reject(
-						"An error occurred while getting consult request (requestId=" + requestId + ")");
-				});
-
-			return deferred.promise;
+			return service.consultRequestModelConverter.convert(
+				(await service.consultationApi.getRequest(requestId)).data.body);
 		};
-		service.getNewRequest = function getRequest(demographicNo)
+		service.getNewRequest = async (demographicNo) =>
 		{
-			var deferred = $q.defer();
-
-			var config = Juno.Common.ServiceHelper.configHeaders();
-			config.params = {
-				demographicNo: demographicNo
-			};
-
-			junoHttp.get(service.apiPath + 'getNewRequest', config).then(
-				function success(results)
-				{
-					if(results.data.referralDate) results.data.referralDate = moment(results.data.referralDate).toDate();
-					if(results.data.appointmentDate) results.data.appointmentDate = moment(results.data.appointmentDate).toDate();
-					if(results.data.followUpDate) results.data.followUpDate = moment(results.data.followUpDate).toDate();
-
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("consultService::getNewRequest error", errors);
-					deferred.reject(
-						"An error occurred while getting new consult request");
-				});
-
-			return deferred.promise;
+			return service.consultRequestModelConverter.convert(
+				(await service.consultationApi.getNewRequest(demographicNo)).data.body);
 		};
 
 		service.getRequestAttachments = function getRequestAttachments(
@@ -309,24 +280,11 @@ angular.module("Common.Services").service("consultService", [
 			return deferred.promise;
 		};
 
-		service.getLetterheadList = function getLetterheadList()
+		service.getLetterheadList = async () =>
 		{
-			var deferred = $q.defer();
-
-			var config = Juno.Common.ServiceHelper.configHeaders();
-			junoHttp.get(service.apiPath + 'getLetterheadList', config).then(
-				function success(results)
-				{
-					deferred.resolve(results);
-				},
-				function error(errors)
-				{
-					console.log("consultService::getLetterheadList error", errors);
-					deferred.reject("An error occurred while fetching letterheads");
-				});
-
-			return deferred.promise;
-		};
+			return service.letterheadToModelConverter.convertList(
+				(await service.consultationApi.getLetterheadList()).data.body);
+		}
 
 		return service;
 	}

@@ -52,7 +52,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			consultService.getLetterheadList().then(
 				function success(results)
 				{
-					consult.letterheadList = Juno.Common.Util.toArray(results.data);
+					consult.letterheadList = results;
 
 					//set default letterhead
 					if(consult.letterhead === null)

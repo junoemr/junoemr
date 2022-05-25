@@ -4,13 +4,14 @@ import {ProvidersServiceApi} from "../../generated";
 import LoadingQueue from "../lib/util/LoadingQueue";
 import ToastService from "../lib/alerts/service/ToastService";
 import moment from "moment";
+import {JunoSelectOption} from "../lib/common/junoSelectOption";
+import Letterhead from "../lib/consult/request/model/Letterhead";
 
 angular.module('Consults').component('consultRequest',
 	{
 		templateUrl: 'src/consults/consultRequest.jsp',
 		bindings: {
 			consult: "<",
-			user: "<",
 		},
 		controller: [
 			'$scope',
@@ -58,65 +59,61 @@ angular.module('Consults').component('consultRequest',
 
 				ctrl.loadingQueue = new LoadingQueue();
 				ctrl.toastService = new ToastService();
+				ctrl.serviceOptions = [];
+				ctrl.demographic = null;
+				ctrl.selectedLetterhead = null;
 
-				ctrl.$onInit = () =>
+				ctrl.$onInit = async () =>
 				{
-					ctrl.consult.faxList = Juno.Common.Util.toArray(ctrl.consult.faxList);
-					ctrl.consult.serviceList = Juno.Common.Util.toArray(ctrl.consult.serviceList);
-					ctrl.consult.sendToList = Juno.Common.Util.toArray(ctrl.consult.sendToList);
+					const results = await Promise.all([
+						demographicService.getDemographic(ctrl.consult.demographicId),
+						providersServiceApi.getActive(),
+						consultService.getLetterheadList(),
+					]);
+
+					ctrl.demographic = results[0];
+					ctrl.providers =  results[1].data.body.map((provider) =>
+					{
+						return {
+							label: provider.name,
+							value: provider.providerNo
+						};
+					});
+
+					ctrl.letterheadOptions = results[2].map((letterhead) =>
+					{
+						return {
+							label: letterhead.name,
+							value: letterhead.id,
+							data: letterhead,
+						};
+					});
+
+					if(!ctrl.consult.letterhead)
+					{
+						ctrl.changeLetterhead(ctrl.letterheadOptions[0].data);
+					}
+					ctrl.selectedLetterhead = ctrl.consult.letterhead.id;
+
+
+					ctrl.serviceOptions = ctrl.consult.serviceList.map((service) =>
+					{
+						return {
+							label: service.serviceDesc,
+							value: service.serviceId,
+						};
+					});
+
+					console.info(ctrl.consult);
 
 					/* If appointment time is present, we must parse the hours and minutes in order to
 					populate the hour and minute selectors */
-					if (ctrl.consult.appointmentTime !== null)
-					{
-						ctrl.parseTime(ctrl.consult.appointmentTime);
-					}
-
-					//set demographic info
-					ctrl.loadingQueue.pushLoadingState();
-					demographicService.getDemographic(ctrl.consult.demographicId).then(
-						function success(results)
-						{
-							ctrl.consult.demographic = results;
-						},
-						function error(errors)
-						{
-							console.error(errors);
-						}
-					).finally(() =>
-					{
-						ctrl.loadingQueue.popLoadingState();
-					});
+					// if (ctrl.consult.appointmentTime !== null)
+					// {
+					// 	ctrl.parseTime(ctrl.consult.appointmentTime);
+					// }
 
 					ctrl.loadingQueue.pushLoadingState();
-					consultService.getLetterheadList().then(
-						function success(results)
-						{
-							ctrl.consult.letterheadList = Juno.Common.Util.toArray(results.data);
-							if(ctrl.consult.letterhead === null)
-							{
-								ctrl.changeLetterhead(ctrl.consult.letterheadList[0]);
-							}
-							else
-							{
-								for (var i = 0; i < ctrl.consult.letterheadList.length; i++)
-								{
-									if (ctrl.consult.letterheadList[i].id === ctrl.consult.letterheadName)
-									{
-										ctrl.changeLetterhead(ctrl.consult.letterheadList[i]);
-										break;
-									}
-								}
-							}
-						},
-						function error(errors)
-						{
-							console.error(errors);
-						}
-					).finally(() =>
-					{
-						ctrl.loadingQueue.popLoadingState();
-					});
 
 					//set specialist list
 					for (var i = 0; i < ctrl.consult.serviceList.length; i++)
@@ -136,30 +133,7 @@ angular.module('Consults').component('consultRequest',
 					});
 
 					//set attachments
-					ctrl.consult.attachments = Juno.Common.Util.toArray(ctrl.consult.attachments);
 					Juno.Consults.Common.sortAttachmentDocs(ctrl.consult.attachments);
-
-					ctrl.loadingQueue.pushLoadingState();
-					providersServiceApi.getActive().then(
-						function success(results)
-						{
-							ctrl.providers = [];
-							for (let provider of results.data.body)
-							{
-								ctrl.providers.push({
-									label: provider.name,
-									value: provider.providerNo
-								})
-							}
-						},
-						function error(results)
-						{
-							console.error("Failed to get provider list with error: " + results);
-						}
-					).finally(() =>
-					{
-						ctrl.loadingQueue.popLoadingState();
-					});
 
 					ctrl.setESendEnabled(); //execute once on form open
 					ctrl.flagUnsaved(false);
@@ -188,15 +162,9 @@ angular.module('Consults').component('consultRequest',
 					ctrl.consult.appointmentMinute = tArray[1];
 				};
 
-				ctrl.changeLetterhead = function changeLetterhead(letterhead)
+				ctrl.changeLetterhead = (letterhead: Letterhead): void =>
 				{
 					ctrl.consult.letterhead = letterhead;
-
-					// these are required for current print functionality
-					ctrl.consult.letterheadName = ctrl.consult.letterhead.id;
-					ctrl.consult.letterheadAddress = ctrl.consult.letterhead.address;
-					ctrl.consult.letterheadPhone = ctrl.consult.letterhead.phone;
-					ctrl.consult.letterheadFax = ctrl.consult.letterhead.fax;
 				};
 
 				ctrl.loadWatches = () =>
@@ -207,7 +175,11 @@ angular.module('Consults').component('consultRequest',
 						},
 						function(newVal, oldVal)
 						{
-							ctrl.flagUnsaved(true);
+							console.info("watch", (newVal === oldVal), newVal, oldVal);
+							if(newVal !== oldVal)
+							{
+								ctrl.flagUnsaved(true);
+							}
 						});
 				}
 
@@ -609,7 +581,7 @@ angular.module('Consults').component('consultRequest',
 					});
 				};
 
-				ctrl.print = function print(reqId)
+				ctrl.print = function print(reqId): void
 				{
 					window.open("../oscarEncounter/oscarConsultationRequest/printPdf2.do?reqId=" + reqId + "&demographicNo=" + ctrl.consult.demographicId);
 				};
