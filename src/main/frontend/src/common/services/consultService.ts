@@ -30,6 +30,12 @@ import {API_BASE_PATH} from "../../lib/constants/ApiConstants";
 import ConsultRequestModelConverter from "../../lib/consult/request/converter/ConsultRequestModelConverter";
 import LetterheadToModelConverter from "../../lib/consult/request/converter/LetterheadToModelConverter";
 import ConsultServiceToModelConverter from "../../lib/consult/request/converter/ConsultServiceToModelConverter";
+import moment from "moment";
+import ConsultRequest from "../../lib/consult/request/model/ConsultRequest";
+import Letterhead from "../../lib/consult/request/model/Letterhead";
+import ConsultService from "../../lib/consult/request/model/ConsultService";
+import ConsultRequestToUpdateInputConverter
+	from "../../lib/consult/request/converter/ConsultRequestToUpdateInputConverter";
 
 angular.module("Common.Services").service("consultService", [
 	'$http',
@@ -41,12 +47,13 @@ angular.module("Common.Services").service("consultService", [
 	         $q,
 	         junoHttp)
 	{
-		var service = {};
+		const service = this;
 
 		service.apiPath = '../ws/rs/consults/';
 		service.consultationApi = new ConsultationApi($http, $httpParamSerializer, API_BASE_PATH);
 
 		service.consultRequestModelConverter = new ConsultRequestModelConverter();
+		service.consultRequestToUpdateInputConverter = new ConsultRequestToUpdateInputConverter();
 		service.letterheadToModelConverter = new LetterheadToModelConverter();
 		service.consultServiceToModelConverter = new ConsultServiceToModelConverter();
 
@@ -93,12 +100,13 @@ angular.module("Common.Services").service("consultService", [
 			return deferred.promise;
 		};
 
-		service.getRequest = async (requestId) =>
+		service.getRequest = async (requestId: number): Promise<ConsultRequest> =>
 		{
 			return service.consultRequestModelConverter.convert(
 				(await service.consultationApi.getRequest(requestId)).data.body);
 		};
-		service.getNewRequest = async (demographicNo) =>
+
+		service.getNewRequest = async (demographicNo: number): Promise<ConsultRequest> =>
 		{
 			return service.consultRequestModelConverter.convert(
 				(await service.consultationApi.getNewRequest(demographicNo)).data.body);
@@ -129,22 +137,16 @@ angular.module("Common.Services").service("consultService", [
 			return deferred.promise;
 		};
 
-		service.saveRequest = function saveRequest(request)
+		service.createRequest = async (request: ConsultRequest): Promise<ConsultRequest> =>
 		{
-			var deferred = $q.defer();
-			junoHttp.post(service.apiPath + 'saveRequest', request).then(
+			let response = await service.consultationApi.saveRequest(service.consultRequestToUpdateInputConverter.convert(request));
+			return service.consultRequestModelConverter.convert(response.data.body);
+		};
 
-				function success(results)
-				{
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("consultService::saveRequest error", error);
-					deferred.reject("An error occurred while fetching consult request after save");
-				});
-
-			return deferred.promise;
+		service.updateRequest = async (request: ConsultRequest): Promise<ConsultRequest> =>
+		{
+			let response = await service.consultationApi.saveRequest(service.consultRequestToUpdateInputConverter.convert(request));
+			return service.consultRequestModelConverter.convert(response.data.body);
 		};
 
 		service.eSendRequest = function eSendRequest(requestId)
@@ -282,18 +284,16 @@ angular.module("Common.Services").service("consultService", [
 			return deferred.promise;
 		};
 
-		service.getLetterheadList = async () =>
+		service.getLetterheadList = async (): Promise<Letterhead[]> =>
 		{
 			return service.letterheadToModelConverter.convertList(
 				(await service.consultationApi.getLetterheadList()).data.body);
 		}
 
-		service.getServiceList = async () =>
+		service.getServiceList = async (): Promise<ConsultService[]> =>
 		{
 			return service.consultServiceToModelConverter.convertList(
 				(await service.consultationApi.getServiceList()).data.body);
 		}
-
-		return service;
 	}
 ]);

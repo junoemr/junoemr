@@ -7,6 +7,7 @@ import moment from "moment";
 import {JunoSelectOption} from "../lib/common/junoSelectOption";
 import Letterhead from "../lib/consult/request/model/Letterhead";
 import ConsultService from "../lib/consult/request/model/ConsultService";
+import ConsultRequest from "../lib/consult/request/model/ConsultRequest";
 
 angular.module('Consults').component('consultRequest',
 	{
@@ -57,6 +58,7 @@ angular.module('Consults').component('consultRequest',
 				//monitor data changed
 				ctrl.consultChanged = false;
 				ctrl.initialized = false;
+				ctrl.editMode = false;
 
 				ctrl.loadingQueue = new LoadingQueue();
 				ctrl.toastService = new ToastService();
@@ -72,7 +74,7 @@ angular.module('Consults').component('consultRequest',
 
 				ctrl.$onInit = async () =>
 				{
-					console.info(ctrl.consult);
+					ctrl.editMode = (ctrl.consult.id !== null);
 
 					const results = await Promise.all([
 						demographicService.getDemographic(ctrl.consult.demographicId),
@@ -392,22 +394,22 @@ angular.module('Consults').component('consultRequest',
 				{
 					if (!ctrl.consult.urgency)
 					{
-						alert("Please select an Urgency");
+						ctrl.toastService.errorToast("Please select an Urgency");
 						return true;
 					}
 					if (!ctrl.consult.letterhead)
 					{
-						alert("Please select a Letterhead");
+						ctrl.toastService.errorToast("Please select a Letterhead");
 						return true;
 					}
 					if (!ctrl.consult.serviceId)
 					{
-						alert("Please select a Service");
+						ctrl.toastService.errorToast("Please select a Service");
 						return true;
 					}
 					if (ctrl.consult.demographicId == null || ctrl.consult.demographicId == "")
 					{
-						alert("Error! Invalid patient!");
+						ctrl.toastService.errorToast("Error! Invalid patient!");
 						return true;
 					}
 					return false;
@@ -471,9 +473,8 @@ angular.module('Consults').component('consultRequest',
 					ctrl.eSendEnabled = ctrl.consult.professionalSpecialist != null && ctrl.consult.professionalSpecialist.eDataUrl != null && ctrl.consult.professionalSpecialist.eDataUrl.trim() != "";
 				};
 
-				ctrl.save = function save()
+				ctrl.save = async () =>
 				{
-					var deferred = $q.defer();
 					var valid = true;
 
 					if (ctrl.consult.id == null && !securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationCreate))
@@ -498,36 +499,32 @@ angular.module('Consults').component('consultRequest',
 						ctrl.flagUnsaved(false); //reset change count
 						ctrl.setAppointmentTime();
 
-						consultService.saveRequest(ctrl.consult).then(
-							function success(results)
+						let response: ConsultRequest;
+						try
+						{
+							if(ctrl.editMode)
 							{
-								if (ctrl.consult.id == null)
-								{
-									ctrl.consult.id = results.id; // assign id to prevent possible double save
-									$location.path("/record/" + ctrl.consult.demographicId + "/consult/" + results.id);
-								}
-								deferred.resolve(results.id);
-							},
-							function error(errors)
+								response = await consultService.updateRequest(ctrl.consult);
+							}
+							else
 							{
-								console.error(errors);
-								deferred.reject(errors);
-							})
-							.finally(
-								function()
-								{
-									ctrl.setESendEnabled();
-									ctrl.consultSaving = false; //hide saving banner
-									ctrl.loadingQueue.popLoadingState();
-								}
-							);
+								response = await consultService.createRequest(ctrl.consult);
+								$location.path("/record/" + ctrl.consult.demographicId + "/consult/" + response.id);
+							}
+							ctrl.consult = response;
+						}
+						catch(error: Error)
+						{
+
+						}
+						finally
+						{
+							ctrl.setESendEnabled();
+							ctrl.consultSaving = false; //hide saving banner
+							ctrl.loadingQueue.popLoadingState();
+						}
 					}
-					else
-					{
-						deferred.reject("Invalid");
-					}
-					return deferred.promise;
-				};
+				}
 
 				ctrl.close = function close()
 				{

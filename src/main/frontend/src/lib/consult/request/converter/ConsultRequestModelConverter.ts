@@ -59,6 +59,7 @@ export default class ConsultRequestModelConverter extends AbstractConverter<Cons
 		{
 			letterhead.fax = new PhoneNumber(from.letterheadFax, null, PhoneType.Fax, false);
 		}
+		model.letterhead = letterhead;
 
 		model.attachments = Juno.Common.Util.toArray(from.attachments); // should have own models
 
