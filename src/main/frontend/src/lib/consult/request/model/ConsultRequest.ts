@@ -1,6 +1,5 @@
 import {
 	ConsultationAttachmentTo1,
-	ConsultationServiceTo1,
 	FaxConfigTo1,
 	ProfessionalSpecialistTo1
 } from "../../../../../generated";
@@ -35,7 +34,6 @@ export default class ConsultRequest
 
 	// todo move lists to their own requests, not attached from model
 	public faxList: Array<FaxConfigTo1>;
-	public serviceList: Array<ConsultationServiceTo1>;
 	public sendToList: Array<string>;
 
 	constructor(id)

@@ -636,6 +636,19 @@ public class ConsultationWebService extends AbstractServiceImpl {
 		return RestSearchResponse.successResponse(letterheadList, 1, letterheadList.size(), letterheadList.size());
 	}
 
+	@GET
+	@Path("/getServiceList")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestSearchResponse<ConsultationServiceTo1> getServiceList()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONSULTATION_READ);
+
+		List<ConsultationServices> consultationServices = consultationManager.getConsultationServices();
+		List<ConsultationServiceTo1> serviceTransfers = servicesToTransferConverter.convert(consultationServices);
+
+		return RestSearchResponse.successResponseOnePage(serviceTransfers);
+	}
+
 	/*******************
 	 * private methods *
 	 *******************/

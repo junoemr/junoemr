@@ -29,6 +29,7 @@ import {ConsultationApi} from "../../../generated";
 import {API_BASE_PATH} from "../../lib/constants/ApiConstants";
 import ConsultRequestModelConverter from "../../lib/consult/request/converter/ConsultRequestModelConverter";
 import LetterheadToModelConverter from "../../lib/consult/request/converter/LetterheadToModelConverter";
+import ConsultServiceToModelConverter from "../../lib/consult/request/converter/ConsultServiceToModelConverter";
 
 angular.module("Common.Services").service("consultService", [
 	'$http',
@@ -47,6 +48,7 @@ angular.module("Common.Services").service("consultService", [
 
 		service.consultRequestModelConverter = new ConsultRequestModelConverter();
 		service.letterheadToModelConverter = new LetterheadToModelConverter();
+		service.consultServiceToModelConverter = new ConsultServiceToModelConverter();
 
 
 		service.searchRequests = function searchRequests(search)
@@ -284,6 +286,12 @@ angular.module("Common.Services").service("consultService", [
 		{
 			return service.letterheadToModelConverter.convertList(
 				(await service.consultationApi.getLetterheadList()).data.body);
+		}
+
+		service.getServiceList = async () =>
+		{
+			return service.consultServiceToModelConverter.convertList(
+				(await service.consultationApi.getServiceList()).data.body);
 		}
 
 		return service;

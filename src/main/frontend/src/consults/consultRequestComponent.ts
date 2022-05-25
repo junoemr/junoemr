@@ -1,11 +1,12 @@
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {LABEL_POSITION} from "../common/components/junoComponentConstants";
-import {ProvidersServiceApi} from "../../generated";
+import {ProfessionalSpecialistTo1, ProvidersServiceApi} from "../../generated";
 import LoadingQueue from "../lib/util/LoadingQueue";
 import ToastService from "../lib/alerts/service/ToastService";
 import moment from "moment";
 import {JunoSelectOption} from "../lib/common/junoSelectOption";
 import Letterhead from "../lib/consult/request/model/Letterhead";
+import ConsultService from "../lib/consult/request/model/ConsultService";
 
 angular.module('Consults').component('consultRequest',
 	{
@@ -77,10 +78,11 @@ angular.module('Consults').component('consultRequest',
 						demographicService.getDemographic(ctrl.consult.demographicId),
 						providersServiceApi.getActive(),
 						consultService.getLetterheadList(),
+						consultService.getServiceList(),
 					]);
 
 					ctrl.demographic = results[0];
-					ctrl.providers =  results[1].data.body.map((provider) =>
+					ctrl.providers =  results[1].data.body.map((provider: any) =>
 					{
 						return {
 							label: provider.name,
@@ -111,19 +113,19 @@ angular.module('Consults').component('consultRequest',
 						};
 					});
 
-					ctrl.serviceOptions = ctrl.consult.serviceList.map((service) =>
+					ctrl.serviceOptions = results[3].map((service: ConsultService) =>
 					{
 						return {
-							label: service.serviceDesc,
-							value: service.serviceId,
+							label: service.description,
+							value: service.id,
 						};
 					});
 
 					// map specialist options to each service
-					ctrl.consult.serviceList.forEach((service) =>
+					results[3].forEach((service: ConsultService) =>
 					{
-						ctrl.serviceSpecialistMap.set(service.serviceId, service.specialists.map(
-							(specialist) =>
+						ctrl.serviceSpecialistMap.set(service.id, service.specialists.map(
+							(specialist: ProfessionalSpecialistTo1) =>
 							{
 								return {
 									label: specialist.name,
@@ -135,7 +137,7 @@ angular.module('Consults').component('consultRequest',
 
 					if(!ctrl.consult.serviceId)
 					{
-						ctrl.consult.serviceId = ctrl.consult.serviceList[0].serviceId;
+						ctrl.consult.serviceId = results[3][0].id;
 					}
 					if(ctrl.consult.professionalSpecialist)
 					{
@@ -214,13 +216,14 @@ angular.module('Consults').component('consultRequest',
 					return ctrl.consultChanged;
 				}
 
-				ctrl.changeService = (serviceId): void =>
+				ctrl.changeService = (serviceId: string): void =>
 				{
 					ctrl.specilistOptions = ctrl.serviceSpecialistMap.get(serviceId);
 
 					// clear current specialist on change if they are not in the new options
 					if(ctrl.consult.professionalSpecialist
-						&& !(ctrl.specilistOptions.map((option) => option.value).includes(ctrl.consult.professionalSpecialist.id)))
+						&& !(ctrl.specilistOptions.map(
+							(option: JunoSelectOption) => option.value).includes(ctrl.consult.professionalSpecialist.id)))
 					{
 						ctrl.consult.professionalSpecialist = null;
 					}

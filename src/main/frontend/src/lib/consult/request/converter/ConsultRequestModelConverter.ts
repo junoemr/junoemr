@@ -63,7 +63,6 @@ export default class ConsultRequestModelConverter extends AbstractConverter<Cons
 		model.attachments = Juno.Common.Util.toArray(from.attachments); // should have own models
 
 		model.faxList = Juno.Common.Util.toArray(from.faxList);
-		model.serviceList = Juno.Common.Util.toArray(from.serviceList);
 		model.sendToList = Juno.Common.Util.toArray(from.sendToList);
 
 		return model;
