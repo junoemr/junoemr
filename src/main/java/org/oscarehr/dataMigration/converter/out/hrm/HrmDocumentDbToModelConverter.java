@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.converter.out.hrm;
 
+import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmCategoryModel;
@@ -33,6 +34,7 @@ import org.oscarehr.hospitalReportManager.model.HRMCategory;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
 import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
 import org.oscarehr.hospitalReportManager.model.HRMObservation;
+import org.oscarehr.util.MiscUtils;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -44,6 +46,7 @@ import java.util.List;
 public class HrmDocumentDbToModelConverter extends
 		BaseDbToModelConverter<HRMDocument, HrmDocument>
 {
+	protected static final Logger logger  = MiscUtils.getLogger();
 
 	@Override
 	public HrmDocument convert(HRMDocument input)
@@ -63,16 +66,19 @@ public class HrmDocumentDbToModelConverter extends
 		hrmDocument.setReportSubClass(input.getSubClass());
 		hrmDocument.setMessageUniqueId(input.getMessageUniqueId());
 		hrmDocument.setDeliverToUserId(input.getDeliverToUserId());
+		hrmDocument.setReportFileSchemaVersion(input.getReportFileSchemaVersion());
 
 		try
 		{
 			hrmDocument.setReportFile(FileFactory.getHrmFile(input.getReportFile()));
-			hrmDocument.setReportFileSchemaVersion(input.getReportFileSchemaVersion());
 			hrmDocument.setDocument(null); // leave it null for now I guess
 		}
 		catch(IOException e)
 		{
-			throw new RuntimeException("Missing HRM Document File", e);
+			/*
+			Allow the model to be used in cases where the file is invalid/missing. this can occur with legacy data.
+			An error will be thrown when attempting to access the file instead. */
+			logger.error("Failed to load HRM Report File", e);
 		}
 
 		hrmDocument.setMatchingData(convertDocumentMatchingData(input));
