@@ -28,7 +28,13 @@ import moment from "moment";
 
 export default class HrmFetchResultsFromTransferConverter extends AbstractConverter<HrmFetchResultsModel, HrmFetchResults>
 {
-	convert(transfer: HrmFetchResultsModel): HrmFetchResults {
+	convert(transfer: HrmFetchResultsModel): HrmFetchResults
+	{
+		if(transfer == null)
+		{
+			return null;
+		}
+
 		let results = new HrmFetchResults();
 
 		results.reportsProcessed = transfer.reportsProcessed;

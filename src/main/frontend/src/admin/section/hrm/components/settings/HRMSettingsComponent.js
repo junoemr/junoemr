@@ -37,13 +37,14 @@ angular.module('Admin.Section').component('hrmSettings',
 			function ($scope, $http, $httpParamSerializer, securityRolesService)
 			{
 				let ctrl = this;
-				const systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
-				const hrmWebService = new HrmService();
-				const toastService = new ToastService();
+				ctrl.systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
+				ctrl.hrmWebService = new HrmService();
+				ctrl.toastService = new ToastService();
 
 
 				ctrl.userSettings = new HrmUserSettings();
 				ctrl.orginalSettings = new HrmUserSettings();
+				ctrl.hasDecryptionKey = false;
 
 				ctrl.newDecryptionKey = "";
 
@@ -69,7 +70,12 @@ angular.module('Admin.Section').component('hrmSettings',
 				ctrl.$onInit = async () =>
 				{
 					ctrl.COMPONENT_STYLE = ctrl.COMPONENT_STYLE || JUNO_STYLE.DEFAULT;
-					await ctrl.fetchUserSettings();
+
+					const response = await Promise.all([
+						ctrl.fetchUserSettings(),
+						ctrl.hrmWebService.hasDecryptionKey(),
+					]);
+					ctrl.hasDecryptionKey = response[1];
 					$scope.$apply();
 				};
 
@@ -92,17 +98,17 @@ angular.module('Admin.Section').component('hrmSettings',
 					try
 					{
 						await Promise.all([
-							systemPreferenceService.setPreference(ctrl.USERNAME_KEY, ctrl.userSettings.userName),
-							systemPreferenceService.setPreference(ctrl.MAILBOX_ADDRESS_KEY, ctrl.userSettings.mailBoxAddress),
-							systemPreferenceService.setPreference(ctrl.REMOTE_PATH_KEY, ctrl.userSettings.remotePath),
-							systemPreferenceService.setPreference(ctrl.PORT_KEY, ctrl.userSettings.port),
+							ctrl.systemPreferenceService.setPreference(ctrl.USERNAME_KEY, ctrl.userSettings.userName),
+							ctrl.systemPreferenceService.setPreference(ctrl.MAILBOX_ADDRESS_KEY, ctrl.userSettings.mailBoxAddress),
+							ctrl.systemPreferenceService.setPreference(ctrl.REMOTE_PATH_KEY, ctrl.userSettings.remotePath),
+							ctrl.systemPreferenceService.setPreference(ctrl.PORT_KEY, ctrl.userSettings.port),
 						]);
 
-						toastService.successToast("HRM settings updated");
+						ctrl.toastService.successToast("HRM settings updated");
 					}
 					catch(err)
 					{
-						toastService.errorToast("There was an error updating your HRM settings");
+						ctrl.toastService.errorToast("There was an error updating your HRM settings");
 					}
 					finally
 					{
@@ -116,7 +122,7 @@ angular.module('Admin.Section').component('hrmSettings',
 
 				ctrl.fetchUserSettings = async() =>
 				{
-					let propertyValues = await systemPreferenceService.getPreferences(
+					let propertyValues = await ctrl.systemPreferenceService.getPreferences(
 						ctrl.USERNAME_KEY,
 						ctrl.MAILBOX_ADDRESS_KEY,
 						ctrl.REMOTE_PATH_KEY,
@@ -142,11 +148,12 @@ angular.module('Admin.Section').component('hrmSettings',
 				{
 					try
 					{
-						await hrmWebService.saveDecryptionKey(ctrl.newDecryptionKey);
+						await ctrl.hrmWebService.saveDecryptionKey(ctrl.newDecryptionKey);
+						ctrl.hasDecryptionKey = true;
 					}
 					catch (e)
 					{
-						toastService.errorToast("Could not save decryption key, please try again later");
+						ctrl.toastService.errorToast("Could not save decryption key, please try again later");
 					}
 					finally
 					{

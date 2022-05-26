@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -79,6 +80,11 @@ public class SystemPreferenceService
 		}
 
 		return result;
+	}
+
+	public Optional<String> getOptionalPreferenceValue(String key)
+	{
+		return Optional.ofNullable(getPreferenceValue(key, null));
 	}
 
 	public Property setPreferenceValue(String key, String value)

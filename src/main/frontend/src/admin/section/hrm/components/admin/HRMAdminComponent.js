@@ -61,7 +61,7 @@ angular.module('Admin.Section').component('hrmAdmin',
 
 						const results = await Promise.all([
 							systemPreferenceService.getPreference(pollingIntervalProperty, 3600),
-							systemPreferenceService.isPreferenceEnabled(pollingEnabledPreference),
+							systemPreferenceService.isPreferenceEnabled(pollingEnabledPreference, false),
 						]);
 
 						ctrl.pollingInterval = Math.floor(results[0]/60);
@@ -70,9 +70,9 @@ angular.module('Admin.Section').component('hrmAdmin',
 					}
 					finally
 					{
-						$scope.apply();
+						$scope.$apply();
 					}
-				};
+				}
 
 				ctrl.togglePolling = async (checked) =>
 				{
