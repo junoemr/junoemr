@@ -71,10 +71,10 @@ angular.module('Admin.Section').component('hrmSettings',
 				{
 					ctrl.COMPONENT_STYLE = ctrl.COMPONENT_STYLE || JUNO_STYLE.DEFAULT;
 
-					let response = await Promise.all(
+					const response = await Promise.all([
 						ctrl.fetchUserSettings(),
 						ctrl.hrmWebService.hasDecryptionKey(),
-					);
+					]);
 					ctrl.hasDecryptionKey = response[1];
 					$scope.$apply();
 				};
