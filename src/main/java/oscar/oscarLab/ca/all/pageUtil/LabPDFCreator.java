@@ -970,12 +970,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
         pInfoTable.addCell(cell);
         cell.setPhrase(new Phrase("Health #: ", boldFont));
         pInfoTable.addCell(cell);
-        String hin = handler.getHealthNum();
-        if (ConnectCareHandler.isConnectCareHandler(handler))
-		{
-			hin += " ABH";
-		}
-		cell.setPhrase(new Phrase(hin, font));
+		cell.setPhrase(new Phrase(getDisplayHin(), font));
         pInfoTable.addCell(cell);
         cell.setPhrase(new Phrase("Patient Location: ", boldFont));
         pInfoTable.addCell(cell);
@@ -1124,7 +1119,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
         
         clientPhrase = new Phrase();
         clientPhrase.add(new Chunk("Health #: ", boldFont));
-        clientPhrase.add(new Chunk(handler.getHealthNum()+"\t\t\t\t\t\t", font));
+        clientPhrase.add(new Chunk(getDisplayHin()+"\t\t\t\t\t\t", font));
         patientInfo.add(clientPhrase);
         
         clientPhrase = new Phrase();
@@ -1229,5 +1224,12 @@ public class LabPDFCreator extends PdfPageEventHelper {
 		obxMessage = obxMessage.replaceAll("\\\\\\.br\\\\", "\n");
 
 		return obxMessage;
+	}
+
+	private String getDisplayHin()
+	{
+		String hin = handler.getHealthNum();
+		String hinProvince = handler.getHealthNumProvince();
+		return StringUtils.trimToEmpty(hin + " " + hinProvince);
 	}
 }
