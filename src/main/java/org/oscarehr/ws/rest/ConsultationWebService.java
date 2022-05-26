@@ -267,7 +267,6 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			}
 			request.setServiceList(serviceTransfers);
 			request.setSendToList(providerDao.getActiveTeams());
-			request.setProviderNo(getLoggedInInfo().getLoggedInProviderNo());
 		}
 		catch(Exception e)
 		{
