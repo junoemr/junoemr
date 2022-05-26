@@ -38,20 +38,20 @@
 			<div id="left_pane" class="col-md-2">
 				<label class="control-label">Patient Details</label>
 				<div class="demographic">
-					<p>{{$ctrl.consult.demographic.displayName}} ({{$ctrl.consult.demographic.title}})</p>
-					<p>DOB: {{$ctrl.consult.demographic.displayDateOfBirth}} ({{$ctrl.consult.demographic.displayAge}})</p>
-					<p>Sex: {{$ctrl.consult.demographic.displaySex}}</p>
-					<p>HIN: {{$ctrl.consult.demographic.healthNumber}} - {{$ctrl.consult.demographic.healthNumberVersion}}</p>
+					<p>{{$ctrl.demographic.displayName}} ({{$ctrl.demographic.title}})</p>
+					<p>DOB: {{$ctrl.demographic.displayDateOfBirth}} ({{$ctrl.demographic.displayAge}})</p>
+					<p>Sex: {{$ctrl.demographic.displaySex}}</p>
+					<p>HIN: {{$ctrl.demographic.healthNumber}} - {{$ctrl.demographic.healthNumberVersion}}</p>
 					<p>Address:</p>
 					<address>
-					{{$ctrl.consult.demographic.address.displayLine1of2}}<br/>
-					{{$ctrl.consult.demographic.address.displayLine2of2}}
+					{{$ctrl.demographic.address.displayLine1of2}}<br/>
+					{{$ctrl.demographic.address.displayLine2of2}}
 					</address>
-					<p>Phone (H): {{$ctrl.consult.demographic.homePhone.formattedForDisplay}}</p>
-					<p>Phone (W): {{$ctrl.consult.demographic.workPhone.formattedForDisplay}}</p>
-					<p>Phone (C): {{$ctrl.consult.demographic.cellPhone.formattedForDisplay}}</p>
-					<p>Email: {{$ctrl.consult.demographic.email}}</p>
-					<p>MRP: {{$ctrl.consult.demographic.mrpProvider.displayName}}</p>
+					<p>Phone (H): {{$ctrl.demographic.homePhone.formattedForDisplay}}</p>
+					<p>Phone (W): {{$ctrl.demographic.workPhone.formattedForDisplay}}</p>
+					<p>Phone (C): {{$ctrl.demographic.cellPhone.formattedForDisplay}}</p>
+					<p>Email: {{$ctrl.demographic.email}}</p>
+					<p>MRP: {{$ctrl.demographic.mrpProvider.displayName}}</p>
 				</div>
 				<br/>
 				<div id="consult_status">
