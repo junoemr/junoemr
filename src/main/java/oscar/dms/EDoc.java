@@ -78,7 +78,7 @@ public class EDoc extends TagObject implements Comparable<EDoc> {
 	private Date reviewDateTimeDate = null;
 	private String indivoIdx = null;
 	private boolean indivoRegistered = false;
-	private int numberOfPages = 0;
+	private Integer numberOfPages = 0;
 	private Integer appointmentNo = -1;
 	private boolean restrictToProgram=false;
 	private boolean hasEncodingError=false;
@@ -510,11 +510,11 @@ public class EDoc extends TagObject implements Comparable<EDoc> {
 		this.reviewDateTime = reviewDateTime;
 	}
 
-	public int getNumberOfPages() {
+	public Integer getNumberOfPages() {
 		return numberOfPages;
 	}
 
-	public void setNumberOfPages(int n) {
+	public void setNumberOfPages(Integer n) {
 		this.numberOfPages = n;
 	}
 	
