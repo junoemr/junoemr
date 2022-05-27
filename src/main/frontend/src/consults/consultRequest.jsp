@@ -162,6 +162,11 @@
 						<div class="form-group col-md-6">
 							<label class="control-label">Referral Date</label>
 							<juno-datepicker-popup juno-model="$ctrl.consult.referralDate" show-icon="true" type="Input"> </juno-datepicker-popup>
+							<juno-date-picker
+									ng-model="$ctrl.consult.referralDate"
+									label="Referral Date"
+									label-position="$ctrl.labelPosition.TOP">
+							</juno-date-picker>
 						</div>
 						<div class="form-group col-md-6">
 							<juno-select

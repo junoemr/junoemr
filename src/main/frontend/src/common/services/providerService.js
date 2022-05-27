@@ -26,7 +26,8 @@
 
  */
 
-import {SitesApi} from "../../../generated";
+import {ProvidersServiceApi, SitesApi} from "../../../generated";
+import {API_BASE_PATH} from "../../lib/constants/ApiConstants";
 
 angular.module("Common.Services").service("providerService", [
 	'$http',
@@ -40,8 +41,8 @@ angular.module("Common.Services").service("providerService", [
 
 		service.apiPath = '../ws/rs/providerService';
 
-		service.sitesApi = new SitesApi($http, $httpParamSerializer,
-			'../ws/rs');
+		service.sitesApi = new SitesApi($http, $httpParamSerializer, API_BASE_PATH);
+		service.providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, API_BASE_PATH);
 
 		service.getMe = function getMe()
 		{
@@ -79,6 +80,11 @@ angular.module("Common.Services").service("providerService", [
 
 			return deferred.promise;
 		};
+
+		service.getActiveProviders = async function getActiveProviders()
+		{
+			return (await service.providersServiceApi.getActive()).data.body;
+		}
 
 		service.searchProviders = function searchProviders(filter)
 		{

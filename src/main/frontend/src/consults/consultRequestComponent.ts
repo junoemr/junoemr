@@ -8,6 +8,7 @@ import {JunoSelectOption} from "../lib/common/junoSelectOption";
 import Letterhead from "../lib/consult/request/model/Letterhead";
 import ConsultService from "../lib/consult/request/model/ConsultService";
 import ConsultRequest from "../lib/consult/request/model/ConsultRequest";
+import {API_BASE_PATH} from "../lib/constants/ApiConstants";
 
 angular.module('Consults').component('consultRequest',
 	{
@@ -26,6 +27,7 @@ angular.module('Consults').component('consultRequest',
 			'$timeout',
 			'consultService',
 			'demographicService',
+			'providerService',
 			'securityRolesService',
 			'summaryService',
 			'staticDataService',
@@ -41,6 +43,7 @@ angular.module('Consults').component('consultRequest',
 				$timeout,
 				consultService,
 				demographicService,
+				providerService,
 				securityRolesService,
 				summaryService,
 				staticDataService)
@@ -49,7 +52,7 @@ angular.module('Consults').component('consultRequest',
 				ctrl.labelPosition = LABEL_POSITION;
 				ctrl.SecurityPermissions = SecurityPermissions;
 
-				let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
+				let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, API_BASE_PATH);
 
 				ctrl.urgencyOptions = staticDataService.getConsultUrgencies();
 				ctrl.statusOptions = staticDataService.getConsultRequestStatuses();
@@ -78,13 +81,13 @@ angular.module('Consults').component('consultRequest',
 
 					const results = await Promise.all([
 						demographicService.getDemographic(ctrl.consult.demographicId),
-						providersServiceApi.getActive(),
+						providerService.getActiveProviders(),
 						consultService.getLetterheadList(),
 						consultService.getServiceList(),
 					]);
 
 					ctrl.demographic = results[0];
-					ctrl.providers =  results[1].data.body.map((provider: any) =>
+					ctrl.providers =  results[1].map((provider: any) =>
 					{
 						return {
 							label: provider.name,
@@ -513,7 +516,7 @@ angular.module('Consults').component('consultRequest',
 							}
 							ctrl.consult = response;
 						}
-						catch(error: Error)
+						catch(error)
 						{
 
 						}

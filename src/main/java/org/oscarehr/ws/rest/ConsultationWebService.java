@@ -626,7 +626,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	}
 
 	@GET
-	@Path("/getLetterheadList")
+	@Path("/letterheads")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<LetterheadTo1> getLetterheadList()
 	{
@@ -637,7 +637,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	}
 
 	@GET
-	@Path("/getServiceList")
+	@Path("/services")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<ConsultationServiceTo1> getServiceList()
 	{

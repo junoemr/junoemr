@@ -1,0 +1,7 @@
+.juno-date-picker {
+
+  .picker-input {
+    @include juno-form-inputs-style(1px, var(--theme-form-field-border-radius));
+    @include juno-form-inputs-colors-default();
+  }
+}
