@@ -637,7 +637,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	}
 
 	@GET
-	@Path("/services")
+	@Path("/services/all")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<ConsultationServiceTo1> getServiceList()
 	{

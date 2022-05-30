@@ -19,7 +19,7 @@ export default class ConsultRequestModelConverter extends AbstractConverter<Cons
 
 		let model = new ConsultRequest(from.id);
 
-		model.referralDate = from.referralDate ? moment(from.referralDate) : null;
+		model.referralDate = from.referralDate ? moment(from.referralDate).startOf("day") : null;
 		model.serviceId = from.serviceId;
 		model.professionalSpecialist = from.professionalSpecialist; // should have own model
 
@@ -41,7 +41,7 @@ export default class ConsultRequestModelConverter extends AbstractConverter<Cons
 		model.urgency = from.urgency;
 		model.patientWillBook = from.patientWillBook;
 		model.siteName = from.siteName;
-		model.followUpDate = from.followUpDate ? moment(from.followUpDate) : null;
+		model.followUpDate = from.followUpDate ? moment(from.followUpDate).startOf("day") : null;
 		model.signatureImg = from.signatureImg;
 
 		let letterhead = new Letterhead(from.letterheadName);

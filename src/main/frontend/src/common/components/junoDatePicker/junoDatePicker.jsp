@@ -12,9 +12,11 @@
 			       ng-ref="$ctrl.datepickerInputRef"
 			       class="w-100"
 			       ng-change="$ctrl.updateExternalModel()"
-			       ng-click="$ctrl.toggleDatepickerState()"
+			       ng-click="$ctrl.showDatePicker()"
+			       ng-disabled="$ctrl.disabled"
 			       placeholder="{{$ctrl.placeholderText}}">
-			<i class="icon icon-calendar"></i>
+			<i class="icon icon-calendar"
+			   ng-click="$ctrl.showDatePicker()"></i>
 		</div>
 	</form-label-wrapper>
 </div>

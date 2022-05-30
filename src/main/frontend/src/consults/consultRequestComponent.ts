@@ -1,6 +1,6 @@
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {LABEL_POSITION} from "../common/components/junoComponentConstants";
-import {ProfessionalSpecialistTo1, ProvidersServiceApi} from "../../generated";
+import {ProfessionalSpecialistTo1} from "../../generated";
 import LoadingQueue from "../lib/util/LoadingQueue";
 import ToastService from "../lib/alerts/service/ToastService";
 import moment from "moment";
@@ -8,7 +8,6 @@ import {JunoSelectOption} from "../lib/common/junoSelectOption";
 import Letterhead from "../lib/consult/request/model/Letterhead";
 import ConsultService from "../lib/consult/request/model/ConsultService";
 import ConsultRequest from "../lib/consult/request/model/ConsultRequest";
-import {API_BASE_PATH} from "../lib/constants/ApiConstants";
 
 angular.module('Consults').component('consultRequest',
 	{
@@ -18,10 +17,6 @@ angular.module('Consults').component('consultRequest',
 		},
 		controller: [
 			'$scope',
-			'$http',
-			"$httpParamSerializer",
-			'$q',
-			'$resource',
 			'$location',
 			'$uibModal',
 			'$timeout',
@@ -34,10 +29,6 @@ angular.module('Consults').component('consultRequest',
 
 			function (
 				$scope,
-				$http,
-				$httpParamSerializer,
-				$q,
-				$resource,
 				$location,
 				$uibModal,
 				$timeout,
@@ -51,8 +42,6 @@ angular.module('Consults').component('consultRequest',
 				const ctrl = this;
 				ctrl.labelPosition = LABEL_POSITION;
 				ctrl.SecurityPermissions = SecurityPermissions;
-
-				let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, API_BASE_PATH);
 
 				ctrl.urgencyOptions = staticDataService.getConsultUrgencies();
 				ctrl.statusOptions = staticDataService.getConsultRequestStatuses();
@@ -227,6 +216,7 @@ angular.module('Consults').component('consultRequest',
 
 					// clear current specialist on change if they are not in the new options
 					if(ctrl.consult.professionalSpecialist
+						&& ctrl.specilistOptions
 						&& !(ctrl.specilistOptions.map(
 							(option: JunoSelectOption) => option.value).includes(ctrl.consult.professionalSpecialist.id)))
 					{

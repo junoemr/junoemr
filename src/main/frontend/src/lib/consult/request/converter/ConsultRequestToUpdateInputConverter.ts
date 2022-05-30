@@ -21,7 +21,7 @@ export default class ConsultRequestToUpdateInputConverter extends AbstractConver
 		if(model.appointmentDateTime)
 		{
 			input.appointmentDate = Juno.Common.Util.formatMomentDate(model.appointmentDateTime);
-			input.appointmentTime = Juno.Common.Util.formatMomentTime(model.appointmentDateTime);
+			input.appointmentTime = Juno.Common.Util.formatMomentTime(model.appointmentDateTime, Juno.Common.Util.settings.defaultTimeFormat);
 		}
 
 		input.reasonForReferral = model.reasonForReferral;

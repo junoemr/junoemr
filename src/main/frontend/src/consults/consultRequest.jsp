@@ -160,8 +160,6 @@
 							</juno-select>
 						</div>
 						<div class="form-group col-md-6">
-							<label class="control-label">Referral Date</label>
-							<juno-datepicker-popup juno-model="$ctrl.consult.referralDate" show-icon="true" type="Input"> </juno-datepicker-popup>
 							<juno-date-picker
 									ng-model="$ctrl.consult.referralDate"
 									label="Referral Date"
@@ -190,8 +188,11 @@
 						</div>
 
 						<div class="form-group col-md-6">
-							<label class="control-label">Last Follow-up Date</label>
-							<juno-datepicker-popup juno-model="$ctrl.consult.followUpDate" show-icon="true" type="Input"> </juno-datepicker-popup>
+							<juno-date-picker
+									ng-model="$ctrl.consult.followUpDate"
+									label="Last Follow-up Date"
+									label-position="$ctrl.labelPosition.TOP">
+							</juno-date-picker>
 						</div>
 
 						<div class="form-group col-md-6">
@@ -203,29 +204,20 @@
 								</div>
 								<div class="appointment-date-time-select">
 									<div class="date-select-wrapper">
-										<label class="control-label">Appointment Date</label>
-										<juno-datepicker-popup juno-model="$ctrl.consult.appointmentDate"
-										                       show-icon="true" type="Input"
-										                       disable-input="$ctrl.consult.patientWillBook">
-										</juno-datepicker-popup>
+										<juno-date-picker
+												ng-model="$ctrl.consult.appointmentDateTime"
+												disabled="$ctrl.consult.patientWillBook"
+												label="Appointment Date"
+												label-position="$ctrl.labelPosition.TOP">
+										</juno-date-picker>
 									</div>
 									<div class="time-select-wrapper">
-										<label class="control-label">Appointment Time</label>
-										<div class="time-select">
-											<select class="form-control"
-											        ng-model="$ctrl.consult.appointmentHour"
-											        ng-options="hour for hour in $ctrl.hours"
-											        ng-change="$ctrl.setAppointmentTime()"
-											        ng-disabled="$ctrl.consult.patientWillBook">
-											</select>
-											<span>:</span>
-											<select class="form-control"
-											        ng-model="$ctrl.consult.appointmentMinute"
-											        ng-options="minute for minute in $ctrl.minutes"
-											        ng-change="$ctrl.setAppointmentTime()"
-											        ng-disabled="$ctrl.consult.patientWillBook">
-											</select>
-										</div>
+										<juno-time-select
+												ng-model="$ctrl.consult.appointmentDateTime"
+												disabled="$ctrl.consult.patientWillBook"
+												label="Appointment Time"
+												label-position="$ctrl.labelPosition.TOP">
+										</juno-time-select>
 									</div>
 								</div>
 							</div>

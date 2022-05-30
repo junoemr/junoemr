@@ -22,7 +22,7 @@
 */
 
 import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
-import moment from "moment";
+import moment, {Moment} from "moment";
 declare const $:JQueryStatic;
 
 angular.module('Common.Components').component('junoDatePicker', {
@@ -45,8 +45,6 @@ angular.module('Common.Components').component('junoDatePicker', {
 		const ctrl = this;
 
 		ctrl.internalModel = null;
-		ctrl.visible = false;
-
 
 		ctrl.$onInit = () =>
 		{
@@ -56,12 +54,13 @@ angular.module('Common.Components').component('junoDatePicker', {
 			ctrl.dateFormat = ctrl.dateFormat || "YYYY-MM-DD";
 			ctrl.placeholderText = ctrl.dateFormat.toUpperCase();
 
+			ctrl.updateInternalModel(ctrl.ngModel);
 		};
 
 		ctrl.createDatepicker = (): void =>
 		{
 			ctrl.datepickerInputRef.datepicker({
-				autoclose: false,
+				autoclose: true,
 				todayHighlight: true,
 				todayBtn: 'linked',
 				clearBtn: true,
@@ -87,14 +86,21 @@ angular.module('Common.Components').component('junoDatePicker', {
 			});
 		}
 
-		$scope.$watch("$ctrl.ngModel", () =>
+		$scope.$watch("$ctrl.ngModel", (newVal, oldVal) =>
 		{
-			// todo need to update datepicker when model changes externally
+			if(newVal !== oldVal)
+			{
+				ctrl.updateInternalModel(ctrl.ngModel);
+			}
 		});
 
 		ctrl.hasDatePicker = (): boolean =>
 		{
 			return ctrl.datepickerInputRef.data('datepicker');
+		}
+		ctrl.datePickerVisible = (): boolean =>
+		{
+			return $(".datepicker.datepicker-dropdown").is(":visible");
 		}
 		ctrl.showDatePicker = (): void =>
 		{
@@ -102,7 +108,6 @@ angular.module('Common.Components').component('junoDatePicker', {
 			{
 				ctrl.createDatepicker();
 			}
-			ctrl.visible = true;
 			ctrl.datepickerInputRef.datepicker("show");
 		}
 		ctrl.hideDatePicker = (): void =>
@@ -111,25 +116,38 @@ angular.module('Common.Components').component('junoDatePicker', {
 			{
 				ctrl.datepickerInputRef.datepicker("hide");
 			}
-			ctrl.visible = false;
 		}
 
 		ctrl.toggleDatepickerState = (): void =>
 		{
-			if(ctrl.visible)
+			if(!ctrl.disabled)
 			{
-				ctrl.hideDatePicker();
-			}
-			else
-			{
-				ctrl.showDatePicker();
+				if(ctrl.datePickerVisible())
+				{
+					ctrl.hideDatePicker();
+				}
+				else
+				{
+					ctrl.showDatePicker();
+				}
 			}
 		}
 
+		ctrl.updateInternalModel = (date: Moment): void =>
+		{
+			if(date && date.isValid())
+			{
+				ctrl.internalModel = Juno.Common.Util.formatMomentDate(date, ctrl.dateFormat);
+			}
+			else
+			{
+				ctrl.internalModel = null;
+			}
+		}
 
 		ctrl.updateExternalModel = (): void =>
 		{
-			let asMoment = moment(ctrl.internalModel, ctrl.dateFormat, true);
+			let asMoment = moment.utc(ctrl.internalModel, ctrl.dateFormat, true);
 			if(asMoment && asMoment.isValid())
 			{
 				ctrl.ngModel = asMoment;
