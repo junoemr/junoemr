@@ -176,6 +176,12 @@ public class HrmDocument extends AbstractTransientModel
 		reviewers = new ArrayList<>();
 	}
 
+	public GenericFile getReportFile()
+	{
+		// an error here means that the file was likely not available to the model converter. check for other errors and the entity filepath.
+		return Optional.ofNullable(reportFile).orElseThrow(() -> new IllegalStateException("Report file was not loaded correctly."));
+	}
+
 	public void addComment(HrmComment comment)
 	{
 		if(this.comments == null)

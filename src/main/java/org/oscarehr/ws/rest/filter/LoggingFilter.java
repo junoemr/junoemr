@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.Date;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -216,14 +217,14 @@ public abstract class LoggingFilter implements ContainerRequestFilter, Container
 			restLog.setUserAgent(request.getHeaderString("User-Agent"));
 			restLog.setUrl(url);
 			restLog.setMethod(request.getMethod());
-			restLog.setRequestMediaType(String.valueOf(request.getMediaType()));
+			restLog.setRequestMediaType(Optional.ofNullable(request.getMediaType()).map(String::valueOf).orElse(null));
 			restLog.setRawQueryString(queryString);
 			restLog.setRawPost(rawPostData);
 
 			restLog.setStatusCode(response.getStatus());
 			restLog.setRawOutput(rawResponseData);
 			restLog.setDuration(duration);
-			restLog.setResponseMediaType(String.valueOf(response.getMediaType()));
+			restLog.setResponseMediaType(Optional.ofNullable(response.getMediaType()).map(String::valueOf).orElse(null));
 
 			LogAction.saveRestLogEntry(restLog);
 		}

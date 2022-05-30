@@ -30,7 +30,6 @@
 <%@ page import="org.oscarehr.log.model.RestServiceLog, org.oscarehr.util.SpringUtils"%>
 <%@ page import="java.util.List"%>
 <%@ page import="oscar.OscarProperties" %>
-<%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/security.tld" prefix="security"%>
@@ -58,24 +57,20 @@ boolean authed=true;
 	int pageNo = 1;
 	int perPage = 25;
 
-	if(pageStr != null)
+	if(StringUtils.isNotBlank(pageStr))
 	{
 		pageNo = Integer.parseInt(pageStr);
 	}
-	if(perPageStr != null)
+	if(StringUtils.isNotBlank(perPageStr))
 	{
 		perPage = Integer.parseInt(perPageStr);
-
 	}
 	if(pageNo < 1) pageNo = 1;
-	int limit = (100 < perPage) ? 100 : perPage;
-	int offset = pageNo * (perPage - 1);
+	int limit = Math.min(100, perPage);
+	int offset = perPage * (pageNo - 1);
 
 	List<RestServiceLog> logEntryList = serviceLogDao.findList(offset, limit);
 	String tdTitleColor = "#CCCC99";
-
-	MiscUtils.getLogger().info("page=" + pageNo + "; perPage=" + perPage);
-
 %>
 
 <html:html locale="true">

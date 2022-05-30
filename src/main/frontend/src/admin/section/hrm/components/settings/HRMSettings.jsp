@@ -85,7 +85,19 @@
 	</panel>
 	<panel class="w-100">
 		<panel-header class="flex-row justify-content-between align-items-center">
-			<h6 class="d-inline-block">File Decryption Key</h6>
+			<div class="flex-row">
+				<h6 class="d-inline-block">File Decryption Key</h6>
+				<div class="m-l-8 m-r-8 flex-column align-items-center justify-content-center">
+					<icon-badge ng-if="$ctrl.hasDecryptionKey"
+					            icon="icon-check"
+					            title="A key exists in the system">
+					</icon-badge>
+					<icon-badge ng-if="!$ctrl.hasDecryptionKey"
+					            icon="icon-private"
+					            title="No key exists in the system">
+					</icon-badge>
+				</div>
+			</div>
 			<div class="flex-row">
 				<juno-button ng-if="!$ctrl.isKeyReadOnly"
 							 class="flex-grow-0 w-256 m-r-8"
