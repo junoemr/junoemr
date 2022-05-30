@@ -23,6 +23,7 @@
 
 import {JUNO_STYLE, LABEL_POSITION} from "../junoComponentConstants";
 import moment from "moment";
+declare const $:JQueryStatic;
 
 angular.module('Common.Components').component('junoDatePicker', {
 	templateUrl: 'src/common/components/junoDatePicker/junoDatePicker.jsp',
@@ -37,11 +38,14 @@ angular.module('Common.Components').component('junoDatePicker', {
 		disabled: "<?",
 		dateFormat: "@?",
 	},
-	controller: ["$scope", function ($scope)
+	controller: [
+		"$scope",
+		function ($scope)
 	{
 		const ctrl = this;
 
 		ctrl.internalModel = null;
+		ctrl.visible = false;
 
 
 		ctrl.$onInit = () =>
@@ -49,22 +53,99 @@ angular.module('Common.Components').component('junoDatePicker', {
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.disabled = ctrl.disabled || false;
-			ctrl.dateFormat = ctrl.dateFormat || "yyyy-MM-dd";
+			ctrl.dateFormat = ctrl.dateFormat || "YYYY-MM-DD";
 			ctrl.placeholderText = ctrl.dateFormat.toUpperCase();
 
-			ctrl.updateDateFields();
 		};
+
+		ctrl.createDatepicker = (): void =>
+		{
+			ctrl.datepickerInputRef.datepicker({
+				autoclose: false,
+				todayHighlight: true,
+				todayBtn: 'linked',
+				clearBtn: true,
+				orientation: $scope.orientation,
+				format: 'yyyy-mm-dd',
+				showOnFocus: true,
+				keyboardNavigation: true,
+
+			}).on("show", (e: Event) =>
+			{
+				// custom button layout
+				const buttonsHtml = "<tfoot><tr>" +
+					"<th style='display: table-cell;' colspan='4' class='today'>Today</th>" +
+					"<th style='display: table-cell;' colspan='3' class='clear'>Clear</th></tr>";
+
+				const dropdown = $(".datepicker.datepicker-dropdown");
+				const footer = dropdown.find('tfoot');
+				footer.replaceWith(buttonsHtml);
+
+				// replace next/prev buttons with custom font icons
+				dropdown.find(".next").html("").addClass("icon-arrow-right");
+				dropdown.find(".prev").html("").addClass("icon-arrow-left");
+			});
+		}
 
 		$scope.$watch("$ctrl.ngModel", () =>
 		{
+			// todo need to update datepicker when model changes externally
 		});
 
-		ctrl.updateInternalModel = () =>
+		ctrl.hasDatePicker = (): boolean =>
 		{
-
+			return ctrl.datepickerInputRef.data('datepicker');
+		}
+		ctrl.showDatePicker = (): void =>
+		{
+			if(!ctrl.hasDatePicker())
+			{
+				ctrl.createDatepicker();
+			}
+			ctrl.visible = true;
+			ctrl.datepickerInputRef.datepicker("show");
+		}
+		ctrl.hideDatePicker = (): void =>
+		{
+			if(!ctrl.hasDatePicker())
+			{
+				ctrl.datepickerInputRef.datepicker("hide");
+			}
+			ctrl.visible = false;
 		}
 
-		ctrl.getInvalidClass = (isInvalid) =>
+		ctrl.toggleDatepickerState = (): void =>
+		{
+			if(ctrl.visible)
+			{
+				ctrl.hideDatePicker();
+			}
+			else
+			{
+				ctrl.showDatePicker();
+			}
+		}
+
+
+		ctrl.updateExternalModel = (): void =>
+		{
+			let asMoment = moment(ctrl.internalModel, ctrl.dateFormat, true);
+			if(asMoment && asMoment.isValid())
+			{
+				ctrl.ngModel = asMoment;
+			}
+			else
+			{
+				ctrl.ngModel = null;
+			}
+
+			if(ctrl.onChange)
+			{
+				ctrl.onChange({value: ctrl.ngModel});
+			}
+		}
+
+		ctrl.getInvalidClass = (isInvalid: boolean): string[] =>
 		{
 			if (isInvalid)
 			{
@@ -73,12 +154,12 @@ angular.module('Common.Components').component('junoDatePicker', {
 			return [];
 		}
 
-		ctrl.labelClasses = () =>
+		ctrl.labelClasses = (): string[] =>
 		{
 			return [ctrl.labelPosition];
 		};
 
-		ctrl.componentClasses = () =>
+		ctrl.componentClasses = (): string[] =>
 		{
 			return [ctrl.componentStyle];
 		}

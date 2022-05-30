@@ -6,11 +6,15 @@
 	                    component-style="$ctrl.componentStyle"
 	>
 		<div ng-class="$ctrl.componentClasses()"
-		     class="flex-row justify-content-center align-items-center picker-input">
+		     ng-ref="$ctrl.datepickerContainerRef"
+		     class="w-100 picker-input">
 			<input ng-model="$ctrl.internalModel"
+			       ng-ref="$ctrl.datepickerInputRef"
 			       class="w-100"
-			       ng-change="$ctrl.onYearChange($ctrl.year)"
+			       ng-change="$ctrl.updateExternalModel()"
+			       ng-click="$ctrl.toggleDatepickerState()"
 			       placeholder="{{$ctrl.placeholderText}}">
+			<i class="icon icon-calendar"></i>
 		</div>
 	</form-label-wrapper>
 </div>
