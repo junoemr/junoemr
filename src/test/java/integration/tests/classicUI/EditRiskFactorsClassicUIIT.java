@@ -21,11 +21,11 @@
  * Canada
  */
 
-package integration.tests;
+package integration.tests.classicUI;
 
-import static integration.tests.EditFamilyHistoryClassicUIIT.addNotes;
-import static integration.tests.EditFamilyHistoryClassicUIIT.archiveNotes;
-import static integration.tests.EditFamilyHistoryClassicUIIT.editCPPNoteTest;
+import static integration.tests.classicUI.EditFamilyHistoryClassicUIIT.addNotes;
+import static integration.tests.classicUI.EditFamilyHistoryClassicUIIT.archiveNotes;
+import static integration.tests.classicUI.EditFamilyHistoryClassicUIIT.editCPPNoteTest;
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 
 import integration.tests.config.TestConfig;
@@ -46,16 +46,16 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class EditOtherMedsClassicUIIT extends SeleniumTestBase
+public class EditRiskFactorsClassicUIIT extends SeleniumTestBase
 {
-
 	@Override
 	protected String[] getTablesToRestore()
 	{
 		return new String[]{
-			"casemgmt_cpp", "casemgmt_issue", "casemgmt_issue_notes", "casemgmt_note",
-			"casemgmt_note_ext", "eChart", "hash_audit", "log", "admission", "demographic",
-			"log_ws_rest", "measurementType", "partial_date", "property", "validations"
+				"casemgmt_cpp", "casemgmt_issue", "casemgmt_issue_notes", "casemgmt_note",
+				"casemgmt_note_ext", "eChart", "hash_audit", "log", "admission", "demographic",
+				"log_ws_rest", "measurementType", "partial_date", "property", "validations"
+
 		};
 	}
 
@@ -69,15 +69,15 @@ public class EditOtherMedsClassicUIIT extends SeleniumTestBase
 		PageUtil.switchToWindow(eChartWindowHandle, driver);
 	}
 
-	String cppType = "Other Meds";
-	String cppTypeID = "menuTitleoMeds";
+	String cppType = "Risk Factors";
+	String cppTypeID = "menuTitleriskFactors";
 	String noteCPP = cppType + " in CPP";
 	String noteEncounter = cppType + " in Encounter";
 	String editedNoteCPP = "Edited " + noteCPP;
 	String archivedNote = "Archived " + cppType;
 
 	@Test
-	public void addOtherMedsTest()
+	public void addRiskFactorsTest()
 	{
 		//Add Notes
 		addNotes(cppTypeID, noteCPP, noteEncounter);
@@ -89,7 +89,7 @@ public class EditOtherMedsClassicUIIT extends SeleniumTestBase
 	}
 
 	@Test
-	public void editOtherMedsTest()
+	public void editRiskFactorsTest()
 	{
 		//Add Notes
 		addNotes(cppTypeID, noteCPP, noteEncounter);
@@ -102,13 +102,12 @@ public class EditOtherMedsClassicUIIT extends SeleniumTestBase
 	}
 
 	@Test
-	public void archiveOtherMedsTest()
+	public void archiveRiskFactorsTest()
 	{
 		//Archive Note
 		archiveNotes(cppType, cppTypeID);
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + archivedNote+ "')]")));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(., '" + archivedNote + "')]")));
 		Assert.assertTrue(cppType + " Note is NOT Archived successfully",
 			PageUtil.isExistsBy(By.xpath("//div[contains(., '" + archivedNote + "')]"), driver));
 	}
-
 }

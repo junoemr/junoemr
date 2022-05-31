@@ -23,12 +23,12 @@
 
 package integration.tests;
 
-import static integration.tests.AddProvidersIT.drApple;
-import static integration.tests.AddProvidersIT.drBerry;
-import static integration.tests.AssignRolesIT.assignRoles;
-import static integration.tests.AssignRolesIT.xpathDropdown;
-import static integration.tests.AssignRolesIT.xpathOption;
-import static integration.tests.AssignRolesIT.xpathProvider;
+import static integration.tests.classicUI.AddProvidersIT.drApple;
+import static integration.tests.classicUI.AddProvidersIT.drBerry;
+import static integration.tests.classicUI.AssignRolesIT.assignRoles;
+import static integration.tests.classicUI.AssignRolesIT.xpathDropdown;
+import static integration.tests.classicUI.AssignRolesIT.xpathOption;
+import static integration.tests.classicUI.AssignRolesIT.xpathProvider;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByLinkText;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;

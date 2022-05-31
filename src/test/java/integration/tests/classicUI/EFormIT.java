@@ -20,34 +20,32 @@
  * Victoria, British Columbia
  * Canada
  */
-package integration.tests;
+package integration.tests.classicUI;
+
+import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.junoUtil.Navigation.EFORM_URL;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.PageUtil.switchToNewWindow;
 
 import integration.tests.config.TestConfig;
 import integration.tests.sql.SqlFiles;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Set;
-
-import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
-import static integration.tests.util.junoUtil.Navigation.EFORM_URL;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
-import static integration.tests.util.seleniumUtil.PageUtil.switchToNewWindow;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")

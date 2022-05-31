@@ -23,36 +23,28 @@
 
 package integration.tests;
 
-import integration.tests.util.SeleniumTestBase;
-import integration.tests.util.junoUtil.AppointmentUtil;
-import integration.tests.util.seleniumUtil.PageUtil;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
-import org.oscarehr.JunoApplication;
-
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Set;
-import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties.Web;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
-import oscar.util.ConversionUtils;
-
 import static integration.tests.AddPatientsIT.mom;
 import static integration.tests.AddPatientsIT.momFullNameJUNO;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
+
+import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.junoUtil.AppointmentUtil;
+import integration.tests.util.seleniumUtil.PageUtil;
+import java.util.Set;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")

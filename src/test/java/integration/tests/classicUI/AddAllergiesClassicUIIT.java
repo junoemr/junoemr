@@ -21,7 +21,7 @@
  * Canada
  */
 
-package integration.tests;
+package integration.tests.classicUI;
 
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.textEdit;
@@ -50,7 +50,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AddAllergiesClassicUIIT extends SeleniumTestBase
+public class  AddAllergiesClassicUIIT extends SeleniumTestBase
 {
 	@Override
 	protected String[] getTablesToRestore()
