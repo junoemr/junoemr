@@ -38,7 +38,6 @@ import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
@@ -78,7 +77,7 @@ public class PatientCharts_DetailsJUNOUIIT extends SeleniumTestBase
 		databaseUtil.createProviderSite();
 
 	}
-@Ignore
+
 	@Test
 	public void editDemographicTest()
 	{
@@ -125,7 +124,7 @@ public class PatientCharts_DetailsJUNOUIIT extends SeleniumTestBase
 		String aliasNamesSaved = driver.findElement(By.xpath("//juno-input[@label='Alias Names']//input")).getAttribute("value");
 		Assert.assertEquals("Alias Names are NOT saved successfully.", aliasNames, aliasNamesSaved);
 	}
-@Ignore
+
 	@Test
 	public void editContactTest()
 	{
@@ -297,7 +296,7 @@ public class PatientCharts_DetailsJUNOUIIT extends SeleniumTestBase
 			.getAttribute("value");
 		Assert.assertEquals("Renew Day is NOT saved successfully.", renewDay, renewDaySaved);
 	}
-@Ignore
+
 	@Test
 	public void editCareTeamTest()
 	{
@@ -431,7 +430,7 @@ public class PatientCharts_DetailsJUNOUIIT extends SeleniumTestBase
 		Assert.assertEquals("Cytology # is NOT saved successfully.", cytology,
 			cytologySaved);
 	}
-@Ignore
+
 	@Test
 	public void editAdditionalInformationTest()
 	{
