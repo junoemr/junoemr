@@ -177,7 +177,7 @@ public class SeleniumTestBase extends DatabaseTestBase
 			FirefoxBinary ffb = new FirefoxBinary();
 			if(junoProperties.getTest().isHeadless())
 			{
-				//ffb.addCommandLineOptions("--headless");
+				ffb.addCommandLineOptions("--headless");
 			}
 			firefoxOptions.setBinary(ffb);
 			driver = new FirefoxDriver(firefoxOptions);
