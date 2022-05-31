@@ -466,7 +466,7 @@ module.exports = {
 			'./src/billing/billingController.js',
 
 			'./src/consults/module.js',
-			'./src/consults/consultRequestAttachmentController.js',
+			'./src/consults/components/consultAttachment/consultAttachmentModalComponent.ts',
 			'./src/consults/consultResponseAttachmentController.js',
 			'./src/consults/consultRequestListController.js',
 			'./src/consults/consultRequestComponent.ts',

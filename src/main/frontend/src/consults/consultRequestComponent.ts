@@ -8,6 +8,7 @@ import {JunoSelectOption} from "../lib/common/junoSelectOption";
 import Letterhead from "../lib/consult/request/model/Letterhead";
 import ConsultService from "../lib/consult/request/model/ConsultService";
 import ConsultRequest from "../lib/consult/request/model/ConsultRequest";
+import Demographic from "../lib/demographic/model/Demographic";
 
 angular.module('Consults').component('consultRequest',
 	{
@@ -430,18 +431,21 @@ angular.module('Consults').component('consultRequest',
 
 				ctrl.attachFiles = function attachFiles()
 				{
-					var modalInstance = $uibModal.open(
+					const modalInstance = $uibModal.open(
 						{
-							templateUrl: "src/consults/consultAttachment.jsp",
-							controller: 'Consults.ConsultRequestAttachmentController as consultAttachmentCtrl',
+							component: "consultAttachmentModalComponent",
 							windowClass: "attachment-modal-window",
 							size: 'lg',
 							resolve:
 								{
-									consult: function()
+									consult: (): ConsultRequest =>
 									{
 										return ctrl.consult;
-									}
+									},
+									demographic: (): Demographic =>
+									{
+										return ctrl.demographic;
+									},
 								}
 						});
 

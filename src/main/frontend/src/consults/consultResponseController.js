@@ -340,7 +340,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 		{
 			var modalInstance = $uibModal.open(
 			{
-				templateUrl: "src/consults/consultAttachment.jsp",
+				templateUrl: "src/consults/consultResponseAttachment.jsp",
 				controller: "Consults.ConsultResponseAttachmentController as consultAttachmentCtrl",
 				windowClass: "attachment-modal-window",
 				backdrop: "static",
