@@ -156,7 +156,8 @@
 					"<bean:message key="oscarEncounter.faceToFaceEnc.title"/>",
 					"<bean:message key="oscarEncounter.telephoneEnc.title"/>",
 					"<bean:message key="oscarEncounter.emailEnc.title"/>",
-					"<bean:message key="oscarEncounter.noClientEnc.title"/>"
+					"<bean:message key="oscarEncounter.noClientEnc.title"/>",
+					"<bean:message key="oscarEncounter.videoEnc.title"/>"
 				]
 			}
 
