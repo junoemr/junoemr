@@ -30,7 +30,7 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 		{
 			const ctrl = this;
 			ctrl.toastService = new ToastService();
-			ctrl.faxAccountService = new FaxAccountService(new ToastErrorHandler());
+			ctrl.faxAccountService = new FaxAccountService(new ToastErrorHandler(true));
 			ctrl.faxInboxService = new FaxInboxService();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;

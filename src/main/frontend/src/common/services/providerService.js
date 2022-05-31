@@ -81,7 +81,7 @@ angular.module("Common.Services").service("providerService", [
 			return deferred.promise;
 		};
 
-		service.getActiveProviders = async function getActiveProviders()
+		service.getActiveProviders = async () =>
 		{
 			return (await service.providersServiceApi.getActive()).data.body;
 		}

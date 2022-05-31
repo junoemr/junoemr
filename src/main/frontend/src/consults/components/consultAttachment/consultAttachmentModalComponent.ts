@@ -43,7 +43,7 @@ angular.module('Consults').component('consultAttachmentModalComponent',
 
 				ctrl.openDoc = function openDoc(doc)
 				{
-					window.open("../../" + doc.url);
+					window.open("../" + doc.url);
 				};
 
 				ctrl.attach = function attach()

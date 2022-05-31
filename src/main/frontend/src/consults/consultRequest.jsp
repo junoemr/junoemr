@@ -343,17 +343,17 @@
 		<div class="wrapper-action col-sm-12"><!-- Action Buttons -->
 			<button type="button" class="btn btn-large btn-success action"
 			        ng-disabled="$ctrl.loadingQueue.isLoading"
-			        ng-click="$ctrl.save()">
+			        ng-click="$ctrl.onSave()">
 				Save
 			</button>&nbsp;
 			<button type="button" class="btn btn-large btn-success action"
 			        ng-disabled="$ctrl.loadingQueue.isLoading"
-			        ng-click="$ctrl.saveAndPrint()">
+			        ng-click="$ctrl.onSaveAndPrint()">
 				Save & Print
 			</button>&nbsp;
 			<button type="button" class="btn btn-large btn-success action"
 			        ng-disabled="$ctrl.loadingQueue.isLoading"
-			        ng-click="$ctrl.saveAndFax()">
+			        ng-click="$ctrl.onSaveAndFax()">
 				Save & Fax
 			</button>&nbsp;
 			<button type="button" class="btn btn-large btn-success action"

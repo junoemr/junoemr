@@ -3,12 +3,15 @@ import {LABEL_POSITION} from "../common/components/junoComponentConstants";
 import {ProfessionalSpecialistTo1} from "../../generated";
 import LoadingQueue from "../lib/util/LoadingQueue";
 import ToastService from "../lib/alerts/service/ToastService";
-import moment from "moment";
 import {JunoSelectOption} from "../lib/common/junoSelectOption";
 import Letterhead from "../lib/consult/request/model/Letterhead";
 import ConsultService from "../lib/consult/request/model/ConsultService";
 import ConsultRequest from "../lib/consult/request/model/ConsultRequest";
 import Demographic from "../lib/demographic/model/Demographic";
+import ArgumentError from "../lib/error/ArgumentError";
+import SecurityError from "../lib/error/SecurtyError";
+import ToastErrorHandler from "../lib/error/handler/ToastErrorHandler";
+import {LogLevel} from "../lib/error/handler/LogLevel";
 
 angular.module('Consults').component('consultRequest',
 	{
@@ -18,6 +21,7 @@ angular.module('Consults').component('consultRequest',
 		},
 		controller: [
 			'$scope',
+			'$state',
 			'$location',
 			'$uibModal',
 			'$timeout',
@@ -30,6 +34,7 @@ angular.module('Consults').component('consultRequest',
 
 			function (
 				$scope,
+				$state,
 				$location,
 				$uibModal,
 				$timeout,
@@ -43,6 +48,7 @@ angular.module('Consults').component('consultRequest',
 				const ctrl = this;
 				ctrl.labelPosition = LABEL_POSITION;
 				ctrl.SecurityPermissions = SecurityPermissions;
+				ctrl.toastErrorHandler = new ToastErrorHandler(false, LogLevel.WARN);
 
 				ctrl.urgencyOptions = staticDataService.getConsultUrgencies();
 				ctrl.statusOptions = staticDataService.getConsultRequestStatuses();
@@ -55,11 +61,11 @@ angular.module('Consults').component('consultRequest',
 
 				ctrl.loadingQueue = new LoadingQueue();
 				ctrl.toastService = new ToastService();
-				ctrl.serviceOptions = [];
 				ctrl.demographic = null;
 				ctrl.selectedLetterhead = null;
 				ctrl.selectedSpecialistId = null;
 
+				ctrl.serviceOptions = [];
 				ctrl.specilistOptions = [];
 				ctrl.serviceSpecialistMap = new Map();
 
@@ -108,19 +114,24 @@ angular.module('Consults').component('consultRequest',
 						};
 					});
 
-					ctrl.serviceOptions = results[3].map((service: ConsultService) =>
+					ctrl.serviceOptions = results[3].map((service: ConsultService): JunoSelectOption =>
 					{
 						return {
 							label: service.description,
 							value: service.id,
 						};
 					});
+					ctrl.serviceOptions.unshift({
+						label: "",
+						value: null,
+					});
 
+					ctrl.serviceSpecialistMap.set(null, []); // add empty option
 					// map specialist options to each service
 					results[3].forEach((service: ConsultService) =>
 					{
 						ctrl.serviceSpecialistMap.set(service.id, service.specialists.map(
-							(specialist: ProfessionalSpecialistTo1) =>
+							(specialist: ProfessionalSpecialistTo1): JunoSelectOption =>
 							{
 								return {
 									label: specialist.name,
@@ -130,10 +141,6 @@ angular.module('Consults').component('consultRequest',
 							}));
 					});
 
-					if(!ctrl.consult.serviceId)
-					{
-						ctrl.consult.serviceId = results[3][0].id;
-					}
 					if(ctrl.consult.professionalSpecialist)
 					{
 						ctrl.selectedSpecialistId = ctrl.consult.professionalSpecialist.id;
@@ -162,13 +169,6 @@ angular.module('Consults').component('consultRequest',
 				ctrl.onReferralPractitionerSelected = (provider) =>
 				{
 					ctrl.consult.providerNo = provider;
-				};
-
-				ctrl.parseTime = function parseTime(time)
-				{
-					var tArray = time.split(":");
-					ctrl.consult.appointmentHour = tArray[0];
-					ctrl.consult.appointmentMinute = tArray[1];
 				};
 
 				ctrl.changeLetterhead = (letterhead: Letterhead): void =>
@@ -201,12 +201,12 @@ angular.module('Consults').component('consultRequest',
 					}
 				});
 
-				ctrl.flagUnsaved = (dirty) =>
+				ctrl.flagUnsaved = (dirty): void =>
 				{
 					ctrl.consultChanged = dirty;
 				}
 
-				ctrl.isUnsaved = () =>
+				ctrl.isUnsaved = (): boolean =>
 				{
 					return ctrl.consultChanged;
 				}
@@ -384,52 +384,32 @@ angular.module('Consults').component('consultRequest',
 						});
 				};
 
-				ctrl.invalidData = function invalidData()
+				ctrl.checkInvalidData = (): void =>
 				{
 					if (!ctrl.consult.urgency)
 					{
-						ctrl.toastService.errorToast("Please select an Urgency");
-						return true;
+						throw new ArgumentError("Please select an Urgency");
 					}
 					if (!ctrl.consult.letterhead)
 					{
-						ctrl.toastService.errorToast("Please select a Letterhead");
-						return true;
+						throw new ArgumentError("Please select a Letterhead");
 					}
 					if (!ctrl.consult.serviceId)
 					{
-						ctrl.toastService.errorToast("Please select a Service");
-						return true;
+						throw new ArgumentError("Please select a Service");
 					}
 					if (ctrl.consult.demographicId == null || ctrl.consult.demographicId == "")
 					{
-						ctrl.toastService.errorToast("Error! Invalid patient!");
-						return true;
-					}
-					return false;
-				};
-
-				ctrl.setAppointmentTime = function setAppointmentTime()
-				{
-					if (ctrl.consult.appointmentHour != null && ctrl.consult.appointmentMinute != null && !ctrl.consult.patientWillBook)
-					{
-						let apptTime = moment(Date.now());
-						apptTime.set('hours', ctrl.consult.appointmentHour);
-						apptTime.set('minute', ctrl.consult.appointmentMinute);
-						ctrl.consult.appointmentTime = apptTime;
-					}
-					else
-					{
-						ctrl.consult.appointmentTime = null;
+						throw new ArgumentError("Error! Invalid patient!");
 					}
 				};
 
-				ctrl.openAttach = function openAttach(attachment)
+				ctrl.openAttach = function openAttach(attachment): void
 				{
 					window.open("../" + attachment.url);
 				};
 
-				ctrl.attachFiles = function attachFiles()
+				ctrl.attachFiles = function attachFiles(): void
 				{
 					const modalInstance = $uibModal.open(
 						{
@@ -467,60 +447,51 @@ angular.module('Consults').component('consultRequest',
 				//show/hide e-send button
 				ctrl.setESendEnabled = function setESendEnabled()
 				{
-					ctrl.eSendEnabled = ctrl.consult.professionalSpecialist != null && ctrl.consult.professionalSpecialist.eDataUrl != null && ctrl.consult.professionalSpecialist.eDataUrl.trim() != "";
+					ctrl.eSendEnabled = !Juno.Common.Util.isBlank(ctrl.consult.professionalSpecialist)
+						&& !Juno.Common.Util.isBlank(ctrl.consult.professionalSpecialist.eDataUrl);
 				};
 
-				ctrl.save = async () =>
+				ctrl.save = async (): Promise<number> =>
 				{
-					var valid = true;
-
-					if (ctrl.consult.id == null && !securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationCreate))
+					if (ctrl.editMode && !securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationUpdate))
 					{
-						ctrl.toastService.errorToast("You don't have right to save new consult");
-						valid = false;
+						throw new SecurityError(SecurityPermissions.ConsultationUpdate);
 					}
-					else if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationUpdate))
+					else if (!securityRolesService.hasSecurityPrivileges(SecurityPermissions.ConsultationCreate))
 					{
-						ctrl.toastService.errorToast("You don't have right to update consult");
-						valid = false;
+						throw new SecurityError(SecurityPermissions.ConsultationCreate);
 					}
-					if (ctrl.invalidData())
-					{
-						valid = false;
-					}
+					ctrl.checkInvalidData();
 
-					if(valid)
-					{
-						ctrl.loadingQueue.pushLoadingState();
-						ctrl.consultSaving = true; //show saving banner
-						ctrl.flagUnsaved(false); //reset change count
-						ctrl.setAppointmentTime();
+					ctrl.loadingQueue.pushLoadingState();
+					ctrl.consultSaving = true; //show saving banner
+					ctrl.flagUnsaved(false); //reset change count
 
-						let response: ConsultRequest;
-						try
+					let response: ConsultRequest;
+					try
+					{
+						if(ctrl.editMode)
 						{
-							if(ctrl.editMode)
-							{
-								response = await consultService.updateRequest(ctrl.consult);
-							}
-							else
-							{
-								response = await consultService.createRequest(ctrl.consult);
-								$location.path("/record/" + ctrl.consult.demographicId + "/consult/" + response.id);
-							}
-							ctrl.consult = response;
+							response = await consultService.updateRequest(ctrl.consult);
 						}
-						catch(error)
+						else
 						{
-
-						}
-						finally
-						{
-							ctrl.setESendEnabled();
-							ctrl.consultSaving = false; //hide saving banner
-							ctrl.loadingQueue.popLoadingState();
+							response = await consultService.createRequest(ctrl.consult);
+							$state.go("record.consultRequest",
+								{
+									demographicNo: ctrl.consult.demographicId,
+									requestId: response.id,
+								});
 						}
 					}
+					finally
+					{
+						ctrl.setESendEnabled();
+						ctrl.consultSaving = false; //hide saving banner
+						ctrl.flagUnsaved(false); //reset change after having updated the object
+						ctrl.loadingQueue.popLoadingState();
+					}
+					return response.id;
 				}
 
 				ctrl.close = function close()
@@ -535,28 +506,49 @@ angular.module('Consults').component('consultRequest',
 					}
 				};
 
-				ctrl.saveAndFax = function saveAndFax()
+				ctrl.onSave = async (): Promise<void> =>
+				{
+					try
+					{
+						await ctrl.save();
+					}
+					catch (error)
+					{
+						ctrl.toastErrorHandler.handleError(error);
+					}
+				}
+
+				ctrl.onSaveAndFax = (): void =>
 				{
 					ctrl.loadingQueue.pushLoadingState();
-					ctrl.save().then(
-						function success(reqId)
+					ctrl.save().then((reqId: number) =>
 						{
+							if (!ctrl.consult.professionalSpecialist)
+							{
+								throw new ArgumentError("A specialist must be selected for faxing");
+							}
+							if (!ctrl.consult.professionalSpecialist.faxNumber)
+							{
+								throw new ArgumentError("Selected specialist is missing a fax number");
+							}
 							var demographicNo = ctrl.consult.demographicId;
-							var letterheadFax = Juno.Common.Util.noNull(ctrl.consult.letterhead.fax);
+							var letterheadFax = Juno.Common.Util.noNull(ctrl.consult.letterhead?.fax?.number);
 							var fax = Juno.Common.Util.noNull(ctrl.consult.professionalSpecialist.faxNumber);
 
 							window.open("../fax/CoverPage.jsp?reqId=" + reqId + "&demographicNo=" + demographicNo + "&letterheadFax=" + letterheadFax + "&faxRecipients=" + fax);
-						},
-						function failure(error)
+						}
+					).catch((error) =>
 						{
+							ctrl.toastErrorHandler.handleError(error);
 						}
 					).finally(() =>
-					{
-						ctrl.loadingQueue.popLoadingState();
-					});
+						{
+							ctrl.loadingQueue.popLoadingState();
+						}
+					);
 				};
 
-				ctrl.eSend = function eSend()
+				ctrl.eSend = function eSend(): void
 				{
 					if (ctrl.eSendEnabled)
 					{
@@ -564,7 +556,7 @@ angular.module('Consults').component('consultRequest',
 						consultService.eSendRequest(ctrl.consult.id).then(
 							function success(results)
 							{
-								alert(results.message);
+								ctrl.toastService.successToast(results.message);
 							},
 							function error(errors)
 							{
@@ -576,7 +568,7 @@ angular.module('Consults').component('consultRequest',
 					}
 				};
 
-				ctrl.saveAndPrint = function saveAndPrint()
+				ctrl.onSaveAndPrint = (): void =>
 				{
 					ctrl.loadingQueue.pushLoadingState();
 					ctrl.save().then(
@@ -586,6 +578,7 @@ angular.module('Consults').component('consultRequest',
 						},
 						function failure(error)
 						{
+							ctrl.toastErrorHandler.handleError(error);
 						}
 					).finally(() =>
 					{
