@@ -33,7 +33,6 @@ angular.module('Common.Components').component('junoDatePicker', {
 		labelPosition: "<?",
 		labelClassList: "<?",
 		componentStyle: "<?",
-		onValidityChange: "&?",
 		onChange: "&?",
 		disabled: "<?",
 		dateFormat: "@?",
@@ -51,7 +50,7 @@ angular.module('Common.Components').component('junoDatePicker', {
 			ctrl.labelPosition = ctrl.labelPosition || LABEL_POSITION.LEFT;
 			ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
 			ctrl.disabled = ctrl.disabled || false;
-			ctrl.dateFormat = ctrl.dateFormat || "YYYY-MM-DD";
+			ctrl.dateFormat = ctrl.dateFormat || Juno.Common.Util.settings.date_format;
 			ctrl.placeholderText = ctrl.dateFormat.toUpperCase();
 
 			ctrl.updateInternalModel(ctrl.ngModel);
@@ -100,6 +99,7 @@ angular.module('Common.Components').component('junoDatePicker', {
 		}
 		ctrl.datePickerVisible = (): boolean =>
 		{
+			//@ts-ignore
 			return $(".datepicker.datepicker-dropdown").is(":visible");
 		}
 		ctrl.showDatePicker = (): void =>
@@ -147,7 +147,8 @@ angular.module('Common.Components').component('junoDatePicker', {
 
 		ctrl.updateExternalModel = (): void =>
 		{
-			let asMoment = moment.utc(ctrl.internalModel, ctrl.dateFormat, true);
+			// use moment in local time zone
+			let asMoment = moment(ctrl.internalModel, ctrl.dateFormat, true);
 			if(asMoment && asMoment.isValid())
 			{
 				ctrl.ngModel = asMoment;

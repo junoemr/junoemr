@@ -17,13 +17,7 @@ export default class ConsultRequestToUpdateInputConverter extends AbstractConver
 		input.referralDate = this.serializeLocalDateTime(model.referralDate);
 		input.serviceId = model.serviceId;
 		input.professionalSpecialist = model.professionalSpecialist;
-
-		if(model.appointmentDateTime)
-		{
-			input.appointmentDate = Juno.Common.Util.formatMomentDate(model.appointmentDateTime);
-			input.appointmentTime = Juno.Common.Util.formatMomentTime(model.appointmentDateTime, Juno.Common.Util.settings.defaultTimeFormat);
-		}
-
+		input.appointmentDateTime = this.serializeZonedDateTime(model.appointmentDateTime);
 		input.reasonForReferral = model.reasonForReferral;
 		input.clinicalInfo = model.clinicalInfo;
 		input.currentMeds = model.currentMeds;

@@ -22,12 +22,7 @@ export default class ConsultRequestModelConverter extends AbstractConverter<Cons
 		model.referralDate = from.referralDate ? moment(from.referralDate).startOf("day") : null;
 		model.serviceId = from.serviceId;
 		model.professionalSpecialist = from.professionalSpecialist; // should have own model
-
-		if(from.appointmentDate && from.appointmentTime)
-		{
-			model.appointmentDateTime = Juno.Common.Util.getDateAndTimeMoment(from.appointmentDate, from.appointmentTime);
-		}
-
+		model.appointmentDateTime = from.appointmentDateTime ? moment(from.appointmentDateTime) : null;
 		model.reasonForReferral = from.reasonForReferral;
 		model.clinicalInfo = from.clinicalInfo;
 		model.currentMeds = from.currentMeds;
