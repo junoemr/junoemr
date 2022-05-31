@@ -261,13 +261,6 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			request.setAttachments(getRequestAttachments(requestId, request.getDemographicId(), ConsultationAttachmentTo1.ATTACHED).getBody());
 
 			request.setFaxList(getFaxList());
-			List<ConsultationServices> consultationServices = consultationManager.getConsultationServices();
-			List<ConsultationServiceTo1> serviceTransfers = new ArrayList<>();
-			for (ConsultationServices consultationService : consultationServices)
-			{
-				serviceTransfers.add(servicesToTransferConverter.convert(consultationService));
-			}
-			request.setServiceList(serviceTransfers);
 			request.setSendToList(providerDao.getActiveTeams());
 		}
 		catch(Exception e)
@@ -303,9 +296,6 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			if(StringUtils.isNotBlank(info)) request.setCurrentMeds(info);
 
 			request.setFaxList(getFaxList());
-			List<ConsultationServices> consultationServices = consultationManager.getConsultationServices();
-			List<ConsultationServiceTo1> serviceTransfers = servicesToTransferConverter.convert(consultationServices);
-			request.setServiceList(serviceTransfers);
 			request.setSendToList(providerDao.getActiveTeams());
 			request.setProviderNo(loggedInProviderNo);
 			request.setPatientWillBook(true);

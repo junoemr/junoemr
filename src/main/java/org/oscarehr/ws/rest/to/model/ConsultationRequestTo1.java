@@ -70,6 +70,5 @@ public class ConsultationRequestTo1 implements Serializable
     private List<ConsultationAttachmentTo1> attachments;
 	
 	private List<FaxConfigTo1> faxList;
-	private List<ConsultationServiceTo1> serviceList;
 	private List<String> sendToList;
 }

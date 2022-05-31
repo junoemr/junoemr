@@ -52,10 +52,10 @@ public class ConsultationRequestToDomainConverter extends AbstractModelConverter
 				"referralDate",
 				"followUpDate");
 
-		request.setReferralDate(ConversionUtils.toLegacyDate(transfer.getReferralDate()));
-		request.setFollowUpDate(ConversionUtils.toLegacyDate(transfer.getFollowUpDate()));
-		request.setAppointmentDate(ConversionUtils.toLegacyDateTime(transfer.getAppointmentDateTime()));
-		request.setAppointmentTime(ConversionUtils.toLegacyDateTime(transfer.getAppointmentDateTime()));
+		request.setReferralDate(ConversionUtils.toNullableLegacyDate(transfer.getReferralDate()));
+		request.setFollowUpDate(ConversionUtils.toNullableLegacyDate(transfer.getFollowUpDate()));
+		request.setAppointmentDate(ConversionUtils.toNullableLegacyDateTime(transfer.getAppointmentDateTime()));
+		request.setAppointmentTime(ConversionUtils.toNullableLegacyDateTime(transfer.getAppointmentDateTime()));
 
 		// Specialist is a many-to-one and is handled slightly differently
 		request.setProfessionalSpecialist(specialistToDomainConverter.convert(transfer.getProfessionalSpecialist()));
