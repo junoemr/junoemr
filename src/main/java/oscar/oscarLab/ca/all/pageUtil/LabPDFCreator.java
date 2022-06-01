@@ -78,8 +78,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import static oscar.oscarLab.ca.all.parsers.AHS.v23.AHSRuralHandler.AHS_RURAL_LAB_TYPE;
-
 /**
  *
  * @author wrighd
@@ -252,6 +250,10 @@ public class LabPDFCreator extends PdfPageEventHelper {
 			ArrayList<String> headers = handler.getHeaders();
 			for (int i = 0; i < headers.size(); i++)
 			{
+				if(handler.isChildOBR(i))
+				{
+					continue;
+				}
 				addLabCategory(headers.get(i), i, null);
 			}
 
@@ -260,6 +262,10 @@ public class LabPDFCreator extends PdfPageEventHelper {
 				ArrayList<String> extraHeaders = extraHandler.getHeaders();
 				for (int i = 0; i < extraHeaders.size(); i++)
 				{
+					if(extraHandler.isChildOBR(i))
+					{
+						continue;
+					}
 					addLabCategory(extraHeaders.get(i), i, extraHandler);
 				}
 			}
@@ -510,31 +516,17 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								if ((k > 0 && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (obxCount>1)))
 								{
 									cell.setPhrase(new Phrase("", lineFont));
-									table.addCell(cell);
 								}
 								else
 								{
 									cell.setPhrase(new Phrase((obrFlag ? "   " : "")+ obxName, lineFont));
-									table.addCell(cell);
 								}
+								table.addCell(cell);
 
 								String result = handler.getOBXResult( j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0");
 								if (!abnormalFlag.equals("N") && handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.TEXT && "CCLAB".equals(handler.getMsgType()))
 								{
 									cell.setPhrase(new Phrase(result + "(" + abnormalFlag + ")", lineFont));
-								}
-								if(AHS_RURAL_LAB_TYPE.equals(handler.getMsgType()))
-								{
-									String resultPhrase = result;
-									if(StringUtils.isBlank(resultPhrase))
-									{
-										resultPhrase = abnormalFlag;
-									}
-									else if(StringUtils.isNotBlank(abnormalFlag))
-									{
-										resultPhrase += " (" + abnormalFlag + ")";
-									}
-									cell.setPhrase(new Phrase(resultPhrase, lineFont));
 								}
 								else
 								{
@@ -546,17 +538,31 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								if(handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, k-1)) && (obxCount>1))
 								{
 									cell.setPhrase(new Phrase("", lineFont));		
-									table.addCell(cell); 
 								}
 								else
 								{
 									cell.setPhrase(new Phrase(handler.getTimeStamp(j, k), lineFont));		
-									table.addCell(cell);
 								}
+								table.addCell(cell);
+
 								if(isTypeCLS)
 								{
 									cell.setPhrase(new Phrase(handler.getOBXResultStatusDisplayValue(j, k), lineFont));
 									table.addCell(cell);
+								}
+
+								/* add a sub table when an obx has a child OBR segment */
+								if(handler.hasChildOBR(j, k))
+								{
+									PdfPCell tableCell = createOBRChild(handler, j, k);
+									PdfPCell emptyCell = new PdfPCell();
+									tableCell.setBorder(PdfPCell.NO_BORDER);
+									emptyCell.setBorder(Rectangle.LEFT | Rectangle.RIGHT);
+									tableCell.setPadding(5);
+
+									table.addCell(emptyCell);
+									table.addCell(tableCell);
+									table.addCell(emptyCell);
 								}
 							}
 							else
@@ -1080,6 +1086,65 @@ public class LabPDFCreator extends PdfPageEventHelper {
 
         document.add(table);
     }
+
+	protected PdfPCell createOBRChild(MessageHandler handler, int obr, int obx)
+	{
+		PdfPCell mainCell = new PdfPCell();
+
+		Font headerFont = new Font(bf, 8, Font.BOLD, Color.BLACK);
+		Font lineFont = new Font(bf, 8, Font.NORMAL, Color.BLACK);
+		Font alertFont = new Font(bf, 8, Font.NORMAL, Color.RED);
+
+		PdfPTable table = initOBRChildTable(headerFont);
+
+		List<Integer> childOBRList = handler.getChildOBRIndexList(obr, obx);
+		for(Integer childObrIndex : childOBRList)
+		{
+			// if no obx results in child, display warning
+			if(handler.getOBXCount(childObrIndex) <= 0)
+			{
+				PdfPCell cell = new PdfPCell();
+				cell.setColspan(2);
+				cell.setPhrase(new Phrase("Missing Result Data", alertFont));
+				table.addCell(cell);
+			}
+			for(int childObxIndex = 0; childObxIndex < handler.getOBXCount(childObrIndex); childObxIndex++)
+			{
+				PdfPCell cell = new PdfPCell();
+				cell.setPhrase(new Phrase(handler.getChildOBR_OBXName(childObrIndex, childObxIndex), lineFont));
+				table.addCell(cell);
+				cell.setPhrase(new Phrase(handler.getChildOBR_OBXResult(childObrIndex, childObxIndex), lineFont));
+				table.addCell(cell);
+
+				// handle obx comments in the sub-table
+				for(int n = 0; n < handler.getOBXCommentCount(childObrIndex, childObxIndex); n++)
+				{
+					PdfPCell commentCell = new PdfPCell();
+					cell.setColspan(2);
+					cell.setPhrase(new Phrase(handler.getOBXComment(childObrIndex, childObxIndex, n), lineFont));
+					table.addCell(commentCell);
+				}
+			}
+		}
+
+		mainCell.addElement(table);
+		return mainCell;
+	}
+
+	protected PdfPTable initOBRChildTable(Font headerFont)
+	{
+		PdfPTable table = new PdfPTable(2);
+		table.setHeaderRows(1);
+		table.setWidthPercentage(100);
+
+		PdfPCell headerCell = new PdfPCell();
+		headerCell.setPhrase(new Phrase("Description", headerFont));
+		table.addCell(headerCell);
+		headerCell.setPhrase(new Phrase("Result", headerFont));
+		table.addCell(headerCell);
+		return table;
+	}
+
     /**
      * Since pdfPtable used in createInfotable() is not properly supported in RTF, 
      * add the patient information to the RTF document using chunks and paragraphs
