@@ -1977,14 +1977,21 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 								                            </td>
 			                                            </tr>
 		                                                <%
-		                                                for (int n=0; n < handler.getOBXCommentCount(childObrIndex, childObxIndex); n++)
+														int obxCommentCount = handler.getOBXCommentCount(childObrIndex, childObxIndex);
+		                                                if(obxCommentCount > 0)
 		                                                {%>
 		                                                <tr class="NormalRes">
 			                                                <td align="left" valign="top" colspan="2">
 				                                                <span style="margin:0; text-align: left;">
-					                                                <%=escapeHtml(handler.getOBXComment(childObrIndex, childObxIndex, n))%>
-				                                                </span>
-			                                                </td>
+		                                                    <%
+			                                                for (int n=0; n < obxCommentCount; n++)
+			                                                {%>
+				                                                <%=escapeHtml(handler.getOBXComment(childObrIndex, childObxIndex, n))%>
+				                                                <br>
+			                                                <%
+			                                                }%>
+		                                                        </span>
+		                                                    </td>
 		                                                </tr>
 		                                                <%
 														}
