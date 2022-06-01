@@ -1,5 +1,5 @@
 /**
- * common error handler interface
+ * common log levels as an enum
  */
 export enum LogLevel
 {
