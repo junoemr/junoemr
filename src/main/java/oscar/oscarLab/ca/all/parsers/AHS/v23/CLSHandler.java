@@ -49,6 +49,8 @@ import java.util.Set;
  */
 public class CLSHandler extends AHSHandler
 {
+	public static final String CLS_MESSAGE_TYPE = "CLS";
+
 	private static Logger logger = Logger.getLogger(CLSHandler.class);
 	protected ORU_R01 msg;
 
@@ -86,8 +88,9 @@ public class CLSHandler extends AHSHandler
 
 	/* ===================================== MSH ====================================== */
 
-	public String getMsgType() {
-		return "CLS";
+	public String getMsgType()
+	{
+		return CLS_MESSAGE_TYPE;
 	}
 
 	/* ===================================== PID ====================================== */
@@ -180,6 +183,12 @@ public class CLSHandler extends AHSHandler
 			}
 		}
 
+		return true;
+	}
+
+	@Override
+	public boolean showStatusForUnstructured()
+	{
 		return true;
 	}
 

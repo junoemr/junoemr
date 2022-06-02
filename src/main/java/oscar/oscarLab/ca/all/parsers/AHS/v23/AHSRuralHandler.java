@@ -156,6 +156,12 @@ public class AHSRuralHandler extends AHSHandler
 		return false;
 	}
 
+	@Override
+	public boolean showStatusForUnstructured()
+	{
+		return true;
+	}
+
     /* ===================================== Hl7 Parsing ====================================== */
 
 	/* ===================================== MSH ====================================== */

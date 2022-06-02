@@ -78,6 +78,9 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import static oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIHandler.CLSDI_MESSAGE_TYPE;
+import static oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler.CLS_MESSAGE_TYPE;
+
 /**
  *
  * @author wrighd
@@ -208,7 +211,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
             throw new DocumentException();
         }
 
-	    this.isTypeCLS = ("CLS".equals(handler.getMsgType()) || "CLSDI".equals(handler.getMsgType()));
+	    this.isTypeCLS = (CLS_MESSAGE_TYPE.equals(handler.getMsgType()) || CLSDI_MESSAGE_TYPE.equals(handler.getMsgType()));
 
         //Create the document we are going to write to
         document = new Document();
@@ -319,7 +322,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 		float[] mainTableWidths;
 		if (isUnstructuredDoc)
 		{
-			if(isTypeCLS)
+			if(handler.showStatusForUnstructured())
 			{
 				mainTableWidths = new float[] { 5f, 10f, 3f, 2f};
 			} else
@@ -387,17 +390,17 @@ public class LabPDFCreator extends PdfPageEventHelper {
 		// table headers
 		if (isUnstructuredDoc)
 		{
+			String dateTimeColumnHeader = "Date/Time Completed";
 			if (isTypeCLS)
 			{
-				String phrase = ("CLSDI".equals(handler.getMsgType())) ? "Exam Date" : "Date/Time Collected";
-				cell.setPhrase(new Phrase(phrase, boldFont));
-				table.addCell(cell);
-				cell.setPhrase(new Phrase("Status", boldFont));
-				table.addCell(cell);
+				dateTimeColumnHeader = (CLSDI_MESSAGE_TYPE.equals(handler.getMsgType())) ? "Exam Date" : "Date/Time Collected";
 			}
-			else
+			cell.setPhrase(new Phrase(dateTimeColumnHeader, boldFont));
+			table.addCell(cell);
+
+			if(handler.showStatusForUnstructured())
 			{
-				cell.setPhrase(new Phrase("Date/Time Completed", boldFont));
+				cell.setPhrase(new Phrase("Status", boldFont));
 				table.addCell(cell);
 			}
 		}
@@ -411,7 +414,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 			table.addCell(cell);
 			if (isTypeCLS)
 			{
-				String phrase = ("CLSDI".equals(handler.getMsgType())) ? "Exam Date" : "Date/Time Collected";
+				String phrase = (CLSDI_MESSAGE_TYPE.equals(handler.getMsgType())) ? "Exam Date" : "Date/Time Collected";
 				cell.setPhrase(new Phrase(phrase, boldFont));
 			}
 			else
@@ -535,7 +538,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								table.addCell(cell);
 								cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 								//if there are duplicate Times, display only the first 
-								if(handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, k-1)) && (obxCount>1))
+								if(k > 0 && handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, k-1)) && (obxCount>1))
 								{
 									cell.setPhrase(new Phrase("", lineFont));		
 								}
@@ -545,9 +548,19 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								}
 								table.addCell(cell);
 
-								if(isTypeCLS)
+								if(handler.showStatusForUnstructured())
 								{
-									cell.setPhrase(new Phrase(handler.getOBXResultStatusDisplayValue(j, k), lineFont));
+									String displayStatus = handler.getOBXResultStatusDisplayValue(j, k);
+									if(k > 0)
+									{
+										//if there are duplicate statuses, display only the first
+										String previousDisplayStatus = handler.getOBXResultStatusDisplayValue(j, k-1);
+										if(displayStatus.equals(previousDisplayStatus))
+										{
+											displayStatus = "";
+										}
+									}
+									cell.setPhrase(new Phrase(displayStatus, lineFont));
 									table.addCell(cell);
 								}
 
@@ -563,6 +576,10 @@ public class LabPDFCreator extends PdfPageEventHelper {
 									table.addCell(emptyCell);
 									table.addCell(tableCell);
 									table.addCell(emptyCell);
+									if(handler.showStatusForUnstructured())
+									{
+										table.addCell(emptyCell);
+									}
 								}
 							}
 							else
