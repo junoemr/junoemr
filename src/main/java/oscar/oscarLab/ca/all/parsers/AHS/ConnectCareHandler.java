@@ -245,7 +245,7 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 		int subCount = getReps("ORDER_OBSERVATION", obr, "OBR-28");
 		for(int k = 0; k < subCount; k++)
 		{
-			docNames.add(getFullDocName("ORDER_OBSERVATION", obr, "OBR-28", k, ""));
+//			docNames.add(getFullDocName("ORDER_OBSERVATION", obr, "OBR-28", k, ""));
 		}
 
 		// add pv1 provider to cc docs

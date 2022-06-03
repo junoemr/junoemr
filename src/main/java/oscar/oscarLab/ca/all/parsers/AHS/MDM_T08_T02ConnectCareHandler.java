@@ -28,7 +28,6 @@ import ca.uhn.hl7v2.model.v23.datatype.CX;
 import ca.uhn.hl7v2.model.v23.message.MDM_T02;
 import ca.uhn.hl7v2.model.v23.message.MDM_T08;
 import ca.uhn.hl7v2.model.v23.segment.PID;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import oscar.oscarLab.ca.all.parsers.messageTypes.MDM_T08_T02MessageHandler;
 
@@ -120,26 +119,17 @@ public abstract class MDM_T08_T02ConnectCareHandler extends MDM_T08_T02MessageHa
 	protected List<String> getCCDocNames() throws HL7Exception
 	{
 		List<String> docNames = new ArrayList<>();
-		int obr = 0;
-		int subCount = getReps("TXA");
+		int subCount = getFieldReps("/.TXA", 23);
 		for(int k = 0; k < subCount; k++)
 		{
-			docNames.add(getResultCopiesTo(obr, subCount));
+			docNames.add(getResultCopiesTo(0, k));
 		}
 
 		// add pv1 provider to cc docs
-		String pv1ProviderNo = getString(get("/.PD1-4"));
-		if(StringUtils.isNotBlank(pv1ProviderNo))
+		int pv1SubCount = getFieldReps("/.PD1", 4);
+		for(int k = 0; k < pv1SubCount; k++)
 		{
-			String familyName = getString(get("/.PD1-4-2"));
-			String givenName = getString(get("/.PD1-4-3"));
-			String middleName = getString(get("/.PD1-4-4"));
-			String suffix = getString(get("/.PD1-4-5"));
-			String prefix = getString(get("/.PD1-4-6"));
-			String degree = getString(get("/.PD1-4-7"));
-
-			String fullName = String.join(" ", prefix, givenName, middleName, familyName, suffix, degree).trim().replaceAll("\\s+", " ");
-			docNames.add(fullName);
+			docNames.add(getFullDocName("/.PD1", 4, k));
 		}
 		return docNames;
 	}

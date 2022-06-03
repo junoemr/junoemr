@@ -276,15 +276,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	protected String getResultCopiesTo(int i, int k) throws HL7Exception
 	{
-		String familyName = getString(get("/.TXA-23(" + k + ")-2"));
-		String givenName = getString(get("/.TXA-23(" + k + ")-3"));
-		String middleName = getString(get("/.TXA-23("+ k + ")-4"));
-		String suffix = getString(get("/.TXA-23(" + k + ")-5"));
-		String prefix = getString(get("/.TXA-23(" + k + ")-6"));
-		String degree = getString(get("/.TXA-23(" + k + ")-7"));
-
-		String fullName = prefix + " " + givenName + " " + middleName + " " + familyName + " " + suffix + " " + degree;
-		return fullName.trim().replaceAll("\\s+", " ");
+		return getFullDocName("/.TXA", 23, k);
 	}
 
 

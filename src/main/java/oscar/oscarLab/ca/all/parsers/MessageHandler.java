@@ -27,6 +27,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.util.SegmentFinder;
 import ca.uhn.hl7v2.util.Terser;
@@ -1317,6 +1318,19 @@ public abstract class MessageHandler
 	}
 
 	/**
+	 * get the reps count of a segment field
+	 * @param path - the full terser path (IE "/.PID" or "ORDER_OBSERVATION(0)/OBX" etc.)
+	 * @param field - field id - 1 indexed, to match hl7 segment convention (IE PID-1 here is ("/.PID", 1))
+	 * @return the number of reps
+	 * @throws HL7Exception if there is an error
+	 */
+	protected int getFieldReps(String path, int field) throws HL7Exception
+	{
+		Segment segment = terser.getSegment(path);
+		return segment.getField(field).length;
+	}
+
+	/**
 	 * convenient way to always search the entire hl7 message for the given group
 	 */
 	private Group findGroupFromTop(String groupName, int groupRep) throws HL7Exception
@@ -1452,29 +1466,20 @@ public abstract class MessageHandler
 		return StringUtils.trimToEmpty(retrieve);
 	}
 
-	protected String getFullDocName(String parentGroupName, int parentRep, String subParentGroupName, int subParentRep, String groupName)
+	protected String getFullDocName(String path, int field, int rep)
 	{
-		try
-		{
-			Group g = findGroupFromTop(parentGroupName, parentRep);
-			Group g2 = (Group) g.get(subParentGroupName, subParentRep);
+		String basePath = path + "-" + field + "(" + rep + ")";
 
-			String familyName = getString(get(g.getName() + "(" + parentRep + ")/" + g2.getName() + "(" + subParentRep + ")" + groupName + "-2"));
-			String givenName =getString(get(g.getName() + "(" + parentRep + ")/" + g2.getName() + "(" + subParentRep + ")" + groupName + "-3"));
-			String middleName = getString(get(g.getName() + "(" + parentRep + ")/" + g2.getName() + "(" + subParentRep + ")" + groupName + "-4"));
-			String suffix = getString(get(g.getName() + "(" + parentRep + ")/" + g2.getName() + "(" + subParentRep + ")" + groupName + "-5"));
-			String prefix = getString(get(g.getName() + "(" + parentRep + ")/" + g2.getName() + "(" + subParentRep + ")" + groupName + "-6"));
-			String degree = getString(get(g.getName() + "(" + parentRep + ")/" + g2.getName() + "(" + subParentRep + ")" + groupName + "-7"));
+		String familyName = getString(get(basePath + "-2"));
+		String givenName = getString(get(basePath + "-3"));
+		String middleName = getString(get(basePath + "-4"));
+		String suffix = getString(get(basePath + "-5"));
+		String prefix = getString(get(basePath + "-6"));
+		String degree = getString(get(basePath + "-7"));
 
-			String fullName = String.join(" ", prefix, givenName, middleName, familyName, suffix, degree).trim().replaceAll("\\s+", " ");
-			logger.info("get reps -> " + g.getName() + "("+parentRep+")/" + g2.getName() + "("+ subParentRep +")" + groupName + ": ");
-			return fullName;
-		}
-		catch(HL7Exception e)
-		{
-			logger.error("Terser Repetition Error", e);
-		}
-		return "";
+		String fullName = String.join(" ", prefix, givenName, middleName, familyName, suffix, degree).trim().replaceAll("\\s+", " ");
+		logger.info("getFullDocName -> " + basePath + ": " + fullName);
+		return fullName;
 	}
 
 	// kept for older parsers
