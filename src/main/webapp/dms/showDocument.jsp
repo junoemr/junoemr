@@ -151,11 +151,7 @@
 				contentType = curdoc.getContentType().substring(slash + 1);
 			}
 
-			int numOfPage = 0;
-			if (curdoc.getNumberOfPages() != null)
-			{
-				numOfPage = curdoc.getNumberOfPages();
-			}
+			int numOfPage = curdoc.getNumberofPagesOptional().orElse(0);
 
 			String numOfPageStr = "";
 			if(numOfPage == 0)
@@ -164,7 +160,7 @@
 			}
 			else
 			{
-				numOfPageStr = (new Integer(numOfPage)).toString();
+				numOfPageStr = String.valueOf(numOfPage);
 			}
 
 			String contextPath = request.getContextPath();
