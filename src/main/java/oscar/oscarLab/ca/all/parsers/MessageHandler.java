@@ -675,7 +675,8 @@ public abstract class MessageHandler
 	 *  Return an ArrayList of the requesting doctors billing number and the
 	 *  billing numbers of the cc'd docs
 	 */
-	public ArrayList<String> getDocNums() {
+	public List<String> getDocNums()
+	{
 		ArrayList<String> docNums = new ArrayList<>();
 		String id;
 		int i;
@@ -1449,6 +1450,31 @@ public abstract class MessageHandler
 	protected String getString(String retrieve)
 	{
 		return StringUtils.trimToEmpty(retrieve);
+	}
+
+	protected String getFullDocName(String parentGroupName, int parentRep, String subParentGroupName, int subParentRep, String groupName)
+	{
+		try
+		{
+			Group g = findGroupFromTop(parentGroupName, parentRep);
+			Group g2 = (Group) g.get(subParentGroupName, subParentRep);
+
+			String familyName = getString(get(g.getName() + "(" + parentRep + ")/" + g2.getName() + "(" + subParentRep + ")" + groupName + "-2"));
+			String givenName =getString(get(g.getName() + "(" + parentRep + ")/" + g2.getName() + "(" + subParentRep + ")" + groupName + "-3"));
+			String middleName = getString(get(g.getName() + "(" + parentRep + ")/" + g2.getName() + "(" + subParentRep + ")" + groupName + "-4"));
+			String suffix = getString(get(g.getName() + "(" + parentRep + ")/" + g2.getName() + "(" + subParentRep + ")" + groupName + "-5"));
+			String prefix = getString(get(g.getName() + "(" + parentRep + ")/" + g2.getName() + "(" + subParentRep + ")" + groupName + "-6"));
+			String degree = getString(get(g.getName() + "(" + parentRep + ")/" + g2.getName() + "(" + subParentRep + ")" + groupName + "-7"));
+
+			String fullName = String.join(" ", prefix, givenName, middleName, familyName, suffix, degree).trim().replaceAll("\\s+", " ");
+			logger.info("get reps -> " + g.getName() + "("+parentRep+")/" + g2.getName() + "("+ subParentRep +")" + groupName + ": ");
+			return fullName;
+		}
+		catch(HL7Exception e)
+		{
+			logger.error("Terser Repetition Error", e);
+		}
+		return "";
 	}
 
 	// kept for older parsers

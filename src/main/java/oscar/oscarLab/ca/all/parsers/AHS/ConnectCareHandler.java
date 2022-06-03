@@ -176,6 +176,8 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 		return "AHS";
 	}
 
+	/* ===================================== OBR ====================================== */
+
 	@Override
 	public String getUniqueIdentifier()
 	{
@@ -199,6 +201,91 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 		return getAssignedPatientLocation();
 	}
 
+	@Override
+	public List<String> getDocNums()
+	{
+		List<String> docNums = new ArrayList<>();
+		try
+		{
+			String providerId = getOrderingProviderNo(0, 0);
+			docNums.add(providerId);
+
+			int obr = 0;
+			int subCount = getReps("ORDER_OBSERVATION", obr, "OBR-28");
+			for(int k = 0; k < subCount; k++)
+			{
+				docNums.add(getString(get("/.ORDER_OBSERVATION(" + obr + ")/OBR-28(" + k + ")-1")));
+			}
+
+			// add pv1 provider to cc docs
+			String pv1ProviderNo = getString(get("/.PD1-4"));
+			if(StringUtils.isNotBlank(pv1ProviderNo))
+			{
+				docNums.add(pv1ProviderNo);
+			}
+
+		}
+		catch(Exception e)
+		{
+			logger.error("Could not return doctor nums", e);
+		}
+		return docNums;
+	}
+
+	@Override
+	public String getCCDocs()
+	{
+		return String.join(", ", getCCDocNames());
+	}
+
+	protected List<String> getCCDocNames()
+	{
+		List<String> docNames = new ArrayList<>();
+		int obr = 0;
+		int subCount = getReps("ORDER_OBSERVATION", obr, "OBR-28");
+		for(int k = 0; k < subCount; k++)
+		{
+			docNames.add(getFullDocName("ORDER_OBSERVATION", obr, "OBR-28", k, ""));
+		}
+
+		// add pv1 provider to cc docs
+		String pv1ProviderNo = getString(get("/.PD1-4"));
+		if(StringUtils.isNotBlank(pv1ProviderNo))
+		{
+			String familyName = getString(get("/.PD1-4-2"));
+			String givenName = getString(get("/.PD1-4-3"));
+			String middleName = getString(get("/.PD1-4-4"));
+			String suffix = getString(get("/.PD1-4-5"));
+			String prefix = getString(get("/.PD1-4-6"));
+			String degree = getString(get("/.PD1-4-7"));
+
+			String fullName = String.join(" ", prefix, givenName, middleName, familyName, suffix, degree).trim().replaceAll("\\s+", " ");
+			docNames.add(fullName);
+		}
+		return docNames;
+	}
+
+	/**
+	 * invalid for connect care as one result may contain multiple cc providers in multiple fields
+	 * rely on getCCDocs list results instead
+	 */
+	@Override
+	protected String getResultCopiesTo(int i, int k)
+	{
+		throw new IllegalStateException("Not valid for ConnectCare");
+	}
+
+	/**
+	 * invalid for connect care as one result may contain multiple cc providers in multiple fields
+	 * rely on getDocNums list results instead
+	 */
+	@Override
+	protected String getResultCopiesToProviderNo(int i, int k)
+	{
+		throw new IllegalStateException("Not valid for ConnectCare");
+	}
+
+	/* ===================================== OBX ====================================== */
 
 	@Override
 	public String getNteForOBX(int i, int j)
