@@ -36,6 +36,7 @@ import org.openqa.selenium.WebElement;
 import org.oscarehr.JunoApplication;
 import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
@@ -49,6 +50,7 @@ import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpat
 import static integration.tests.util.seleniumUtil.PageUtil.switchToNewWindow;
 
 @RunWith(SpringRunner.class)
+@TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(
 		classes = {JunoApplication.class, TestConfig.class},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

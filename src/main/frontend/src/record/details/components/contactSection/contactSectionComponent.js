@@ -26,6 +26,7 @@ import {ElectronicMessagingConsentStatus} from "../../../../lib/demographic/Elec
 import {SystemPreferenceApi} from "../../../../../generated";
 import Address from "../../../../lib/common/model/Address";
 import {PhoneType} from "../../../../lib/common/model/PhoneType";
+import {SystemPreferences} from "../../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Record.Details').component('contactSection', {
 	templateUrl: 'src/record/details/components/contactSection/contactSection.jsp',
@@ -52,7 +53,7 @@ angular.module('Record.Details').component('contactSection', {
 			ctrl.address2 = ctrl.ngModel.address2 || new Address();
 			ctrl.updatePrimaryPhoneValues();
 
-			systemPreferenceApi.getPreferenceValue("enable_additional_address").then(
+			systemPreferenceApi.getPreferenceValue(SystemPreferences.ExtraAddressField).then(
 				function success(result)
 				{
 					if(result.data.body == "true")

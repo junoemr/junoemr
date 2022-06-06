@@ -27,6 +27,7 @@
  */
 
 import {SystemPreferenceApi} from "../../../generated";
+import {SystemPreferences} from "./systemPreferenceServiceConstants";
 
 angular.module("Common.Services").service("k2aService", [
 	'$q',
@@ -47,7 +48,7 @@ angular.module("Common.Services").service("k2aService", [
 		 */
 		service.isK2AEnabled = async () =>
 		{
-			const response = await service.systemPreferenceApi.getPreferenceEnabled("integration.know2Act.enabled");
+			const response = await service.systemPreferenceApi.getPreferenceEnabled(SystemPreferences.K2AEnabled);
 			return response.data.body;
 		}
 		

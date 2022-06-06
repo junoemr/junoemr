@@ -39,7 +39,7 @@ import java.time.LocalDate;
 @XmlRootElement
 @Schema(description = "Partial Demographic record data transfer object")
 @JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class DemographicListTransfer implements Serializable
+public class ApiDemographicListTransfer implements Serializable
 {
 	// demographic base info
 	@Schema(description = "patient demographic record identifier")

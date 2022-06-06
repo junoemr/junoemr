@@ -279,7 +279,7 @@ public class IHAHandler extends ORU_R01MessageHandler
     }
 
     @Override
-    public String getAccessionNum()
+    public String getUniqueIdentifier()
     {
         String accessionNo = null;
         switch(getSendingApplicationType())
@@ -305,7 +305,7 @@ public class IHAHandler extends ORU_R01MessageHandler
     }
 
     @Override
-    public String getFillerOrderNumber()
+    public String getUniqueVersionIdentifier()
     {
 		// use lab date with code to identify a unique version
 		return getString(get("/.OBR-7")) + getString(get("/.OBR-25"));

@@ -27,7 +27,7 @@
 <div id="patient-record-page" class="h-min-100 flex-col">
     <juno-security-check permissions="recordCtrl.SecurityPermissions.DemographicRead">
         <div class="flex-row align-items-center patient-record-header">
-            <div class="flex-row align-items-centerflex-item-grow">
+            <div class="flex-row align-items-center flex-item-grow">
                 <h3 class="patient-header-name" ng-cloak>
                     {{recordCtrl.demographic.displayName}}
                     <span ng-show="recordCtrl.demographic.alias">({{recordCtrl.demographic.alias}})</span>
@@ -61,6 +61,13 @@
                             Call Patient
                         </div>
                     </juno-button>
+                </div>
+            </div>
+            <div class="flex-row align-items-center justify-content-end">
+                <div ng-if="recordCtrl.netcareModuleEnabled" class="w-128 m-l-4 m-r-4">
+                    <netcare-button ng-if="recordCtrl.demographic"
+                                    phn="recordCtrl.demographic.healthNumber">
+                    </netcare-button>
                 </div>
             </div>
         </div>

@@ -27,6 +27,8 @@ import {HRMStatus} from "../../../../../lib/integration/hrm/model/HrmFetchResult
 import moment from "moment";
 import SystemPreferenceService from "../../../../../lib/system/service/SystemPreferenceService";
 import {SecurityPermissions} from "../../../../../common/security/securityConstants";
+import ToastService from "../../../../../lib/alerts/service/ToastService";
+import {SystemPreferences} from "../../../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Admin.Section').component('hrmAdmin',
 	{
@@ -38,34 +40,56 @@ angular.module('Admin.Section').component('hrmAdmin',
 				let ctrl = this;
 				const hrmService = new HrmService();
 				const systemPreferenceService = new SystemPreferenceService($http, $httpParamSerializer);
+				const toastService = new ToastService();
 
 				ctrl.COMPONENT_STYLE = JUNO_STYLE.DEFAULT;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 				ctrl.LABEL_POSITION = LABEL_POSITION.TOP;
 
-				ctrl.pollingEnabled = true;
+				ctrl.pollingEnabled = false;
 				ctrl.pollingInterval = 0;
 
-				ctrl.pollingEnabledPreferenceName = "omd.hrm.polling_enabled";
-				ctrl.pollingIntervalPropertyKey = "omd.hrm.poll_interval_sec";
+				const pollingEnabledPreference = SystemPreferences.HrmPollingEnabled;
+				const pollingIntervalProperty = SystemPreferences.HrmPollingInterval;
 
 				ctrl.$onInit = async () =>
 				{
-					ctrl.COMPONENT_STYLE = ctrl.COMPONENT_STYLE || JUNO_STYLE.DEFAULT;
-
-					hrmService.getLastResults()
-					.then(value =>
+					try
 					{
-						ctrl.latestResults = value;
-					});
+						ctrl.COMPONENT_STYLE = ctrl.COMPONENT_STYLE || JUNO_STYLE.DEFAULT;
 
-					systemPreferenceService.getProperty(ctrl.pollingIntervalPropertyKey)
-					.then(value =>
+						const results = await Promise.all([
+							systemPreferenceService.getPreference(pollingIntervalProperty, 3600),
+							systemPreferenceService.isPreferenceEnabled(pollingEnabledPreference, false),
+						]);
+
+						ctrl.pollingInterval = Math.floor(results[0]/60);
+						ctrl.pollingEnabled = results[1];
+						ctrl.latestResults = await hrmService.getLastResults();
+					}
+					finally
 					{
-						ctrl.pollingInterval = Math.floor((value)/60);
-					});
-				};
+						$scope.$apply();
+					}
+				}
+
+				ctrl.togglePolling = async (checked) =>
+				{
+					try
+					{
+						await systemPreferenceService.setPreference(pollingEnabledPreference, checked);
+					}
+					catch (exception)
+					{
+						console.error(exception);
+						toastService.errorToast("Could not enable polling, please try again later");
+					}
+					finally
+					{
+						$scope.$apply();
+					}
+				}
 
 				ctrl.fetchHRMDocs = async () =>
 				{
@@ -73,6 +97,11 @@ angular.module('Admin.Section').component('hrmAdmin',
 					{
 						ctrl.working = true;
 						ctrl.latestResults = await hrmService.fetchNewHRMDocuments();
+					}
+					catch (exception)
+					{
+						console.error(exception);
+						toastService.errorToast("Could not fetch documents, contact support for assistance");
 					}
 					finally
 					{
@@ -83,7 +112,15 @@ angular.module('Admin.Section').component('hrmAdmin',
 
 				ctrl.getSummaryText = (hrmStatus) =>
 				{
-					if (hrmStatus === HRMStatus.SUCCESS)
+					if (!ctrl.pollingEnabled)
+					{
+						return "Disabled";
+					}
+					if (!hrmStatus)
+					{
+						return "Not yet polled";
+					}
+					else if (hrmStatus === HRMStatus.SUCCESS)
 					{
 						return "OK: No problems detected";
 					}
@@ -99,8 +136,11 @@ angular.module('Admin.Section').component('hrmAdmin',
 
 				ctrl.getSummaryClass = (hrmStatus) =>
 				{
-
-					if (hrmStatus === HRMStatus.SUCCESS)
+					if (!ctrl.pollingEnabled || !hrmStatus)
+					{
+						return "off";
+					}
+					else if (hrmStatus === HRMStatus.SUCCESS)
 					{
 						return "ok";
 					}

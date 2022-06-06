@@ -11,6 +11,7 @@ package org.oscarehr.hospitalReportManager.model;
 
 import lombok.Data;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.consultations.model.ConsultDocs;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -97,6 +98,9 @@ public class HRMDocument extends AbstractModel<Integer>
 
 	@OneToMany(fetch= FetchType.LAZY, mappedBy = "hrmDocument")
 	private List<HRMDocumentToProvider> documentToProviderList;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "hrmDocument")
+	private List<ConsultDocs> consultDocsList;
 
 	@Override
 	public Integer getId()

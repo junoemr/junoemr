@@ -36,6 +36,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -77,10 +78,10 @@ public class StringEncryptor
 			Cipher cipher = Cipher.getInstance(TRANSFORM);
 			final SecureRandom rng = new SecureRandom();
 
-			SecretKeySpec skeySpec = getSecretKeySpec(getAESKey());
-			IvParameterSpec iv = createIV(cipher.getBlockSize(), Optional.of(rng));
+			SecretKeySpec sKeySpec = getSecretKeySpec(getAESKey());
+			IvParameterSpec iv = createIV(cipher.getBlockSize(), rng);
 
-			cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
+			cipher.init(Cipher.ENCRYPT_MODE, sKeySpec, iv);
 
 			byte[] encrypted = cipher.doFinal(plaintext);
 			return concat(iv.getIV(), encrypted);
@@ -124,13 +125,13 @@ public class StringEncryptor
 		{
 			throw new EncryptionException("Invalid encryption key");
 		}
-		return new SecretKeySpec(secretKey.getBytes("UTF-8"), AES);
+		return new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), AES);
 	}
 
-	private static IvParameterSpec createIV(final int ivSizeBytes, final Optional<SecureRandom> rng)
+	private static IvParameterSpec createIV(final int ivSizeBytes, final SecureRandom rng)
 	{
 		final byte[] iv = new byte[ivSizeBytes];
-		final SecureRandom theRNG = rng.orElse(new SecureRandom());
+		final SecureRandom theRNG = Optional.ofNullable(rng).orElse(new SecureRandom());
 		theRNG.nextBytes(iv);
 		return new IvParameterSpec(iv);
 	}

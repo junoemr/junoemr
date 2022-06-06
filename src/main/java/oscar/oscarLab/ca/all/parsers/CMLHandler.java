@@ -425,7 +425,7 @@ public class CMLHandler extends ORU_R01MessageHandler
         }
     }
 
-    public String getAccessionNum(){
+    public String getUniqueIdentifier(){
         String accessionNum = "";
         try{
             accessionNum = getString(msg.getRESPONSE().getORDER_OBSERVATION(0).getORC().getPlacerOrderNumber(0).getEntityIdentifier().getValue());
@@ -504,7 +504,7 @@ public class CMLHandler extends ORU_R01MessageHandler
         return "";
     }
 
-    public String getFillerOrderNumber(){
+    public String getUniqueVersionIdentifier(){
 		return "";
 	}
 

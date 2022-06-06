@@ -81,7 +81,7 @@ public class HRMDownloadFileAction extends DownloadAction
 		}
   
 		// This is somehow already decoding the base64 content... don't ask me how.
-    	byte[] binaryContent = report.getBase64BinaryContent();
+    	byte[] binaryContent = report.getBinaryContent();
 		
     	String fileExtension = report.getFileExtension().toLowerCase();
 	    fileExtension = fileExtension.replaceAll("\\.", "");

@@ -23,9 +23,11 @@
 package org.oscarehr.olis.converter;
 
 import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.olis.model.OLISSystemPreferences;
 import org.oscarehr.olis.service.OLISPollingService;
 import org.oscarehr.olis.transfer.OLISSystemSettingsTransfer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
@@ -36,6 +38,9 @@ import java.util.List;
 @Component
 public class OLISSystemPreferencesToTransferConverter extends AbstractModelConverter<OLISSystemPreferences, OLISSystemSettingsTransfer>
 {
+	@Autowired
+	private JunoProperties junoProperties;
+
 	@Override
 	public OLISSystemSettingsTransfer convert(OLISSystemPreferences input)
 	{
@@ -61,8 +66,9 @@ public class OLISSystemPreferencesToTransferConverter extends AbstractModelConve
 		// always have a polling frequency
 		if(transfer.getFrequency() == null)
 		{
-			transfer.setFrequency(OLISSystemPreferences.DEFAULT_POLLING_FREQUENCY_MIN);
+			transfer.setFrequency(junoProperties.getOlis().getDefaultPollingIntervalMin());
 		}
+		transfer.setVendorId(junoProperties.getOlis().getVendorId());
 
 		return transfer;
 	}

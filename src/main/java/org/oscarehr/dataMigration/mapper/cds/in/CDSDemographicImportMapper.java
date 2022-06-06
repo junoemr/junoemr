@@ -22,12 +22,20 @@
  */
 package org.oscarehr.dataMigration.mapper.cds.in;
 
+import static org.oscarehr.demographic.entity.Demographic.STATUS_ACTIVE;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_DECEASED;
+import static org.oscarehr.demographic.entity.Demographic.STATUS_INACTIVE;
+
+import java.time.LocalDate;
+import java.util.List;
+import javax.xml.datatype.XMLGregorianCalendar;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.common.PhoneNumberModel;
-import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.ProviderModel;
+import org.oscarehr.demographic.entity.Demographic;
+import org.oscarehr.demographic.model.DemographicModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import oscar.oscarDemographic.pageUtil.Util;
@@ -35,15 +43,10 @@ import oscar.util.ConversionUtils;
 import xml.cds.v5_0.Demographics;
 import xml.cds.v5_0.HealthCard;
 import xml.cds.v5_0.OfficialSpokenLanguageCode;
+import xml.cds.v5_0.PersonNamePartTypeCode;
 import xml.cds.v5_0.PersonNamePrefixCode;
+import xml.cds.v5_0.PersonNameStandard.LegalName.OtherName;
 import xml.cds.v5_0.PersonStatus;
-
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.time.LocalDate;
-
-import static org.oscarehr.demographic.entity.Demographic.STATUS_ACTIVE;
-import static org.oscarehr.demographic.entity.Demographic.STATUS_DECEASED;
-import static org.oscarehr.demographic.entity.Demographic.STATUS_INACTIVE;
 
 @Component
 public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demographics, DemographicModel>
@@ -70,6 +73,7 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 	protected void mapBasicInfo(Demographics importStructure, DemographicModel demographic)
 	{
 		demographic.setFirstName(importStructure.getNames().getLegalName().getFirstName().getPart());
+		demographic.setMiddleName(getPatientMiddleNames(importStructure.getNames().getLegalName().getOtherName()));
 		demographic.setLastName(importStructure.getNames().getLegalName().getLastName().getPart());
 		demographic.setDateOfBirth(ConversionUtils.toLocalDate(importStructure.getDateOfBirth()));
 		demographic.setSex(Person.SEX.getIgnoreCase(importStructure.getGender().toString()));
@@ -275,5 +279,24 @@ public class CDSDemographicImportMapper extends AbstractCDSImportMapper<Demograp
 			return LocalDate.now();
 		}
 		return LocalDate.of(statusDate.getYear(), statusDate.getMonth(), statusDate.getDay());
+	}
+
+	protected String getPatientMiddleNames(List<OtherName> otherNames)
+	{
+		String middleName = null;
+		for (OtherName name: otherNames)
+		{
+			if (name.getPartType().name().equals(PersonNamePartTypeCode.GIV.name()))
+			{
+
+				middleName = name.getPart();
+				if (middleName.length() > Demographic.MIDDLE_NAME_MAX_LENGTH)
+				{
+					middleName = middleName.substring(0, Demographic.MIDDLE_NAME_MAX_LENGTH);
+					logEvent("Demographic middle name is too long. Will be truncated to: '" + middleName + "'");
+				}
+			}
+		}
+		return middleName;
 	}
 }

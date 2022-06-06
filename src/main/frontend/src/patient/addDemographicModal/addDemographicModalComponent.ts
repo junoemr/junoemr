@@ -11,6 +11,7 @@ import moment from "moment";
 import PhoneNumber from "../../lib/common/model/PhoneNumber";
 import SimpleProvider from "../../lib/provider/model/SimpleProvider";
 import {PhoneType} from "../../lib/common/model/PhoneType";
+import {SystemPreferences} from "../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Patient').component('addDemographicModal', {
 	templateUrl: 'src/patient/addDemographicModal/addDemographicModal.jsp',
@@ -109,7 +110,7 @@ angular.module('Patient').component('addDemographicModal', {
 			ctrl.$onInit = () :void =>
 			{
 				// Pull phone prefix from Oscar Properties file
-				ctrl.systemPreferenceApi.getPreferenceValue("phone_prefix", "").then(
+				ctrl.systemPreferenceApi.getPreferenceValue(SystemPreferences.DefaultPhonePrefix, "").then(
 					function success(results)
 					{
 						ctrl.defaultPhoneNumber = results.data.body;

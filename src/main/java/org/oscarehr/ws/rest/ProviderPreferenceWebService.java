@@ -52,8 +52,8 @@ public class ProviderPreferenceWebService extends AbstractServiceImpl
 	private ProviderManager2 providerManager;
 
 	@GET
-	@Path("/get")
-	public AbstractSearchResponse<ProviderSettings> getProviderSettings()
+	@Path("/all")
+	public AbstractSearchResponse<ProviderSettings> getAllProviderSettings()
 	{
 		AbstractSearchResponse<ProviderSettings> response = new AbstractSearchResponse<>();
 
@@ -76,6 +76,16 @@ public class ProviderPreferenceWebService extends AbstractServiceImpl
 
 		providerManager.updateProviderSettings(getLoggedInInfo(), providerNo, providerSettings);
 		return response;
+	}
+
+	@GET
+	@Path("/{key}")
+	public RestResponse<String> getProviderSetting(@PathParam("key") String key)
+	{
+		String loggedInProviderId = getLoggedInProviderId();
+		securityInfoManager.requireAllPrivilege(loggedInProviderId, Permission.PREFERENCE_READ);
+		return RestResponse.successResponse(
+				providerManager.getSingleSetting(loggedInProviderId, key));
 	}
 
 	@PUT

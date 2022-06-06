@@ -94,7 +94,7 @@ public class IHAHandler extends DefaultGenericHandler implements MessageHandler 
     }
 
     @Override
-    public String getAccessionNum(){
+    public String getUniqueIdentifier(){
         try{
             String accessionNum = getString(DynamicHapiLoaderUtils.terserGet(terser,"/.MSH-10-1"));
             int firstDash = accessionNum.indexOf("-");

@@ -44,9 +44,10 @@ if(!authed) {
     List<String> labLabels = (List<String>) request.getAttribute("labArray");
     List<String> docLabels = (List<String>) request.getAttribute("docArray");
     List<String> eFormLabels = (List<String>) request.getAttribute("eFormArray");
+	List<String> hrmLabels = (List<String>) request.getAttribute("hrmLabels");
 
 	String displayValue = "display: none;";
-	if(docLabels.isEmpty() && labLabels.isEmpty() && eFormLabels.isEmpty())
+	if(docLabels.isEmpty() && labLabels.isEmpty() && eFormLabels.isEmpty() && hrmLabels.isEmpty())
 	{
 		displayValue = "";
 	}
@@ -73,6 +74,12 @@ if(!authed) {
 	<li class="eform"><%=eFormLabel%></li>
 	<%
         }
+		for(String hrmLabel : hrmLabels)
+		{
+	%>
+	<li class="hrm"><%=hrmLabel%></li>
+	<%
+		}
     %>
 </ul>
 <p id="attachDefault"

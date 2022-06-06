@@ -33,6 +33,7 @@ import {
 	BookQueuedAppointmentTransfer,
 	MhaIntegrationApi
 } from "../../../../../../generated";
+import {SystemProperties} from "../../../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 {
@@ -75,7 +76,7 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		{
 			ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 
-			ctrl.isMultisiteEnabled = (await systemPreferenceApi.getPropertyEnabled("multisites")).data.body;
+			ctrl.isMultisiteEnabled = (await systemPreferenceApi.getPropertyEnabled(SystemProperties.Multisites)).data.body;
 			ctrl.loadProviderList();
 		}
 

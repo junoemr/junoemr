@@ -683,7 +683,7 @@ public String strikeOutInvalidContent(String content, String status) {
                         <table width="100%" border="0" cellspacing="0" cellpadding="3">
                             <tr>
                                 <td align="left" class="MainTableTopRowRightColumn no-print" width="100%">
-                                	<input type="hidden" name="labName" value="<%=handler.getAccessionNum() %>"/>
+                                	<input type="hidden" name="labName" value="<%=handler.getUniqueIdentifier() %>"/>
                                     <input type="hidden" name="segmentID" value="<%= segmentID %>"/>
 	                                <input type="hidden" name="uuid" value="<%= resultUuid %>"/>
                                     <input type="hidden" name="multiID" value="<%= multiLabId %>" />
@@ -1116,7 +1116,7 @@ public String strikeOutInvalidContent(String content, String status) {
                                             </td>
                                             <td>
                                                 <div class="FieldData">
-                                                    <%= handler.getAccessionNum()%>
+                                                    <%= handler.getUniqueIdentifier()%>
                                                     <span style="margin-left:15px; font-size:8px; color:#333333;">
                                                     <%= handler.getAccessionNumSourceOrganization() %>
                                                     </span>

@@ -44,6 +44,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties.Web;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import oscar.util.ConversionUtils;
 
@@ -54,6 +55,7 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVis
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
 @RunWith(SpringRunner.class)
+@TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ChangeAppointmentStatusIT extends SeleniumTestBase
 {

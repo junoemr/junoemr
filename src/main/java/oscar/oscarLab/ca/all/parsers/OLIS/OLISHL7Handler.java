@@ -932,6 +932,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	 * @param obx segment index - 0 indexed
 	 * @return true if the given segment has a linked OBR child segment
 	 */
+	@Override
 	public boolean hasChildOBR(int obr, int obx)
 	{
 		return obrParentMap.containsKey(obr, obx);
@@ -941,6 +942,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	 * @param obr segment index - 0 indexed
 	 * @return true if a mapped value exists
 	 */
+	@Override
 	public boolean isChildOBR(int obr)
 	{
 		return obrParentMap.containsValue(obr);
@@ -1577,7 +1579,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 			{
 				if (getOBXValueType(i, j).equals("ED")) // Encapsulated Data type
 				{
-					logger.info("Found embedded Document in OLIS lab " + getAccessionNum() + " [OBR(" + i + "), OBX(" + j + ")], pulling it out");
+					logger.info("Found embedded Document in OLIS lab " + getUniqueIdentifier() + " [OBR(" + i + "), OBX(" + j + ")], pulling it out");
 					String data = getOBXField(i, j, 5, 0, 5);
 					OLIS_DOC_TYPES docType = OLIS_DOC_TYPES.valueOf(getOBXField(i, j, 5, 0, 3));
 
@@ -1585,7 +1587,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 					embeddedDocument.setBase64Data(data);
 					embeddedDocument.setMimeType(docType.getMimeType());
 
-					String fileName = "-" + getAccessionNum() + "-" + getFillerOrderNumber() + "-" + i + "-" + j + "." + docType.getExtension();
+					String fileName = "-" + getUniqueIdentifier() + "-" + getUniqueVersionIdentifier() + "-" + i + "-" + j + "." + docType.getExtension();
 					embeddedDocument.setFileName(fileName);
 					embeddedDocument.setDescription("embedded_" + docType.getExtension());
 					embeddedDocument.setSourceFacility("HL7Upload");
@@ -1647,7 +1649,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 
 			// write the responce content
 			response.setContentType(mimeType);
-			response.setHeader("Content-Disposition", "attachment; filename=\"" + getAccessionNum().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_" + fileNameSuffix + "\"");
+			response.setHeader("Content-Disposition", "attachment; filename=\"" + getUniqueIdentifier().replaceAll("\\s", "_") + "_" + obr + "-" + obx + "_" + fileNameSuffix + "\"");
 
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			baos.write(buffer, 0, buffer.length);
@@ -2144,7 +2146,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	 * acts as the unique lab version number
 	 */
 	@Override
-	public String getFillerOrderNumber()
+	public String getUniqueVersionIdentifier()
 	{
 		// not totally sure which fields to use here.
 		// OLIS doesn't want to give us an official way to check versions.
@@ -2306,7 +2308,7 @@ public class OLISHL7Handler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public String getAccessionNum()
+	public String getUniqueIdentifier()
 	{
 		if(getOBRCount() > 0)
 		{

@@ -68,6 +68,8 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String PROVIDER_FAXNUMBER = "faxnumber";
     public static final String PROVIDER_COLOUR = "ProviderColour";
 
+    public static final String OLIS_INTEGRATION_ENABLED = "integration.olis.enabled";
+    public static final String OLIS_EMR_ID="integration.olis.emr_id";
     public static final String OLIS_POLLING_ENABLED="olis_polling_enabled";
     public static final String OFFICIAL_FIRST_NAME="official_first_name";
     public static final String OFFICIAL_SECOND_NAME="official_second_name";
@@ -132,6 +134,8 @@ public class UserProperty extends AbstractModel<Integer> implements Serializable
     public static final String INTAKE_FORM_ENABLED = "intake_form_enabled";
     public static final String TICKLER_VIEW_ONLY_MINE = "tickler_view_only_mine";
     public static final String CARE_CONNECT_ENABLED = "integration.CareConnect.enabled";
+    public static final String NETCARE_ENABLED = "integration.netcare.enabled";
+    public static final String NETCARE_USER_ID = "integration.netcare.user_id";
     public static final String EFORM_POPUP_WIDTH = "eform.popup.width";
     public static final String EFORM_POPUP_HEIGHT = "eform.popup.height";
     public static final String ROSTERING_AND_FAMILY_DOCTOR_ENABLED = "enable_family_doctor_and_rostering";

@@ -347,6 +347,7 @@ module.exports = {
 			...(glob.sync("./src/integration/**/*.js", {nosort: true})),
 
 			...(glob.sync("./src/record/components/**/*.js", {nosort: true})),
+			...(glob.sync("./src/record/components/**/*.ts", {nosort: true})),
 			'./src/record/module.js',
 			'./src/record/recordController.js',
 			'./src/record/summary/module.js',
@@ -457,6 +458,9 @@ module.exports = {
 			'./src/admin/systemProperties/components/junoSelectSave/junoSelectSaveComponent.js',
 			'./src/admin/section/rosterStatus/rosterStatusManagementComponent.js',
 			'./src/admin/section/rosterStatus/modals/editRosterStatusModalComponent.js',
+
+			'./src/auth/module.js',
+			'./src/auth/logout/logoutComponent.ts',
 
 			'./src/billing/billingController.js',
 

@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.olis.exception.OLISUnknownFacilityException;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -35,7 +36,6 @@ import org.oscarehr.util.OscarAuditLogger;
 import org.oscarehr.util.SpringUtils;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import oscar.OscarProperties;
 import oscar.oscarLab.ca.all.parsers.AlphaHandler;
 import oscar.oscarLab.ca.all.parsers.CMLHandler;
 import oscar.oscarLab.ca.all.parsers.GDMLHandler;
@@ -63,6 +63,7 @@ public class OLISUtils
 
 	private static final Logger logger = MiscUtils.getLogger();
 	private static final Hl7TextInfoDao hl7TextInfoDao = SpringUtils.getBean(Hl7TextInfoDao.class);
+	private static final JunoProperties junoProperties = SpringUtils.getBean(JunoProperties.class);
 
 	private static final String CMLIndentifier = "5047";// Canadian Medical Laboratories
 	private static final String GammaDyancareIndentifier = "5552";// Gamma Dynacare
@@ -77,7 +78,7 @@ public class OLISUtils
 		DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		SchemaFactory factory = SchemaFactory.newInstance("http://www.w3.org/2001/XMLSchema");
 
-		Source schemaFile = new StreamSource(new File(OscarProperties.getInstance().getProperty("olis_response_schema")));
+		Source schemaFile = new StreamSource(new File(junoProperties.getOlis().getResponseSchema()));
 		factory.newSchema(schemaFile);
 
 		JAXBContext jc = JAXBContext.newInstance("ca.ssha._2005.hial");
@@ -96,13 +97,13 @@ public class OLISUtils
 	{
 		String sendingFacility = h.getPlacerGroupNumber();
 		logger.debug("SENDING FACILITY: " + sendingFacility);
-		String accessionNumber = h.getAccessionNum();
-		String fillerOrderNo = h.getFillerOrderNumber();
+		String uniqueIdentifier = h.getUniqueIdentifier();
+		String uniqueVersionIdentifier = h.getUniqueVersionIdentifier();
 		String hin = h.getHealthNum();
 		String collectionDate = h.getCollectionDateTime(0);
 		collectionDate = (StringUtils.isNotBlank(collectionDate)) ? collectionDate.substring(0, 10).replaceAll("-", "") : null;
 
-		return isDuplicate(loggedInInfo, sendingFacility, accessionNumber, fillerOrderNo, msg, hin, collectionDate);
+		return isDuplicate(loggedInInfo, sendingFacility, uniqueIdentifier, uniqueVersionIdentifier, msg, hin, collectionDate);
 	}
 
 	public static boolean isDuplicate(LoggedInInfo loggedInInfo, String sendingFacility, String accessionNumber, String fillerOrderNo, String msg, String hin, String olisCollectionDate)
@@ -141,7 +142,7 @@ public class OLISUtils
 
 				for(Hl7TextInfo dupResult : dupResults)
 				{
-					logger.debug("LIFELABS " + dupResult.getAccessionNumber() + " " + accessionNumber + " == " + dupResult.getAccessionNumber().equals(accessionNumber.substring(5)));
+					logger.debug("LIFELABS " + dupResult.getUniqueIdentifier() + " " + accessionNumber + " == " + dupResult.getUniqueIdentifier().equals(accessionNumber.substring(5)));
 
 					if(hin.equals(dupResult.getHealthNumber()))
 					{
@@ -208,7 +209,7 @@ public class OLISUtils
 
 				for(Hl7TextInfo dupResult : dupResults)
 				{
-					logger.debug("AlphaLabs " + dupResult.getAccessionNumber() + " " + accessionNumber + " == " + dupResult.getAccessionNumber().equals(accessionNumber.substring(5)));
+					logger.debug("AlphaLabs " + dupResult.getUniqueIdentifier() + " " + accessionNumber + " == " + dupResult.getUniqueIdentifier().equals(accessionNumber.substring(5)));
 					if(hin.equals(dupResult.getHealthNumber()))
 					{
 						OscarAuditLogger.getInstance().log(loggedInInfo, "Lab", "Skip", "Duplicate AlphaLabs lab skipped - accession " + accessionNumber + "\n" + msg);
@@ -223,7 +224,7 @@ public class OLISUtils
 
 				Optional<Hl7TextInfo> duplicate = dupResults
 						.stream()
-						.filter((result -> fillerOrderNo.equals(result.getFillerOrderNum())))
+						.filter((result -> fillerOrderNo.equals(result.getUniqueVersionIdentifier())))
 						.findFirst();
 				return duplicate.isPresent();
 			}

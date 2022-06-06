@@ -22,6 +22,7 @@ import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.consultations.service.ConsultationAttachmentService;
 import org.oscarehr.consultations.service.ConsultationPDFCreationService;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.fax.exception.FaxException;
 import org.oscarehr.fax.model.FaxFileType;
@@ -96,6 +97,7 @@ public class EctConsultationFormFaxAction extends Action
 			List<EDoc> attachedDocuments;
 			List<LabResultData> attachedLabs;
 			List<EFormData> attachedEForms;
+			List<HrmDocument> attachedHRM;
 
 			if (doCoverPage)
 			{
@@ -111,7 +113,8 @@ public class EctConsultationFormFaxAction extends Action
 				CommonLabResultData consultLabs = new CommonLabResultData();
 				attachedDocuments = EDocUtil.listResponseDocs(loggedInInfo, demoNo, reqId, EDocUtil.ATTACHED);
 				attachedLabs = consultLabs.populateLabResultsDataConsultResponse(loggedInInfo, demoNo, reqId, CommonLabResultData.ATTACHED);
-				attachedEForms = new ArrayList<>(0); //TODO-legacy populate eform attachments
+				attachedEForms = new ArrayList<>(0); //TODO-legacy populate eform & hrm attachments
+				attachedHRM = new ArrayList<>(0);
 
 				String consultResponsePDF = ConsultResponsePDFCreator.create(consultResponsePage);
 				GenericFile tempFile = FileFactory.getExistingFile(consultResponsePDF);
@@ -122,12 +125,14 @@ public class EctConsultationFormFaxAction extends Action
 				attachedDocuments = consultationAttachmentService.getAttachedDocuments(loggedInInfo, demographicNo, requestId);
 				attachedLabs = consultationAttachmentService.getAttachedLabs(loggedInInfo, demographicNo, requestId);
 				attachedEForms = consultationAttachmentService.getAttachedEForms(demographicNo, requestId);
+				attachedHRM = consultationAttachmentService.getAttachedHRMList(demographicNo, requestId);
 
 				streamList.add(consultationPDFCreationService.getConsultationRequestAsStream(request, loggedInInfo));
 			}
 			streamList.addAll(consultationPDFCreationService.toEDocInputStreams(request, attachedDocuments));
 			streamList.addAll(consultationPDFCreationService.toLabInputStreams(attachedLabs));
 			streamList.addAll(consultationPDFCreationService.toEFormInputStreams(request, attachedEForms));
+			streamList.addAll(consultationPDFCreationService.toHRMInputStreams(request, attachedHRM));
 
 			if(!streamList.isEmpty())
 			{

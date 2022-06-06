@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ProviderManager2
@@ -680,6 +681,11 @@ public class ProviderManager2
 			settings.setEnableCareConnectPPNCheck(ConversionUtils.fromBoolString(map.get(UserProperty.CARECONNECT_PPN_CHECK).getValue()));
 		}
 
+		if (map.get(UserProperty.NETCARE_USER_ID) != null)
+		{
+			settings.setNetcareUserId(map.get(UserProperty.NETCARE_USER_ID).getValue());
+		}
+
 
 		settings.setNewTicklerWarningWindow(pp.getNewTicklerWarningWindow());
 
@@ -1010,6 +1016,9 @@ public class ProviderManager2
 		property = getMappedOrNewProperty(map, UserProperty.CARECONNECT_PPN_CHECK, providerNo);
 		property.setValue(Boolean.toString(settings.isEnableCareConnectPPNCheck()));
 
+		property = getMappedOrNewProperty(map, UserProperty.NETCARE_USER_ID, providerNo);
+		property.setValue(settings.getNetcareUserId());
+
 		if (map.get("rx_use_rx3") != null)
 		{
 			settings.setUseRx3("yes".equals(map.get("rx_use_rx3").getValue()) ? true : false);
@@ -1046,6 +1055,12 @@ public class ProviderManager2
 				propertyDao.remove(prop);
 			}
 		}
+	}
+
+	public String getSingleSetting(String providerNo, String key)
+	{
+		Property userProp = propertyDao.findByNameAndProvider(key, providerNo);
+		return Optional.ofNullable(userProp).map(Property::getValue).orElse(null);
 	}
 
 	/**

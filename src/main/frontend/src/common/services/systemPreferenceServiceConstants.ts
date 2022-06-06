@@ -21,32 +21,68 @@
 * Canada
 */
 
-export enum SYSTEM_PROPERTIES
+/**
+ * keys for the instance properties file
+ */
+export enum SystemProperties
 {
-    INSTANCE_TYPE = "instance_type",
-    BILLING_TYPE = "billing_type",
+    InstanceType = "instance_type",
+    BillingType = "billing_type",
+    DefaultTicklerProvider = "default_tickler_provider",
+    Multisites = "multisites",
+    MHATelehealthEnabled = "myhealthaccess_telehealth_enabled",
+}
 
+/**
+ * keys for the property table, associated with the system provider.
+ */
+export enum SystemPreferences
+{
     // GENERAL PREFERENCES
-    DEFAULT_PHONE_PREFIX = "phone_prefix",
-    ROSTERING_MODULE = "enable_family_doctor_and_rostering",
-    EXTRA_ADDRESS_FIELD = "enable_additional_address",
+    DefaultPhonePrefix = "phone_prefix",
+    RosteringModule = "enable_family_doctor_and_rostering",
+    ExtraAddressField = "enable_additional_address",
 
     // RX PREFERENCES
-    AUTO_STAMP_RX_SIGNATURES = "rx_preset_signatures",
+    AytoStampRxSignatures = "rx_preset_signatures",
 
     // BILLING PREFERENCES
-    SERVICE_LOCATION_CODE = "service_location_code",
+    ServiceLocationCode = "service_location_code",
 
     // AQS
-    AQS_ORGANIZATION_ID = "aqs_organization_id",
-    AQS_ORGANIZATION_SECRET = "aqs_api_secret_key",
+    AqsOrganizationId = "aqs_organization_id",
+    AqsOrganizationSecret = "aqs_api_secret_key",
 
     // UI
-    UI_CUSTOM_NAV_ICON = "ui_custom_nav",
-    UI_LOCK_TO_JUNO_UI = "ui_lock",
+    UiCustomNavIcon = "ui_custom_nav",
+    UiLockToJunoUi = "ui_lock",
 
     // FAXING
-    ACTIVE_FAX_ACCOUNT = "system_active_fax_account_id",
+    ActiveFaxAccount = "system_active_fax_account_id",
+
+    // misc integrations
+    AQSEnabled = "aqs_enabled",
+    CareConnectEnabled = "integration.CareConnect.enabled",
+    IcefallEnabled = "icefall_enabled",
+    IMDHealthEnabled = "integration.imdHealth.enabled",
+    K2AEnabled = "integration.know2Act.enabled",
+    NetcareEnabled = "integration.netcare.enabled",
+    OceanToolbarEnabled = "integration.OceanToolBar.enabled",
+}
+
+export enum SystemPreferences
+{
+    OlisIntegrationEnabled = "integration.olis.enabled",
+    OlisEmrId = "integration.olis.emr_id",
+    OlisPollingEnabled = "olis_polling_enabled",
+
+		HrmEnabled = "integration.hrm.enabled",
+		HrmPollingEnabled = "omd.hrm.polling_enabled",
+		HrmPollingInterval = "omd.hrm.polling_interval_sec",
+		HrmUser = "omd.hrm.user",
+		HrmMailBoxAddress = "omd.hrm.address",
+		HrmRemotePath = "omd.hrm.remote_path",
+		HrmPort = "omd.hrm.port",
 }
 
 export enum INSTANCE_TYPE

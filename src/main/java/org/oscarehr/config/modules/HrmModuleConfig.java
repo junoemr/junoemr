@@ -23,23 +23,28 @@
 
 package org.oscarehr.config.modules;
 
-import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.hospitalReportManager.service.HRMScheduleService;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import oscar.OscarProperties;
 
 import javax.annotation.PostConstruct;
 
 @Configuration
-@Conditional(HrmModuleConfig.Condition.class)
 public class HrmModuleConfig
 {
 	@Autowired
 	private HRMScheduleService hrmScheduleService;
+
+	@Autowired
+	private JunoProperties junoProperties;
+
+	@Autowired
+	private SystemPreferenceService systemPreferences;
 
 	private static final Logger logger = MiscUtils.getLogger();
 	
@@ -48,23 +53,15 @@ public class HrmModuleConfig
 		logger.info("Loaded HRM module");
 	}
 
-	static class Condition extends ModuleConfigCondition
-	{
-		public OscarProperties.Module getModule()
-		{
-			return OscarProperties.Module.MODULE_HRM;
-		}
-	}
-	
 	@PostConstruct
 	public void startSchedule()
 	{
-		boolean pollingEnabled = OscarProperties.getInstance().isPropertyActive("omd.hrm.polling_enabled");
+		JunoProperties.Hrm hrmConfig = junoProperties.getHrm();
 
-		if (pollingEnabled)
-		{
-			String interval = OscarProperties.getInstance().getProperty("omd.hrm.poll_interval_sec");
-			hrmScheduleService.scheduleRegularFetch(Math.max(NumberUtils.toInt(interval), HRMScheduleService.HRM_MINIMUM_POLL_TIME_SEC));
-		}
+		String userInterval = systemPreferences.getPreferenceValue("omd.hrm.polling_interval_sec", null);
+		int defaultInterval = hrmConfig.getDefaultPollingIntervalSeconds();
+		int interval = NumberUtils.toInt(userInterval, defaultInterval);
+
+		hrmScheduleService.startSchedule(Math.max(interval, hrmConfig.getMinPollingIntervalSeconds()));
 	}
 }

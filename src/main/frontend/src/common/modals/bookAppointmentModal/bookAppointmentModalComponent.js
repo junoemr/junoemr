@@ -24,6 +24,7 @@
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../components/junoComponentConstants";
 import {ScheduleApi, SitesApi, SystemPreferenceApi} from "../../../../generated";
 import AppointmentBooking from "./appointmentBooking";
+import {SystemProperties} from "../../services/systemPreferenceServiceConstants";
 
 /**
  * Booking modal.
@@ -71,7 +72,7 @@ angular.module('Common.Components').component('bookAppointmentModal',
 		  {
 			  ctrl.resolve.bookingData = ctrl.resolve.bookingData || new AppointmentBooking();
 
-			  ctrl.isMultisiteEnabled = (await ctrl.systemPreferenceApi.getPropertyEnabled("multisites")).data.body;
+			  ctrl.isMultisiteEnabled = (await ctrl.systemPreferenceApi.getPropertyEnabled(SystemProperties.Multisites)).data.body;
 			  ctrl.loadAppointmentTypeOptions();
 			  ctrl.loadAppointmentReasonTypes();
 

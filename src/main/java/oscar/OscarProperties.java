@@ -82,7 +82,6 @@ public class OscarProperties extends Properties {
 		MODULE_HRM("HRM"),
 		MODULE_INDIVO("Indivo"),
 		MODULE_JOBS("Jobs"),
-		MODULE_OLIS("OLIS"),
 		MODULE_ORN("ORN"),
 		REST("REST"),
 		MODULE_SPIRE("Spire");

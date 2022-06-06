@@ -17,6 +17,7 @@ export default class OlisSystemSettingsTransferToModelConverter extends Abstract
 		model.frequency = from.frequency;
 		model.filterPatients = from.filterPatients;
 		model.warnings = from.warnings;
+		model.vendorId = from.vendorId;
 
 		return model;
 	}

@@ -23,7 +23,7 @@
 package org.oscarehr.ws.validator;
 
 import org.oscarehr.demographic.util.HinValidator;
-import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferBasic;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.ApiDemographicBaseTransfer;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -31,7 +31,7 @@ import javax.validation.ConstraintValidatorContext;
 /**
  * Custom validator to ensure health insurance numbers are valid
  */
-public class DemographicTransferHinValidator implements ConstraintValidator<DemographicTransferHinConstraint, DemographicTransferBasic>
+public class DemographicTransferHinValidator implements ConstraintValidator<DemographicTransferHinConstraint, ApiDemographicBaseTransfer>
 {
 	private boolean allowNull;
 
@@ -42,7 +42,7 @@ public class DemographicTransferHinValidator implements ConstraintValidator<Demo
 	}
 
 	@Override
-	public boolean isValid(DemographicTransferBasic demographicTransfer, ConstraintValidatorContext constraintValidatorContext)
+	public boolean isValid(ApiDemographicBaseTransfer demographicTransfer, ConstraintValidatorContext constraintValidatorContext)
 	{
 		if(demographicTransfer == null)
 		{

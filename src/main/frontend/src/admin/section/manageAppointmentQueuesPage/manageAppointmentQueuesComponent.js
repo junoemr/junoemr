@@ -1,6 +1,6 @@
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
 import {AqsQueuesApi} from "../../../../generated";
-import {SYSTEM_PROPERTIES} from "../../../common/services/systemPreferenceServiceConstants";
+import {SystemPreferences} from "../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 	{
@@ -68,7 +68,7 @@ angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 						}
 					);
 
-					ctrl.organizationName = await systemPreferenceService.getPreference(SYSTEM_PROPERTIES.AQS_ORGANIZATION_ID, null);
+					ctrl.organizationName = await systemPreferenceService.getPreference(SystemPreferences.AqsOrganizationId, null);
 
 					ctrl.loadQueuesList();
 				};
@@ -152,12 +152,12 @@ angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 				{
 					if (ctrl.organizationName)
 					{
-						systemPreferenceService.setPreference(SYSTEM_PROPERTIES.AQS_ORGANIZATION_ID, ctrl.organizationName);
+						systemPreferenceService.setPreference(SystemPreferences.AqsOrganizationId, ctrl.organizationName);
 					}
 
 					if (ctrl.organizationSecret)
 					{
-						systemPreferenceService.setPreference(SYSTEM_PROPERTIES.AQS_ORGANIZATION_SECRET, ctrl.organizationSecret);
+						systemPreferenceService.setPreference(SystemPreferences.AqsOrganizationSecret, ctrl.organizationSecret);
 					}
 
 					// reload queues.

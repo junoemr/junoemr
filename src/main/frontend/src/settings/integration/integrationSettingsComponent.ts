@@ -21,6 +21,8 @@
 * Canada
 */
 
+import {LABEL_POSITION} from "../../common/components/junoComponentConstants";
+
 angular.module('Settings').component('integrationSettings',
 	{
 		templateUrl: 'src/settings/integration/integrationSettings.jsp',
@@ -36,6 +38,7 @@ angular.module('Settings').component('integrationSettings',
 			)
 			{
 				const ctrl = this;
+				ctrl.LABEL_POSITION = LABEL_POSITION;
 
 				ctrl.olisLabs = [
 					{

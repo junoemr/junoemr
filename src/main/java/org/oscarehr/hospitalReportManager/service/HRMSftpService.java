@@ -31,12 +31,12 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import oscar.OscarProperties;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.Session;
@@ -59,11 +59,9 @@ public class HRMSftpService
 	@Autowired
 	private SystemPreferenceService systemPreferences;
 
-	// LOCAL CONFIG
-	private static final String OMD_SFTP_SSH_KEY = OscarProperties.getInstance().getProperty("omd.hrm.private_key_file");
-	
-	// UTIL
-	private static final int TIMEOUT_SECONDS = 20;
+	@Autowired
+	private JunoProperties junoProperties;
+
 	private static final Logger logger = MiscUtils.getLogger();
 	
 	/**
@@ -90,14 +88,15 @@ public class HRMSftpService
 
 		try
 		{
-			jsch.addIdentity(OMD_SFTP_SSH_KEY);
+			JunoProperties.Hrm hrmConfig = junoProperties.getHrm();
+			jsch.addIdentity(hrmConfig.getAccessKeyLocation());
 			session = jsch.getSession(OMD_HRM_USER, OMD_HRM_IP, OMD_HRM_PORT);
 			
 			java.util.Properties confProp = new java.util.Properties();
 			confProp.put("StrictHostKeyChecking", "no");
 			session.setConfig(confProp);
 			
-			session.connect(TIMEOUT_SECONDS * 1000);
+			session.connect(hrmConfig.getSftpTimeoutSeconds() * 1000);
 			
 			sftp = (ChannelSftp) session.openChannel("sftp");
 			sftp.connect();

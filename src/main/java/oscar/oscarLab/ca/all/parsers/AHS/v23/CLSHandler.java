@@ -111,7 +111,7 @@ public class CLSHandler extends AHSHandler
 		}
 	}
 
-	public String getFillerOrderNumber() {
+	public String getUniqueVersionIdentifier() {
 		// this is different from the filler order number in ORC
 		return get("/.OBR-3-1");
 	}
@@ -152,7 +152,7 @@ public class CLSHandler extends AHSHandler
 		return get("/.OBR-7-1");
 	}
 
-	public String getAccessionNum() {
+	public String getUniqueIdentifier() {
 		return get("/.OBR-20");
 	}
 
@@ -192,18 +192,18 @@ public class CLSHandler extends AHSHandler
 	    Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao)SpringUtils.getBean("hl7TextInfoDao");
 		Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
 
-	    String accessionNumber = this.getAccessionNum();
-	    String fillerOrderNumber = this.getFillerOrderNumber();
+	    String accessionNumber = this.getUniqueIdentifier();
+	    String fillerOrderNumber = this.getUniqueVersionIdentifier();
 	    Hl7TextInfo hl7TextInfo = hl7TextInfoDao.findLatestVersionByAccessionNumberOrFillerNumber(
 			    accessionNumber, fillerOrderNumber);
 
 	    // Glucose labs come back with different accession numbers, but the same filler number.
 	    // We are going to replace any successive accession numbers with the originals as
 	    // suggested in the CLS conformance documentation
-	    if(hl7TextInfo != null && hl7TextInfo.getFillerOrderNum().equals(fillerOrderNumber) &&
-			    !hl7TextInfo.getAccessionNumber().equals(accessionNumber)) {
+	    if(hl7TextInfo != null && hl7TextInfo.getUniqueVersionIdentifier().equals(fillerOrderNumber) &&
+			    !hl7TextInfo.getUniqueIdentifier().equals(accessionNumber)) {
 
-		    hl7Message = this.ReplaceAccessionNumber(hl7Message, accessionNumber, hl7TextInfo.getAccessionNumber());
+		    hl7Message = this.ReplaceAccessionNumber(hl7Message, accessionNumber, hl7TextInfo.getUniqueIdentifier());
 	    }
 
 	    if(hl7TextInfo != null) {

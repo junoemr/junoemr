@@ -20,20 +20,30 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.external.rest.v1.transfer.demographic;
+package org.oscarehr.common.io.conversion;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.swagger.v3.oas.annotations.media.Schema;
+import org.oscarehr.common.io.PDFFile;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 
-@XmlRootElement
-@Schema(description = "Demographic record data transfer object")
-@JsonIgnoreProperties(ignoreUnknown = true) // Ignore properties that are not defined in this class
-public class DemographicTransferInbound extends DemographicTransferBasic
+import static org.oscarehr.common.io.conversion.HtmlToPdfFileConverter.HTML_WRAPPER_TEMPLATE;
+
+@Component
+public class TextToPdfFileConverter extends AbstractFileConverter<String, PDFFile>
 {
-	public DemographicTransferInbound()
+	@Autowired
+	protected HtmlToPdfFileConverter htmlToPdfFileConverter;
+
+	@Override
+	public PDFFile toFile(String text) throws Exception
 	{
-		super();
+		String htmlContent = MessageFormat.format("<pre style=\"white-space: pre-wrap\">{0}</pre>", text);
+
+		byte[] textContentBytes = MessageFormat.format(HTML_WRAPPER_TEMPLATE, htmlContent).getBytes(StandardCharsets.UTF_8);
+		return htmlToPdfFileConverter.convert(new ByteArrayInputStream(textContentBytes));
 	}
 }

@@ -7,6 +7,7 @@ export default class OlisSystemSettings
 	private _filterPatients: boolean;
 	private _frequency: number;
 	private _warnings: string[];
+	private _vendorId: string;
 
 
 	get startDateTime(): Moment
@@ -57,5 +58,15 @@ export default class OlisSystemSettings
 	set warnings(value: string[])
 	{
 		this._warnings = value;
+	}
+
+	get vendorId(): string
+	{
+		return this._vendorId;
+	}
+
+	set vendorId(value: string)
+	{
+		this._vendorId = value;
 	}
 }

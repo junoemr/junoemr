@@ -225,7 +225,7 @@ public class PATHL7Handler extends ORU_R01MessageHandler
     /*
      *  OBC METHODS
      */
-    public String getAccessionNum(){
+    public String getUniqueIdentifier(){
         try
         {
             String str = msg.getRESPONSE().getORDER_OBSERVATION(0).getORC().getFillerOrderNumber().getEntityIdentifier().getValue();
@@ -767,7 +767,7 @@ public class PATHL7Handler extends ORU_R01MessageHandler
         return "";
     }
 
-    public String getFillerOrderNumber(){
+    public String getUniqueVersionIdentifier(){
         return "";
     }
     public String getEncounterId(){

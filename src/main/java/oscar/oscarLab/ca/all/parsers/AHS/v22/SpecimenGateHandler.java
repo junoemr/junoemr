@@ -81,7 +81,7 @@ public class SpecimenGateHandler extends AHSHandler
 	}
 
 	@Override
-	public String getAccessionNum() {
+	public String getUniqueIdentifier() {
 
 		// unique labs are a combination of accessionNumber, fillerOrderNumber, universalServiceId, and observation year
 		// fillerOrderNumber is separate (for lab versions), but the other fields are combined here to ensure uniqueness

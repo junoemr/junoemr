@@ -9,25 +9,24 @@
 
 package org.oscarehr.hospitalReportManager.reportImpl;
 
-import org.apache.commons.codec.binary.Base64;
+import org.apache.mina.util.Base64;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.hospitalReportManager.HRMReport;
-
-import xml.hrm.v4_1.HealthCard;
-import xml.hrm.v4_1.OmdCds;
+import oscar.util.ConversionUtils;
 import xml.hrm.v4_1.DateFullOrPartial;
 import xml.hrm.v4_1.Demographics;
+import xml.hrm.v4_1.HealthCard;
+import xml.hrm.v4_1.OmdCds;
 import xml.hrm.v4_1.PatientRecord;
 import xml.hrm.v4_1.PersonNameStandard;
 import xml.hrm.v4_1.PersonNameStandard.LegalName.OtherName;
 import xml.hrm.v4_1.ReportFormat;
 import xml.hrm.v4_1.ReportsReceived;
-
-import oscar.util.ConversionUtils;
 import xml.hrm.v4_1.ReportsReceived.OBRContent;
 import xml.hrm.v4_1.TransactionInformation;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -256,7 +255,7 @@ public class HRMReport_4_1 implements HRMReport
 		return content;
 	}
 
-	public byte[] getBase64BinaryContent()
+	public byte[] getBinaryContent()
 	{
 		byte[] media = null;
 		if (getReport().isPresent() && getReport().get().getContent() != null)
@@ -267,15 +266,13 @@ public class HRMReport_4_1 implements HRMReport
 		return media;
 	}
 
-	public byte[] getBinaryContent()
+	public Optional<String> getBinaryContentBase64()
 	{
-		byte[] binaryContent = null;
-		if (getBase64BinaryContent() != null)
+		if(getBinaryContent() != null)
 		{
-			binaryContent = Base64.decodeBase64(getBase64BinaryContent());
+			return Optional.of(new String(Base64.encodeBase64(getBinaryContent()), StandardCharsets.UTF_8));
 		}
-
-		return binaryContent;
+		return Optional.empty();
 	}
 
 	public String getClassName()

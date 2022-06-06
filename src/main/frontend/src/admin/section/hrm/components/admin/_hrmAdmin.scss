@@ -13,8 +13,8 @@
 				text-align: center;
 
 				&.ok {
-					border-color: var(--color-lime-darker);
-					color: var(--color-lime-darker);
+					border-color: var(--color-primary-base);
+					color: var(--color-primary-base);
 				}
 
 				&.warn {
@@ -23,8 +23,13 @@
 				}
 
 				&.error {
-					border-color: var(--color-red-base);
-					color: var(--color-red-base);
+					border-color: var(--color-red-dark);
+					color: var(--color-red-dark);
+				}
+
+				&.off {
+					border-color: var(--color-neutral-grey);
+					color: var(--color-neutral-grey);
 				}
 			}
 
@@ -43,12 +48,6 @@
 			overflow: hidden;
 			height: 30px;
 			width: 256px;
-		}
-
-		juno-input {
-			flex-grow: 0;
-			display: inline-block;
-			width: 512px;
 		}
 	}
 }

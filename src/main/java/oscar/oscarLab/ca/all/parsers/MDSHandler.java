@@ -674,7 +674,7 @@ public class MDSHandler extends ORU_R01MessageHandler
         }
     }
 
-    public String getAccessionNum(){
+    public String getUniqueIdentifier(){
         try{
             String accessionNum = getString(DynamicHapiLoaderUtils.terserGet(terser,"/.MSH-10-1"));
             int firstDash = accessionNum.indexOf("-");
@@ -923,12 +923,12 @@ public class MDSHandler extends ORU_R01MessageHandler
             messageTime = timeFormatter.format(getMsgDateAsDate());
         }catch(Exception e){MiscUtils.getLogger().error("Error", e);}
 
-        retVal = getAuditLine(procDate, procTime, "REC",getOrderStatus(), getFormType(), getAccessionNum(), getHealthNum(), getHealthNumVersion(), getUnescapedName(),getClientRef(),messageDate, messageTime);
+        retVal = getAuditLine(procDate, procTime, "REC",getOrderStatus(), getFormType(), getUniqueIdentifier(), getHealthNum(), getHealthNumVersion(), getUnescapedName(),getClientRef(),messageDate, messageTime);
 
         return retVal;
     }
 
-    public String getFillerOrderNumber(){
+    public String getUniqueVersionIdentifier(){
 		return "";
 	}
     public String getEncounterId(){

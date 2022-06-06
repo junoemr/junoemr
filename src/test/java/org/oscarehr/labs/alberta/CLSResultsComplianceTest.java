@@ -167,7 +167,7 @@ public class CLSResultsComplianceTest {
 		//CLSHandler handler = new CLSHandler();
 		//handler.init(SAMPLE_LAB_WITH_ORC_SEGMENTS);
 		CLSHandler handler = new CLSHandler(SAMPLE_LAB_WITH_ORC_SEGMENTS);
-		assertEquals("20809880170", handler.getFillerOrderNumber());
+		assertEquals("20809880170", handler.getUniqueVersionIdentifier());
 		
 		/*
 		 * Requirement:
@@ -187,24 +187,24 @@ public class CLSResultsComplianceTest {
 		// Occult Blood
 		//handler.init(TestLabs.LAB29);
 		CLSHandler handler1 = new CLSHandler(TestLabs.LAB29);
-		assertEquals("10-344-300006", handler1.getAccessionNum());
+		assertEquals("10-344-300006", handler1.getUniqueIdentifier());
 		
 		//handler.init(TestLabs.LAB30);
 		CLSHandler handler2 = new CLSHandler(TestLabs.LAB30);
-		assertEquals("10-344-300006", handler2.getAccessionNum());
+		assertEquals("10-344-300006", handler2.getUniqueIdentifier());
 		
 		//handler.init(TestLabs.LAB31);
 		CLSHandler handler3 = new CLSHandler(TestLabs.LAB31);
-		assertEquals("10-344-300006", handler3.getAccessionNum());
+		assertEquals("10-344-300006", handler3.getUniqueIdentifier());
 
 		// Glucose Tolerance
 		//handler.init(TestLabs.LAB55);
 		CLSHandler handler4 = new CLSHandler(TestLabs.LAB55);
-		assertEquals("11-012-300002", handler4.getAccessionNum());
+		assertEquals("11-012-300002", handler4.getUniqueIdentifier());
 				
 		//handler.init(TestLabs.LAB57);
 		CLSHandler handler5 = new CLSHandler(TestLabs.LAB57);
-		assertEquals("11-012-300004", handler5.getAccessionNum());
+		assertEquals("11-012-300004", handler5.getUniqueIdentifier());
 		
 		/*
 		 * Care sets. The sequence of the results on the clinic charts do not need to be the same 

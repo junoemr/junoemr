@@ -29,6 +29,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.oscarehr.consultations.service.ConsultationAttachmentService;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.eform.model.EFormData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
@@ -42,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ConsultationGetAttachedAction extends Action
 {
@@ -59,6 +61,7 @@ public class ConsultationGetAttachedAction extends Action
 		List<String> labLabels;
 		List<String> docLabels;
 		List<String> eFormLabels;
+		List<String> hrmLabels;
 
 		if(StringUtils.isNumeric(demoNo) && StringUtils.isNumeric(requestId))
 		{
@@ -70,17 +73,22 @@ public class ConsultationGetAttachedAction extends Action
 
 			List<EFormData> eFormList = consultationAttachmentService.getAttachedEForms(Integer.parseInt(demoNo), Integer.parseInt(requestId));
 			eFormLabels = getEFormLabels(eFormList);
+
+			List<HrmDocument> hrmList = consultationAttachmentService.getAttachedHRMList(Integer.parseInt(demoNo), Integer.parseInt(requestId));
+			hrmLabels = getHRMLabels(hrmList);
 		}
 		else
 		{
 			labLabels = new ArrayList<>(0);
 			docLabels = new ArrayList<>(0);
 			eFormLabels = new ArrayList<>(0);
+			hrmLabels = new ArrayList<>(0);
 		}
 
 		request.setAttribute("docArray", docLabels);
 		request.setAttribute("labArray", labLabels);
 		request.setAttribute("eFormArray", eFormLabels);
+		request.setAttribute("hrmLabels", hrmLabels);
 
 		return mapping.findForward("success");
 	}
@@ -116,5 +124,13 @@ public class ConsultationGetAttachedAction extends Action
 			labels.add(StringUtils.maxLenString(label, LABEL_MAX_LEN, LABEL_MAX_LEN-LABEL_ADDED.length(), LABEL_ADDED));
 		}
 		return labels;
+	}
+
+	private List<String> getHRMLabels(List<HrmDocument> hrmList)
+	{
+		return hrmList.stream()
+				.map(hrmDocument -> StringUtils.maxLenString(
+						hrmDocument.getDescription(), LABEL_MAX_LEN, LABEL_MAX_LEN - LABEL_ADDED.length(), LABEL_ADDED))
+				.collect(Collectors.toList());
 	}
 }

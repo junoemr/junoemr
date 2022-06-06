@@ -25,25 +25,35 @@
 
 package org.oscarehr.consultations.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Where;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.hospitalReportManager.model.HRMDocument;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "consultdocs")
 public class ConsultDocs extends AbstractModel<Integer>
 {
 	public static final String DOCTYPE_DOC = "D";
 	public static final String DOCTYPE_EFORM = "E";
 	public static final String DOCTYPE_LAB = "L";
+	public static final String DOCTYPE_HRM = "H";
 	public static final String DELETED = "Y";
 
 	@Id
@@ -67,6 +77,11 @@ public class ConsultDocs extends AbstractModel<Integer>
 	@Column(name = "provider_no")
 	private String providerNo;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "document_no", insertable=false, updatable=false)
+	@Where(clause = ("doctype = '" + DOCTYPE_HRM + "'"))
+	private HRMDocument hrmDocument;
+
 	public ConsultDocs()
 	{
 	}
@@ -78,75 +93,5 @@ public class ConsultDocs extends AbstractModel<Integer>
 		setDocType(docType);
 		setProviderNo(providerNo);
 		setAttachDate(new Date());
-	}
-
-	public Integer getId()
-	{
-		return id;
-	}
-
-	public void setId(Integer id)
-	{
-		this.id = id;
-	}
-
-	public int getRequestId()
-	{
-		return requestId;
-	}
-
-	public void setRequestId(int requestId)
-	{
-		this.requestId = requestId;
-	}
-
-	public int getDocumentNo()
-	{
-		return documentNo;
-	}
-
-	public void setDocumentNo(int documentNo)
-	{
-		this.documentNo = documentNo;
-	}
-
-	public String getDocType()
-	{
-		return docType;
-	}
-
-	public void setDocType(String docType)
-	{
-		this.docType = docType;
-	}
-
-	public String getDeleted()
-	{
-		return deleted;
-	}
-
-	public void setDeleted(String deleted)
-	{
-		this.deleted = deleted;
-	}
-
-	public Date getAttachDate()
-	{
-		return attachDate;
-	}
-
-	public void setAttachDate(Date attachDate)
-	{
-		this.attachDate = attachDate;
-	}
-
-	public String getProviderNo()
-	{
-		return providerNo;
-	}
-
-	public void setProviderNo(String providerNo)
-	{
-		this.providerNo = providerNo;
 	}
 }

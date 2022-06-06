@@ -363,6 +363,15 @@ public class ConversionUtils {
 		return toDateTimeString(zonedDateTime, DateTimeFormatter.ISO_DATE_TIME);
 	}
 
+	public static String toNullableDateTimeString(ZonedDateTime zonedDateTime, DateTimeFormatter formatter)
+	{
+		if(zonedDateTime == null)
+		{
+			return null;
+		}
+		return toDateTimeString(zonedDateTime, formatter);
+	}
+
 	public static String toDateTimeString(ZonedDateTime zonedDateTime, DateTimeFormatter formatter)
 	{
 		return zonedDateTime.format(formatter);
@@ -727,6 +736,17 @@ public class ConversionUtils {
 	public static Date toLegacyDateTime(LocalDateTime localDateTime)
 	{
 		return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+	}
+
+	public static Date toNullableLegacyDateTime(ZonedDateTime zonedDateTime)
+	{
+		if(zonedDateTime == null) return null;
+		return toLegacyDateTime(zonedDateTime);
+	}
+
+	public static Date toLegacyDateTime(ZonedDateTime zonedDateTime)
+	{
+		return Date.from(zonedDateTime.toInstant());
 	}
 
 	public static LocalDate toNullableLocalDate(String dateString)

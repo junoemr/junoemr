@@ -34,7 +34,7 @@ import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.rest.AbstractExternalRestWs;
 import org.oscarehr.ws.external.rest.v1.conversion.DemographicListConverter;
-import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicListTransfer;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.ApiDemographicListTransfer;
 import org.oscarehr.ws.rest.exception.MissingArgumentException;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +67,7 @@ public class DemographicsWs extends AbstractExternalRestWs
 	@GET
 	@Path("/search")
 	@Operation(summary = "Search demographics by parameter")
-	public RestSearchResponse<DemographicListTransfer> search(
+	public RestSearchResponse<ApiDemographicListTransfer> search(
 			@QueryParam("page")
 			@DefaultValue("1")
 			@Parameter(description = "Requested result page")
@@ -153,7 +153,7 @@ public class DemographicsWs extends AbstractExternalRestWs
 
 		int totalResultCount = demographicDao.criteriaSearchCount(searchQuery);
 
-		List<DemographicListTransfer> response;
+		List<ApiDemographicListTransfer> response;
 		if(totalResultCount > 0)
 		{
 			List<Demographic> results = demographicDao.criteriaSearch(searchQuery);

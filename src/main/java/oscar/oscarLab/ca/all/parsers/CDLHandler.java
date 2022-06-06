@@ -416,7 +416,7 @@ public class CDLHandler extends ORU_R01MessageHandler
         }
     }
 
-    public String getAccessionNum(){
+    public String getUniqueIdentifier(){
         String accessionNum = "";
         try{
 			accessionNum =
@@ -474,7 +474,7 @@ public class CDLHandler extends ORU_R01MessageHandler
         return "";
     }
 
-    public String getFillerOrderNumber(){
+    public String getUniqueVersionIdentifier(){
 		return "";
 	}
 

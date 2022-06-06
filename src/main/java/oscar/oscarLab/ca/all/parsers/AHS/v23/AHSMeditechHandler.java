@@ -95,14 +95,14 @@ public class AHSMeditechHandler extends AHSHandler
 	/* ===================================== OBR ====================================== */
 
 	@Override
-	public String getAccessionNum()
+	public String getUniqueIdentifier()
 	{
 		// use the filler order number as the unique lab identifier apparently
 		return get("/.OBR-3-1");
 	}
 
 	@Override
-	public String getFillerOrderNumber()
+	public String getUniqueVersionIdentifier()
 	{
 		// use the status code to fake a lab version
 		return get("/.OBR-25-1");

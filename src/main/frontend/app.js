@@ -63,6 +63,7 @@ var oscarApp = angular.module('oscarProviderViewModule', [
 	'Dashboard',
 	'Consults',
 	'Admin',
+	'Auth',
 ]);
 
 oscarApp.config([
@@ -1038,6 +1039,11 @@ oscarApp.config([
 			{
 				url: '/faxSendReceive',
 				component: 'faxSendReceive',
+			})
+		.state('logout',
+			{
+				url: '/logout',
+				component: 'logout',
 			});
 	$httpProvider.interceptors.push('errorInterceptor');
 }]);

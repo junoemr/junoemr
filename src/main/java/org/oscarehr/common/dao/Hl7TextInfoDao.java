@@ -51,14 +51,6 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
 		super(Hl7TextInfo.class);
 	}
 
-	
-	@SuppressWarnings("unchecked")
-	@Deprecated
-	public List<Hl7TextInfo> findAll() {
-		Query query = createQuery("x", null);
-		return query.getResultList();
-	}
-
 	/**
 	 * LabId is also refereed to as Lab_no, and segmentId.
 	 */
@@ -157,31 +149,9 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
 		return  results.get(0).intValue();
 	}
 
-    @SuppressWarnings("unchecked")
-    public List<Hl7TextInfo> findByHealthCardNo(String hin) {
-    	String sql = "select hl7 from Hl7TextInfo hl7 where hl7.healthNumber = :hin";
-    	Query query = entityManager.createQuery(sql);
-    	query.setParameter("hin", hin);
-    	List<Hl7TextInfo> list = query.getResultList();
-    	return list;
-    }
-
-    public List<Hl7TextInfo> searchByAccessionNumber(String acc) {
-
-    	String sqlCommand="select x from Hl7TextInfo x where x.accessionNumber = ?1";
-
-    	Query query = entityManager.createQuery(sqlCommand);
-		query.setParameter(1,acc);
-
-		@SuppressWarnings("unchecked")
-		List<Hl7TextInfo> results = query.getResultList();
-
-		return results;
-    }
-
 	public List<Hl7TextInfo> searchByAccessionNumber(String accession, String labType)
 	{
-		String sqlCommand="select x from Hl7TextInfo x where x.accessionNumber = :accession AND x.hl7TextMessage.type = :type";
+		String sqlCommand="select x from Hl7TextInfo x where x.uniqueIdentifier = :accession AND x.hl7TextMessage.type = :type";
 
 		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter("accession", accession);
@@ -193,12 +163,14 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
 		return results;
 	}
 
-	public Hl7TextInfo findLatestVersionByAccessionNo(String acc) {
-		String sqlCommand="SELECT x FROM Hl7TextInfo x WHERE x.accessionNumber = :accession " +
+	public Hl7TextInfo findLatestVersionByAccessionNo(String acc, String labType)
+	{
+		String sqlCommand="SELECT x FROM Hl7TextInfo x WHERE x.uniqueIdentifier = :accession AND x.hl7TextMessage.type = :type " +
 				"ORDER BY x.obrDate DESC, x.labNumber DESC";
 
 		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter("accession", acc);
+		query.setParameter("type", labType);
 
 		return (getSingleResultOrNull(query));
 	}
@@ -208,8 +180,8 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
     public Hl7TextInfo findLatestVersionByAccessionNumberOrFillerNumber(
 		String acc, String fillerNumber) {
 
-		String sqlCommand="SELECT x FROM Hl7TextInfo x WHERE x.accessionNumber = :accession " +
-			"OR x.fillerOrderNum = :fillerNo order by x.labNumber DESC";
+		String sqlCommand="SELECT x FROM Hl7TextInfo x WHERE x.uniqueIdentifier = :accession " +
+			"OR x.uniqueVersionIdentifier = :fillerNo order by x.labNumber DESC";
 
 		Query query = entityManager.createQuery(sqlCommand);
 		query.setParameter("accession", acc);
@@ -219,7 +191,7 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
     }
 
     public List<Hl7TextInfo> searchByFillerOrderNumber(String fon, String sending_facility){
-    	String sql = "select x from Hl7TextInfo x where x.fillerOrderNum=?1 and x.sendingFacility=?2";
+    	String sql = "select x from Hl7TextInfo x where x.uniqueVersionIdentifier=?1 and x.sendingFacility=?2";
     	Query query = entityManager.createQuery(sql);
     	query.setParameter(1, fon);
     	query.setParameter(2, sending_facility);
@@ -309,8 +281,8 @@ public class Hl7TextInfoDao extends AbstractDao<Hl7TextInfo> {
     public List<Object[]> findByLabIdViaMagic(Integer labNo, boolean prioritizeFinalCount)
     {
 		String sql = "FROM Hl7TextInfo a, Hl7TextInfo b " +
-				"WHERE a.accessionNumber <> '' " +
-				"AND a.accessionNumber = b.accessionNumber " +
+				"WHERE a.uniqueIdentifier <> '' " +
+				"AND a.uniqueIdentifier = b.uniqueIdentifier " +
 				"AND b.labNumber = :labNo " +
 				"ORDER BY a.obrDate, ";
 

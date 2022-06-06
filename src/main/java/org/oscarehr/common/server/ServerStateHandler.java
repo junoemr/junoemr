@@ -86,10 +86,9 @@ public class ServerStateHandler
 			String localHostname = inetAddress.getHostName();
 			logger.info("local hostname: " + localHostname);
 
-			// this property should not be included on production servers, so log an error if it exists
 			if(forceMasterDomainOverride != null)
 			{
-				logger.error("Master check has properties file override: " + forceMasterDomainOverride);
+				logger.info("Master check has properties file override: " + forceMasterDomainOverride);
 			}
 
 			// force this server to master if the override domain matches the localhost

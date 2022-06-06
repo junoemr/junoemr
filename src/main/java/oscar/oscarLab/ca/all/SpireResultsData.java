@@ -104,7 +104,7 @@ public class SpireResultsData {
 					lbData.acknowledgedStatus = "U";
 				}
 
-				lbData.accessionNumber = hl7.getAccessionNumber();
+				lbData.accessionNumber = hl7.getUniqueIdentifier();
 				lbData.healthNumber = hl7.getHealthNumber();
 				lbData.patientName = hl7.getLastName() + ", " + hl7.getFirstName();
 				lbData.sex = hl7.getSex();

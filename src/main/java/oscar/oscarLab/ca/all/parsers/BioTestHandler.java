@@ -614,7 +614,7 @@ public class BioTestHandler extends ORU_R01MessageHandler
         }
     }
 
-    public String getAccessionNum(){
+    public String getUniqueIdentifier(){
         try{
             return(getString(msg.getRESPONSE().getPATIENT().getPID().getPatientIDInternalID(0).getID().getValue()));
         }catch(Exception e){
@@ -719,7 +719,7 @@ public class BioTestHandler extends ORU_R01MessageHandler
         return "";
     }
 
- public String getFillerOrderNumber(){
+ public String getUniqueVersionIdentifier(){
 
 
 		return "";

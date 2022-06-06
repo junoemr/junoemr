@@ -155,6 +155,12 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 		return null;
 	}
 
+	@Override
+	public String getHealthNumProvince()
+	{
+		return "ABH";
+	}
+
 	/**
 	 *  call getPatientIdentificationList default behavior of appending namespace
 	 * @return - list of paris patient identification &lt;id type , id + assigning authority >
@@ -171,13 +177,13 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public String getAccessionNum()
+	public String getUniqueIdentifier()
 	{
 		return get("/.ORDER_OBSERVATION/OBR-3-1");
 	}
 
 	@Override
-	public String getFillerOrderNumber()
+	public String getUniqueVersionIdentifier()
 	{
 		return get("/.ORDER_OBSERVATION/ORC-3-1");
 	}

@@ -123,7 +123,7 @@ public class EpsilonHandler  extends CMLHandler {
 	}
 
 	@Override
-	public String getAccessionNum() {
+	public String getUniqueIdentifier() {
 		String accessionNum = "";
 		try {
 			// medHealth sends the accession number in PID-3

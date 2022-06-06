@@ -117,7 +117,7 @@ public class MeasurementDao extends AbstractDao<Measurement> {
 				String name = messageHandler.getOBXName(i, j);
 				String unit = messageHandler.getOBXUnits(i, j);
 				String labname = messageHandler.getPatientLocation();
-				String accession = messageHandler.getAccessionNum();
+				String accession = messageHandler.getUniqueIdentifier();
 				String req_datetime = messageHandler.getRequestDate(i);
 				String datetime = messageHandler.getTimeStamp(i, j);
 				String olis_status = messageHandler.getOBXResultStatus(i, j);

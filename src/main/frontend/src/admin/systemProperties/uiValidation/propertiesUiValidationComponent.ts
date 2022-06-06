@@ -22,7 +22,7 @@
  */
 
 import {SystemPreferenceApi} from "../../../../generated/api/SystemPreferenceApi";
-import {SYSTEM_PROPERTIES} from "../../../common/services/systemPreferenceServiceConstants";
+import {SystemProperties} from "../../../common/services/systemPreferenceServiceConstants";
 import {
 	JUNO_BUTTON_COLOR,
 	JUNO_BUTTON_COLOR_PATTERN,

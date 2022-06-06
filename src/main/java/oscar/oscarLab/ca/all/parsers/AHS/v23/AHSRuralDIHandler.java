@@ -104,14 +104,14 @@ public class AHSRuralDIHandler extends AHSHandler
 	/* ===================================== OBR ====================================== */
 
 	@Override
-	public String getAccessionNum()
+	public String getUniqueIdentifier()
 	{
 		// use the filler order number as the unique lab identifier apparently
 		return get("/.OBR-3-1");
 	}
 
 	@Override
-	public String getFillerOrderNumber()
+	public String getUniqueVersionIdentifier()
 	{
 		return StringUtils.trimToEmpty(get("/.OBR-18-2") + " " + get("/.OBR-4-5"));
 	}

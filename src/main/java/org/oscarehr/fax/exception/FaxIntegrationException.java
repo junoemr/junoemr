@@ -23,6 +23,9 @@
 
 package org.oscarehr.fax.exception;
 
+/**
+ * Indicate that something is incorrect with the integration setup.
+ */
 public class FaxIntegrationException extends FaxException
 {
 

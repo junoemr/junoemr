@@ -28,8 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.entity.DemographicExt;
-import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferInbound;
-import org.oscarehr.ws.external.rest.v1.transfer.demographic.DemographicTransferOutbound;
+import org.oscarehr.ws.external.rest.v1.transfer.demographic.ApiDemographicCreateTransfer;
 import oscar.util.ConversionUtils;
 
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ import java.util.List;
 
 public class DemographicConverter
 {
-	public static Demographic getAsDomainObject(DemographicTransferInbound transfer)
+	public static Demographic getAsDomainObject(ApiDemographicCreateTransfer transfer)
 	{
 		Demographic demographic = new Demographic();
 
@@ -99,7 +98,7 @@ public class DemographicConverter
 
 		return demographic;
 	}
-	public static List<DemographicExt> getExtensionList(DemographicTransferInbound transfer)
+	public static List<DemographicExt> getExtensionList(ApiDemographicCreateTransfer transfer)
 	{
 		List<DemographicExt> extensionList = new ArrayList<>(1);
 
@@ -113,7 +112,7 @@ public class DemographicConverter
 		}
 		return extensionList;
 	}
-	public static DemographicCust getCustom(DemographicTransferInbound transfer)
+	public static DemographicCust getCustom(ApiDemographicCreateTransfer transfer)
 	{
 		DemographicCust demographicCustom = null;
 		if (transfer.getNurse() != null || transfer.getResident() != null || transfer.getAlert() != null || transfer.getMidwife() != null || transfer.getNotes() != null)
@@ -126,88 +125,5 @@ public class DemographicConverter
 			demographicCustom.setNotes("<unotes>" + StringEscapeUtils.escapeXml(StringUtils.trimToEmpty(transfer.getNotes())) + "</unotes>");
 		}
 		return demographicCustom;
-	}
-
-	public static DemographicTransferOutbound getAsTransferObject(Demographic demographic, List<DemographicExt> demographicExtensions, DemographicCust demographicCustom)
-	{
-		DemographicTransferOutbound transfer = new DemographicTransferOutbound();
-
-		// base info
-		transfer.setDemographicNo(demographic.getDemographicId());
-		transfer.setFirstName(demographic.getFirstName());
-		transfer.setLastName(demographic.getLastName());
-		transfer.setDateOfBirth(demographic.getDateOfBirth());
-		transfer.setTitle(demographic.getTitle());
-		transfer.setSex(demographic.getSex());
-		transfer.setHin(demographic.getHin());
-		transfer.setSin(demographic.getSin());
-		transfer.setHcVersion(demographic.getVer());
-		transfer.setHcType(demographic.getHcType());
-		transfer.setHcRenewDate(ConversionUtils.toNullableLocalDate(demographic.getHcRenewDate()));
-		transfer.setHcEffectiveDate(ConversionUtils.toNullableLocalDate(demographic.getHcEffectiveDate()));
-		transfer.setPatientStatus(demographic.getPatientStatus());
-		transfer.setPatientStatusDate(ConversionUtils.toNullableLocalDate(demographic.getPatientStatusDate()));
-		transfer.setDateJoined(ConversionUtils.toNullableLocalDate(demographic.getDateJoined()));
-		transfer.setEndDate(ConversionUtils.toNullableLocalDate(demographic.getEndDate()));
-		transfer.setVeteranNo(demographic.getVeteranNo());
-
-		// contact info
-		transfer.setAddress(demographic.getAddress());
-		transfer.setProvince(demographic.getProvince());
-		transfer.setCity(demographic.getCity());
-		transfer.setPostal(demographic.getPostal());
-		transfer.setPrimaryPhone(demographic.getPhone());
-		transfer.setSecondaryPhone(demographic.getPhone2());
-		transfer.setEmail(demographic.getEmail());
-
-		// roster info
-		transfer.setRosterStatus(demographic.getRosterStatus());
-		transfer.setRosterDate(ConversionUtils.toNullableLocalDate(demographic.getRosterDate()));
-		transfer.setRosterTerminationDate(ConversionUtils.toNullableLocalDate(demographic.getRosterTerminationDate()));
-		transfer.setRosterTerminationReason(demographic.getRosterTerminationReason());
-
-		// physician info
-		transfer.setProviderNo(demographic.getProviderNo());
-		transfer.setReferralDoctorName(demographic.getReferralDoctorName());
-		transfer.setReferralDoctorNo(demographic.getReferralDoctorNumber());
-		transfer.setFamilyDoctorName(demographic.getFamilyDoctorName());
-		transfer.setFamilyDoctorNo(demographic.getFamilyDoctorNumber());
-
-		//other info
-		transfer.setPcnIndicator(demographic.getPcnIndicator());
-		transfer.setChartNo(demographic.getChartNo());
-		transfer.setAlias(demographic.getAlias());
-		transfer.setChildren(demographic.getChildren());
-		transfer.setSourceOfIncome(demographic.getSourceOfIncome());
-		transfer.setCitizenship(demographic.getCitizenship());
-		transfer.setSpokenLanguage(demographic.getSpokenLanguage());
-		transfer.setOfficialLanguage(demographic.getOfficialLanguage());
-		transfer.setCountryOfOrigin(demographic.getCountryOfOrigin());
-		transfer.setNewsletter(demographic.getNewsletter());
-		transfer.setAnonymous(demographic.getAnonymous());
-		transfer.setLastUpdateDate(ConversionUtils.toNullableLocalDate(demographic.getLastUpdateDate()));
-
-		if(demographicExtensions != null)
-		{
-			for(DemographicExt extension : demographicExtensions)
-			{
-				String key = extension.getKey();
-				String value = StringUtils.trimToNull(extension.getValue());
-
-				switch(key)
-				{
-					case "demo_cell": transfer.setCellPhone(value); break;
-				}
-			}
-		}
-		if(demographicCustom != null)
-		{
-			transfer.setNotes(StringUtils.substringBetween(demographicCustom.getNotes(), "<unotes>", "</unotes>"));
-			transfer.setAlert(demographicCustom.getAlert());
-			transfer.setMidwife(demographicCustom.getMidwife());
-			transfer.setNurse(demographicCustom.getNurse());
-			transfer.setResident(demographicCustom.getResident());
-		}
-		return transfer;
 	}
 }

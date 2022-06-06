@@ -22,7 +22,7 @@
  */
 
 import {SystemPreferenceApi} from "../../../../generated/api/SystemPreferenceApi";
-import {SYSTEM_PROPERTIES} from "../../../common/services/systemPreferenceServiceConstants";
+import {SystemPreferences} from "../../../common/services/systemPreferenceServiceConstants";
 
 angular.module('Admin').component('systemPropertiesGeneral',
 	{
@@ -62,7 +62,7 @@ angular.module('Admin').component('systemPropertiesGeneral',
 					{
 						name: "Phone Prefix",
 						description: "Change the default phone number prefix (XXX or XXX-)",
-						propertyName: SYSTEM_PROPERTIES.DEFAULT_PHONE_PREFIX,
+						propertyName: SystemPreferences.DefaultPhonePrefix,
 						type: propertyTypes.text,
 						value: "",
 						validation: ctrl.validations.phonePrefixValid,
@@ -70,7 +70,7 @@ angular.module('Admin').component('systemPropertiesGeneral',
 					{
 						name: "Family Doctor & Demographic Rostering",
 						description: "Enable additional family doctor field in classic UI and demographic rostering section in Juno UI",
-						propertyName: SYSTEM_PROPERTIES.ROSTERING_MODULE,
+						propertyName: SystemPreferences.RosteringModule,
 						type: propertyTypes.toggle,
 						value: false,
 						validation: false,
@@ -78,7 +78,7 @@ angular.module('Admin').component('systemPropertiesGeneral',
 					{
 						name: "Additional Demographic Address",
 						description: "Enable an additional demographic address",
-						propertyName: SYSTEM_PROPERTIES.EXTRA_ADDRESS_FIELD,
+						propertyName: SystemPreferences.ExtraAddressField,
 						type: propertyTypes.toggle,
 						value: false,
 						validation: false,
@@ -86,7 +86,7 @@ angular.module('Admin').component('systemPropertiesGeneral',
 					{
 						name: "Custom Nav Icon",
 						description: "Use a user supplied .png as the logo image in the Juno UI nav bar",
-						propertyName: SYSTEM_PROPERTIES.UI_CUSTOM_NAV_ICON,
+						propertyName: SystemPreferences.UiCustomNavIcon,
 						type: propertyTypes.toggle,
 						value: false,
 						validation: false,
@@ -94,7 +94,7 @@ angular.module('Admin').component('systemPropertiesGeneral',
 					{
 						name: "Restrict to Juno UI",
 						description: "Disable link to classic UI when clicking the logo in the Juno UI nav bar",
-						propertyName: SYSTEM_PROPERTIES.UI_LOCK_TO_JUNO_UI,
+						propertyName: SystemPreferences.UiLockToJunoUi,
 						type: propertyTypes.toggle,
 						value: false,
 						validation: false,

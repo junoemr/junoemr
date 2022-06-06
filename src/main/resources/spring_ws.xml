@@ -366,9 +366,7 @@
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.ScheduleExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.IntegrationExceptionMapper"/>
 			<bean class="org.oscarehr.ws.rest.exceptionMapping.HrmExceptionMapper"/>
-
-			<!-- Juno filters. -->
-			<bean class="org.oscarehr.ws.rest.filter.LoggingFilterInternal"/>
+			<bean class="org.oscarehr.ws.rest.exceptionMapping.FaxExceptionMapper"/>
 
 			<!-- Custom ContextResolver to apply settings to the Jackson ObjectMapper -->
 			<bean class="org.oscarehr.ws.spring.contextResolver.ObjectMapperContextResolver"/>
@@ -421,13 +419,15 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.aqs.QueueWebService"/>
-			<!-- AQS -->
+			<!-- End AQS -->
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmCategoriesWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmCategoryWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmSubClassWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmScheduleWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.hrm.HrmAccountWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.iceFall.IceFallWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.imdhealth.iMDHealthWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.integrations.netcare.NetcareWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.lab.LabWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.lab.olis.OlisLabWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.MeasurementsWebService"/>

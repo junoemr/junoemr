@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.io.XMLFile;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
-import org.oscarehr.dataMigration.converter.out.hrm.HrmDocumentDbToModelConverter;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.dataMigration.converter.in.hrm.HrmDocumentModelToDbConverter;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument;
@@ -47,6 +47,7 @@ import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
 import org.oscarehr.hospitalReportManager.model.HrmFetchResultsModel;
+import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,16 +78,19 @@ public class HRMService
 	private HrmDocumentModelToDbConverter modelToEntity;
 
 	@Autowired
-	private HrmDocumentDbToModelConverter entityToModel;
+	private HRMDocumentDao hrmDocumentDao;
 
 	@Autowired
-	private HRMDocumentDao hrmDocumentDao;
+	private SystemPreferenceService systemPreferences;
 
 	@Autowired
 	private HRMDocumentToDemographicDao hrmDocumentToDemographicDao;
 
 	@Autowired
 	private HRMDocumentToProviderDao hrmDocumentToProviderDao;
+
+	@Autowired
+	private JunoProperties junoProps;
 	
 	private Logger logger = MiscUtils.getLogger();
 	
@@ -113,15 +117,14 @@ public class HRMService
 	{
 		HrmFetchResultsModel results = new HrmFetchResultsModel();
 		List<GenericFile> downloadedFiles = sftpService.pullHRMFromSource(results);
-		reportProcessor.processHRMFiles(downloadedFiles, true, results);
+		reportProcessor.processHRMFiles(downloadedFiles, junoProps.getHrm().isDecryptRemoteFiles(), results);
 		
 		this.lastFetchResults = results;
 		return results;
 	}
 	
 	/**
-	 * Skip downloading, and process the results of the local override directory instead.  These files
-	 * will not be decrypted, only parsed and routed.
+	 * Skip downloading, and process the results of the local override directory instead.
 	 *
 	 * @return object containing results of the operation
 	 */
@@ -138,7 +141,7 @@ public class HRMService
 			List<GenericFile> localFiles = Files.list(localHRMPath)
 			                                    .map(path -> new XMLFile(path.toFile()))
 			                                    .collect(Collectors.toList());
-			reportProcessor.processHRMFiles(localFiles, true, results);
+			reportProcessor.processHRMFiles(localFiles, junoProps.getHrm().isDecryptLocalFiles(), results);
 		}
 		catch(IOException e)
 		{
@@ -336,5 +339,15 @@ public class HRMService
 			original.setNumDuplicatesReceived(original.getNumDuplicatesReceived() + 1);
 			hrmDocumentDao.merge(original);
 		}
+	}
+
+	public boolean isHRMEnabled()
+	{
+		return systemPreferences.isPreferenceEnabled("integration.hrm.enabled", false);
+	}
+
+	public boolean isHRMFetchEnabled()
+	{
+		return systemPreferences.isPreferenceEnabled("omd.hrm.polling_enabled", false);
 	}
 }

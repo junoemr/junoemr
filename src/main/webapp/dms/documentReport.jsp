@@ -196,10 +196,19 @@ boolean hasNoteCreatePermission = false;
 
 if(module.equals("demographic"))
 {
-    hasDocumentCreatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.DOCUMENT_CREATE);
-    hasDocumentUpdatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.DOCUMENT_UPDATE);
-    hasTicklerCreatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.TICKLER_CREATE);
-    hasNoteCreatePermission = securityInfoManager.hasPrivileges(curUser, Integer.parseInt(demographicNo), Permission.ENCOUNTER_NOTE_CREATE);
+	Integer demoNo = Integer.parseInt(demographicNo);
+
+    hasDocumentCreatePermission = securityInfoManager.hasPrivileges(curUser, demoNo, Permission.DOCUMENT_CREATE);
+    hasDocumentUpdatePermission = securityInfoManager.hasPrivileges(curUser, demoNo, Permission.DOCUMENT_UPDATE);
+    hasTicklerCreatePermission = securityInfoManager.hasPrivileges(curUser, demoNo, Permission.TICKLER_CREATE);
+    hasNoteCreatePermission = securityInfoManager.hasPrivileges(curUser, demoNo, Permission.ENCOUNTER_NOTE_CREATE);
+}
+else
+{
+	hasDocumentCreatePermission = securityInfoManager.hasPrivileges(curUser, Permission.DOCUMENT_CREATE);
+	hasDocumentUpdatePermission = securityInfoManager.hasPrivileges(curUser, Permission.DOCUMENT_UPDATE);
+	hasTicklerCreatePermission = securityInfoManager.hasPrivileges(curUser, Permission.TICKLER_CREATE);
+	hasNoteCreatePermission = securityInfoManager.hasPrivileges(curUser, Permission.ENCOUNTER_NOTE_CREATE);
 }
 %>
 <html:html locale="true">
@@ -270,6 +279,47 @@ function selectAll(checkboxId,parentEle, className){
    for (i =0; i < chkList.length; i++){
       chkList[i].checked = val;
    }
+}
+
+function combinePdfs()
+{
+	// Verify that all checked documents are pdfs, and that there are at least 2
+	var form = document.forms[2];
+	var checkBoxes = form.docNo;
+	if (!checkBoxes)
+	{
+		alert("No documents to combine")
+	}
+
+	var checkedPdfs = 0;
+	for (var i=0; i < checkBoxes.length; i++)
+	{
+		var checkBox = checkBoxes[i];
+		if (checkBox.checked)
+		{
+			var contentType = checkBox.getAttribute("data-content");
+			if (!contentType || contentType.toLowerCase() !== 'pdf')
+			{
+				alert("All selected documents must be PDF format")
+				return;
+			}
+			else
+			{
+				checkedPdfs++;
+			}
+		}
+	}
+
+	if (checkedPdfs < 2)
+	{
+		alert("You must select at least 2 PDF documents to combine");
+		return;
+	}
+	else
+	{
+		var action = '<rewrite:reWrite jspPage="combinePDFs.do"/>';
+		return submitForm(action);
+	}
 }
 
 function submitForm(actionPath) {
@@ -519,7 +569,8 @@ function popup1(height, width, url, windowName){
           <td>
           <% if (curdoc.isFaxable()){%> <input class="tightCheckbox<%=i%>"
             type="checkbox" name="docNo" id="docNo<%=curdoc.getDocId()%>"
-            value="<%=curdoc.getDocId()%>" style="margin: 0px; padding: 0px;" />
+            value="<%=curdoc.getDocId()%>" style="margin: 0px; padding: 0px;"
+			data-content="<%=contentType%>"/>
           <%}else{%> &nbsp; <%}%>
           </td>
           <td>
@@ -640,9 +691,9 @@ function popup1(height, width, url, windowName){
         value='<bean:message key="global.btnPrint"/>'
         onClick="window.print()">
           <input type="button"
-                  <%=(hasDocumentCreatePermission) ? "" : "disabled='disabled'"%>
-        value="<bean:message key="dms.documentReport.btnCombinePDF"/>"
-        onclick="return submitForm('<rewrite:reWrite jspPage="combinePDFs.do"/>');" />
+				  <%=(hasDocumentCreatePermission) ? "" : "disabled='disabled'"%>
+				 value="<bean:message key="dms.documentReport.btnCombinePDF"/>"
+				 onclick="return combinePdfs();" />
 				<% if (faxEnabled) { %>
 				<input type="button"
 					value="Fax Documents"

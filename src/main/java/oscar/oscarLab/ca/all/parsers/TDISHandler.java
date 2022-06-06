@@ -826,7 +826,7 @@ public class TDISHandler extends ORU_R01MessageHandler
 		return "00000000";
 	}
 
-	public String getAccessionNum() {
+	public String getUniqueIdentifier() {
 		try {
 			return msg.getMSH().getMessageControlID().getValue().toString();
 		} catch (Exception e) {
@@ -912,7 +912,7 @@ public class TDISHandler extends ORU_R01MessageHandler
 		return "";
 	}
 
-	public String getFillerOrderNumber(){
+	public String getUniqueVersionIdentifier(){
 		String fonum = "";
 		String entityId = getString(obrSegKeySet.get(0).getFillerOrderNumber().getEntityIdentifier().getValue());
 		String namseSpaceId = getString(obrSegKeySet.get(0).getFillerOrderNumber().getNamespaceID().getValue());

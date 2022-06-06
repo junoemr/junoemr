@@ -24,27 +24,29 @@ package org.oscarehr.common.hl7.copd.mapper;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v24.segment.PID;
-import org.apache.commons.lang.StringUtils;
-import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
-import org.oscarehr.dataMigration.service.ImporterExporterFactory;
-import org.oscarehr.demographic.entity.Demographic;
-import org.oscarehr.demographic.entity.DemographicCust;
-import org.oscarehr.demographic.entity.DemographicExt;
-import org.oscarehr.dataMigration.service.CoPDPreProcessorService;
-import org.oscarehr.util.MiscUtils;
-import oscar.util.ConversionUtils;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
+import org.oscarehr.common.hl7.copd.model.v24.message.ZPD_ZTR;
+import org.oscarehr.dataMigration.service.CoPDPreProcessorService;
+import org.oscarehr.dataMigration.service.ImporterExporterFactory;
+import org.oscarehr.demographic.entity.Demographic;
+import org.oscarehr.demographic.entity.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicExt;
+import org.oscarehr.util.MiscUtils;
+import oscar.util.ConversionUtils;
 
 public class DemographicMapper extends AbstractMapper
 {
 	private final PID messagePID;
 	private final String DEMO_NULL_NAME = "NULL_NAME";
 	private final String[] PERSONAL_EMAIL_TYPES = {"PERS", "RESD"};
+	private final String FIRST_NAME = "first";
+	private final String MIDDLE_NAME = "middle";
+	private final String LAST_NAME = "last";
 
 	public DemographicMapper(ZPD_ZTR message, ImporterExporterFactory.IMPORT_SOURCE importSource)
 	{
@@ -60,6 +62,8 @@ public class DemographicMapper extends AbstractMapper
 		{
 			Demographic demographic = new Demographic();
 			demographic.setFirstName(getFirstName(0));
+			String middleName = getMiddleName(0);
+			demographic.setMiddleName(middleName);
 			demographic.setLastName(getLastName(0));
 			demographic.setSex(getSex());
 			demographic.setDateOfBirth(getDOB());
@@ -114,46 +118,54 @@ public class DemographicMapper extends AbstractMapper
 	}
 
 	/* Methods for accessing various values in the import message */
-
 	public String getFirstName(int rep) throws HL7Exception
 	{
-		String firstName = StringUtils.trimToNull(messagePID.getPatientName(rep).getGivenName().getValue());
-		if (firstName == null)
-		{
-			MiscUtils.getLogger().warn("demographic has no first name! using: " + DEMO_NULL_NAME);
-			firstName = DEMO_NULL_NAME;
-		}
-		// Append middle name to firstName if it exists to prevent data loss. Middle name doesn't have a place in Juno
-		String middleName = StringUtils.trimToNull(messagePID.getPatientName(rep).getSecondAndFurtherGivenNamesOrInitialsThereof().getValue());
-		if (middleName != null)
-		{
-			firstName += " " + middleName;
-		}
-		firstName = firstName.replaceAll("<", "").replaceAll(">", "");
-
-		if (firstName.length() > Demographic.FIRST_NAME_MAX_LENGTH)
-		{
-			firstName = firstName.substring(0, Demographic.FIRST_NAME_MAX_LENGTH);
-			MiscUtils.getLogger().warn("Demographic first name is too long. Will be truncated to: '" + firstName + "'");
-		}
+		String firstName = processName(StringUtils.trimToNull(messagePID.getPatientName(rep).getGivenName().getValue()), FIRST_NAME);
 		return firstName;
 	}
+
+	public String getMiddleName(int rep) throws HL7Exception
+	{
+		String middleName = processName(StringUtils.trimToNull(messagePID.getPatientName(rep).getSecondAndFurtherGivenNamesOrInitialsThereof().getValue()), MIDDLE_NAME);
+		return middleName;
+	}
+
 	public String getLastName(int rep) throws HL7Exception
 	{
-		String lastName = StringUtils.trimToNull(messagePID.getPatientName(rep).getFamilyName().getSurname().getValue());
-		if (lastName == null)
+		String lastName = processName(StringUtils.trimToNull(messagePID.getPatientName(rep).getFamilyName().getSurname().getValue()), LAST_NAME);
+		return lastName;
+	}
+
+	public String processName(String name, String nameType)
+	{
+		int nameLength = getDefaultNameLength(nameType);
+
+		if (name == null)
 		{
-			MiscUtils.getLogger().warn("demographic has no last name! using: " + DEMO_NULL_NAME);
+			MiscUtils.getLogger().warn("demographic has no " + nameType + " name! using: " + DEMO_NULL_NAME);
 			return DEMO_NULL_NAME;
 		}
-		lastName = lastName.replaceAll("<", "").replaceAll(">", "");
+		name = name.replaceAll("<", "").replaceAll(">", "");
 
-		if (lastName.length() > Demographic.LAST_NAME_MAX_LENGTH)
+		if (name.length() > nameLength)
 		{
-			lastName = lastName.substring(0, Demographic.LAST_NAME_MAX_LENGTH);
-			MiscUtils.getLogger().warn("Demographic last name is too long. Will be truncated to: '" + lastName + "'");
+			name = name.substring(0, nameLength);
+			MiscUtils.getLogger().warn("Demographic " + nameType + " name is too long. Will be truncated to: '" + name + "'");
 		}
-		return lastName;
+		return name;
+	}
+
+	public int getDefaultNameLength(String nameType)
+	{
+		switch(nameType)
+		{
+			case MIDDLE_NAME:
+				return Demographic.MIDDLE_NAME_MAX_LENGTH;
+			case LAST_NAME:
+				return Demographic.LAST_NAME_MAX_LENGTH;
+			default:
+				return Demographic.FIRST_NAME_MAX_LENGTH;
+		}
 	}
 
 	public boolean hasFirstName(int rep) throws HL7Exception

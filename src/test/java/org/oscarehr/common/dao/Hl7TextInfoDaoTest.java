@@ -74,11 +74,6 @@ public class Hl7TextInfoDaoTest extends DaoTestFixtures
 	}
 
 	@Test
-	public void testFindByHealthCardNo() {
-		hl7TextInfoDao.findByHealthCardNo("HIN");
-	}
-
-	@Test
 	public void testFindByLabId() {
 		hl7TextInfoDao.findByLabId(10);
 	}
@@ -159,11 +154,6 @@ public class Hl7TextInfoDaoTest extends DaoTestFixtures
 	@Test
 	public void testgetMatchingLabs() {
 		hl7TextInfoDao.getMatchingLabs("BLYA");
-	}
-
-	@Test
-	public void testsearchByAccessionNumber() {
-		hl7TextInfoDao.searchByAccessionNumber("PZDTS");
 	}
 
 	@Test

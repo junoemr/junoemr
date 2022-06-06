@@ -34,9 +34,11 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.oscarehr.common.exception.HtmlToPdfConversionException;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.eform.model.EFormData;
+import org.oscarehr.hospitalReportManager.service.HRMDocumentService;
 import org.oscarehr.labs.dao.Hl7DocumentLinkDao;
 import org.oscarehr.labs.model.Hl7DocumentLink;
 import org.oscarehr.util.LoggedInInfo;
@@ -46,6 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.xml.sax.SAXException;
 import oscar.dms.EDoc;
 import oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ConsultationPDFCreator;
 import oscar.oscarEncounter.oscarConsultationRequest.pageUtil.ImagePDFCreator;
@@ -54,6 +57,7 @@ import oscar.oscarLab.ca.on.LabResultData;
 import oscar.util.ConcatPDF;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -74,6 +78,9 @@ public class ConsultationPDFCreationService
 	private Hl7DocumentLinkDao hl7DocumentLinkDao;
 	@Autowired
 	private DocumentDao documentDao;
+
+	@Autowired
+	private HRMDocumentService hrmDocumentService;
 
 	public List<InputStream> toEDocInputStreams(HttpServletRequest request, List<EDoc> attachedDocuments) throws IOException, DocumentException
 	{
@@ -188,6 +195,16 @@ public class ConsultationPDFCreationService
 			streamList.add(new ByteInputStream(buffer, buffer.length));
 		}
 
+		return streamList;
+	}
+
+	public List<InputStream> toHRMInputStreams(HttpServletRequest request, List<HrmDocument> attachedHRM) throws IOException, JAXBException, SAXException
+	{
+		List<InputStream> streamList = new ArrayList<>(attachedHRM.size());
+		for(HrmDocument hrmDocument : attachedHRM)
+		{
+			streamList.add(hrmDocumentService.toPdfInputStream(hrmDocument));
+		}
 		return streamList;
 	}
 

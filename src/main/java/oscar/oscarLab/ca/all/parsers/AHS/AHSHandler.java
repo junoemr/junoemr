@@ -83,7 +83,7 @@ public abstract class AHSHandler extends ORU_R01MessageHandler
 	}
 
 	@Override
-	public String getAccessionNum() {
+	public String getUniqueIdentifier() {
 		return get("/.OBR-20");
 	}
 
@@ -122,7 +122,7 @@ public abstract class AHSHandler extends ORU_R01MessageHandler
 	/* ===================================== OBR ====================================== */
 
 	@Override
-	public String getFillerOrderNumber() {
+	public String getUniqueVersionIdentifier() {
 		// this is different from the filler order number in ORC
 		return get("/.OBR-3-1");
 	}

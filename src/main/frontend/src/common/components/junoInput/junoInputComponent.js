@@ -73,7 +73,12 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.noBox = ctrl.noBox || false;
 			ctrl.onlyNumeric = ctrl.onlyNumeric || false;
 			ctrl.icon = ctrl.icon || null;
-			ctrl.hideCharacterLimit = ctrl.hideCharacterLimit || true;
+
+			if (ctrl.hideCharacterLimit === undefined)
+			{
+				ctrl.hideCharacterLimit = true;
+			}
+
 			ctrl.allowAutocomplete = ctrl.allowAutocomplete || false;
 
 			ctrl.showInvalidFocus = ctrl.showInvalidFocus  || false;
@@ -155,7 +160,7 @@ angular.module('Common.Components').component('junoInput', {
 			ctrl.pristine = false;
 			if (ctrl.ngChange)
 			{
-				ctrl.ngChange({});
+				ctrl.ngChange({value: ctrl.ngModel});
 			}
 		}
 

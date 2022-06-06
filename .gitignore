@@ -11,6 +11,7 @@
 /myoscar_client_override.xml
 /velocity.log
 oscar.iml
+application-localhost.properties
 database/database.iml
 src/main/java/org/caisi/caisi.iml
 src/main/main.iml

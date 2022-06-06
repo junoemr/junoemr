@@ -8,10 +8,10 @@
     and "gnu.org/licenses/gpl-2.0.html".
 
 --%>
-<%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="org.apache.commons.lang.StringEscapeUtils"%>
-<%@page import="java.text.SimpleDateFormat" %>
-<%@ page language="java" contentType="text/html" %>
+<%@ page import="org.oscarehr.util.LoggedInInfo"%>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page contentType="text/html" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
 <%@ taglib uri="/WEB-INF/oscar-tag.tld" prefix="oscar"%>
@@ -73,9 +73,17 @@
 		}
 	}
 
-
-	HRMReport hrmReport = HRMReportParser.parseReport(hrmDocument.getReportFile().getPath(), hrmDocument.getReportFileSchemaVersion());
-	if (hrmReport == null) {
+    HRMReport hrmReport = null;
+    try
+    {
+        hrmReport = HRMReportParser.parseReport(hrmDocument.getReportFile().getPath(), hrmDocument.getReportFileSchemaVersion());
+    }
+    catch(Exception e)
+    {
+        MiscUtils.getLogger().error("HRM Parse Error", e);
+    }
+	if (hrmReport == null)
+    {
 		LogAction.addLogEntry(loggedInInfo.getLoggedInProviderNo(), demoNo, LogConst.ACTION_READ, LogConst.CON_HRM, LogConst.STATUS_FAILURE, documentId, remoteIp);
 
 %>
@@ -151,16 +159,15 @@
 <%@ page import="org.oscarehr.hospitalReportManager.service.HRMCategoryService" %>
 <%@ page import="org.oscarehr.dataMigration.model.hrm.HrmCategoryModel" %>
 <%@ page import="java.time.LocalDateTime" %>
-<%@ page import="org.oscarehr.hospitalReportManager.model.HRMDocument" %>
 <%@ page import="org.oscarehr.hospitalReportManager.service.HRMDocumentService" %>
 <%@ page import="oscar.log.LogAction" %>
 <%@ page import="oscar.log.LogConst" %>
 <%@ page import="org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao" %>
 <%@ page import="org.oscarehr.hospitalReportManager.HRMReportParser" %>
 <%@ page import="org.oscarehr.hospitalReportManager.dao.HRMDocumentCommentDao" %>
-<%@ page import="org.oscarehr.hospitalReportManager.model.HRMProviderConfidentialityStatement" %>
 <%@ page import="org.oscarehr.hospitalReportManager.dao.HRMProviderConfidentialityStatementDao" %>
 <%@ page import="org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao" %>
+<%@ page import="org.oscarehr.util.MiscUtils" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%!
@@ -585,8 +592,7 @@
             }
 
             .hrm-content {
-                width: 100%;
-                background-color:red;
+                width: 100%
             }
 
             #hrmHeader {
@@ -807,7 +813,7 @@
         <b>DOB: </b><span class="<%=getFieldClass(dateOfBirth)%>"><%=getFieldDisplayValue(dateOfBirth)%></span><br>
         <b>HCN: </b><span class="<%=getFieldClass(HCN)%>"><%=getFieldDisplayValue(HCN)%></span> <span class="<%=getFieldClass(HCNVersion)%>"><%=getFieldDisplayValue(HCNVersion)%></span><br/>
     </div>
-    <div id="hrmNotice" class="<%= previewMode ? "hide-on-preview" : ""%>">
+    <div id="hrmNotice" class="hide-on-print <%= previewMode ? "hide-on-preview" : ""%>">
         This report was received from the Hospital Report Manager (HRM) at <%= ConversionUtils.toDateTimeString(hrmDocument.getReceivedDateTime()) %>.
 
 	Message Unique ID: <%=hrmReport.getMessageUniqueId()%>
@@ -933,7 +939,7 @@
                 <tr class="<%= previewMode ? "hide-on-preview" : ""%>">
                     <td>
                         <input type="hidden" id="demographic-no" name="demographicNo">
-                        <input type="text" autocomplete="off" id="demographic-search"<%--onchange="checkSave('<%=hrmReportId%>hrm')"--%>>
+                        <input type="text" style="width: 100%" autocomplete="off" id="demographic-search"<%--onchange="checkSave('<%=hrmReportId%>hrm')"--%>>
                     </td>
                     <td>
                         <a href="#" onclick="addDemoToHrm('<%=hrmDocument.getId()%>')">(link)</a>

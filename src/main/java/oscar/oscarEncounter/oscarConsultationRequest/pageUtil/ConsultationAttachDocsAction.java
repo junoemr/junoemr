@@ -33,6 +33,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.oscarehr.consultations.service.ConsultationAttachmentService;
 import org.oscarehr.managers.SecurityInfoManager;
+import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.SpringUtils;
 
@@ -47,14 +48,14 @@ public class ConsultationAttachDocsAction extends Action
 {
 	private static final Logger logger = Logger.getLogger(ConsultationAttachDocsAction.class);
 
-	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
+	private final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private final ConsultationAttachmentService consultationAttachmentService = SpringUtils.getBean(ConsultationAttachmentService.class);
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException
 	{
-		securityInfoManager.requireOnePrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(),
-				SecurityInfoManager.CREATE, null, "_con");
+		String loggedInProviderId = LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo();
+		securityInfoManager.requireAllPrivilege(loggedInProviderId, Permission.CONSULTATION_CREATE);
 
 		DynaActionForm frm = (DynaActionForm) form;
 
@@ -72,10 +73,12 @@ public class ConsultationAttachDocsAction extends Action
 			List<Integer> labIds = toIntList(request.getParameterValues("labNo"));
 			List<Integer> docIds = toIntList(request.getParameterValues("docNo"));
 			List<Integer> eformIds = toIntList(request.getParameterValues("eFormNo"));
+			List<Integer> hrmIds = toIntList(request.getParameterValues("hrmId"));
 
 			consultationAttachmentService.setAttachedDocuments(requestId, provNo, docIds);
 			consultationAttachmentService.setAttachedLabs(requestId, provNo, labIds);
 			consultationAttachmentService.setAttachedEForms(requestId, provNo, eformIds);
+			consultationAttachmentService.setAttachedHRM(requestId, provNo, hrmIds);
 			return mapping.findForward("success");
 		}
 		logger.error("Invalid consultation document parameters " +
