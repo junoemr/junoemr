@@ -1842,7 +1842,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 											if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
 											{
 												String obxDocId = "";
-												java.util.regex.Matcher docIdMatcher = Pattern.compile("embedded_doc_id_(\\d+)").matcher(handler.getOBXResult(j, k));
+												java.util.regex.Matcher docIdMatcher = Pattern.compile(MessageHandler.pdfReplacement + "(\\d+)").matcher(handler.getOBXResult(j, k));
 												if (docIdMatcher.find())
 												{
 													obxDocId = docIdMatcher.group(1);
@@ -2048,7 +2048,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										   if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
 										   {
 										   		String obxDocId = "";
-										   		java.util.regex.Matcher docIdMatcher = Pattern.compile("embedded_doc_id_(\\d+)").matcher(handler.getOBXResult(j, k));
+										   		java.util.regex.Matcher docIdMatcher = Pattern.compile(MessageHandler.pdfReplacement + "(\\d+)").matcher(handler.getOBXResult(j, k));
 										   		if (docIdMatcher.find())
 												{
 													obxDocId = docIdMatcher.group(1);
