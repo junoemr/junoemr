@@ -21,7 +21,7 @@
  * Canada
  */
 
-package integration.tests;
+package integration.tests.classicUI;
 
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;

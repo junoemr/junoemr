@@ -21,8 +21,13 @@
  * Canada
  */
 
-package integration.tests;
+package integration.tests.classicUI;
 
+import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
+import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByLinkText;
+
+import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
@@ -31,62 +36,65 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
-import org.openqa.selenium.By.ByLinkText;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-
-import java.sql.SQLException;
-import java.util.concurrent.TimeUnit;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysById;
-import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
-
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")
-@SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AddEformsClassicUIIT extends SeleniumTestBase
+@SpringBootTest(classes = {JunoApplication.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class EditEpisodesClassicUIIT extends SeleniumTestBase
 {
 	@Override
 	protected String[] getTablesToRestore()
 	{
-		return new String[]{
-			"admission", "billingservice", "caisi_role", "demographic", "documentDescriptionTemplate",
-			"eform_data", "eform_values", "Facility", "issue", "log", "log_ws_rest", "measurementType",
-			"LookupList", "LookupListItem", "OscarJob", "OscarJobType", "program_provider", "property", "provider",
-			"providerArchive", "providerbillcenter", "ProviderPreference", "roster_status", "security", "secUserRole",
-			"tickler_text_suggest", "validations", "log_ws_rest", "provider_recent_demographic_access"
+		return new String[]
+			{
+				"admission", "demographic", "Episode", "log", "log_ws_rest", "measurementType", "validations"
 		};
 	}
 
 	@Before
 	public void setup()
-		throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException
 	{
 		loadSpringBeans();
 		databaseUtil.createTestDemographic();
-		databaseUtil.createTestProvider();
 	}
 
 	@Test
-	public void addFormsTest()
-			throws InterruptedException
+	public void addEpisodeTest()
 	{
-		String subject = "EFormTest";
+		String codingSystem = "icd9";
+		String description = "ABN AMNION NEC AFF NB";
+		String startDate = "2022-01-01";
+		String endDate = "2022-03-03";
+		String status = "Current";
+
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + ECHART_URL);
 		String currWindowHandle = driver.getWindowHandle();
-		clickWaitSwitchToLast(driver, webDriverWait, By.xpath("//div[@id='menuTitleeforms']//descendant::a[contains(., '+')]"));
-		clickWaitSwitchToLast(driver, webDriverWait, By.linkText("letter"));
-		findWaitSendKeysById(driver, webDriverWait, "subject", subject);
-		findWaitClickByXpath(driver, webDriverWait, "//input[@value='Submit']");
+		PageUtil.switchToLastWindow(driver);
+
+		//Add Episode
+		driver.findElement(
+			By.xpath("//div[@id='menuTitleepisode']//descendant::a[contains(., '+')]")).click();
+		PageUtil.switchToLastWindow(driver);
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("search_coding_system")));
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("search_coding_system"), codingSystem);
+		WebElement descriptionDropdown = driver.findElement(By.id("description"));
+		descriptionDropdown.sendKeys(description);
+		findWaitClickByLinkText(driver, webDriverWait, description);
+		driver.findElement(By.id("startDate")).sendKeys(startDate);
+		driver.findElement(By.id("endDate")).sendKeys(endDate);
+		dropdownSelectByVisibleText(driver, webDriverWait, By.id("episode.status"), status);
+		driver.findElement(By.xpath("//input[@type='submit']")).click();
+
 		PageUtil.switchToWindow(currWindowHandle, driver);
 		driver.navigate().refresh();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(subject)));
-		Assert.assertTrue("Eform Letter is NOT added successfully.", PageUtil.isExistsBy(By.partialLinkText(subject), driver));
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.linkText(description)));
+		Assert.assertTrue(" Episode is NOT added successfully",
+			PageUtil.isExistsBy(By.linkText(description), driver));
 	}
 }

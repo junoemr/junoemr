@@ -21,9 +21,9 @@
  * Canada
  */
 
-package integration.tests;
+package integration.tests.classicUI;
 
-import static integration.tests.AddProvidersIT.drApple;
+import static integration.tests.classicUI.AddProvidersIT.drApple;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;

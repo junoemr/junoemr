@@ -34,6 +34,7 @@ public class PatientTestData
 	public String sex = "";
 	public String hin = "";
 
+	public String middleName = "Middle";
 	public String language = "English";
 	public String title = "MS";
 	public String spoken = "English";

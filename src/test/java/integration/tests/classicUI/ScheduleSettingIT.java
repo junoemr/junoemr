@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package integration.tests;
+package integration.tests.classicUI;
 
 import integration.tests.config.TestConfig;
 import integration.tests.util.SeleniumTestBase;

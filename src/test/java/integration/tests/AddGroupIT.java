@@ -23,8 +23,17 @@
 
 package integration.tests;
 
+import static integration.tests.classicUI.AddProvidersIT.drApple;
+import static integration.tests.classicUI.AddProvidersIT.drBerry;
+import static integration.tests.classicUI.AddProvidersIT.drCherry;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
+import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
+
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.seleniumUtil.PageUtil;
+import java.sql.SQLException;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,19 +41,9 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.oscarehr.JunoApplication;
-
-import java.sql.SQLException;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import static integration.tests.AddProvidersIT.drApple;
-import static integration.tests.AddProvidersIT.drBerry;
-import static integration.tests.AddProvidersIT.drCherry;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
-import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
-import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")
