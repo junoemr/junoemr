@@ -427,7 +427,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public int getOBXCount(int i)
 	{
-		return getReps(getOBXGroup());
+		return getReps(getObservationGroup());
 	}
 
 	/**
@@ -439,7 +439,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXValueType(int i, int j)
 	{
-		return getString(get("/." + getOBXGroup() + "/OBX("+j+")-2"));
+		return getString(get(getObservationOBXPath(j) + "-2"));
 	}
 
 	/**
@@ -451,7 +451,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXIdentifier(int i, int j)
 	{
-		return getString(get("/." + getOBXGroup() + "/OBX("+j+")-3-1"));
+		return getString(get(getObservationOBXPath(j) + "-3-1"));
 	}
 
 	/**
@@ -465,7 +465,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXName( int i, int j)
 	{
-		return getString(get("/." + getOBXGroup() + "/OBX("+j+")-3-2"));
+		return getString(get(getObservationOBXPath(j) + "-3-2"));
 	}
 
 	/**
@@ -478,7 +478,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXResult(int i, int j, int k)
 	{
-		return getString(get("/." + getOBXGroup() + "/OBX("+j+")-5-"+k));
+		return getString(get(getObservationOBXPath(j) + "-5-"+k));
 	}
 
 	/**
@@ -490,7 +490,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXUnits( int i, int j)
 	{
-		return getString(get("/." + getOBXGroup() + "/OBX("+j+")-6"));
+		return getString(get(getObservationOBXPath(j) + "-6"));
 	}
 
 	/**
@@ -502,7 +502,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXReferenceRange( int i, int j)
 	{
-		return getString(get("/." + getOBXGroup() + "/OBX("+j+")-7"));
+		return getString(get(getObservationOBXPath(j) + "-7"));
 	}
 
 	/**
@@ -514,7 +514,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXAbnormalFlag( int i, int j)
 	{
-		String ab = getString(get("/." + getOBXGroup() + "/OBX("+j+")-8"));
+		String ab = getString(get(getObservationOBXPath(j) + "-8"));
 		if (ab == null || ab.isEmpty())
 		{// no ab string means normal
 			return "N";
@@ -531,7 +531,36 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXResultStatus( int i, int j)
 	{
-		return getString(get("/." + getOBXGroup() + "/OBX("+j+")-11"));
+		return getString(get(getObservationOBXPath(j) + "-11"));
+	}
+
+	/**
+	 * Return the number of comments (NTE segments) following the jth OBX segment.
+	 * @param i ignored
+	 * @return the number of NTE segments
+	 */
+	@Override
+	public int getOBXCommentCount( int i, int j)
+	{
+		if(getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		{
+			return getReps(getObservationGroup(), j, "NTE");
+		}
+		return 0;
+	}
+
+	/**
+	 *  Return the kth comment of the ith OBR segment.
+	 *  @param i ignored
+	 */
+	@Override
+	public String getOBXComment(int i, int j, int k)
+	{
+		if(getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		{
+			return getString(get(getObservationNTEPath(k) + "(" + k + ")-3"));
+		}
+		return "";
 	}
 
 	/**
@@ -544,10 +573,10 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getTimeStamp(int i, int j)
 	{
-		return formatDateTime(get("/." + getOBXGroup() + "/OBX("+j+")-14"));
+		return formatDateTime(get(getObservationOBXPath(j) + "-14"));
 	}
 
-	protected String getOBXGroup()
+	protected String getObservationGroup()
 	{
 		if (getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
 		{
@@ -557,6 +586,25 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 		{
 			return "";
 		}
+	}
+	protected String getObservationOBXPath(int rep)
+	{
+		if(getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		{
+			return "/.OBSERVATION(" + rep + ")/OBX";
+		}
+		else
+		{
+			return "/.OBX(" + rep + ")";
+		}
+	}
+	protected String getObservationNTEPath(int rep)
+	{
+		if(getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		{
+			return "/.OBSERVATION(" + rep + ")/NTE";
+		}
+		throw new IllegalStateException("NTE does not exist for message version " + getMsgVersion());
 	}
 
 }
