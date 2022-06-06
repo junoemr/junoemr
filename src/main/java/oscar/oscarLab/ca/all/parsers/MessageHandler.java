@@ -673,7 +673,7 @@ public abstract class MessageHandler
 	}
 
 	/**
-	 *  Return an ArrayList of the requesting doctors billing number and the
+	 *  Return a List of the requesting doctors billing number and the
 	 *  billing numbers of the cc'd docs
 	 */
 	public List<String> getDocNums()

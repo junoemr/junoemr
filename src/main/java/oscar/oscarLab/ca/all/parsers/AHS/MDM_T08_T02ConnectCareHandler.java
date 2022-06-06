@@ -143,4 +143,41 @@ public abstract class MDM_T08_T02ConnectCareHandler extends MDM_T08_T02MessageHa
 		return docNames;
 	}
 
+	@Override
+	public List<String> getDocNums()
+	{
+		List<String> docIds = new ArrayList<>();
+		try
+		{
+			String providerId = getOrderingProviderNo(0, 0);
+			docIds.add(providerId);
+
+			int txa_23Count = getFieldReps("/.TXA", 23);
+			for(int k = 0; k < txa_23Count; k++)
+			{
+				String docId = getResultCopiesToProviderNo(0, k);
+				if(StringUtils.isNotBlank(docId))
+				{
+					docIds.add(docId);
+				}
+			}
+
+			// add pv1 provider to cc docs
+			int pd1_4Count = getFieldReps("/.PD1", 4);
+			for(int k = 0; k < pd1_4Count; k++)
+			{
+				String docId = get("/.PD1-4(" + k + ")-1");
+				if(StringUtils.isNotBlank(docId))
+				{
+					docIds.add(docId);
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			logger.error("Could not return doctor nums", e);
+		}
+		return docIds;
+	}
+
 }

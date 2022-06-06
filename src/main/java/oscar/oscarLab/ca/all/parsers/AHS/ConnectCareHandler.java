@@ -204,32 +204,41 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	@Override
 	public List<String> getDocNums()
 	{
-		List<String> docNums = new ArrayList<>();
+		List<String> docIds = new ArrayList<>();
 		try
 		{
 			String providerId = getOrderingProviderNo(0, 0);
-			docNums.add(providerId);
+			docIds.add(providerId);
 
-			int obr = 0;
-			int subCount = getReps("ORDER_OBSERVATION", obr, "OBR-28");
-			for(int k = 0; k < subCount; k++)
+			for(int i = 0; i < getOBRCount(); i++)
 			{
-				docNums.add(getString(get("/.ORDER_OBSERVATION(" + obr + ")/OBR-28(" + k + ")-1")));
+				int obr_28Count = getFieldReps("/.ORDER_OBSERVATION(" + i + ")/OBR", 28);
+				for(int k = 0; k < obr_28Count; k++)
+				{
+					String docId = getResultCopiesToProviderNo(i, k);
+					if(StringUtils.isNotBlank(docId))
+					{
+						docIds.add(docId);
+					}
+				}
 			}
 
 			// add pv1 provider to cc docs
-			String pv1ProviderNo = getString(get("/.PD1-4"));
-			if(StringUtils.isNotBlank(pv1ProviderNo))
+			int pd1_4Count = getFieldReps("/.PD1", 4);
+			for(int k = 0; k < pd1_4Count; k++)
 			{
-				docNums.add(pv1ProviderNo);
+				String docId = get("/.PD1-4(" + k + ")-1");
+				if(StringUtils.isNotBlank(docId))
+				{
+					docIds.add(docId);
+				}
 			}
-
 		}
 		catch(Exception e)
 		{
 			logger.error("Could not return doctor nums", e);
 		}
-		return docNums;
+		return docIds;
 	}
 
 	@Override
