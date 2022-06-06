@@ -24,6 +24,7 @@ package oscar.oscarLab.ca.all.parsers.messageTypes;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
+import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
 import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
@@ -156,7 +157,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getHealthNum()
 	{
-		return getString(get("/.PID-3(1)-1"));
+		return getString(get("/.PID-3-1"));
 	}
 
 	/**
@@ -426,7 +427,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public int getOBXCount(int i)
 	{
-		return getReps("OBX");
+		return getReps(getOBXGroup());
 	}
 
 	/**
@@ -438,7 +439,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXValueType(int i, int j)
 	{
-		return getString(get("/.OBX("+j+")-2"));
+		return getString(get("/." + getOBXGroup() + "/OBX("+j+")-2"));
 	}
 
 	/**
@@ -450,7 +451,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXIdentifier(int i, int j)
 	{
-		return getString(get("/.OBX("+j+")-3-1"));
+		return getString(get("/." + getOBXGroup() + "/OBX("+j+")-3-1"));
 	}
 
 	/**
@@ -464,7 +465,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXName( int i, int j)
 	{
-		return getString(get("/.OBX("+j+")-3-2"));
+		return getString(get("/." + getOBXGroup() + "/OBX("+j+")-3-2"));
 	}
 
 	/**
@@ -477,7 +478,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXResult(int i, int j, int k)
 	{
-		return getString(get("/.OBX("+j+")-5-"+k));
+		return getString(get("/." + getOBXGroup() + "/OBX("+j+")-5-"+k));
 	}
 
 	/**
@@ -489,7 +490,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXUnits( int i, int j)
 	{
-		return getString(get("/.OBX("+j+")-6"));
+		return getString(get("/." + getOBXGroup() + "/OBX("+j+")-6"));
 	}
 
 	/**
@@ -501,7 +502,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXReferenceRange( int i, int j)
 	{
-		return getString(get("/.OBX("+j+")-7"));
+		return getString(get("/." + getOBXGroup() + "/OBX("+j+")-7"));
 	}
 
 	/**
@@ -513,7 +514,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXAbnormalFlag( int i, int j)
 	{
-		String ab = getString(get("/.OBX("+j+")-8"));
+		String ab = getString(get("/." + getOBXGroup() + "/OBX("+j+")-8"));
 		if (ab == null || ab.isEmpty())
 		{// no ab string means normal
 			return "N";
@@ -530,7 +531,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXResultStatus( int i, int j)
 	{
-		return getString(get("/.OBX("+j+")-11"));
+		return getString(get("/." + getOBXGroup() + "/OBX("+j+")-11"));
 	}
 
 	/**
@@ -543,7 +544,19 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getTimeStamp(int i, int j)
 	{
-		return formatDateTime(get("/.OBX("+j+")-14"));
+		return formatDateTime(get("/." + getOBXGroup() + "/OBX("+j+")-14"));
+	}
+
+	protected String getOBXGroup()
+	{
+		if (getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		{
+			return "OBSERVATION";
+		}
+		else
+		{
+			return "";
+		}
 	}
 
 }

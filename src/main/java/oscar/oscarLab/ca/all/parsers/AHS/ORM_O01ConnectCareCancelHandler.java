@@ -85,7 +85,7 @@ public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHand
 				return id.getRight();
 			}
 		}
-		return null;
+		return "";
 	}
 
 	/**

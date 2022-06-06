@@ -80,6 +80,7 @@ import oscar.oscarLab.ca.all.parsers.AHS.v23.ProvlabHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestORMHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v251.ConnectCareLabHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v251.ConnectCareProviderCommunicationsHandler;
 import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
 import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 
@@ -98,6 +99,7 @@ public final class Factory {
 		AHSRuralHandler.AHS_RURAL_LAB_TYPE,
 		AHSMeditechHandler.AHS_MEDITECH_LAB_TYPE,
 		AHSRuralDIHandler.AHS_RURAL_DI_LAB_TYPE,
+		ConnectCareProviderCommunicationsHandler.AHS_CCCOMM_LAB_TYPE,
 		"CCLAB",
 		"CCENDO",
 		"CCCARDIOLOGY",
@@ -228,6 +230,10 @@ public final class Factory {
 			if (ConnectCareDocumentationAddHandler.handlerTypeMatch(msg))
 			{
 				handler = new ConnectCareDocumentationAddHandler(msg);
+			}
+			else if(ConnectCareProviderCommunicationsHandler.handlerTypeMatch(msg))
+			{
+				handler = new ConnectCareProviderCommunicationsHandler(msg);
 			}
 		}
 		else if(mshSplit[8].equals("MDM^T08"))

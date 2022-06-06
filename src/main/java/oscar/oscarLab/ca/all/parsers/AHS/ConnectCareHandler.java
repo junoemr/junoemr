@@ -152,7 +152,7 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 				return id.getRight();
 			}
 		}
-		return null;
+		return "";
 	}
 
 	@Override

@@ -101,7 +101,7 @@ public abstract class MDM_T08_T02ConnectCareHandler extends MDM_T08_T02MessageHa
 				return id.getRight();
 			}
 		}
-		return null;
+		return "";
 	}
 
 	@Override
