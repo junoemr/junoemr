@@ -21,7 +21,11 @@
  * Canada
  */
 
-package integration.tests;
+package integration.tests.classicUI;
+
+import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
+import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
+import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
 
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.data.SiteTestCollection;
@@ -37,15 +41,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
-import static integration.tests.util.seleniumUtil.PageUtil.clickWaitSwitchToLast;
-import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
-
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AddSitesIT extends SeleniumTestBase
+public class AddSitesClassicUIIT extends SeleniumTestBase
 {
 	@Override
 	protected String[] getTablesToRestore()
@@ -90,18 +89,5 @@ public class AddSitesIT extends SeleniumTestBase
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(site.siteName)));
 		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(site.siteName), driver));
 		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));
-	}
-
-
-	@Test
-	public void addSitesJUNOUITest()
-	{
-		SiteTestData siteJuno = SiteTestCollection.siteMap.get(SiteTestCollection.siteNames[1]);
-		accessSectionJUNOUI(driver, webDriverWait, "Admin");
-		addNewSites(siteJuno, "content-frame");
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(siteJuno.siteName)));
-		Assert.assertTrue(PageUtil.isExistsBy(By.linkText(siteJuno.siteName), driver));
-		Assert.assertTrue(PageUtil.isExistsBy(By.xpath(".//td[contains(.,site.shortName)]"), driver));
-
 	}
 }

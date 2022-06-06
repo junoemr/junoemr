@@ -21,11 +21,11 @@
  * Canada
  */
 
-package integration.tests;
+package integration.tests.classicUI;
 
-import static integration.tests.AddGroupIT.valueOfDrApple;
-import static integration.tests.AddGroupIT.valueOfDrBerry;
-import static integration.tests.AddPatientsIT.mom;
+import static integration.tests.classicUI.AddGroupClassicUIIT.valueOfDrApple;
+import static integration.tests.classicUI.AddGroupClassicUIIT.valueOfDrBerry;
+import static integration.tests.classicUI.AddPatientsClassicUIIT.mom;
 import static integration.tests.classicUI.AddProvidersIT.drApple;
 import static integration.tests.classicUI.AddProvidersIT.drBerry;
 import static integration.tests.classicUI.ScheduleSettingIT.getDailySchedule;
@@ -287,7 +287,7 @@ public class AddAppointmentsIT extends SeleniumTestBase
 		//Setup Groups
 		accessAdministrationSectionClassicUI(driver, webDriverWait, "Schedule Management", "Add a Group"
 		);
-		AddGroupIT addGroupIT = new AddGroupIT();
+		AddGroupClassicUIIT addGroupIT = new AddGroupClassicUIIT();
 		addGroupIT.addGroup(groupName, 2);
 		Assert.assertTrue("Group is Not added successfully.",
 				PageUtil.isExistsBy(By.name(valueOfDrApple), driver) &&

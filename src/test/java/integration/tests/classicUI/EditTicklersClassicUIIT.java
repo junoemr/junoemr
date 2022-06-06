@@ -23,7 +23,7 @@
 
 package integration.tests.classicUI;
 
-import static integration.tests.AddPatientsIT.mom;
+import static integration.tests.classicUI.AddPatientsClassicUIIT.mom;
 import static integration.tests.classicUI.AddProvidersIT.drBerry;
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;

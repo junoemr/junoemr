@@ -21,11 +21,11 @@
  * Canada
  */
 
-package integration.tests;
+package integration.tests.classicUI;
 
-import static integration.tests.AddPatientsIT.dad;
-import static integration.tests.AddPatientsIT.dadFullName;
-import static integration.tests.AddPatientsIT.mom;
+import static integration.tests.classicUI.AddPatientsClassicUIIT.dad;
+import static integration.tests.classicUI.AddPatientsClassicUIIT.dadFullName;
+import static integration.tests.classicUI.AddPatientsClassicUIIT.mom;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
@@ -53,7 +53,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class EditAppointmentsIT extends SeleniumTestBase
+public class EditAppointmentsClassicUIIT extends SeleniumTestBase
 {
 	String apptDurationUpdated = "30";
 	String nameUpdated = dadFullName;
@@ -85,7 +85,7 @@ public class EditAppointmentsIT extends SeleniumTestBase
 		databaseUtil.createProviderSite();
 	}
 
-	public String getDropdownValue(By dropdownBy)
+	public static String getDropdownValue(By dropdownBy)
 	{
 		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(dropdownBy));
 		Select dropdown = new Select(driver.findElement(dropdownBy));

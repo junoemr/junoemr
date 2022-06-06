@@ -21,14 +21,13 @@
  * Canada
  */
 
-package integration.tests;
+package integration.tests.junoUI;
 
+import static integration.tests.classicUI.AddGroupClassicUIIT.addGroup;
+import static integration.tests.classicUI.AddGroupClassicUIIT.deleteGroupMember;
 import static integration.tests.classicUI.AddProvidersIT.drApple;
 import static integration.tests.classicUI.AddProvidersIT.drBerry;
 import static integration.tests.classicUI.AddProvidersIT.drCherry;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
-import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
 
 import integration.tests.util.SeleniumTestBase;
@@ -49,7 +48,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 
-public class AddGroupIT extends SeleniumTestBase
+public class AddGroupJUNOUIIT extends SeleniumTestBase
 {
 	public static final String groupName = "TestGroup";
 	public static final String valueOfDrApple = groupName + drApple.providerNo;
@@ -73,64 +72,9 @@ public class AddGroupIT extends SeleniumTestBase
 		databaseUtil.createTestProvider();
 	}
 
-	public void addGroup(String groupName, int groupSize)
-	{
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@name='mygroup_no']")));
-		driver.findElement(By.xpath("//input[@name='mygroup_no']")).sendKeys(groupName);
-		for (int i = 1; i <= groupSize; i ++)
-		{
-			driver.findElement(By.xpath("//input[@value='" + i + "']")).click();
-		}
-		findWaitClickByXpath(driver, webDriverWait, "//input[@value='Save']");
-		findWaitClick(driver, webDriverWait, By.linkText("View Group List"));
-	}
-
-	public void deleteGroupMember(String[] groupMemberValue)
-	{
-		for (int i = 0; i < groupMemberValue.length; i ++)
-		{
-			findWaitClickByXpath(driver, webDriverWait, "//input[@name='" + groupMemberValue[i] + "']");
-		}
-		findWaitClickByXpath(driver, webDriverWait, "//input[@value='Delete']");
-		findWaitClick(driver, webDriverWait, By.linkText("View Group List"));
-	}
-
 	@Test
-	public void addGroupsClassicUITest() throws InterruptedException {
-		//Add a New Group with two providers: Dr. Apple and Dr. Berry
-		accessAdministrationSectionClassicUI(driver, webDriverWait, "Schedule Management", "Add a Group"
-        );
-		addGroup(groupName, 2);
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.name(valueOfDrBerry)));
-		Assert.assertTrue("Group is Not added successfully.",
-				PageUtil.isExistsBy(By.name(valueOfDrApple), driver) &&
-						PageUtil.isExistsBy(By.name(valueOfDrBerry), driver));
-
-		//Add a Member: Dr. Cherry
-		driver.findElement(By.linkText("New Group/Add a Member")).click();
-		addGroup(groupName, 3);
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.name(valueOfDrCherry)));
-		Assert.assertTrue("New member is Not added successfully.",
-				PageUtil.isExistsBy(By.name(valueOfDrApple), driver) &&
-						PageUtil.isExistsBy(By.name(valueOfDrBerry), driver) &&
-						PageUtil.isExistsBy(By.name(valueOfDrCherry), driver));
-
-		//Delete the first provider from the Group
-		deleteGroupMember(new String[]{valueOfDrApple});
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.name(valueOfDrCherry)));
-		Assert.assertFalse("Dr. Apple is Not deleted successfully.",
-				PageUtil.isExistsBy(By.name(valueOfDrApple), driver));
-
-		//Delete the rest of the Group
-		deleteGroupMember(new String[]{valueOfDrBerry, valueOfDrCherry});
-		webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@value='Delete']")));
-		Assert.assertTrue("Group is Not deleted successfully.",
-						(!PageUtil.isExistsBy(By.name(valueOfDrBerry), driver)) &&
-						(!PageUtil.isExistsBy(By.name(valueOfDrCherry), driver)));
-	}
-
-	@Test
-	public void addGroupsJUNOUITest() throws InterruptedException {
+	public void addGroupsJUNOUITest()
+	{
 		accessAdministrationSectionJUNOUI(driver, webDriverWait, "Schedule Management", "Add a Group"
 		);
 

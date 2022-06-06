@@ -21,7 +21,7 @@
  * Canada
  */
 
-package integration.tests;
+package integration.tests.classicUI;
 
 import static integration.tests.util.data.PatientTestCollection.patientLNames;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByIndex;
@@ -50,7 +50,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AddPatientsIT extends SeleniumTestBase
+public class AddPatientsClassicUIIT extends SeleniumTestBase
 {
 	public static final PatientTestData mom = PatientTestCollection.patientMap.get(patientLNames[0]);
 	public static final PatientTestData dad = PatientTestCollection.patientMap.get(patientLNames[1]);
@@ -67,7 +67,7 @@ public class AddPatientsIT extends SeleniumTestBase
 		};
 	}
 
-	private static boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow)
+	public static boolean isPatientAdded(String lastName, String firstName, By searchPage, By searchTerm, By nameRow)
 	{
 		findWaitClick(driver, webDriverWait, searchPage);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(searchTerm));
@@ -150,7 +150,7 @@ public class AddPatientsIT extends SeleniumTestBase
 				By.xpath("//input[@class='wideInput']"),
 				By.xpath("//tr[@class='odd']")));
 	}
-	//@Ignore
+
 	@Test
 	public void addPatientsClassicUIQuickFormTest()
 	{

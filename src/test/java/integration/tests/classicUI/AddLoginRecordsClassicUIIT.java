@@ -21,26 +21,23 @@
  * Canada
  */
 
-package integration.tests;
+package integration.tests.classicUI;
 
 import static integration.tests.classicUI.AddProvidersIT.drApple;
 import static integration.tests.classicUI.AddProvidersIT.drBerry;
 import static integration.tests.classicUI.AssignRolesIT.assignRoles;
 import static integration.tests.classicUI.AssignRolesIT.xpathDropdown;
-import static integration.tests.classicUI.AssignRolesIT.xpathOption;
 import static integration.tests.classicUI.AssignRolesIT.xpathProvider;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByValue;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByLinkText;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionClassicUI;
-import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
 
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import java.sql.SQLException;
-import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +53,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AddLoginRecordsIT extends SeleniumTestBase
+public class AddLoginRecordsClassicUIIT extends SeleniumTestBase
 {
 	String userNameApple = drApple.firstName + "." + drApple.lastName;
 	String userNameBerry = drBerry.firstName + "." + drBerry.lastName;
@@ -86,7 +83,7 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		databaseUtil.createTestProvider();
 	}
 
-	public String passwordValidation(String passwordInput)
+	public static String passwordValidation(String passwordInput)
 	{
 		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='password']", passwordInput);
 		findWaitClickByXpath(driver, webDriverWait, "//input[@name='subbutton']");
@@ -95,7 +92,7 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		return alertMessage8Symbols;
 	}
 
-	private void addLoginRecord(String password, String providerNo, String pin)///
+	public static void addLoginRecord(String password, String providerNo, String pin)///
 	{
 		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='password']", password);
 		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='conPassword']", password);
@@ -112,7 +109,7 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//input[@name='subbutton']")).click();
 	}
 
-	private void removeExpiryDate(String userName)
+	public void removeExpiryDate(String userName)
 	{
 		Navigation.doLogin(AuthUtils.TEST_USER_NAME, AuthUtils.TEST_PASSWORD, AuthUtils.TEST_PIN,
 			Navigation.getOscarUrl(randomTomcatPort), driver, webDriverWait);
@@ -126,7 +123,7 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		findWaitClickByXpath(driver, webDriverWait, "//input[@name='subbutton']");
 	}
 
-	private void resetPassword(String password, String passwordUpdated)
+	public static void resetPassword(String password, String passwordUpdated)
 	{
 		findWaitSendKeysByXpath(driver, webDriverWait, "//input[@name='oldPassword']", password);
 		driver.findElement(By.xpath("//input[@name='newPassword']")).sendKeys(passwordUpdated);
@@ -181,60 +178,6 @@ public class AddLoginRecordsIT extends SeleniumTestBase
 		//Reset password
 		Navigation.doLogin(userNameApple, password, pin,
 				Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
-				driver, webDriverWait);
-		resetPassword(password, passwordUpdated);
-		Assert.assertTrue(Navigation.isLoggedIn(driver));
-	}
-
-	@Test
-	public void addLoginRecordsJUNOUITest()
-	{
-		String xpathProvider = "(//td[contains(., '" + drBerry.providerNo + "')])";
-		String xpathDropdown = xpathProvider + xpathOption;
-
-		//Assign Roles
-		accessAdministrationSectionClassicUI(driver, webDriverWait, "User Management", "Assign Role to Provider"
-		);
-		assignRoles(xpathDropdown, xpathProvider, "admin", "//following-sibling::td/input[@value='Add']");
-
-		String message = "Role " + roleValue + " is added. (" + drBerry.providerNo + ")";
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//font[contains(., '" + message + "')]")));
-		Assert.assertTrue("Admin is NOT assigned to the provider successfully.",
-				PageUtil.isExistsBy(By.xpath("//font[contains(., '" + message + "')]"), driver));
-
-		Set<String> handles = driver.getWindowHandles();
-		PageUtil.switchToWindow(handles.iterator().next(), driver);
-		accessAdministrationSectionJUNOUI(driver, webDriverWait, "User Management", "Add a Login Record"
-		);
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='user_name']")));
-		driver.findElement(By.xpath("//input[@name='user_name']")).sendKeys(userNameBerry);
-
-		//password validation
-		String alertMessage8Symbols = passwordValidation("1234");
-		Assert.assertEquals(message8SymbolsExpected, alertMessage8Symbols);
-		driver.switchTo().alert().accept();
-		String alertMessageContent = passwordValidation("12345678");
-		Assert.assertEquals(messageContentExpected, alertMessageContent);
-		driver.switchTo().alert().accept();
-		String alertMessageContent1 = passwordValidation("1@345678");
-		Assert.assertEquals(messageContentExpected, alertMessageContent1);
-		driver.switchTo().alert().accept();
-
-		//Account expired.
-		addLoginRecord(password, drBerry.providerNo, pin);
-		Navigation.doLogin(userNameBerry, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver,
-			webDriverWait);
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//p[contains(., 'Your account is expired. Please contact your administrator.')]")));
-		Assert.assertTrue(PageUtil.isExistsBy(By.xpath("//p[contains(., 'Your account is expired. Please contact your administrator.')]"), driver));
-
-		//Remove Expiry date.
-		removeExpiryDate(userNameBerry);
-		Navigation.doLogin(userNameBerry, password, pin, Navigation.getOscarUrl(randomTomcatPort), driver,
-			webDriverWait);
-		Assert.assertTrue(Navigation.isLoggedIn(driver));
-
-		//Reset password
-		Navigation.doLogin(userNameBerry, password, pin, Navigation.getOscarUrl(Integer.toString(randomTomcatPort)),
 				driver, webDriverWait);
 		resetPassword(password, passwordUpdated);
 		Assert.assertTrue(Navigation.isLoggedIn(driver));

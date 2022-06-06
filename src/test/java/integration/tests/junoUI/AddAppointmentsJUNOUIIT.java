@@ -21,9 +21,9 @@
  * Canada
  */
 
-package integration.tests;
+package integration.tests.junoUI;
 
-import static integration.tests.AddPatientsIT.mom;
+import static integration.tests.classicUI.AddPatientsClassicUIIT.mom;
 import static integration.tests.util.data.SiteTestCollection.siteNames;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClick;
@@ -32,6 +32,7 @@ import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByI
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessAdministrationSectionJUNOUI;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
+import integration.tests.classicUI.AddGroupClassicUIIT;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.seleniumUtil.ActionUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
@@ -222,7 +223,7 @@ public class AddAppointmentsJUNOUIIT extends SeleniumTestBase
 		String testGroup = "TestGroup";
 		accessAdministrationSectionJUNOUI(driver, webDriverWait, "Schedule Management", "Add a Group"
 		);
-		AddGroupIT addGroupIT = new AddGroupIT();
+		AddGroupClassicUIIT addGroupIT = new AddGroupClassicUIIT();
 		addGroupIT.addGroup(testGroup, 2);
 		driver.switchTo().defaultContent();
 		findWaitClick(driver, webDriverWait, By.linkText("Schedule"));

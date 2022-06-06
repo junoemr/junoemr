@@ -21,9 +21,7 @@
  * Canada
  */
 
-package integration.tests;
-
-import static integration.tests.util.junoUtil.Navigation.SUMMARY_URL;
+package integration.tests.classicUI;
 
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
@@ -48,7 +46,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = WebEnvironment.DEFINED_PORT)
-public class EditEncounterNotesIT extends SeleniumTestBase
+public class EditEncounterNotesClassicUIIT extends SeleniumTestBase
 {
 	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" +
 		AuthUtils.TEST_PROVIDER_ID +
@@ -94,30 +92,5 @@ public class EditEncounterNotesIT extends SeleniumTestBase
 		String text = driver.findElement(By.xpath(caseNoteXpath)).getText();
 
 		Assert.assertTrue("Edited Note is NOT saved", Pattern.compile(editedNote).matcher(text).find());
-	}
-
-	@Test
-	public void editEncounterNotesJUNOUITest()
-	{
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + SUMMARY_URL);
-
-		String newNote = "Testing Note JUNO";
-		String editedNote = "Edited Testing Note JUNO";
-		ActionUtil.findWaitClickById(driver, webDriverWait,"note-editor-header");//add this step to make sure the encounter note editor is get focus
-		ActionUtil.findWaitSendKeysById(driver, webDriverWait, "noteEditor1", newNote);
-		ActionUtil.findWaitClickById(driver, webDriverWait,"theSave");
-		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@ng-click='$ctrl.editButtonClick()']");
-
-		String noteId = "noteEditor1";
-		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id(noteId)));
-		driver.findElement(By.id(noteId)).clear();
-		driver.findElement(By.id(noteId)).sendKeys(editedNote);
-		ActionUtil.findWaitClickById(driver, webDriverWait, "theSave");
-
-		String noteXpath = "//div[@class='row note-body']";
-		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(noteXpath)));
-		String text = driver.findElement(By.xpath(noteXpath)).getText();
-
-		Assert.assertTrue("Edited Note is NOT saved in JUNO UI", Pattern.compile(editedNote).matcher(text).find());
 	}
 }
