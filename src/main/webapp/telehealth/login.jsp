@@ -1,4 +1,6 @@
-<%@ page import="oscar.OscarProperties" %><%--
+<%@ page import="oscar.OscarProperties" %>
+<%@ page import="org.oscarehr.config.JunoProperties" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %><%--
 
     Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
     This software is published under the GPL GNU General Public License.
@@ -25,9 +27,10 @@
 <%
     String email = request.getParameter("email") == null ? "" : request.getParameter("email");
     OscarProperties oscarProps = OscarProperties.getInstance();
+	JunoProperties junoProps = SpringUtils.getBean(JunoProperties.class);
 
     String MHA_PROTOCOL = oscarProps.getProperty("myhealthaccess_protocol");
-    String MHA_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
+    String MHA_DOMAIN = junoProps.getMyhealthaccess().getMyhealthaccessDomain();
     String MHA_ENDPOINT = "/clinic_users/password/new";
 
     String passwordResetPathURL = MHA_PROTOCOL + "://" + MHA_DOMAIN + MHA_ENDPOINT;

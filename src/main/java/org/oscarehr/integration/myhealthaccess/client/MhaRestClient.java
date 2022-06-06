@@ -22,7 +22,9 @@
  */
 package org.oscarehr.integration.myhealthaccess.client;
 
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.integration.model.Integration;
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 
 import java.net.URI;
@@ -30,6 +32,9 @@ import java.net.URISyntaxException;
 
 public class MhaRestClient extends RestClientBase
 {
+	private static final JunoProperties junoProps = SpringUtils.getBean(JunoProperties.class);
+	JunoProperties.Myhealthaccess mhaConfig = junoProps.getMyhealthaccess();
+
 	//==========================================================================
 	// Public Methods
 	//==========================================================================
@@ -47,7 +52,7 @@ public class MhaRestClient extends RestClientBase
 		{
 			return new URI(
 					oscarProps.getProperty("myhealthaccess_protocol"),
-					oscarProps.getProperty("myhealthaccess_domain"),
+					mhaConfig.getMyhealthaccessDomain(),
 					oscarProps.getProperty("myhealthaccess_api_uri"),
 					"");
 		}
@@ -65,7 +70,7 @@ public class MhaRestClient extends RestClientBase
 		{
 			return new URI(
 					oscarProps.getProperty("myhealthaccess_protocol"),
-					oscarProps.getProperty("myhealthaccess_domain"),
+					mhaConfig.getMyhealthaccessDomain(),
 					null,
 					null);
 		}

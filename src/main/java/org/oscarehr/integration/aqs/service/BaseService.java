@@ -28,7 +28,11 @@ import ca.cloudpractice.aqs.client.api.AdminApi;
 import ca.cloudpractice.aqs.client.api.OrganizationApi;
 import ca.cloudpractice.aqs.client.auth.ApiKeyAuth;
 import ca.cloudpractice.aqs.client.model.RemoteUserType;
+import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.UserPropertyDAO;
+import org.oscarehr.config.JunoProperties;
+import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -39,9 +43,12 @@ import static org.oscarehr.common.model.UserProperty.AQS_INTEGRATION_ORGANIZATIO
 @Service
 public abstract class BaseService extends org.oscarehr.integration.BaseService
 {
+	private static Logger logger = MiscUtils.getLogger();
+	private static final JunoProperties junoProps = SpringUtils.getBean(JunoProperties.class);
+
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
 	protected final String AQS_PROTOCOL = oscarProps.getProperty("aqs_protocol");
-	protected final String AQS_DOMAIN = oscarProps.getProperty("aqs_domain");
+	protected final String AQS_DOMAIN = junoProps.getAqs().getAqsDomain();
 	protected final String BASE_API_URI = oscarProps.getProperty("aqs_api_uri");
 	protected final String BASE_END_POINT = AQS_DOMAIN + BASE_API_URI;
 
