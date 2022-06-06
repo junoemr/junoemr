@@ -27,11 +27,13 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.datatype.CX;
 import ca.uhn.hl7v2.model.v23.message.MDM_T11;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.parsers.messageTypes.MDM_T11MessageHandler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 {
@@ -157,6 +159,45 @@ public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 	public Hl7TextInfo.REPORT_STATUS getJunoOrderStatus()
 	{
 		return Hl7TextInfo.REPORT_STATUS.X;
+	}
+
+	@Override
+	public String getCCDocs()
+	{
+		try
+		{
+			return String.join(", ", getCCDocNames());
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected List<String> getCCDocNames() throws HL7Exception
+	{
+		List<String> docNames = new ArrayList<>();
+		int txa_23Count = getFieldReps("/.TXA", 23);
+		for(int k = 0; k < txa_23Count; k++)
+		{
+			String docName = getResultCopiesTo(0, k);
+			if(StringUtils.isNotBlank(docName))
+			{
+				docNames.add(docName);
+			}
+		}
+
+		// add pv1 provider to cc docs
+		int pd1_4Count = getFieldReps("/.PD1", 4);
+		for(int k = 0; k < pd1_4Count; k++)
+		{
+			String docName = getFullDocName("/.PD1", 4, k);
+			if(StringUtils.isNotBlank(docName))
+			{
+				docNames.add(docName);
+			}
+		}
+		return docNames;
 	}
 
 

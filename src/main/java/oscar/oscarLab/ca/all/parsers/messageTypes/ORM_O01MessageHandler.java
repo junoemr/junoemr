@@ -238,29 +238,13 @@ public abstract class ORM_O01MessageHandler extends MessageHandler
 	@Override
 	protected String getOrderingProvider(int i, int k) throws HL7Exception
 	{
-		String familyName = getString(get("/.ORDER("+i+")/ORDER_DETAIL/OBR-16("+k+")-2"));
-		String givenName = getString(get("/.ORDER("+i+")/ORDER_DETAIL/OBR-16("+k+")-3"));
-		String middleName = getString(get("/.ORDER("+i+")/ORDER_DETAIL/OBR-16("+k+")-4"));
-		String suffix = getString(get("/.ORDER("+i+")/ORDER_DETAIL/OBR-16("+k+")-5"));
-		String prefix = getString(get("/.ORDER("+i+")/ORDER_DETAIL/OBR-16("+k+")-6"));
-		String degree = getString(get("/.ORDER("+i+")/ORDER_DETAIL/OBR-16("+k+")-7"));
-
-		String fullName = prefix + " " + givenName + " " + middleName + " " + familyName + " " + suffix + " " + degree;
-		return fullName.trim().replaceAll("\\s+", " ");
+		return getFullDocName("/.ORDER("+i+")/ORDER_DETAIL/OBR", 16, k);
 	}
 
 	@Override
 	protected String getResultCopiesTo(int i, int k) throws HL7Exception
 	{
-		String familyName = getString(get("/.ORDER("+i+")/ORDER_DETAIL/OBR-28("+k+")-2"));
-		String givenName = getString(get("/.ORDER("+i+")/ORDER_DETAIL/OBR-28("+k+")-3"));
-		String middleName = getString(get("/.ORDER("+i+")/ORDER_DETAIL/OBR-28("+k+")-4"));
-		String suffix = getString(get("/.ORDER("+i+")/ORDER_DETAIL/OBR-28("+k+")-5"));
-		String prefix = getString(get("/.ORDER("+i+")/ORDER_DETAIL/OBR-28("+k+")-6"));
-		String degree = getString(get("/.ORDER("+i+")/ORDER_DETAIL/OBR-28("+k+")-7"));
-
-		String fullName = prefix + " " + givenName + " " + middleName + " " + familyName + " " + suffix + " " + degree;
-		return fullName.trim().replaceAll("\\s+", " ");
+		return getFullDocName("/.ORDER("+i+")/ORDER_DETAIL/OBR", 28, k);
 	}
 
 	@Override

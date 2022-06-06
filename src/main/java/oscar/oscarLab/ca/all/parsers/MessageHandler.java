@@ -1326,8 +1326,12 @@ public abstract class MessageHandler
 	 */
 	protected int getFieldReps(String path, int field) throws HL7Exception
 	{
-		Segment segment = terser.getSegment(path);
-		return segment.getField(field).length;
+		if(isComponentPresent(path + "-" + field))
+		{
+			Segment segment = terser.getSegment(path);
+			return segment.getField(field).length;
+		}
+		return 0;
 	}
 
 	/**
@@ -1478,7 +1482,7 @@ public abstract class MessageHandler
 		String degree = getString(get(basePath + "-7"));
 
 		String fullName = String.join(" ", prefix, givenName, middleName, familyName, suffix, degree).trim().replaceAll("\\s+", " ");
-		logger.info("getFullDocName -> " + basePath + ": " + fullName);
+		logger.debug("getFullDocName -> " + basePath + ": " + fullName);
 		return fullName;
 	}
 

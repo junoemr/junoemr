@@ -235,54 +235,43 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	@Override
 	public String getCCDocs()
 	{
-		return String.join(", ", getCCDocNames());
+		try
+		{
+			return String.join(", ", getCCDocNames());
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 
-	protected List<String> getCCDocNames()
+	protected List<String> getCCDocNames() throws HL7Exception
 	{
 		List<String> docNames = new ArrayList<>();
-		int obr = 0;
-		int subCount = getReps("ORDER_OBSERVATION", obr, "OBR-28");
-		for(int k = 0; k < subCount; k++)
+		for(int i = 0; i < getOBRCount(); i++)
 		{
-//			docNames.add(getFullDocName("ORDER_OBSERVATION", obr, "OBR-28", k, ""));
+			int obr_28Count = getFieldReps("/.ORDER_OBSERVATION(" + i + ")/OBR", 28);
+			for(int k = 0; k < obr_28Count; k++)
+			{
+				String docName = getResultCopiesTo(0, k);
+				if(StringUtils.isNotBlank(docName))
+				{
+					docNames.add(docName);
+				}
+			}
 		}
 
 		// add pv1 provider to cc docs
-		String pv1ProviderNo = getString(get("/.PD1-4"));
-		if(StringUtils.isNotBlank(pv1ProviderNo))
+		int pd1_4Count = getFieldReps("/.PD1", 4);
+		for(int k = 0; k < pd1_4Count; k++)
 		{
-			String familyName = getString(get("/.PD1-4-2"));
-			String givenName = getString(get("/.PD1-4-3"));
-			String middleName = getString(get("/.PD1-4-4"));
-			String suffix = getString(get("/.PD1-4-5"));
-			String prefix = getString(get("/.PD1-4-6"));
-			String degree = getString(get("/.PD1-4-7"));
-
-			String fullName = String.join(" ", prefix, givenName, middleName, familyName, suffix, degree).trim().replaceAll("\\s+", " ");
-			docNames.add(fullName);
+			String docName = getFullDocName("/.PD1", 4, k);
+			if(StringUtils.isNotBlank(docName))
+			{
+				docNames.add(docName);
+			}
 		}
 		return docNames;
-	}
-
-	/**
-	 * invalid for connect care as one result may contain multiple cc providers in multiple fields
-	 * rely on getCCDocs list results instead
-	 */
-	@Override
-	protected String getResultCopiesTo(int i, int k)
-	{
-		throw new IllegalStateException("Not valid for ConnectCare");
-	}
-
-	/**
-	 * invalid for connect care as one result may contain multiple cc providers in multiple fields
-	 * rely on getDocNums list results instead
-	 */
-	@Override
-	protected String getResultCopiesToProviderNo(int i, int k)
-	{
-		throw new IllegalStateException("Not valid for ConnectCare");
 	}
 
 	/* ===================================== OBX ====================================== */
