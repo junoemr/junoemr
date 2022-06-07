@@ -33,7 +33,7 @@ import java.net.URISyntaxException;
 public class CloudMdRestClient extends RestClientBase
 {
 	private static final JunoProperties junoProps = SpringUtils.getBean(JunoProperties.class);
-	JunoProperties.Myhealthaccess cloudmdConfig = junoProps.getMyhealthaccess();
+	JunoProperties.Myhealthaccess mhaConfig = junoProps.getMyhealthaccess();
 
 	//==========================================================================
 	// Public Methods
@@ -51,9 +51,9 @@ public class CloudMdRestClient extends RestClientBase
 		try
 		{
 			return new URI(
-					oscarProps.getProperty("myhealthaccess_protocol"),
-					cloudmdConfig.getCloudmdDomain(),
-					oscarProps.getProperty("myhealthaccess_api_uri"),
+					mhaConfig.getMyhealthaccessProtocol(),
+					mhaConfig.getCloudmdDomain(),
+					mhaConfig.getMyhealthaccessApiUri(),
 					"");
 		}
 		catch(URISyntaxException e)
@@ -69,8 +69,8 @@ public class CloudMdRestClient extends RestClientBase
 		try
 		{
 			return new URI(
-					oscarProps.getProperty("myhealthaccess_protocol"),
-					cloudmdConfig.getCloudmdDomain(),
+					mhaConfig.getMyhealthaccessProtocol(),
+					mhaConfig.getCloudmdDomain(),
 					null,
 					null);
 		}

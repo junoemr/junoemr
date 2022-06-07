@@ -125,11 +125,17 @@ public class JunoProperties
 	public static class Aqs
 	{
 		private String aqsDomain;
+		private String aqsProtocol;
+		private String aqsApiUri;
 	}
 
 	@Data
 	public static class Myhealthaccess
 	{
+		private boolean myhealthaccessTelehealthEnabled;
+		private String myhealthaccessProtocol;
+		private boolean myhealthaccessDevMode;
+		private String myhealthaccessApiUri;
 		private String myhealthaccessDomain;
 		private String cloudmdDomain;
 	}

@@ -30,6 +30,7 @@ import org.oscarehr.common.dao.LookupListItemDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.model.LookupList;
 import org.oscarehr.common.model.LookupListItem;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.dataMigration.converter.in.AppointmentModelToDbConverter;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.entity.Demographic;
@@ -116,6 +117,9 @@ public class Appointment
 	@Autowired
 	SiteService siteService;
 
+	@Autowired
+	JunoProperties junoProps;
+
 	private String formatName(String upperFirstName, String upperLastName)
 	{
 		List<String> outputList = new ArrayList<>();
@@ -171,7 +175,7 @@ public class Appointment
 		appointment.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		oscarAppointmentDao.persist(appointment);
 
-		if (OscarProperties.getInstance().isMyHealthAccessEnabled())
+		if (junoProps.getMyhealthaccess().isMyhealthaccessTelehealthEnabled())
 		{
 			Integration integration = integrationService.findMhaIntegration(appointment);
 

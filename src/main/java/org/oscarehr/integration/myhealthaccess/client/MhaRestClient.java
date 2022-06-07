@@ -51,9 +51,9 @@ public class MhaRestClient extends RestClientBase
 		try
 		{
 			return new URI(
-					oscarProps.getProperty("myhealthaccess_protocol"),
+					mhaConfig.getMyhealthaccessProtocol(),
 					mhaConfig.getMyhealthaccessDomain(),
-					oscarProps.getProperty("myhealthaccess_api_uri"),
+					mhaConfig.getMyhealthaccessApiUri(),
 					"");
 		}
 		catch(URISyntaxException e)
@@ -69,7 +69,7 @@ public class MhaRestClient extends RestClientBase
 		try
 		{
 			return new URI(
-					oscarProps.getProperty("myhealthaccess_protocol"),
+					mhaConfig.getMyhealthaccessProtocol(),
 					mhaConfig.getMyhealthaccessDomain(),
 					null,
 					null);

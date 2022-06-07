@@ -29,7 +29,7 @@
     OscarProperties oscarProps = OscarProperties.getInstance();
 	JunoProperties junoProps = SpringUtils.getBean(JunoProperties.class);
 
-    String MHA_PROTOCOL = oscarProps.getProperty("myhealthaccess_protocol");
+    String MHA_PROTOCOL = junoProps.getMyhealthaccess().getMyhealthaccessProtocol();
     String MHA_DOMAIN = junoProps.getMyhealthaccess().getMyhealthaccessDomain();
     String MHA_ENDPOINT = "/clinic_users/password/new";
 
