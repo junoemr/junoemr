@@ -74,7 +74,8 @@ public abstract class MessageHandler
 		TEXT,
 		SUSCEPTIBILITY,
 		STRUCTURED_NUMERIC,
-		PDF
+		PDF,
+		JPEG,
 	}
 
 	/**
@@ -193,6 +194,11 @@ public abstract class MessageHandler
 	protected EmbeddedDocument toEmbeddedPdf(String base64String, int index)
 	{
 		return toEmbeddedDocument(base64String, "application/pdf", "pdf", index, "embedded_pdf");
+	}
+
+	protected EmbeddedDocument toEmbeddedJpeg(String base64String, int index)
+	{
+		return toEmbeddedDocument(base64String, "application/jpeg", "jpg", index, "embedded_jpeg");
 	}
 
 	protected EmbeddedDocument toEmbeddedDocument(String base64String, String mimeType, String extension, int index, String description)
@@ -778,7 +784,25 @@ public abstract class MessageHandler
 	 */
 	public OBX_CONTENT_TYPE getOBXContentType(int i, int j)
 	{
+		if(getOBXValueType(i, j).equals("ED")) // Encapsulated Data type
+		{
+			String docType = getOBXResult(i, j, 2).toUpperCase();
+			switch(docType)
+			{
+				case "PDF": return OBX_CONTENT_TYPE.PDF;
+				case "JPG":
+				case "JPEG": return OBX_CONTENT_TYPE.JPEG;
+				default: return OBX_CONTENT_TYPE.UNKNOWN;
+			}
+		}
 		return OBX_CONTENT_TYPE.TEXT;
+	}
+
+	public boolean isOBXEmbeddedDocument(int i, int j)
+	{
+		OBX_CONTENT_TYPE contentType = getOBXContentType(i, j);
+		return (contentType == OBX_CONTENT_TYPE.JPEG
+				|| contentType == OBX_CONTENT_TYPE.PDF);
 	}
 
 	/**

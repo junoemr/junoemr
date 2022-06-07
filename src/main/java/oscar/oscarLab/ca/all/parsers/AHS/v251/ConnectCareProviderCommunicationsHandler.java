@@ -101,25 +101,4 @@ public class ConnectCareProviderCommunicationsHandler extends MDM_T08_T02Connect
 	{
 		return get("/.OBSERVATION(" + j + ")/OBX-5-5");
 	}
-
-	/**
-	 * check for obx content type
-	 * @param i - ignored
-	 * @param j - obx rep
-	 * @return PDF or UNKNOWN if type is not PDF
-	 */
-	@Override
-	public OBX_CONTENT_TYPE getOBXContentType(int i, int j)
-	{
-		String value = get("/.OBSERVATION(" + j + ")/OBX-5-2");
-		if("PDF".equalsIgnoreCase(value))
-		{
-			return OBX_CONTENT_TYPE.PDF;
-		}
-		else
-		{
-			return OBX_CONTENT_TYPE.UNKNOWN;
-		}
-	}
-
 }

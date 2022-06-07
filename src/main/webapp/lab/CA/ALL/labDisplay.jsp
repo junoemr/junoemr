@@ -1839,7 +1839,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										}
 										else if(isUnstructuredDoc || handler.isOBRUnstructured(j))
 										{
-											if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
+											if (handler.isOBXEmbeddedDocument(i, j))
 											{
 												String obxDocId = "";
 												java.util.regex.Matcher docIdMatcher = Pattern.compile(MessageHandler.pdfReplacement + "(\\d+)").matcher(handler.getOBXResult(j, k));
@@ -1853,7 +1853,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 												%>
 												   <tr>
 													   <td valign="top" align="left" class="NarrativeRes"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a>
-													   <td class="NarrativeRes"> <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../../../dms/ManageDocument.do?method=display&doc_no=<%=obxDocId%>');">Display PDF</a> </td>
+													   <td class="NarrativeRes"> <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../../../dms/ManageDocument.do?method=display&doc_no=<%=obxDocId%>');">Display Document</a> </td>
 												   </tr>
 						   						<%
 												}
@@ -1862,7 +1862,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 												%>
 												   <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>">
 													   <td valign="top" align="middle">
-														   Lab contains a PDF that cannot be displayed. Contact support for more details.
+														   Lab contains a document that cannot be displayed. Contact support for more details.
 													   </td>
 												   </tr>
 											    <%
@@ -2045,7 +2045,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                    			else{//if it isn't a PATHL7 doc%>
                                		<tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>"><%
 
-										   if (handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
+										   if (handler.isOBXEmbeddedDocument(j, k))
 										   {
 										   		String obxDocId = "";
 										   		java.util.regex.Matcher docIdMatcher = Pattern.compile(MessageHandler.pdfReplacement + "(\\d+)").matcher(handler.getOBXResult(j, k));
@@ -2058,7 +2058,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 												{
 												%>
 											   <td valign="top" align="left"><%= obrFlag ? "&nbsp; &nbsp; &nbsp;" : "&nbsp;" %><a href="javascript:popupStart('660','900','../ON/labValues.jsp?testName=<%=obxName%>&demo=<%=demographicID%>&labType=HL7&identifier=<%= URLEncoder.encode(handler.getOBXIdentifier(j, k).replaceAll("&","%26"),"UTF-8") %>')"><%=obxName %></a>
-												   <td> <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../../../dms/ManageDocument.do?method=display&doc_no=<%=obxDocId%>');">Display PDF</a> </td>
+												   <td> <a href="javascript:void(0);" onclick="popupFocusPage('660', '900', '../../../dms/ManageDocument.do?method=display&doc_no=<%=obxDocId%>');">Display Document</a> </td>
 											   </tr>
 											 	<%
 												}
@@ -2067,7 +2067,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 												%>
 											   <tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%="NarrativeRes"%>">
 												   <td valign="top" align="middle">
-													   Lab contains a PDF that cannot be displayed. Contact support for more details.
+													   Lab contains a document that cannot be displayed. Contact support for more details.
 												   </td>
 											   </tr>
 						   						<%

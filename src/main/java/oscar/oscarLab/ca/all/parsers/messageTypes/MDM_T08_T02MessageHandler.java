@@ -355,25 +355,24 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public List<EmbeddedDocument> getEmbeddedDocuments()
 	{
-		List<EmbeddedDocument> embeddedDocuments = new LinkedList<>();
-		String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
-		// Every PDF should be prefixed with this due to b64 encoding of PDF header
-
 		int count = 0;
-		for(int j = 0; j < getOBXCount(0); j++)
+		List<EmbeddedDocument> embeddedDocuments = new LinkedList<>();
+		for(int j=0; j < getOBXCount(0); j++)
 		{
-			if(getOBXValueType(0, j).equals("ED"))
+			String docData = getOBXResult(0, j);
+			switch(getOBXContentType(0, j))
 			{
-				// Some embedded PDFs simply have the lab as-is, some have it split up like above
-				for (int k = 1; k <= referenceStrings.length; k++)
+				case PDF:
 				{
-					String embeddedPdf = getOBXResult(0, j, k);
-					if (embeddedPdf.startsWith(MessageHandler.embeddedPdfPrefix))
-					{
-						logger.info("Found embedded PDF in lab upload, pulling it out");
-						embeddedDocuments.add(toEmbeddedPdf(embeddedPdf, count));
-						count++;
-					}
+					embeddedDocuments.add(toEmbeddedPdf(docData, count));
+					count++;
+					break;
+				}
+				case JPEG:
+				{
+					embeddedDocuments.add(toEmbeddedJpeg(docData, count));
+					count++;
+					break;
 				}
 			}
 		}
@@ -478,7 +477,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXResult(int i, int j, int k)
 	{
-		return getString(get(getObservationOBXPath(j) + "-5-"+k));
+		return getString(get(getObservationOBXPath(j) + "-5-" + k));
 	}
 
 	/**
