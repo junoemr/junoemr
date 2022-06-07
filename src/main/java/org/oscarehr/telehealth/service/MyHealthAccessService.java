@@ -84,7 +84,7 @@ public class MyHealthAccessService
 
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
 	protected static final String MHA_DOMAIN = junoProps.getMyhealthaccess().getMyhealthaccessDomain();
-	protected static final String CLOUD_MD_DOMAIN = junoProps.getCloudmd().getCloudmdDomain();
+	protected static final String CLOUD_MD_DOMAIN = junoProps.getMyhealthaccess().getCloudmdDomain();
 	public static final String MHA_HOME_URL = "/clinic/home";
 	public static final String MHA_BASE_TELEHEALTH_URL = "/patient/#/clinic/%s/telehealth/appointment/%s";
 	public static final String MHA_BASE_AQS_TELEHEALTH_URL = "/patient/#/clinic_user/aqs/queue/%s/queued_appointment/%s/session";
