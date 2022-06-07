@@ -179,36 +179,4 @@ public class AddPatientsClassicUIIT extends SeleniumTestBase
 				By.xpath("//input[@class='wideInput']"),
 				By.xpath("//tr[@class='odd']")));
 	}
-
-	@Test
-	public void addPatientsJUNOUITest()
-	{
-		// open JUNO UI page
-		driver.findElement(By.xpath("//img[@title=\"Go to Juno UI\"]")).click();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@title=\"Add a new Patient\"]")));
-
-		// Add a demographic record page
-		driver.findElement(By.xpath("//button[@title=\"Add a new Patient\"]")).click();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//juno-input[@label='Last Name']//input")));
-		driver.findElement(By.xpath("//juno-input[@label='Last Name']//input")).sendKeys(son.lastName);
-		driver.findElement(By.xpath("//juno-input[@label='First Name']//input")).sendKeys(son.firstName);
-		dropdownSelectByValue(driver, webDriverWait, By.xpath("//juno-select[@label='Gender']//select"), "string:" + son.sex);
-		driver.findElement(By.id("input-dob")).sendKeys(son.dobYear + "-" + son.dobMonth + "-" + son.dobDate);
-		dropdownSelectByValue(driver, webDriverWait, By.xpath("//juno-select-text[@label='Health Insurance Number']//select"), "string:" + son.hcType);
-		driver.findElement(By.xpath("//input[@class='ng-pristine ng-untouched ng-valid ng-empty']")).sendKeys(son.hin);
-		driver.findElement(By.xpath("//juno-input[@label='Address']//input")).sendKeys(son.address);
-		driver.findElement(By.xpath("//juno-input[@label='City']//input")).sendKeys(son.city);
-		dropdownSelectByValue(driver, webDriverWait, By.xpath("//juno-select[@label='Province']//select"), "string:" + son.province);
-		driver.findElement(By.xpath("//juno-input[@label='Postal Code']//input")).sendKeys(son.postal);
-		driver.findElement(By.xpath("//juno-input[@label='Email']//input")).sendKeys(son.email);
-		dropdownSelectByValue(driver, webDriverWait, By.xpath("//juno-select-text[@label='Preferred Phone']//select"), "string:" + son.preferredPhone);
-		driver.findElement(By.xpath("//juno-select-text[@label='Preferred Phone']//input")).sendKeys(son.homePhone);
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//juno-button[@click='$ctrl.onAdd()']")));
-		driver.findElement(By.xpath("//juno-button[@click='$ctrl.onAdd()']")).click();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(".//h4[contains(.,'Demographic')]")));
-		Assert.assertTrue("Demographic is NOT added successfully.", isPatientAdded(son.lastName, son.firstName,
-				By.xpath("//i[@class='icon icon-user-search']"),
-				By.xpath("//input[@ng-model='$ctrl.search.term']"),
-				By.xpath("//td[contains(., son.lastName)]")));
-	}
 }

@@ -29,7 +29,7 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVal
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
-import integration.tests.classicUI.AddAppointmentsIT;
+import integration.tests.classicUI.AddAppointmentsClassicUIIT;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.AppointmentUtil;
 import integration.tests.util.seleniumUtil.PageUtil;
@@ -86,7 +86,7 @@ public class ChangeAppointmentStatusJUNOUIIT extends SeleniumTestBase
 		driver.findElement(By.xpath(viewNextDaySelector)).click();
 
 		String currWindowHandle = driver.getWindowHandle();
-		AddAppointmentsIT addAppointmentsTests = new AddAppointmentsIT();
+		AddAppointmentsClassicUIIT addAppointmentsTests = new AddAppointmentsClassicUIIT();
 		addAppointmentsTests.addAppointmentsSchedulePage("10:00", currWindowHandle, mom.firstName);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(mom.lastName)));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",

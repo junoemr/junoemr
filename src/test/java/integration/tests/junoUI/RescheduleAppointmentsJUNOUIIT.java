@@ -29,7 +29,7 @@ import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVis
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
 import static integration.tests.util.seleniumUtil.SectionAccessUtil.accessSectionJUNOUI;
 
-import integration.tests.classicUI.AddAppointmentsIT;
+import integration.tests.classicUI.AddAppointmentsClassicUIIT;
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.AppointmentUtil;
 import integration.tests.util.seleniumUtil.ActionUtil;
@@ -80,7 +80,6 @@ public class RescheduleAppointmentsJUNOUIIT extends SeleniumTestBase
 
     @Test
     public void rescheduleAppointmentTestsJUNOUI()
-            throws InterruptedException
     {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEEE MMM d");
 		LocalDate dateToday = LocalDate.now();
@@ -90,7 +89,7 @@ public class RescheduleAppointmentsJUNOUIIT extends SeleniumTestBase
 		// Add an appointment at 10:00-10:15 with demographic selected for the day after tomorrow.
         driver.findElement(By.xpath("//img[@alt='View Next DAY']")).click();
         String currWindowHandle = driver.getWindowHandle();
-        AddAppointmentsIT addAppointmentsTests = new AddAppointmentsIT();
+        AddAppointmentsClassicUIIT addAppointmentsTests = new AddAppointmentsClassicUIIT();
         addAppointmentsTests.addAppointmentsSchedulePage("10:00", currWindowHandle, mom.firstName);
         webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(mom.lastName)));
         Assert.assertTrue("Appointments is NOT added successfully.",

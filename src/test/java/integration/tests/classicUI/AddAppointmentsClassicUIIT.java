@@ -63,7 +63,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AddAppointmentsIT extends SeleniumTestBase
+public class AddAppointmentsClassicUIIT extends SeleniumTestBase
 {
 	@Override
 	protected String[] getTablesToRestore()

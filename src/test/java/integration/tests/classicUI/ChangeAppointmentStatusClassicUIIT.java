@@ -93,7 +93,7 @@ public class ChangeAppointmentStatusClassicUIIT extends SeleniumTestBase
 	{
 		// Add an appointment at 9:00-9:15 with demographic selected for tomorrow.
 		String currWindowHandle = driver.getWindowHandle();
-		AddAppointmentsIT addAppointmentsTests = new AddAppointmentsIT();
+		AddAppointmentsClassicUIIT addAppointmentsTests = new AddAppointmentsClassicUIIT();
 		addAppointmentsTests.addAppointmentsSchedulePage("09:00", currWindowHandle, mom.firstName);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(mom.lastName)));
 		Assert.assertTrue("Appointment with demographic selected is NOT added successfully.",
