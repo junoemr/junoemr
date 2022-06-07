@@ -69,7 +69,8 @@ public abstract class MessageHandler
 	public static final String embeddedPdfPrefix = "JVBERi0xLj";
 	public static final String pdfReplacement = "embedded_doc_id_";
 
-	public enum OBX_CONTENT_TYPE {
+	public enum ObxContentType
+	{
 		UNKNOWN,
 		TEXT,
 		SUSCEPTIBILITY,
@@ -782,27 +783,27 @@ public abstract class MessageHandler
 	 * @param j - obx rep
 	 * @return - the content type of this obx segment
 	 */
-	public OBX_CONTENT_TYPE getOBXContentType(int i, int j)
+	public ObxContentType getOBXContentType(int i, int j)
 	{
 		if(getOBXValueType(i, j).equals("ED")) // Encapsulated Data type
 		{
 			String docType = getOBXResult(i, j, 2).toUpperCase();
 			switch(docType)
 			{
-				case "PDF": return OBX_CONTENT_TYPE.PDF;
+				case "PDF": return ObxContentType.PDF;
 				case "JPG":
-				case "JPEG": return OBX_CONTENT_TYPE.JPEG;
-				default: return OBX_CONTENT_TYPE.UNKNOWN;
+				case "JPEG": return ObxContentType.JPEG;
+				default: return ObxContentType.UNKNOWN;
 			}
 		}
-		return OBX_CONTENT_TYPE.TEXT;
+		return ObxContentType.TEXT;
 	}
 
 	public boolean isOBXEmbeddedDocument(int i, int j)
 	{
-		OBX_CONTENT_TYPE contentType = getOBXContentType(i, j);
-		return (contentType == OBX_CONTENT_TYPE.JPEG
-				|| contentType == OBX_CONTENT_TYPE.PDF);
+		ObxContentType contentType = getOBXContentType(i, j);
+		return (contentType == ObxContentType.JPEG
+				|| contentType == ObxContentType.PDF);
 	}
 
 	/**

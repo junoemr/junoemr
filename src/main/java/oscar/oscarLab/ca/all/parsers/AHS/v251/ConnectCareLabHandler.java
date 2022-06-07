@@ -215,15 +215,15 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	@Override
 	public String getOBXResult(int i, int j)
 	{
-		if (getOBXContentType(i, j) == OBX_CONTENT_TYPE.PDF)
+		if (getOBXContentType(i, j) == ObxContentType.PDF)
 		{
 			return getOBXResult(i, j, 5);
 		}
-		else if (getOBXContentType(i, j) == OBX_CONTENT_TYPE.SUSCEPTIBILITY)
+		else if (getOBXContentType(i, j) == ObxContentType.SUSCEPTIBILITY)
 		{
 			return getString(super.getOBXName(i, j) + ": " + getOBXAbnormalFlag(i, j));
 		}
-		else if (getOBXContentType(i, j) == OBX_CONTENT_TYPE.STRUCTURED_NUMERIC)
+		else if (getOBXContentType(i, j) == ObxContentType.STRUCTURED_NUMERIC)
 		{
 			return getOBXResult(i, j, 1) + getOBXResult(i, j, 2) + getOBXResult(i, j, 3) + getOBXResult(i, j, 4);
 		}
@@ -244,25 +244,25 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	 * @return TEXT, SUSCEPTIBILITY OR PDF
 	 */
 	@Override
-	public OBX_CONTENT_TYPE getOBXContentType(int i, int j)
+	public ObxContentType getOBXContentType(int i, int j)
 	{
 		if(getOBXValueType(i, j).equals("ED"))
 		{
 			if (getOBXResult(i, j, 2).equals("PDF"))
 			{
-				return OBX_CONTENT_TYPE.PDF;
+				return ObxContentType.PDF;
 			}
 		}
 		else if (getOBXValueType(i, j).equals("SN"))
 		{
-			return OBX_CONTENT_TYPE.STRUCTURED_NUMERIC;
+			return ObxContentType.STRUCTURED_NUMERIC;
 		}
 		else if (isOBRSusceptibility(i))
 		{
-			return OBX_CONTENT_TYPE.SUSCEPTIBILITY;
+			return ObxContentType.SUSCEPTIBILITY;
 		}
 
-		return OBX_CONTENT_TYPE.TEXT;
+		return ObxContentType.TEXT;
 	}
 
 	/**

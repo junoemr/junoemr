@@ -835,18 +835,21 @@ public class PATHL7Handler extends ORU_R01MessageHandler
 		// Every PDF should be prefixed with this due to b64 encoding of PDF header
 
 		int count = 0;
-		for(int j = 0; j < getOBXCount(0); j++)
+		for(int i = 0; i < getOBRCount(); i++)
 		{
-			if(getOBXValueType(0, j).equals("ED"))
+			for(int j = 0; j < getOBXCount(i); j++)
 			{
-				// Some embedded PDFs simply have the lab as-is, some have it split up like above
-				for (int k = 1; k <= referenceStrings.length; k++)
+				if(getOBXValueType(i, j).equals("ED"))
 				{
-					String embeddedPdf = getOBXResult(0, j, k);
-					if (embeddedPdf.startsWith(MessageHandler.embeddedPdfPrefix))
+					// Some embedded PDFs simply have the lab as-is, some have it split up like above
+					for(int k = 1; k <= referenceStrings.length; k++)
 					{
-						embeddedDocuments.add(toEmbeddedPdf(embeddedPdf, count));
-						count++;
+						String embeddedPdf = getOBXResult(i, j, k);
+						if(embeddedPdf.startsWith(MessageHandler.embeddedPdfPrefix))
+						{
+							embeddedDocuments.add(toEmbeddedPdf(embeddedPdf, count));
+							count++;
+						}
 					}
 				}
 			}

@@ -1908,7 +1908,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 										    	String disclaimer = "<br>IMPORTANT DISCLAIMER: You are viewing a PREVIEW of the original report. The rich text formatting contained in the original report may convey critical information that must be considered for clinical decision making. Please refer to the ORIGINAL report, by clicking 'Print', prior to making any decision on diagnosis or treatment.";%>
 										    	<td align="left"><%= rtfText + disclaimer %></td><%
 											}
-											else if (handler.getMsgType().equals("CCLAB") && handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.TEXT)
+											else if (handler.getMsgType().equals("CCLAB") && handler.getOBXContentType(j, k) == MessageHandler.ObxContentType.TEXT)
 											{
 												String abnormalFlag = handler.getOBXAbnormalFlag(j, k);
 												if (handler.isOBXAbnormal(j, k))

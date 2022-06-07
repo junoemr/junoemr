@@ -107,15 +107,15 @@ public class ConnectCareDocumentationEditHandler extends MDM_T08_T02ConnectCareH
 	 * @return PDF or UNKNOWN if type is not PDF
 	 */
 	@Override
-	public OBX_CONTENT_TYPE getOBXContentType(int i, int j)
+	public ObxContentType getOBXContentType(int i, int j)
 	{
 		if (get("/.OBX(" + j + ")-5-2") != null && get("/.OBX(" + j + ")-5-2").equals("PDF"))
 		{
-			return OBX_CONTENT_TYPE.PDF;
+			return ObxContentType.PDF;
 		}
 		else
 		{
-			return OBX_CONTENT_TYPE.UNKNOWN;
+			return ObxContentType.UNKNOWN;
 		}
 	}
 }

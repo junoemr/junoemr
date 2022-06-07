@@ -28,7 +28,6 @@ import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import org.apache.commons.lang.StringUtils;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
-import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
 public class ConnectCareCardiologyHandler extends ConnectCareHandler
 {
@@ -85,17 +84,17 @@ public class ConnectCareCardiologyHandler extends ConnectCareHandler
 	 * @return TEXT OR PDF
 	 */
 	@Override
-	public OBX_CONTENT_TYPE getOBXContentType(int i, int j)
+	public ObxContentType getOBXContentType(int i, int j)
 	{
 		if(getOBXValueType(i, j).equals("ED"))
 		{
 			if (getOBXResult(i, j, 2).equals("PDF"))
 			{
-				return OBX_CONTENT_TYPE.PDF;
+				return ObxContentType.PDF;
 			}
 		}
 
-		return OBX_CONTENT_TYPE.TEXT;
+		return ObxContentType.TEXT;
 	}
 
 	/**
@@ -141,7 +140,7 @@ public class ConnectCareCardiologyHandler extends ConnectCareHandler
 	@Override
 	public String getOBXResult(int i, int j)
 	{
-		if (getOBXContentType(i, j) == MessageHandler.OBX_CONTENT_TYPE.PDF)
+		if (getOBXContentType(i, j) == ObxContentType.PDF)
 		{
 			return getOBXResult(i, j, 5);
 		}
