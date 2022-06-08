@@ -28,9 +28,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DownloadAction;
 import org.oscarehr.common.io.GenericFile;
+import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.exception.HrmDocumentException;
 import org.oscarehr.hospitalReportManager.model.HRMDocument;
-import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
@@ -122,9 +122,11 @@ public class HRMDownloadFileAction extends DownloadAction
 	    {
 		    contentType = "text/html";
 	    }
-         
+
+		response.setContentType(contentType);
+		response.setContentLength(binaryContent.length);
         response.setHeader("Content-disposition", 
-                           "attachment; filename=" + fileName);
+                           "inline; filename=" + fileName);
         
         File temp = File.createTempFile("HRMDownloadFile", "." + fileExtension);
         temp.deleteOnExit();
