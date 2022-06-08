@@ -3,6 +3,10 @@
 		h1 {
 			color: var(--color-primary-base);
 		}
+
+		.label-custom-style {
+			--juno-form-label-width: 200px;
+		}
 	}
 	.fax-config-body {
 		.table-text-primary

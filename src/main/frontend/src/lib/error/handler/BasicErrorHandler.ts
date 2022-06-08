@@ -1,5 +1,7 @@
 import {ErrorHandler} from "./ErrorHandler";
 import {LogLevel} from "./LogLevel";
+import GenericError from "../GenericError";
+import BaseError from "../BaseError";
 
 export default class BasicErrorHandler implements ErrorHandler
 {
@@ -33,13 +35,17 @@ export default class BasicErrorHandler implements ErrorHandler
 
 		if(this.rethrow)
 		{
+			if (response instanceof BaseError)
+			{
+				throw response;
+			}
 			if (response && response.data && response.data.error)
 			{
-				throw response.data.error;
+				throw new GenericError(response.data.error);
 			}
 			else
 			{
-				throw response;
+				throw new GenericError(response);
 			}
 		}
 	}
