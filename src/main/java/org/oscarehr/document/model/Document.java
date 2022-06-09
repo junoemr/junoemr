@@ -337,7 +337,7 @@ public class Document extends AbstractModel<Integer> implements Serializable {
         return numberofpages;
     }
 
-    public void setNumberofpages(int numberOfPages) {
+    public void setNumberofpages(Integer numberOfPages) {
         this.numberofpages = numberOfPages;
     }
 

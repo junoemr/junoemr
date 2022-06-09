@@ -135,24 +135,34 @@
 			String docId = curdoc.getDocId();
 
 			String ackFunc;
-			if( skipComment ) {
+			if( skipComment )
+			{
 				ackFunc = "updateStatus('acknowledgeForm_" + docId + "'," + inQueueB + ");";
 			}
-			else {
+			else
+			{
 				ackFunc = "getDocComment('" + docId + "','" + providerNo + "'," + inQueueB + ");";
 			}
 
 			int slash = 0;
 			String contentType = "";
-			if ((slash = curdoc.getContentType().indexOf('/')) != -1) {
+			if ((slash = curdoc.getContentType().indexOf('/')) != -1)
+			{
 				contentType = curdoc.getContentType().substring(slash + 1);
 			}
-			int numOfPage=curdoc.getNumberOfPages();
-			String numOfPageStr="";
-			if(numOfPage==0)
-				numOfPageStr="unknown";
+
+			int numOfPage = curdoc.getNumberofPagesOptional().orElse(0);
+
+			String numOfPageStr = "";
+			if(numOfPage == 0)
+			{
+				numOfPageStr = "unknown";
+			}
 			else
-				numOfPageStr=(new Integer(numOfPage)).toString();
+			{
+				numOfPageStr = String.valueOf(numOfPage);
+			}
+
 			String contextPath = request.getContextPath();
 			String url = contextPath +"/dms/ManageDocument.do?method=viewDocPage&doc_no=" + docId+"&curPage=1&rand=" + Math.random();
 			String url2 = contextPath +"/dms/ManageDocument.do?method=display&doc_no=" + docId;
