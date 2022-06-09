@@ -81,7 +81,6 @@ public class SeleniumTestBase extends DatabaseTestBase
 	@Autowired
 	protected JunoProperties junoProperties;
 
-
 	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 60;
 	public static final Integer WEB_DRIVER_PAGE_LOAD_TIMEOUT = 60;
 	public static final Integer WEB_DRIVER_SCRIPT_TIMEOUT = 60;
