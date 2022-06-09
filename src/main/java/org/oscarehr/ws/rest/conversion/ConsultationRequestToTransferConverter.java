@@ -29,6 +29,10 @@ import org.oscarehr.ws.rest.to.model.ConsultationRequestTo1;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
+
+import java.time.ZoneId;
+import java.util.Optional;
 
 @Component
 public class ConsultationRequestToTransferConverter extends AbstractModelConverter<ConsultationRequest, ConsultationRequestTo1>
@@ -45,7 +49,21 @@ public class ConsultationRequestToTransferConverter extends AbstractModelConvert
 			return null;
 		}
 
-		BeanUtils.copyProperties(request, transfer, "professionalSpecialist");
+		BeanUtils.copyProperties(request, transfer,
+				"professionalSpecialist",
+				"appointmentDate",
+				"appointmentTime",
+				"referralDate",
+				"followUpDate");
+		transfer.setReferralDate(ConversionUtils.toNullableLocalDate(request.getReferralDate()));
+		transfer.setFollowUpDate(ConversionUtils.toNullableLocalDate(request.getFollowUpDate()));
+
+		transfer.setAppointmentDateTime(
+				Optional.ofNullable(request.getAppointmentDateTime())
+						.map(ConversionUtils::toLocalDateTime)
+						.map((localDateTime) -> localDateTime.atZone(ZoneId.systemDefault()))
+						.orElse(null));
+
 		transfer.setProfessionalSpecialist(specialistToTransferConverter.convert(request.getProfessionalSpecialist()));
 		return transfer;
 	}

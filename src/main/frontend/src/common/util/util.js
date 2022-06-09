@@ -134,8 +134,14 @@ Juno.Common.Util.formatMomentDateTime = function formatMomentDateTime(d, format)
 	return d.format(format);
 };
 
-Juno.Common.Util.formatMomentDateTimeNoTimezone = function formatMomentDateTimeNoTimezone(d) {
+Juno.Common.Util.formatMomentDateTimeNoTimezone = function formatMomentDateTimeNoTimezone(d)
+{
 	return d.format(Juno.Common.Util.settings.datetime_no_timezone_format);
+};
+
+Juno.Common.Util.formatZonedMomentDateTime = function formatZonedMomentDateTime(d)
+{
+	return d.format(Juno.Common.Util.settings.datetime_format);
 };
 
 

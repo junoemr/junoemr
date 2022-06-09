@@ -25,17 +25,38 @@
  Ontario, Canada
 
  */
+import {ConsultationApi} from "../../../generated";
+import {API_BASE_PATH} from "../../lib/constants/ApiConstants";
+import ConsultRequestModelConverter from "../../lib/consult/request/converter/ConsultRequestModelConverter";
+import LetterheadToModelConverter from "../../lib/consult/request/converter/LetterheadToModelConverter";
+import ConsultServiceToModelConverter from "../../lib/consult/request/converter/ConsultServiceToModelConverter";
+import moment from "moment";
+import ConsultRequest from "../../lib/consult/request/model/ConsultRequest";
+import Letterhead from "../../lib/consult/request/model/Letterhead";
+import ConsultService from "../../lib/consult/request/model/ConsultService";
+import ConsultRequestToUpdateInputConverter
+	from "../../lib/consult/request/converter/ConsultRequestToUpdateInputConverter";
+
 angular.module("Common.Services").service("consultService", [
 	'$http',
+	'$httpParamSerializer',
 	'$q',
 	'junoHttp',
 	function($http,
+	         $httpParamSerializer,
 	         $q,
 	         junoHttp)
 	{
-		var service = {};
+		const service = this;
 
 		service.apiPath = '../ws/rs/consults/';
+		service.consultationApi = new ConsultationApi($http, $httpParamSerializer, API_BASE_PATH);
+
+		service.consultRequestModelConverter = new ConsultRequestModelConverter();
+		service.consultRequestToUpdateInputConverter = new ConsultRequestToUpdateInputConverter();
+		service.letterheadToModelConverter = new LetterheadToModelConverter();
+		service.consultServiceToModelConverter = new ConsultServiceToModelConverter();
+
 
 		service.searchRequests = function searchRequests(search)
 		{
@@ -79,56 +100,16 @@ angular.module("Common.Services").service("consultService", [
 			return deferred.promise;
 		};
 
-		service.getRequest = function getRequest(requestId)
+		service.getRequest = async (requestId: number): Promise<ConsultRequest> =>
 		{
-			var deferred = $q.defer();
-
-			var config = Juno.Common.ServiceHelper.configHeaders();
-
-			junoHttp.get(service.apiPath + 'getRequest/' + encodeURIComponent(requestId), config).then(
-				function success(results)
-				{
-					if(results.data.referralDate) results.data.referralDate = moment(results.data.referralDate).toDate();
-					if(results.data.appointmentDate) results.data.appointmentDate = moment(results.data.appointmentDate).toDate();
-					if(results.data.followUpDate) results.data.followUpDate = moment(results.data.followUpDate).toDate();
-
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("consultService::getRequest error", errors);
-					deferred.reject(
-						"An error occurred while getting consult request (requestId=" + requestId + ")");
-				});
-
-			return deferred.promise;
+			return service.consultRequestModelConverter.convert(
+				(await service.consultationApi.getRequest(requestId)).data.body);
 		};
-		service.getNewRequest = function getRequest(demographicNo)
+
+		service.getNewRequest = async (demographicNo: number): Promise<ConsultRequest> =>
 		{
-			var deferred = $q.defer();
-
-			var config = Juno.Common.ServiceHelper.configHeaders();
-			config.params = {
-				demographicNo: demographicNo
-			};
-
-			junoHttp.get(service.apiPath + 'getNewRequest', config).then(
-				function success(results)
-				{
-					if(results.data.referralDate) results.data.referralDate = moment(results.data.referralDate).toDate();
-					if(results.data.appointmentDate) results.data.appointmentDate = moment(results.data.appointmentDate).toDate();
-					if(results.data.followUpDate) results.data.followUpDate = moment(results.data.followUpDate).toDate();
-
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("consultService::getNewRequest error", errors);
-					deferred.reject(
-						"An error occurred while getting new consult request");
-				});
-
-			return deferred.promise;
+			return service.consultRequestModelConverter.convert(
+				(await service.consultationApi.getNewRequest(demographicNo)).data.body);
 		};
 
 		service.getRequestAttachments = function getRequestAttachments(
@@ -156,22 +137,16 @@ angular.module("Common.Services").service("consultService", [
 			return deferred.promise;
 		};
 
-		service.saveRequest = function saveRequest(request)
+		service.createRequest = async (request: ConsultRequest): Promise<ConsultRequest> =>
 		{
-			var deferred = $q.defer();
-			junoHttp.post(service.apiPath + 'saveRequest', request).then(
+			let response = await service.consultationApi.saveRequest(service.consultRequestToUpdateInputConverter.convert(request));
+			return service.consultRequestModelConverter.convert(response.data.body);
+		};
 
-				function success(results)
-				{
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("consultService::saveRequest error", error);
-					deferred.reject("An error occurred while fetching consult request after save");
-				});
-
-			return deferred.promise;
+		service.updateRequest = async (request: ConsultRequest): Promise<ConsultRequest> =>
+		{
+			let response = await service.consultationApi.saveRequest(service.consultRequestToUpdateInputConverter.convert(request));
+			return service.consultRequestModelConverter.convert(response.data.body);
 		};
 
 		service.eSendRequest = function eSendRequest(requestId)
@@ -309,25 +284,16 @@ angular.module("Common.Services").service("consultService", [
 			return deferred.promise;
 		};
 
-		service.getLetterheadList = function getLetterheadList()
+		service.getLetterheadList = async (): Promise<Letterhead[]> =>
 		{
-			var deferred = $q.defer();
+			return service.letterheadToModelConverter.convertList(
+				(await service.consultationApi.getLetterheadList()).data.body);
+		}
 
-			var config = Juno.Common.ServiceHelper.configHeaders();
-			junoHttp.get(service.apiPath + 'getLetterheadList', config).then(
-				function success(results)
-				{
-					deferred.resolve(results);
-				},
-				function error(errors)
-				{
-					console.log("consultService::getLetterheadList error", errors);
-					deferred.reject("An error occurred while fetching letterheads");
-				});
-
-			return deferred.promise;
-		};
-
-		return service;
+		service.getServiceList = async (): Promise<ConsultService[]> =>
+		{
+			return service.consultServiceToModelConverter.convertList(
+				(await service.consultationApi.getServiceList()).data.body);
+		}
 	}
 ]);

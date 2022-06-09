@@ -24,7 +24,7 @@ angular.module("Admin.Section.Fax").component('faxConfigurationEditModal', {
 		function ($scope, $uibModal)
 		{
 			const ctrl = this;
-			ctrl.faxAccountService = new FaxAccountService(new ToastErrorHandler());
+			ctrl.faxAccountService = new FaxAccountService(new ToastErrorHandler(true));
 			ctrl.LoadingQueue = new LoadingQueue();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;

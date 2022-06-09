@@ -29,7 +29,7 @@
                         disabled="$ctrl.disabled"
                         component-style="$ctrl.componentStyle"
     >
-        <div ng-class="$ctrl.componentClasses()" class="flex-row justify-content-center align-items-center">
+        <div ng-class="$ctrl.componentClasses()" class="flex-row justify-content-start align-items-center">
             <label ng-if="$ctrl.showValueLabels" class="toggle-value-label">{{$ctrl.toggleFalseValue}}</label>
             <label class="switch">
                 <input id="{{$ctrl.id}}" type="checkbox"

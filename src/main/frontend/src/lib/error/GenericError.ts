@@ -21,6 +21,16 @@
 * Canada
 */
 
-import {SecurityPermissionTransfer} from "../../../generated";
+import BaseError from "./BaseError";
 
-export import SecurityPermissions = SecurityPermissionTransfer.PermissionEnum;
+export default class GenericError extends BaseError
+{
+	// ==========================================================================
+	// Public Methods
+	// ==========================================================================
+
+	constructor(message: string)
+	{
+		super(message);
+	}
+}

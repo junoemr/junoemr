@@ -7,7 +7,7 @@ import ToastErrorHandler from "../../error/handler/ToastErrorHandler";
 export default class RingCentralAccountProvider implements FaxAccountProvider
 {
 	protected faxAccount: FaxAccount;
-	protected faxAccountService = new FaxAccountService(new ToastErrorHandler());
+	protected faxAccountService = new FaxAccountService(new ToastErrorHandler(true));
 
 	constructor(faxAccount: FaxAccount)
 	{

@@ -30,13 +30,14 @@ import {OfficialLanguageType} from "../../lib/demographic/model/OfficialLanguage
 import {RosterTerminationReasonType} from "../../lib/demographic/model/RosterTerminationReasonType";
 import {Province} from "../../lib/constants/Province";
 import {USStateCode} from "../../lib/constants/USStateCode";
+import {JunoSelectOption} from "../../lib/common/junoSelectOption";
 
 angular.module("Common.Services").service("staticDataService", [
 	function()
 	{
-		var service = {};
+		const service = this;
 
-		service.getGenders = function getGenders()
+		service.getGenders = function getGenders(): JunoSelectOption[]
 		{
 			var genders = [];
 			genders.push(
@@ -67,7 +68,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return genders;
 		};
 
-		service.getBillingRegions = function ()
+		service.getBillingRegions = function (): JunoSelectOption[]
 		{
 			let regions = [];
 			regions.push(
@@ -98,7 +99,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return regions;
 		};
 
-		service.getAlbertaTimeRoleModifier = function ()
+		service.getAlbertaTimeRoleModifier = function (): JunoSelectOption[]
 		{
 			let modifiers = [];
 			modifiers.push(
@@ -170,7 +171,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return modifiers;
 		};
 
-		service.getSaskatchewanBillingModes =  function()
+		service.getSaskatchewanBillingModes = function(): JunoSelectOption[]
 		{
 			let billingModes = [];
 			billingModes.push({
@@ -196,7 +197,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return billingModes;
 		};
 
-		service.getSaskatchewanLocationCodes = function ()
+		service.getSaskatchewanLocationCodes = function (): JunoSelectOption[]
 		{
 			let locationCodes = [];
 			locationCodes.push({
@@ -262,7 +263,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return locationCodes;
 		};
 
-		service.getSaskatchewanSubmissionTypes = function()
+		service.getSaskatchewanSubmissionTypes = function(): JunoSelectOption[]
 		{
 			let submissionTypes = [];
 			submissionTypes.push({
@@ -276,7 +277,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return submissionTypes;
 		};
 
-		service.getSaskatchewanCorporationIndicators = function()
+		service.getSaskatchewanCorporationIndicators = function(): JunoSelectOption[]
 		{
 			let corporationIndicators = [];
 			corporationIndicators.push({
@@ -303,7 +304,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return corporationIndicators;
 		};
 
-		service.getOntarioServiceLocationIndicators = function()
+		service.getOntarioServiceLocationIndicators = function(): JunoSelectOption[]
 		{
 			let serviceLocationIndicators = [];
 			serviceLocationIndicators.push({
@@ -353,7 +354,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return serviceLocationIndicators;
 		};
 
-		service.getProviderTypes = function ()
+		service.getProviderTypes = function (): JunoSelectOption[]
 		{
 			var types = [];
 			types.push({
@@ -383,7 +384,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return types;
 		};
 
-		service.getProviderStatuses = function ()
+		service.getProviderStatuses = function (): JunoSelectOption[]
 		{
 			let statuses = [];
 			statuses.push({
@@ -402,7 +403,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return statuses;
 		};
 
-		service.getTitles = function getTitles()
+		service.getTitles = function getTitles(): JunoSelectOption[]
 		{
 			var titles = [];
 			titles.push(
@@ -473,7 +474,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return titles;
 		};
 
-		service.getCanadaProvinces = function getCanadaProvinces()
+		service.getCanadaProvinces = function getCanadaProvinces(): JunoSelectOption[]
 		{
 			var provinces = [];
 			provinces.push(
@@ -544,7 +545,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return provinces;
 		};
 
-		service.getProvinces = function getProvinces()
+		service.getProvinces = function getProvinces(): JunoSelectOption[]
 		{
 			var provinces = [];
 			provinces.push(
@@ -905,7 +906,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return provinces;
 		};
 
-		service.getCountries = function getCountries()
+		service.getCountries = function getCountries(): JunoSelectOption[]
 		{
 			var countries = [];
 			countries.push(
@@ -2146,7 +2147,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return countries;
 		};
 
-		service.getEngFre = function getEngFre()
+		service.getEngFre = function getEngFre(): JunoSelectOption[]
 		{
 			var langs = [];
 			langs.push(
@@ -2167,7 +2168,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return langs;
 		};
 
-		service.getSpokenLanguages = function getSpokenLanguages()
+		service.getSpokenLanguages = function getSpokenLanguages(): JunoSelectOption[]
 		{
 			var langs = [];
 			langs.push(
@@ -4528,7 +4529,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return langs;
 		};
 
-		service.getRosterTerminationReasons = function getRosterTerminationReasons()
+		service.getRosterTerminationReasons = function getRosterTerminationReasons(): JunoSelectOption[]
 		{
 			var reasons = [];
 			reasons.push(
@@ -4684,7 +4685,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return reasons;
 		};
 
-		service.getSecurityQuestions = function getSecurityQuestions()
+		service.getSecurityQuestions = function getSecurityQuestions(): JunoSelectOption[]
 		{
 			var questions = [];
 			questions.push(
@@ -4735,69 +4736,69 @@ angular.module("Common.Services").service("staticDataService", [
 			return questions;
 		};
 
-		service.getConsultUrgencies = function getConsultUrgencies()
+		service.getConsultUrgencies = function getConsultUrgencies(): JunoSelectOption[]
 		{
 			var urgencies = [];
 			urgencies.push(
 			{
 				value: "2",
-				name: "Non-Urgent"
+				label: "Non-Urgent"
 			});
 			urgencies.push(
 			{
 				value: "1",
-				name: "Urgent"
+				label: "Urgent"
 			});
 			urgencies.push(
 			{
 				value: "3",
-				name: "Return"
+				label: "Return"
 			});
 			return urgencies;
 		};
 
-		service.getConsultRequestStatuses = function getConsultRequestStatuses()
+		service.getConsultRequestStatuses = function getConsultRequestStatuses(): JunoSelectOption[]
 		{
 			var statuses = [];
 			statuses.push(
 			{
 				value: "1",
-				name: "Not Complete"
+				label: "Not Complete"
 			});
 			statuses.push(
 			{
 				value: "2",
-				name: "Preliminary Pending Specialist"
+				label: "Preliminary Pending Specialist"
 			});
 			statuses.push(
 			{
 				value: "3",
-				name: "Pending Callback"
+				label: "Pending Callback"
 			});
 			statuses.push(
 			{
 				value: "4",
-				name: "Completed"
+				label: "Completed"
 			});
 			statuses.push(
 			{
 				value: "5",
-				name: "Cancelled"
+				label: "Cancelled"
 			});
 			statuses.push(
 			{
 				value: "6",
-				name: "Appointment Booked"
+				label: "Appointment Booked"
 			});
 			statuses.push(
 			{
 				value: "7",
-				name: "Deleted"
+				label: "Deleted"
 			});
 			return statuses;
 		};
 
-		service.getConsultResponseStatuses = function getConsultResponseStatuses()
+		service.getConsultResponseStatuses = function getConsultResponseStatuses(): JunoSelectOption[]
 		{
 			var statuses = [];
 			statuses.push(
@@ -4838,14 +4839,14 @@ angular.module("Common.Services").service("staticDataService", [
 			return statuses;
 		};
 
-		service.getHours = function getHours()
+		service.getHours = function getHours(): string[]
 		{
 			return ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
 				"13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"
 			];
 		};
 
-		service.getMinutes = function getMinutes()
+		service.getMinutes = function getMinutes(): string[]
 		{
 			return ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
 				"11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
@@ -4856,7 +4857,7 @@ angular.module("Common.Services").service("staticDataService", [
 			];
 		};
 
-		service.getRxInteractionLevels = function getRxInteractionLevels()
+		service.getRxInteractionLevels = function getRxInteractionLevels(): JunoSelectOption[]
 		{
 			var levels = [];
 			levels.push(
@@ -4887,7 +4888,7 @@ angular.module("Common.Services").service("staticDataService", [
 			return levels;
 		};
 
-		service.getAboriginalStatuses = () =>
+		service.getAboriginalStatuses = (): JunoSelectOption[] =>
 		{
 			return [
 				{label: "Yes", value: true},
@@ -4896,7 +4897,7 @@ angular.module("Common.Services").service("staticDataService", [
 			]
 		};
 
-		service.getArchivedChartOptions = () =>
+		service.getArchivedChartOptions = (): JunoSelectOption[] =>
 		{
 			return [
 				{label: "--", value: null},
