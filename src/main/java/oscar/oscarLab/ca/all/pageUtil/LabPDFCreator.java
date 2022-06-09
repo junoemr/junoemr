@@ -78,7 +78,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import static oscar.oscarLab.ca.all.parsers.AHS.v23.AHSRuralHandler.AHS_RURAL_LAB_TYPE;
+import static oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIHandler.CLSDI_MESSAGE_TYPE;
+import static oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler.CLS_MESSAGE_TYPE;
 
 /**
  *
@@ -210,7 +211,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
             throw new DocumentException();
         }
 
-	    this.isTypeCLS = ("CLS".equals(handler.getMsgType()) || "CLSDI".equals(handler.getMsgType()));
+	    this.isTypeCLS = (CLS_MESSAGE_TYPE.equals(handler.getMsgType()) || CLSDI_MESSAGE_TYPE.equals(handler.getMsgType()));
 
         //Create the document we are going to write to
         document = new Document();
@@ -252,6 +253,10 @@ public class LabPDFCreator extends PdfPageEventHelper {
 			ArrayList<String> headers = handler.getHeaders();
 			for (int i = 0; i < headers.size(); i++)
 			{
+				if(handler.isChildOBR(i))
+				{
+					continue;
+				}
 				addLabCategory(headers.get(i), i, null);
 			}
 
@@ -260,6 +265,10 @@ public class LabPDFCreator extends PdfPageEventHelper {
 				ArrayList<String> extraHeaders = extraHandler.getHeaders();
 				for (int i = 0; i < extraHeaders.size(); i++)
 				{
+					if(extraHandler.isChildOBR(i))
+					{
+						continue;
+					}
 					addLabCategory(extraHeaders.get(i), i, extraHandler);
 				}
 			}
@@ -313,7 +322,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 		float[] mainTableWidths;
 		if (isUnstructuredDoc)
 		{
-			if(isTypeCLS)
+			if(handler.showStatusForUnstructured())
 			{
 				mainTableWidths = new float[] { 5f, 10f, 3f, 2f};
 			} else
@@ -381,17 +390,17 @@ public class LabPDFCreator extends PdfPageEventHelper {
 		// table headers
 		if (isUnstructuredDoc)
 		{
+			String dateTimeColumnHeader = "Date/Time Completed";
 			if (isTypeCLS)
 			{
-				String phrase = ("CLSDI".equals(handler.getMsgType())) ? "Exam Date" : "Date/Time Collected";
-				cell.setPhrase(new Phrase(phrase, boldFont));
-				table.addCell(cell);
-				cell.setPhrase(new Phrase("Status", boldFont));
-				table.addCell(cell);
+				dateTimeColumnHeader = (CLSDI_MESSAGE_TYPE.equals(handler.getMsgType())) ? "Exam Date" : "Date/Time Collected";
 			}
-			else
+			cell.setPhrase(new Phrase(dateTimeColumnHeader, boldFont));
+			table.addCell(cell);
+
+			if(handler.showStatusForUnstructured())
 			{
-				cell.setPhrase(new Phrase("Date/Time Completed", boldFont));
+				cell.setPhrase(new Phrase("Status", boldFont));
 				table.addCell(cell);
 			}
 		}
@@ -405,7 +414,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 			table.addCell(cell);
 			if (isTypeCLS)
 			{
-				String phrase = ("CLSDI".equals(handler.getMsgType())) ? "Exam Date" : "Date/Time Collected";
+				String phrase = (CLSDI_MESSAGE_TYPE.equals(handler.getMsgType())) ? "Exam Date" : "Date/Time Collected";
 				cell.setPhrase(new Phrase(phrase, boldFont));
 			}
 			else
@@ -510,31 +519,17 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								if ((k > 0 && handler.getOBXIdentifier(j, k).equalsIgnoreCase(handler.getOBXIdentifier(j, k-1)) && (obxCount>1)))
 								{
 									cell.setPhrase(new Phrase("", lineFont));
-									table.addCell(cell);
 								}
 								else
 								{
 									cell.setPhrase(new Phrase((obrFlag ? "   " : "")+ obxName, lineFont));
-									table.addCell(cell);
 								}
+								table.addCell(cell);
 
 								String result = handler.getOBXResult( j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0");
 								if (!abnormalFlag.equals("N") && handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.TEXT && "CCLAB".equals(handler.getMsgType()))
 								{
 									cell.setPhrase(new Phrase(result + "(" + abnormalFlag + ")", lineFont));
-								}
-								if(AHS_RURAL_LAB_TYPE.equals(handler.getMsgType()))
-								{
-									String resultPhrase = result;
-									if(StringUtils.isBlank(resultPhrase))
-									{
-										resultPhrase = abnormalFlag;
-									}
-									else if(StringUtils.isNotBlank(abnormalFlag))
-									{
-										resultPhrase += " (" + abnormalFlag + ")";
-									}
-									cell.setPhrase(new Phrase(resultPhrase, lineFont));
 								}
 								else
 								{
@@ -543,20 +538,48 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								table.addCell(cell);
 								cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 								//if there are duplicate Times, display only the first 
-								if(handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, k-1)) && (obxCount>1))
+								if(k > 0 && handler.getTimeStamp(j, k).equals(handler.getTimeStamp(j, k-1)) && (obxCount>1))
 								{
 									cell.setPhrase(new Phrase("", lineFont));		
-									table.addCell(cell); 
 								}
 								else
 								{
 									cell.setPhrase(new Phrase(handler.getTimeStamp(j, k), lineFont));		
+								}
+								table.addCell(cell);
+
+								if(handler.showStatusForUnstructured())
+								{
+									String displayStatus = handler.getOBXResultStatusDisplayValue(j, k);
+									if(k > 0)
+									{
+										//if there are duplicate statuses, display only the first
+										String previousDisplayStatus = handler.getOBXResultStatusDisplayValue(j, k-1);
+										if(displayStatus.equals(previousDisplayStatus))
+										{
+											displayStatus = "";
+										}
+									}
+									cell.setPhrase(new Phrase(displayStatus, lineFont));
 									table.addCell(cell);
 								}
-								if(isTypeCLS)
+
+								/* add a sub table when an obx has a child OBR segment */
+								if(handler.hasChildOBR(j, k))
 								{
-									cell.setPhrase(new Phrase(handler.getOBXResultStatusDisplayValue(j, k), lineFont));
-									table.addCell(cell);
+									PdfPCell tableCell = createOBRChild(handler, j, k);
+									PdfPCell emptyCell = new PdfPCell();
+									tableCell.setBorder(PdfPCell.NO_BORDER);
+									emptyCell.setBorder(Rectangle.LEFT | Rectangle.RIGHT);
+									tableCell.setPadding(5);
+
+									table.addCell(emptyCell);
+									table.addCell(tableCell);
+									table.addCell(emptyCell);
+									if(handler.showStatusForUnstructured())
+									{
+										table.addCell(emptyCell);
+									}
 								}
 							}
 							else
@@ -1072,14 +1095,113 @@ public class LabPDFCreator extends PdfPageEventHelper {
         table.addCell(cell);
 
         // add the created tables to the document
-        table = addTableToTable(table, pInfoTable, 1);
-        table = addTableToTable(table, rInfoTable, 1);
-        table = addTableToTable(table, clientTable, 2);
+        table = addTableToTable(table, pInfoTable, 1, 3);
+        table = addTableToTable(table, rInfoTable, 1, 3);
+        table = addTableToTable(table, clientTable, 2, 3);
 
         table.setWidthPercentage(100);
 
         document.add(table);
     }
+
+	protected PdfPCell createOBRChild(MessageHandler handler, int obr, int obx)
+	{
+		PdfPCell mainCell = new PdfPCell();
+		// need a main table since you can't add multiple elements to a cell in the order I am for whatever reason
+		PdfPTable mainTable = new PdfPTable(1);
+		mainTable.setWidthPercentage(100);
+
+		Font headerFont = new Font(bf, 8, Font.BOLD, Color.BLACK);
+		Font lineFont = new Font(bf, 8, Font.NORMAL, Color.BLACK);
+		Font alertFont = new Font(bf, 8, Font.NORMAL, Color.RED);
+
+		PdfPTable resultsTable = initOBRChildTable(headerFont);
+		boolean addTable = false;
+
+		List<Integer> childOBRList = handler.getChildOBRIndexList(obr, obx);
+		for(Integer childObrIndex : childOBRList)
+		{
+			// if no obx results in child, display warning
+			if(handler.getOBXCount(childObrIndex) <= 0)
+			{
+				PdfPCell cell = new PdfPCell();
+				cell.setColspan(2);
+				cell.setPhrase(new Phrase("Missing Result Data", alertFont));
+				resultsTable.addCell(cell);
+			}
+			for(int childObxIndex = 0; childObxIndex < handler.getOBXCount(childObrIndex); childObxIndex++)
+			{
+				PdfPCell cell = new PdfPCell();
+				cell.setPhrase(new Phrase(handler.getChildOBR_OBXName(childObrIndex, childObxIndex), lineFont));
+				resultsTable.addCell(cell);
+				cell.setPhrase(new Phrase(handler.getChildOBR_OBXResult(childObrIndex, childObxIndex), lineFont));
+				resultsTable.addCell(cell);
+
+				// handle obx comments in the sub-table
+				int obxCommentCount = handler.getOBXCommentCount(childObrIndex, childObxIndex);
+				if(obxCommentCount > 0)
+				{
+					PdfPCell commentCell = new PdfPCell();
+					commentCell.setColspan(2);
+					commentCell.setBorder(PdfPCell.NO_BORDER);
+
+					for(int n = 0; n < handler.getOBXCommentCount(childObrIndex, childObxIndex); n++)
+					{
+						commentCell.addElement(new Phrase(handler.getOBXComment(childObrIndex, childObxIndex, n), lineFont));
+					}
+					resultsTable.addCell(commentCell);
+				}
+			}
+			addTable = true; // table will for sure have content at this point
+
+			int obrCommentCount = handler.getOBRCommentCount(childObrIndex);
+			if(obrCommentCount > 0)
+			{
+				/* in the case of a comment, we end the table early and insert the comment.
+				* additional child obr segments will be given a second table below the comment. */
+				addTableToTable(mainTable, resultsTable, 1);
+
+				//set up a cell to hole the comments under the table
+				PdfPCell commentCell = new PdfPCell();
+				commentCell.setPaddingBottom(5);
+				commentCell.setBorder(PdfPCell.NO_BORDER);
+
+				for(int n = 0; n < obrCommentCount; n++)
+				{
+					commentCell.addElement(new Phrase(handler.getOBRComment(childObrIndex, n), lineFont));
+				}
+				mainTable.addCell(commentCell);
+
+				// following a comment, we will init a new table as described above
+				resultsTable = initOBRChildTable(headerFont);
+				addTable = false; // table is currently empty. wouldn't want to add it
+			}
+		}
+
+		// only append table if it has content
+		if(addTable)
+		{
+			addTableToTable(mainTable, resultsTable, 1);
+		}
+
+		mainCell.addElement(mainTable);
+		return mainCell;
+	}
+
+	protected PdfPTable initOBRChildTable(Font headerFont)
+	{
+		PdfPTable table = new PdfPTable(2);
+		table.setHeaderRows(1);
+		table.setWidthPercentage(100);
+
+		PdfPCell headerCell = new PdfPCell();
+		headerCell.setPhrase(new Phrase("Description", headerFont));
+		table.addCell(headerCell);
+		headerCell.setPhrase(new Phrase("Result", headerFont));
+		table.addCell(headerCell);
+		return table;
+	}
+
     /**
      * Since pdfPtable used in createInfotable() is not properly supported in RTF, 
      * add the patient information to the RTF document using chunks and paragraphs
@@ -1169,9 +1291,14 @@ public class LabPDFCreator extends PdfPageEventHelper {
      *  addTableToTable(PdfPTable main, PdfPTable add) adds the table 'add' as
      *  a cell spanning 'colspan' columns to the table main.
      */
-    private PdfPTable addTableToTable(PdfPTable main, PdfPTable add, int colspan){
+    private PdfPTable addTableToTable(PdfPTable main, PdfPTable add, int colspan)
+    {
+		return addTableToTable(main, add, colspan, 0);
+    }
+    private PdfPTable addTableToTable(PdfPTable main, PdfPTable add, int colspan, int padding)
+    {
         PdfPCell cell = new PdfPCell(add);
-        cell.setPadding(3);
+        cell.setPadding(padding);
         cell.setColspan(colspan);
         main.addCell(cell);
         return main;
