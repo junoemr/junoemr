@@ -569,6 +569,10 @@
             overflow-x: scroll;
         }
 
+        .embedded-content {
+            max-width: 100%;
+        }
+
 		.description-container .label {
             width: 30%;
             display: inline-block;
@@ -827,14 +831,14 @@
 
                 if (hrmReport.getFileExtension() != null && imageFormats.contains(hrmReport.getFileExtension())) {
             %>
-            <img src="<%=request.getContextPath() %>/hospitalReportManager/HRMDownloadFile.do?id=<%=documentId%>"/><br/>
+            <img class="embedded-content" src="<%=request.getContextPath() %>/hospitalReportManager/HRMDownloadFile.do?id=<%=documentId%>"/><br/>
             <% } else { %>
             <div style="display: inline-block; margin:auto; color:red; white-space: pre-line">
                 This report contains an attachment which cannot be viewed in your browser.
                 Please use the link to view/download the content contained within.
             </div>
             <% } %>
-            <a href="<%=request.getContextPath() %>/hospitalReportManager/HRMDownloadFile.do?id=<%=documentId%>"><%=(hrmReport.getLegalLastName() + "_" + hrmReport.getLegalFirstName() + "_" +  hrmReport.getClassName() + hrmReport.getFileExtension()).replaceAll("\\s", "_") %></a>
+            <a target="_blank" href="<%=request.getContextPath() %>/hospitalReportManager/HRMDownloadFile.do?id=<%=documentId%>"><%=(hrmReport.getLegalLastName() + "_" + hrmReport.getLegalFirstName() + "_" +  hrmReport.getClassName() + hrmReport.getFileExtension()).replaceAll("\\s", "_") %></a>
             <% } else { %>
             <div class="<%=getFieldClass(hrmReport.getTextContent())%>"><%=ConversionUtils.hasContent(hrmReport.getTextContent()) ? hrmReport.getTextContent() : "NO CONTENT"%></div>
             <% } %>
