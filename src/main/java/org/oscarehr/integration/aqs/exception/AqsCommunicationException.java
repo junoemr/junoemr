@@ -48,7 +48,11 @@ public class AqsCommunicationException extends RuntimeException
 		}
 		catch (Exception e)
 		{
-			MiscUtils.getLogger().error("Failed to deserialize error response from AQS server with error: " + e.toString());
+			MiscUtils.getLogger().error(
+				"Failed to deserialize error response from AQS server with error: " +
+				e.toString() +
+				" While handling error: " +
+				cause.toString());
 		}
 	}
 }
