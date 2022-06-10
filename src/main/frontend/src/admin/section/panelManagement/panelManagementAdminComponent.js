@@ -105,5 +105,12 @@ angular.module('Admin.Section').component('panelManagementAdmin',
 				document.querySelector("#dashboard-embedded-page").contentWindow.location.reload();
 			}
 		};
+
+		ctrl.showIframe = () =>
+		{
+			// the iframe should only show when the url is defined.
+			// without this firefox will not display the iframe
+			return !Juno.Common.Util.isBlank(ctrl.dashboardUrl);
+		}
 	}]
 });

@@ -61,5 +61,5 @@
 			</panel-body>
 		</panel>
 	</div>
-	<iframe id="dashboard-embedded-page" ng-src="{{$ctrl.dashboardUrl}}" width="97%" height="4000px"></iframe>
+	<iframe id="dashboard-embedded-page" ng-if="$ctrl.showIframe()" ng-src="{{$ctrl.dashboardUrl}}" width="97%" height="4000px"></iframe>
 </div>
