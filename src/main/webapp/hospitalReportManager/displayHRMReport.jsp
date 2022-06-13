@@ -168,6 +168,7 @@
 <%@ page import="org.oscarehr.hospitalReportManager.dao.HRMProviderConfidentialityStatementDao" %>
 <%@ page import="org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%!
@@ -790,15 +791,15 @@
 			});
 		}
 
-		function popupPatient(height, width, url, windowName, docId, d) {
-			urlNew = url + d;
-			return popup2(height, width, 0, 0, urlNew, windowName);
-		}
+        function openTicklerWindow(reportId, demographicId)
+        {
+            if(demographicId)
+            {
+                let url = "../tickler/ForwardDemographicTickler.do?docType=HRM&docId=" + reportId + "&demographic_no=" + demographicId;
+                window.open(url, "tickler", 'width=800,height=450');
+            }
+        }
 
-		function popupPatientTickler(height, width, url, windowName,docId,d,n) {
-			urlNew = url + "method=edit&tickler.demographic_webName=" + n + "&tickler.demographicNo=" +  d + "&docType=DOC&docId="+docId;
-			return popup2(height, width, 0, 0, urlNew, windowName);
-		}
     </script>
 </head>
 <body id="hrmReport">
@@ -1073,6 +1074,14 @@
                         <%
                             }
                         %>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <input type="button" class="input-button" value="Tickler" <%=(demoNo == null) ? "disabled" : ""%>
+                               title="<%=(demoNo == null) ? "Requires an assigned demographic" : "Create tickler for patient"%>"
+                               onClick="openTicklerWindow('<%=hrmDocument.getId()%>', '<%=demoNo%>')"/>
                     </td>
                 </tr>
             </table>

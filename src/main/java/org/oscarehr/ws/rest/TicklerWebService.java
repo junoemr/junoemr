@@ -198,10 +198,13 @@ public class TicklerWebService extends AbstractServiceImpl
 		ticklerCriteriaSearch.setMrp(StringUtils.trimToNull(mrp));
 		ticklerCriteriaSearch.setDemographicNo(demographicNo);
 
-		Tickler.STATUS ticklerStatus = Tickler.STATUS.valueOf(status);
-		ticklerCriteriaSearch.setStatus(ticklerStatus);
+		if(StringUtils.isNotBlank(status))
+		{
+			Tickler.STATUS ticklerStatus = Tickler.STATUS.valueOf(status);
+			ticklerCriteriaSearch.setStatus(ticklerStatus);
+		}
 
-		if (priority != null && !priority.isEmpty())
+		if (StringUtils.isNotBlank(priority))
 		{
 			Tickler.PRIORITY ticklerPriority = Tickler.PRIORITY.valueOf(priority);
 			ticklerCriteriaSearch.setPriority(ticklerPriority);
