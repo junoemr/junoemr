@@ -312,7 +312,7 @@ String curUser_no = (String) session.getAttribute("user");
                                     <a href="javascript:void(0);" onclick="reportWindow('<%=url.toString()%>',screen.availHeight, screen.availWidth); return false;" ><%=labRead + StringEscapeUtils.escapeHtml(result.getPatientName())%></a>
                                     
                                     <% }else if(result.isHRM()){%>
-                                    <a href="javascript:reportWindow('../hospitalReportManager/displayHRMReport.jsp?id=<%=segmentID%>',850,1020)"><%=labRead%><%=result.getPatientName()%></a>
+                                    <a href="javascript:reportWindow('../hospitalReportManager/displayHRMReport.jsp?prev=inbox&id=<%=segmentID%>',850,1020)"><%=labRead%><%=result.getPatientName()%></a>
                                     <% }else {%>
                                     <a href="javascript:parent.reportWindow('<%=request.getContextPath()%>/lab/CA/BC/labDisplay.jsp?segmentID=<%=segmentID%>&providerNo=<%=providerNo%>&searchProviderNo=<%=searchProviderNo%>&status=<%=status%>')"><%=labRead%><%=StringEscapeUtils.escapeJavaScript(result.getPatientName())%></a>
                                     <% }%>
