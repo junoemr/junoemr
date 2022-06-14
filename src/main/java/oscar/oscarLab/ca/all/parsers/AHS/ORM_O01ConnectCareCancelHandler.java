@@ -88,6 +88,12 @@ public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHand
 		return "";
 	}
 
+	@Override
+	public String getHealthNumProvince()
+	{
+		return "ABH";
+	}
+
 	/**
 	 * Connect Care labs send more than just health card number, they can also send, EPI, ABH, NWT, BKR
 	 * @param appendNamespace - if true append namespace to end of identifier
