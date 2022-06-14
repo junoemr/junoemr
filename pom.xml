@@ -2008,16 +2008,11 @@
 						<systemProperty>
 							<key>openApiSpecBuilder.resourceClassCsv</key>
 							<value>
-								org.oscarehr.ws.rest.SystemPreferenceWebService
-								org.oscarehr.ws.rest.ScheduleService
-								org.oscarehr.ws.rest.SitesService
+								<!-- Alphabetical please -->
 								org.oscarehr.ws.rest.AppointmentService
 								org.oscarehr.ws.rest.CareTrackerWebService
 								org.oscarehr.ws.rest.CareTrackersWebService
-								org.oscarehr.ws.rest.eform.EFormInstanceWebService
-								org.oscarehr.ws.rest.EFormService
-								org.oscarehr.ws.rest.EFormsService
-								org.oscarehr.ws.rest.FormsService
+								org.oscarehr.ws.rest.ConsultationWebService
 								org.oscarehr.ws.rest.DecisionSupportWebService
 								org.oscarehr.ws.rest.DemographicService
 								org.oscarehr.ws.rest.DemographicsService
@@ -2032,9 +2027,13 @@
 								org.oscarehr.ws.rest.DocumentTypesWebService
 								org.oscarehr.ws.rest.DiseaseRegistryService
 								org.oscarehr.ws.rest.DocumentWebService
+								org.oscarehr.ws.rest.eform.EFormInstanceWebService
+								org.oscarehr.ws.rest.EFormService
+								org.oscarehr.ws.rest.EFormsService
 								org.oscarehr.ws.rest.fax.FaxAccountWebService
 								org.oscarehr.ws.rest.fax.FaxInboundWebService
 								org.oscarehr.ws.rest.fax.FaxOutboundWebService
+								org.oscarehr.ws.rest.FormsService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
 								org.oscarehr.ws.rest.integrations.aqs.QueueWebService

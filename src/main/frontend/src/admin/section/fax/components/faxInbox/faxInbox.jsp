@@ -14,16 +14,16 @@
 	</div>
 
 	<div class="flex-row flex-gap-16 p-t-16 p-b-16 align-items-flex-end">
-		<juno-date-select
+		<juno-date-picker
 				ng-model="$ctrl.searchParams.startDate"
 				label="<bean:message bundle="ui" key="admin.fax.sr.search.startDate"/>"
 				label-position="$ctrl.LABEL_POSITION.TOP">
-		</juno-date-select>
-		<juno-date-select
+		</juno-date-picker>
+		<juno-date-picker
 				ng-model="$ctrl.searchParams.endDate"
 				label="<bean:message bundle="ui" key="admin.fax.sr.search.endDate"/>"
 				label-position="$ctrl.LABEL_POSITION.TOP">
-		</juno-date-select>
+		</juno-date-picker>
 		<juno-select
 				label="<bean:message bundle="ui" key="admin.fax.sr.choose-account"/>"
 				label-position="$ctrl.LABEL_POSITION.TOP"

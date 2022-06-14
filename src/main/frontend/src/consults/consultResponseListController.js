@@ -315,7 +315,7 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 							{
 								if (consult.status === controller.statuses[j].value)
 								{
-									consult.statusDescription = controller.statuses[j].name;
+									consult.statusDescription = controller.statuses[j].label;
 									break;
 								}
 							}
@@ -325,7 +325,7 @@ angular.module('Consults').controller('Consults.ConsultResponseListController', 
 							{
 								if (consult.urgency === controller.urgencies[j].value)
 								{
-									consult.urgencyDescription = controller.urgencies[j].name;
+									consult.urgencyDescription = controller.urgencies[j].label;
 									break;
 								}
 							}
