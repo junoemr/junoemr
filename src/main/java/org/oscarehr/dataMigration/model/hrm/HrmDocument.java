@@ -23,6 +23,7 @@
 package org.oscarehr.dataMigration.model.hrm;
 
 import lombok.Data;
+import org.apache.commons.text.WordUtils;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.document.Document;
@@ -55,6 +56,11 @@ public class HrmDocument extends AbstractTransientModel
 		public String getValue()
 		{
 			return this.value;
+		}
+
+		public String toFriendlyName()
+		{
+			return WordUtils.capitalizeFully(this.name());
 		}
 
 		public static ReportStatus fromValueString(String value)

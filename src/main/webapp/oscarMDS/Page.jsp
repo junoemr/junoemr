@@ -22,6 +22,7 @@
 <%@page import="java.util.List"%>
 <%@ page import="org.oscarehr.labs.service.Hl7TextInfoService" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.oscarehr.dataMigration.model.hrm.HrmDocument" %>
 
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -336,7 +337,11 @@ String curUser_no = (String) session.getAttribute("user");
                                     <%=result.isDocument() ? result.description == null ? "" : result.description : result.getDisciplineDisplayString()%>
                                 </td>
                                 <td nowrap> <!--  -->
-                                    <%= (Hl7TextInfoService.getReportStatusDisplayString(Hl7TextInfoService.getReportStatusFromString(result.getReportStatus())))%>
+									<% if (result.isHRM()) {%>
+                                        <%= result.getReportStatus() != null ? HrmDocument.ReportStatus.fromValueString(result.getReportStatus()).toFriendlyName() : ""%>
+									<% } else { %>
+                                    	<%= (Hl7TextInfoService.getReportStatusDisplayString(Hl7TextInfoService.getReportStatusFromString(result.getReportStatus())))%>
+									<% } %>
                                 </td>
                                 <td nowrap>
                                     <% int multiLabCount = result.getMultipleAckCount(); %>

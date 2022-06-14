@@ -59,6 +59,7 @@
 							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
 							 disabled="!$ctrl.canRead() || !$ctrl.pollingEnabled"
+							 title="$ctrl.pollingTitle()"
 							 click="$ctrl.fetchHRMDocs()">
 					Check For Reports Now
 				</juno-button>
