@@ -41,6 +41,7 @@ import oscar.util.ConversionUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class HrmDocumentDbToModelConverter extends
@@ -61,7 +62,13 @@ public class HrmDocumentDbToModelConverter extends
 		hrmDocument.setSendingFacilityId(input.getSendingFacilityId());
 		hrmDocument.setSendingFacilityReport(input.getSendingFacilityReportId());
 		hrmDocument.setCreatedBy(null); // TODO not sure how to determine this
-		hrmDocument.setReportStatus(HrmDocument.ReportStatus.fromValueString(input.getReportStatus().toValueString()));
+
+		// Not really optional now, but not reliably there in legacy schemas
+		Optional.ofNullable(input.getReportStatus()).ifPresent(
+			status -> hrmDocument.setReportStatus(
+				HrmDocument.ReportStatus.fromValueString(input.getReportStatus().toValueString())
+			)
+		);
 		hrmDocument.setReportClass(HrmDocument.ReportClass.fromValueString(input.getReportType()));
 		hrmDocument.setReportSubClass(input.getSubClass());
 		hrmDocument.setMessageUniqueId(input.getMessageUniqueId());
