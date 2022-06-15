@@ -338,7 +338,7 @@ String curUser_no = (String) session.getAttribute("user");
                                 </td>
                                 <td nowrap> <!--  -->
 									<% if (result.isHRM()) {%>
-                                        <%= result.getReportStatus() != null ? HrmDocument.ReportStatus.fromValueString(result.getReportStatus()).toFriendlyName() : ""%>
+                                        <%= result.getReportStatus() != null ? HrmDocument.ReportStatus.fromValueString(result.getReportStatus()).toDisplayName() : ""%>
 									<% } else { %>
                                     	<%= (Hl7TextInfoService.getReportStatusDisplayString(Hl7TextInfoService.getReportStatusFromString(result.getReportStatus())))%>
 									<% } %>

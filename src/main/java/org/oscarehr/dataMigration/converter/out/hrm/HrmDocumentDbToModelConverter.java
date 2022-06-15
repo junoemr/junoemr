@@ -69,6 +69,7 @@ public class HrmDocumentDbToModelConverter extends
 				HrmDocument.ReportStatus.fromValueString(input.getReportStatus().toValueString())
 			)
 		);
+		
 		hrmDocument.setReportClass(HrmDocument.ReportClass.fromValueString(input.getReportType()));
 		hrmDocument.setReportSubClass(input.getSubClass());
 		hrmDocument.setMessageUniqueId(input.getMessageUniqueId());

@@ -58,7 +58,7 @@ public class HrmDocument extends AbstractTransientModel
 			return this.value;
 		}
 
-		public String toFriendlyName()
+		public String toDisplayName()
 		{
 			return WordUtils.capitalizeFully(this.name());
 		}
