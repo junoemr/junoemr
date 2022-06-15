@@ -187,14 +187,17 @@ public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 			}
 		}
 
-		// add pv1 provider to cc docs
-		int pd1_4Count = getFieldReps("/.PD1", 4);
-		for(int k = 0; k < pd1_4Count; k++)
+		// add pv1 provider to cc docs if not marked confidential
+		if(!isReportBlocked())
 		{
-			String docName = getFullDocName("/.PD1", 4, k);
-			if(StringUtils.isNotBlank(docName))
+			int pd1_4Count = getFieldReps("/.PD1", 4);
+			for(int k = 0; k < pd1_4Count; k++)
 			{
-				docNames.add(docName);
+				String docName = getFullDocName("/.PD1", 4, k);
+				if(StringUtils.isNotBlank(docName))
+				{
+					docNames.add(docName);
+				}
 			}
 		}
 		return docNames;
@@ -219,14 +222,17 @@ public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 				}
 			}
 
-			// add pv1 provider to cc docs
-			int pd1_4Count = getFieldReps("/.PD1", 4);
-			for(int k = 0; k < pd1_4Count; k++)
+			// add pv1 provider to cc docs if not marked confidential
+			if(!isReportBlocked())
 			{
-				String docId = get("/.PD1-4(" + k + ")-1");
-				if(StringUtils.isNotBlank(docId))
+				int pd1_4Count = getFieldReps("/.PD1", 4);
+				for(int k = 0; k < pd1_4Count; k++)
 				{
-					docIds.add(docId);
+					String docId = get("/.PD1-4(" + k + ")-1");
+					if(StringUtils.isNotBlank(docId))
+					{
+						docIds.add(docId);
+					}
 				}
 			}
 		}
@@ -237,6 +243,21 @@ public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 		return docIds;
 	}
 
+	/**
+	 * indicates blocked or sensitive data within the report
+	 * @return true if report flagged as sensitive/confidential
+	 */
+	@Override
+	public boolean isReportBlocked()
+	{
+		switch(getString(get("/.TXA-18")))
+		{
+			case "RE":              // Restricted
+			case "VR": return true; // Very restricted
+			case "UC":              // Usual control
+			default: return false;
+		}
+	}
 
 	/* ========================== OBX ========================== */
 

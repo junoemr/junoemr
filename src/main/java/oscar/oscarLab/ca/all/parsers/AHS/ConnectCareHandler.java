@@ -223,14 +223,17 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 				}
 			}
 
-			// add pv1 provider to cc docs
-			int pd1_4Count = getFieldReps("/.PD1", 4);
-			for(int k = 0; k < pd1_4Count; k++)
+			// add pv1 provider to cc docs if not marked confidential
+			if(!isReportBlocked())
 			{
-				String docId = get("/.PD1-4(" + k + ")-1");
-				if(StringUtils.isNotBlank(docId))
+				int pd1_4Count = getFieldReps("/.PD1", 4);
+				for(int k = 0; k < pd1_4Count; k++)
 				{
-					docIds.add(docId);
+					String docId = get("/.PD1-4(" + k + ")-1");
+					if(StringUtils.isNotBlank(docId))
+					{
+						docIds.add(docId);
+					}
 				}
 			}
 		}
@@ -270,14 +273,17 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 			}
 		}
 
-		// add pv1 provider to cc docs
-		int pd1_4Count = getFieldReps("/.PD1", 4);
-		for(int k = 0; k < pd1_4Count; k++)
+		// add pv1 provider to cc docs if not marked confidential
+		if(!isReportBlocked())
 		{
-			String docName = getFullDocName("/.PD1", 4, k);
-			if(StringUtils.isNotBlank(docName))
+			int pd1_4Count = getFieldReps("/.PD1", 4);
+			for(int k = 0; k < pd1_4Count; k++)
 			{
-				docNames.add(docName);
+				String docName = getFullDocName("/.PD1", 4, k);
+				if(StringUtils.isNotBlank(docName))
+				{
+					docNames.add(docName);
+				}
 			}
 		}
 		return docNames;
