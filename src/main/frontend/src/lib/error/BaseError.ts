@@ -27,7 +27,7 @@ export default class BaseError extends Error
 	// Public Methods
 	// ==========================================================================
 
-	constructor(message)
+	constructor(message: string)
 	{
 		super(message);
 	}

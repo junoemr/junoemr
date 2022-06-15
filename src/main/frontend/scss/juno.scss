@@ -17,6 +17,7 @@
 @import "../node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 @import "bootstrap/dropdown";
 @import "bootstrap/badges";
+@import "bootstrap/pagination";
 // UIB overrides
 @import "directives/uib-datepicker";
 // bootstrap-timepicker does not provide a CSS file so compile as SCSS
@@ -58,6 +59,7 @@
 @import "../src/common/components/junoTab/components/swimLaneTab/swimLaneTab";
 @import "../src/common/components/junoToast/junoToast";
 @import "../src/common/components/junoToggle/junoToggle";
+@import "../src/common/components/junoDatePicker/junoDatePicker";
 @import "../src/common/components/junoDateSelect/junoDateSelect";
 @import "../src/common/components/junoPartialDateSelect/junoPartialDateSelect";
 @import "../src/common/components/junoRadioSelect/junoRadioSelect";

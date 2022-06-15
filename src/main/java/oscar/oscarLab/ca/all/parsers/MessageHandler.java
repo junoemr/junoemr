@@ -1171,6 +1171,11 @@ public abstract class MessageHandler
 		return false;
 	}
 
+	public boolean showStatusForUnstructured()
+	{
+		return false;
+	}
+
 
 	/* ================================== Extra Methods and helpers ==================================== */
 

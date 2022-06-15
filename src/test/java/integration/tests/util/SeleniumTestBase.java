@@ -25,10 +25,14 @@ package integration.tests.util;
 import integration.tests.config.TestConfig;
 import integration.tests.util.junoUtil.DatabaseUtil;
 import integration.tests.util.junoUtil.Navigation;
+import java.io.IOException;
 import java.lang.reflect.Field;
-import java.net.MalformedURLException;
 import java.net.URL;
-import lombok.CustomLog;
+import java.sql.SQLException;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 import net.jodah.failsafe.RetryPolicy;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.log4j.Logger;
@@ -36,7 +40,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxBinary;
@@ -63,13 +66,6 @@ import org.oscarehr.util.DatabaseTestBase;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.LocalServerPort;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Import;
 import oscar.OscarProperties;
 
@@ -84,7 +80,6 @@ public class SeleniumTestBase extends DatabaseTestBase
 
 	@Autowired
 	protected JunoProperties junoProperties;
-
 
 	public static final Integer WEB_DRIVER_EXPLICIT_TIMEOUT = 60;
 	public static final Integer WEB_DRIVER_PAGE_LOAD_TIMEOUT = 60;

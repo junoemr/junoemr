@@ -29,6 +29,7 @@ import org.oscarehr.ws.rest.to.model.ConsultationRequestTo1;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import oscar.util.ConversionUtils;
 
 @Component
 public class ConsultationRequestToDomainConverter extends AbstractModelConverter<ConsultationRequestTo1, ConsultationRequest>
@@ -45,7 +46,16 @@ public class ConsultationRequestToDomainConverter extends AbstractModelConverter
 			return null;
 		}
 
-		BeanUtils.copyProperties(transfer, request, "professionalSpecialist");
+		BeanUtils.copyProperties(transfer, request,
+				"professionalSpecialist",
+				"appointmentDateTime",
+				"referralDate",
+				"followUpDate");
+
+		request.setReferralDate(ConversionUtils.toNullableLegacyDate(transfer.getReferralDate()));
+		request.setFollowUpDate(ConversionUtils.toNullableLegacyDate(transfer.getFollowUpDate()));
+		request.setAppointmentDate(ConversionUtils.toNullableLegacyDateTime(transfer.getAppointmentDateTime()));
+		request.setAppointmentTime(ConversionUtils.toNullableLegacyDateTime(transfer.getAppointmentDateTime()));
 
 		// Specialist is a many-to-one and is handled slightly differently
 		request.setProfessionalSpecialist(specialistToDomainConverter.convert(transfer.getProfessionalSpecialist()));

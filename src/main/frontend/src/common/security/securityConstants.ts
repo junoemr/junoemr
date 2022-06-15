@@ -23,4 +23,4 @@
 
 import {SecurityPermissionTransfer} from "../../../generated";
 
-export const SecurityPermissions = SecurityPermissionTransfer.PermissionEnum;
+export import SecurityPermissions = SecurityPermissionTransfer.PermissionEnum;

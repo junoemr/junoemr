@@ -1,0 +1,97 @@
+/**
+ * Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
+ * This software is published under the GPL GNU General Public License.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * This software was written for
+ * CloudPractice Inc.
+ * Victoria, British Columbia
+ * Canada
+ */
+
+package integration.tests.junoUI.patientCharts.summary;
+
+import static integration.tests.util.junoUtil.Navigation.SUMMARY_URL;
+
+import integration.tests.util.SeleniumTestBase;
+import integration.tests.util.junoUtil.Navigation;
+import integration.tests.util.seleniumUtil.ActionUtil;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.regex.Pattern;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.oscarehr.JunoApplication;
+import org.oscarehr.common.dao.utils.AuthUtils;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+@TestPropertySource("classpath:integration-test.properties")
+@SpringBootTest(classes = JunoApplication.class, webEnvironment = WebEnvironment.DEFINED_PORT)
+public class EditEncounterNotesJUNOUIIT extends SeleniumTestBase
+{
+	private static final String ECHART_URL = "/oscarEncounter/IncomingEncounter.do?providerNo=" +
+		AuthUtils.TEST_PROVIDER_ID +
+		"&appointmentNo=&demographicNo=1&curProviderNo=&reason=Tel-Progress+Note&encType=&curDate=2019-4-17&appointmentDate=&startTime=&status=";
+
+	@Override
+	protected String[] getTablesToRestore()
+	{
+		return new String[]{
+			"admission", "casemgmt_note", "demographic", "eChart", "eform_data", "eform_instance",
+			"eform_values", "log", "log_ws_rest", "measurementType",
+			"provider_recent_demographic_access","validations", "property", "casemgmt_tmpsave"
+		};
+	}
+
+	@Before
+	public void setup() throws SQLException, IllegalAccessException, ClassNotFoundException, InstantiationException, IOException, InterruptedException
+	{
+		loadSpringBeans();
+		databaseUtil.createTestDemographic();
+	}
+
+	@Test
+	public void editEncounterNotesJUNOUITest()
+	{
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + SUMMARY_URL);
+
+		String newNote = "Testing Note JUNO";
+		String editedNote = "Edited Testing Note JUNO";
+		ActionUtil.findWaitClickById(driver, webDriverWait,"note-editor-header");//add this step to make sure the encounter note editor is get focus
+		ActionUtil.findWaitSendKeysById(driver, webDriverWait, "noteEditor1", newNote);
+		ActionUtil.findWaitClickById(driver, webDriverWait,"theSave");
+		ActionUtil.findWaitClickByXpath(driver, webDriverWait, "//button[@ng-click='$ctrl.editButtonClick()']");
+
+		String noteId = "noteEditor1";
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.id(noteId)));
+		driver.findElement(By.id(noteId)).clear();
+		driver.findElement(By.id(noteId)).sendKeys(editedNote);
+		ActionUtil.findWaitClickById(driver, webDriverWait, "theSave");
+
+		String noteXpath = "//div[@class='row note-body']";
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(noteXpath)));
+		String text = driver.findElement(By.xpath(noteXpath)).getText();
+
+		Assert.assertTrue("Edited Note is NOT saved in JUNO UI", Pattern.compile(editedNote).matcher(text).find());
+	}
+}

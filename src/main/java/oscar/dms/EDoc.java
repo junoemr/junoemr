@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * @deprecated use oscarehr.document.service.Document for new changes
@@ -78,7 +79,7 @@ public class EDoc extends TagObject implements Comparable<EDoc> {
 	private Date reviewDateTimeDate = null;
 	private String indivoIdx = null;
 	private boolean indivoRegistered = false;
-	private int numberOfPages = 0;
+	private Integer numberOfPages = 0;
 	private Integer appointmentNo = -1;
 	private boolean restrictToProgram=false;
 	private boolean hasEncodingError=false;
@@ -105,7 +106,7 @@ public class EDoc extends TagObject implements Comparable<EDoc> {
 		preliminaryProcessing();
 	}
 
-	public EDoc(String description, String type, String fileName, String html, String creatorId, String responsibleId, String source, char status, String observationDate, String reviewerId, String reviewDateTime, String module, String moduleId, int numberOfPages) {
+	public EDoc(String description, String type, String fileName, String html, String creatorId, String responsibleId, String source, char status, String observationDate, String reviewerId, String reviewDateTime, String module, String moduleId, Integer numberOfPages) {
 		this.setDescription(description.trim());
 		this.setType(type.trim());
 		this.setFileName(fileName.trim());
@@ -510,15 +511,18 @@ public class EDoc extends TagObject implements Comparable<EDoc> {
 		this.reviewDateTime = reviewDateTime;
 	}
 
-	public int getNumberOfPages() {
+	public Integer getNumberOfPages() {
 		return numberOfPages;
 	}
 
-	public void setNumberOfPages(int n) {
+	public Optional<Integer> getNumberofPagesOptional()
+	{
+		return Optional.ofNullable(numberOfPages);
+	}
+
+	public void setNumberOfPages(Integer n) {
 		this.numberOfPages = n;
 	}
-	
-	
 
 	public boolean isRestrictToProgram() {
 		return restrictToProgram;

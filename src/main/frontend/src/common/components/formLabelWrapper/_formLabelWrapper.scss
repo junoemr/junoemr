@@ -1,6 +1,8 @@
 .form-label-wrapper {
   flex: 0 0 100%;
-  --form-label-width: unset;
+
+  --juno-form-label-padding: 0;
+  --juno-form-label-width: unset;
 
   &.juno-input-label-top {
     display: flex;
@@ -19,6 +21,8 @@
       margin-right: var(--juno-form-input-label-padding-left);
       margin-bottom: 0 !important;/// _forms.scss is a little baby and will add a margin to the bottom!
       text-align: right;
+      padding: var(--juno-form-label-padding);
+      width: var(--juno-form-label-width);
     }
   }
 
@@ -35,7 +39,13 @@
     }
   }
 
+  .label-style {
+    padding: var(--juno-form-label-padding);
+    width: var(--juno-form-label-width);
+  }
+
   .form-input-wrapper {
     display: inline-block;
+    flex-grow: 1;
   }
 }

@@ -38,7 +38,9 @@ import org.oscarehr.util.SpringUtils;
  *
  * @author Robert
  */
-public class CLSDIHandler extends CLSHandler {
+public class CLSDIHandler extends CLSHandler
+{
+	public static final String CLSDI_MESSAGE_TYPE = "CLSDI";
 
 	private static Logger logger = Logger.getLogger(CLSDIHandler.class);
 	private static Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
@@ -91,8 +93,9 @@ public class CLSDIHandler extends CLSHandler {
 
     /* ===================================== Hl7 Parsing ====================================== */
 
-	public String getMsgType() {
-		return "CLSDI";
+	public String getMsgType()
+	{
+		return CLSDI_MESSAGE_TYPE;
 	}
 
 	@Override
@@ -148,6 +151,12 @@ public class CLSDIHandler extends CLSHandler {
 
 	@Override
 	public boolean isUnstructured() {
+		return true;
+	}
+
+	@Override
+	public boolean showStatusForUnstructured()
+	{
 		return true;
 	}
 }

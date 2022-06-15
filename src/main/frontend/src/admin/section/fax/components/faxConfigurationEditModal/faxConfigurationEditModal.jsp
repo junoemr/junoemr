@@ -37,7 +37,7 @@
 					<juno-toggle round="true"
 					             ng-model="$ctrl.faxAccount.enabled"
 					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.acctEnabled'/>"
-					             label-class-list="['text-bold']"
+					             label-class-list="['text-bold', 'label-custom-style']"
 					             label-position="$ctrl.LABEL_POSITION.RIGHT">
 					</juno-toggle>
 				</div>
@@ -72,7 +72,7 @@
 					<juno-toggle round="true"
 					             ng-model="$ctrl.faxAccount.enableOutbound"
 					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.enableOutbound'/>"
-					             label-class-list="['text-bold']"
+					             label-class-list="['text-bold', 'label-custom-style']"
 					             label-position="$ctrl.LABEL_POSITION.RIGHT">
 					</juno-toggle>
 					<i class="icon icon-info-circle info-badge" title="<bean:message bundle='ui' key='admin.fax.acct.edit.outboundInfoMessage'/>"></i>
@@ -110,7 +110,7 @@
 					<juno-toggle round="true"
 					             ng-model="$ctrl.faxAccount.enableInbound"
 					             label="<bean:message bundle='ui' key='admin.fax.acct.edit.enableInbound'/>"
-					             label-class-list="['text-bold']"
+					             label-class-list="['text-bold', 'label-custom-style']"
 					             label-position="$ctrl.LABEL_POSITION.RIGHT">
 					</juno-toggle>
 					<i class="icon icon-info-circle info-badge" title="<bean:message bundle='ui' key='admin.fax.acct.edit.inboundInfoMessage'/>"></i>

@@ -833,8 +833,7 @@ oscarApp.config([
 		.state('record.consultRequest',
 		{
 			url: '/consult/:requestId',
-			templateUrl: 'src/consults/consultRequest.jsp',
-			controller: 'Consults.ConsultRequestController as consultRequestCtrl',
+			component: 'consultRequest',
 			resolve:
 			{
 				consult: ['$stateParams', 'consultService', function($stateParams, consultService)
@@ -844,10 +843,6 @@ oscarApp.config([
 					}
 					return consultService.getRequest($stateParams.requestId);
 				}],
-				user: ['providerService', function(providerService)
-				{
-					return providerService.getMe();
-				}]
 			},
 			meta:
 			{

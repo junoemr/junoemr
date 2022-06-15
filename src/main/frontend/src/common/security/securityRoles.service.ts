@@ -25,7 +25,8 @@
 
  */
 
-import {SecurityPermissionTransfer, UserSecurityRolesTransfer} from "../../../generated";
+import {UserSecurityRolesTransfer} from "../../../generated";
+import {SecurityPermissions} from "./securityConstants";
 
 angular.module("Common.Security").service("securityRolesService", [
 	'securityApiService',
@@ -51,7 +52,7 @@ angular.module("Common.Security").service("securityRolesService", [
 		 * check the current users permissions, return true if all requirements are met
 		 * @param requiredPermissions - the permissions required
 		 */
-		service.hasSecurityPrivileges = (...requiredPermissions: SecurityPermissionTransfer.PermissionEnum[]): boolean =>
+		service.hasSecurityPrivileges = (...requiredPermissions: SecurityPermissions[]): boolean =>
 		{
 			if (service.rolesData
 				&& service.rolesData.securityPermissions
