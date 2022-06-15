@@ -1088,7 +1088,7 @@ public class CaisiIntegratorUpdateTask extends TimerTask {
 		cachedDemographicDocument.setDocFilename(eDoc.getFileName());
 		cachedDemographicDocument.setDocType(eDoc.getType());
 		cachedDemographicDocument.setDocXml(eDoc.getHtml());
-		cachedDemographicDocument.setNumberOfPages(eDoc.getNumberOfPages());
+		cachedDemographicDocument.setNumberOfPages(eDoc.getNumberofPagesOptional().orElse(0));
 		cachedDemographicDocument.setObservationDate(DateUtils.toGregorianCalendarDate(eDoc.getObservationDate()));
 		cachedDemographicDocument.setProgramId(eDoc.getProgramId());
 		cachedDemographicDocument.setPublic1(Integer.parseInt(eDoc.getDocPublic()));

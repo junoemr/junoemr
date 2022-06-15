@@ -67,6 +67,8 @@
 <%@ page import="oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler" %>
 <%@ page import="static org.apache.commons.lang.StringEscapeUtils.escapeHtml" %>
 <%@ page import="static oscar.oscarLab.ca.all.parsers.AHS.v23.AHSRuralHandler.AHS_RURAL_LAB_TYPE" %>
+<%@ page import="static oscar.oscarLab.ca.all.parsers.AHS.v23.CLSHandler.CLS_MESSAGE_TYPE" %>
+<%@ page import="static oscar.oscarLab.ca.all.parsers.AHS.v23.CLSDIHandler.CLSDI_MESSAGE_TYPE" %>
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
 <%@ taglib uri="/WEB-INF/struts-logic.tld" prefix="logic" %>
@@ -1456,15 +1458,19 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 	                           <tr class="Field2">
 	                               <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formTestName"/></td>
 	                               <td width="60%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formResult"/></td>
-								   <% if ("CLS".equals(handler.getMsgType())) { %>
+								   <% if (CLS_MESSAGE_TYPE.equals(handler.getMsgType())) { %>
 									   <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompletedCLS"/></td>
 		                           <% }
-		                           else if ("CLSDI".equals(handler.getMsgType())) { %>
+		                           else if (CLSDI_MESSAGE_TYPE.equals(handler.getMsgType())) { %>
 		                           <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompletedCLSDI"/></td>
 								   <% }
 								   else { %>
 									   <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompleted"/></td>
-								   <% } %>
+								   <% }
+								   if (handler.showStatusForUnstructured())
+								   { %>
+		                                <td width="20%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formNew"/></td>
+		                           <% } %>
 	                           </tr><%
 						} else {%>
                        <table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#CCCCFF" bordercolor="#9966FF" bordercolordark="#bfcbe3" name="tblDiscs" id="tblDiscs">
@@ -1474,10 +1480,10 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
                                <td width="5%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formAbn"/></td>
                                <td width="15%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formReferenceRange"/></td>
                                <td width="10%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formUnits"/></td>
-                               <% if ("CLS".equals(handler.getMsgType())) { %>
+                               <% if (CLS_MESSAGE_TYPE.equals(handler.getMsgType())) { %>
                                    <td width="15%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompletedCLS"/></td>
 							   <% }
-							   else if ("CLSDI".equals(handler.getMsgType())) { %>
+							   else if (CLSDI_MESSAGE_TYPE.equals(handler.getMsgType())) { %>
 	                           <td width="15%" align="middle" valign="bottom" class="Cell"><bean:message key="oscarMDS.segmentDisplay.formDateTimeCompletedCLSDI"/></td>
 	                           <% }
 	                           else { %>
@@ -1936,7 +1942,22 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 				                                    <td align="center"><%= handler.getTimeStamp(j, k) %></td><%
 	                                            }
 											}
-										    %></tr><%
+										   if(handler.showStatusForUnstructured())
+										   {
+											   String displayStatus = handler.getOBXResultStatusDisplayValue(j, k);
+											   if(k > 0)
+											   {
+												   //if there are duplicate statuses, display only the first
+												   String previousDisplayStatus = handler.getOBXResultStatusDisplayValue(j, k-1);
+												   if(displayStatus.equals(previousDisplayStatus))
+												   {
+													   displayStatus = "";
+												   }
+											   }
+											    %>
+											    <td align="center"><%= displayStatus %></td><%
+										   }%>
+										    </tr><%
 
 					                       if(handler.hasChildOBR(j, k))
 					                       {
@@ -1977,14 +1998,21 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 								                            </td>
 			                                            </tr>
 		                                                <%
-		                                                for (int n=0; n < handler.getOBXCommentCount(childObrIndex, childObxIndex); n++)
+														int obxCommentCount = handler.getOBXCommentCount(childObrIndex, childObxIndex);
+		                                                if(obxCommentCount > 0)
 		                                                {%>
 		                                                <tr class="NormalRes">
 			                                                <td align="left" valign="top" colspan="2">
 				                                                <span style="margin:0; text-align: left;">
-					                                                <%=escapeHtml(handler.getOBXComment(childObrIndex, childObxIndex, n))%>
-				                                                </span>
-			                                                </td>
+		                                                    <%
+			                                                for (int n=0; n < obxCommentCount; n++)
+			                                                {%>
+				                                                <%=escapeHtml(handler.getOBXComment(childObrIndex, childObxIndex, n))%>
+				                                                <br>
+			                                                <%
+			                                                }%>
+		                                                        </span>
+		                                                    </td>
 		                                                </tr>
 		                                                <%
 														}
@@ -1997,14 +2025,14 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 		                                                %>  </tbody>
 		                                                </table>
 	                                                    </td>
-		                                                <td></td>
+		                                                <td colspan="2"></td>
 	                                                    </tr>
 		                                                <%
 		                                                for (int n=0; n < obrCommentCount; n++)
 		                                                {%>
 			                                            <tr class="NormalRes">
 				                                            <td></td>
-			                                                <td align="left" valign="top" colspan="2">
+			                                                <td align="left" valign="top" colspan="3">
 				                                                <span style="margin:0; text-align: left;">
 					                                                <%=escapeHtml(handler.getOBRComment(childObrIndex, n))%>
 				                                                </span>
@@ -2036,7 +2064,7 @@ div.Title4   { font-weight: 600; font-size: 8pt; color: white; font-family:
 						                        %>  </tbody>
 	                                                </table>
                                                 </td>
-                                                <td></td>
+			                                    <td colspan="2"></td>
                                             </tr><%
 		                                        }
 										   }

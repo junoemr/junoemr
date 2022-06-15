@@ -711,6 +711,7 @@ public abstract class MessageHandler
 
 	/**
 	 * check if the report is marked as blocked. mostly related to OLIS and custom lab imports
+	 * indicates blocked, sensitive, or confidential data within the report
 	 * @return true if blocked
 	 */
 	public boolean isReportBlocked()
@@ -1192,6 +1193,11 @@ public abstract class MessageHandler
 	}
 
 	public boolean isUnstructured()
+	{
+		return false;
+	}
+
+	public boolean showStatusForUnstructured()
 	{
 		return false;
 	}

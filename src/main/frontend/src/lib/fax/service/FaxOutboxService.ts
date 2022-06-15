@@ -39,7 +39,7 @@ export default class FaxOutboxService
 			params.combinedStatus as any,
 			params.archived,
 		)).data;
-		return new PagedResponse(this.faxOutboxResultToModelConverter.convertList(transfer.body, transfer.headers));
+		return new PagedResponse(this.faxOutboxResultToModelConverter.convertList(transfer.body), transfer.headers);
 	}
 
 	public async download(recordId: number): Promise<void>

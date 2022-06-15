@@ -1,6 +1,18 @@
 import {ErrorHandler} from "./ErrorHandler";
+import {LogLevel} from "./LogLevel";
+import GenericError from "../GenericError";
+import BaseError from "../BaseError";
 
-export default class BasicErrorHandler implements ErrorHandler {
+export default class BasicErrorHandler implements ErrorHandler
+{
+	private readonly _rethrow: boolean;
+	private readonly _logLevel: LogLevel;
+
+	constructor(rethrow: boolean = false, logLevel: LogLevel = LogLevel.ERROR)
+	{
+		this._rethrow = rethrow;
+		this._logLevel = logLevel;
+	}
 
 	/**
 	 * Optional behaviour to call on the error object.
@@ -18,16 +30,46 @@ export default class BasicErrorHandler implements ErrorHandler {
 	 */
 	public handleError(response: any): any
 	{
-		console.error(response);
+		this.logError(response);
 		this.serviceError(response);
 
-		if (response && response.data && response.data.error)
+		if(this.rethrow)
 		{
-			throw response.data.error;
+			if (response instanceof BaseError)
+			{
+				throw response;
+			}
+			if (response && response.data && response.data.error)
+			{
+				throw new GenericError(response.data.error);
+			}
+			else
+			{
+				throw new GenericError(response);
+			}
 		}
-		else
+	}
+
+	protected logError(message: any)
+	{
+		switch (this.logLevel)
 		{
-			throw response;
+			case LogLevel.CRITICAL: console.error(message); break;
+			case LogLevel.ERROR: console.error(message); break;
+			case LogLevel.WARN: console.warn(message); break;
+			case LogLevel.INFO: console.info(message); break;
+			case LogLevel.DEBUG: console.debug(message); break;
+			case LogLevel.NONE: break;
 		}
+	}
+
+	get rethrow(): boolean
+	{
+		return this._rethrow;
+	}
+
+	get logLevel(): LogLevel
+	{
+		return this._logLevel;
 	}
 }

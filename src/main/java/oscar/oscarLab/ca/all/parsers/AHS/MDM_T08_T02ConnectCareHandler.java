@@ -170,14 +170,17 @@ public abstract class MDM_T08_T02ConnectCareHandler extends MDM_T08_T02MessageHa
 			}
 		}
 
-		// add pv1 provider to cc docs
-		int pd1_4Count = getFieldReps("/.PD1", 4);
-		for(int k = 0; k < pd1_4Count; k++)
+		// add pv1 provider to cc docs if not marked confidential
+		if(!isReportBlocked())
 		{
-			String docName = getFullDocName("/.PD1", 4, k);
-			if(StringUtils.isNotBlank(docName))
+			int pd1_4Count = getFieldReps("/.PD1", 4);
+			for(int k = 0; k < pd1_4Count; k++)
 			{
-				docNames.add(docName);
+				String docName = getFullDocName("/.PD1", 4, k);
+				if(StringUtils.isNotBlank(docName))
+				{
+					docNames.add(docName);
+				}
 			}
 		}
 		return docNames;
@@ -202,14 +205,17 @@ public abstract class MDM_T08_T02ConnectCareHandler extends MDM_T08_T02MessageHa
 				}
 			}
 
-			// add pv1 provider to cc docs
-			int pd1_4Count = getFieldReps("/.PD1", 4);
-			for(int k = 0; k < pd1_4Count; k++)
+			// add pv1 provider to cc docs if not marked confidential
+			if(!isReportBlocked())
 			{
-				String docId = get("/.PD1-4(" + k + ")-1");
-				if(StringUtils.isNotBlank(docId))
+				int pd1_4Count = getFieldReps("/.PD1", 4);
+				for(int k = 0; k < pd1_4Count; k++)
 				{
-					docIds.add(docId);
+					String docId = get("/.PD1-4(" + k + ")-1");
+					if(StringUtils.isNotBlank(docId))
+					{
+						docIds.add(docId);
+					}
 				}
 			}
 		}
@@ -218,6 +224,37 @@ public abstract class MDM_T08_T02ConnectCareHandler extends MDM_T08_T02MessageHa
 			logger.error("Could not return doctor nums", e);
 		}
 		return docIds;
+	}
+
+	/**
+	 * indicates blocked or sensitive data within the report
+	 * @return true if report flagged as sensitive/confidential
+	 */
+	@Override
+	public boolean isReportBlocked()
+	{
+		String status = getString(get("/.TXA-18"));
+
+		if(getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		{
+			switch(status)
+			{
+				case "R":              // Restricted
+				case "V": return true; // Very restricted
+				case "U":              // Usual control
+				default: return false;
+			}
+		}
+		else
+		{
+			switch(status)
+			{
+				case "RE":              // Restricted
+				case "VR": return true; // Very restricted
+				case "UC":              // Usual control
+				default: return false;
+			}
+		}
 	}
 
 }
