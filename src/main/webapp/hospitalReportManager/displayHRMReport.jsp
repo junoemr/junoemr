@@ -753,7 +753,8 @@
 					// same ergonomics as labs.
 					if (isSign && jQuery("#prev").val().toLowerCase() === "inbox")
 					{
-						window.opener.location.reload(false);
+						window.opener.Effect.BlindUp('labdoc_' + reportId);
+						window.opener.refreshCategoryList();
 						window.close()
 					}
 					else
