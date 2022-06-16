@@ -168,7 +168,6 @@
 <%@ page import="org.oscarehr.hospitalReportManager.dao.HRMProviderConfidentialityStatementDao" %>
 <%@ page import="org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
 <%!
@@ -800,6 +799,24 @@
             }
         }
 
+        function openDemographicMaster(demographicId)
+        {
+            if(demographicId)
+            {
+                let url = "../demographic/demographiccontrol.jsp?dboperation=search_detail&displaymode=edit&demographic_no=" + demographicId;
+                window.open(url, "master", 'width=1024,height=710');
+            }
+        }
+
+        function openDemographicChart(demographicId)
+        {
+            if(demographicId)
+            {
+                let url = "../oscarEncounter/IncomingEncounter.do?demographicNo=" + demographicId;
+                window.open(url, "encounter", 'width=1024,height=710');
+            }
+        }
+
     </script>
 </head>
 <body id="hrmReport">
@@ -926,7 +943,12 @@
                     Demographic demographic = demographicDao.find(demographicLink.getDemographicNo());
                 %>
                 <tr>
-                    <td><%=demographic.getFormattedName()%> (<%=demographic.getSex()%>) <a class="<%= previewMode ? "hide-on-preview" : ""%>" href="#" onclick="removeDemoFromHrm('<%=hrmDocument.getId()%>')">(remove)</a></td>
+                    <td>
+                        <span><%=demographic.getFormattedName()%> (<%=demographic.getSex()%>)</span>
+                        <a class="<%= previewMode ? "hide-on-preview" : ""%>" href="#" onclick="openDemographicMaster('<%=demographic.getId()%>')">M</a>
+                        <a class="<%= previewMode ? "hide-on-preview" : ""%>" href="#" onclick="openDemographicChart('<%=demographic.getId()%>')">E</a>
+                        <a class="<%= previewMode ? "hide-on-preview" : ""%>" href="#" onclick="removeDemoFromHrm('<%=hrmDocument.getId()%>')">(remove)</a>
+                    </td>
                 </tr>
                 <tr>
                     <td><%=demographic.getHin()%> <%=demographic.getVer()%> <%=demographic.getHcType()%></td>
