@@ -22,6 +22,7 @@
 <%@page import="java.util.List"%>
 <%@ page import="org.oscarehr.labs.service.Hl7TextInfoService" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.oscarehr.dataMigration.model.hrm.HrmDocument" %>
 
 <%
       String roleName$ = (String)session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -312,7 +313,7 @@ String curUser_no = (String) session.getAttribute("user");
                                     <a href="javascript:void(0);" onclick="reportWindow('<%=url.toString()%>',screen.availHeight, screen.availWidth); return false;" ><%=labRead + StringEscapeUtils.escapeHtml(result.getPatientName())%></a>
                                     
                                     <% }else if(result.isHRM()){%>
-                                    <a href="javascript:reportWindow('../hospitalReportManager/displayHRMReport.jsp?id=<%=segmentID%>',850,1020)"><%=labRead%><%=result.getPatientName()%></a>
+                                    <a href="javascript:reportWindow('../hospitalReportManager/displayHRMReport.jsp?prev=inbox&id=<%=segmentID%>',850,1020)"><%=labRead%><%=result.getPatientName()%></a>
                                     <% }else {%>
                                     <a href="javascript:parent.reportWindow('<%=request.getContextPath()%>/lab/CA/BC/labDisplay.jsp?segmentID=<%=segmentID%>&providerNo=<%=providerNo%>&searchProviderNo=<%=searchProviderNo%>&status=<%=status%>')"><%=labRead%><%=StringEscapeUtils.escapeJavaScript(result.getPatientName())%></a>
                                     <% }%>
@@ -336,7 +337,11 @@ String curUser_no = (String) session.getAttribute("user");
                                     <%=result.isDocument() ? result.description == null ? "" : result.description : result.getDisciplineDisplayString()%>
                                 </td>
                                 <td nowrap> <!--  -->
-                                    <%= (Hl7TextInfoService.getReportStatusDisplayString(Hl7TextInfoService.getReportStatusFromString(result.getReportStatus())))%>
+									<% if (result.isHRM()) {%>
+                                        <%= result.getReportStatus() != null ? HrmDocument.ReportStatus.fromValueString(result.getReportStatus()).toDisplayName() : ""%>
+									<% } else { %>
+                                    	<%= (Hl7TextInfoService.getReportStatusDisplayString(Hl7TextInfoService.getReportStatusFromString(result.getReportStatus())))%>
+									<% } %>
                                 </td>
                                 <td nowrap>
                                     <% int multiLabCount = result.getMultipleAckCount(); %>

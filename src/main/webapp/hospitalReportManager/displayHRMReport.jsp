@@ -753,7 +753,18 @@
 				url: "<%=request.getContextPath() %>/hospitalReportManager/Modify.do",
 				data: data,
 				success: function(data) {
-					window.location.reload();
+					// refresh the parent and dismiss the page if from the inbox
+					// same ergonomics as labs.
+					if (isSign && jQuery("#prev").val().toLowerCase() === "inbox")
+					{
+						window.opener.Effect.BlindUp('labdoc_' + reportId);
+						window.opener.refreshCategoryList();
+						window.close()
+					}
+					else
+					{
+						window.location.reload();
+					}
 				}
 			});
 		}
@@ -812,6 +823,8 @@
     String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 %>
 <div id="hrmReportContent">
+	<!-- Determine if we came here from the inbox (or not) -->
+	<input type="hidden" id="prev" value="<%=request.getParameter("prev")%>">
     <div id="hrmHeader"><b>HRM Patient Record</b><br/>
         <b>Name: </b><span class="<%=getFieldClass(lastName)%>"><%=getFieldDisplayValue(lastName)%></span>, <span class="<%=getFieldClass(firstName)%>"><%=getFieldDisplayValue(firstName)%></span> <span class="<%=getFieldClass(gender)%>">(<%=getFieldDisplayValue(gender)%>)</span><br/>
         <b>DOB: </b><span class="<%=getFieldClass(dateOfBirth)%>"><%=getFieldDisplayValue(dateOfBirth)%></span><br>
