@@ -9,6 +9,7 @@
 
 package org.oscarehr.hospitalReportManager.reportImpl;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.mina.util.Base64;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.hospitalReportManager.HRMReport;
@@ -18,6 +19,7 @@ import xml.hrm.v4_1.Demographics;
 import xml.hrm.v4_1.HealthCard;
 import xml.hrm.v4_1.OmdCds;
 import xml.hrm.v4_1.PatientRecord;
+import xml.hrm.v4_1.PersonNameSimple;
 import xml.hrm.v4_1.PersonNameStandard;
 import xml.hrm.v4_1.PersonNameStandard.LegalName.OtherName;
 import xml.hrm.v4_1.ReportFormat;
@@ -231,7 +233,16 @@ public class HRMReport_4_1 implements HRMReport
 	{
 		if (getReport().isPresent())
 		{
-			return getReport().get().getFormat().equals(ReportFormat.BINARY);
+			ReportsReceived report = getReport().get();
+			ReportFormat format = report.getFormat();
+			if(format != null)
+			{
+				return format.equals(ReportFormat.BINARY);
+			}
+			else
+			{
+				return StringUtils.isNotBlank(report.getFileExtensionAndVersion()) && (getBinaryContent() != null);
+			}
 		}
 
 		return false;
@@ -312,17 +323,18 @@ public class HRMReport_4_1 implements HRMReport
 	public String getAuthorPhysician()
 	{
 		StringBuilder nameBuilder = new StringBuilder();
-
 		if (getReport().isPresent())
 		{
-			String physicianHL7String = getReport().get().getAuthorPhysician().getLastName();
-			String[] physicianNameComponents = physicianHL7String.split("^");
-
-			for (int i = 0; i < physicianNameComponents.length; i++)
+			PersonNameSimple physicianHL7 = getReport().get().getAuthorPhysician();
+			if (physicianHL7 != null && physicianHL7.getLastName() != null)
 			{
-				if (!physicianNameComponents[i].isEmpty())
+				String[] physicianNameArray = physicianHL7.getLastName().split("\\^");
+				for (String namePart : physicianNameArray)
 				{
-					nameBuilder.append(physicianNameComponents[i]).append(" ");
+					if (!namePart.isEmpty())
+					{
+						nameBuilder.append(namePart).append(" ");
+					}
 				}
 			}
 		}
