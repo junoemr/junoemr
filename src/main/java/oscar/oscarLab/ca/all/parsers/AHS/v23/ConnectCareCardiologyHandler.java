@@ -28,6 +28,7 @@ import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import org.apache.commons.lang.StringUtils;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareLabType;
 
 public class ConnectCareCardiologyHandler extends ConnectCareHandler
 {
@@ -42,7 +43,7 @@ public class ConnectCareCardiologyHandler extends ConnectCareHandler
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
 
-			return "CCCARDIOLOGY".equalsIgnoreCase(sendingApplication) &&
+			return ConnectCareLabType.CCCARDIOLOGY.name().equalsIgnoreCase(sendingApplication) &&
 					"AHS".equalsIgnoreCase(sendingFacility);
 		}
 		return false;
@@ -66,7 +67,7 @@ public class ConnectCareCardiologyHandler extends ConnectCareHandler
 	@Override
 	public String getMsgType()
 	{
-		return "CCCARDIOLOGY";
+		return ConnectCareLabType.CCCARDIOLOGY.name();
 	}
 
 	@Override

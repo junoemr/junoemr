@@ -28,6 +28,7 @@ import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import org.apache.commons.lang3.tuple.Pair;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareLabType;
 
 import java.util.ArrayList;
 
@@ -44,7 +45,7 @@ public class ConnectCareDiagnosticImagingHandler extends ConnectCareHandler
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
 
-			return "CCIMAGING".equalsIgnoreCase(sendingApplication) &&
+			return ConnectCareLabType.CCIMAGING.name().equalsIgnoreCase(sendingApplication) &&
 					"AHS".equalsIgnoreCase(sendingFacility);
 		}
 		return false;
@@ -58,7 +59,7 @@ public class ConnectCareDiagnosticImagingHandler extends ConnectCareHandler
 	@Override
 	public String getMsgType()
 	{
-		return "CCIMAGING";
+		return ConnectCareLabType.CCIMAGING.name();
 	}
 
 	/**

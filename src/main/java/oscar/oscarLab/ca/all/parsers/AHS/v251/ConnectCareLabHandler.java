@@ -32,6 +32,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.hl7.AHS.model.v251.segment.ZBR;
 import org.oscarehr.util.MiscUtils;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareLabType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +53,7 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
 
-			return "CCLAB".equalsIgnoreCase(sendingApplication) &&
+			return ConnectCareLabType.CCLAB.name().equalsIgnoreCase(sendingApplication) &&
 					"AHS".equalsIgnoreCase(sendingFacility);
 		}
 		return false;
@@ -61,7 +62,7 @@ public class ConnectCareLabHandler extends ConnectCareHandler
 	@Override
 	public String getMsgType()
 	{
-		return "CCLAB";
+		return ConnectCareLabType.CCLAB.name();
 	}
 
 	public ConnectCareLabHandler(Message msg) throws HL7Exception

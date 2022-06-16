@@ -30,6 +30,7 @@ import ca.uhn.hl7v2.model.v23.segment.MSH;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.model.Hl7TextInfo;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareLabType;
 import oscar.oscarLab.ca.all.parsers.messageTypes.MDM_T11MessageHandler;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
 
-			return "CCDOC".equalsIgnoreCase(sendingApplication) &&
+			return ConnectCareLabType.CCDOC.name().equalsIgnoreCase(sendingApplication) &&
 					"AHS".equalsIgnoreCase(sendingFacility);
 		}
 		return false;
@@ -62,7 +63,7 @@ public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 	@Override
 	public String getMsgType()
 	{
-		return "CCDOC";
+		return ConnectCareLabType.CCDOC.name();
 	}
 
 	@Override

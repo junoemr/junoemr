@@ -26,6 +26,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.datatype.CX;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.hl7.AHS.model.v23.message.ORU_R01;
 import org.oscarehr.common.model.Hl7TextInfo;
@@ -37,6 +38,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 {
@@ -64,8 +66,7 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	 */
 	public static boolean isConnectCareHandler(MessageHandler handler)
 	{
-		String handlerType = handler.getMsgType();
-		return getConnectCareLabTypes().contains(handlerType);
+		return EnumUtils.isValidEnum(ConnectCareLabType.class, handler.getMsgType());
 	}
 
 	/**
@@ -74,7 +75,7 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	 */
 	public static List<String> getConnectCareLabTypes()
 	{
-		return Arrays.asList("CCLAB", "CCIMAGING", "CCCARDIOLOGY", "CCENDO", "CCDOC");
+		return Arrays.stream(ConnectCareLabType.values()).map(Enum::name).collect(Collectors.toList());
 	}
 
 	public ConnectCareHandler(Message msg) throws HL7Exception

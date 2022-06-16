@@ -26,6 +26,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.MDM_T08;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareLabType;
 import oscar.oscarLab.ca.all.parsers.AHS.MDM_T08_T02ConnectCareHandler;
 
 public class ConnectCareDocumentationEditHandler extends MDM_T08_T02ConnectCareHandler
@@ -46,7 +47,7 @@ public class ConnectCareDocumentationEditHandler extends MDM_T08_T02ConnectCareH
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
 
-			return "CCDOC".equalsIgnoreCase(sendingApplication) &&
+			return ConnectCareLabType.CCDOC.name().equalsIgnoreCase(sendingApplication) &&
 					"AHS".equalsIgnoreCase(sendingFacility);
 		}
 		return false;
@@ -55,7 +56,7 @@ public class ConnectCareDocumentationEditHandler extends MDM_T08_T02ConnectCareH
 	@Override
 	public String getMsgType()
 	{
-		return "CCDOC";
+		return ConnectCareLabType.CCDOC.name();
 	}
 
 	@Override

@@ -26,12 +26,11 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v251.message.MDM_T02;
 import ca.uhn.hl7v2.model.v251.segment.MSH;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareLabType;
 import oscar.oscarLab.ca.all.parsers.AHS.MDM_T08_T02ConnectCareHandler;
 
 public class ConnectCareProviderCommunicationsHandler extends MDM_T08_T02ConnectCareHandler
 {
-	public static final String AHS_CCCOMM_LAB_TYPE = "CCCOMM";
-
 	public ConnectCareProviderCommunicationsHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
@@ -48,7 +47,7 @@ public class ConnectCareProviderCommunicationsHandler extends MDM_T08_T02Connect
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
 
-			return AHS_CCCOMM_LAB_TYPE.equalsIgnoreCase(sendingApplication) &&
+			return ConnectCareLabType.CCCOMM.name().equalsIgnoreCase(sendingApplication) &&
 					"AHS".equalsIgnoreCase(sendingFacility);
 		}
 		return false;
@@ -57,7 +56,7 @@ public class ConnectCareProviderCommunicationsHandler extends MDM_T08_T02Connect
 	@Override
 	public String getMsgType()
 	{
-		return AHS_CCCOMM_LAB_TYPE;
+		return ConnectCareLabType.CCCOMM.name();
 	}
 
 	@Override
