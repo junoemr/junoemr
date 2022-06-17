@@ -1,52 +1,48 @@
 BEGIN;
 
-ALTER TABLE demographic_roster MODIFY roster_termination_reason VARCHAR(128);
-
 INSERT INTO demographic_roster(demographic_no, rostered_physician, ohip_no, roster_status_id, roster_date, roster_termination_date, roster_termination_reason)
-
 SELECT d.demographic_no, 
-	CONCAT(p.last_name, ", ", p.first_name), 
-	IF(p.ohip_no != '', p.ohip_no, NULL), 
+	IF(d.family_doctor_2 != '<fd></fd>' AND ExtractValue(d.family_doctor_2, '//fdname') != '', ExtractValue(d.family_doctor_2, '//fdname'), NULL), 
+	IF(d.family_doctor_2 != '<fd></fd>' AND ExtractValue(d.family_doctor_2, '//fd') != '', ExtractValue(d.family_doctor_2, '//fd'), NULL), 
 	(SELECT id FROM roster_status WHERE roster_status = d.roster_status), 
 	IF(d.roster_date != '', d.roster_date, NULL), 
-	IF(d.roster_termination_date != '', d.roster_termination_date, NULL), 
+	IF(d.roster_termination_date != '' AND d.roster_status != 'RO', d.roster_termination_date, NULL), 
 CASE
-	WHEN d.roster_termination_reason = '' THEN NULL
-	WHEN d.roster_termination_reason = 12 THEN 'Health Number error'
-	WHEN d.roster_termination_reason = 14 THEN 'Patient identified as deceased on ministry database'
-	WHEN d.roster_termination_reason = 24 THEN 'Patient added to roster in error'
-	WHEN d.roster_termination_reason = 30 THEN 'Pre-member/ Assigned member ended; now enrolled or registered with red and white health card'
-	WHEN d.roster_termination_reason = 32 THEN 'Pre-member/ Assigned member ended; now enrolled or registered with photo health card'
-	WHEN d.roster_termination_reason = 33 THEN 'Termination reason cannot be released (due to patient confidentiality)'
-	WHEN d.roster_termination_reason = 35 THEN 'Patient transferred from roster per physician request'
-	WHEN d.roster_termination_reason = 36 THEN 'Original enrolment ended; patient now re-enroled'
-	WHEN d.roster_termination_reason = 37 THEN 'Original enrolment ended; patient now enrolled as Long Term Care'
-	WHEN d.roster_termination_reason = 38 THEN 'Long Term Care enrolment ended; patient has left Long Term Care'
-	WHEN d.roster_termination_reason = 39 THEN 'Assigned member status ended; roster transferred per physician request'
-	WHEN d.roster_termination_reason = 40 THEN 'Physician reported member as deceased'
-	WHEN d.roster_termination_reason = 41 THEN 'Patient no longer meets selection criteria for your roster - assigned to another physician'
-	WHEN d.roster_termination_reason = 42 THEN 'Physician ended enrolment; patient entered Long Term Care facility'
-	WHEN d.roster_termination_reason = 44 THEN 'Physician ended patient enrolment'
-	WHEN d.roster_termination_reason = 51 THEN 'Patient no longer meets selection criteria for your roster'
-	WHEN d.roster_termination_reason = 53 THEN 'Physician ended enrolment; patient moved out of geographic area'
-	WHEN d.roster_termination_reason = 54 THEN 'Physician ended enrolment; patient left province'
-	WHEN d.roster_termination_reason = 56 THEN 'Physician ended enrolment; per patient request'
-	WHEN d.roster_termination_reason = 57 THEN 'Enrolment terminated by patient'
-	WHEN d.roster_termination_reason = 59 THEN 'Enrolment ended; patient out of geographic area'
-	WHEN d.roster_termination_reason = 60 THEN 'No current eligibility'
-	WHEN d.roster_termination_reason = 61 THEN 'Patient out of geographic area; address over-ride applied'
-	WHEN d.roster_termination_reason = 62 THEN 'Patient out of geographic area; address over-ride removed'
-	WHEN d.roster_termination_reason = 73 THEN 'No current eligibility'
-	WHEN d.roster_termination_reason = 74 THEN 'No current eligibility'
-	WHEN d.roster_termination_reason = 82 THEN 'Ministry has not received enrolment/ Consent form'
-	WHEN d.roster_termination_reason = 84 THEN 'Termination reason cannot be released (due to patient confidentiality)'
-	WHEN d.roster_termination_reason = 90 THEN 'Termination reason cannot be released (due to patient confidentiality)'
-	WHEN d.roster_termination_reason = 91 THEN 'Termination reason cannot be released (due to patient confidentiality)'
+	WHEN d.roster_termination_reason = 12 THEN 'HEALTH_NUM'
+	WHEN d.roster_termination_reason = 14 THEN 'MINISTRY_REPORTED_DECEASED'
+	WHEN d.roster_termination_reason = 24 THEN 'ASSIGNED_IN_ERROR'
+	WHEN d.roster_termination_reason = 30 THEN 'REGISTERED_RED_CARD'
+	WHEN d.roster_termination_reason = 32 THEN 'REGISTERED_PHOTO_CARD'
+	WHEN d.roster_termination_reason = 33 THEN 'CONFIDENTIAL'
+	WHEN d.roster_termination_reason = 35 THEN 'TRANSFERRED'
+	WHEN d.roster_termination_reason = 36 THEN 'RE_ENROLLED'
+	WHEN d.roster_termination_reason = 37 THEN 'ENTERED_LONG_TERM_CARE'
+	WHEN d.roster_termination_reason = 38 THEN 'LEFT_LONG_TERM_CARE'
+	WHEN d.roster_termination_reason = 39 THEN 'ASSIGNMENT_ENDED'
+	WHEN d.roster_termination_reason = 40 THEN 'PHYSICIAN_REPORTED_DECEASED'
+	WHEN d.roster_termination_reason = 41 THEN 'NO_LONGER_MEETS_CRITERIA_REASSIGNED'
+	WHEN d.roster_termination_reason = 42 THEN 'PHYSICIAN_ENDED_LONG_TERM_CARE'
+	WHEN d.roster_termination_reason = 44 THEN 'PHYSICIAN_ENDED_PATIENT_ENROLMENT'
+	WHEN d.roster_termination_reason = 51 THEN 'NO_LONGER_MEETS_CRITERIA'
+	WHEN d.roster_termination_reason = 53 THEN 'LEFT_GEOGRAPHIC_AREA'
+	WHEN d.roster_termination_reason = 54 THEN 'LEFT_PROVINCE'
+	WHEN d.roster_termination_reason = 56 THEN 'PATIENT_REQUESTED_END'
+	WHEN d.roster_termination_reason = 57 THEN 'PATIENT_TERMINATED_ENROLMENT'
+	WHEN d.roster_termination_reason = 59 THEN 'OUT_OF_GEOGRAPHIC_AREA'
+	WHEN d.roster_termination_reason = 60 THEN 'NO_CURRENT_ELIGIBILITY'
+	WHEN d.roster_termination_reason = 61 THEN 'OUT_OF_GEOGRAPHIC_AREA_OVERRIDE_APPLIED'
+	WHEN d.roster_termination_reason = 62 THEN 'OUT_OF_GEOGRAPHIC_AREA_OVERRIDE_REMOVED'
+	WHEN d.roster_termination_reason = 73 THEN 'NO_ELIGIBILITY_73'
+	WHEN d.roster_termination_reason = 74 THEN 'NO_ELIGIBILITY_74'
+	WHEN d.roster_termination_reason = 82 THEN 'NO_CONSENT_FORM'
+	WHEN d.roster_termination_reason = 84 THEN 'CONFIDENTIAL_84'
+	WHEN d.roster_termination_reason = 90 THEN 'CONFIDENTIAL_90'
+	WHEN d.roster_termination_reason = 91 THEN 'CONFIDENTIAL_91'
+	ELSE NULL
 END
 FROM demographic d
-JOIN provider p ON d.provider_no = p.provider_no
 WHERE d.roster_status IS NOT NULL 
 AND d.roster_status != ""
-AND d.demographic_no NOT IN(SELECT demographic_no FROM demographic_roster);
+AND d.demographic_no NOT IN(SELECT DISTINCT demographic_no FROM demographic_roster);
 
 COMMIT;
