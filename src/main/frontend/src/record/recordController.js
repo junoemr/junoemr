@@ -141,7 +141,7 @@ angular.module('Record').controller('Record.RecordController', [
 					if (controller.page.encounterNote.note === controller.page.initNote) return; //user did not input anything, don't save
 
 					console.log("save", controller.page.encounterNote);
-					noteService.tmpSave($stateParams.demographicNo,
+					noteService.tempSave($stateParams.demographicNo,
 						controller.page.encounterNote.note,
 						controller.page.encounterNote.noteId).then(() =>
 					{
@@ -342,17 +342,17 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-		// TODO-legacy
-		controller.cancelNoteEdit = function cancelNoteEdit()
+		controller.cancelNoteEdit = async () =>
 		{
 			console.log('CANCELLING EDIT');
 			controller.page.encounterNote = null;
 			$scope.$broadcast('stopEditingNote');
 			controller.skipTmpSave = true;
-			controller.getCurrentNote(false);
-			controller.removeEditingNoteFlag();
 			controller.$storage.hideNote = true;
-		};
+			await noteService.clearTempSave($stateParams.demographicNo);
+			await controller.getCurrentNote(false);
+			controller.removeEditingNoteFlag();
+		}
 
 		// This is a hack wrapper until we figure out a more sane way to check the DOM for updated content
 		// Right now this is being called from anywhere that directly manipulates the DOM

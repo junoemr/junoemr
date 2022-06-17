@@ -130,9 +130,14 @@ angular.module("Common.Services").service("noteService", [
 			return deferred.promise;
 		};
 
-		service.tmpSave = async (demographicNo, note, noteId = null) =>
+		service.tempSave = async (demographicNo, note, noteId = null) =>
 		{
 			return service.demographicNoteApi.saveTempNote(demographicNo, noteId, note);
+		}
+
+		service.clearTempSave = async (demographicNo) =>
+		{
+			return service.demographicNoteApi.deleteTempNote(demographicNo);
 		}
 
 		service.getNoteExt = function getNoteExt(noteId)

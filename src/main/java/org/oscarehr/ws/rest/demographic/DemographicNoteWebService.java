@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -65,17 +66,6 @@ public class DemographicNoteWebService extends AbstractServiceImpl
 		return RestResponse.successResponse(modelOption.orElse(null));
 	}
 
-	@GET
-	@Path("/temp/{tempNoteId}")
-	public RestResponse<TempNoteModel> getTempNote(@PathParam("demographicNo") Integer demographicId,
-	                                               @PathParam("tempNoteId") Integer tempNoteId)
-	{
-		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.ENCOUNTER_NOTE_READ);
-
-		TempNoteModel model = tempNoteService.getTempNote(tempNoteId);
-		return RestResponse.successResponse(model);
-	}
-
 	@POST
 	@Path("/temp")
 	public RestResponse<TempNoteModel> saveTempNote(@PathParam("demographicNo") Integer demographicId,
@@ -87,5 +77,13 @@ public class DemographicNoteWebService extends AbstractServiceImpl
 
 		TempNoteModel model = tempNoteService.setTempNote(getLoggedInProviderId(), demographicId, noteInput, noteId);
 		return RestResponse.successResponse(model);
+	}
+
+	@DELETE
+	@Path("/temp")
+	public RestResponse<Boolean> deleteTempNote(@PathParam("demographicNo") Integer demographicId)
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.ENCOUNTER_NOTE_DELETE);
+		return RestResponse.successResponse(tempNoteService.deleteTempNote(getLoggedInProviderId(), demographicId));
 	}
 }

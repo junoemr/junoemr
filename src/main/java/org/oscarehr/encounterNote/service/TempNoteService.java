@@ -48,18 +48,26 @@ public class TempNoteService
 	@Autowired
 	protected TempNoteToModelConverter tempNoteToModelConverter;
 
-	public Optional<TempNoteModel> getTempNote(String providerId, Integer demographicNo)
+	/**
+	 * retrieve a tempNote if it exists, keyed on the provider and demographic id
+	 * @param providerId the provider id the note is keyed on
+	 * @param demographicId the demographic id the note is keyed on
+	 * @return the optional model
+	 */
+	public Optional<TempNoteModel> getTempNote(String providerId, Integer demographicId)
 	{
-		Optional<CaseManagementTmpSave> existingTempSave = caseManagementTmpSaveDao.findOptional(providerId, demographicNo);
+		Optional<CaseManagementTmpSave> existingTempSave = caseManagementTmpSaveDao.findOptional(providerId, demographicId);
 		return existingTempSave.map((tmpSave) -> tempNoteToModelConverter.convert(tmpSave));
 	}
 
-	public TempNoteModel getTempNote(Integer tempNoteId)
-	{
-		CaseManagementTmpSave tmpSave = caseManagementTmpSaveDao.find(tempNoteId);
-		return tempNoteToModelConverter.convert(tmpSave);
-	}
-
+	/**
+	 * create or update a temp note, keyed on the provider and demographic id
+	 * @param providerId the provider id the note is keyed on
+	 * @param demographicId the demographic id the note is keyed on
+	 * @param noteInput the note text to save
+	 * @param noteId the optional note id, for linking to an existing note
+	 * @return the updated model
+	 */
 	public TempNoteModel setTempNote(String providerId, Integer demographicId, String noteInput, Integer noteId)
 	{
 		Optional<CaseManagementTmpSave> existingTempSave = caseManagementTmpSaveDao.findOptional(providerId, demographicId);
@@ -78,9 +86,25 @@ public class TempNoteService
 			tempSave.setDemographicNo(demographicId);
 			tempSave.setProviderNo(providerId);
 			tempSave.setProgramId(programManager.getProgramIdByProgramName("OSCAR"));// can we remove program id outright?
-			// use persist over merge for new entites so that the generated id is attached properly
 			caseManagementTmpSaveDao.persist(tempSave);
 		}
 		return tempNoteToModelConverter.convert(tempSave);
+	}
+
+	/**
+	 * delete the temp save note if it exists
+	 * @param providerId the provider id the note is keyed on
+	 * @param demographicId the demographic id the note is keyed on
+	 * @return true if a temp note was deleted, false otherwise
+	 */
+	public boolean deleteTempNote(String providerId, Integer demographicId)
+	{
+		Optional<CaseManagementTmpSave> existingTempSave = caseManagementTmpSaveDao.findOptional(providerId, demographicId);
+		if(existingTempSave.isPresent())
+		{
+			caseManagementTmpSaveDao.remove(existingTempSave.get());
+			return true;
+		}
+		return false;
 	}
 }
