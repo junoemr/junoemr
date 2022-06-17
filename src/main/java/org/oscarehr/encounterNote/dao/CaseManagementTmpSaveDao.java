@@ -24,6 +24,7 @@
 package org.oscarehr.encounterNote.dao;
 
 import java.util.Date;
+import java.util.Optional;
 import javax.persistence.Query;
 
 import org.oscarehr.common.dao.AbstractDao;
@@ -37,7 +38,8 @@ public class CaseManagementTmpSaveDao extends AbstractDao<CaseManagementTmpSave>
 	public CaseManagementTmpSaveDao() {
 		super(CaseManagementTmpSave.class);
 	}
-	
+
+	@Deprecated // programId being phased out
     public int remove(String providerNo, Integer demographicNo, Integer programId) {
     	Query query = entityManager.createQuery("DELETE FROM CaseManagementTmpSave x WHERE x.providerNo = :provNo and x.demographicNo=:demoNo and x.programId = :progId");
     	query.setParameter("provNo", providerNo);
@@ -47,6 +49,16 @@ public class CaseManagementTmpSaveDao extends AbstractDao<CaseManagementTmpSave>
 		return query.executeUpdate();
     }
 
+	public CaseManagementTmpSave find(String providerNo, Integer demographicNo)
+	{
+		Query query = entityManager.createQuery("SELECT x FROM CaseManagementTmpSave x WHERE x.providerNo = :providerId and x.demographicNo= :demographicId order by x.updateDate DESC");
+		query.setParameter("providerId", providerNo);
+		query.setParameter("demographicId", demographicNo);
+
+		return this.getSingleResultOrNull(query);
+	}
+
+	@Deprecated // programId being phased out
     public CaseManagementTmpSave find(String providerNo, Integer demographicNo, Integer programId) {
     	Query query = entityManager.createQuery("SELECT x FROM CaseManagementTmpSave x WHERE x.providerNo = ?1 and x.demographicNo=?2 and x.programId = ?3 order by x.updateDate DESC");
 		query.setParameter(1,providerNo);
@@ -55,7 +67,8 @@ public class CaseManagementTmpSaveDao extends AbstractDao<CaseManagementTmpSave>
 		
 		return this.getSingleResultOrNull(query);
     }
-    
+
+	@Deprecated // programId being phased out
     public CaseManagementTmpSave find(String providerNo, Integer demographicNo, Integer programId, Date date) {
     	Query query = entityManager.createQuery("SELECT x FROM CaseManagementTmpSave x WHERE x.providerNo = ?1 and x.demographicNo=?2 and x.programId = ?3 and x.updateDate >= ?4 order by x.updateDate DESC");
 		query.setParameter(1,providerNo);
@@ -65,6 +78,15 @@ public class CaseManagementTmpSaveDao extends AbstractDao<CaseManagementTmpSave>
 		
 		return this.getSingleResultOrNull(query);
     }
+
+	public Optional<CaseManagementTmpSave> findOptional(String providerNo, Integer demographicNo)
+	{
+		Query query = entityManager.createQuery("SELECT x FROM CaseManagementTmpSave x WHERE x.providerNo = :providerId and x.demographicNo= :demographicId order by x.updateDate DESC");
+		query.setParameter("providerId", providerNo);
+		query.setParameter("demographicId", demographicNo);
+
+		return Optional.ofNullable(this.getSingleResultOrNull(query));
+	}
 
     
 

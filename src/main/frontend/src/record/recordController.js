@@ -141,7 +141,9 @@ angular.module('Record').controller('Record.RecordController', [
 					if (controller.page.encounterNote.note === controller.page.initNote) return; //user did not input anything, don't save
 
 					console.log("save", controller.page.encounterNote);
-					noteService.tmpSave($stateParams.demographicNo, controller.page.encounterNote).then(() =>
+					noteService.tmpSave($stateParams.demographicNo,
+						controller.page.encounterNote.note,
+						controller.page.encounterNote.noteId).then(() =>
 					{
 						controller.noteDirty = false;
 					});

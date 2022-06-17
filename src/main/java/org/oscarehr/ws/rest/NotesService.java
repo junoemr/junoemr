@@ -55,7 +55,6 @@ import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
-import org.oscarehr.encounterNote.converter.CaseManagementTmpSaveConverter;
 import org.oscarehr.encounterNote.dao.CaseManagementTmpSaveDao;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
@@ -73,7 +72,6 @@ import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.TicklerNoteResponse;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
-import org.oscarehr.ws.rest.to.model.CaseManagementTmpSaveTo1;
 import org.oscarehr.ws.rest.to.model.IssueTo1;
 import org.oscarehr.ws.rest.to.model.NoteExtTo1;
 import org.oscarehr.ws.rest.to.model.NoteIssueTo1;
@@ -168,9 +166,6 @@ public class NotesService extends AbstractServiceImpl
 	CaseManagementTmpSaveDao caseManagementTmpSaveDao;
 
 	@Autowired
-	CaseManagementTmpSaveConverter caseManagementTmpSaveConverter;
-
-	@Autowired
 	private PartialDateDao partialDateDao;
 
 	@GET
@@ -232,46 +227,6 @@ public class NotesService extends AbstractServiceImpl
 		NoteSelectionTo1 returnResult  = noteService.searchEncounterNotes(loggedInInfo, criteria);
 
 		return RestResponse.successResponse(returnResult);
-	}
-	
-	
-	
-	@POST
-	@Path("/{demographicNo}/tmpSave")
-	@Consumes("application/json")
-	@Produces("application/json")
-	public NoteTo1 tmpSaveNote(@PathParam("demographicNo") Integer demographicNo, NoteTo1 note)
-	{
-		LoggedInInfo loggedInInfo = getLoggedInInfo();//  LoggedInInfo.loggedInInfo.get();
-		String providerNo = loggedInInfo.getLoggedInProviderNo();
-
-		securityInfoManager.requireAllPrivilege(providerNo, demographicNo, Permission.ENCOUNTER_NOTE_CREATE);
-
-		logger.debug("autosave "+note);
-
-		String programId = getProgram(loggedInInfo, providerNo);
-		String noteStr = note.getNote();
-		String noteId  = ""+note.getNoteId();
-		
-		try{  
-			Integer.parseInt(noteId);
-		}catch(Exception e){
-			noteId = null;
-		}
-
-		if (noteStr == null || noteStr.length() == 0) {
-			return null;
-		}		
-		
-		//delete from tmp save and then add another
-		try {
-			caseManagementMgr.deleteTmpSave(providerNo, ""+demographicNo, programId);
-			caseManagementMgr.tmpSave(providerNo, ""+demographicNo, programId, noteId, noteStr);
-		} catch (Throwable e) {
-			logger.error("AutoSave Error: ", e);
-		}
-
-		return note;
 	}
 
 	/**
@@ -941,25 +896,6 @@ public class NotesService extends AbstractServiceImpl
 	}
 
 	@GET
-	@Path("/{demographicNo}/tmpSave")
-	@Consumes("application/json")
-	@Produces("application/json")
-	public RestResponse<CaseManagementTmpSaveTo1> getTmpSave(@PathParam("demographicNo") Integer demographicNo)
-	{
-		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		String providerNo = loggedInInfo.getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(providerNo, demographicNo, Permission.ENCOUNTER_NOTE_READ);
-
-		Integer programId = getProgramId(loggedInInfo, providerNo);
-
-		CaseManagementTmpSave tmpSave = caseManagementTmpSaveDao.find(providerNo, demographicNo, programId);
-
-		CaseManagementTmpSaveTo1 note = caseManagementTmpSaveConverter.convertCasemanagementTmpSaveToCaseManagementTmpSaveTo1(tmpSave);
-
-		return RestResponse.successResponse(note);
-	}
-
-	@GET
 	@Path("/{demographicNo}/getNoteToEdit/{noteId}")
 	@Consumes("application/json")
 	@Produces("application/json")
@@ -1079,10 +1015,11 @@ public class NotesService extends AbstractServiceImpl
 		// get the last temp note?
 		else if (tmpsavenote != null && !forceNote.equals("true")) {
 			logger.debug("tempsavenote is NOT NULL == noteId :"+tmpsavenote.getNoteId());
-			if (tmpsavenote.getNoteId() > 0) {
+			if (tmpsavenote.getNoteId() != null && tmpsavenote.getNoteId() > 0)
+			{
 //				session.setAttribute("newNote", "false");
 				note = caseManagementMgr.getNote(String.valueOf(tmpsavenote.getNoteId()));
-				logger.debug("Restoring " + String.valueOf(note.getId()));
+				logger.debug("Restoring " + note.getId());
 			} else {
 				logger.debug("creating new note");
 //				session.setAttribute("newNote", "true");
