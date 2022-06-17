@@ -17,6 +17,11 @@ export abstract class BaseNote
 		this._id = id;
 	}
 
+	get id(): string
+	{
+		return this._id;
+	}
+
 	get noteText(): string
 	{
 		return this._noteText;

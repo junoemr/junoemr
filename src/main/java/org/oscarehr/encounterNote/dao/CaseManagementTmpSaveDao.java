@@ -58,6 +58,11 @@ public class CaseManagementTmpSaveDao extends AbstractDao<CaseManagementTmpSave>
 		return this.getSingleResultOrNull(query);
 	}
 
+	public Optional<CaseManagementTmpSave> findOptional(String providerNo, Integer demographicNo)
+	{
+		return Optional.ofNullable(find(providerNo, demographicNo));
+	}
+
 	@Deprecated // programId being phased out
     public CaseManagementTmpSave find(String providerNo, Integer demographicNo, Integer programId) {
     	Query query = entityManager.createQuery("SELECT x FROM CaseManagementTmpSave x WHERE x.providerNo = ?1 and x.demographicNo=?2 and x.programId = ?3 order by x.updateDate DESC");
@@ -78,16 +83,4 @@ public class CaseManagementTmpSaveDao extends AbstractDao<CaseManagementTmpSave>
 		
 		return this.getSingleResultOrNull(query);
     }
-
-	public Optional<CaseManagementTmpSave> findOptional(String providerNo, Integer demographicNo)
-	{
-		Query query = entityManager.createQuery("SELECT x FROM CaseManagementTmpSave x WHERE x.providerNo = :providerId and x.demographicNo= :demographicId order by x.updateDate DESC");
-		query.setParameter("providerId", providerNo);
-		query.setParameter("demographicId", demographicNo);
-
-		return Optional.ofNullable(this.getSingleResultOrNull(query));
-	}
-
-    
-
 }

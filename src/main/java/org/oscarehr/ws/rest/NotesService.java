@@ -55,9 +55,9 @@ import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
-import org.oscarehr.encounterNote.dao.CaseManagementTmpSaveDao;
-import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
+import org.oscarehr.encounterNote.model.TempNoteModel;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.encounterNote.service.TempNoteService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
@@ -102,6 +102,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.oscarehr.encounterNote.model.Issue.SUMMARY_CODE_TICKLER_NOTE;
@@ -163,7 +164,7 @@ public class NotesService extends AbstractServiceImpl
 	private EncounterNoteService encounterNoteService;
 
 	@Autowired
-	CaseManagementTmpSaveDao caseManagementTmpSaveDao;
+	private TempNoteService tempNoteService;
 
 	@Autowired
 	private PartialDateDao partialDateDao;
@@ -382,15 +383,7 @@ public class NotesService extends AbstractServiceImpl
 
 		if(deleteTmpSave)
 		{
-			try
-			{
-				String programId = getProgram(loggedInInfo, providerNo);
-				caseManagementMgr.deleteTmpSave(note.getProviderNo(), demographicNo.toString(), programId);
-			}
-			catch (Exception e)
-			{
-				logger.warn("Error deleting tmpSave", e);
-			}
+			tempNoteService.deleteTempNote(note.getProviderNo(), demographicNo);
 		}
 
 		return RestResponse.successResponse(note);
@@ -966,8 +959,7 @@ public class NotesService extends AbstractServiceImpl
 
 		logger.debug("NoteId " + nId);
 
-		CaseManagementTmpSave tmpsavenote = this.caseManagementMgr.restoreTmpSave(providerNo, ""+demographicNo, programIdString);
-		
+		Optional<TempNoteModel> tempNoteModelOptional = tempNoteService.getTempNote(providerNo, demographicNo);
 
 		logger.debug("Get Note for editing");
 		String strBeanName = "casemgmt_oscar_bean" + demographicNo;
@@ -1013,12 +1005,14 @@ public class NotesService extends AbstractServiceImpl
 
 		}
 		// get the last temp note?
-		else if (tmpsavenote != null && !forceNote.equals("true")) {
-			logger.debug("tempsavenote is NOT NULL == noteId :"+tmpsavenote.getNoteId());
-			if (tmpsavenote.getNoteId() != null && tmpsavenote.getNoteId() > 0)
+		else if (tempNoteModelOptional.isPresent() && !forceNote.equals("true"))
+		{
+			TempNoteModel tempNoteModel = tempNoteModelOptional.get();
+			logger.debug("tempsavenote is NOT NULL == noteId :"+tempNoteModel.getNoteId());
+			if (tempNoteModel.getOptionalNoteId().isPresent())
 			{
 //				session.setAttribute("newNote", "false");
-				note = caseManagementMgr.getNote(String.valueOf(tmpsavenote.getNoteId()));
+				note = caseManagementMgr.getNote(String.valueOf(tempNoteModel.getOptionalNoteId().get()));
 				logger.debug("Restoring " + note.getId());
 			} else {
 				logger.debug("creating new note");
@@ -1032,7 +1026,7 @@ public class NotesService extends AbstractServiceImpl
 				note.setDemographic_no(""+demographicNo);
 			}
 			
-			note.setNote(tmpsavenote.getNote());
+			note.setNote(tempNoteModel.getNote());
 			logger.debug("Setting note to " + note.getNote());
 
 		}

@@ -26,15 +26,26 @@ package org.oscarehr.encounterNote.model;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 @Data
 public class TempNoteModel
 {
     private Integer id;
-    private Integer demographicNo;
+    private Integer demographicId;
     private String providerId;
     private Integer programId;
     private String note;
     private ZonedDateTime updateDateTime;
     private Integer noteId;
+
+    public Optional<Integer> getOptionalNoteId()
+    {
+        Integer noteId = getNoteId();
+        if(noteId == null || noteId <= 0)
+        {
+            return Optional.empty();
+        }
+        return Optional.of(noteId);
+    }
 }

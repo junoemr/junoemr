@@ -42,7 +42,7 @@ public class TempNoteToModelConverter extends AbstractModelConverter<CaseManagem
 		TempNoteModel model = new TempNoteModel();
 		model.setId(entity.getId());
 		model.setNoteId(entity.getNoteId());
-		model.setDemographicNo(entity.getDemographicNo());
+		model.setDemographicId(entity.getDemographicNo());
 		model.setProgramId(entity.getProgramId());
 		model.setUpdateDateTime(ConversionUtils.toZonedDateTime(entity.getUpdateDate()));
 		model.setProviderId(entity.getProviderNo());

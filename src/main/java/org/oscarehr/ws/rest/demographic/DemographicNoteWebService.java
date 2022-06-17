@@ -43,7 +43,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.Optional;
 
-@Path("demographic/{demographicNo}/note")
+@Path("demographic/{demographicId}/note")
 @Component("demographicNoteWebService")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -58,7 +58,7 @@ public class DemographicNoteWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/temp")
-	public RestResponse<TempNoteModel> getCurrentTempNote(@PathParam("demographicNo") Integer demographicId)
+	public RestResponse<TempNoteModel> getCurrentTempNote(@PathParam("demographicId") Integer demographicId)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.ENCOUNTER_NOTE_READ);
 
@@ -68,7 +68,7 @@ public class DemographicNoteWebService extends AbstractServiceImpl
 
 	@POST
 	@Path("/temp")
-	public RestResponse<TempNoteModel> saveTempNote(@PathParam("demographicNo") Integer demographicId,
+	public RestResponse<TempNoteModel> saveTempNote(@PathParam("demographicId") Integer demographicId,
 	                                                @QueryParam("noteId") Integer noteId,
 	                                                String noteInput)
 	{
@@ -81,7 +81,7 @@ public class DemographicNoteWebService extends AbstractServiceImpl
 
 	@DELETE
 	@Path("/temp")
-	public RestResponse<Boolean> deleteTempNote(@PathParam("demographicNo") Integer demographicId)
+	public RestResponse<Boolean> deleteTempNote(@PathParam("demographicId") Integer demographicId)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId, Permission.ENCOUNTER_NOTE_DELETE);
 		return RestResponse.successResponse(tempNoteService.deleteTempNote(getLoggedInProviderId(), demographicId));
