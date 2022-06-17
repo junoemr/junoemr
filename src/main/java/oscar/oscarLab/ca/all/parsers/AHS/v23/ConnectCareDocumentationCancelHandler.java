@@ -27,11 +27,14 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.datatype.CX;
 import ca.uhn.hl7v2.model.v23.message.MDM_T11;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.model.Hl7TextInfo;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareLabType;
 import oscar.oscarLab.ca.all.parsers.messageTypes.MDM_T11MessageHandler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 {
@@ -51,7 +54,7 @@ public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
 
-			return "CCDOC".equalsIgnoreCase(sendingApplication) &&
+			return ConnectCareLabType.CCDOC.name().equalsIgnoreCase(sendingApplication) &&
 					"AHS".equalsIgnoreCase(sendingFacility);
 		}
 		return false;
@@ -60,7 +63,7 @@ public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 	@Override
 	public String getMsgType()
 	{
-		return "CCDOC";
+		return ConnectCareLabType.CCDOC.name();
 	}
 
 	@Override
@@ -159,6 +162,103 @@ public class ConnectCareDocumentationCancelHandler extends MDM_T11MessageHandler
 		return Hl7TextInfo.REPORT_STATUS.X;
 	}
 
+	@Override
+	public String getCCDocs()
+	{
+		try
+		{
+			return String.join(", ", getCCDocNames());
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected List<String> getCCDocNames() throws HL7Exception
+	{
+		List<String> docNames = new ArrayList<>();
+		int txa_23Count = getFieldReps("/.TXA", 23);
+		for(int k = 0; k < txa_23Count; k++)
+		{
+			String docName = getResultCopiesTo(0, k);
+			if(StringUtils.isNotBlank(docName))
+			{
+				docNames.add(docName);
+			}
+		}
+
+		// add pv1 provider to cc docs if not marked confidential
+		if(!isReportBlocked())
+		{
+			int pd1_4Count = getFieldReps("/.PD1", 4);
+			for(int k = 0; k < pd1_4Count; k++)
+			{
+				String docName = getFullDocName("/.PD1", 4, k);
+				if(StringUtils.isNotBlank(docName))
+				{
+					docNames.add(docName);
+				}
+			}
+		}
+		return docNames;
+	}
+
+	@Override
+	public List<String> getDocNums()
+	{
+		List<String> docIds = new ArrayList<>();
+		try
+		{
+			String providerId = getOrderingProviderNo(0, 0);
+			docIds.add(providerId);
+
+			int txa_23Count = getFieldReps("/.TXA", 23);
+			for(int k = 0; k < txa_23Count; k++)
+			{
+				String docId = getResultCopiesToProviderNo(0, k);
+				if(StringUtils.isNotBlank(docId))
+				{
+					docIds.add(docId);
+				}
+			}
+
+			// add pv1 provider to cc docs if not marked confidential
+			if(!isReportBlocked())
+			{
+				int pd1_4Count = getFieldReps("/.PD1", 4);
+				for(int k = 0; k < pd1_4Count; k++)
+				{
+					String docId = get("/.PD1-4(" + k + ")-1");
+					if(StringUtils.isNotBlank(docId))
+					{
+						docIds.add(docId);
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			logger.error("Could not return doctor nums", e);
+		}
+		return docIds;
+	}
+
+	/**
+	 * indicates blocked or sensitive data within the report
+	 * @return true if report flagged as sensitive/confidential
+	 */
+	@Override
+	public boolean isReportBlocked()
+	{
+		switch(getString(get("/.TXA-18")))
+		{
+			case "RE":              // Restricted
+			case "VR": return true; // Very restricted
+			case "UC":              // Usual control
+			default: return false;
+		}
+	}
 
 	/* ========================== OBX ========================== */
 
