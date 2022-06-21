@@ -76,7 +76,7 @@ angular.module('Record.Forms').component('formViewComponent', {
                 }
                 else
                 {
-                    formService.openEFormPopup($stateParams.demographicNo, form.formId).then(function (val)
+                    formService.openEFormPopup($stateParams.demographicNo, form.formId, $stateParams.appointmentNo).then(function (val)
                     {
                         ctrl.reloadForms({});
                     });

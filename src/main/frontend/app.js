@@ -737,7 +737,8 @@ oscarApp.config([
 			templateUrl: 'src/record/forms/forms.jsp',
 			controller: 'Record.Forms.FormController as formCtrl',
 			params: {
-				viewState: FORM_CONTROLLER_STATES.COMPLETED
+				viewState: FORM_CONTROLLER_STATES.COMPLETED,
+				appointmentNo: null
 			},
 			meta:
 			{

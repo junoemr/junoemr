@@ -146,7 +146,10 @@ angular.module('Record.Nav').component('recordNav', {
 				}
 				else
 				{
-					$state.go(temp.state[0]);
+					$state.go(temp.state[0],
+							{
+								appointmentNo: $stateParams.appointmentNo
+							});
 				}
 			}
 			else
