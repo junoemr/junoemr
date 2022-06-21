@@ -372,6 +372,7 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 				var containerDiv = junoJQuery('#' + sectionName + 'list');
 
 				containerDiv.empty();
+				var displayOnSingleLine = response.body.displayOnSingleLine;
 
 				junoJQuery.each(response.body.notes, function (index, note)
 				{
@@ -405,6 +406,8 @@ if (!Juno.OscarEncounter.JunoEncounter) Juno.OscarEncounter.JunoEncounter = func
 					{
 						note.textLineArray = note.text.split(/\r?\n/);
 					}
+
+					note.displayOnSingleLine = displayOnSingleLine;
 
 					var newNode;
 					if (me.isCppSection(sectionName))
