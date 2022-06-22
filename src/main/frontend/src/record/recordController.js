@@ -868,7 +868,7 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			if(controller.draftSavedDate)
 			{
-				return "Draft saved " + Juno.Common.Util.formatMomentDateTime(
+				return "Draft saved on " + Juno.Common.Util.formatMomentDateTime(
 					controller.draftSavedDate,
 					Juno.Common.Util.DisplaySettings.dateTimeFormat);
 			}

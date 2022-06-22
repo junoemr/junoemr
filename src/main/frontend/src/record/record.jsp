@@ -109,21 +109,13 @@
                             </div>
                         </div>
                         <div class="grid-column-3 grid-gap-4 m-b-4">
-                            <div class="flex-row align-items-center justify-content-between">
-                                <div id="note-editor-enc-date">
-                                    <p>Encounter:
-                                        <span>
-                                        <juno-datepicker-popup juno-model="recordCtrl.page.encounterNote.observationDate" type="Link">
-                                        </juno-datepicker-popup>
+                            <div id="note-editor-enc-date" class="flex-row align-items-center justify-content-start">
+                                <p>Encounter:
+                                    <span>
+                                    <juno-datepicker-popup juno-model="recordCtrl.page.encounterNote.observationDate" type="Link">
+                                    </juno-datepicker-popup>
                                     </span>
-                                    </p>
-
-                                </div>
-                                <div ng-if="!recordCtrl.noteDirty">
-                                    <icon-badge icon="icon-check"
-                                                title="{{recordCtrl.draftSavedMessage()}}">
-                                    </icon-badge>
-                                </div>
+                                </p>
                             </div>
                             <div class="dropup">
                                 <input type="text" ng-model="recordCtrl.options.magicVal" placeholder="Template"
@@ -170,9 +162,8 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="row" id="note-editor-footer">
-                            <div class="col-sm-12">
-
+                        <div id="note-editor-footer" class="grid-column-3 grid-gap-4 m-b-8">
+                            <div class="flex-row">
                                 <input type="hidden" id="startTag" value="<bean:message key="oscarEncounter.Index.startTime"/>">
                                 <input type="hidden" id="endTag" value="<bean:message key="oscarEncounter.Index.endTime"/>">
                                 <div class="pull-left">
@@ -180,6 +171,16 @@
                                         Cancel
                                     </button>
                                 </div>
+                            </div>
+                            <div class="flex-row justify-content-end align-items-center">
+                                <div ng-if="!recordCtrl.noteDirty">
+                                    <span class="body-smallest"
+                                          title="{{recordCtrl.draftSavedMessage()}}">
+                                        Draft Saved
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex-row justify-content-end">
                                 <div class="btn-group btn-group-md pull-right">
                                     <button type="button" class="btn btn-default" ng-click="recordCtrl.pasteTimer()" id="aTimer" title="<bean:message key="oscarEncounter.Index.pasteTimer"/>">
                                         00:00
