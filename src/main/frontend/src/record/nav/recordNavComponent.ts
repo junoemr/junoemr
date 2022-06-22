@@ -132,21 +132,22 @@ angular.module('Record.Nav').component('recordNav', {
 			$scope.$apply();
 		}
 
-		ctrl.changeTab = function changeTab(temp)
+		ctrl.changeTab = function changeTab(tabInfo)
 		{
-			ctrl.currenttab2 = ctrl.recordTabs[temp.id];
+			ctrl.currenttab2 = ctrl.recordTabs[tabInfo.id];
 
-			if (Juno.Common.Util.isDefinedAndNotNull(temp.state))
+			if (Juno.Common.Util.isDefinedAndNotNull(tabInfo.state))
 			{
-				if(Juno.Common.Util.isDefinedAndNotNull(temp.demoId)){
-					$state.go(temp.state[0],
+				if(Juno.Common.Util.isDefinedAndNotNull(tabInfo.demoId)){
+					$state.go(tabInfo.state[0],
 						{
-							demographicNo: temp.demoId
+							demographicNo: tabInfo.demoId,
+							appointmentNo: $stateParams.appointmentNo
 						});
 				}
 				else
 				{
-					$state.go(temp.state[0],
+					$state.go(tabInfo.state[0],
 							{
 								appointmentNo: $stateParams.appointmentNo
 							});
@@ -154,25 +155,25 @@ angular.module('Record.Nav').component('recordNav', {
 			}
 			else
 			{
-				switch (temp.id)
+				switch (tabInfo.id)
 				{
 					case ctrl.PATIENT_MESSENGER_NAV_ID:
-						$state.go(temp.custom_state.state, temp.custom_state.params);
+						$state.go(tabInfo.custom_state.state, tabInfo.custom_state.params);
 						break;
 					default:
-						if (angular.isDefined(temp.url))
+						if (angular.isDefined(tabInfo.url))
 						{
 							var win;
-							if (temp.label === "Rx")
+							if (tabInfo.label === "Rx")
 							{
-								win = temp.label + ctrl.demographicNo;
+								win = tabInfo.label + ctrl.demographicNo;
 							}
 							else
 							{
 								var rnd = Math.round(Math.random() * 1000);
 								win = "win" + rnd;
 							}
-							window.open(temp.url, win, "scrollbars=yes, location=no, width=1000, height=600");
+							window.open(tabInfo.url, win, "scrollbars=yes, location=no, width=1000, height=600");
 						}
 						break;
 				}
