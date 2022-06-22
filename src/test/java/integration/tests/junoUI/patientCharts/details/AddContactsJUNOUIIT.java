@@ -103,7 +103,7 @@ public class AddContactsJUNOUIIT extends SeleniumTestBase
 		String externalLName = "Smith";
 		String externalFName = "External";
 		String phone = "2502502500";
-		String address = "31 Bastion Square #302";
+		String address = "31 ABC Ave";
 		// open JUNO UI Patient Details page
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Details_URL);
 
