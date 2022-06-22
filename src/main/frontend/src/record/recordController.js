@@ -31,6 +31,7 @@ import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../common/components
 import {MhaCallPanelEvents} from "./components/mhaCallPanel/mhaCallPanelEvents";
 import {API_BASE_PATH} from "../lib/constants/ApiConstants";
 import {netcareService} from "../lib/integration/netcare/service/NetcareService";
+import moment from "moment";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -105,6 +106,7 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.recordtabs2 = [];
 		controller.working = false;
 		controller.noteDirty = false;
+		controller.draftSavedDate = null;
 		controller.displayPhone = null;
 		controller.page.cannotChange = true;
 		controller.canMHACallPatient = false;
@@ -135,20 +137,6 @@ angular.module('Record').controller('Record.RecordController', [
 				controller.skipTmpSave = false;
 				controller.noteDirty = false;
 
-
-				let saveUpdates = function saveUpdates()
-				{
-					if (controller.page.encounterNote.note === controller.page.initNote) return; //user did not input anything, don't save
-
-					console.log("save", controller.page.encounterNote);
-					noteService.tempSave($stateParams.demographicNo,
-						controller.page.encounterNote.note,
-						controller.page.encounterNote.noteId).then(() =>
-					{
-						controller.noteDirty = false;
-					});
-				};
-
 				await controller.getCurrentNote(true);
 
 				let delayTmpSave = function delayTmpSave(newVal, oldVal)
@@ -158,11 +146,12 @@ angular.module('Record').controller('Record.RecordController', [
 						if (newVal !== oldVal)
 						{
 							controller.noteDirty = true;
+							controller.draftSavedDate = null;
 							if (timeout)
 							{
 								$timeout.cancel(timeout);
 							}
-							timeout = $timeout(saveUpdates, saveIntervalSeconds * 1000);
+							timeout = $timeout(controller.saveUpdates, saveIntervalSeconds * 1000);
 						}
 						else
 						{
@@ -194,6 +183,20 @@ angular.module('Record').controller('Record.RecordController', [
 			//TODO re-enable once conformance is passed and prod credentials set
 			controller.netcareModuleEnabled = false; //await netcareService.loadEnabledState();
 		}
+
+		controller.saveUpdates = function saveUpdates()
+		{
+			if (controller.page.encounterNote.note === controller.page.initNote) return; //user did not input anything, don't save
+
+			console.log("save", controller.page.encounterNote);
+			noteService.tempSave($stateParams.demographicNo,
+				controller.page.encounterNote.note,
+				controller.page.encounterNote.noteId).then(() =>
+			{
+				controller.noteDirty = false;
+				controller.draftSavedDate = new moment();
+			});
+		};
 
 		/**
 		 * check if patient has the MHA app & they have a strong enough connection to be called from the eChart.
@@ -248,11 +251,7 @@ angular.module('Record').controller('Record.RecordController', [
 			// If the encounter note is not null/undefined and the new state is not a child of record, continue
 			if (controller.inUnsavedNoteState() && data.name.indexOf('record.') === -1)
 			{
-				const discard = confirm("You have unsaved note data. Are you sure you want to leave?");
-				if (!discard)
-				{
-					event.preventDefault();
-				}
+				controller.saveUpdates(); // force temp-save current note
 			}
 		});
 
@@ -864,6 +863,17 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			controller.mhaCallPanelOpen = false;
 		});
+
+		controller.draftSavedMessage = () =>
+		{
+			if(controller.draftSavedDate)
+			{
+				return "Draft saved " + Juno.Common.Util.formatMomentDateTime(
+					controller.draftSavedDate,
+					Juno.Common.Util.DisplaySettings.dateTimeFormat);
+			}
+			return "";
+		}
 	}
 ]);
 

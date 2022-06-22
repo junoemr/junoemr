@@ -108,22 +108,30 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="row vertical-align">
-                            <div class="col-xs-4" id="note-editor-enc-date">
-                                <p>Encounter:
-                                    <span>
+                        <div class="grid-column-3 grid-gap-4 m-b-4">
+                            <div class="flex-row align-items-center justify-content-between">
+                                <div id="note-editor-enc-date">
+                                    <p>Encounter:
+                                        <span>
                                         <juno-datepicker-popup juno-model="recordCtrl.page.encounterNote.observationDate" type="Link">
                                         </juno-datepicker-popup>
                                     </span>
-                                </p>
+                                    </p>
+
+                                </div>
+                                <div ng-if="!recordCtrl.noteDirty">
+                                    <icon-badge icon="icon-check"
+                                                title="{{recordCtrl.draftSavedMessage()}}">
+                                    </icon-badge>
+                                </div>
                             </div>
-                            <div class="col-xs-4 dropup">
+                            <div class="dropup">
                                 <input type="text" ng-model="recordCtrl.options.magicVal" placeholder="Template"
                                 uib-typeahead="t.encounterTemplateName as t.encounterTemplateName for t in recordCtrl.searchTemplates($viewValue)"
                                 typeahead-on-select="recordCtrl.insertTemplate($item, $model, $label)"
                                 class="form-control">
                             </div>
-                            <div class="col-xs-4 dropup">
+                            <div class="dropup">
                                 <juno-security-check permissions="recordCtrl.SecurityPermissions.EncounterIssueRead">
                                     <input type="text" class="form-control" placeholder="Assign Issue"
                                            ng-disabled="!recordCtrl.canSaveIssues()"
