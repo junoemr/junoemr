@@ -22,10 +22,11 @@
  */
 package org.oscarehr.careTracker.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Where;
-import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.careTrackerDecisionSupport.entity.DsRule;
+import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -47,7 +48,8 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "care_tracker_item")
 @Where(clause = "deleted_at IS NULL")

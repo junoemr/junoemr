@@ -24,7 +24,7 @@
 import {SecurityPermissions} from "../../../../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../../../common/components/junoComponentConstants";
 import moment, {Moment} from "moment";
-import CareTrackerItemDataModel from "../../../../../lib/careTracker/model/CareTrackerItemDataModel";
+import CareTrackerItemData from "../../../../../lib/careTracker/model/CareTrackerItemData";
 import {AlertSeverityType} from "../../../../../lib/careTracker/model/AlertSeverityType";
 import {IAngularEvent} from "angular";
 import {JUNO_RADIO_STYLE} from "../../../../../common/components/junoRadioSelect/junoRadioSelectConstants";
@@ -80,7 +80,7 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 
 				ctrl.clearNewEntry = (): void =>
 				{
-					ctrl.newEntry = new CareTrackerItemDataModel();
+					ctrl.newEntry = new CareTrackerItemData();
 					ctrl.newEntry.observationDateTime = moment();
 					ctrl.preventionGivenCheck = false;
 					ctrl.booleanCheckYes = false;
@@ -167,11 +167,11 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					);
 				}
 
-				ctrl.submitNewItemData = async (): Promise<CareTrackerItemDataModel> =>
+				ctrl.submitNewItemData = async (): Promise<CareTrackerItemData> =>
 				{
 					ctrl.isLoading = true;
 					ctrl.validationAlerts = [];
-					let newDataElement: CareTrackerItemDataModel = null;
+					let newDataElement: CareTrackerItemData = null;
 					try
 					{
 						newDataElement = await careTrackerApiService.addCareTrackerItemData(ctrl.demographicId, ctrl.trackerId, ctrl.model.id, ctrl.newEntry);
@@ -199,7 +199,7 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					if(ctrl.canSubmitItem())
 					{
 						const selected: boolean = ctrl.addToNoteOnSave;
-						const newDataModel: CareTrackerItemDataModel = await ctrl.submitNewItemData();
+						const newDataModel: CareTrackerItemData = await ctrl.submitNewItemData();
 
 						if(newDataModel && selected)
 						{
@@ -211,7 +211,7 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 
 				$scope.$on("careTracker.savePendingData", async (event: IAngularEvent, callback: Function): Promise<void> =>
 				{
-					let newDataModel: CareTrackerItemDataModel = null;
+					let newDataModel: CareTrackerItemData = null;
 					const selected: boolean = ctrl.addToNoteOnSave;
 					if(ctrl.canSubmitItem())
 					{

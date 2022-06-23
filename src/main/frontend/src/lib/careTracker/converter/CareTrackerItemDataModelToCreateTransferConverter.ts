@@ -25,11 +25,11 @@
 
 import {CareTrackerItemDataCreateTransfer} from "../../../../generated";
 import AbstractConverter from "../../conversion/AbstractConverter";
-import CareTrackerItemDataModel from "../model/CareTrackerItemDataModel";
+import CareTrackerItemData from "../model/CareTrackerItemData";
 
-export default class CareTrackerItemDataModelToCreateTransferConverter extends AbstractConverter<CareTrackerItemDataModel, CareTrackerItemDataCreateTransfer>
+export default class CareTrackerItemDataModelToCreateTransferConverter extends AbstractConverter<CareTrackerItemData, CareTrackerItemDataCreateTransfer>
 {
-	public convert(dataModel: CareTrackerItemDataModel): CareTrackerItemDataCreateTransfer
+	public convert(dataModel: CareTrackerItemData): CareTrackerItemDataCreateTransfer
 	{
 		if (!dataModel)
 		{

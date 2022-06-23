@@ -30,21 +30,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class CareTracker extends AbstractTransientModel
+public class CareTrackerModel extends AbstractTransientModel
 {
 	private Integer id;
 	private String name;
 	private String description;
 	private boolean enabled;
 	private boolean systemManaged;
-	private List<CareTrackerItemGroup> careTrackerItemGroups;
+	private List<CareTrackerItemGroupModel> careTrackerItemGroups;
 	private List<DxCode> triggerCodes;
 
 	private Integer parentCareTrackerId;
 	private Integer ownerDemographicId;
 	private String ownerProviderId;
 
-	public CareTracker()
+	public CareTrackerModel()
 	{
 		careTrackerItemGroups = new ArrayList<>();
 		triggerCodes = new ArrayList<>();

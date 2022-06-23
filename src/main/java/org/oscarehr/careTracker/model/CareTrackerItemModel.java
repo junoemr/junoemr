@@ -34,7 +34,7 @@ import java.util.List;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CareTrackerItem extends AbstractTransientModel
+public class CareTrackerItemModel extends AbstractTransientModel
 {
 	private Integer id;
 	private String name;
@@ -49,10 +49,10 @@ public class CareTrackerItem extends AbstractTransientModel
 
 	// transient
 	private boolean hidden;
-	private List<CareTrackerItemAlert> careTrackerItemAlerts;
-	private List<CareTrackerItemData> data;
+	private List<CareTrackerItemAlertModel> careTrackerItemAlerts;
+	private List<CareTrackerItemDataModel> data;
 
-	public CareTrackerItem()
+	public CareTrackerItemModel()
 	{
 		rules = new ArrayList<>();
 		careTrackerItemAlerts = new ArrayList<>();
@@ -69,16 +69,16 @@ public class CareTrackerItem extends AbstractTransientModel
 		return ItemType.PREVENTION.equals(this.type);
 	}
 
-	public void addCareTrackerItemAlert(CareTrackerItemAlert alert)
+	public void addCareTrackerItemAlert(CareTrackerItemAlertModel alert)
 	{
 		careTrackerItemAlerts.add(alert);
 	}
 
-	public void addCareTrackerItemData(CareTrackerItemData itemData)
+	public void addCareTrackerItemData(CareTrackerItemDataModel itemData)
 	{
 		data.add(itemData);
 	}
-	public void addAllCareTrackerItemData(List<CareTrackerItemData> itemDataList)
+	public void addAllCareTrackerItemData(List<CareTrackerItemDataModel> itemDataList)
 	{
 		data.addAll(itemDataList);
 	}

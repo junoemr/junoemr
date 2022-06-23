@@ -27,17 +27,17 @@ import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.careTrackerDecisionSupport.model.consequence.SeverityLevel;
 
 @Data
-public class CareTrackerItemAlert extends AbstractTransientModel
+public class CareTrackerItemAlertModel extends AbstractTransientModel
 {
 	private SeverityLevel severityLevel;
 	private String message;
 
-	public CareTrackerItemAlert()
+	public CareTrackerItemAlertModel()
 	{
 		this(null, SeverityLevel.RECOMMENDATION);
 	}
 
-	public CareTrackerItemAlert(String message, SeverityLevel severityLevel)
+	public CareTrackerItemAlertModel(String message, SeverityLevel severityLevel)
 	{
 		this.message = message;
 		this.severityLevel = severityLevel;

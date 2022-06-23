@@ -21,7 +21,7 @@
  * Canada
  */
 
-import CareTrackerItemDataModel from "../../../../../lib/careTracker/model/CareTrackerItemDataModel";
+import CareTrackerItemData from "../../../../../lib/careTracker/model/CareTrackerItemData";
 import {Moment} from "moment";
 
 angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModal',
@@ -49,7 +49,7 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModa
 				{
 					ctrl.model = angular.copy(ctrl.resolve.model); // use a copy so we don't modify the real model
 					ctrl.model.sortDataByObservationDate(true);
-					const dataPoints = ctrl.model.data.filter((value: CareTrackerItemDataModel) => value.observationDateTime && value.observationDateTime.isValid())
+					const dataPoints = ctrl.model.data.filter((value: CareTrackerItemData) => value.observationDateTime && value.observationDateTime.isValid())
 
 					ctrl.labels = ctrl.formatLabels(dataPoints);
 					ctrl.data = [ctrl.formatData(dataPoints)];
@@ -57,20 +57,20 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModa
 					ctrl.isLoading = false;
 				}
 
-				ctrl.formatLabels = (dataPoints: CareTrackerItemDataModel[]): object[] =>
+				ctrl.formatLabels = (dataPoints: CareTrackerItemData[]): object[] =>
 				{
-					return dataPoints.map((data: CareTrackerItemDataModel) =>
+					return dataPoints.map((data: CareTrackerItemData) =>
 					{
 						return data.observationDateTime.toDate();
 					});
 				}
 
-				ctrl.formatData = (dataPoints: CareTrackerItemDataModel[]): number[] =>
+				ctrl.formatData = (dataPoints: CareTrackerItemData[]): number[] =>
 				{
-					return dataPoints.map((data: CareTrackerItemDataModel) => Number(data.value));
+					return dataPoints.map((data: CareTrackerItemData) => Number(data.value));
 				}
 
-				ctrl.formatOptions = (dataPoints: CareTrackerItemDataModel[]): object =>
+				ctrl.formatOptions = (dataPoints: CareTrackerItemData[]): object =>
 				{
 					const axisDaysThreshold = 30; // after this, only months are displayed on x-axis
 					const axisMonthsThreshold = 365 * 2; // after this, only years are displayed on x-axis

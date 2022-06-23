@@ -23,7 +23,7 @@
 package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.careTracker.model.CareTracker;
+import org.oscarehr.careTracker.model.CareTrackerModel;
 import org.oscarehr.careTracker.service.CareTrackerService;
 import org.oscarehr.careTracker.transfer.CareTrackerCreateTransfer;
 import org.oscarehr.careTracker.transfer.CareTrackerUpdateTransfer;
@@ -56,7 +56,7 @@ public class CareTrackerWebService extends AbstractServiceImpl
 
 	@POST
 	@Path("/")
-	public RestResponse<CareTracker> createCareTracker(CareTrackerCreateTransfer careTracker)
+	public RestResponse<CareTrackerModel> createCareTracker(CareTrackerCreateTransfer careTracker)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CARE_TRACKER_CREATE);
 		return RestResponse.successResponse(careTrackerService.addNewCareTracker(getLoggedInProviderId(), careTracker));
@@ -64,7 +64,7 @@ public class CareTrackerWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/{id}")
-	public RestResponse<CareTracker> getCareTracker(@PathParam("id") Integer careTrackerId)
+	public RestResponse<CareTrackerModel> getCareTracker(@PathParam("id") Integer careTrackerId)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CARE_TRACKER_READ);
 		return RestResponse.successResponse(careTrackerService.getCareTracker(careTrackerId));
@@ -72,7 +72,7 @@ public class CareTrackerWebService extends AbstractServiceImpl
 
 	@PUT
 	@Path("/{id}")
-	public RestResponse<CareTracker> updateCareTracker(@PathParam("id") Integer careTrackerId, CareTrackerUpdateTransfer careTracker)
+	public RestResponse<CareTrackerModel> updateCareTracker(@PathParam("id") Integer careTrackerId, CareTrackerUpdateTransfer careTracker)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CARE_TRACKER_UPDATE);
 		return RestResponse.successResponse(careTrackerService.updateCareTracker(getLoggedInProviderId(), careTrackerId, careTracker));
@@ -97,14 +97,14 @@ public class CareTrackerWebService extends AbstractServiceImpl
 
 	@POST
 	@Path("/{id}/clone")
-	public RestResponse<CareTracker> cloneCareTracker(
+	public RestResponse<CareTrackerModel> cloneCareTracker(
 			@PathParam("id") Integer careTrackerId,
 			@QueryParam("providerId") String providerId,
 			@QueryParam("demographicId") Integer demographicId)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CARE_TRACKER_CREATE);
 
-		CareTracker clone;
+		CareTrackerModel clone;
 		if(demographicId != null)
 		{
 			clone = careTrackerService.addNewDemographicCareTrackerCopy(getLoggedInProviderId(), careTrackerId, demographicId);

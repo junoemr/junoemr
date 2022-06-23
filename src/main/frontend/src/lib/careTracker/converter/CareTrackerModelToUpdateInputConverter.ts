@@ -1,5 +1,3 @@
-'use strict';
-
 /*
 
     Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
@@ -25,30 +23,19 @@
 
  */
 
-import {AlertSeverityType} from "./AlertSeverityType";
+import CareTracker from "../model/CareTracker";
+import {CareTrackerUpdateTransfer} from "../../../../generated";
+import CareTrackerModelToInputConverter from "./CareTrackerModelToInputConverter";
 
-export default class AlertModel
+export default class CareTrackerModelToUpdateInputConverter extends CareTrackerModelToInputConverter<CareTrackerUpdateTransfer>
 {
-	private _message: string;
-	private _severityLevel: AlertSeverityType;
-
-	get message(): string
+	public convert(careTrackerModel: CareTracker): CareTrackerUpdateTransfer
 	{
-		return this._message;
-	}
-
-	set message(value: string)
-	{
-		this._message = value;
-	}
-
-	get severityLevel(): AlertSeverityType
-	{
-		return this._severityLevel;
-	}
-
-	set severityLevel(value: AlertSeverityType)
-	{
-		this._severityLevel = value;
+		let input = super.convert(careTrackerModel);
+		if (input)
+		{
+			input.id = careTrackerModel.id;
+		}
+		return input;
 	}
 }

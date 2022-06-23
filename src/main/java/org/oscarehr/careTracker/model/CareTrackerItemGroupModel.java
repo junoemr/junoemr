@@ -29,14 +29,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class CareTrackerItemGroup extends AbstractTransientModel
+public class CareTrackerItemGroupModel extends AbstractTransientModel
 {
 	private Integer id;
 	private String name;
 	private String description;
-	private List<CareTrackerItem> careTrackerItems;
+	private List<CareTrackerItemModel> careTrackerItems;
 
-	public CareTrackerItemGroup()
+	public CareTrackerItemGroupModel()
 	{
 		careTrackerItems = new ArrayList<>();
 	}

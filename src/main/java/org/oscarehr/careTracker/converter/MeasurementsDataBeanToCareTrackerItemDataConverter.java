@@ -23,26 +23,26 @@
 package org.oscarehr.careTracker.converter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.oscarehr.careTracker.model.CareTrackerItemData;
+import org.oscarehr.careTracker.model.CareTrackerItemDataModel;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.springframework.stereotype.Component;
 import oscar.oscarEncounter.oscarMeasurements.bean.EctMeasurementsDataBean;
 import oscar.util.ConversionUtils;
 
 @Component
-public class MeasurementsDataBeanToCareTrackerItemDataConverter extends AbstractModelConverter<EctMeasurementsDataBean, CareTrackerItemData>
+public class MeasurementsDataBeanToCareTrackerItemDataConverter extends AbstractModelConverter<EctMeasurementsDataBean, CareTrackerItemDataModel>
 {
 	@Override
-	public CareTrackerItemData convert(EctMeasurementsDataBean input)
+	public CareTrackerItemDataModel convert(EctMeasurementsDataBean input)
 	{
-		CareTrackerItemData careTrackerItemData = new CareTrackerItemData();
-		careTrackerItemData.setId(input.getId());
-		careTrackerItemData.setValue(input.getDataField());
-		careTrackerItemData.setComment(StringUtils.trimToNull(input.getComments()));
-		careTrackerItemData.setObservationDateTime(ConversionUtils.toNullableLocalDateTime(input.getDateObservedAsDate()));
-		careTrackerItemData.setCreatedDateTime(ConversionUtils.toLocalDateTime(input.getDateEnteredAsDate()));
-		careTrackerItemData.setUpdatedDateTime(ConversionUtils.toLocalDateTime(input.getDateEnteredAsDate()));
+		CareTrackerItemDataModel careTrackerItemDataModel = new CareTrackerItemDataModel();
+		careTrackerItemDataModel.setId(input.getId());
+		careTrackerItemDataModel.setValue(input.getDataField());
+		careTrackerItemDataModel.setComment(StringUtils.trimToNull(input.getComments()));
+		careTrackerItemDataModel.setObservationDateTime(ConversionUtils.toNullableLocalDateTime(input.getDateObservedAsDate()));
+		careTrackerItemDataModel.setCreatedDateTime(ConversionUtils.toLocalDateTime(input.getDateEnteredAsDate()));
+		careTrackerItemDataModel.setUpdatedDateTime(ConversionUtils.toLocalDateTime(input.getDateEnteredAsDate()));
 
-		return careTrackerItemData;
+		return careTrackerItemDataModel;
 	}
 }

@@ -23,26 +23,26 @@
 package org.oscarehr.careTracker.converter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.oscarehr.careTracker.model.CareTrackerItemData;
+import org.oscarehr.careTracker.model.CareTrackerItemDataModel;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.model.Measurement;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 @Component
-public class MeasurementToCareTrackerItemDataConverter extends AbstractModelConverter<Measurement, CareTrackerItemData>
+public class MeasurementToCareTrackerItemDataConverter extends AbstractModelConverter<Measurement, CareTrackerItemDataModel>
 {
 	@Override
-	public CareTrackerItemData convert(Measurement input)
+	public CareTrackerItemDataModel convert(Measurement input)
 	{
-		CareTrackerItemData careTrackerItemData = new CareTrackerItemData();
-		careTrackerItemData.setId(input.getId());
-		careTrackerItemData.setValue(input.getDataField());
-		careTrackerItemData.setComment(StringUtils.trimToNull(input.getComments()));
-		careTrackerItemData.setObservationDateTime(ConversionUtils.toNullableLocalDateTime(input.getDateObserved()));
-		careTrackerItemData.setCreatedDateTime(ConversionUtils.toLocalDateTime(input.getCreateDate()));
-		careTrackerItemData.setUpdatedDateTime(ConversionUtils.toLocalDateTime(input.getCreateDate()));
+		CareTrackerItemDataModel careTrackerItemDataModel = new CareTrackerItemDataModel();
+		careTrackerItemDataModel.setId(input.getId());
+		careTrackerItemDataModel.setValue(input.getDataField());
+		careTrackerItemDataModel.setComment(StringUtils.trimToNull(input.getComments()));
+		careTrackerItemDataModel.setObservationDateTime(ConversionUtils.toNullableLocalDateTime(input.getDateObserved()));
+		careTrackerItemDataModel.setCreatedDateTime(ConversionUtils.toLocalDateTime(input.getCreateDate()));
+		careTrackerItemDataModel.setUpdatedDateTime(ConversionUtils.toLocalDateTime(input.getCreateDate()));
 
-		return careTrackerItemData;
+		return careTrackerItemDataModel;
 	}
 }

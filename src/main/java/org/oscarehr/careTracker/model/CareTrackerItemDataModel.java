@@ -28,7 +28,7 @@ import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import java.time.LocalDateTime;
 
 @Data
-public class CareTrackerItemData extends AbstractTransientModel
+public class CareTrackerItemDataModel extends AbstractTransientModel
 {
 	private Integer id;
 	private String value;
@@ -38,7 +38,7 @@ public class CareTrackerItemData extends AbstractTransientModel
 	private LocalDateTime createdDateTime;
 	private LocalDateTime updatedDateTime;
 
-	public CareTrackerItemData()
+	public CareTrackerItemDataModel()
 	{
 	}
 }

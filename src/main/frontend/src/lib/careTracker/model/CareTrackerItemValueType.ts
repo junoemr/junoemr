@@ -25,5 +25,5 @@
 
  */
 
-import {CareTrackerItem} from "../../../../generated";
-export import CareTrackerItemValueType = CareTrackerItem.ValueTypeEnum;
+import {CareTrackerItemModel} from "../../../../generated";
+export import CareTrackerItemValueType = CareTrackerItemModel.ValueTypeEnum;

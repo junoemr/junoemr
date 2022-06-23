@@ -23,7 +23,7 @@
 
 import {SecurityPermissions} from "../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
-import CareTrackerModel from "../../lib/careTracker/model/CareTrackerModel";
+import CareTracker from "../../lib/careTracker/model/CareTracker";
 import DxRecordModel from "../../lib/dx/model/DxRecordModel";
 import DxCodeModel from "../../lib/dx/model/DxCodeModel";
 
@@ -54,8 +54,8 @@ angular.module('Record.Tracker').component('healthTracker',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.careTrackers = [] as CareTrackerModel[];
-				ctrl.selectedCareTracker = null as CareTrackerModel;
+				ctrl.careTrackers = [] as CareTracker[];
+				ctrl.selectedCareTracker = null as CareTracker;
 				ctrl.activeDxRecords = [];
 
 				ctrl.accordianListItems = [
@@ -100,14 +100,14 @@ angular.module('Record.Tracker').component('healthTracker',
 					ctrl.initCareTrackerLists(ctrl.careTrackers);
 				}
 
-				ctrl.initCareTrackerLists = (careTrackers: CareTrackerModel[]): void =>
+				ctrl.initCareTrackerLists = (careTrackers: CareTracker[]): void =>
 				{
 					const clinicCareTrackerItems = ctrl.accordianListItems[1].items;
 					const providerCareTrackerItems = ctrl.accordianListItems[2].items;
 					const demographicCareTrackerItems = ctrl.accordianListItems[3].items;
 
 					// sort all careTrackers by level (clinic, provider, demographic)
-					careTrackers.forEach((careTracker: CareTrackerModel) =>
+					careTrackers.forEach((careTracker: CareTracker) =>
 					{
 						if(careTracker.isDemographicLevel())
 						{
@@ -128,28 +128,28 @@ angular.module('Record.Tracker').component('healthTracker',
 					const triggerMap = new Map();
 
 					// put all base level careTrackers into a map
-					ctrl.getTriggeredCareTrackers(clinicCareTrackerItems).forEach((careTracker: CareTrackerModel) => {
+					ctrl.getTriggeredCareTrackers(clinicCareTrackerItems).forEach((careTracker: CareTracker) => {
 						triggerMap.set(careTracker.id, careTracker);
 					});
 
 					// overwrite mapped values with provider specific version where possible
-					ctrl.getTriggeredCareTrackers(providerCareTrackerItems).forEach((careTracker: CareTrackerModel) => {
+					ctrl.getTriggeredCareTrackers(providerCareTrackerItems).forEach((careTracker: CareTracker) => {
 						const key = careTracker.parentCareTrackerId ? careTracker.parentCareTrackerId : careTracker.id;
 						triggerMap.set(key, careTracker);
 					});
 
 					// overwrite mapped values again with demographic specific version where possible
-					ctrl.getTriggeredCareTrackers(demographicCareTrackerItems).forEach((careTracker: CareTrackerModel) => {
+					ctrl.getTriggeredCareTrackers(demographicCareTrackerItems).forEach((careTracker: CareTracker) => {
 						const key = careTracker.parentCareTrackerId ? careTracker.parentCareTrackerId : careTracker.id;
 						triggerMap.set(key, careTracker);
 					});
 					ctrl.accordianListItems[0].items = Array.from(triggerMap.values());
 				}
 
-				ctrl.getTriggeredCareTrackers = (careTrackers: CareTrackerModel[]): CareTrackerModel[] =>
+				ctrl.getTriggeredCareTrackers = (careTrackers: CareTracker[]): CareTracker[] =>
 				{
 					const activeCodes: DxCodeModel[] = ctrl.activeDxRecords.map((dxRecord: DxRecordModel) => dxRecord.dxCode);
-					return careTrackers.filter((careTracker: CareTrackerModel) =>
+					return careTrackers.filter((careTracker: CareTracker) =>
 					{
 						for(let activeCode of activeCodes)
 						{

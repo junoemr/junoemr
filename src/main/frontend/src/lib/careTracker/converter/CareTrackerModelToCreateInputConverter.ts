@@ -23,28 +23,14 @@
 
  */
 
-import {CareTrackerItemData} from "../../../../generated";
-import AbstractConverter from "../../conversion/AbstractConverter";
-import CareTrackerItemDataModel from "../model/CareTrackerItemDataModel";
-import moment from "moment";
+import CareTracker from "../model/CareTracker";
+import {CareTrackerCreateTransfer} from "../../../../generated";
+import CareTrackerModelToInputConverter from "./CareTrackerModelToInputConverter";
 
-export default class CareTrackerItemDataTransferToModelConverter extends AbstractConverter<CareTrackerItemData, CareTrackerItemDataModel>
+export default class CareTrackerModelToCreateInputConverter extends CareTrackerModelToInputConverter<CareTrackerCreateTransfer>
 {
-	public convert(transfer: CareTrackerItemData): CareTrackerItemDataModel
+	public convert(careTrackerModel: CareTracker): CareTrackerCreateTransfer
 	{
-		if (!transfer)
-		{
-			return null;
-		}
-
-		const dataModel = new CareTrackerItemDataModel();
-		dataModel.id = transfer.id;
-		dataModel.value = transfer.value;
-		dataModel.comment = transfer.comment;
-		dataModel.observationDateTime = moment(transfer.observationDateTime);
-		dataModel.createdDateTime = moment(transfer.createdDateTime);
-		dataModel.updatedDateTime = moment(transfer.updatedDateTime);
-
-		return dataModel;
+		return super.convert(careTrackerModel);
 	}
 }

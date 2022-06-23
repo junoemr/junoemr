@@ -28,10 +28,10 @@
 import DsRuleModel from "../../decisionSupport/model/DsRuleModel";
 import {CareTrackerItemType} from "./CareTrackerItemType";
 import {CareTrackerItemValueType} from "./CareTrackerItemValueType";
-import AlertModel from "./AlertModel";
-import CareTrackerItemDataModel from "./CareTrackerItemDataModel";
+import Alert from "./Alert";
+import CareTrackerItemData from "./CareTrackerItemData";
 
-export default class CareTrackerItemModel
+export default class CareTrackerItem
 {
 	private readonly _id: number;
 	private _name: string;
@@ -42,8 +42,8 @@ export default class CareTrackerItemModel
 	private _hidden: boolean;
 	private _valueType: CareTrackerItemValueType;
 	private _valueLabel: string;
-	private _careTrackerItemAlerts: AlertModel[];
-	private _data: CareTrackerItemDataModel[];
+	private _careTrackerItemAlerts: Alert[];
+	private _data: CareTrackerItemData[];
 	private _rules: DsRuleModel[];
 
 	public constructor(id: number = null)
@@ -96,7 +96,7 @@ export default class CareTrackerItemModel
 
 	public sortDataByObservationDate(ascending: boolean = true): void
 	{
-		this.data = this.data.sort((itemA: CareTrackerItemDataModel, itemB: CareTrackerItemDataModel) =>
+		this.data = this.data.sort((itemA: CareTrackerItemData, itemB: CareTrackerItemData) =>
 		{
 			if(ascending)
 			{
@@ -196,22 +196,22 @@ export default class CareTrackerItemModel
 		this._valueLabel = value;
 	}
 
-	get careTrackerItemAlerts(): AlertModel[]
+	get careTrackerItemAlerts(): Alert[]
 	{
 		return this._careTrackerItemAlerts;
 	}
 
-	set careTrackerItemAlerts(value: AlertModel[])
+	set careTrackerItemAlerts(value: Alert[])
 	{
 		this._careTrackerItemAlerts = value;
 	}
 
-	get data(): CareTrackerItemDataModel[]
+	get data(): CareTrackerItemData[]
 	{
 		return this._data;
 	}
 
-	set data(value: CareTrackerItemDataModel[])
+	set data(value: CareTrackerItemData[])
 	{
 		this._data = value;
 	}

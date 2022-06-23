@@ -25,17 +25,17 @@
 
  */
 
-import CareTrackerItemGroupModel from "./CareTrackerItemGroupModel";
+import CareTrackerItemGroup from "./CareTrackerItemGroup";
 import DxCodeModel from "../../dx/model/DxCodeModel";
 
-export default class CareTrackerModel
+export default class CareTracker
 {
 	private _id: number;
 	private _name: string;
 	private _description: string;
 	private _enabled: boolean;
 	private _systemManaged: boolean;
-	private _careTrackerItemGroups: CareTrackerItemGroupModel[];
+	private _careTrackerItemGroups: CareTrackerItemGroup[];
 	private _triggerCodes: DxCodeModel[];
 	private _parentCareTrackerId: number;
 	private _ownerDemographicId: number;
@@ -65,7 +65,7 @@ export default class CareTrackerModel
 	public getItemCount(): number
 	{
 		let count = 0;
-		this.careTrackerItemGroups.forEach((group: CareTrackerItemGroupModel) =>
+		this.careTrackerItemGroups.forEach((group: CareTrackerItemGroup) =>
 		{
 			count += group.careTrackerItems.length;
 		})
@@ -122,12 +122,12 @@ export default class CareTrackerModel
 		this._systemManaged = value;
 	}
 
-	get careTrackerItemGroups(): CareTrackerItemGroupModel[]
+	get careTrackerItemGroups(): CareTrackerItemGroup[]
 	{
 		return this._careTrackerItemGroups;
 	}
 
-	set careTrackerItemGroups(value: CareTrackerItemGroupModel[])
+	set careTrackerItemGroups(value: CareTrackerItemGroup[])
 	{
 		this._careTrackerItemGroups = value;
 	}

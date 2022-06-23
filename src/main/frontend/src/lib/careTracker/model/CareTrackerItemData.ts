@@ -25,7 +25,7 @@
 
 import {Moment} from "moment";
 
-export default class CareTrackerItemDataModel
+export default class CareTrackerItemData
 {
 	private _id: number;
 	private _value: string;

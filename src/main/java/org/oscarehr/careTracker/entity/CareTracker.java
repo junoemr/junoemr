@@ -22,11 +22,12 @@
  */
 package org.oscarehr.careTracker.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Where;
+import org.oscarehr.careTrackerDecisionSupport.entity.Drools;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.common.model.Icd9;
-import org.oscarehr.careTrackerDecisionSupport.entity.Drools;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.provider.model.ProviderData;
 
@@ -52,7 +53,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "care_tracker")
 @Where(clause = "deleted_at IS NULL")

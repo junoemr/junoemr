@@ -23,7 +23,7 @@
 package org.oscarehr.ws.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.careTracker.model.CareTracker;
+import org.oscarehr.careTracker.model.CareTrackerModel;
 import org.oscarehr.careTracker.search.CareTrackerCriteriaSearch;
 import org.oscarehr.careTracker.service.CareTrackerService;
 import org.oscarehr.security.model.Permission;
@@ -51,7 +51,7 @@ public class CareTrackersWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/search")
-	public RestSearchResponse<CareTracker> search(
+	public RestSearchResponse<CareTrackerModel> search(
 			@QueryParam("enabled") Boolean isEnabled,
 			@QueryParam("includeClinicLevel") @DefaultValue("true") boolean includeClinicLevel,
 			@QueryParam("includeProviderLevel") @DefaultValue("false") boolean includeProviderLevel,

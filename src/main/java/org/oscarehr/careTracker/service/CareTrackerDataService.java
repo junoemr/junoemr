@@ -33,18 +33,20 @@ import org.oscarehr.careTracker.converter.MeasurementsDataBeanToCareTrackerItemD
 import org.oscarehr.careTracker.converter.PreventionToCareTrackerItemDataConverter;
 import org.oscarehr.careTracker.dao.CareTrackerDao;
 import org.oscarehr.careTracker.dao.CareTrackerItemDao;
+import org.oscarehr.careTracker.entity.CareTracker;
 import org.oscarehr.careTracker.entity.CareTrackerItem;
-import org.oscarehr.careTracker.model.CareTracker;
-import org.oscarehr.careTracker.model.CareTrackerItemAlert;
-import org.oscarehr.careTracker.model.CareTrackerItemData;
+import org.oscarehr.careTracker.model.CareTrackerItemAlertModel;
+import org.oscarehr.careTracker.model.CareTrackerItemDataModel;
+import org.oscarehr.careTracker.model.CareTrackerItemModel;
+import org.oscarehr.careTracker.model.CareTrackerModel;
 import org.oscarehr.careTracker.transfer.CareTrackerItemDataCreateTransfer;
-import org.oscarehr.common.model.Measurement;
 import org.oscarehr.careTrackerDecisionSupport.converter.DsRuleDbToModelConverter;
 import org.oscarehr.careTrackerDecisionSupport.entity.Drools;
 import org.oscarehr.careTrackerDecisionSupport.model.DsInfoCache;
 import org.oscarehr.careTrackerDecisionSupport.model.consequence.SeverityLevel;
 import org.oscarehr.careTrackerDecisionSupport.service.DroolsCachingService;
 import org.oscarehr.careTrackerDecisionSupport.service.DsRuleService;
+import org.oscarehr.common.model.Measurement;
 import org.oscarehr.measurements.service.MeasurementsService;
 import org.oscarehr.prevention.dao.PreventionDao;
 import org.oscarehr.prevention.model.Prevention;
@@ -115,7 +117,7 @@ public class CareTrackerDataService
 	 * @param itemData the data to be saved
 	 * @return the new data item created
 	 */
-	public CareTrackerItemData addCareTrackerItemData(
+	public CareTrackerItemDataModel addCareTrackerItemData(
 			String providerId,
 			Integer demographicId,
 			Integer careTrackerItemId,
@@ -144,10 +146,10 @@ public class CareTrackerDataService
 	 * @return the care tracker
 	 * @throws Exception on error
 	 */
-	public CareTracker getCareTrackerForDemographic(Integer demographicId, Integer careTrackerId) throws Exception
+	public CareTrackerModel getCareTrackerForDemographic(Integer demographicId, Integer careTrackerId) throws Exception
 	{
-		org.oscarehr.careTracker.entity.CareTracker careTrackerEntity = careTrackerDao.find(careTrackerId);
-		CareTracker careTracker = careTrackerEntityToModelConverter.convert(careTrackerEntity);
+		CareTracker careTrackerEntity = careTrackerDao.find(careTrackerId);
+		CareTrackerModel careTracker = careTrackerEntityToModelConverter.convert(careTrackerEntity);
 
 		MeasurementInfo measurementInfo = loadMeasurementInfoWithDrools(careTrackerEntity.getCareTrackerItems(), careTrackerEntity.getDrools(), demographicId);
 		oscar.oscarPrevention.Prevention preventionInfo = loadPreventionInfoWithDrools(careTrackerEntity.getCareTrackerItems(), demographicId);
@@ -166,10 +168,10 @@ public class CareTrackerDataService
 	 * @return the care tracker item
 	 * @throws Exception on error
 	 */
-	public org.oscarehr.careTracker.model.CareTrackerItem getCareTrackerItemForDemographic(Integer demographicId, Integer careTrackerItemId) throws Exception
+	public CareTrackerItemModel getCareTrackerItemForDemographic(Integer demographicId, Integer careTrackerItemId) throws Exception
 	{
 		CareTrackerItem careTrackerItem = careTrackerItemDao.find(careTrackerItemId);
-		org.oscarehr.careTracker.entity.CareTracker careTrackerEntity = careTrackerItem.getCareTracker();
+		CareTracker careTrackerEntity = careTrackerItem.getCareTracker();
 
 		List<CareTrackerItem> items = new ArrayList<>(1);
 		items.add(careTrackerItem);
@@ -177,14 +179,14 @@ public class CareTrackerDataService
 		MeasurementInfo measurementInfo = loadMeasurementInfoWithDrools(items, careTrackerEntity.getDrools(), demographicId);
 		oscar.oscarPrevention.Prevention preventionInfo = loadPreventionInfoWithDrools(items, demographicId);
 
-		org.oscarehr.careTracker.model.CareTrackerItem itemModel = careTrackerItemEntityToModelConverter.convert(careTrackerItem);
+		CareTrackerItemModel itemModel = careTrackerItemEntityToModelConverter.convert(careTrackerItem);
 		fillItem(itemModel, measurementInfo, preventionInfo, demographicId);
 
 		return itemModel;
 	}
 
 	private void fillItem(
-			org.oscarehr.careTracker.model.CareTrackerItem item,
+			CareTrackerItemModel item,
 			MeasurementInfo measurementInfo,
 			oscar.oscarPrevention.Prevention preventionInfo,
 			Integer demographicId)
@@ -201,41 +203,41 @@ public class CareTrackerDataService
 		}
 	}
 
-	private void fillItemAlerts(DsInfoCache dsInfoCache, org.oscarehr.careTracker.model.CareTrackerItem item)
+	private void fillItemAlerts(DsInfoCache dsInfoCache, CareTrackerItemModel item)
 	{
 		// set item specific alerts
 		String typeCode = item.getTypeCode();
 		if(dsInfoCache.hasRecommendation(typeCode))
 		{
 			dsInfoCache.getRecommendations(typeCode).forEach((recommendation) -> {
-				CareTrackerItemAlert alert = new CareTrackerItemAlert(recommendation, SeverityLevel.RECOMMENDATION);
+				CareTrackerItemAlertModel alert = new CareTrackerItemAlertModel(recommendation, SeverityLevel.RECOMMENDATION);
 				item.addCareTrackerItemAlert(alert);
 			});
 		}
 		if(dsInfoCache.hasWarning(typeCode))
 		{
 			dsInfoCache.getWarnings(typeCode).forEach((warning) -> {
-				CareTrackerItemAlert alert = new CareTrackerItemAlert(warning, SeverityLevel.WARNING);
+				CareTrackerItemAlertModel alert = new CareTrackerItemAlertModel(warning, SeverityLevel.WARNING);
 				item.addCareTrackerItemAlert(alert);
 			});
 		}
 		if(dsInfoCache.hasCriticalAlert(typeCode))
 		{
 			dsInfoCache.getCriticalAlerts(typeCode).forEach((warning) -> {
-				CareTrackerItemAlert alert = new CareTrackerItemAlert(warning, SeverityLevel.DANGER);
+				CareTrackerItemAlertModel alert = new CareTrackerItemAlertModel(warning, SeverityLevel.DANGER);
 				item.addCareTrackerItemAlert(alert);
 			});
 		}
 		item.setHidden(dsInfoCache.getHidden(typeCode));
 	}
 
-	private void fillMeasurementItemData(MeasurementInfo measurementInfo, org.oscarehr.careTracker.model.CareTrackerItem item)
+	private void fillMeasurementItemData(MeasurementInfo measurementInfo, CareTrackerItemModel item)
 	{
 		List<EctMeasurementsDataBean> measurementsDataBeans = measurementInfo.getMeasurementData(item.getTypeCode());
 		item.addAllCareTrackerItemData(measurementsDataBeanToCareTrackerItemDataConverter.convert(measurementsDataBeans));
 	}
 
-	private void fillPreventionItemData(Integer demographicId, org.oscarehr.careTracker.model.CareTrackerItem item)
+	private void fillPreventionItemData(Integer demographicId, CareTrackerItemModel item)
 	{
 		List<Prevention> preventions = preventionDao.findByTypeAndDemoNo(item.getTypeCode(), demographicId);
 		item.addAllCareTrackerItemData(preventionToCareTrackerItemDataConverter.convert(preventions));
@@ -288,7 +290,7 @@ public class CareTrackerDataService
 		return prevention;
 	}
 
-	private CareTrackerItemData addCareTrackerMeasurement(
+	private CareTrackerItemDataModel addCareTrackerMeasurement(
 			String providerId,
 			Integer demographicId,
 			CareTrackerItem careTrackerItem,
@@ -331,7 +333,7 @@ public class CareTrackerDataService
 		}
 	}
 
-	private CareTrackerItemData addCareTrackerPrevention(
+	private CareTrackerItemDataModel addCareTrackerPrevention(
 			String providerId,
 			Integer demographicId,
 			CareTrackerItem careTrackerItem,

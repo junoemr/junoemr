@@ -23,17 +23,17 @@
 
  */
 
-import CareTrackerModel from "../model/CareTrackerModel";
-import {CareTracker, CareTrackerItem, CareTrackerItemGroup} from "../../../../generated";
-import CareTrackerItemGroupModel from "../model/CareTrackerItemGroupModel";
-import CareTrackerItemModel from "../model/CareTrackerItemModel";
+import CareTracker from "../model/CareTracker";
+import {CareTrackerItemGroupModel, CareTrackerItemModel} from "../../../../generated";
+import CareTrackerItemGroup from "../model/CareTrackerItemGroup";
+import CareTrackerItem from "../model/CareTrackerItem";
 import DsRuleModelToTransferConverter from "../../decisionSupport/converter/DsRuleModelToTransferConverter";
 import AbstractConverter from "../../conversion/AbstractConverter";
 import DxCodeModelToTransferConverter from "../../dx/converter/DxCodeModelToTransferConverter";
 
-export default class CareTrackerModelToTransferConverter extends AbstractConverter<CareTrackerModel, CareTracker>
+export default abstract class CareTrackerModelToInputConverter<T> extends AbstractConverter<CareTracker, T>
 {
-	public convert(careTrackerModel: CareTrackerModel): CareTracker
+	public convert(careTrackerModel: CareTracker): T
 	{
 		if (!careTrackerModel)
 		{
@@ -41,20 +41,19 @@ export default class CareTrackerModelToTransferConverter extends AbstractConvert
 		}
 
 		return {
-			id: careTrackerModel.id,
 			name: careTrackerModel.name,
 			description: careTrackerModel.description,
 			enabled: careTrackerModel.enabled,
 			careTrackerItemGroups: this.convertAllGroups(careTrackerModel.careTrackerItemGroups),
 			triggerCodes: new DxCodeModelToTransferConverter().convertList(careTrackerModel.triggerCodes),
-		} as CareTracker;
+		} as unknown as T;
 	}
 
-	private convertAllGroups(itemGroups: Array<CareTrackerItemGroupModel>): Array<CareTrackerItemGroup>
+	private convertAllGroups(itemGroups: Array<CareTrackerItemGroup>): Array<CareTrackerItemGroupModel>
 	{
 		return itemGroups.map(itemGroup =>
 		{
-			const groupModel = {} as CareTrackerItemGroup;
+			const groupModel = {} as CareTrackerItemGroupModel;
 			groupModel.id = itemGroup.id;
 			groupModel.name = itemGroup.name;
 			groupModel.description = itemGroup.description;
@@ -64,12 +63,12 @@ export default class CareTrackerModelToTransferConverter extends AbstractConvert
 		});
 	}
 
-	private convertAllItems(items: Array<CareTrackerItemModel>): Array<CareTrackerItem>
+	private convertAllItems(items: Array<CareTrackerItem>): Array<CareTrackerItemModel>
 	{
 		const ruleToTransferConverter = new DsRuleModelToTransferConverter();
 		return items.map(item =>
 		{
-			const model = {} as CareTrackerItem;
+			const model = {} as CareTrackerItemModel;
 			model.id = item.id;
 			model.name = item.name;
 			model.description = item.description;

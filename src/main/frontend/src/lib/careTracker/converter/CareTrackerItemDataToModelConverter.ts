@@ -1,5 +1,3 @@
-'use strict';
-
 /*
 
     Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
@@ -25,58 +23,28 @@
 
  */
 
-import CareTrackerItemModel from "./CareTrackerItemModel";
+import {CareTrackerItemDataModel} from "../../../../generated";
+import AbstractConverter from "../../conversion/AbstractConverter";
+import CareTrackerItemData from "../model/CareTrackerItemData";
+import moment from "moment";
 
-export default class CareTrackerItemGroupModel
+export default class CareTrackerItemDataToModelConverter extends AbstractConverter<CareTrackerItemDataModel, CareTrackerItemData>
 {
-	private _id: number;
-	private _name: string;
-	private _description: string;
-	private _careTrackerItems: CareTrackerItemModel[];
-
-
-	public constructor()
+	public convert(transfer: CareTrackerItemDataModel): CareTrackerItemData
 	{
-		this.careTrackerItems = [];
-	}
+		if (!transfer)
+		{
+			return null;
+		}
 
-	get id(): number
-	{
-		return this._id;
-	}
+		const dataModel = new CareTrackerItemData();
+		dataModel.id = transfer.id;
+		dataModel.value = transfer.value;
+		dataModel.comment = transfer.comment;
+		dataModel.observationDateTime = moment(transfer.observationDateTime);
+		dataModel.createdDateTime = moment(transfer.createdDateTime);
+		dataModel.updatedDateTime = moment(transfer.updatedDateTime);
 
-	set id(value: number)
-	{
-		this._id = value;
-	}
-
-	get name(): string
-	{
-		return this._name;
-	}
-
-	set name(value: string)
-	{
-		this._name = value;
-	}
-
-	get description(): string
-	{
-		return this._description;
-	}
-
-	set description(value: string)
-	{
-		this._description = value;
-	}
-
-	get careTrackerItems(): CareTrackerItemModel[]
-	{
-		return this._careTrackerItems;
-	}
-
-	set careTrackerItems(value: CareTrackerItemModel[])
-	{
-		this._careTrackerItems = value;
+		return dataModel;
 	}
 }

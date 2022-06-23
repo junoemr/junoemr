@@ -23,10 +23,10 @@
 
 import {SecurityPermissions} from "../../../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
-import CareTrackerItemGroupModel from "../../../lib/careTracker/model/CareTrackerItemGroupModel";
-import CareTrackerItemModel from "../../../lib/careTracker/model/CareTrackerItemModel";
-import CareTrackerItemDataModel from "../../../lib/careTracker/model/CareTrackerItemDataModel";
-import CareTrackerModel from "../../../lib/careTracker/model/CareTrackerModel";
+import CareTrackerItemGroup from "../../../lib/careTracker/model/CareTrackerItemGroup";
+import CareTrackerItem from "../../../lib/careTracker/model/CareTrackerItem";
+import CareTrackerItemData from "../../../lib/careTracker/model/CareTrackerItemData";
+import CareTracker from "../../../lib/careTracker/model/CareTracker";
 
 angular.module('Record.Tracker.CareTracker').component('careTracker',
 	{
@@ -53,7 +53,7 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-				ctrl.careTracker = null as CareTrackerModel;
+				ctrl.careTracker = null as CareTracker;
 				ctrl.demographicId = null;
 
 				ctrl.filter = {
@@ -94,13 +94,13 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 					ctrl.filter.data.maxEntries = null;
 				};
 
-				ctrl.showCareTrackerGroup = (group: CareTrackerItemGroupModel): boolean =>
+				ctrl.showCareTrackerGroup = (group: CareTrackerItemGroup): boolean =>
 				{
 					// filter visible items. show group if one or more items visible
-					let visibleItems = group.careTrackerItems.filter((item: CareTrackerItemModel) => ctrl.showCareTrackerItem(item));
+					let visibleItems = group.careTrackerItems.filter((item: CareTrackerItem) => ctrl.showCareTrackerItem(item));
 					return (visibleItems.length > 0);
 				}
-				ctrl.showCareTrackerItem = (item: CareTrackerItemModel): boolean =>
+				ctrl.showCareTrackerItem = (item: CareTrackerItem): boolean =>
 				{
 					if(item)
 					{
@@ -144,9 +144,9 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 						{
 							const map = new Map();
 							$scope.$broadcast("careTracker.savePendingData",
-								(item: CareTrackerItemModel,
+								(item: CareTrackerItem,
 								 selected?: boolean,
-								 newItemData?: CareTrackerItemDataModel): void =>
+								 newItemData?: CareTrackerItemData): void =>
 								{
 									map.set(item.id, {item: item, data: newItemData, selected: Boolean(selected)});
 									if (map.size >= expectedResponseCount)
@@ -168,8 +168,8 @@ angular.module('Record.Tracker.CareTracker').component('careTracker',
 					const message = itemDataPairs
 						.filter((result: any) => result.data && result.selected)
 						.map((result: any) => {
-						const item = result.item as CareTrackerItemModel;
-						const data = result.data as CareTrackerItemDataModel;
+						const item = result.item as CareTrackerItem;
+						const data = result.data as CareTrackerItemData;
 						return item.toString() + ": " + data.toString();
 					}).join("\n");
 
