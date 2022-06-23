@@ -23,15 +23,13 @@
     Ontario, Canada
 
 */
-import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import MhaConfigService from "../lib/integration/myhealthaccess/service/MhaConfigService";
 import MhaPatientService from "../lib/integration/myhealthaccess/service/MhaPatientService";
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../common/components/junoComponentConstants";
 import {MhaCallPanelEvents} from "./components/mhaCallPanel/mhaCallPanelEvents";
-import {API_BASE_PATH} from "../lib/constants/ApiConstants";
-import {netcareService} from "../lib/integration/netcare/service/NetcareService";
 import moment from "moment";
+import AppointmentService from "../lib/appointment/service/AppointmentService";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -86,7 +84,7 @@ angular.module('Record').controller('Record.RecordController', [
 		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-		controller.appointmentApi = new AppointmentApi($http, $httpParamSerializer, API_BASE_PATH);
+		controller.appointmentService = new AppointmentService();
 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.demographic = null;
@@ -101,6 +99,7 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.page.itvCheck = null;
 		controller.page.editingNoteId = null;
 		controller.page.isNoteSaved = false; // Track save state of note TODO-legacy: Potentially add this to the encounterNote object on the backend
+		controller.page.currentNoteConfig = {};
 
 		controller.$storage = $localStorage; // Define persistent storage
 		controller.recordtabs2 = [];
@@ -137,7 +136,12 @@ angular.module('Record').controller('Record.RecordController', [
 				controller.skipTmpSave = false;
 				controller.noteDirty = false;
 
-				await controller.getCurrentNote(true);
+				if($stateParams.appointmentNo && securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentRead))
+				{
+					controller.page.appointment = await controller.appointmentService.getAppointment($stateParams.appointmentNo);
+				}
+
+				await controller.getCurrentNote(controller.page.appointment);
 
 				let delayTmpSave = function delayTmpSave(newVal, oldVal)
 				{
@@ -179,6 +183,25 @@ angular.module('Record').controller('Record.RecordController', [
 				});
 
 			}
+
+			billingService.getBillingRegion().then(
+				function success(results)
+				{
+					controller.page.billregion = results.message;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
+			billingService.getDefaultView().then(
+				function success(results)
+				{
+					controller.page.defaultView = results.message;
+				},
+				function error(errors)
+				{
+					console.log(errors);
+				});
 
 			//TODO re-enable once conformance is passed and prod credentials set
 			controller.netcareModuleEnabled = false; //await netcareService.loadEnabledState();
@@ -349,7 +372,7 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.skipTmpSave = true;
 			controller.$storage.hideNote = true;
 			await noteService.clearTempSave($stateParams.demographicNo);
-			await controller.getCurrentNote(false);
+			await controller.getCurrentNote();
 			controller.removeEditingNoteFlag();
 		}
 
@@ -396,7 +419,7 @@ angular.module('Record').controller('Record.RecordController', [
 					controller.skipTmpSave = true;
 					controller.page.encounterNote = results;
 					controller.$storage.hideNote = true;
-					controller.getCurrentNote(false);
+					controller.getCurrentNote();
 					controller.page.assignedCMIssues = [];
 					controller.working = false;
 				},
@@ -429,37 +452,6 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.saveNote();
 		};
 
-		billingService.getBillingRegion().then(
-			function success(results)
-			{
-				controller.page.billregion = results.message;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-		billingService.getDefaultView().then(
-			function success(results)
-			{
-				controller.page.defaultView = results.message;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-		if ($location.search().appointmentNo != null)
-		{
-			controller.appointmentApi.getAppointment($location.search().appointmentNo).then(
-				function success(results)
-				{
-					controller.page.appointment = results.data.body;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-		}
-
 		controller.saveSignBillNote = function saveSignBillNote()
 		{
 			if(controller.isWorking())
@@ -484,9 +476,9 @@ angular.module('Record').controller('Record.RecordController', [
 				apptNo = controller.page.appointment.id;
 				apptProvider = controller.page.appointment.providerNo;
 				var dt = moment(controller.page.appointment.appointmentDate).toDate();
-				apptDate = dt.getFullYear() + "-" + zero(dt.getMonth() + 1) + "-" + zero(dt.getDate());
+				apptDate = dt.getFullYear() + "-" + Juno.Common.Util.pad0(dt.getMonth() + 1) + "-" + Juno.Common.Util.pad0(dt.getDate());
 				dt = new Date(controller.page.appointment.startTime);
-				apptStartTime = zero(dt.getHours()) + ":" + zero(dt.getMinutes()) + ":" + zero(dt.getSeconds());
+				apptStartTime = Juno.Common.Util.pad0(dt.getHours()) + ":" + Juno.Common.Util.pad0(dt.getMinutes()) + ":" + Juno.Common.Util.pad0(dt.getSeconds());
 			}
 
 			var url = "../billing.do?billRegion=" + encodeURIComponent(controller.page.billregion);
@@ -501,9 +493,6 @@ angular.module('Record').controller('Record.RecordController', [
 			window.open(url, "billingWin", "scrollbars=yes, location=no, width=" + screen.width + ", height=" + screen.height);
 		};
 
-		controller.page.currentNoteConfig = {};
-
-
 		controller.getIssueNote = function getIssueNote()
 		{
 			if (controller.page.encounterNote.noteId != null)
@@ -511,7 +500,7 @@ angular.module('Record').controller('Record.RecordController', [
 				noteService.getIssueNote(controller.page.encounterNote.noteId).then(
 					function success(results)
 					{
-						if (results != null) controller.page.assignedCMIssues = toArray(results.assignedCMIssues);
+						if (results != null) controller.page.assignedCMIssues = Juno.Common.Util.toArray(results.assignedCMIssues);
 					},
 					function error(errors)
 					{
@@ -520,15 +509,15 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-		controller.getCurrentNote = async function getCurrentNote(showNoteAfterLoadingFlag)
+		controller.getCurrentNote = async function getCurrentNote(appointment = null)
 		{
 			let results = await noteService.getCurrentNote($stateParams.demographicNo, $location.search());
 			controller.page.encounterNote = results;
 			controller.page.initNote = results.note; //compare this with current note content to determine tmpsave or not
 			controller.getIssueNote();
 			$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
-			controller.initAppendNoteEditor();
-			controller.initObservationDate();
+			controller.initAppendNoteEditor(appointment);
+			controller.initObservationDate(appointment);
 			return results.note;
 		};
 
@@ -574,20 +563,31 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.removeEditingNoteFlag();
 		})
 
-		controller.initAppendNoteEditor = function initAppendNoteEditor()
+		controller.initAppendNoteEditor = function initAppendNoteEditor(appointment = null)
 		{
 			if ($location.search().noteEditorText != null)
 			{
 				controller.page.encounterNote.note = controller.page.encounterNote.note + $location.search().noteEditorText;
 			}
+			else if(appointment && appointment.reason && Juno.Common.Util.isBlank(controller.page.encounterNote.note))
+			{
+				controller.page.encounterNote.note = appointment.reason;
+			}
 		};
 
 		// Initialize the observationDate for new notes
-		controller.initObservationDate = function initObservationDate()
+		controller.initObservationDate = function initObservationDate(appointment = null)
 		{
 			if (controller.page.encounterNote.observationDate === null)
 			{
-				controller.page.encounterNote.observationDate = new Date();
+				if(appointment && appointment.appointmentDate)
+				{
+					controller.page.encounterNote.observationDate = moment(appointment.appointmentDate).toDate();
+				}
+				else
+				{
+					controller.page.encounterNote.observationDate = new Date();
+				}
 			}
 		};
 
@@ -876,16 +876,3 @@ angular.module('Record').controller('Record.RecordController', [
 		}
 	}
 ]);
-
-function toArray(obj)
-{ //convert single object to array
-	if (obj instanceof Array) return obj;
-	if (obj == null) return [];
-	return [obj];
-}
-
-function zero(n)
-{
-	if (n < 10) n = "0" + n;
-	return n;
-}
