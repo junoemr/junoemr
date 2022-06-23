@@ -162,7 +162,7 @@
                                 </table>
                             </div>
                         </div>
-                        <div id="note-editor-footer" class="grid-column-3 grid-gap-4 m-b-8">
+                        <div id="note-editor-footer" class="flex-row grid-gap-4 justify-content-between m-b-8 flex-wrap">
                             <div class="flex-row">
                                 <input type="hidden" id="startTag" value="<bean:message key="oscarEncounter.Index.startTime"/>">
                                 <input type="hidden" id="endTag" value="<bean:message key="oscarEncounter.Index.endTime"/>">
@@ -173,14 +173,12 @@
                                 </div>
                             </div>
                             <div class="flex-row justify-content-end align-items-center">
-                                <div ng-if="!recordCtrl.noteDirty">
+                                <div ng-if="!recordCtrl.noteDirty" class="m-r-4">
                                     <span class="body-smallest"
                                           title="{{recordCtrl.draftSavedMessage()}}">
                                         Draft Saved
                                     </span>
                                 </div>
-                            </div>
-                            <div class="flex-row justify-content-end">
                                 <div class="btn-group btn-group-md pull-right">
                                     <button type="button" class="btn btn-default" ng-click="recordCtrl.pasteTimer()" id="aTimer" title="<bean:message key="oscarEncounter.Index.pasteTimer"/>">
                                         00:00

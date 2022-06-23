@@ -30,6 +30,8 @@ import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../common/components
 import {MhaCallPanelEvents} from "./components/mhaCallPanel/mhaCallPanelEvents";
 import moment from "moment";
 import AppointmentService from "../lib/appointment/service/AppointmentService";
+import ToastErrorHandler from "../lib/error/handler/ToastErrorHandler";
+import {LogLevel} from "../lib/error/handler/LogLevel";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -91,6 +93,7 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.page = {};
 		controller.page.assignedCMIssues = [];
 		controller.SecurityPermissions = SecurityPermissions;
+		controller.errorHandler = new ToastErrorHandler(false, LogLevel.WARN);
 
 		/*
 		 * handle concurrent note edit - EditingNoteFlag
@@ -184,24 +187,20 @@ angular.module('Record').controller('Record.RecordController', [
 
 			}
 
-			billingService.getBillingRegion().then(
-				function success(results)
-				{
-					controller.page.billregion = results.message;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-			billingService.getDefaultView().then(
-				function success(results)
-				{
-					controller.page.defaultView = results.message;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
+			try
+			{
+				let billingResults = await Promise.all([
+					billingService.getBillingRegion(),
+					billingService.getDefaultView(),
+				]);
+
+				controller.page.billregion = billingResults[0].message;
+				controller.page.defaultView = billingResults[1].message;
+			}
+			catch (e)
+			{
+				controller.errorHandler.handleError(e);
+			}
 
 			//TODO re-enable once conformance is passed and prod credentials set
 			controller.netcareModuleEnabled = false; //await netcareService.loadEnabledState();
@@ -211,7 +210,6 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			if (controller.page.encounterNote.note === controller.page.initNote) return; //user did not input anything, don't save
 
-			console.log("save", controller.page.encounterNote);
 			noteService.tempSave($stateParams.demographicNo,
 				controller.page.encounterNote.note,
 				controller.page.encounterNote.noteId).then(() =>
@@ -571,7 +569,7 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 			else if(appointment && appointment.reason && Juno.Common.Util.isBlank(controller.page.encounterNote.note))
 			{
-				controller.page.encounterNote.note = appointment.reason;
+				controller.page.encounterNote.note = "Reason: " + appointment.reason;
 			}
 		};
 
