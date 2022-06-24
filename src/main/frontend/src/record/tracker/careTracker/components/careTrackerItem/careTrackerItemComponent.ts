@@ -74,6 +74,11 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					{
 						ctrl.inputRegexRestriction = /^-?\d*\.?\d*$/;
 					}
+					else if(ctrl.model.valueTypeIsBloodPressure())
+					{
+						// regex can't be super strict as it is applied during each input change
+						ctrl.inputRegexRestriction = /^\d*\/?\d*$/;
+					}
 
 					ctrl.clearNewEntry();
 				}
@@ -130,7 +135,8 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 				}
 				ctrl.showValueTextInput = (): boolean =>
 				{
-					return ctrl.model && ctrl.model.itemTypeIsMeasurement() && (ctrl.model.valueTypeIsFreeText() || ctrl.model.valueTypeIsNumeric());
+					return ctrl.model && ctrl.model.itemTypeIsMeasurement() &&
+						(ctrl.model.valueTypeIsFreeText() || ctrl.model.valueTypeIsNumeric() || ctrl.model.valueTypeIsBloodPressure());
 				}
 				ctrl.showValueDateInput = (): boolean =>
 				{
@@ -139,7 +145,7 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 
 				ctrl.isGraphable = (): boolean =>
 				{
-					return ctrl.model.valueTypeIsNumeric();
+					return ctrl.model.valueTypeIsNumeric() || ctrl.model.valueTypeIsBloodPressure();
 				}
 
 				ctrl.onBooleanValueYes = (value: boolean): void =>
@@ -155,6 +161,11 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 				}
 
 				ctrl.onDateChangeValue = (value: Moment): void =>
+				{
+					ctrl.newEntry.value = value.isValid() ? Juno.Common.Util.formatMomentDate(value) : null;
+				}
+
+				ctrl.onBPChangeValue = (value: Moment): void =>
 				{
 					ctrl.newEntry.value = value.isValid() ? Juno.Common.Util.formatMomentDate(value) : null;
 				}

@@ -84,6 +84,11 @@ export default class CareTrackerItem
 		return this.valueType === CareTrackerItemValueType.Date;
 	}
 
+	public valueTypeIsBloodPressure(): boolean
+	{
+		return this.valueType === CareTrackerItemValueType.BloodPressure;
+	}
+
 	public hasAttachedData(): boolean
 	{
 		return (this.data && this.data.length > 0);

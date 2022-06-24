@@ -28,4 +28,5 @@ public enum ValueType
 	NUMERIC,
 	BOOLEAN,
 	DATE,
+	BLOOD_PRESSURE,
 }

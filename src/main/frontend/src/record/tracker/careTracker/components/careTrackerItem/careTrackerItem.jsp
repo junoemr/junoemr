@@ -76,11 +76,10 @@
 			            ng-model="$ctrl.newEntry.value"
 			            valid-regex="$ctrl.inputRegexRestriction">
 			</juno-input>
-			<juno-date-picker
-					ng-if="$ctrl.showValueDateInput()"
-					label="{{$ctrl.getInputLabel()}}"
-					ng-model="$ctrl.dateValue"
-					on-change="$ctrl.onDateChangeValue(value)">
+			<juno-date-picker ng-if="$ctrl.showValueDateInput()"
+			                  label="{{$ctrl.getInputLabel()}}"
+			                  ng-model="$ctrl.dateValue"
+			                  on-change="$ctrl.onDateChangeValue(value)">
 			</juno-date-picker>
 		</div>
 		<div class="flex-row flex-grow align-items-center">

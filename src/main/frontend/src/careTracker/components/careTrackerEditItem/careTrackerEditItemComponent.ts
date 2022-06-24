@@ -49,6 +49,7 @@ angular.module('CareTracker').component('careTrackerEditItem',
 					{label: "Numeric", value: CareTrackerItemValueType.Numeric},
 					{label: "Checkbox", value: CareTrackerItemValueType.Boolean},
 					{label: "Date", value: CareTrackerItemValueType.Date},
+					{label: "Blood Pressure", value: CareTrackerItemValueType.BloodPressure},
 				];
 
 				ctrl.isLoading = true;
