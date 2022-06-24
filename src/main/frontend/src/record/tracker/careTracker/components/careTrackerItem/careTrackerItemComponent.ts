@@ -165,11 +165,6 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					ctrl.newEntry.value = value.isValid() ? Juno.Common.Util.formatMomentDate(value) : null;
 				}
 
-				ctrl.onBPChangeValue = (value: Moment): void =>
-				{
-					ctrl.newEntry.value = value.isValid() ? Juno.Common.Util.formatMomentDate(value) : null;
-				}
-
 				ctrl.canSubmitItem = (): boolean =>
 				{
 					return (!ctrl.isLoading && ctrl.model
