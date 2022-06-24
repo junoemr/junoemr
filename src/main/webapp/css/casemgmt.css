@@ -448,14 +448,18 @@ div.encounterNavBar li.encounterNoteOdd, div.encounterNavBar li.encounterNoteOdd
 
 div.encounterNavBar span.encounterNoteTitle {
 	z-index: 1;
-	position:absolute;
 	margin-right:10px;
 	width:90%;
 	overflow:hidden;
-	height:1.2em;
 	white-space:nowrap;
 	float:left;
+	height:auto;
 	text-align:left;
+}
+
+div.encounterNavBar span.encounterNoteTitle.singleLine {
+	position:absolute;
+	height:1.2em;
 }
 
 div.encounterNavBar a.encounterNoteTitle {
