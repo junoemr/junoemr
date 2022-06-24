@@ -42,7 +42,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("demographic/{demographicNo}/careTracker")
+@Path("demographic/{demographicNo}/ct") // can't include the word 'tracker' in path. it gets flagged by add-blockers etc.
 @Component("demographicCareTrackerWebService")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)

@@ -20,13 +20,14 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest;
+package org.oscarehr.ws.rest.careTracker;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.careTracker.model.CareTrackerModel;
 import org.oscarehr.careTracker.search.CareTrackerCriteriaSearch;
 import org.oscarehr.careTracker.service.CareTrackerService;
 import org.oscarehr.security.model.Permission;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,7 +40,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-@Path("careTracker")
+@Path("ct") // can't include the word 'tracker' in path. it gets flagged by add-blockers etc.
 @Component("careTrackersWebService")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -51,7 +52,7 @@ public class CareTrackersWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/search")
-	public RestSearchResponse<CareTrackerModel> search(
+	public RestSearchResponse<CareTrackerModel> searchCareTrackers(
 			@QueryParam("enabled") Boolean isEnabled,
 			@QueryParam("includeClinicLevel") @DefaultValue("true") boolean includeClinicLevel,
 			@QueryParam("includeProviderLevel") @DefaultValue("false") boolean includeProviderLevel,

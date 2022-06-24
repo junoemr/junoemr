@@ -74,7 +74,7 @@ angular.module("CareTracker").service("careTrackerApiService", [
 			perPage: number): Promise<Array<CareTracker>> =>
 		{
 			return service.careTrackerToModelConverter.convertList(
-				(await service.careTrackersApi.search(
+				(await service.careTrackersApi.searchCareTrackers(
 					enabled, includeClinicLevel, includeProviderLevel, providerId, includeDemographicLevel, demographicId, page, perPage)).data.body);
 		}
 

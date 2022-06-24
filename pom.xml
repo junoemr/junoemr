@@ -2010,8 +2010,8 @@
 							<value>
 								<!-- Alphabetical please -->
 								org.oscarehr.ws.rest.AppointmentService
-								org.oscarehr.ws.rest.CareTrackerWebService
-								org.oscarehr.ws.rest.CareTrackersWebService
+								org.oscarehr.ws.rest.careTracker.CareTrackerWebService
+								org.oscarehr.ws.rest.careTracker.CareTrackersWebService
 								org.oscarehr.ws.rest.ConsultationWebService
 								org.oscarehr.ws.rest.DecisionSupportWebService
 								org.oscarehr.ws.rest.DemographicService
