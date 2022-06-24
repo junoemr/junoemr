@@ -56,16 +56,16 @@
 					</div>
 					<div class="flex-row flex-grow flex-gap-8 flex-wrap">
 						<div class="input-size-constraint">
-							<juno-date-select label="After Date"
+							<juno-date-picker label="After Date"
 							                  label-position="$ctrl.LABEL_POSITION.TOP"
 							                  ng-model="$ctrl.filter.data.afterDate">
-							</juno-date-select>
+							</juno-date-picker>
 						</div>
 						<div class="input-size-constraint">
-							<juno-date-select label="Before Date"
+							<juno-date-picker label="Before Date"
 							                  label-position="$ctrl.LABEL_POSITION.TOP"
 							                  ng-model="$ctrl.filter.data.beforeDate">
-							</juno-date-select>
+							</juno-date-picker>
 						</div>
 					</div>
 					<div class="flex-row flex-grow justify-content-end">

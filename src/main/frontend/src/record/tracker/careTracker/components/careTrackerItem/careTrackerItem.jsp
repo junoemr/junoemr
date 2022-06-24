@@ -76,13 +76,12 @@
 			            ng-model="$ctrl.newEntry.value"
 			            valid-regex="$ctrl.inputRegexRestriction">
 			</juno-input>
-			<juno-date-select
+			<juno-date-picker
 					ng-if="$ctrl.showValueDateInput()"
 					label="{{$ctrl.getInputLabel()}}"
 					ng-model="$ctrl.dateValue"
-					change="$ctrl.onDateChangeValue(value)">
-			</juno-date-select>
-			{{$ctrl.dateValue}}
+					on-change="$ctrl.onDateChangeValue(value)">
+			</juno-date-picker>
 		</div>
 		<div class="flex-row flex-grow align-items-center">
 			<juno-check-box label="Add to Note"
@@ -90,10 +89,10 @@
 			</juno-check-box>
 		</div>
 		<div>
-			<juno-date-select
+			<juno-date-picker
 					label="Observation Date"
 					ng-model="$ctrl.newEntry.observationDateTime">
-			</juno-date-select>
+			</juno-date-picker>
 		</div>
 
 		<div class="action-button-container">
