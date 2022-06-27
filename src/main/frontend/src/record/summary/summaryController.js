@@ -81,6 +81,7 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		controller.busy = false;
 
 		controller.demographicNo = $stateParams.demographicNo;
+		controller.appointmentNo = $stateParams.appointmentNo;
 		controller.user = user;
 		controller.olisSearchEnabled = false;
 
@@ -165,7 +166,11 @@ angular.module('Record.Summary').controller('Record.Summary.SummaryController', 
 		controller.openAddForms = function openForms()
 		{
 			// open forms tab with "Library" list selected
-			$state.go('record.forms.add');
+			$state.go('record.forms.add',
+				{
+					demographicNo: controller.demographicNo,
+					appointmentNo: controller.appointmentNo
+				});
 		};
 
 		controller.openCompletedForms = function()

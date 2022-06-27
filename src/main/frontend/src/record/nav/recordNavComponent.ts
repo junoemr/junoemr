@@ -48,6 +48,7 @@ angular.module('Record.Nav').component('recordNav', {
 
 		ctrl.PATIENT_MESSENGER_NAV_ID = 432543;
 		ctrl.recordTabs = [];
+		ctrl.appointmentNo = $stateParams.appointmentNo;
 
 		ctrl.$onInit = () =>
 		{
@@ -142,14 +143,14 @@ angular.module('Record.Nav').component('recordNav', {
 					$state.go(tabInfo.state[0],
 						{
 							demographicNo: tabInfo.demoId,
-							appointmentNo: $stateParams.appointmentNo
+							appointmentNo: ctrl.appointmentNo
 						});
 				}
 				else
 				{
 					$state.go(tabInfo.state[0],
 							{
-								appointmentNo: $stateParams.appointmentNo
+								appointmentNo: ctrl.appointmentNo
 							});
 				}
 			}
