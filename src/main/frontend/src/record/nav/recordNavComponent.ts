@@ -42,7 +42,7 @@ angular.module('Record.Nav').component('recordNav', {
 		function ($scope,
 		          $state,
 		          $stateParams,
-							$location,
+		          $location,
 		          uxService,
 		          securityRolesService)
 	{
@@ -198,11 +198,11 @@ angular.module('Record.Nav').component('recordNav', {
 			{
 				return $location.search().appointmentNo
 			},
-					function(newVal, oldVal)
+			function(newVal, oldVal)
 			{
-				if (newVal)
+				if(newVal !== oldVal)
 				{
-					if(newVal !== oldVal)
+					if(Juno.Common.Util.isDefinedAndNotNull(newVal))
 					{
 						ctrl.appointmentNo = newVal;
 					}
