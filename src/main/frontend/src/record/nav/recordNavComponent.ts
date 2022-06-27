@@ -202,10 +202,7 @@ angular.module('Record.Nav').component('recordNav', {
 			{
 				if(newVal !== oldVal)
 				{
-					if(Juno.Common.Util.isDefinedAndNotNull(newVal))
-					{
-						ctrl.appointmentNo = newVal;
-					}
+					ctrl.appointmentNo = newVal;
 				}
 			});
 
