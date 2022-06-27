@@ -57,12 +57,6 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModa
 					ctrl.series = ctrl.formatSeries(ctrl.model);
 					ctrl.data = ctrl.formatData(ctrl.model, dataPoints);
 					ctrl.options = ctrl.formatOptions(dataPoints);
-
-					if(ctrl.model.valueTypeIsBloodPressure())
-					{
-						ctrl.series = ["Systolic", "Diastolic"];
-					}
-
 					ctrl.isLoading = false;
 				}
 

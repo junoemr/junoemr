@@ -64,12 +64,8 @@ export default class CareTracker
 
 	public getItemCount(): number
 	{
-		let count = 0;
-		this.careTrackerItemGroups.forEach((group: CareTrackerItemGroup) =>
-		{
-			count += group.careTrackerItems.length;
-		})
-		return count;
+		return this.careTrackerItemGroups.reduce((previousValue: number, group: CareTrackerItemGroup) =>
+			previousValue + group.careTrackerItems.length, 0);
 	}
 
 	get id(): number
