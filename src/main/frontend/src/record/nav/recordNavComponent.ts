@@ -36,11 +36,13 @@ angular.module('Record.Nav').component('recordNav', {
 		'$scope',
 		'$state',
 		'$stateParams',
+		'$location',
 		'uxService',
 		'securityRolesService',
 		function ($scope,
 		          $state,
 		          $stateParams,
+							$location,
 		          uxService,
 		          securityRolesService)
 	{
@@ -48,11 +50,11 @@ angular.module('Record.Nav').component('recordNav', {
 
 		ctrl.PATIENT_MESSENGER_NAV_ID = 432543;
 		ctrl.recordTabs = [];
-		ctrl.appointmentNo = $stateParams.appointmentNo;
 
 		ctrl.$onInit = () =>
 		{
 			ctrl.fillMenu();
+			ctrl.appointmentNo = $location.search().appointmentNo;
 		}
 
 		ctrl.fillMenu = () =>
@@ -191,6 +193,21 @@ angular.module('Record.Nav').component('recordNav', {
 
 			return false;
 		};
+
+		$scope.$watch(function()
+			{
+				return $location.search().appointmentNo
+			},
+					function(newVal, oldVal)
+			{
+				if (newVal)
+				{
+					if(newVal !== oldVal)
+					{
+						ctrl.appointmentNo = newVal;
+					}
+				}
+			});
 
 	}]
 });
