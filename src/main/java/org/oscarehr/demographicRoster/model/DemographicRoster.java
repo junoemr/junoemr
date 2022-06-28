@@ -24,7 +24,8 @@
 package org.oscarehr.demographicRoster.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.rosterStatus.model.RosterStatus;
@@ -46,7 +47,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "demographic_roster")
 public class DemographicRoster extends AbstractModel<Integer> implements Serializable

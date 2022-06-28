@@ -244,10 +244,7 @@
 				}
 
 				demographicDao.persist(demographic);
-				if(StringUtils.isNotBlank(demographic.getRosterStatus()))
-				{
-					demographicRosterService.saveRosterHistory(demographic);
-				}
+				demographicRosterService.addRosterHistoryEntry(demographic);
 
 				// save custom licensed producer if enabled
 				if(oscarVariables.isPropertyActive("show_demographic_licensed_producers")) {

@@ -26,7 +26,6 @@ package org.oscarehr.managers;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTimeComparator;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.Gender;
@@ -58,7 +57,6 @@ import org.oscarehr.demographic.entity.DemographicMerged;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographic.service.HinValidationService;
-import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.provider.dao.RecentDemographicAccessDao;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.security.model.Permission;
@@ -188,9 +186,6 @@ public class DemographicManager {
 
 	@Autowired
 	private HinValidationService hinValidationService;
-
-	@Autowired
-	private DemographicRosterService demographicRosterService;
 
 	@Autowired
 	private ProviderDao providerDao;
@@ -559,35 +554,6 @@ public class DemographicManager {
 			if (!(ext.getKey().equals(prevExt.getKey()) && ext.getValue().equals(prevExt.getValue()))) {
 				demographicExtArchiveDao.archiveDemographicExt(prevExt);
 			}
-		}
-	}
-
-	/**
-	 * Creates a new roster history entry for a given demographic.
-	 * Only records changes if there is a difference between the two for any of the roster/enrollment fields.
-	 * @param currentDemo current revision of the demographic we want to record
-	 * @param previousDemo previous version of the demographic
-	 */
-	public void addRosterHistoryEntry(org.oscarehr.demographic.entity.Demographic currentDemo,
-									  org.oscarehr.demographic.entity.Demographic previousDemo)
-	{
-		boolean hasChanged = false;
-		
-		// If the roster status is valid, check if any fields changed from last time we edited
-		if (ConversionUtils.hasContent(currentDemo.getRosterStatus()))
-		{
-			DateTimeComparator dateComparator = DateTimeComparator.getDateOnlyInstance();
-
-			hasChanged = currentDemo.getFamilyDoctor() != null && !currentDemo.getFamilyDoctor().equals(previousDemo.getFamilyDoctor());
-			hasChanged |= currentDemo.getRosterDate() != null && dateComparator.compare(currentDemo.getRosterDate(), previousDemo.getRosterDate()) != 0;
-			hasChanged |= currentDemo.getRosterStatus() != null && !currentDemo.getRosterStatus().equals(previousDemo.getRosterStatus());
-			hasChanged |= currentDemo.getRosterTerminationDate() != null && dateComparator.compare(currentDemo.getRosterTerminationDate(), previousDemo.getRosterTerminationDate()) != 0;
-			hasChanged |= currentDemo.getRosterTerminationReason() != null && !currentDemo.getRosterTerminationReason().equals(previousDemo.getRosterTerminationReason());
-		}
-
-		if (hasChanged)
-		{
-			demographicRosterService.saveRosterHistory(currentDemo);
 		}
 	}
 

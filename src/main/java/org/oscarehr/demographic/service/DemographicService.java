@@ -47,6 +47,7 @@ import org.oscarehr.demographic.transfer.DemographicCreateInput;
 import org.oscarehr.demographic.transfer.DemographicUpdateInput;
 import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
+import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.integration.service.IntegrationPushUpdateService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.model.ProviderData;
@@ -88,10 +89,6 @@ public class DemographicService
 	@Autowired
 	private DemographicCustDao demographicCustDao;
 
-	// ONLY FOR LEGACY SUPPORT. DO NOT USE
-	@Autowired
-	private org.oscarehr.common.dao.DemographicDao legacyDemographicDao;
-
 	@Autowired
 	private DemographicIntegrationDao demographicIntegrationDao;
 
@@ -106,6 +103,9 @@ public class DemographicService
 
 	@Autowired
 	private DemographicRosterDao demographicRosterDao;
+
+	@Autowired
+	private DemographicRosterService demographicRosterService;
 
 	@Autowired
 	private IntegrationPushUpdateService integrationPushUpdateService;
@@ -497,7 +497,7 @@ public class DemographicService
 	{
 		Demographic oldDemographic = demographicDao.find(demographic.getId());
 		archiveDemographicRecord(oldDemographic);
-		demographicManager.addRosterHistoryEntry(demographic, oldDemographic);
+		demographicRosterService.addRosterHistoryEntry(demographic, oldDemographic);
 
 		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
 
@@ -545,7 +545,7 @@ public class DemographicService
 			demographicCustDao.persist(demoCustom);
 		}
 
-		demographicManager.addRosterHistoryEntry(demographic, oldDemographic);
+		demographicRosterService.addRosterHistoryEntry(demographic, oldDemographic);
 		if(updateInput.getWaitList() != null)
 		{
 			waitListService.updateDemographicWaitList(demographic.getId(), updateInput.getWaitList());

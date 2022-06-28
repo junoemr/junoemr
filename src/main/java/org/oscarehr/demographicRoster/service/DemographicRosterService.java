@@ -23,6 +23,8 @@
 
 package org.oscarehr.demographicRoster.service;
 
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTimeComparator;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
 import org.oscarehr.demographicRoster.model.DemographicRoster;
@@ -36,26 +38,73 @@ import oscar.util.ConversionUtils;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
 public class DemographicRosterService
 {
 	@Autowired
-	DemographicRosterDao demographicRosterDao;
+	protected DemographicRosterDao demographicRosterDao;
 
 	@Autowired
-	RosterStatusService rosterStatusService;
+	protected RosterStatusService rosterStatusService;
 
 	@Autowired
-	DemographicRosterToTransferConverter demographicRosterToTransferConverter;
+	protected DemographicRosterToTransferConverter demographicRosterToTransferConverter;
+
+
+	/**
+	 * Creates a new roster history entry for a given demographic.
+	 * should be used for new demographic creation only
+	 * @param currentDemo current revision of the demographic we want to record
+	 * @return optional new roster model
+	 */
+	public Optional<DemographicRosterTransfer> addRosterHistoryEntry(Demographic currentDemo)
+	{
+		if (StringUtils.isNotBlank(currentDemo.getRosterStatus()))
+		{
+			return Optional.ofNullable(demographicRosterToTransferConverter.convert(saveRosterHistory(currentDemo)));
+		}
+		return Optional.empty();
+	}
+
+	/**
+	 * Creates a new roster history entry for a given demographic.
+	 * Only records changes if there is a difference between the two for any of the roster/enrollment fields.
+	 * @param currentDemo current revision of the demographic we want to record
+	 * @param previousDemo previous version of the demographic
+	 * @return optional new roster model
+	 */
+	public Optional<DemographicRosterTransfer> addRosterHistoryEntry(Demographic currentDemo, Demographic previousDemo)
+	{
+		boolean hasChanged = false;
+
+		// If the roster status is valid, check if any fields changed from last time we edited
+		if (StringUtils.isNotBlank(currentDemo.getRosterStatus()))
+		{
+			DateTimeComparator dateComparator = DateTimeComparator.getDateOnlyInstance();
+
+			hasChanged = currentDemo.getFamilyDoctor() != null && !currentDemo.getFamilyDoctor().equals(previousDemo.getFamilyDoctor());
+			hasChanged |= currentDemo.getRosterDate() != null && dateComparator.compare(currentDemo.getRosterDate(), previousDemo.getRosterDate()) != 0;
+			hasChanged |= currentDemo.getRosterStatus() != null && !currentDemo.getRosterStatus().equals(previousDemo.getRosterStatus());
+			hasChanged |= currentDemo.getRosterTerminationDate() != null && dateComparator.compare(currentDemo.getRosterTerminationDate(), previousDemo.getRosterTerminationDate()) != 0;
+			hasChanged |= currentDemo.getRosterTerminationReason() != null && !currentDemo.getRosterTerminationReason().equals(previousDemo.getRosterTerminationReason());
+		}
+
+		if (hasChanged)
+		{
+			return Optional.ofNullable(demographicRosterToTransferConverter.convert(saveRosterHistory(currentDemo)));
+		}
+		return Optional.empty();
+	}
 
 	/**
 	 * Create a demographic roster history entry, given a demographic record.
 	 * @param demographic reference that we're recording history for
 	 * @return a newly made history entry
 	 */
-	public DemographicRoster saveRosterHistory(Demographic demographic)
+	private DemographicRoster saveRosterHistory(Demographic demographic)
 	{
 		DemographicRoster demographicRoster = new DemographicRoster();
 		demographicRoster.setDemographicId(demographic.getDemographicId());
