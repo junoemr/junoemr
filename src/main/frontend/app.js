@@ -606,7 +606,7 @@ oscarApp.config([
 			})
 		.state('settings.tracker',
 			{
-				url: '/healthTracker',
+				url: '/patientHealth',
 				component: 'careTrackerManager',
 				params: {
 					pref: null,
@@ -623,7 +623,7 @@ oscarApp.config([
 			})
 		.state('settings.editCareTracker',
 			{
-				url: '/healthTracker/careTracker/:careTrackerId',
+				url: '/patientHealth/ct/:careTrackerId',
 				component: 'careTrackerEdit',
 			})
 		.state('support',
@@ -689,7 +689,7 @@ oscarApp.config([
 		})
 		.state('record.summary.tracker',
 		{
-			url: '/tracker',
+			url: '/patientHealth',
 			component: 'healthTracker',
 			resolve:
 			{
@@ -722,7 +722,7 @@ oscarApp.config([
 			})
 		.state('record.summary.tracker.careTracker',
 		{
-			url: '/careTracker/:careTrackerId',
+			url: '/ct/:careTrackerId',
 			component: 'careTracker',
 			meta:
 				{
@@ -887,7 +887,7 @@ oscarApp.config([
 		})
 		.state('record.tracker',
 		{
-			url: '/tracker',
+			url: '/patientHealth',
 			component: 'healthTrackerPage',
 			resolve:
 			{
@@ -916,7 +916,7 @@ oscarApp.config([
 			})
 		.state('record.tracker.careTracker',
 		{
-			url: '/careTracker/:careTrackerId',
+			url: '/ct/:careTrackerId',
 			component: 'careTracker',
 			meta:
 				{
@@ -927,7 +927,7 @@ oscarApp.config([
 		})
 		.state('record.configureHealthTracker',
 		{
-			url: '/configureHealthTracker',
+			url: '/configurePatientHealth',
 			component: 'careTrackerManager',
 			resolve: {
 				user: ['providerService', function(providerService)
@@ -938,7 +938,7 @@ oscarApp.config([
 		})
 		.state('record.editCareTracker',
 			{
-				url: '/configureHealthTracker/careTracker/:careTrackerId',
+				url: '/configurePatientHealth/ct/:careTrackerId',
 				component: 'careTrackerEdit',
 			})
         .state('record.patientEducation',

@@ -180,11 +180,14 @@ angular.module('Record.Tracker').component('healthTracker',
 				ctrl.onViewAllPatientMeasurements = (): void =>
 				{
 					ctrl.selectedCareTracker = null;
-					const state = $state.includes("**.careTracker") ? "^.measurements" : ".measurements";
-					$state.go(state,
-						{
-							demographicNo: ctrl.demographicNo,
-						});
+					if(!$state.includes("**.measurements")) // already on the page
+					{
+						const state = $state.includes("**.careTracker") ? "^.measurements" : ".measurements";
+						$state.go(state,
+							{
+								demographicNo: ctrl.demographicNo,
+							});
+					}
 				}
 
 				ctrl.onManageCareTrackers = (): void =>
