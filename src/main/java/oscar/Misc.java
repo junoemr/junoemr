@@ -298,7 +298,7 @@ public final class Misc
 	 * Splits a string at a delimiter
 	 * @param S String to split
 	 * @param delim Delimiter to split on
-	 * @return
+	 * @return the split string
 	 */
 	public static String[] stringSplit(String S, String delim)
 	{
