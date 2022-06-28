@@ -643,6 +643,10 @@ oscarApp.config([
 			url: '/record/:demographicNo',
 			templateUrl: 'src/record/record.jsp',
 			controller: 'Record.RecordController as recordCtrl',
+			params:
+			{
+				appointmentNo: null
+			},
 			resolve:
 			{
 				user: ['providerService', function(providerService)
@@ -737,8 +741,7 @@ oscarApp.config([
 			templateUrl: 'src/record/forms/forms.jsp',
 			controller: 'Record.Forms.FormController as formCtrl',
 			params: {
-				viewState: FORM_CONTROLLER_STATES.COMPLETED,
-				appointmentNo: null
+				viewState: FORM_CONTROLLER_STATES.COMPLETED
 			},
 			meta:
 			{

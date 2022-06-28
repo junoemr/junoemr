@@ -54,7 +54,7 @@ angular.module('Record.Nav').component('recordNav', {
 		ctrl.$onInit = () =>
 		{
 			ctrl.fillMenu();
-			ctrl.appointmentNo = $location.search().appointmentNo;
+			ctrl.appointmentNo = $stateParams.appointmentNo;
 		}
 
 		ctrl.fillMenu = () =>
@@ -196,7 +196,7 @@ angular.module('Record.Nav').component('recordNav', {
 
 		$scope.$watch(function()
 			{
-				return $location.search().appointmentNo
+				return $stateParams.appointmentNo
 			},
 			function(newVal, oldVal)
 			{
