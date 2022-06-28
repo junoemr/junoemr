@@ -162,7 +162,7 @@
                                 </table>
                             </div>
                         </div>
-                        <div id="note-editor-footer" class="flex-row grid-gap-4 justify-content-between m-b-8 flex-wrap">
+                        <div id="note-editor-footer" class="flex-row flex-gap-4 flex-wrap justify-content-between m-b-8">
                             <div class="flex-row">
                                 <input type="hidden" id="startTag" value="<bean:message key="oscarEncounter.Index.startTime"/>">
                                 <input type="hidden" id="endTag" value="<bean:message key="oscarEncounter.Index.endTime"/>">

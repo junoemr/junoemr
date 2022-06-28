@@ -196,17 +196,23 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.netcareModuleEnabled = false; //await netcareService.loadEnabledState();
 		}
 
-		controller.saveUpdates = function saveUpdates()
+		controller.saveUpdates = async () =>
 		{
 			if (controller.page.encounterNote.note === controller.page.initNote) return; //user did not input anything, don't save
 
-			noteService.tempSave($stateParams.demographicNo,
-				controller.page.encounterNote.note,
-				controller.page.encounterNote.noteId).then(() =>
+			try
 			{
+				await noteService.tempSave($stateParams.demographicNo,
+					controller.page.encounterNote.note,
+					controller.page.encounterNote.noteId);
+
 				controller.noteDirty = false;
 				controller.draftSavedDate = new moment();
-			});
+			}
+			catch (e)
+			{
+				controller.errorHandler.handleError(e);
+			}
 		};
 
 		/**
@@ -521,9 +527,10 @@ angular.module('Record').controller('Record.RecordController', [
 			{
 				console.log('Note is already being edited! Do you want to save changes?');
 				controller.displayWarning(data);
-				controller.removeEditingNoteFlag();
 				return;
 			}
+			controller.removeEditingNoteFlag();
+
 			controller.page.encounterNote = angular.copy(data);
 			controller.getIssueNote();
 
