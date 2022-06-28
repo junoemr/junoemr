@@ -199,7 +199,7 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 	 * Find the provider associated with the deliverToID.  If the ID starts with a "D", the id refers to the CPSID
 	 * of a physician.  If it starts with an "N", then it's the CNO number of a nurse.
 	 * @param deliverToID Practitioner No of the provider for the link
-	 * @returns provider link if provider exists in the system, otherwise null
+	 * @return provider link if provider exists in the system, otherwise null
 	 */
 	protected HRMDocumentToProvider createDeliverToLink(HRMDocument document, String deliverToID)
 	{

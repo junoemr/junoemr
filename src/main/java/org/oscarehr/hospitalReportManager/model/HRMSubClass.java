@@ -9,7 +9,8 @@
 
 package org.oscarehr.hospitalReportManager.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
@@ -21,7 +22,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Entity
 public class HRMSubClass extends AbstractModel<Integer>
 {

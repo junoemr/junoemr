@@ -43,6 +43,7 @@ import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.model.Hl7TextInfo;
+import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.UtilDateUtilities;
 
@@ -52,6 +53,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -824,6 +826,37 @@ public class PATHL7Handler extends ORU_R01MessageHandler
         }
         return false;
     }
+
+	@Override
+	public List<EmbeddedDocument> getEmbeddedDocuments()
+	{
+		List<EmbeddedDocument> embeddedDocuments = new LinkedList<>();
+		String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
+		// Every PDF should be prefixed with this due to b64 encoding of PDF header
+
+		int count = 0;
+		for(int i = 0; i < getOBRCount(); i++)
+		{
+			for(int j = 0; j < getOBXCount(i); j++)
+			{
+				if(getOBXValueType(i, j).equals("ED"))
+				{
+					// Some embedded PDFs simply have the lab as-is, some have it split up like above
+					for(int k = 1; k <= referenceStrings.length; k++)
+					{
+						String embeddedPdf = getOBXResult(i, j, k);
+						if(embeddedPdf.startsWith(MessageHandler.embeddedPdfPrefix))
+						{
+							embeddedDocuments.add(toEmbeddedPdf(embeddedPdf, count));
+							count++;
+						}
+					}
+				}
+			}
+		}
+
+		return embeddedDocuments;
+	}
 
     public String getNteForPID(){
 

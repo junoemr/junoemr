@@ -668,7 +668,7 @@
 									</c:choose>
 
 										<%-- Link title --%>
-									<span class="encounterNoteTitle">
+									<span class="encounterNoteTitle <c:if test="${section.displayOnSingleLine}">singleLine</c:if>">
 										<a
 												class="links ${fn:join(note.titleClasses, ' ')}"
 												<c:if test="${note.colour != null}">
@@ -680,7 +680,16 @@
 												onclick="${note.onClick};return false;"
 												title="${note.title}"
 										>
-											<c:out value="${note.text}"/>
+											<c:choose>
+												<c:when test="${section.displayOnSingleLine}">
+													<c:out value="${note.text}"/>
+												</c:when>
+												<c:otherwise>
+													<c:forEach items="${note.textLineArray}" var="noteLine">
+														<c:out value="${noteLine}" /><br />
+													</c:forEach>
+												</c:otherwise>
+											</c:choose>
 										</a>
 									</span>
 

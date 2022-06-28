@@ -34,6 +34,7 @@ export default class TicklerAttachment
 			case TicklerAttachmentType.Mds: return "../oscarMDS/SegmentDisplay.jsp?segmentID=" + this.attachmentId;
 			case TicklerAttachmentType.Hl7: return "../lab/CA/ALL/labDisplay.jsp?segmentID=" + this.attachmentId;
 			case TicklerAttachmentType.Doc: return "../dms/ManageDocument.do?method=display&doc_no=" + this.attachmentId;
+			case TicklerAttachmentType.Hrm: return "../hospitalReportManager/displayHRMReport.jsp?id=" + this.attachmentId;
 			case TicklerAttachmentType.Message:
 			{
 				const meta = JSON.parse(this.attachmentMeta);
