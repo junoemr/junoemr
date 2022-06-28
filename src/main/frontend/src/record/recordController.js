@@ -78,7 +78,6 @@ angular.module('Record').controller('Record.RecordController', [
 		billingService,
 		focusService)
 	{
-
 		var controller = this;
 
 		const PATIENT_MESSENGER_NAV_ID = 432543;
@@ -105,7 +104,6 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.page.currentNoteConfig = {};
 
 		controller.$storage = $localStorage; // Define persistent storage
-		controller.recordtabs2 = [];
 		controller.working = false;
 		controller.noteDirty = false;
 		controller.draftSavedDate = null;
@@ -114,14 +112,6 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.canMHACallPatient = false;
 		controller.mhaCallPanelOpen = false;
 		controller.netcareModuleEnabled = false;
-
-		// phone related constants
-		controller.phone = {
-			cellExtKey: "demo_cell",
-			workPhoneExtensionKey: "wPhoneExt",
-			homePhoneExtensionKey: "hPhoneExt",
-			preferredIndicator: "*",
-		};
 
 		controller.$onInit = async () =>
 		{
@@ -364,8 +354,8 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.cancelNoteEdit = async () =>
 		{
-			console.log('CANCELLING EDIT');
 			controller.page.encounterNote = null;
+			controller.page.assignedCMIssues = [];
 			$scope.$broadcast('stopEditingNote');
 			controller.skipTmpSave = true;
 			controller.$storage.hideNote = true;
@@ -531,6 +521,7 @@ angular.module('Record').controller('Record.RecordController', [
 			{
 				console.log('Note is already being edited! Do you want to save changes?');
 				controller.displayWarning(data);
+				controller.removeEditingNoteFlag();
 				return;
 			}
 			controller.page.encounterNote = angular.copy(data);
@@ -539,9 +530,8 @@ angular.module('Record').controller('Record.RecordController', [
 			//Need to check if note has been saved yet.
 			controller.$storage.hideNote = false;
 			focusService.focusRef(controller.encounterNoteTextAreaRef);
+			controller.setEditingNoteFlag();
 			$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
-
-			controller.removeEditingNoteFlag();
 		});
 
 		$scope.$on('appendToCurrentNote', (event, message) =>
@@ -871,6 +861,24 @@ angular.module('Record').controller('Record.RecordController', [
 					Juno.Common.Util.DisplaySettings.dateTimeFormat);
 			}
 			return "";
+		}
+
+		controller.cancelButtonText = () =>
+		{
+			if(controller.page.editingNoteId === null)
+			{
+				return "Delete";
+			}
+			return "Cancel";
+		}
+
+		controller.cancelButtonTooltip = () =>
+		{
+			if(controller.page.editingNoteId === null)
+			{
+				return "Deletes saved draft, encounter text, and assigned issues.";
+			}
+			return "Cancel saved draft";
 		}
 	}
 ]);

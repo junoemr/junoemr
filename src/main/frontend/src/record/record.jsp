@@ -167,8 +167,10 @@
                                 <input type="hidden" id="startTag" value="<bean:message key="oscarEncounter.Index.startTime"/>">
                                 <input type="hidden" id="endTag" value="<bean:message key="oscarEncounter.Index.endTime"/>">
                                 <div class="pull-left">
-                                    <button class="btn btn-danger" ng-click="recordCtrl.cancelNoteEdit()">
-                                        Cancel
+                                    <button class="btn btn-danger"
+                                            title="{{recordCtrl.cancelButtonTooltip()}}"
+                                            ng-click="recordCtrl.cancelNoteEdit()">
+                                        {{recordCtrl.cancelButtonText()}}
                                     </button>
                                 </div>
                             </div>
