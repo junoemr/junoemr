@@ -27,11 +27,12 @@ import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTimeComparator;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
-import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
-import org.oscarehr.rosterStatus.model.RosterStatus;
+import org.oscarehr.demographicRoster.entity.DemographicRoster;
+import org.oscarehr.demographicRoster.entity.RosterTerminationReason;
+import org.oscarehr.demographicRoster.model.DemographicRosterModel;
+import org.oscarehr.rosterStatus.entity.RosterStatus;
 import org.oscarehr.rosterStatus.service.RosterStatusService;
-import org.oscarehr.ws.conversion.DemographicRosterToTransferConverter;
+import org.oscarehr.demographicRoster.converter.DemographicRosterToModelConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.util.ConversionUtils;
@@ -51,7 +52,7 @@ public class DemographicRosterService
 	protected RosterStatusService rosterStatusService;
 
 	@Autowired
-	protected DemographicRosterToTransferConverter demographicRosterToTransferConverter;
+	protected DemographicRosterToModelConverter demographicRosterToModelConverter;
 
 
 	/**
@@ -60,11 +61,11 @@ public class DemographicRosterService
 	 * @param currentDemo current revision of the demographic we want to record
 	 * @return optional new roster model
 	 */
-	public Optional<DemographicRosterTransfer> addRosterHistoryEntry(Demographic currentDemo)
+	public Optional<DemographicRosterModel> addRosterHistoryEntry(Demographic currentDemo)
 	{
 		if (StringUtils.isNotBlank(currentDemo.getRosterStatus()))
 		{
-			return Optional.ofNullable(demographicRosterToTransferConverter.convert(saveRosterHistory(currentDemo)));
+			return Optional.ofNullable(demographicRosterToModelConverter.convert(saveRosterHistory(currentDemo)));
 		}
 		return Optional.empty();
 	}
@@ -76,7 +77,7 @@ public class DemographicRosterService
 	 * @param previousDemo previous version of the demographic
 	 * @return optional new roster model
 	 */
-	public Optional<DemographicRosterTransfer> addRosterHistoryEntry(Demographic currentDemo, Demographic previousDemo)
+	public Optional<DemographicRosterModel> addRosterHistoryEntry(Demographic currentDemo, Demographic previousDemo)
 	{
 		boolean hasChanged = false;
 
@@ -94,7 +95,7 @@ public class DemographicRosterService
 
 		if (hasChanged)
 		{
-			return Optional.ofNullable(demographicRosterToTransferConverter.convert(saveRosterHistory(currentDemo)));
+			return Optional.ofNullable(demographicRosterToModelConverter.convert(saveRosterHistory(currentDemo)));
 		}
 		return Optional.empty();
 	}
@@ -121,7 +122,7 @@ public class DemographicRosterService
 			if (RosterStatus.ROSTER_STATUS_TERMINATED.equals(rosterStatus.getRosterStatus()))
 			{
 				demographicRoster.setRosterTerminationDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterTerminationDate()));
-				DemographicRoster.ROSTER_TERMINATION_REASON terminationReason = DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(Integer.parseInt(demographic.getRosterTerminationReason()));
+				RosterTerminationReason terminationReason = RosterTerminationReason.getByCode(Integer.parseInt(demographic.getRosterTerminationReason()));
 				demographicRoster.setRosterTerminationReason(terminationReason);
 			}
 		}
@@ -134,8 +135,8 @@ public class DemographicRosterService
 		return demographicRoster;
 	}
 
-	public List<DemographicRosterTransfer> getRosteredHistory(Integer demographicNo)
+	public List<DemographicRosterModel> getRosteredHistory(Integer demographicNo)
 	{
-		return demographicRosterToTransferConverter.convert(demographicRosterDao.findByDemographic(demographicNo));
+		return demographicRosterToModelConverter.convert(demographicRosterDao.findByDemographic(demographicNo));
 	}
 }

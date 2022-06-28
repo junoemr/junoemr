@@ -21,14 +21,14 @@
  * Canada
  */
 
-package org.oscarehr.rosterStatus.transfer;
+package org.oscarehr.rosterStatus.model;
 
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
-public class RosterStatusTransfer
+public class RosterStatusModel
 {
 	private Integer id;
 	private String rosterStatus;

@@ -46,7 +46,7 @@ import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.transfer.DemographicCreateInput;
 import org.oscarehr.demographic.transfer.DemographicUpdateInput;
 import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
+import org.oscarehr.demographicRoster.entity.DemographicRoster;
 import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.integration.service.IntegrationPushUpdateService;
 import org.oscarehr.managers.DemographicManager;

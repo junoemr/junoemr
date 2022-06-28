@@ -23,5 +23,5 @@
 
  */
 
-import {DemographicRosterTransfer} from "../../../../generated";
-export import RosterTerminationReasonType = DemographicRosterTransfer.RosterTerminationReasonEnum;
+import {DemographicRosterModel} from "../../../../generated";
+export import RosterTerminationReasonType = DemographicRosterModel.RosterTerminationReasonEnum;

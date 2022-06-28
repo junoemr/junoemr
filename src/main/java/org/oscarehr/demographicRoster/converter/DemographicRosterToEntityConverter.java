@@ -21,36 +21,35 @@
  * Canada
  */
 
-package org.oscarehr.ws.conversion;
+package org.oscarehr.demographicRoster.converter;
 
-import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.rosterStatus.model.RosterStatus;
-import org.oscarehr.rosterStatus.transfer.RosterStatusTransfer;
+import org.oscarehr.rosterStatus.converter.RosterStatusToEntityConverter;
 import org.springframework.beans.BeanUtils;
+import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.demographicRoster.entity.DemographicRoster;
+import org.oscarehr.demographicRoster.model.DemographicRosterModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RosterStatusToTransferConverter extends AbstractModelConverter<RosterStatus, RosterStatusTransfer>
+public class DemographicRosterToEntityConverter extends AbstractModelConverter<DemographicRosterModel, DemographicRoster>
 {
 	@Autowired
-	ProviderDao providerDao;
+	private RosterStatusToEntityConverter rosterStatusToEntityConverter;
 
 	@Override
-	public RosterStatusTransfer convert(RosterStatus rosterStatus)
+	public DemographicRoster convert(DemographicRosterModel model)
 	{
-		if (rosterStatus == null)
+		if (model == null)
 		{
 			return null;
 		}
 
-		RosterStatusTransfer transfer = new RosterStatusTransfer();
-		BeanUtils.copyProperties(rosterStatus, transfer);
-		// for display
-		transfer.setUpdatedByProviderName(providerDao.getProviderName(transfer.getUpdatedBy()));
-		transfer.setActive(transfer.getDeletedAt() == null);
+		DemographicRoster demographicRoster = new DemographicRoster();
+		BeanUtils.copyProperties(model, demographicRoster, "rosterStatus");
 
-		return transfer;
+		demographicRoster.setRosterStatus(rosterStatusToEntityConverter.convert(model.getRosterStatus()));
+
+		return demographicRoster;
 	}
 }

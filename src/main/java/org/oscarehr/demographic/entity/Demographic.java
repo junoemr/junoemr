@@ -28,7 +28,7 @@ import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
 import org.oscarehr.PMmodule.utility.Utility;
 import org.oscarehr.common.model.AbstractModel;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
+import org.oscarehr.demographicRoster.entity.DemographicRoster;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.provider.model.ProviderData;

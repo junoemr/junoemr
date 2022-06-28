@@ -289,10 +289,11 @@ if(!authed) {
 <%@ page import="java.sql.ResultSet" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
 <%@ page import="org.oscarehr.demographic.entity.DemographicMerged" %>
-<%@ page import="org.oscarehr.demographicRoster.model.DemographicRoster" %>
+<%@ page import="org.oscarehr.demographicRoster.entity.DemographicRoster" %>
 <%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
 <%@ page import="static org.oscarehr.contact.entity.DemographicContact.TYPE_DEMOGRAPHIC" %>
 <%@ page import="static org.oscarehr.contact.entity.DemographicContact.CATEGORY_PERSONAL" %>
+<%@ page import="org.oscarehr.demographicRoster.entity.RosterTerminationReason" %>
 <html:html locale="true">
 
 <head>
@@ -846,7 +847,7 @@ jQuery(document).ready(function(){
 	catch (NumberFormatException ignored) {}
 
 	pageContext.setAttribute("rosterTerminationCode", rosterTerminationCode);
-	pageContext.setAttribute("terminationReasons", DemographicRoster.ROSTER_TERMINATION_REASON.values());
+	pageContext.setAttribute("terminationReasons", RosterTerminationReason.values());
 
 	AdmissionManager admissionManager = SpringUtils.getBean(AdmissionManager.class);
      	Admission bedAdmission = admissionManager.getCurrentBedProgramAdmission(demographic.getDemographicNo());
@@ -1733,7 +1734,7 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
 %>
 													<li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.RosterTerminationReason" />:</span>
-                                                        <span class="info"><%=DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(terminationCode).description%></span>
+                                                        <span class="info"><%=RosterTerminationReason.getByCode(terminationCode).description%></span>
                                                     </li>
 <%} %>
                                                     <li><span class="label"><bean:message

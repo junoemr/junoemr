@@ -33,7 +33,7 @@ import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.demographic.model.DemographicModel;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
+import org.oscarehr.demographicRoster.entity.RosterTerminationReason;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +47,8 @@ import java.util.Set;
 import static org.oscarehr.dataMigration.mapper.cds.CDSConstants.COUNTRY_CODE_USA;
 import static org.oscarehr.dataMigration.model.common.AddressModel.US_REGION_CODE_RESIDENT;
 import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
-import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_ROSTERED;
-import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_TERMINATED;
+import static org.oscarehr.rosterStatus.entity.RosterStatus.ROSTER_STATUS_ROSTERED;
+import static org.oscarehr.rosterStatus.entity.RosterStatus.ROSTER_STATUS_TERMINATED;
 
 @Component
 public class DemographicModelToDbConverter
@@ -94,7 +94,7 @@ public class DemographicModelToDbConverter
 			dbDemographic.setRosterDate(ConversionUtils.toNullableLegacyDateTime(currentRosterData.getRosterDateTime()));
 			dbDemographic.setRosterTerminationDate(ConversionUtils.toNullableLegacyDateTime(currentRosterData.getTerminationDateTime()));
 
-			DemographicRoster.ROSTER_TERMINATION_REASON reason = currentRosterData.getTerminationReason();
+			RosterTerminationReason reason = currentRosterData.getTerminationReason();
 			dbDemographic.setRosterTerminationReason((reason != null) ? String.valueOf(reason.getTerminationCode()) : null);
 		}
 

@@ -26,14 +26,14 @@ import org.apache.commons.lang.StringUtils;
 import org.oscarehr.dataMigration.converter.out.BaseDbToModelConverter;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.ProviderModel;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
+import org.oscarehr.demographicRoster.entity.DemographicRoster;
 import org.oscarehr.rosterStatus.dao.RosterStatusDao;
-import org.oscarehr.rosterStatus.model.RosterStatus;
+import org.oscarehr.rosterStatus.entity.RosterStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_ROSTERED;
-import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_TERMINATED;
+import static org.oscarehr.rosterStatus.entity.RosterStatus.ROSTER_STATUS_ROSTERED;
+import static org.oscarehr.rosterStatus.entity.RosterStatus.ROSTER_STATUS_TERMINATED;
 
 @Component
 public class RosterModelToDbConverter extends BaseDbToModelConverter<RosterData, DemographicRoster>

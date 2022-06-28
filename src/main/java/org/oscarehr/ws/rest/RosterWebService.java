@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.rosterStatus.service.RosterStatusService;
-import org.oscarehr.rosterStatus.transfer.RosterStatusTransfer;
+import org.oscarehr.rosterStatus.model.RosterStatusModel;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
@@ -63,34 +63,34 @@ public class RosterWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/statuses")
-	public RestSearchResponse<RosterStatusTransfer> getRosterStatuses(@QueryParam("active") Boolean active)
+	public RestSearchResponse<RosterStatusModel> getRosterStatuses(@QueryParam("active") Boolean active)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.DEMOGRAPHIC_READ);
-		List<RosterStatusTransfer> rosterStatuses = rosterStatusService.getRosterStatusList(active);
+		List<RosterStatusModel> rosterStatuses = rosterStatusService.getRosterStatusList(active);
 		return RestSearchResponse.successResponseOnePage(rosterStatuses);
 	}
 
 	@POST
 	@Path("/status")
-	public RestResponse<RosterStatusTransfer> addStatus(RosterStatusTransfer rosterStatusTransfer)
+	public RestResponse<RosterStatusModel> addStatus(RosterStatusModel rosterStatusModel)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ADMIN_CREATE);
 		String currentProvider = getCurrentProvider().getProviderNo();
-		rosterStatusTransfer = rosterStatusService.addStatus(rosterStatusTransfer, currentProvider);
+		rosterStatusModel = rosterStatusService.addStatus(rosterStatusModel, currentProvider);
 
-		return RestResponse.successResponse(rosterStatusTransfer);
+		return RestResponse.successResponse(rosterStatusModel);
 	}
 
 	@PUT
 	@Path("/status/{id}")
-	public RestResponse<RosterStatusTransfer> editStatus(
+	public RestResponse<RosterStatusModel> editStatus(
 			@PathParam("id") Integer id,
-			RosterStatusTransfer rosterStatusTransfer)
+			RosterStatusModel rosterStatusModel)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.ADMIN_UPDATE);
 		String currentProvider = getCurrentProvider().getProviderNo();
-		rosterStatusTransfer = rosterStatusService.editStatus(rosterStatusTransfer, currentProvider);
+		rosterStatusModel = rosterStatusService.editStatus(rosterStatusModel, currentProvider);
 
-		return RestResponse.successResponse(rosterStatusTransfer);
+		return RestResponse.successResponse(rosterStatusModel);
 	}
 }

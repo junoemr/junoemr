@@ -21,34 +21,39 @@
  * Canada
  */
 
-package org.oscarehr.ws.conversion;
+package org.oscarehr.demographicRoster.converter;
 
-import org.springframework.beans.BeanUtils;
 import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
-import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
+import org.oscarehr.demographicRoster.entity.DemographicRoster;
+import org.oscarehr.demographicRoster.model.DemographicRosterModel;
+import org.oscarehr.rosterStatus.converter.RosterStatusToModelConverter;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DemographicRosterToDomainConverter extends AbstractModelConverter<DemographicRosterTransfer, DemographicRoster>
+public class DemographicRosterToModelConverter extends AbstractModelConverter<DemographicRoster, DemographicRosterModel>
 {
 	@Autowired
-	RosterStatusToDomainConverter rosterStatusToDomainConverter;
+	private RosterStatusToModelConverter rosterStatusToModelConverter;
 
 	@Override
-	public DemographicRoster convert(DemographicRosterTransfer transfer)
+	public DemographicRosterModel convert(DemographicRoster demographicRoster)
 	{
-		if (transfer == null)
+		if (demographicRoster == null)
 		{
 			return null;
 		}
 
-		DemographicRoster demographicRoster = new DemographicRoster();
-		BeanUtils.copyProperties(transfer, demographicRoster, "rosterStatus");
+		DemographicRosterModel model = new DemographicRosterModel();
+		BeanUtils.copyProperties(demographicRoster, model, "rosterStatus");
 
-		demographicRoster.setRosterStatus(rosterStatusToDomainConverter.convert(transfer.getRosterStatus()));
+		model.setRosterStatus(rosterStatusToModelConverter.convert(demographicRoster.getRosterStatus()));
+		if (demographicRoster.getRosterTerminationReason() != null)
+		{
+			model.setRosterTerminationDescription(demographicRoster.getRosterTerminationReason().getDescription());
+		}
 
-		return demographicRoster;
+		return model;
 	}
 }

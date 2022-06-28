@@ -54,8 +54,9 @@
 <%@page import="oscar.util.DateUtils" %>
 <%@page import="oscar.util.StringUtils" %>
 <%@page import="oscar.oscarDemographic.pageUtil.Util" %>
-<%@ page import="org.oscarehr.rosterStatus.model.RosterStatus" %>
-<%@ page import="org.oscarehr.demographicRoster.model.DemographicRoster" %>
+<%@ page import="org.oscarehr.rosterStatus.entity.RosterStatus" %>
+<%@ page import="org.oscarehr.demographicRoster.entity.DemographicRoster" %>
+<%@ page import="org.oscarehr.demographicRoster.entity.RosterTerminationReason" %>
 <html:html locale="true">
 <head>
 <title>Enrollment History</title>
@@ -156,7 +157,7 @@
 						%>
 							<tr>
 								<td nowrap="nowrap">Termination Reason: </td>
-								<td colspan="5"><%=DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(terminationCode).getDescription()%></td>
+								<td colspan="5"><%=RosterTerminationReason.getByCode(terminationCode).getDescription()%></td>
 							</tr>
 						<%} %>
 						<%
@@ -218,7 +219,7 @@
 									%>
 										<tr>
 											<td nowrap="nowrap">Termination Reason: </td>
-											<td colspan="5"><%=DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(terminationCode).getDescription()%></td>
+											<td colspan="5"><%=RosterTerminationReason.getByCode(terminationCode).getDescription()%></td>
 										</tr>
 									<%}
 								}

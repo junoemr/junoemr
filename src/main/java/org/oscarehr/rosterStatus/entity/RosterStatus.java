@@ -21,9 +21,10 @@
  * Canada
  */
 
-package org.oscarehr.rosterStatus.model;
+package org.oscarehr.rosterStatus.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.Column;
@@ -35,7 +36,8 @@ import javax.persistence.Table;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "roster_status")
 public class RosterStatus extends AbstractModel<Integer> implements Serializable
