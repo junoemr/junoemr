@@ -42,14 +42,14 @@
 <%@ page import="org.oscarehr.PMmodule.service.AdmissionManager, org.oscarehr.PMmodule.service.ProgramManager, org.oscarehr.PMmodule.web.GenericIntakeEditAction, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
 <%@ page import="org.oscarehr.common.dao.DemographicArchiveDao"%>
 <%@ page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
-<%@ page import="org.oscarehr.common.dao.DemographicDao"%>
+<%@ page import="org.oscarehr.demographic.dao.DemographicDao"%>
 
 <%@ page import="org.oscarehr.demographic.dao.DemographicExtArchiveDao" %>
 
 <%@ page import="org.oscarehr.demographic.dao.DemographicExtDao" %>
 <%@ page import="org.oscarehr.common.model.ConsentType" %>
 
-<%@ page import="org.oscarehr.common.model.Demographic" %>
+<%@ page import="org.oscarehr.demographic.entity.Demographic" %>
 <%@ page import="org.oscarehr.demographic.entity.DemographicCust" %>
 <%@ page import="org.oscarehr.demographic.entity.DemographicExt" %>
 <%@ page import="org.oscarehr.demographic.entity.DemographicExtArchive" %>
@@ -71,6 +71,8 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="org.oscarehr.util.MiscUtils" %>
 <%@ page import="static oscar.util.StringUtils.filterControlCharacters" %>
+<%@ page import="org.oscarehr.demographicRoster.service.DemographicRosterService" %>
+<%@ page import="org.oscarehr.demographic.service.HinValidationService" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html"%>
@@ -82,13 +84,16 @@
 	ProgramManager pm = SpringUtils.getBean(ProgramManager.class);
 	AdmissionManager am = SpringUtils.getBean(AdmissionManager.class);
 	DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
-	DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
+	org.oscarehr.common.dao.DemographicDao legacyDemographicDao = (org.oscarehr.common.dao.DemographicDao) SpringUtils.getBean("demographicDao");
+	DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
 
 	DemographicExtArchiveDao demographicExtArchiveDao = SpringUtils.getBean(DemographicExtArchiveDao.class);
 	DemographicArchiveDao demographicArchiveDao = (DemographicArchiveDao)SpringUtils.getBean("demographicArchiveDao");
 
 	RecentDemographicAccessService recentDemographicAccessService = SpringUtils.getBean(RecentDemographicAccessService.class);
+	DemographicRosterService demographicRosterService = SpringUtils.getBean(DemographicRosterService.class);
+	HinValidationService hinValidationService = SpringUtils.getBean(HinValidationService.class);
 
 %>
 
@@ -136,10 +141,9 @@
 				demographic.setPhone(filterControlCharacters(request.getParameter("phone")));
 				demographic.setPhone2(filterControlCharacters(request.getParameter("phone2")));
 				demographic.setEmail(request.getParameter("email"));
-				demographic.setMyOscarUserName(StringUtils.trimToNull(request.getParameter("myOscarUserName")));
 				demographic.setYearOfBirth(request.getParameter("year_of_birth"));
 				demographic.setMonthOfBirth(request.getParameter("month_of_birth")!=null && request.getParameter("month_of_birth").length()==1 ? "0"+request.getParameter("month_of_birth") : request.getParameter("month_of_birth"));
-				demographic.setDateOfBirth(request.getParameter("date_of_birth")!=null && request.getParameter("date_of_birth").length()==1 ? "0"+request.getParameter("date_of_birth") : request.getParameter("date_of_birth"));
+				demographic.setDayOfBirth(request.getParameter("date_of_birth")!=null && request.getParameter("date_of_birth").length()==1 ? "0"+request.getParameter("date_of_birth") : request.getParameter("date_of_birth"));
 
                 String hin = request.getParameter("hin");
                 if (hin != null)
@@ -171,9 +175,9 @@
 				month = StringUtils.trimToNull(request.getParameter("eff_date_month"));
 				day = StringUtils.trimToNull(request.getParameter("eff_date_date"));
 				if (year!=null && month!=null && day!=null) {
-					demographic.setEffDate(MyDateFormat.getSysDate(year + "-" + month + "-" + day));
+					demographic.setHcEffectiveDate(MyDateFormat.getSysDate(year + "-" + month + "-" + day));
 				} else {
-					demographic.setEffDate(null);
+					demographic.setHcEffectiveDate(null);
 				}
 
 				demographic.setPcnIndicator(request.getParameter("pcn_indicator"));
@@ -197,9 +201,9 @@
 					demographic.setHcRenewDate(null);
 				}
 
-				demographic.setFamilyDoctor("<rdohip>" + StringUtils.trimToEmpty(request.getParameter("referral_doctor_no")) + "</rdohip>" +
+				demographic.setReferralDoctor("<rdohip>" + StringUtils.trimToEmpty(request.getParameter("referral_doctor_no")) + "</rdohip>" +
 						"<rd>" + StringUtils.trimToEmpty(request.getParameter("referral_doctor_name")) + "</rd>");
-				demographic.setFamilyDoctor2("<fd>" + StringUtils.trimToEmpty(request.getParameter("family_doctor_no")) + "</fd>" +
+				demographic.setFamilyDoctor("<fd>" + StringUtils.trimToEmpty(request.getParameter("family_doctor_no")) + "</fd>" +
 						"<fdname>" + StringUtils.trimToEmpty(request.getParameter("family_doctor_name")) + "</fdname>");
 				demographic.setCountryOfOrigin(("-1".equals(countryOfOrigin)) ? null : countryOfOrigin);
 				demographic.setNewsletter(request.getParameter("newsletter"));
@@ -215,26 +219,19 @@
 
 				StringBuilder bufChart = null, bufName = null, bufNo = null, bufDoctorNo = null;
 				// add checking hin duplicated record, if there is a HIN number
-				// added check to see if patient has a bc health card and has a version code of 66, in this case you are aloud to have dup hin
-				boolean hinDupCheckException = false;
 				String hcType = request.getParameter("hc_type");
 				String ver  = request.getParameter("ver");
-				if (hcType != null && ver != null && hcType.equals("BC") && ver.equals("66")){
-					hinDupCheckException = true;
-				}
+				String paramNameHin = StringUtils.trimToNull(request.getParameter("hin"));
 
-				String paramNameHin = request.getParameter("hin");
-				if(paramNameHin!=null && paramNameHin.length()>5 && !hinDupCheckException) {
-					//oscar.oscarBilling.ca.on.data.BillingONDataHelp dbObj = new oscar.oscarBilling.ca.on.data.BillingONDataHelp();
-					//String sql = "select demographic_no from demographic where hin=? and year_of_birth=? and month_of_birth=? and date_of_birth=?";
-					List<Demographic> demographics = demographicDao.searchByHealthCard(paramNameHin.trim());
-					if(demographics.size()>0){
+				if(paramNameHin != null
+						&& !hinValidationService.isDuplicateAllowable(ver, hcType)
+						&& hinValidationService.hinInSystem(paramNameHin))
+				{
 			%>
 			***<font color='red'><bean:message key="demographic.demographicaddarecord.msgDuplicatedHIN" /></font>***<br><br>
 			<a href=# onClick="history.go(-1);return false;"><b>&lt;-<bean:message key="global.btnBack" /></b></a>
 			<%
-						return;
-					}
+					return;
 				}
 
 				bufName = new StringBuilder(request.getParameter("last_name")+ ","+ request.getParameter("first_name") );
@@ -246,7 +243,11 @@
 					demographic.setVeteranNo(StringUtils.trimToNull(request.getParameter("veteranNo")));
 				}
 
-				demographicDao.save(demographic);
+				demographicDao.persist(demographic);
+				if(StringUtils.isNotBlank(demographic.getRosterStatus()))
+				{
+					demographicRosterService.saveRosterHistory(demographic);
+				}
 
 				// save custom licensed producer if enabled
 				if(oscarVariables.isPropertyActive("show_demographic_licensed_producers")) {
@@ -254,12 +255,12 @@
 						int licensedProducerID = Integer.parseInt(request.getParameter("licensed_producer"));
 						int licensedProducerID2 = Integer.parseInt(request.getParameter("licensed_producer2"));
 						int licensedProducerAddressID = Integer.parseInt(request.getParameter("licensed_producer_address"));
-						demographicDao.saveDemographicLicensedProducer(demographic.getDemographicNo(), licensedProducerID, licensedProducerID2, licensedProducerAddressID);
+						legacyDemographicDao.saveDemographicLicensedProducer(demographic.getDemographicId(), licensedProducerID, licensedProducerID2, licensedProducerAddressID);
 					}
 					catch(NumberFormatException e) {
 						// unable to save licensed producer info
 						MiscUtils.getLogger().warn(
-								String.format("Failed to save licensed producer for demographic %d.", demographic.getDemographicNo())
+								String.format("Failed to save licensed producer for demographic %d.", demographic.getDemographicId())
 						);
 					}
 				}
@@ -275,19 +276,19 @@
 				else {
 					programId = Integer.parseInt(residentialStatus);
 				}
-				gieat.admitBedCommunityProgram(demographic.getDemographicNo(),loggedInInfo.getLoggedInProviderNo(),programId,"","",null);
+				gieat.admitBedCommunityProgram(demographic.getDemographicId(),loggedInInfo.getLoggedInProviderNo(),programId,"","",null);
 
 				String[] servP = request.getParameterValues("sp");
 				if(servP!=null&&servP.length>0){
 					Set<Integer> s = new HashSet<Integer>();
 					for(String _s:servP) s.add(Integer.parseInt(_s));
-					gieat.admitServicePrograms(demographic.getDemographicNo(),loggedInInfo.getLoggedInProviderNo(),s,"",null);
+					gieat.admitServicePrograms(demographic.getDemographicId(),loggedInInfo.getLoggedInProviderNo(),s,"",null);
 				}
 
 
 				//add democust record for alert
 				String[] param2 =new String[6];
-				param2[0]=demographic.getDemographicNo().toString();
+				param2[0]=demographic.getDemographicId().toString();
 
 				DemographicCust demographicCust = new DemographicCust();
 				demographicCust.setResident(request.getParameter("cust2"));
@@ -295,10 +296,10 @@
 				demographicCust.setAlert(request.getParameter("cust3"));
 				demographicCust.setMidwife(request.getParameter("cust4"));
 				demographicCust.setNotes("<unotes>"+ request.getParameter("content")+"</unotes>");
-				demographicCust.setId(demographic.getDemographicNo());
+				demographicCust.setId(demographic.getDemographicId());
 				demographicCustDao.persist(demographicCust);
 
-				dem = demographic.getDemographicNo().toString();
+				dem = demographic.getDemographicId().toString();
 
 				// Save the patient consent values.
 				if( OscarProperties.getInstance().getBooleanProperty("USE_NEW_PATIENT_CONSENT_MODULE", "true") ) {
@@ -311,29 +312,29 @@
 						consentTypeId = request.getParameter( consentType.getType() );
 						// checked box means add or edit consent.
 						if( consentTypeId != null ) {
-							patientConsentManager.addConsent(loggedInInfo, demographic.getDemographicNo(), Integer.parseInt( consentTypeId ) );
+							patientConsentManager.addConsent(loggedInInfo, demographic.getDemographicId(), Integer.parseInt( consentTypeId ) );
 						}
 					}
 				}
 
 				String proNo = (String) session.getValue("user");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "hPhoneExt", filterControlCharacters(request.getParameter("hPhoneExt")), "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "wPhoneExt", filterControlCharacters(request.getParameter("wPhoneExt")), "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "demo_cell", filterControlCharacters(request.getParameter("demo_cell")), "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "aboriginal", request.getParameter("aboriginal"), "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "cytolNum",  request.getParameter("cytolNum"),  "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "ethnicity",     request.getParameter("ethnicity"),     "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "area",          request.getParameter("area"),          "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "statusNum",     request.getParameter("statusNum"),     "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "fNationCom",    request.getParameter("fNationCom"),    "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "given_consent", request.getParameter("given_consent"), "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "rxInteractionWarningLevel", request.getParameter("rxInteractionWarningLevel"), "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "primaryEMR", request.getParameter("primaryEMR"), "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "aboriginal", request.getParameter("aboriginal"), "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "phoneComment", filterControlCharacters(request.getParameter("phoneComment")), "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "usSigned", request.getParameter("usSigned"), "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "privacyConsent", request.getParameter("privacyConsent"), "");
-				demographicExtDao.addKey(proNo, demographic.getDemographicNo(), "informedConsent", request.getParameter("informedConsent"), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "hPhoneExt", filterControlCharacters(request.getParameter("hPhoneExt")), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "wPhoneExt", filterControlCharacters(request.getParameter("wPhoneExt")), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "demo_cell", filterControlCharacters(request.getParameter("demo_cell")), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "aboriginal", request.getParameter("aboriginal"), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "cytolNum",  request.getParameter("cytolNum"),  "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "ethnicity",     request.getParameter("ethnicity"),     "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "area",          request.getParameter("area"),          "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "statusNum",     request.getParameter("statusNum"),     "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "fNationCom",    request.getParameter("fNationCom"),    "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "given_consent", request.getParameter("given_consent"), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "rxInteractionWarningLevel", request.getParameter("rxInteractionWarningLevel"), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "primaryEMR", request.getParameter("primaryEMR"), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "aboriginal", request.getParameter("aboriginal"), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "phoneComment", filterControlCharacters(request.getParameter("phoneComment")), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "usSigned", request.getParameter("usSigned"), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "privacyConsent", request.getParameter("privacyConsent"), "");
+				demographicExtDao.addKey(proNo, demographic.getDemographicId(), "informedConsent", request.getParameter("informedConsent"), "");
 				//for the IBD clinic
 				OtherIdManager.saveIdDemographic(dem, "meditech_id", request.getParameter("meditech_id"));
 
@@ -341,18 +342,18 @@
 				if(oscarVariables.getProperty("demographicExt") != null) {
 					String [] propDemoExt = oscarVariables.getProperty("demographicExt","").split("\\|");
 					for(int k=0; k<propDemoExt.length; k++) {
-						demographicExtDao.addKey(proNo,demographic.getDemographicNo(),propDemoExt[k],request.getParameter(propDemoExt[k].replace(' ','_')),"");
+						demographicExtDao.addKey(proNo,demographic.getDemographicId(),propDemoExt[k],request.getParameter(propDemoExt[k].replace(' ','_')),"");
 					}
 				}
 				// customized key
 
 				// add log
 				String ip = request.getRemoteAddr();
-				LogAction.addLogEntry(curUser_no, demographic.getDemographicNo(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, param2[0], ip);
-				recentDemographicAccessService.updateAccessRecord(Integer.parseInt(curUser_no), demographic.getDemographicNo());
+				LogAction.addLogEntry(curUser_no, demographic.getDemographicId(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, param2[0], ip);
+				recentDemographicAccessService.updateAccessRecord(Integer.parseInt(curUser_no), demographic.getDemographicId());
 
 				//archive the original too
-				Long archiveId = demographicArchiveDao.archiveRecord(demographicDao.getDemographic(dem));
+				Long archiveId = demographicArchiveDao.archiveDemographic(demographic).getId();
 				List<DemographicExt> extensions = demographicExtDao.getDemographicExtByDemographicNo(Integer.parseInt(dem));
 				for (DemographicExt extension : extensions) {
 					DemographicExtArchive archive = new DemographicExtArchive(extension);
@@ -365,7 +366,7 @@
 				String waitListIdStr = request.getParameter("list_id");
 				if(waitListIdStr != null) {
 					int waitingListID = Integer.parseInt(waitListIdStr);
-					WLWaitingListUtil.addToWaitingList(waitingListID, demographic.getDemographicNo(), request.getParameter("waiting_list_referral_date"), request.getParameter("waiting_list_note"));
+					WLWaitingListUtil.addToWaitingList(waitingListID, demographic.getDemographicId(), request.getParameter("waiting_list_referral_date"), request.getParameter("waiting_list_note"));
 				}
 
 				if(start_time2!=null && !start_time2.equals("null")) {

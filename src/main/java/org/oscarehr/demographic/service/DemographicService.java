@@ -28,12 +28,12 @@ import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.DemographicArchive;
+import org.oscarehr.demographic.converter.ApiDemographicUpdateTransferToUpdateInputConverter;
 import org.oscarehr.demographic.converter.DemographicCreateInputToEntityConverter;
 import org.oscarehr.demographic.converter.DemographicDbToModelConverter;
-import org.oscarehr.demographic.converter.DemographicModelToDbConverter;
 import org.oscarehr.demographic.converter.DemographicModelToApiResponseTransferConverter;
+import org.oscarehr.demographic.converter.DemographicModelToDbConverter;
 import org.oscarehr.demographic.converter.DemographicUpdateInputToEntityConverter;
-import org.oscarehr.demographic.converter.ApiDemographicUpdateTransferToUpdateInputConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicIntegrationDao;
@@ -497,6 +497,7 @@ public class DemographicService
 	{
 		Demographic oldDemographic = demographicDao.find(demographic.getId());
 		archiveDemographicRecord(oldDemographic);
+		demographicManager.addRosterHistoryEntry(demographic, oldDemographic);
 
 		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
 
@@ -551,29 +552,6 @@ public class DemographicService
 		}
 
 		return demographicDbToModelConverter.convert(demographic);
-	}
-
-	/**
-	 * DO NOT USE IN NEW CODE.
-	 * Provides legacy saving support for old demographic objects
-	 * @param demographic - legacy demographic to save
-	 * @param extensions - extension entries to archive.
-	 * @param loggedInInfo - logged in info
-	 * @return - the save demographic
-	 */
-	@Deprecated
-	public org.oscarehr.common.model.Demographic updateLegacyDemographicRecord(org.oscarehr.common.model.Demographic demographic,
-																			   List<DemographicExt> extensions,
-																			   LoggedInInfo loggedInInfo)
-	{
-		org.oscarehr.common.model.Demographic oldDemographic = legacyDemographicDao.getDemographicById(demographic.getDemographicNo());
-		Long archiveId = demographicArchiveDao.archiveRecord(oldDemographic);
-		legacyDemographicDao.save(demographic);
-		demographicManager.saveAndArchiveDemographicExt(archiveId, extensions);
-
-		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
-
-		return demographic;
 	}
 
 	public void addDemographicIntegrationRecord(Integer demographicNo, DemographicIntegrationTransfer transfer)
