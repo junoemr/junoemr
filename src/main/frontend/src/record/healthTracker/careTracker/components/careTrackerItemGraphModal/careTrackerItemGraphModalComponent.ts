@@ -27,7 +27,7 @@ import CareTrackerItem from "../../../../../lib/careTracker/model/CareTrackerIte
 
 angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModal',
 	{
-		templateUrl: 'src/record/tracker/careTracker/components/careTrackerItemGraphModal/careTrackerItemGraphModal.jsp',
+		templateUrl: 'src/record/healthTracker/careTracker/components/careTrackerItemGraphModal/careTrackerItemGraphModal.jsp',
 		bindings: {
 			modalInstance: "<",
 			resolve: "<",

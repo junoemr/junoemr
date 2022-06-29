@@ -29,7 +29,7 @@ import DxCodeModel from "../../lib/dx/model/DxCodeModel";
 
 angular.module('Record.Tracker').component('healthTracker',
 	{
-		templateUrl: 'src/record/tracker/tracker.jsp',
+		templateUrl: 'src/record/healthTracker/healthTracker.jsp',
 		bindings: {
 			componentStyle: "<?",
 			user: "<",

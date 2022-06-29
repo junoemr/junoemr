@@ -21,39 +21,23 @@
  * Canada
  */
 
+import {SecurityPermissions} from "../../common/security/securityConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
+import CareTracker from "../../lib/careTracker/model/CareTracker";
+import DxRecordModel from "../../lib/dx/model/DxRecordModel";
+import DxCodeModel from "../../lib/dx/model/DxCodeModel";
 
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../../common/components/junoComponentConstants";
-import {SecurityPermissions} from "../../../../../common/security/securityConstants";
-import {Moment} from "moment/moment";
-
-angular.module('Record.Tracker.CareTracker').component('careTrackerItemData',
+angular.module('Record.Tracker').component('healthTrackerPage',
 	{
-		templateUrl: 'src/record/tracker/careTracker/components/careTrackerItemData/careTrackerItemData.jsp',
+		templateUrl: 'src/record/healthTracker/healthTrackerPage.jsp',
 		bindings: {
 			componentStyle: "<?",
-			model: "<",
+			user: "<",
+			embeddedView: "<?",
 		},
 		controller: [
-			function (
-			)
+			function ()
 			{
 				const ctrl = this;
-
-				ctrl.SecurityPermissions = SecurityPermissions;
-				ctrl.LABEL_POSITION = LABEL_POSITION;
-				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
-				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
-
-				ctrl.validationAlerts = [];
-
-				ctrl.$onInit = async () =>
-				{
-					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
-				}
-
-				ctrl.getDateForDisplay = (dateTime: Moment) =>
-				{
-					return (dateTime && dateTime.isValid()) ? Juno.Common.Util.formatDate(dateTime) : "Invalid Date";
-				}
 			}]
 	});

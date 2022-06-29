@@ -25,7 +25,7 @@ import MeasurementModel from "../../../lib/measurement/model/measurementModel";
 
 angular.module('Record.Tracker.Measurement').component('measurementPage',
 	{
-		templateUrl: 'src/record/tracker/measurement/measurementPage.jsp',
+		templateUrl: 'src/record/healthTracker/measurement/measurementPage.jsp',
 		bindings: {
 			componentStyle: "<?",
 		},

@@ -21,33 +21,39 @@
  * Canada
  */
 
-import {SecurityPermissions} from "../../common/security/securityConstants";
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
-import CareTracker from "../../lib/careTracker/model/CareTracker";
-import DxRecordModel from "../../lib/dx/model/DxRecordModel";
-import DxCodeModel from "../../lib/dx/model/DxCodeModel";
 
-angular.module('Record.Tracker').component('healthTrackerPage',
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../../common/components/junoComponentConstants";
+import {SecurityPermissions} from "../../../../../common/security/securityConstants";
+import {Moment} from "moment/moment";
+
+angular.module('Record.Tracker.CareTracker').component('careTrackerItemData',
 	{
-		templateUrl: 'src/record/tracker/trackerPage.jsp',
+		templateUrl: 'src/record/healthTracker/careTracker/components/careTrackerItemData/careTrackerItemData.jsp',
 		bindings: {
 			componentStyle: "<?",
-			user: "<",
-			embeddedView: "<?",
+			model: "<",
 		},
 		controller: [
-			'$state',
-			'$stateParams',
-			'$uibModal',
-			'demographicApiService',
-			'careTrackerApiService',
 			function (
-				$state,
-				$stateParams,
-				$uibModal,
-				demographicApiService,
-				careTrackerApiService)
+			)
 			{
 				const ctrl = this;
+
+				ctrl.SecurityPermissions = SecurityPermissions;
+				ctrl.LABEL_POSITION = LABEL_POSITION;
+				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
+				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+
+				ctrl.validationAlerts = [];
+
+				ctrl.$onInit = async () =>
+				{
+					ctrl.componentStyle = ctrl.componentStyle || JUNO_STYLE.DEFAULT;
+				}
+
+				ctrl.getDateForDisplay = (dateTime: Moment) =>
+				{
+					return (dateTime && dateTime.isValid()) ? Juno.Common.Util.formatDate(dateTime) : "Invalid Date";
+				}
 			}]
 	});

@@ -30,7 +30,7 @@ import CareTracker from "../../../lib/careTracker/model/CareTracker";
 
 angular.module('Record.Tracker.CareTracker').component('careTracker',
 	{
-		templateUrl: 'src/record/tracker/careTracker/careTracker.jsp',
+		templateUrl: 'src/record/healthTracker/careTracker/careTracker.jsp',
 		bindings: {
 			componentStyle: "<?",
 		},

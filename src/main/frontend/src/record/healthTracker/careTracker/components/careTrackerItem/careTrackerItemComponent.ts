@@ -31,7 +31,7 @@ import {JUNO_RADIO_STYLE} from "../../../../../common/components/junoRadioSelect
 
 angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 	{
-		templateUrl: 'src/record/tracker/careTracker/components/careTrackerItem/careTrackerItem.jsp',
+		templateUrl: 'src/record/healthTracker/careTracker/components/careTrackerItem/careTrackerItem.jsp',
 		bindings: {
 			componentStyle: "<?",
 			model: "<",
