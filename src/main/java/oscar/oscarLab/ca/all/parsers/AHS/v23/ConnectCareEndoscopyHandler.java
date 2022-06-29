@@ -27,7 +27,7 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORU_R01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareHandler;
-import oscar.oscarLab.ca.all.parsers.MessageHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareLabType;
 
 public class ConnectCareEndoscopyHandler extends ConnectCareHandler
 {
@@ -42,7 +42,7 @@ public class ConnectCareEndoscopyHandler extends ConnectCareHandler
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
 
-			return "CCENDO".equalsIgnoreCase(sendingApplication) &&
+			return ConnectCareLabType.CCENDO.name().equalsIgnoreCase(sendingApplication) &&
 					"AHS".equalsIgnoreCase(sendingFacility);
 		}
 		return false;
@@ -66,7 +66,7 @@ public class ConnectCareEndoscopyHandler extends ConnectCareHandler
 	@Override
 	public String getMsgType()
 	{
-		return "CCENDO";
+		return ConnectCareLabType.CCENDO.name();
 	}
 
 	@Override
@@ -84,17 +84,17 @@ public class ConnectCareEndoscopyHandler extends ConnectCareHandler
 	 * @return TEXT OR PDF
 	 */
 	@Override
-	public OBX_CONTENT_TYPE getOBXContentType(int i, int j)
+	public ObxContentType getOBXContentType(int i, int j)
 	{
 		if(getOBXValueType(i, j).equals("ED"))
 		{
 			if (getOBXResult(i, j, 2).equals("PDF"))
 			{
-				return OBX_CONTENT_TYPE.PDF;
+				return ObxContentType.PDF;
 			}
 		}
 
-		return OBX_CONTENT_TYPE.TEXT;
+		return ObxContentType.TEXT;
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class ConnectCareEndoscopyHandler extends ConnectCareHandler
 	@Override
 	public String getOBXResult(int i, int j)
 	{
-		if (getOBXContentType(i, j) == MessageHandler.OBX_CONTENT_TYPE.PDF)
+		if (getOBXContentType(i, j) == ObxContentType.PDF)
 		{
 			return getOBXResult(i, j, 5);
 		}

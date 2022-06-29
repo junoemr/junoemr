@@ -171,5 +171,17 @@ angular.module('Admin.Section').component('hrmAdmin',
 				{
 					return securityRolesService.hasSecurityPrivileges(SecurityPermissions.HrmRead);
 				}
+
+				ctrl.pollingTitle = () =>
+				{
+					if (ctrl.pollingEnabled)
+					{
+						return "Pull HRM documents now";
+					}
+					else
+					{
+						return "Polling is disabled, enable polling to continue"
+					}
+				}
 			}]
 	});

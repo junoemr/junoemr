@@ -322,29 +322,13 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 	@Override
 	protected String getOrderingProvider(int i, int k)
 	{
-		String familyName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-2"));
-		String givenName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-3"));
-		String middleName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-4"));
-		String suffix = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-5"));
-		String prefix = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-6"));
-		String degree = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-16("+k+")-7"));
-
-		String fullName = prefix + " " + givenName + " " + middleName + " " + familyName + " " + suffix + " " + degree;
-		return fullName.trim().replaceAll("\\s+", " ");
+		return getFullDocName("/.ORDER_OBSERVATION("+i+")/OBR", 16, k);
 	}
 
 	@Override
 	protected String getResultCopiesTo(int i, int k)
 	{
-		String familyName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-2"));
-		String givenName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-3"));
-		String middleName = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-4"));
-		String suffix = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-5"));
-		String prefix = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-6"));
-		String degree = getString(get("/.ORDER_OBSERVATION("+i+")/OBR-28("+k+")-7"));
-
-		String fullName = prefix + " " + givenName + " " + middleName + " " + familyName + " " + suffix + " " + degree;
-		return fullName.trim().replaceAll("\\s+", " ");
+		return getFullDocName("/.ORDER_OBSERVATION("+i+")/OBR", 28, k);
 	}
 
 	@Override
@@ -662,27 +646,26 @@ public abstract class ORU_R01MessageHandler extends MessageHandler
 	@Override
 	public List<EmbeddedDocument> getEmbeddedDocuments()
 	{
-		List<EmbeddedDocument> embeddedDocuments = new LinkedList<>();
-		String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
-		// Every PDF should be prefixed with this due to b64 encoding of PDF header
-
 		int count = 0;
-		for (int i = 0; i < getOBRCount(); i++)
+		List<EmbeddedDocument> embeddedDocuments = new LinkedList<>();
+		for(int i = 0; i < getOBRCount(); i++)
 		{
-			for (int j =0; j < getOBXCount(i); j ++)
+			for(int j = 0; j < getOBXCount(i); j++)
 			{
-				if (getOBXValueType(i, j).equals("ED"))
+				String docData = getOBXResult(i, j);
+				switch(getOBXContentType(i, j))
 				{
-					// Some embedded PDFs simply have the lab as-is, some have it split up like above
-					for (int k = 1; k <= referenceStrings.length; k++)
+					case PDF:
 					{
-						String embeddedPdf = getOBXResult(i, j, k);
-						if (embeddedPdf.startsWith(MessageHandler.embeddedPdfPrefix))
-						{
-							logger.info("Found embedded PDF in lab upload, pulling it out");
-							embeddedDocuments.add(toEmbeddedPdf(embeddedPdf, count));
-							count++;
-						}
+						embeddedDocuments.add(toEmbeddedPdf(docData, count));
+						count++;
+						break;
+					}
+					case JPEG:
+					{
+						embeddedDocuments.add(toEmbeddedJpeg(docData, count));
+						count++;
+						break;
 					}
 				}
 			}

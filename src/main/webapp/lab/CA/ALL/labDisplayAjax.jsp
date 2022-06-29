@@ -1063,7 +1063,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                       } else  if (!handler.getOBXResultStatus(j, k).equals("TDIS") && !handler.getMsgType().equals("EPSILON")) {
                                           	%><tr bgcolor="<%=(linenum % 2 == 1 ? highlight : "")%>" class="<%=lineClass%>"><%
                                        		if(isUnstructuredDoc){
-                                                if (isPDF || handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
+                                                if (isPDF || handler.getOBXContentType(j, k) == MessageHandler.ObxContentType.PDF)
                                                 {
                                                     String obxDocId = "";
                                                     java.util.regex.Matcher docIdMatcher = Pattern.compile("embedded_doc_id_(\\d+)").matcher(handler.getOBXResult(j, k));
@@ -1125,7 +1125,7 @@ if (request.getAttribute("printError") != null && (Boolean) request.getAttribute
                                    			}//end of isUnstructuredDoc
 
                                    			else{//if it isn't a PATHL7 doc
-                                                 if (isPDF || handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.PDF)
+                                                 if (isPDF || handler.getOBXContentType(j, k) == MessageHandler.ObxContentType.PDF)
                                                 {
                                                     String obxDocId = "";
                                                     java.util.regex.Matcher docIdMatcher = java.util.regex.Pattern.compile("embedded_doc_id_(\\d+)").matcher(handler.getOBXResult(j, k));

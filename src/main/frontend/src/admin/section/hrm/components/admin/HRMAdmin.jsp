@@ -54,7 +54,7 @@
 		<panel-header class="flex-row justify-content-between align-items-center">
 			<h6 class="d-inline-block">Report Polling</h6>
 			<div class="d-flex">
-				<juno-button ng-if="!$ctrl.working"
+				<juno-button ng-if="$ctrl.pollingEnabled && !$ctrl.working"
 							 class="flex-grow-0 w-256"
 							 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 							 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"

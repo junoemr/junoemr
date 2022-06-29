@@ -44,7 +44,7 @@ public class SecUserRoleDao extends AbstractDao<SecUserRole>
     {
         if (providerNo == null)
         {
-            throw new IllegalArgumentException();
+            throw new SecurityException("Invalid Provider Id");
         }
 
         Query query = entityManager.createQuery("SELECT s FROM SecUserRole s WHERE s.providerNo = :providerNo");

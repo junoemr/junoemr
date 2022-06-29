@@ -1673,7 +1673,7 @@ public class MSPReconcile {
 	/**
 	 * Returns the count of distinct values for the specified Bill field
 	 * Really just a convenience method for selecting distinct values without hitting the database multiple times
-	 * @todo-legqcy This method should be generalized to count the fields of a collection of arbitrary beans
+	 * todo-legacy This method should be generalized to count the fields of a collection of arbitrary beans
 	 * @param bills List
 	 * @param status String
 	 * @return int

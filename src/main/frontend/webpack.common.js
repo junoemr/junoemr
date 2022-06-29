@@ -421,7 +421,7 @@ module.exports = {
 			'./src/admin/section/lab/config/olis/module.js',
 			'./src/admin/section/lab/config/olis/olisConfigComponent.ts',
 			'./src/admin/section/landingPage/landingPageComponent.js',
-			'./src/admin/section/panelManagement/panelManagementAdminComponent.js',
+			'./src/admin/section/panelManagement/panelManagementAdminComponent.ts',
 			'./src/admin/section/editProviderPage/editProviderAdminComponent.js',
 			'./src/admin/section/manageUserPage/manageUserAdminComponent.js',
 			'./src/admin/section/securityRole/securityRoleConfigComponent.js',

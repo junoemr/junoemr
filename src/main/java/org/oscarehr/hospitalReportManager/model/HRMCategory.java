@@ -9,7 +9,8 @@
 
 package org.oscarehr.hospitalReportManager.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.common.model.AbstractModel;
 
 import javax.persistence.CascadeType;
@@ -24,7 +25,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Data
+@Getter
+@Setter
 @Entity
 public class HRMCategory extends AbstractModel<Integer>
 {

@@ -506,10 +506,10 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		{
 
 			var url = "../form/forwardshortcutname.jsp" +
-				"?formname=" + encodeURIComponent(note.note) +
-				"&demographic_no=" + encodeURIComponent(demographicNo) +
-				"&appointmentNo=" + encodeURIComponent(appointmentNo) +
-				"&formId=" + encodeURIComponent(note.noteId);
+				"?formname=" + encodeURIComponent(note.note || "") +
+				"&demographic_no=" + encodeURIComponent(demographicNo || "") +
+				"&appointmentNo=" + encodeURIComponent(appointmentNo || "") +
+				"&formId=" + encodeURIComponent(note.noteId || "");
 
 			onClickString = "popupPage(700,800,'" + winName + "','" + url + "');";
 		}
