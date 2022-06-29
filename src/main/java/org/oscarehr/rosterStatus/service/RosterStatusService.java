@@ -23,11 +23,11 @@
 
 package org.oscarehr.rosterStatus.service;
 
+import org.oscarehr.rosterStatus.converter.RosterStatusToEntityConverter;
+import org.oscarehr.rosterStatus.converter.RosterStatusToModelConverter;
 import org.oscarehr.rosterStatus.dao.RosterStatusDao;
 import org.oscarehr.rosterStatus.entity.RosterStatus;
 import org.oscarehr.rosterStatus.model.RosterStatusModel;
-import org.oscarehr.rosterStatus.converter.RosterStatusToEntityConverter;
-import org.oscarehr.rosterStatus.converter.RosterStatusToModelConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.log.LogAction;
@@ -43,18 +43,13 @@ import java.util.stream.Collectors;
 public class RosterStatusService
 {
 	@Autowired
-	RosterStatusDao rosterStatusDao;
+	protected RosterStatusDao rosterStatusDao;
 
 	@Autowired
-	RosterStatusToModelConverter rosterStatusToModelConverter;
+	protected RosterStatusToModelConverter rosterStatusToModelConverter;
 
 	@Autowired
-	RosterStatusToEntityConverter rosterStatusToEntityConverter;
-
-	public RosterStatus findByStatus(String status)
-	{
-		return rosterStatusDao.findByStatus(status);
-	}
+	protected RosterStatusToEntityConverter rosterStatusToEntityConverter;
 
 	public List<RosterStatusModel> getRosterStatusList(Boolean active)
 	{
