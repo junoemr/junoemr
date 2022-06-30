@@ -1,4 +1,3 @@
-<%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <div class="record-nav">
 	<nav class="nav record-navbar no-print" role="navigation" id="record-nav">
 		<!-- Brand and toggle get grouped for better mobile display -->
@@ -21,8 +20,8 @@
 					   ng-if="!tab.dropdown"
 					   ng-click="$ctrl.changeTab(tab)">
 						{{tab.label}}
-						<span ng-show="tab.extra == 'outstanding'"
-						      title="<bean:message key="oscarEncounter.Index.ConsultOutstanding"/>"
+						<span ng-show="tab.extra"
+						      title="{{tab.extra}}"
 						      class="badge badge-danger ng-binding ng-scope">
 							!
 						</span>

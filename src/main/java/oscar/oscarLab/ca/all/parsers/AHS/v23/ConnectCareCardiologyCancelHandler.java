@@ -26,6 +26,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORM_O01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareLabType;
 import oscar.oscarLab.ca.all.parsers.AHS.ORM_O01ConnectCareCancelHandler;
 
 public class ConnectCareCardiologyCancelHandler extends ORM_O01ConnectCareCancelHandler
@@ -46,7 +47,7 @@ public class ConnectCareCardiologyCancelHandler extends ORM_O01ConnectCareCancel
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
 
-			return "CCCARDIOLOGY".equalsIgnoreCase(sendingApplication) &&
+			return ConnectCareLabType.CCCARDIOLOGY.name().equalsIgnoreCase(sendingApplication) &&
 					"AHS".equalsIgnoreCase(sendingFacility);
 		}
 		return false;
@@ -56,7 +57,7 @@ public class ConnectCareCardiologyCancelHandler extends ORM_O01ConnectCareCancel
 	@Override
 	public String getMsgType()
 	{
-		return "CCCARDIOLOGY";
+		return ConnectCareLabType.CCCARDIOLOGY.name();
 	}
 
 

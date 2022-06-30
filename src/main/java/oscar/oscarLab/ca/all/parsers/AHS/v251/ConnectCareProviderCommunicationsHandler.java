@@ -20,18 +20,18 @@
  * Victoria, British Columbia
  * Canada
  */
-package oscar.oscarLab.ca.all.parsers.AHS.v23;
+package oscar.oscarLab.ca.all.parsers.AHS.v251;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.v23.message.MDM_T08;
-import ca.uhn.hl7v2.model.v23.segment.MSH;
+import ca.uhn.hl7v2.model.v251.message.MDM_T02;
+import ca.uhn.hl7v2.model.v251.segment.MSH;
 import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareLabType;
 import oscar.oscarLab.ca.all.parsers.AHS.MDM_T08_T02ConnectCareHandler;
 
-public class ConnectCareDocumentationEditHandler extends MDM_T08_T02ConnectCareHandler
+public class ConnectCareProviderCommunicationsHandler extends MDM_T08_T02ConnectCareHandler
 {
-	public ConnectCareDocumentationEditHandler(Message msg) throws HL7Exception
+	public ConnectCareProviderCommunicationsHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
 	}
@@ -39,15 +39,15 @@ public class ConnectCareDocumentationEditHandler extends MDM_T08_T02ConnectCareH
 	public static boolean handlerTypeMatch(Message message)
 	{
 		String version = message.getVersion();
-		if(version.equals("2.3"))
+		if(version.equals("2.5.1"))
 		{
-			MDM_T08 msh = (MDM_T08) message;
+			MDM_T02 msh = (MDM_T02) message;
 			MSH messageHeaderSegment = msh.getMSH();
 
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
 
-			return ConnectCareLabType.CCDOC.name().equalsIgnoreCase(sendingApplication) &&
+			return ConnectCareLabType.CCCOMM.name().equalsIgnoreCase(sendingApplication) &&
 					"AHS".equalsIgnoreCase(sendingFacility);
 		}
 		return false;
@@ -56,7 +56,7 @@ public class ConnectCareDocumentationEditHandler extends MDM_T08_T02ConnectCareH
 	@Override
 	public String getMsgType()
 	{
-		return ConnectCareLabType.CCDOC.name();
+		return ConnectCareLabType.CCCOMM.name();
 	}
 
 	@Override
@@ -81,13 +81,13 @@ public class ConnectCareDocumentationEditHandler extends MDM_T08_T02ConnectCareH
 	{
 	}
 
+	/* ================================= OBX ======================================= */
+
 	@Override
 	public boolean supportsEmbeddedDocuments()
 	{
 		return true;
 	}
-
-	/* ================================= OBX ======================================= */
 
 	/**
 	 * get obx results. aka document id.
@@ -98,25 +98,6 @@ public class ConnectCareDocumentationEditHandler extends MDM_T08_T02ConnectCareH
 	@Override
 	public String getOBXResult(int i, int j)
 	{
-		return get("/.OBX(" + j + ")-5-5");
-	}
-
-	/**
-	 * check for obx content type
-	 * @param i - ignored
-	 * @param j - obx rep
-	 * @return PDF or UNKNOWN if type is not PDF
-	 */
-	@Override
-	public ObxContentType getOBXContentType(int i, int j)
-	{
-		if (get("/.OBX(" + j + ")-5-2") != null && get("/.OBX(" + j + ")-5-2").equals("PDF"))
-		{
-			return ObxContentType.PDF;
-		}
-		else
-		{
-			return ObxContentType.UNKNOWN;
-		}
+		return get("/.OBSERVATION(" + j + ")/OBX-5-5");
 	}
 }

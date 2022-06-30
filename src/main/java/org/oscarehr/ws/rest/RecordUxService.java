@@ -24,29 +24,6 @@
 package org.oscarehr.ws.rest;
 
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
@@ -65,6 +42,7 @@ import org.oscarehr.managers.PreferenceManager;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.security.model.Permission;
+import org.oscarehr.ticklers.service.TicklerService;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
@@ -80,9 +58,30 @@ import org.oscarehr.ws.rest.to.model.SummaryTo1;
 import org.oscarehr.ws.rest.transfer.DashboardTo1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import oscar.OscarProperties;
 import oscar.oscarProvider.data.ProviderMyOscarIdData;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.StreamingOutput;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 
 
@@ -112,6 +111,9 @@ public class RecordUxService extends AbstractServiceImpl {
 	@Autowired
 	private DashboardDao dashboardDao;
 
+	@Autowired
+	private TicklerService ticklerService;
+
 	/**
 	$scope.recordtabs2 = [ 
 	 {id : 0,name : 'Master',url : 'partials/master.html'},
@@ -140,6 +142,7 @@ public class RecordUxService extends AbstractServiceImpl {
 		LoggedInInfo loggedInInfo = getLoggedInInfo();
 		String loggedInProviderId = getLoggedInProviderId();
 		ResourceBundle bundle = getResourceBundle();
+		ResourceBundle oscarResourcesBundle = getOscarResourcesBundle();
 		
 		int idCounter = 0;
 
@@ -162,7 +165,10 @@ public class RecordUxService extends AbstractServiceImpl {
 
 		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.TICKLER_READ))
 		{
-			menulist.add(MenuItemTo1.generateStateMenuItem(idCounter++, "Tickler", Arrays.asList("record.tickler")));
+			int overdueCount = ticklerService.getOverdueTicklerCount(loggedInProviderId, demographicNo);
+			String alert = overdueCount > 0 ? "This patient has " + overdueCount + " ticklers overdue" : null;
+
+			menulist.add(new MenuItemTo1(idCounter++, demographicNo, "Tickler", Arrays.asList("record.tickler"), alert));
 		}
 		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.MEASUREMENT_READ))
 		{
@@ -191,24 +197,27 @@ public class RecordUxService extends AbstractServiceImpl {
 		if(securityInfoManager.hasPrivileges(loggedInProviderId, demographicNo, Permission.CONSULTATION_READ))
 		{
 			//add notification if patient has outstanding consultation requests (incomplete requests > 1 month)
-			String outstanding = consultationManager.hasOutstandingConsultations(loggedInInfo, demographicNo)? "outstanding" : null;
+			String alert = consultationManager.hasOutstandingConsultations(loggedInInfo, demographicNo)? oscarResourcesBundle.getString("oscarEncounter.Index.ConsultOutstanding") : null;
 			
-			if (!consultationManager.isConsultRequestEnabled() && consultationManager.isConsultResponseEnabled()) {
+			if (!consultationManager.isConsultRequestEnabled() && consultationManager.isConsultResponseEnabled())
+			{
 				menulist.add(new MenuItemTo1(idCounter++,  demographicNo, bundle.getString("navbar.menu.consults"), Arrays.asList("record.consultResponses"), null));
 			}
-			else if (consultationManager.isConsultRequestEnabled() && consultationManager.isConsultResponseEnabled()) {
-				MenuItemTo1 consultMenu = new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consults"), null, outstanding);
+			else if (consultationManager.isConsultRequestEnabled() && consultationManager.isConsultResponseEnabled())
+			{
+				MenuItemTo1 consultMenu = new MenuItemTo1(idCounter++, bundle.getString("navbar.menu.consults"), null, alert);
 				consultMenu.setDropdown(true);
 				
 				List<MenuItemTo1> consultList = new ArrayList<MenuItemTo1>();
-				consultList.add(new MenuItemTo1(idCounter++, demographicNo, bundle.getString("navbar.menu.consultRequests"), Arrays.asList("record.consultRequests"), outstanding));
+				consultList.add(new MenuItemTo1(idCounter++, demographicNo, bundle.getString("navbar.menu.consultRequests"), Arrays.asList("record.consultRequests"), alert));
 				consultList.add(new MenuItemTo1(idCounter++, demographicNo, bundle.getString("navbar.menu.consultResponses"), Arrays.asList("record.consultResponses"), null));
 				consultMenu.setDropdownItems(consultList);
 				
 				menulist.add(consultMenu);
 			}
-			else {
-				menulist.add(new MenuItemTo1(idCounter++,  demographicNo, bundle.getString("navbar.menu.consults"), Arrays.asList("record.consultRequests"), outstanding));
+			else
+			{
+				menulist.add(new MenuItemTo1(idCounter++,  demographicNo, bundle.getString("navbar.menu.consults"), Arrays.asList("record.consultRequests"), alert));
 			}
 		}
 

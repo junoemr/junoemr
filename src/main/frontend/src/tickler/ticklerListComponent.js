@@ -1,6 +1,4 @@
 import {SecurityPermissions} from "../common/security/securityConstants";
-
-import {TicklerAttachmentType} from "../lib/tickler/model/TicklerAttachmentType";
 import ToastService from "../lib/alerts/service/ToastService";
 import TicklerAttachment from "../lib/tickler/model/TicklerAttachment";
 

@@ -527,7 +527,7 @@ public class LabPDFCreator extends PdfPageEventHelper {
 								table.addCell(cell);
 
 								String result = handler.getOBXResult( j, k).replaceAll("<br\\s*/*>", "\n").replace("\t", "\u00a0\u00a0\u00a0\u00a0");
-								if (!abnormalFlag.equals("N") && handler.getOBXContentType(j, k) == MessageHandler.OBX_CONTENT_TYPE.TEXT && "CCLAB".equals(handler.getMsgType()))
+								if (!abnormalFlag.equals("N") && handler.getOBXContentType(j, k) == MessageHandler.ObxContentType.TEXT && "CCLAB".equals(handler.getMsgType()))
 								{
 									cell.setPhrase(new Phrase(result + "(" + abnormalFlag + ")", lineFont));
 								}

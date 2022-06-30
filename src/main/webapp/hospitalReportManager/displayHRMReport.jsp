@@ -753,7 +753,18 @@
 				url: "<%=request.getContextPath() %>/hospitalReportManager/Modify.do",
 				data: data,
 				success: function(data) {
-					window.location.reload();
+					// refresh the parent and dismiss the page if from the inbox
+					// same ergonomics as labs.
+					if (isSign && jQuery("#prev").val().toLowerCase() === "inbox")
+					{
+						window.opener.Effect.BlindUp('labdoc_' + reportId);
+						window.opener.refreshCategoryList();
+						window.close()
+					}
+					else
+					{
+						window.location.reload();
+					}
 				}
 			});
 		}
@@ -790,15 +801,33 @@
 			});
 		}
 
-		function popupPatient(height, width, url, windowName, docId, d) {
-			urlNew = url + d;
-			return popup2(height, width, 0, 0, urlNew, windowName);
-		}
+        function openTicklerWindow(reportId, demographicId)
+        {
+            if(demographicId)
+            {
+                let url = "../tickler/ForwardDemographicTickler.do?docType=HRM&docId=" + reportId + "&demographic_no=" + demographicId;
+                window.open(url, "tickler", 'width=800,height=450');
+            }
+        }
 
-		function popupPatientTickler(height, width, url, windowName,docId,d,n) {
-			urlNew = url + "method=edit&tickler.demographic_webName=" + n + "&tickler.demographicNo=" +  d + "&docType=DOC&docId="+docId;
-			return popup2(height, width, 0, 0, urlNew, windowName);
-		}
+        function openDemographicMaster(demographicId)
+        {
+            if(demographicId)
+            {
+                let url = "../demographic/demographiccontrol.jsp?dboperation=search_detail&displaymode=edit&demographic_no=" + demographicId;
+                window.open(url, "master", 'width=1024,height=710');
+            }
+        }
+
+        function openDemographicChart(demographicId)
+        {
+            if(demographicId)
+            {
+                let url = "../oscarEncounter/IncomingEncounter.do?demographicNo=" + demographicId;
+                window.open(url, "encounter", 'width=1024,height=710');
+            }
+        }
+
     </script>
 </head>
 <body id="hrmReport">
@@ -812,6 +841,8 @@
     String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 %>
 <div id="hrmReportContent">
+	<!-- Determine if we came here from the inbox (or not) -->
+	<input type="hidden" id="prev" value="<%=request.getParameter("prev")%>">
     <div id="hrmHeader"><b>HRM Patient Record</b><br/>
         <b>Name: </b><span class="<%=getFieldClass(lastName)%>"><%=getFieldDisplayValue(lastName)%></span>, <span class="<%=getFieldClass(firstName)%>"><%=getFieldDisplayValue(firstName)%></span> <span class="<%=getFieldClass(gender)%>">(<%=getFieldDisplayValue(gender)%>)</span><br/>
         <b>DOB: </b><span class="<%=getFieldClass(dateOfBirth)%>"><%=getFieldDisplayValue(dateOfBirth)%></span><br>
@@ -925,7 +956,12 @@
                     Demographic demographic = demographicDao.find(demographicLink.getDemographicNo());
                 %>
                 <tr>
-                    <td><%=demographic.getFormattedName()%> (<%=demographic.getSex()%>) <a class="<%= previewMode ? "hide-on-preview" : ""%>" href="#" onclick="removeDemoFromHrm('<%=hrmDocument.getId()%>')">(remove)</a></td>
+                    <td>
+                        <span><%=demographic.getFormattedName()%> (<%=demographic.getSex()%>)</span>
+                        <a class="<%= previewMode ? "hide-on-preview" : ""%>" href="#" onclick="openDemographicMaster('<%=demographic.getId()%>')">M</a>
+                        <a class="<%= previewMode ? "hide-on-preview" : ""%>" href="#" onclick="openDemographicChart('<%=demographic.getId()%>')">E</a>
+                        <a class="<%= previewMode ? "hide-on-preview" : ""%>" href="#" onclick="removeDemoFromHrm('<%=hrmDocument.getId()%>')">(remove)</a>
+                    </td>
                 </tr>
                 <tr>
                     <td><%=demographic.getHin()%> <%=demographic.getVer()%> <%=demographic.getHcType()%></td>
@@ -1073,6 +1109,14 @@
                         <%
                             }
                         %>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <input type="button" class="input-button" value="Tickler" <%=(demoNo == null) ? "disabled" : ""%>
+                               title="<%=(demoNo == null) ? "Requires an assigned demographic" : "Create tickler for patient"%>"
+                               onClick="openTicklerWindow('<%=hrmDocument.getId()%>', '<%=demoNo%>')"/>
                     </td>
                 </tr>
             </table>
