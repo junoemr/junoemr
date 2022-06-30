@@ -23,7 +23,6 @@
 
 import CareTrackerItemData from "../../../../../lib/careTracker/model/CareTrackerItemData";
 import {Moment} from "moment";
-import CareTrackerItem from "../../../../../lib/careTracker/model/CareTrackerItem";
 
 angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModal',
 	{
@@ -53,46 +52,11 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItemGraphModa
 					ctrl.model.sortDataByObservationDate(true);
 					const dataPoints = ctrl.model.data.filter((value: CareTrackerItemData) => value.observationDateTime && value.observationDateTime.isValid())
 
-					ctrl.labels = ctrl.formatLabels(dataPoints);
-					ctrl.series = ctrl.formatSeries(ctrl.model);
-					ctrl.data = ctrl.formatData(ctrl.model, dataPoints);
+					ctrl.series = ctrl.model.getGraphSeries();
+					ctrl.labels = ctrl.model.formatGraphLabels(dataPoints);
+					ctrl.data = ctrl.model.formatGraphDataPoints(dataPoints);
 					ctrl.options = ctrl.formatOptions(dataPoints);
 					ctrl.isLoading = false;
-				}
-
-				ctrl.formatLabels = (dataPoints: CareTrackerItemData[]): object[] =>
-				{
-					return dataPoints.map((data: CareTrackerItemData) =>
-					{
-						return data.observationDateTime.toDate();
-					});
-				}
-
-				ctrl.formatSeries = (model: CareTrackerItem): string[] =>
-				{
-					if(model.valueTypeIsBloodPressure())
-					{
-						return ["Systolic", "Diastolic"];
-					}
-					else
-					{
-						return ["Recorded Value"];
-					}
-				}
-
-				ctrl.formatData = (model: CareTrackerItem, dataPoints: CareTrackerItemData[]): number[][] =>
-				{
-					if(model.valueTypeIsBloodPressure())
-					{
-						let systolic = dataPoints.map((data: CareTrackerItemData) => Number(data.value.split('/')[0]));
-						let diastolic = dataPoints.map((data: CareTrackerItemData) => Number(data.value.split('/')[1]));
-
-						return[systolic, diastolic];
-					}
-					else
-					{
-						return [dataPoints.map((data: CareTrackerItemData) => Number(data.value))];
-					}
 				}
 
 				ctrl.formatOptions = (dataPoints: CareTrackerItemData[]): object =>

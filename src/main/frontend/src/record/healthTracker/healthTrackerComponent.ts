@@ -84,9 +84,9 @@ angular.module('Record.Tracker').component('healthTracker',
 				ctrl.$onInit = async (): Promise<void> =>
 				{
 					ctrl.embeddedView = ctrl.embeddedView || false;
-					ctrl.demographicNo = $stateParams.demographicNo;
-					ctrl.careTrackers = await careTrackerApiService.searchCareTrackers(true, true, true, ctrl.user.providerNo, true, ctrl.demographicNo, 1, 100);
-					ctrl.activeDxRecords = await demographicApiService.getActiveDxRecords(ctrl.demographicNo);
+					ctrl.demographicId = $stateParams.demographicNo;
+					ctrl.careTrackers = await careTrackerApiService.searchCareTrackers(true, true, true, ctrl.user.providerNo, true, ctrl.demographicId, 1, 100);
+					ctrl.activeDxRecords = await demographicApiService.getActiveDxRecords(ctrl.demographicId);
 
 					if($stateParams.careTrackerId)
 					{
@@ -134,13 +134,13 @@ angular.module('Record.Tracker').component('healthTracker',
 
 					// overwrite mapped values with provider specific version where possible
 					ctrl.getTriggeredCareTrackers(providerCareTrackerItems).forEach((careTracker: CareTracker) => {
-						const key = careTracker.parentCareTrackerId ? careTracker.parentCareTrackerId : careTracker.id;
+						const key = careTracker.parentCareTrackerId ?? careTracker.id;
 						triggerMap.set(key, careTracker);
 					});
 
 					// overwrite mapped values again with demographic specific version where possible
 					ctrl.getTriggeredCareTrackers(demographicCareTrackerItems).forEach((careTracker: CareTracker) => {
-						const key = careTracker.parentCareTrackerId ? careTracker.parentCareTrackerId : careTracker.id;
+						const key = careTracker.parentCareTrackerId ?? careTracker.id;
 						triggerMap.set(key, careTracker);
 					});
 					ctrl.accordianListItems[0].items = Array.from(triggerMap.values());
@@ -172,7 +172,7 @@ angular.module('Record.Tracker').component('healthTracker',
 					const state = $state.includes("**.careTracker") ? "." : $state.includes("**.measurements") ? "^.careTracker" : ".careTracker";
 					$state.go(state,
 						{
-							demographicNo: ctrl.demographicNo,
+							demographicNo: ctrl.demographicId,
 							careTrackerId: careTracker.id,
 						});
 				}
@@ -185,7 +185,7 @@ angular.module('Record.Tracker').component('healthTracker',
 						const state = $state.includes("**.careTracker") ? "^.measurements" : ".measurements";
 						$state.go(state,
 							{
-								demographicNo: ctrl.demographicNo,
+								demographicNo: ctrl.demographicId,
 							});
 					}
 				}
@@ -194,7 +194,7 @@ angular.module('Record.Tracker').component('healthTracker',
 				{
 					$state.go("record.configureHealthTracker",
 						{
-							demographicNo: ctrl.demographicNo,
+							demographicNo: ctrl.demographicId,
 						});
 				}
 			}]

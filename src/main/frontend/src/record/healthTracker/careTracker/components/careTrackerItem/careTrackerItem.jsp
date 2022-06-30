@@ -26,7 +26,7 @@
 			<h6 class="item-header">{{$ctrl.model.name}} ({{$ctrl.model.typeCode}})</h6>
 			<div class="item-description">{{$ctrl.model.description}}</div>
 		</div>
-		<div ng-if="$ctrl.isGraphable()" class="no-print m-t-2">
+		<div ng-if="$ctrl.model.isGraphable()" class="no-print m-t-2">
 			<juno-button component-style="$ctrl.componentStyle"
 			             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 			             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"

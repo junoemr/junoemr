@@ -143,11 +143,6 @@ angular.module('Record.Tracker.CareTracker').component('careTrackerItem',
 					return ctrl.model && ctrl.model.itemTypeIsMeasurement() && ctrl.model.valueTypeIsDate();
 				}
 
-				ctrl.isGraphable = (): boolean =>
-				{
-					return ctrl.model.valueTypeIsNumeric() || ctrl.model.valueTypeIsBloodPressure();
-				}
-
 				ctrl.onBooleanValueYes = (value: boolean): void =>
 				{
 					ctrl.booleanCheckNo = false;

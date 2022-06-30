@@ -94,6 +94,47 @@ export default class CareTrackerItem
 		return (this.data && this.data.length > 0);
 	}
 
+	public isGraphable = (): boolean =>
+	{
+		return this.valueTypeIsNumeric() || this.valueTypeIsBloodPressure();
+	}
+
+	public formatGraphDataPoints = (dataPoints: CareTrackerItemData[]): number[][] =>
+	{
+		if (this.valueTypeIsBloodPressure())
+		{
+			let systolic = dataPoints.map((data: CareTrackerItemData) => Number(data.value.split('/')[0]));
+			let diastolic = dataPoints.map((data: CareTrackerItemData) => Number(data.value.split('/')[1]));
+
+			return [systolic, diastolic];
+		}
+		else if (this.isGraphable())
+		{
+			return [dataPoints.map((data: CareTrackerItemData) => Number(data.value))];
+		}
+		return [];
+	}
+
+	public formatGraphLabels = (dataPoints: CareTrackerItemData[]): object[] =>
+	{
+		return dataPoints.map((data: CareTrackerItemData) =>
+		{
+			return data.observationDateTime.toDate();
+		});
+	}
+
+	public getGraphSeries = (): string[] =>
+	{
+		if (this.valueTypeIsBloodPressure())
+		{
+			return ["Systolic", "Diastolic"];
+		}
+		else
+		{
+			return ["Recorded Value"];
+		}
+	}
+
 	public toString(): string
 	{
 		return this.name + " (" + this.typeCode + ")";
@@ -115,6 +156,8 @@ export default class CareTrackerItem
 			}
 		});
 	}
+
+	// ---- getters and setters ----
 
 	get id(): number
 	{
