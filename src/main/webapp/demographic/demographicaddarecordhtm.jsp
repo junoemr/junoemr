@@ -71,7 +71,6 @@
 <%@page import="org.oscarehr.PMmodule.service.ProgramManager" %>
 <%@page import="org.oscarehr.common.dao.WaitingListNameDao" %>
 <%@page import="org.oscarehr.eform.dao.EFormDao" %>
-<%@page import="org.oscarehr.PMmodule.dao.ProgramDao" %>
 <%@page import="org.oscarehr.common.model.Facility" %>
 <%@page import="oscar.OscarProperties" %>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
@@ -82,6 +81,7 @@
 <%@ page import="org.oscarehr.eform.model.EForm" %>
 <%@ page import="java.sql.ResultSet" %>
 <%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
+<%@ page import="static org.caisi.comp.web.WebComponentUtil.getServletContext" %>
 
 
 <jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean" scope="session" />
@@ -865,10 +865,7 @@ function ignoreDuplicates() {
 					key="demographic.demographicaddrecordhtm.formEMail" />: </b></td>
 				<td id="emailCell" align="left"><input type="text" id="email" name="email" value="">
 				</td>
-				<td id="myOscarLbl" align="right"><b><bean:message
-					key="demographic.demographicaddrecordhtm.formPHRUserName" />:</b></td>
-				<td id="myOscarCell"  align="left"><input type="text" name="myOscarUserName" value="">
-				</td>
+				<td colspan="2"></td>
 			</tr>
 			<tr valign="top">
 				<td id="dobLbl" align="right"><b><bean:message

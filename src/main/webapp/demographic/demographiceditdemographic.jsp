@@ -106,7 +106,7 @@ if(!authed) {
 <%@ page import="org.oscarehr.common.model.WaitingListName" %>
 <%@ page import="org.oscarehr.common.web.ContactAction,org.oscarehr.managers.DemographicManager" %>
 <%@ page import="org.oscarehr.managers.PatientConsentManager"%>
-<%@ page import="org.oscarehr.managers.ProgramManager2,org.oscarehr.myoscar.utils.MyOscarLoggedInInfo" %>
+<%@ page import="org.oscarehr.managers.ProgramManager2" %>
 <%@ page import="org.oscarehr.provider.service.RecentDemographicAccessService" %>
 <%@ page import="org.oscarehr.sharingcenter.SharingCenterUtil" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
@@ -289,7 +289,6 @@ if(!authed) {
 <%@ page import="java.sql.ResultSet" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
 <%@ page import="org.oscarehr.demographic.entity.DemographicMerged" %>
-<%@ page import="org.oscarehr.demographicRoster.entity.DemographicRoster" %>
 <%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
 <%@ page import="static org.oscarehr.contact.entity.DemographicContact.TYPE_DEMOGRAPHIC" %>
 <%@ page import="static org.oscarehr.contact.entity.DemographicContact.CATEGORY_PERSONAL" %>
@@ -1256,40 +1255,6 @@ if(wLReadonly.equals("")){
                </td>
            </tr>
            <% } %>
-				<phr:indivoRegistered provider="<%=curProvider_no%>"
-					demographic="<%=demographic_no%>">
-                                <tr class="Header">
-				     <td style="font-weight: bold"><bean:message key="global.personalHealthRecord"/></td>
-                                </tr>
-					<tr>
-						<td>
-							<%
-								String onclickString="alert('Please login to MyOscar first.')";
-
-								MyOscarLoggedInInfo myOscarLoggedInInfo=MyOscarLoggedInInfo.getLoggedInInfo(session);
-								if (myOscarLoggedInInfo!=null && myOscarLoggedInInfo.isLoggedIn()) onclickString="popupOscarRx(600,900,'../phr/PhrMessage.do?method=createMessage&providerNo="+curProvider_no+"&demographicNo="+demographic_no+"')";
-							%>
-							<a href="javascript: function myFunction() {return false; }" ONCLICK="<%=onclickString%>"	title="myOscar">
-								<bean:message key="demographic.demographiceditdemographic.msgSendMsgPHR"/>
-							</a>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<a href="" onclick="popup(600, 1000, '<%=request.getContextPath()%>/demographic/viewPhrRecord.do?demographic_no=<%=demographic_no%>', 'viewPatientPHR'); return false;">View PHR Record</a>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<%
-								if (myOscarLoggedInInfo!=null && myOscarLoggedInInfo.isLoggedIn()) onclickString="popupOscarRx(600,900,'"+request.getContextPath()+"/admin/oscar_myoscar_sync_config_redirect.jsp')";
-							%>
-							<a href="javascript: function myFunction() {return false; }" ONCLICK="<%=onclickString%>"	title="myOscar">
-								<bean:message key="demographic.demographiceditdemographic.MyOscarDataSync"/>
-							</a>
-						</td>
-					</tr>
-				</phr:indivoRegistered>
 			
 <% if (oscarProps.getProperty("clinic_no", "").startsWith("1022")) { // quick hack to make Dr. Hunter happy
 %>
@@ -2712,21 +2677,7 @@ if ( Dead.equals(PatStat) ) {%>
 								<td align="left"><input type="text" name="email" size="30" <%=getDisabled("email")%>
 									value="<%=demographic.getEmail()!=null? demographic.getEmail() : ""%>">
 								</td>
-								<td align="right"><b><bean:message
-									key="demographic.demographiceditdemographic.formPHRUserName" />: </b></td>
-								<td align="left"><input type="text" name="myOscarUserName" size="30" <%=getDisabled("myOscarUserName")%>
-									value="<%=demographic.getMyOscarUserName()!=null? demographic.getMyOscarUserName() : ""%>"><br />
-								<%if (demographic.getMyOscarUserName()==null ||demographic.getMyOscarUserName().equals("")) {%>
-
-								<%
-									String onclickString="popup(900, 800, '../phr/indivo/RegisterIndivo.jsp?demographicNo="+demographic_no+"', 'indivoRegistration');";
-									MyOscarLoggedInInfo myOscarLoggedInInfo=MyOscarLoggedInInfo.getLoggedInInfo(session);
-									if (myOscarLoggedInInfo==null || !myOscarLoggedInInfo.isLoggedIn()) onclickString="alert('Please login to MyOscar first.')";
-								%>
-								<a href="javascript:"
-									onclick="<%=onclickString%>"><sub
-									style="white-space: nowrap;"><bean:message key="demographic.demographiceditdemographic.msgRegisterPHR"/></sub></a> <%}%>
-								</td>
+								<td colspan="2"></td>
 							</tr>
 							<tr valign="top">
 								<td align="right"><b><bean:message

@@ -23,10 +23,14 @@
 package org.oscarehr.demographicRoster.entity;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
+@AllArgsConstructor
 public enum RosterTerminationReason
 {
 	HEALTH_NUM("Health Number error", 12),
@@ -71,22 +75,6 @@ public enum RosterTerminationReason
 		{
 			BY_CODE.put(terminationReason.terminationCode, terminationReason);
 		}
-	}
-
-	RosterTerminationReason(String description, Integer terminationCode)
-	{
-		this.description = description;
-		this.terminationCode = terminationCode;
-	}
-
-	public String getDescription()
-	{
-		return description;
-	}
-
-	public Integer getTerminationCode()
-	{
-		return terminationCode;
 	}
 
 	public static RosterTerminationReason getByCode(Integer terminationCode)
