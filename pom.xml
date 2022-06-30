@@ -2023,6 +2023,7 @@
 								org.oscarehr.ws.rest.demographic.DemographicDocumentWebService
 								org.oscarehr.ws.rest.demographic.DemographicDxWebService
 								org.oscarehr.ws.rest.demographic.DemographicMeasurementsWebService
+								org.oscarehr.ws.rest.demographic.DemographicNoteWebService
 								org.oscarehr.ws.rest.demographic.DemographicWaitListWebService
 								org.oscarehr.ws.rest.DocumentTypesWebService
 								org.oscarehr.ws.rest.DiseaseRegistryService

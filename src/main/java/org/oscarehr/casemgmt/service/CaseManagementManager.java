@@ -1066,6 +1066,7 @@ public class CaseManagementManager {
 		return filteredNotes;
 	}
 
+	@Deprecated // use tempNoteService
 	public void tmpSave(String providerNo, String demographicNo, String programId, String noteId, String note) {
 		CaseManagementTmpSave tmp = new CaseManagementTmpSave();
 		tmp.setProviderNo(providerNo);
@@ -1080,18 +1081,21 @@ public class CaseManagementManager {
 		caseManagementTmpSaveDao.persist(tmp);
 	}
 
+	@Deprecated // use tempNoteService
 	public void deleteTmpSave(String providerNo, String demographicNo, String programId) {
 		Integer intDemoNo = ConversionUtils.fromIntString(demographicNo);
 		Integer intProgramId = ConversionUtils.fromIntString(programId);
 		caseManagementTmpSaveDao.remove(providerNo, intDemoNo, intProgramId);
 	}
 
+	@Deprecated // use tempNoteService
 	public CaseManagementTmpSave restoreTmpSave(String providerNo, String demographicNo, String programId) {
 		CaseManagementTmpSave obj = caseManagementTmpSaveDao.find(providerNo, new Integer(demographicNo), new Integer(programId));
 		return obj;
 	}
 
 	// we want to load a temp saved note only if it's more recent than date
+	@Deprecated // use tempNoteService
 	public CaseManagementTmpSave restoreTmpSave(String providerNo, String demographicNo, String programId, Date date) {
 		CaseManagementTmpSave obj = caseManagementTmpSaveDao.find(providerNo, new Integer(demographicNo), new Integer(programId), date);
 		return obj;

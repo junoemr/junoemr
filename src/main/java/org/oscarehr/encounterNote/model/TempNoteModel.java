@@ -21,32 +21,31 @@
  * Canada
  */
 
-package org.oscarehr.encounterNote.converter;
+package org.oscarehr.encounterNote.model;
 
-import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
-import org.oscarehr.ws.rest.to.model.CaseManagementTmpSaveTo1;
-import org.springframework.stereotype.Service;
+import lombok.Data;
 
-@Service
-public class CaseManagementTmpSaveConverter
+import java.time.ZonedDateTime;
+import java.util.Optional;
+
+@Data
+public class TempNoteModel
 {
-	public CaseManagementTmpSaveTo1 convertCasemanagementTmpSaveToCaseManagementTmpSaveTo1(CaseManagementTmpSave model)
-	{
-		if(model == null)
-		{
-			return null;
-		}
+    private Integer id;
+    private Integer demographicId;
+    private String providerId;
+    private Integer programId;
+    private String note;
+    private ZonedDateTime updateDateTime;
+    private Integer noteId;
 
-		CaseManagementTmpSaveTo1 to1 = new CaseManagementTmpSaveTo1();
-
-		to1.setId(model.getId());
-		to1.setNoteId(model.getNoteId());
-		to1.setDemographicNo(model.getDemographicNo());
-		to1.setProgramId(model.getProgramId());
-		to1.setUpdateDate(model.getUpdateDate());
-		to1.setProviderNo(model.getProviderNo());
-		to1.setNote(model.getNote());
-
-		return to1;
-	}
+    public Optional<Integer> getOptionalNoteId()
+    {
+        Integer noteId = getNoteId();
+        if(noteId == null || noteId <= 0)
+        {
+            return Optional.empty();
+        }
+        return Optional.of(noteId);
+    }
 }
