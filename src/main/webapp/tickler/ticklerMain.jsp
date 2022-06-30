@@ -1353,6 +1353,12 @@
 					<a href="javascript:reportWindow('../dms/ManageDocument.do?method=display&doc_no=<%=ticklerLink.getTableId()%>&providerNo=<%=user_no%>&searchProviderNo=<%=user_no%>&status=')">ATT</a>
 					<%
 					}
+					else if (LabResultData.isHRM(type))
+					{
+					%>
+					<a href="javascript:reportWindow('../hospitalReportManager/displayHRMReport.jsp?id=<%=ticklerLink.getTableId()%>')">ATT</a>
+					<%
+					}
 					else if (ticklerLink.getTableName().equals("message"))
 					{
 						JSONObject metaData = new JSONObject(ticklerLink.getMeta());

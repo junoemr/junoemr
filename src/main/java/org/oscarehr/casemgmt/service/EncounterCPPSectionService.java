@@ -87,6 +87,8 @@ public abstract class EncounterCPPSectionService extends EncounterSectionService
 
 		section.setTitleKey(getSectionTitleKey());
 		section.setColour(getSectionTitleColour());
+		// CPP notes should not be condensed into single lines
+		section.setDisplayOnSingleLine(false);
 		//section.setCppIssues(cppIssues);
 
 		List<EncounterSectionNote> notes = getNotes(sectionParams, issue.getIssueId(), cppIssues);

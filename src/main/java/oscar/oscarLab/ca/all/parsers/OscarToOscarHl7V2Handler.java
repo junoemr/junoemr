@@ -40,6 +40,7 @@ import oscar.oscarLab.ca.all.parsers.OscarToOscarHl7V2.RefI12Handler;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public final class OscarToOscarHl7V2Handler extends ORU_R01MessageHandler
 {
@@ -98,7 +99,9 @@ public final class OscarToOscarHl7V2Handler extends ORU_R01MessageHandler
 	    return chainnedMessageAdapter.getDocName();
     }
 
-	public ArrayList<String> getDocNums() {
+	@Override
+	public List<String> getDocNums()
+	{
 	    return chainnedMessageAdapter.getDocNums();
     }
 

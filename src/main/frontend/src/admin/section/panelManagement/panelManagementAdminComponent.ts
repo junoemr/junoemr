@@ -21,7 +21,7 @@
  * Canada
  */
 
-import {ProvidersServiceApi} from "../../../../generated";
+import {JunoSelectOption} from "../../../lib/common/junoSelectOption";
 
 angular.module('Admin.Section').component('panelManagementAdmin',
 {
@@ -31,45 +31,44 @@ angular.module('Admin.Section').component('panelManagementAdmin',
 		'$scope',
 		'$http',
 		'$httpParamSerializer',
+		'providerService',
 		'uxService',
 		function (
 			$scope,
 			$http,
 			$httpParamSerializer,
+			providerService,
 			uxService)
 	{
-		let ctrl = this;
-
-		let providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, "../ws/rs");
+		const ctrl = this;
 
 		ctrl.selectedProvider = null;
 		ctrl.selectedPanel = null;
 		ctrl.dashboardUrl = null;
 		ctrl.missingRequiredFeildProvider = false;
 		ctrl.missingRequiredFeildPanel = false;
-		let DASHBOARD_URL_PATTERN = "../web/dashboard/display/DashboardDisplay.do?method=getDashboard&dashboardId=";
+		ctrl.DASHBOARD_URL_PATTERN = "../web/dashboard/display/DashboardDisplay.do?method=getDashboard&dashboardId=";
 
 		ctrl.providers = [];
 		ctrl.panels = [];
 
-		ctrl.$onInit = function ()
+		ctrl.$onInit = function (): void
 		{
-			providersServiceApi.getAll().then(
-					function success(result)
+			providerService.getActiveProviders().then(
+				function success(result: any[])
+				{
+					ctrl.providers = result.map((provider: any): JunoSelectOption =>
 					{
-						ctrl.providers = [];
-						for (let provider of result.data.body)
-						{
-							ctrl.providers.push({
-								label: provider.name,
-								value: provider.providerNo
-							})
-						}
-					},
-					function error(result)
-					{
-						console.error("Failed to get provider list with error: " + result);
-					}
+						return {
+							label: provider.name,
+							value: provider.providerNo,
+						};
+					});
+				},
+				function error(result)
+				{
+					console.error("Failed to get provider list with error: " + result);
+				}
 			);
 
 			uxService.getAllDashboards().then(
@@ -94,16 +93,22 @@ angular.module('Admin.Section').component('panelManagementAdmin',
 			)
 		};
 
-		ctrl.runReport = function()
+		ctrl.runReport = function(): void
 		{
 			ctrl.missingRequiredFeildProvider = ctrl.selectedProvider == null;
-			ctrl.missingRequiredFeildPanel 		= ctrl.selectedPanel == null;
+			ctrl.missingRequiredFeildPanel    = ctrl.selectedPanel == null;
 
 			if (ctrl.selectedPanel != null && ctrl.selectedProvider != null)
 			{
-				ctrl.dashboardUrl = DASHBOARD_URL_PATTERN + ctrl.selectedPanel + "&providerNo=" + ctrl.selectedProvider;
-				document.querySelector("#dashboard-embedded-page").contentWindow.location.reload();
+				ctrl.dashboardUrl = ctrl.DASHBOARD_URL_PATTERN + ctrl.selectedPanel + "&providerNo=" + ctrl.selectedProvider;
 			}
 		};
+
+		ctrl.showIframe = (): boolean =>
+		{
+			// the iframe should only show when the url is defined.
+			// without this firefox will not display the iframe
+			return !Juno.Common.Util.isBlank(ctrl.dashboardUrl);
+		}
 	}]
 });

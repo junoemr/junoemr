@@ -58,7 +58,7 @@ Juno.CareConnect.Util.determineCareConnectURL = function determineCareConnectURL
  */
 Juno.CareConnect.Util.checkPPNOverride = function checkPPNOverride(callback)
 {
-    var endpoint = "../../ws/rs/providerSettings/get"
+    var endpoint = "../../ws/rs/providerSettings/all"
     jQuery.ajax({
         url: endpoint,
         success: function success(settings)

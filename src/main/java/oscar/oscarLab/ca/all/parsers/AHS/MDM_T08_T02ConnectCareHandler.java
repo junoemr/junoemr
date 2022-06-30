@@ -24,14 +24,13 @@ package oscar.oscarLab.ca.all.parsers.AHS;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.v23.datatype.CX;
-import ca.uhn.hl7v2.model.v23.message.MDM_T02;
-import ca.uhn.hl7v2.model.v23.message.MDM_T08;
-import ca.uhn.hl7v2.model.v23.segment.PID;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
 import oscar.oscarLab.ca.all.parsers.messageTypes.MDM_T08_T02MessageHandler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class MDM_T08_T02ConnectCareHandler extends MDM_T08_T02MessageHandler
 {
@@ -48,30 +47,39 @@ public abstract class MDM_T08_T02ConnectCareHandler extends MDM_T08_T02MessageHa
 	 */
 	public ArrayList<Pair<String, String>> getPatientIdentificationList(boolean appendNamespace)
 	{
-		if (message instanceof MDM_T08)
+		if(getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
 		{
-			MDM_T08 msg = (MDM_T08) message;
-			return getPatientIdentificationFromPID(msg.getPID(), appendNamespace);
+			if(message instanceof ca.uhn.hl7v2.model.v251.message.MDM_T02)
+			{
+				ca.uhn.hl7v2.model.v251.message.MDM_T02 msg = (ca.uhn.hl7v2.model.v251.message.MDM_T02) message;
+				return getPatientIdentificationFromPID(msg.getPID(), appendNamespace);
+			}
 		}
-		else if (message instanceof MDM_T02)
+		else if(getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_23)
 		{
-			MDM_T02 msg = (MDM_T02) message;
-			return getPatientIdentificationFromPID(msg.getPID(), appendNamespace);
+			if(message instanceof ca.uhn.hl7v2.model.v23.message.MDM_T08)
+			{
+				ca.uhn.hl7v2.model.v23.message.MDM_T08 msg = (ca.uhn.hl7v2.model.v23.message.MDM_T08) message;
+				return getPatientIdentificationFromPID(msg.getPID(), appendNamespace);
+			}
+			else if(message instanceof ca.uhn.hl7v2.model.v23.message.MDM_T02)
+			{
+				ca.uhn.hl7v2.model.v23.message.MDM_T02 msg = (ca.uhn.hl7v2.model.v23.message.MDM_T02) message;
+				return getPatientIdentificationFromPID(msg.getPID(), appendNamespace);
+			}
 		}
-		else
-		{
-			return new ArrayList<Pair<String, String>>();
-		}
+		return new ArrayList<>(0);
 	}
 
-	private ArrayList<Pair<String, String>> getPatientIdentificationFromPID(PID pid, boolean appendNamespace)
+	private ArrayList<Pair<String, String>> getPatientIdentificationFromPID(ca.uhn.hl7v2.model.v23.segment.PID pid, boolean appendNamespace)
 	{
 		ArrayList<Pair<String, String>> identification = new ArrayList<>();
 		for (int i =0; i < pid.getPatientIDInternalIDReps(); i ++)
 		{
-			CX id = pid.getPatientIDInternalID(i);
-			if (id.getAssigningAuthority().getNamespaceID().getValue() != null && id.getID().getValue() != null &&
-					id.getIdentifierTypeCode().getValue() != null)
+			ca.uhn.hl7v2.model.v23.datatype.CX id = pid.getPatientIDInternalID(i);
+			if (id.getAssigningAuthority().getNamespaceID().getValue() != null
+					&& id.getID().getValue() != null
+					&& id.getIdentifierTypeCode().getValue() != null)
 			{
 				String idString = id.getID().getValue();
 				if (appendNamespace)
@@ -79,6 +87,34 @@ public abstract class MDM_T08_T02ConnectCareHandler extends MDM_T08_T02MessageHa
 					idString += " " + id.getAssigningAuthority().getNamespaceID().getValue();
 				}
 				identification.add(Pair.of(id.getIdentifierTypeCode().getValue(), idString));
+			}
+		}
+		return identification;
+	}
+
+	private ArrayList<Pair<String, String>> getPatientIdentificationFromPID(ca.uhn.hl7v2.model.v251.segment.PID pid, boolean appendNamespace)
+	{
+		ArrayList<Pair<String, String>> identification = new ArrayList<>();
+		for (int i =0; i < pid.getPid3_PatientIdentifierListReps(); i ++)
+		{
+			try
+			{
+				ca.uhn.hl7v2.model.v251.datatype.CX id = pid.getPid3_PatientIdentifierList(i);
+				if(id.getAssigningAuthority().getNamespaceID().getValue() != null
+						&& id.getIDNumber().getValue() != null
+						&& id.getIdentifierTypeCode().getValue() != null)
+				{
+					String idString = id.getIDNumber().getValue();
+					if(appendNamespace)
+					{
+						idString += " " + id.getAssigningAuthority().getNamespaceID().getValue();
+					}
+					identification.add(Pair.of(id.getIdentifierTypeCode().getValue(), idString));
+				}
+			}
+			catch(Exception e)
+			{
+				logger.error("Error reading patient identification", e);
 			}
 		}
 		return identification;
@@ -99,7 +135,126 @@ public abstract class MDM_T08_T02ConnectCareHandler extends MDM_T08_T02MessageHa
 				return id.getRight();
 			}
 		}
-		return null;
+		return "";
+	}
+
+	@Override
+	public String getHealthNumProvince()
+	{
+		return "ABH";
+	}
+
+	@Override
+	public String getCCDocs()
+	{
+		try
+		{
+			return String.join(", ", getCCDocNames());
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected List<String> getCCDocNames() throws HL7Exception
+	{
+		List<String> docNames = new ArrayList<>();
+		int txa_23Count = getFieldReps("/.TXA", 23);
+		for(int k = 0; k < txa_23Count; k++)
+		{
+			String docName = getResultCopiesTo(0, k);
+			if(StringUtils.isNotBlank(docName))
+			{
+				docNames.add(docName);
+			}
+		}
+
+		// add pv1 provider to cc docs if not marked confidential
+		if(!isReportBlocked())
+		{
+			int pd1_4Count = getFieldReps("/.PD1", 4);
+			for(int k = 0; k < pd1_4Count; k++)
+			{
+				String docName = getFullDocName("/.PD1", 4, k);
+				if(StringUtils.isNotBlank(docName))
+				{
+					docNames.add(docName);
+				}
+			}
+		}
+		return docNames;
+	}
+
+	@Override
+	public List<String> getDocNums()
+	{
+		List<String> docIds = new ArrayList<>();
+		try
+		{
+			String providerId = getOrderingProviderNo(0, 0);
+			docIds.add(providerId);
+
+			int txa_23Count = getFieldReps("/.TXA", 23);
+			for(int k = 0; k < txa_23Count; k++)
+			{
+				String docId = getResultCopiesToProviderNo(0, k);
+				if(StringUtils.isNotBlank(docId))
+				{
+					docIds.add(docId);
+				}
+			}
+
+			// add pv1 provider to cc docs if not marked confidential
+			if(!isReportBlocked())
+			{
+				int pd1_4Count = getFieldReps("/.PD1", 4);
+				for(int k = 0; k < pd1_4Count; k++)
+				{
+					String docId = get("/.PD1-4(" + k + ")-1");
+					if(StringUtils.isNotBlank(docId))
+					{
+						docIds.add(docId);
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			logger.error("Could not return doctor nums", e);
+		}
+		return docIds;
+	}
+
+	/**
+	 * indicates blocked or sensitive data within the report
+	 * @return true if report flagged as sensitive/confidential
+	 */
+	@Override
+	public boolean isReportBlocked()
+	{
+		String status = getString(get("/.TXA-18"));
+
+		if(getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		{
+			switch(status)
+			{
+				case "R":              // Restricted
+				case "V": return true; // Very restricted
+				case "U":              // Usual control
+				default: return false;
+			}
+		}
+		else
+		{
+			switch(status)
+			{
+				case "RE":              // Restricted
+				case "VR": return true; // Very restricted
+				case "UC":              // Usual control
+				default: return false;
+			}
+		}
 	}
 
 }
