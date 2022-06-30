@@ -643,6 +643,10 @@ oscarApp.config([
 			url: '/record/:demographicNo',
 			templateUrl: 'src/record/record.jsp',
 			controller: 'Record.RecordController as recordCtrl',
+			params:
+			{
+				appointmentNo: null
+			},
 			resolve:
 			{
 				user: ['providerService', function(providerService)
