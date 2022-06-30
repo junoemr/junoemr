@@ -60,7 +60,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 	private static HRMSubClassService subClassService = SpringUtils.getBean(HRMSubClassService.class);
 
 	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	 
+
 	public ActionForward undefined(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		String method = request.getParameter("method");
 
@@ -98,7 +98,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 
 	public ActionForward makeIndependent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE);
-		
+
 		try {
 			String reportId = request.getParameter("reportId");
 
@@ -107,7 +107,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 				document.setParentReport(null);
 				hrmDocumentDao.merge(document);
 			} else {
-				// This is the parent document; choose the closest one 
+				// This is the parent document; choose the closest one
 				List<HRMDocument> documentChildren = hrmDocumentDao.getAllChildrenOf(document.getId());
 				if (documentChildren != null && documentChildren.size() > 0) {
 					HRMDocument newParentDoc = documentChildren.get(0);
@@ -124,7 +124,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 
 			request.setAttribute("success", true);
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("Tried to set make document independent but failed.", e); 
+			MiscUtils.getLogger().error("Tried to set make document independent but failed.", e);
 			request.setAttribute("success", false);
 		}
 
@@ -137,7 +137,8 @@ public class HRMModifyDocumentAction extends DispatchAction {
 
 		try {
 			String reportId = request.getParameter("reportId");
-			String signedOff = request.getParameter("signedOff");
+			String signedOffParam = request.getParameter("signedOff");
+			boolean isSignedOff = Integer.parseInt(signedOffParam) == 1;
 
 			HRMDocumentToProvider providerMapping = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(Integer.parseInt(reportId), providerNo);
 			if(providerMapping == null) {
@@ -150,28 +151,30 @@ public class HRMModifyDocumentAction extends DispatchAction {
 					providerMapping.setProviderNo(providerNo);
 				}
 			}
-
-			if (providerMapping != null) {
-				providerMapping.setSignedOff(Integer.parseInt(signedOff) == 1);
+			if (providerMapping != null)
+			{
+				providerMapping.setSignedOff(isSignedOff);
 				providerMapping.setSignedOffTimestamp(new Date());
 				hrmDocumentToProviderDao.merge(providerMapping);
+				// Once the provider has signed off, try to ack the report in their inbox
+				CommonLabResultData.updateReportStatus(Integer.parseInt(reportId), providerNo,
+					ProviderInboxItem.ACK, "", InboxManager.INBOX_TYPE_HRM);
 			}
 			else
 			{
 				HRMDocumentToProvider hrmDocumentToProvider=new HRMDocumentToProvider();
 				hrmDocumentToProvider.setHrmDocument(hrmDocumentDao.find(Integer.parseInt(reportId)));
 				hrmDocumentToProvider.setProviderNo(providerNo);
-				hrmDocumentToProvider.setSignedOff(Integer.parseInt(signedOff) == 1);
+				hrmDocumentToProvider.setSignedOff(isSignedOff);
 				hrmDocumentToProvider.setSignedOffTimestamp(new Date());
 				hrmDocumentToProviderDao.persist(hrmDocumentToProvider);
 
-				// Once the provider has signed off for the first time, try to ack the report in their inbox
 				CommonLabResultData.updateReportStatus(Integer.parseInt(reportId), providerNo, ProviderInboxItem.ACK, "", InboxManager.INBOX_TYPE_HRM);
 			}
 
 			request.setAttribute("success", true);
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("Tried to set signed off status on document but failed.", e); 
+			MiscUtils.getLogger().error("Tried to set signed off status on document but failed.", e);
 			request.setAttribute("success", false);
 		}
 
@@ -215,7 +218,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 				request.setAttribute("success", false);
 			}
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("Tried to assign HRM document to provider but failed.", e); 
+			MiscUtils.getLogger().error("Tried to assign HRM document to provider but failed.", e);
 			request.setAttribute("success", false);
 		}
 
@@ -237,7 +240,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 
 			request.setAttribute("success", true);
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("Tried to remove HRM document from demographic but failed.", e); 
+			MiscUtils.getLogger().error("Tried to remove HRM document from demographic but failed.", e);
 			request.setAttribute("success", false);
 		}
 
@@ -274,7 +277,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 
 			request.setAttribute("success", true);
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("Tried to assign HRM document to demographic but failed.", e); 
+			MiscUtils.getLogger().error("Tried to assign HRM document to demographic but failed.", e);
 			request.setAttribute("success", false);
 		}
 
@@ -283,7 +286,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 
 	public ActionForward makeActiveSubClass(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE);
-		
+
 		try {
 			String hrmDocumentId = request.getParameter("reportId");
 			String subClassId = request.getParameter("subClassId");
@@ -298,7 +301,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 			request.setAttribute("success", true);
 
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("Tried to change active subclass but failed.", e); 
+			MiscUtils.getLogger().error("Tried to change active subclass but failed.", e);
 			request.setAttribute("success", false);
 		}
 
@@ -309,7 +312,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 
 	public ActionForward removeProvider(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE);
-		
+
 		try {
 			String providerMappingId = request.getParameter("providerMappingId");
 
@@ -317,7 +320,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 
 			request.setAttribute("success", true);
 		} catch (Exception e) {
-			MiscUtils.getLogger().error("Tried to remove provider from HRM document but failed.", e); 
+			MiscUtils.getLogger().error("Tried to remove provider from HRM document but failed.", e);
 			request.setAttribute("success", false);
 		}
 
@@ -328,7 +331,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 	public ActionForward addComment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		LoggedInInfo loggedInInfo=LoggedInInfo.getLoggedInInfoFromSession(request);
 		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), Permission.HRM_UPDATE);
-		
+
 		try {
 			String documentId = request.getParameter("reportId");
 			String commentString = request.getParameter("comment");
@@ -346,13 +349,13 @@ public class HRMModifyDocumentAction extends DispatchAction {
 			MiscUtils.getLogger().error("Couldn't add a comment for HRM document", e);
 			request.setAttribute("success", false);
 		}
-		
+
 		return mapping.findForward("ajax");
 	}
-	
+
 	public ActionForward deleteComment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 		securityInfoManager.requireAllPrivilege(LoggedInInfo.getLoggedInInfoFromSession(request).getLoggedInProviderNo(), Permission.HRM_UPDATE);
-		
+
 		try {
 			String commentId = request.getParameter("commentId");
 			hrmDocumentCommentDao.deleteComment(Integer.parseInt(commentId));
@@ -361,7 +364,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 			MiscUtils.getLogger().error("Couldn't delete comment on HRM document", e);
 			request.setAttribute("success", false);
 		}
-		
+
 		return mapping.findForward("ajax");
 	}
 
