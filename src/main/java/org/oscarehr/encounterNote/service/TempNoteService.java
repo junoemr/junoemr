@@ -32,7 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @Service
@@ -75,7 +75,7 @@ public class TempNoteService
 
 		tempSave.setNoteId(noteId);
 		tempSave.setNote(noteInput);
-		tempSave.setUpdateDate(new Date());
+		tempSave.setUpdateDateTime(ZonedDateTime.now());
 
 		if(existingTempSave.isPresent())
 		{

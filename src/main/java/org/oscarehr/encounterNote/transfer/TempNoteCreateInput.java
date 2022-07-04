@@ -21,34 +21,17 @@
  * Canada
  */
 
-package org.oscarehr.encounterNote.model;
+package org.oscarehr.encounterNote.transfer;
 
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.Optional;
 
 @Data
-public class TempNoteModel
+public class TempNoteCreateInput
 {
-    private Integer id;
-    private Integer demographicId;
-    private String providerId;
-    private Integer programId;
     private String note;
-    private ZonedDateTime updateDateTime;
     private LocalDate observationDate;
-    private Integer noteId;
     private String encounterType;
-
-    public Optional<Integer> getOptionalNoteId()
-    {
-        Integer noteId = getNoteId();
-        if(noteId == null || noteId <= 0)
-        {
-            return Optional.empty();
-        }
-        return Optional.of(noteId);
-    }
+    private Integer noteId;
 }
