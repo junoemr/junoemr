@@ -229,9 +229,14 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.netcareModuleEnabled = false; //await netcareService.loadEnabledState();
 		}
 
+		controller.noteChanged = () =>
+		{
+			return (controller.page.encounterNote.note !== controller.page.initNote);
+		}
+
 		controller.saveUpdates = async () =>
 		{
-			if (controller.page.encounterNote.note === controller.page.initNote) return; //user did not input anything, don't save
+			if (!controller.noteChanged()) return; //user did not input anything, don't save
 
 			try
 			{
@@ -901,6 +906,23 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			if(controller.draftSavedDate)
 			{
+				return "Draft saved";
+			}
+			else if (controller.page.encounterNote
+				&& controller.page.encounterNote.note
+				&& !controller.noteChanged()
+				&& controller.page.encounterNote.updateDate)
+			{
+				return "Draft loaded from " + Juno.Common.Util.formatMomentDateTime(
+					moment(controller.page.encounterNote.updateDate),
+					Juno.Common.Util.DisplaySettings.dateTimeFormat);
+			}
+			return "";
+		}
+		controller.draftSavedTooltip = () =>
+		{
+			if(controller.draftSavedDate)
+			{
 				return "Draft saved on " + Juno.Common.Util.formatMomentDateTime(
 					controller.draftSavedDate,
 					Juno.Common.Util.DisplaySettings.dateTimeFormat);
@@ -910,7 +932,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.cancelButtonText = () =>
 		{
-			if(controller.page.editingNoteId === null)
+			if(controller.page.editingNoteId)
 			{
 				return "Delete";
 			}
@@ -919,7 +941,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.cancelButtonTooltip = () =>
 		{
-			if(controller.page.editingNoteId === null)
+			if(controller.page.editingNoteId)
 			{
 				return "Deletes saved draft, encounter text, and assigned issues.";
 			}

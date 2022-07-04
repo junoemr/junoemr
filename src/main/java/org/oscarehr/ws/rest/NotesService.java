@@ -1028,6 +1028,7 @@ public class NotesService extends AbstractServiceImpl
 			
 			note.setNote(tempNoteModel.getNote());
 			note.setObservation_date(ConversionUtils.toNullableLegacyDate(tempNoteModel.getObservationDate()));
+			note.setUpdate_date(ConversionUtils.toNullableLegacyDateTime(tempNoteModel.getUpdateDateTime()));
 			note.setEncounter_type(tempNoteModel.getEncounterType());
 			logger.debug("Setting note to " + note.getNote());
 

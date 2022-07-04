@@ -184,8 +184,8 @@
                             <div class="flex-row justify-content-end align-items-center">
                                 <div ng-if="!recordCtrl.noteDirty" class="m-r-4">
                                     <span class="body-smallest"
-                                          title="{{recordCtrl.draftSavedMessage()}}">
-                                        Draft Saved
+                                          title="{{recordCtrl.draftSavedTooltip()}}">
+                                        {{recordCtrl.draftSavedMessage()}}
                                     </span>
                                 </div>
                                 <div class="btn-group btn-group-md pull-right">
