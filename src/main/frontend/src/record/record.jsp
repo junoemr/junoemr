@@ -148,9 +148,9 @@
                             </div>
 
                         </div>
-                        <div class="row note-editor-issues">
-                            <div class="col-sm-12">
-                                <label >Assigned Issues:</label>
+                        <div class="grid-column-2 grid-gap-4 note-editor-issues">
+                            <div class="flex-column">
+                                <label>Assigned Issues:</label>
                                 <table class="table table-condensed">
                                     <tr ng-repeat="i in recordCtrl.page.assignedCMIssues" class="note-editor-issue-row">
                                         <td>{{i.issue.description}} ({{i.issue.code}})</td>
@@ -160,6 +160,13 @@
                                     </tr>
 
                                 </table>
+                            </div>
+                            <div class="flex-column">
+                                <juno-select ng-model="recordCtrl.page.encounterNote.encounterType"
+                                             options="recordCtrl.encounterTypeOptions"
+                                             label="Encounter Type"
+                                             label-position="LABEL_POSITION.LEFT">
+                                </juno-select>
                             </div>
                         </div>
                         <div id="note-editor-footer" class="flex-row flex-gap-4 flex-wrap justify-content-between m-b-8">

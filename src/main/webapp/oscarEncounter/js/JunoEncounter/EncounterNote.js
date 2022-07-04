@@ -741,7 +741,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			data: JSON.stringify({
 				noteId: noteId,
 				note: noteData.note,
-				observationDate: noteData.observationDate,
+				observationDate: moment(noteData.observationDate),
 				encounterType: noteData.encounterType,
 			}),
 			success: function (response)

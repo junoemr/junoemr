@@ -22,6 +22,7 @@
  */
 package org.oscarehr.encounterNote.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.encounterNote.converter.TempNoteToModelConverter;
 import org.oscarehr.encounterNote.dao.CaseManagementTmpSaveDao;
@@ -76,7 +77,7 @@ public class TempNoteService
 		tempSave.setNoteId(noteInput.getNoteId());
 		tempSave.setNote(noteInput.getNote());
 		tempSave.setObservationDate(noteInput.getObservationDate());
-		tempSave.setEncounterType(noteInput.getEncounterType());
+		tempSave.setEncounterType(StringUtils.trimToNull(noteInput.getEncounterType()));
 		tempSave.setUpdateDateTime(ZonedDateTime.now());
 
 		if(existingTempSave.isPresent())
