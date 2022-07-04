@@ -141,13 +141,13 @@ public class HRMModifyDocumentAction extends DispatchAction {
 			boolean isSignedOff = Integer.parseInt(signedOffParam) == 1;
 
 			HRMDocumentToProvider providerMapping = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(Integer.parseInt(reportId), providerNo);
-			if(providerMapping == null) {
+			if (providerMapping == null) {
 				// No longer required for Juno data, but keeping this in for now in case removing it does something
 				// weird to input data.
-
-				// Check for unclaimed record, if that exists..update that one
+				// Legacy system used to create an HRMDocumentToProvider assigned to provider no -1 if it couldn't find a mapping.
 				providerMapping = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(Integer.parseInt(reportId), "-1");
-				if(providerMapping != null) {
+				if(providerMapping != null)
+				{
 					providerMapping.setProviderNo(providerNo);
 				}
 			}
@@ -156,19 +156,22 @@ public class HRMModifyDocumentAction extends DispatchAction {
 				providerMapping.setSignedOff(isSignedOff);
 				providerMapping.setSignedOffTimestamp(new Date());
 				hrmDocumentToProviderDao.merge(providerMapping);
-				// Once the provider has signed off, try to ack the report in their inbox
-				CommonLabResultData.updateReportStatus(Integer.parseInt(reportId), providerNo,
-					ProviderInboxItem.ACK, "", InboxManager.INBOX_TYPE_HRM);
+
 			}
 			else
 			{
-				HRMDocumentToProvider hrmDocumentToProvider=new HRMDocumentToProvider();
+				// In case of unmatched providers, then the current provider will ack
+				HRMDocumentToProvider hrmDocumentToProvider = new HRMDocumentToProvider();
 				hrmDocumentToProvider.setHrmDocument(hrmDocumentDao.find(Integer.parseInt(reportId)));
 				hrmDocumentToProvider.setProviderNo(providerNo);
 				hrmDocumentToProvider.setSignedOff(isSignedOff);
 				hrmDocumentToProvider.setSignedOffTimestamp(new Date());
 				hrmDocumentToProviderDao.persist(hrmDocumentToProvider);
+			}
 
+			if (isSignedOff)
+			{
+				// Once the provider has signed off, try to ack the report in their inbox
 				CommonLabResultData.updateReportStatus(Integer.parseInt(reportId), providerNo, ProviderInboxItem.ACK, "", InboxManager.INBOX_TYPE_HRM);
 			}
 
