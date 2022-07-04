@@ -32,6 +32,7 @@ import moment from "moment";
 import AppointmentService from "../lib/appointment/service/AppointmentService";
 import ToastErrorHandler from "../lib/error/handler/ToastErrorHandler";
 import {LogLevel} from "../lib/error/handler/LogLevel";
+import TempNoteInput from "../lib/note/model/TempNoteInput";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -202,9 +203,12 @@ angular.module('Record').controller('Record.RecordController', [
 
 			try
 			{
-				await noteService.tempSave($stateParams.demographicNo,
-					controller.page.encounterNote.note,
-					controller.page.encounterNote.noteId);
+				let tmpInput = new TempNoteInput();
+				tmpInput.noteId = controller.page.encounterNote.noteId;
+				tmpInput.noteText = controller.page.encounterNote.note;
+				tmpInput.observationDate = moment(controller.page.encounterNote.observationDate);
+
+				await noteService.tempSave($stateParams.demographicNo, tmpInput);
 
 				controller.noteDirty = false;
 				controller.draftSavedDate = new moment();

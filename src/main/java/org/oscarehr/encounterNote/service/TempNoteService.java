@@ -27,6 +27,7 @@ import org.oscarehr.encounterNote.converter.TempNoteToModelConverter;
 import org.oscarehr.encounterNote.dao.CaseManagementTmpSaveDao;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.encounterNote.model.TempNoteModel;
+import org.oscarehr.encounterNote.transfer.TempNoteCreateInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -64,17 +65,18 @@ public class TempNoteService
 	 * create or update a temp note, keyed on the provider and demographic id
 	 * @param providerId the provider id the note is keyed on
 	 * @param demographicId the demographic id the note is keyed on
-	 * @param noteInput the note text to save
-	 * @param noteId the optional note id, for linking to an existing note
+	 * @param noteInput the note input object
 	 * @return the updated model
 	 */
-	public TempNoteModel setTempNote(String providerId, Integer demographicId, String noteInput, Integer noteId)
+	public TempNoteModel setTempNote(String providerId, Integer demographicId, TempNoteCreateInput noteInput)
 	{
 		Optional<CaseManagementTmpSave> existingTempSave = caseManagementTmpSaveDao.findOptional(providerId, demographicId);
 		CaseManagementTmpSave tempSave = existingTempSave.orElse(new CaseManagementTmpSave());
 
-		tempSave.setNoteId(noteId);
-		tempSave.setNote(noteInput);
+		tempSave.setNoteId(noteInput.getNoteId());
+		tempSave.setNote(noteInput.getNote());
+		tempSave.setObservationDate(noteInput.getObservationDate());
+		tempSave.setEncounterType(noteInput.getEncounterType());
 		tempSave.setUpdateDateTime(ZonedDateTime.now());
 
 		if(existingTempSave.isPresent())
