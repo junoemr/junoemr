@@ -1133,6 +1133,7 @@ public class NotesService extends AbstractServiceImpl
 		returnNote.setEncounterTime(nd.getEncounterTime());	
 		returnNote.setEncounterTransportationTime(nd.getEncounterTransportationTime());
 		returnNote.setAppointmentNo(nd.getAppointmentNo());
+		returnNote.setUpdateDate(nd.getUpdateDate());
 		
 		return returnNote;
 	}

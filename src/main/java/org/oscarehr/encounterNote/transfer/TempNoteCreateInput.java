@@ -33,5 +33,5 @@ public class TempNoteCreateInput
     private String note;
     private LocalDate observationDate;
     private String encounterType;
-    private Integer noteId;
+    private Integer noteId; // optionally links draft to existing note
 }

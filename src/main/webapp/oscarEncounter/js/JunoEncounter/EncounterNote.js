@@ -575,7 +575,9 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	  if(tmpSave && tmpSave.noteId === note.noteId)
 		{
-			note.note = tmpSave.note
+			note.note = tmpSave.note;
+			note.observationDate = tmpSave.observationDate;
+			note.encounterType = tmpSave.encounterType;
 		}
 
 		var date = moment(note.observationDate);

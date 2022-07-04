@@ -192,7 +192,10 @@ angular.module('Record').controller('Record.RecordController', [
 				};
 
 				controller.checkIfMhaCallAvailable();
-				$scope.$watch('recordCtrl.page.encounterNote.note', delayTmpSave);
+				$scope.$watchGroup(["recordCtrl.page.encounterNote.note",
+					"recordCtrl.page.encounterNote.encounterType",
+					"recordCtrl.page.encounterNote.observationDate",
+				], delayTmpSave);
 
 				//////
 
