@@ -69,14 +69,6 @@ public class RosterStatusService
 		return rosterStatusToModelConverter.convert(statuses);
 	}
 
-	public List<RosterStatusModel> getActiveRosterStatusList()
-	{
-		List<RosterStatus> statuses = rosterStatusDao.findAll();
-		return rosterStatusToModelConverter.convert(statuses.stream()
-				.filter(status -> status.getDeletedAt() == null)
-				.collect(Collectors.toList()));
-	}
-
 	public RosterStatusModel addStatus(RosterStatusModel statusTransfer, String providerNo)
 	{
 		RosterStatus rosterStatus = rosterStatusToEntityConverter.convert(statusTransfer);

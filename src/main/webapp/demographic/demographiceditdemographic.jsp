@@ -128,6 +128,7 @@ if(!authed) {
 	ProfessionalSpecialistDao professionalSpecialistDao = (ProfessionalSpecialistDao) SpringUtils.getBean("professionalSpecialistDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
 	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+	RosterStatusService rosterStatusService = SpringUtils.getBean(RosterStatusService.class);
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	ProviderPreferenceDao providerPreferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
 	List<Provider> doctors = providerDao.getActiveProvidersByType("doctor");
@@ -239,6 +240,8 @@ if(!authed) {
 		pageContext.setAttribute( "patientConsents", patientConsentManager.getAllConsentsByDemographic( loggedInInfo, demographicNo ) );
 	}
 
+	List<RosterStatusModel> rosterStatuses = rosterStatusService.getRosterStatusList(true);
+
 	// Custom licensed producer fields
 	String licensedProducerDefault = "None";
 	String licensedProducer = licensedProducerDefault;
@@ -293,6 +296,8 @@ if(!authed) {
 <%@ page import="static org.oscarehr.contact.entity.DemographicContact.TYPE_DEMOGRAPHIC" %>
 <%@ page import="static org.oscarehr.contact.entity.DemographicContact.CATEGORY_PERSONAL" %>
 <%@ page import="org.oscarehr.demographicRoster.entity.RosterTerminationReason" %>
+<%@ page import="org.oscarehr.rosterStatus.service.RosterStatusService" %>
+<%@ page import="org.oscarehr.rosterStatus.model.RosterStatusModel" %>
 <html:html locale="true">
 
 <head>
@@ -559,18 +564,6 @@ function newStatus() {
     } else if(newOpt != "") {
         document.updatedelete.patient_status.options[document.updatedelete.patient_status.length] = new Option(newOpt, newOpt);
         document.updatedelete.patient_status.options[document.updatedelete.patient_status.length-1].selected = true;
-    } else {
-        alert("<bean:message key="demographic.demographiceditdemographic.msgInvalidEntry"/>");
-    }
-}
-
-function newStatus1() {
-    newOpt = prompt("<bean:message key="demographic.demographiceditdemographic.msgPromptStatus"/>:", "");
-    if (newOpt == null) {
-    	return;
-    } else if(newOpt != "") {
-        document.updatedelete.roster_status.options[document.updatedelete.roster_status.length] = new Option(newOpt, newOpt);
-        document.updatedelete.roster_status.options[document.updatedelete.roster_status.length-1].selected = true;
     } else {
         alert("<bean:message key="demographic.demographiceditdemographic.msgInvalidEntry"/>");
     }
@@ -3103,35 +3096,24 @@ document.updatedelete.referral_doctor_no.value = refNo;
 									key="demographic.demographiceditdemographic.formRosterStatus" />:
 								</b></td>
 								<td align="left">
-								<%String rosterStatus = demographic.getRosterStatus();
-                                  if (rosterStatus == null) {
-                                     rosterStatus = "";
+								<%String currentRosterStatus = demographic.getRosterStatus();
+                                  if (currentRosterStatus == null) {
+	                                  currentRosterStatus = "";
                                   }
                                   %>
-                                <input type="hidden" name="initial_rosterstatus" value="<%=rosterStatus%>"/>
-								<select id="roster_status" name="roster_status" style="width: 120" <%=getDisabled("roster_status")%> onchange="checkRosterStatus2()">
+                                <input type="hidden" name="initial_rosterstatus" value="<%=currentRosterStatus%>"/>
+								<select id="roster_status" name="roster_status" <%=getDisabled("roster_status")%> onchange="checkRosterStatus2()">
 									<option value=""></option>
-									<option value="RO"
-										<%="RO".equals(rosterStatus)?" selected":""%>>
-									<bean:message key="demographic.demographiceditdemographic.optRostered"/></option>
-									<option value="NR"
-										<%=rosterStatus.equals("NR")?" selected":""%>>
-									<bean:message key="demographic.demographiceditdemographic.optNotRostered"/></option>
-									<option value="TE"
-										<%=rosterStatus.equals("TE")?" selected":""%>>
-									<bean:message key="demographic.demographiceditdemographic.optTerminated"/></option>
-									<option value="FS"
-										<%=rosterStatus.equals("FS")?" selected":""%>>
-									<bean:message key="demographic.demographiceditdemographic.optFeeService"/></option>
-									<% 
-									for(String status: demographicDao.getRosterStatuses()) {
+									<%
+									for(RosterStatusModel rosterStatus : rosterStatuses)
+									{
+										String statusCode = rosterStatus.getRosterStatus();
 									%>
-									<option value="<%=status%>"
-										<%=rosterStatus.equals(status)?" selected":""%>><%=status%></option>
-									<% }
-                                    
-                                   // end while %>
-								</select> <input type="button" onClick="newStatus1();" value="<bean:message key="demographic.demographiceditdemographic.btnAddNew"/>">
+									<option value="<%=statusCode%>" <%=statusCode.equals(currentRosterStatus) ? " selected":""%>>
+										<%=statusCode + "-" + rosterStatus.getStatusDescription()%>
+									</option>
+									<% } %>
+								</select>
 								</td>
                                                                     <%
                                                              // Put 0 on the left on dates
