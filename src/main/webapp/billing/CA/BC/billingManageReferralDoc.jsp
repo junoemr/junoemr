@@ -109,10 +109,26 @@ function registerFormSubmit(formId, divId)
 	});
 }
 
+function openAddReferralDoc(referralDocNumber)
+{
+	if (referralDocNumber)
+	{
+		let url = "<%=request.getContextPath() %>/billing/CA/BC/billingAddReferralDoc.jsp?id=" + referralDocNumber;
+		window.open(url, "_self");
+	}
+}
+
 </script>
 
 <style>
 table td{font-size:10px;}
+
+.referralDoctorLink:hover {
+	background-color: lightblue;
+	color: blue;
+	cursor: pointer;
+	text-decoration: underline;
+}
 </style>
 
 <body>
@@ -178,9 +194,8 @@ table td{font-size:10px;}
 				{
 					Billingreferral billingReferral = alist.get(i);
             %>
-			<tr>
-				<!--td><%=billingReferral.getBillingreferralNo()%></td-->
-				<td><a href="<%=request.getContextPath() %>/billing/CA/BC/billingAddReferralDoc.jsp?id=<%=billingReferral.getBillingreferralNo()%>" class="contentLink"><%=billingReferral.getReferralNo()%></a></td>
+			<tr onclick="openAddReferralDoc(<%=billingReferral.getBillingreferralNo()%>)" class="referralDoctorLink">
+				<td><%=billingReferral.getReferralNo()%></td>
 				<td><%if(billingReferral.getLastName()!=null){out.print(billingReferral.getLastName());}%></td>
 				<td><%if(billingReferral.getFirstName()!=null){out.print(billingReferral.getFirstName());}%></td>
 				<td><%if(billingReferral.getSpecialty()!=null){out.print(billingReferral.getSpecialty());}%></td>
