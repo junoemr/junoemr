@@ -104,6 +104,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static org.oscarehr.encounterNote.model.Issue.SUMMARY_CODE_TICKLER_NOTE;
 
@@ -369,6 +370,7 @@ public class NotesService extends AbstractServiceImpl
 				remoteAddr, lastSavedNoteString);
 
 		caseManagementMgr.getEditors(caseMangementNote);
+		note.setEditorNames(caseMangementNote.getEditors().stream().map(Provider::getDisplayName).collect(Collectors.toList()));
 
 		note.setNoteId(Integer.parseInt("" + caseMangementNote.getId()));
 		note.setUuid(caseMangementNote.getUuid());
