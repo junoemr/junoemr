@@ -1,5 +1,3 @@
-'use strict';
-
 /*
 
     Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
@@ -25,5 +23,28 @@
 
  */
 
-import {CareTrackerItemAlertModel} from "../../../../generated";
-export import AlertSeverityType = CareTrackerItemAlertModel.SeverityLevelEnum;
+import {CareTrackerItemDataModel} from "../../../../generated";
+import AbstractConverter from "../../conversion/AbstractConverter";
+import CareTrackerItemData from "../model/CareTrackerItemData";
+import moment from "moment";
+
+export default class CareTrackerItemDataToModelConverter extends AbstractConverter<CareTrackerItemDataModel, CareTrackerItemData>
+{
+	public convert(transfer: CareTrackerItemDataModel): CareTrackerItemData
+	{
+		if (!transfer)
+		{
+			return null;
+		}
+
+		const dataModel = new CareTrackerItemData();
+		dataModel.id = transfer.id;
+		dataModel.value = transfer.value;
+		dataModel.comment = transfer.comment;
+		dataModel.observationDateTime = moment(transfer.observationDateTime);
+		dataModel.createdDateTime = moment(transfer.createdDateTime);
+		dataModel.updatedDateTime = moment(transfer.updatedDateTime);
+
+		return dataModel;
+	}
+}

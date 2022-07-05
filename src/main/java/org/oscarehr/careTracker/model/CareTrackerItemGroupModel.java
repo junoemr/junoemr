@@ -20,13 +20,24 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.careTracker.entity;
+package org.oscarehr.careTracker.model;
 
-public enum ValueType
+import lombok.Data;
+import org.oscarehr.dataMigration.model.AbstractTransientModel;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+public class CareTrackerItemGroupModel extends AbstractTransientModel
 {
-	STRING,
-	NUMERIC,
-	BOOLEAN,
-	DATE,
-	BLOOD_PRESSURE,
+	private Integer id;
+	private String name;
+	private String description;
+	private List<CareTrackerItemModel> careTrackerItems;
+
+	public CareTrackerItemGroupModel()
+	{
+		careTrackerItems = new ArrayList<>();
+	}
 }

@@ -1,5 +1,3 @@
-'use strict';
-
 /*
 
     Copyright (c) 2012-2018. CloudPractice Inc. All Rights Reserved.
@@ -25,5 +23,19 @@
 
  */
 
-import {CareTrackerItemAlertModel} from "../../../../generated";
-export import AlertSeverityType = CareTrackerItemAlertModel.SeverityLevelEnum;
+import CareTracker from "../model/CareTracker";
+import {CareTrackerUpdateTransfer} from "../../../../generated";
+import CareTrackerModelToInputConverter from "./CareTrackerModelToInputConverter";
+
+export default class CareTrackerModelToUpdateInputConverter extends CareTrackerModelToInputConverter<CareTrackerUpdateTransfer>
+{
+	public convert(careTrackerModel: CareTracker): CareTrackerUpdateTransfer
+	{
+		let input = super.convert(careTrackerModel);
+		if (input)
+		{
+			input.id = careTrackerModel.id;
+		}
+		return input;
+	}
+}

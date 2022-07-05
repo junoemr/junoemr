@@ -22,14 +22,17 @@
  */
 package org.oscarehr.careTracker.converter;
 
+import org.oscarehr.careTracker.entity.CareTracker;
+import org.oscarehr.careTracker.entity.CareTrackerItem;
+import org.oscarehr.careTracker.entity.CareTrackerItemGroup;
+import org.oscarehr.careTracker.model.CareTrackerItemGroupModel;
+import org.oscarehr.careTracker.model.CareTrackerItemModel;
+import org.oscarehr.careTracker.model.CareTrackerModel;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.common.model.Icd9;
 import org.oscarehr.dataMigration.model.dx.DxCode;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.dx.converter.Icd9EntityToDxCodeConverter;
-import org.oscarehr.careTracker.entity.CareTrackerItem;
-import org.oscarehr.careTracker.model.CareTracker;
-import org.oscarehr.careTracker.model.CareTrackerItemGroup;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +44,7 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-public class CareTrackerEntityToModelConverter extends AbstractModelConverter<org.oscarehr.careTracker.entity.CareTracker, CareTracker>
+public class CareTrackerEntityToModelConverter extends AbstractModelConverter<CareTracker, CareTrackerModel>
 {
 	@Autowired
 	private CareTrackerItemEntityToModelConverter careTrackerItemEntityToModelConverter;
@@ -50,9 +53,9 @@ public class CareTrackerEntityToModelConverter extends AbstractModelConverter<or
 	private Icd9EntityToDxCodeConverter icd9EntityToDxCodeConverter;
 
 	@Override
-	public CareTracker convert(org.oscarehr.careTracker.entity.CareTracker input)
+	public CareTrackerModel convert(CareTracker input)
 	{
-		CareTracker careTrackerModel = new CareTracker();
+		CareTrackerModel careTrackerModel = new CareTrackerModel();
 		BeanUtils.copyProperties(input, careTrackerModel,
 				"careTrackerItems",
 				"careTrackerItemGroups",
@@ -64,20 +67,20 @@ public class CareTrackerEntityToModelConverter extends AbstractModelConverter<or
 		careTrackerModel.setCareTrackerItemGroups(buildGroups(input));
 		careTrackerModel.setTriggerCodes(buildTriggers(input));
 
-		careTrackerModel.setParentCareTrackerId(input.getOptionalParentCareTracker().map(org.oscarehr.careTracker.entity.CareTracker::getId).orElse(null));
+		careTrackerModel.setParentCareTrackerId(input.getOptionalParentCareTracker().map(CareTracker::getId).orElse(null));
 		careTrackerModel.setOwnerProviderId(input.getOptionalOwnerProvider().map(ProviderData::getId).orElse(null));
 		careTrackerModel.setOwnerDemographicId(input.getOptionalOwnerDemographic().map(Demographic::getId).orElse(null));
 
 		return careTrackerModel;
 	}
 
-	private List<CareTrackerItemGroup> buildGroups(org.oscarehr.careTracker.entity.CareTracker input)
+	private List<CareTrackerItemGroupModel> buildGroups(CareTracker input)
 	{
 		// add items by group
-		List<CareTrackerItemGroup> groups = new LinkedList<>();
-		for(org.oscarehr.careTracker.entity.CareTrackerItemGroup group: input.getCareTrackerItemGroups())
+		List<CareTrackerItemGroupModel> groups = new LinkedList<>();
+		for(CareTrackerItemGroup group: input.getCareTrackerItemGroups())
 		{
-			CareTrackerItemGroup groupModel = new CareTrackerItemGroup();
+			CareTrackerItemGroupModel groupModel = new CareTrackerItemGroupModel();
 			groupModel.setId(group.getId());
 			groupModel.setName(group.getName());
 			groupModel.setDescription(group.getDescription());
@@ -90,9 +93,9 @@ public class CareTrackerEntityToModelConverter extends AbstractModelConverter<or
 		{
 			if(item.getCareTrackerItemGroup() == null)
 			{
-				List<org.oscarehr.careTracker.model.CareTrackerItem> items = new ArrayList<>(1);
+				List<CareTrackerItemModel> items = new ArrayList<>(1);
 				items.add(careTrackerItemEntityToModelConverter.convert(item));
-				CareTrackerItemGroup groupModel = new CareTrackerItemGroup();
+				CareTrackerItemGroupModel groupModel = new CareTrackerItemGroupModel();
 				groupModel.setCareTrackerItems(items);
 				groups.add(groupModel);
 			}
@@ -100,7 +103,7 @@ public class CareTrackerEntityToModelConverter extends AbstractModelConverter<or
 		return groups;
 	}
 
-	private List<DxCode> buildTriggers(org.oscarehr.careTracker.entity.CareTracker input)
+	private List<DxCode> buildTriggers(CareTracker input)
 	{
 		Set<Icd9> icd9TriggerCodes = input.getIcd9Triggers();
 		return icd9EntityToDxCodeConverter.convert(icd9TriggerCodes);

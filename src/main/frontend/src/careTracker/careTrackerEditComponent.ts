@@ -23,9 +23,9 @@
 
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../common/components/junoComponentConstants";
-import CareTrackerModel from "../lib/careTracker/model/CareTrackerModel";
-import CareTrackerItemModel from "../lib/careTracker/model/CareTrackerItemModel";
-import CareTrackerItemGroupModel from "../lib/careTracker/model/CareTrackerItemGroupModel";
+import CareTracker from "../lib/careTracker/model/CareTracker";
+import CareTrackerItem from "../lib/careTracker/model/CareTrackerItem";
+import CareTrackerItemGroup from "../lib/careTracker/model/CareTrackerItemGroup";
 import {CareTrackerItemType} from "../lib/careTracker/model/CareTrackerItemType";
 import {CareTrackerItemValueType} from "../lib/careTracker/model/CareTrackerItemValueType";
 import DxCodeModel from "../lib/dx/model/DxCodeModel";
@@ -64,7 +64,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
 				ctrl.isLoading = true as boolean;
-				ctrl.careTracker = null as CareTrackerModel;
+				ctrl.careTracker = null as CareTracker;
 
 				ctrl.$onInit = async (): Promise<void> =>
 				{
@@ -76,7 +76,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 					}
 					else
 					{
-						ctrl.careTracker = new CareTrackerModel();
+						ctrl.careTracker = new CareTracker();
 						ctrl.readOnly = ctrl.careTracker.systemManaged || !ctrl.userCanCreate();
 					}
 					ctrl.isLoading = false;
@@ -112,7 +112,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 
 					if(groupName)
 					{
-						const newGroup = new CareTrackerItemGroupModel();
+						const newGroup = new CareTrackerItemGroup();
 						newGroup.name = groupName;
 						ctrl.careTracker.careTrackerItemGroups.push(newGroup);
 					}
@@ -196,7 +196,7 @@ angular.module('CareTracker').component('careTrackerEdit',
 					if(selection)
 					{
 						const data = selection.data;
-						let newItem = new CareTrackerItemModel();
+						let newItem = new CareTrackerItem();
 						if(isMeasurementType)
 						{
 							newItem.name = data.name;

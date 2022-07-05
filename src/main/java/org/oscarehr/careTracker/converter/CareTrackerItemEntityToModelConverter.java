@@ -22,23 +22,24 @@
  */
 package org.oscarehr.careTracker.converter;
 
-import org.oscarehr.common.conversion.AbstractModelConverter;
+import org.oscarehr.careTracker.entity.CareTrackerItem;
+import org.oscarehr.careTracker.model.CareTrackerItemModel;
 import org.oscarehr.careTrackerDecisionSupport.converter.DsRuleDbToModelConverter;
-import org.oscarehr.careTracker.model.CareTrackerItem;
+import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CareTrackerItemEntityToModelConverter extends AbstractModelConverter<org.oscarehr.careTracker.entity.CareTrackerItem, CareTrackerItem>
+public class CareTrackerItemEntityToModelConverter extends AbstractModelConverter<CareTrackerItem, CareTrackerItemModel>
 {
 	@Autowired
 	private DsRuleDbToModelConverter dsRuleDbToModelConverter;
 
 	@Override
-	public CareTrackerItem convert(org.oscarehr.careTracker.entity.CareTrackerItem input)
+	public CareTrackerItemModel convert(CareTrackerItem input)
 	{
-		CareTrackerItem careTrackerItemModel = new CareTrackerItem();
+		CareTrackerItemModel careTrackerItemModel = new CareTrackerItemModel();
 		BeanUtils.copyProperties(input, careTrackerItemModel, "careTrackerItemGroup", "dsRules");
 
 		careTrackerItemModel.setRules(dsRuleDbToModelConverter.convert(input.getDsRules()));

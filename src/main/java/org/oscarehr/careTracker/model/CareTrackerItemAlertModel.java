@@ -20,13 +20,27 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.careTracker.entity;
+package org.oscarehr.careTracker.model;
 
-public enum ValueType
+import lombok.Data;
+import org.oscarehr.dataMigration.model.AbstractTransientModel;
+import org.oscarehr.careTrackerDecisionSupport.model.consequence.SeverityLevel;
+
+@Data
+public class CareTrackerItemAlertModel extends AbstractTransientModel
 {
-	STRING,
-	NUMERIC,
-	BOOLEAN,
-	DATE,
-	BLOOD_PRESSURE,
+	private SeverityLevel severityLevel;
+	private String message;
+
+	public CareTrackerItemAlertModel()
+	{
+		this(null, SeverityLevel.RECOMMENDATION);
+	}
+
+	public CareTrackerItemAlertModel(String message, SeverityLevel severityLevel)
+	{
+		this.message = message;
+		this.severityLevel = severityLevel;
+	}
 }
+

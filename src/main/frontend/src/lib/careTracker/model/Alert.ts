@@ -25,5 +25,30 @@
 
  */
 
-import {CareTrackerItemAlertModel} from "../../../../generated";
-export import AlertSeverityType = CareTrackerItemAlertModel.SeverityLevelEnum;
+import {AlertSeverityType} from "./AlertSeverityType";
+
+export default class Alert
+{
+	private _message: string;
+	private _severityLevel: AlertSeverityType;
+
+	get message(): string
+	{
+		return this._message;
+	}
+
+	set message(value: string)
+	{
+		this._message = value;
+	}
+
+	get severityLevel(): AlertSeverityType
+	{
+		return this._severityLevel;
+	}
+
+	set severityLevel(value: AlertSeverityType)
+	{
+		this._severityLevel = value;
+	}
+}

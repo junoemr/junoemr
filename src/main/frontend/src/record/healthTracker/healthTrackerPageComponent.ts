@@ -20,13 +20,24 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.careTracker.entity;
 
-public enum ValueType
-{
-	STRING,
-	NUMERIC,
-	BOOLEAN,
-	DATE,
-	BLOOD_PRESSURE,
-}
+import {SecurityPermissions} from "../../common/security/securityConstants";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../../common/components/junoComponentConstants";
+import CareTracker from "../../lib/careTracker/model/CareTracker";
+import DxRecordModel from "../../lib/dx/model/DxRecordModel";
+import DxCodeModel from "../../lib/dx/model/DxCodeModel";
+
+angular.module('Record.Tracker').component('healthTrackerPage',
+	{
+		templateUrl: 'src/record/healthTracker/healthTrackerPage.jsp',
+		bindings: {
+			componentStyle: "<?",
+			user: "<",
+			embeddedView: "<?",
+		},
+		controller: [
+			function ()
+			{
+				const ctrl = this;
+			}]
+	});

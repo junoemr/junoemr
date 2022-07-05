@@ -23,9 +23,9 @@
 package org.oscarehr.ws.rest.demographic;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.oscarehr.careTracker.model.CareTracker;
-import org.oscarehr.careTracker.model.CareTrackerItem;
-import org.oscarehr.careTracker.model.CareTrackerItemData;
+import org.oscarehr.careTracker.model.CareTrackerModel;
+import org.oscarehr.careTracker.model.CareTrackerItemModel;
+import org.oscarehr.careTracker.model.CareTrackerItemDataModel;
 import org.oscarehr.careTracker.service.CareTrackerDataService;
 import org.oscarehr.careTracker.transfer.CareTrackerItemDataCreateTransfer;
 import org.oscarehr.security.model.Permission;
@@ -42,7 +42,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("demographic/{demographicNo}/careTracker")
+@Path("demographic/{demographicNo}/ct") // can't include the word 'tracker' in path. it gets flagged by add-blockers etc.
 @Component("demographicCareTrackerWebService")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -54,7 +54,7 @@ public class DemographicCareTrackerWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/{careTrackerId}")
-	public RestResponse<CareTracker> getCareTrackerForDemographic(
+	public RestResponse<CareTrackerModel> getCareTrackerForDemographic(
 			@PathParam("demographicNo") Integer demographicId,
 			@PathParam("careTrackerId") Integer careTrackerId)
 			throws Exception
@@ -68,7 +68,7 @@ public class DemographicCareTrackerWebService extends AbstractServiceImpl
 
 	@GET
 	@Path("/{careTrackerId}/item/{itemId}")
-	public RestResponse<CareTrackerItem> getCareTrackerItemForDemographic(
+	public RestResponse<CareTrackerItemModel> getCareTrackerItemForDemographic(
 			@PathParam("demographicNo") Integer demographicId,
 			@PathParam("careTrackerId") Integer careTrackerId,
 			@PathParam("itemId") Integer careTrackerItemId)
@@ -84,7 +84,7 @@ public class DemographicCareTrackerWebService extends AbstractServiceImpl
 	@POST
 	@Path("/{careTrackerId}/item/{itemId}/data")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public RestResponse<CareTrackerItemData> addCareTrackerItemData(
+	public RestResponse<CareTrackerItemDataModel> addCareTrackerItemData(
 			@PathParam("demographicNo") Integer demographicId,
 			@PathParam("careTrackerId") Integer careTrackerId,
 			@PathParam("itemId") Integer careTrackerItemId,
