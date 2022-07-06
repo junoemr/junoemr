@@ -1,6 +1,8 @@
 import {SystemPreferenceApi} from "../../generated";
 import TicklerAttachmentToTicklerLinkDtoConverter from "../lib/tickler/converter/TicklerAttachmentToTicklerLinkDtoConverter";
 import {SystemProperties} from "../common/services/systemPreferenceServiceConstants";
+import {LABEL_POSITION} from "../common/components/junoComponentConstants";
+import moment from "moment";
 
 angular.module('Tickler').component('ticklerAddComponent', {
 	templateUrl: 'src/tickler/ticklerAdd.jsp',
@@ -34,6 +36,8 @@ angular.module('Tickler').component('ticklerAddComponent', {
 			const controller = this;
 			let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, '../ws/rs');
 
+			$scope.LABEL_POSITION = LABEL_POSITION;
+
 			// holds the patient typeahead selection
 			controller.demographicSearch = null;
 			controller.isDisabled = false; // Save button enabled by default
@@ -47,7 +51,7 @@ angular.module('Tickler').component('ticklerAddComponent', {
 						id: 1,
 						name: ''
 					},
-				serviceDateDate: new Date(),
+				serviceDateMoment: moment().startOf('day'),
 				serviceDateTime: "12:00 AM",
 				suggestedTextId: 0,
 				taskAssignedTo: null,
@@ -90,8 +94,6 @@ angular.module('Tickler').component('ticklerAddComponent', {
 			{
 				alert(reason);
 			});
-
-			$('#timepicker').timepicker({defaultTime: controller.tickler.serviceDateTime});
 		};
 
 		controller.$postLink = () =>
@@ -128,11 +130,11 @@ angular.module('Tickler').component('ticklerAddComponent', {
 			{
 				controller.errors.push('Message is required');
 			}
-			if (controller.errors.length > 0)
+			if (!t.serviceDateMoment || !t.serviceDateMoment.isValid())
 			{
-				return false;
+				controller.errors.push('Service Date is required');
 			}
-			return true;
+			return controller.errors.length <= 0;
 		};
 
 		controller.saveWithEncounter = function saveWithEncounter()
@@ -161,21 +163,7 @@ angular.module('Tickler').component('ticklerAddComponent', {
 				tickler.attachments = (new TicklerAttachmentToTicklerLinkDtoConverter()).convertList(controller.tickler.attachments);
 			}
 
-			var givenDate = controller.tickler.serviceDateDate;
-			var givenTime;
-			var midnight = "12:00 AM";
-			if (controller.tickler.serviceDateTime === midnight)
-			{
-				givenTime = moment(controller.tickler.serviceDateTime, 'hh:mm A').add(1, 'minutes');
-			}else
-			{
-				givenTime = moment(controller.tickler.serviceDateTime, 'hh:mm A');
-			}
-			givenDate.setHours(givenTime.get('hour'));
-			givenDate.setMinutes(givenTime.get('minute'));
-			givenDate.setSeconds(givenTime.get('second'));
-
-			tickler.serviceDate = givenDate;
+			tickler.serviceDate = controller.tickler.serviceDateMoment.toDate();
             ticklerService.add(tickler, writeEncounter).then(
                 (response) =>
                 {
@@ -275,7 +263,7 @@ angular.module('Tickler').component('ticklerAddComponent', {
 
 		controller.addMonthsFromNow = function(num)
 		{
-			controller.tickler.serviceDateDate = moment().add(num, 'months').toDate();
+			controller.tickler.serviceDateMoment = moment().add(num, 'months');
 		};
 
 		controller.setTicklerProvider = async function setTicklerProvider()

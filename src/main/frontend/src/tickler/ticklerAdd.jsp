@@ -98,19 +98,12 @@
 					</div>
 				</div>
 
-				<div class="row">
-					<div class="col-xs-12">
-						<label><bean:message key="tickler.add.serviceDate" bundle="ui"/>:</label>
-					</div>
-				</div>
-
-
 				<div class="row vertical-align">
 					<div class="form-group col-xs-7">
-						<juno-datepicker-popup juno-model="$ctrl.tickler.serviceDateDate"
-											   show-icon="true"
-											   type="Input">
-						</juno-datepicker-popup>
+						<juno-date-picker ng-model="$ctrl.tickler.serviceDateMoment"
+						                  label="<bean:message key="tickler.add.serviceDate" bundle="ui"/>"
+						                  label-position="LABEL_POSITION.TOP">
+						</juno-date-picker>
 					</div>
 
 					<div class="form-group col-xs-2">
@@ -124,15 +117,10 @@
 
 				<div class="row">
 					<div class="form-group col-xs-7">
-						<label><bean:message key="tickler.view.serviceTime" bundle="ui"/>:</label>
-						<div class="input-group bootstrap-timepicker timepicker">
-							<input ng-model="$ctrl.tickler.serviceDateTime"
-								   type="text"
-								   class="form-control input-small" id="timepicker">
-							<span class="input-group-addon">
-								<i class="glyphicon glyphicon-time"></i>
-							</span>
-						</div>
+						<juno-time-select ng-model="$ctrl.tickler.serviceDateMoment"
+						                  label="<bean:message key="tickler.view.serviceTime" bundle="ui"/>"
+						                  label-position="LABEL_POSITION.TOP">
+						</juno-time-select>
 					</div>
 				</div>
 
