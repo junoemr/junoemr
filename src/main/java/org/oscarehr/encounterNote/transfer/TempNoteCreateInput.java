@@ -25,13 +25,13 @@ package org.oscarehr.encounterNote.transfer;
 
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 @Data
 public class TempNoteCreateInput
 {
     private String note;
-    private LocalDate observationDate;
+    private ZonedDateTime observationDate;
     private String encounterType;
     private Integer noteId; // optionally links draft to existing note
 }

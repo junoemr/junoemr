@@ -33,7 +33,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
 @Getter
@@ -64,7 +63,7 @@ public class CaseManagementTmpSave extends AbstractModel<Integer>
 	private Integer noteId;
 
 	@Column(name = "observation_date", columnDefinition = "TIMESTAMP")
-	private LocalDate observationDate;
+	private ZonedDateTime observationDate;
 
 	@Column(name = "encounter_type")
 	private String encounterType;

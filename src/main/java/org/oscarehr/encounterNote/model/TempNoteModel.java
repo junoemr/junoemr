@@ -25,7 +25,6 @@ package org.oscarehr.encounterNote.model;
 
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
@@ -38,7 +37,7 @@ public class TempNoteModel
     private Integer programId;
     private String note;
     private ZonedDateTime updateDateTime;
-    private LocalDate observationDate;
+    private ZonedDateTime observationDate;
     private Integer noteId;
     private String encounterType;
 

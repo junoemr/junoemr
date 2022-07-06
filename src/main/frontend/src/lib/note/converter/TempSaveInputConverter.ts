@@ -9,7 +9,7 @@ export default class TempSaveInputConverter extends AbstractConverter<TempNoteIn
 		return {
 			noteId: input.noteId,
 			note: input.noteText,
-			observationDate: this.serializeLocalDateTime(input.observationDate),
+			observationDate: this.serializeZonedDateTime(input.observationDate),
 			encounterType: input.encounterType,
 		} as TempNoteCreateInput;
 	}
