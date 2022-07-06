@@ -157,7 +157,7 @@ angular.module('Record.Details').component('careTeamSection', {
 							value: displayName,
 							referralNo: results[i].referralNo
 						};
-						if (results[i].specialtyType != null && results[i].specialtyType != "")
+						if (results[i].referralNo != null && results[i].referralNo != "")
 						{
 							referralDoctors[i].label += " [" + results[i].referralNo + "]";
 						}

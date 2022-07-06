@@ -24,7 +24,7 @@ package org.oscarehr.dataMigration.mapper.cds.in;
 
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.ProviderModel;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
+import org.oscarehr.demographicRoster.entity.RosterTerminationReason;
 import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 import xml.cds.v5_0.Demographics;
@@ -66,7 +66,7 @@ public class CDSEnrollmentHistoryImportMapper extends AbstractCDSImportMapper<De
 		{
 			// this must be an integer (defined in CT-010) to meet cds requirements
 			Integer terminationReasonCode = Integer.parseInt(terminationReason);
-			rosterData.setTerminationReason(DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(terminationReasonCode));
+			rosterData.setTerminationReason(RosterTerminationReason.getByCode(terminationReasonCode));
 		}
 
 		Demographics.Enrolment.EnrolmentHistory.EnrolledToPhysician enrolledPhysician = importStructure.getEnrolledToPhysician();

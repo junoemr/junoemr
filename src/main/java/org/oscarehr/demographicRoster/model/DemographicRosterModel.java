@@ -21,38 +21,26 @@
  * Canada
  */
 
-package org.oscarehr.ws.conversion;
+package org.oscarehr.demographicRoster.model;
 
-import org.oscarehr.common.conversion.AbstractModelConverter;
-import org.oscarehr.rosterStatus.model.RosterStatus;
-import org.oscarehr.rosterStatus.transfer.RosterStatusTransfer;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Component;
+import lombok.Data;
+import org.oscarehr.demographicRoster.entity.RosterTerminationReason;
+import org.oscarehr.rosterStatus.model.RosterStatusModel;
 
 import java.time.LocalDateTime;
 
-@Component
-public class RosterStatusToDomainConverter extends AbstractModelConverter<RosterStatusTransfer, RosterStatus>
+@Data
+public class DemographicRosterModel
 {
-	@Override
-	public RosterStatus convert(RosterStatusTransfer transfer)
-	{
-		if (transfer == null)
-		{
-			return null;
-		}
-
-		RosterStatus rosterStatus = new RosterStatus();
-		BeanUtils.copyProperties(transfer, rosterStatus);
-
-		// model has no associated boolean field, have to set this here while we have access to transfer
-		LocalDateTime deletedAt = null;
-		if (!transfer.isActive())
-		{
-			deletedAt = LocalDateTime.now();
-		}
-		rosterStatus.setDeletedAt(deletedAt);
-
-		return rosterStatus;
-	}
+	private Integer id;
+	private Integer demographicId;
+	private String rosteredPhysician;
+	private String ohipNo;
+	private LocalDateTime rosterDate;
+	private LocalDateTime rosterTerminationDate;
+	private RosterTerminationReason rosterTerminationReason;
+	// extra field to help communicate mapping between enum and description
+	private String rosterTerminationDescription;
+	private RosterStatusModel rosterStatus;
+	private LocalDateTime addedAt;
 }

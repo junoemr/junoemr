@@ -24,7 +24,7 @@
 package org.oscarehr.rosterStatus.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.rosterStatus.model.RosterStatus;
+import org.oscarehr.rosterStatus.entity.RosterStatus;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.Query;

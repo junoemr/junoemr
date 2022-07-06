@@ -26,7 +26,6 @@ package org.oscarehr.managers;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTimeComparator;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.Gender;
@@ -38,7 +37,6 @@ import org.oscarehr.common.dao.ProfessionalSpecialistDao;
 import org.oscarehr.common.exception.PatientDirectiveException;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.Demographic.PatientStatus;
 import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.common.model.ProfessionalSpecialist;
 import org.oscarehr.common.model.Provider;
@@ -59,7 +57,6 @@ import org.oscarehr.demographic.entity.DemographicMerged;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographic.service.HinValidationService;
-import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.provider.dao.RecentDemographicAccessDao;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.security.model.Permission;
@@ -189,9 +186,6 @@ public class DemographicManager {
 
 	@Autowired
 	private HinValidationService hinValidationService;
-
-	@Autowired
-	private DemographicRosterService demographicRosterService;
 
 	@Autowired
 	private ProviderDao providerDao;
@@ -448,104 +442,6 @@ public class DemographicManager {
 		return (DemographicContact) demographicContactDao.merge(demographicContact);
 	}
 
-	public void createDemographic(LoggedInInfo loggedInInfo, Demographic demographic)
-	{
-		createDemographic(loggedInInfo.getLoggedInProviderNo(), demographic, programManager.getDefaultProgramId());
-	}
-
-	public void createDemographic(String providerNo, Demographic demographic, Integer admissionProgramId) {
-		checkPrivilege(providerNo, Permission.DEMOGRAPHIC_CREATE);
-		try {
-			demographic.getBirthDay();
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Birth date was specified for " + demographic.getFullName() + ": " + demographic.getBirthDayAsString());
-		}
-
-		if(demographic.getPatientStatus() == null)
-		{
-			demographic.setPatientStatus(PatientStatus.AC.name());
-		}
-		if(demographic.getFamilyDoctor().isEmpty())
-		{
-			demographic.setFamilyDoctor("<rdohip></rdohip><rd></rd>");
-		}
-		if (demographic.getFamilyDoctor2() == null)
-		{
-			demographic.setFamilyDoctor2("<fd></fd><fdname></fdname>");
-		}
-		demographic.setPhone(oscar.util.StringUtils.filterControlCharacters(demographic.getPhone()));
-		demographic.setPhone2(oscar.util.StringUtils.filterControlCharacters(demographic.getPhone2()));
-		demographic.setLastUpdateUser(providerNo);
-		demographicDao.save(demographic);
-
-		Admission admission = new Admission();
-		admission.setClientId(demographic.getDemographicNo());
-		admission.setProgramId(admissionProgramId);
-		admission.setProviderNo(providerNo);
-		admission.setAdmissionDate(new Date());
-		admission.setAdmissionStatus(Admission.STATUS_CURRENT);
-		admission.setAdmissionNotes("");
-
-		admissionDao.saveAdmission(admission);
-
-		if (demographic.getExtras() != null) {
-			for (DemographicExt ext : demographic.getExtras()) {
-				ext.setDemographicNo(demographic.getDemographicNo());
-				createExtension(providerNo, ext);
-			}
-		}
-	}
-
-	/**
-	 * Given information on provider making changes and a demographic, update demographic record.
-	 * @param loggedInInfo provider making changes
-	 * @param demographic updated demographic record
-	 */
-	public void updateDemographic(LoggedInInfo loggedInInfo, org.oscarehr.demographic.entity.Demographic demographic)
-	{
-		securityInfoManager.requireAllPrivilege(loggedInInfo.getLoggedInProviderNo(), demographic.getDemographicId(), Permission.DEMOGRAPHIC_UPDATE);
-		org.oscarehr.demographic.entity.Demographic previousDemographic = newDemographicDao.find(demographic.getDemographicId());
-		demographicArchiveDao.archiveDemographic(previousDemographic);
-
-		String previousStatus = previousDemographic.getPatientStatus();
-		Date previousStatusDate = previousDemographic.getPatientStatusDate();
-		String currentStatus = demographic.getPatientStatus();
-		Date currentStatusDate = demographic.getPatientStatusDate();
-
-		// fill in a default patient status date if the status changes and no date is given
-		if (!currentStatus.equals(previousStatus) && currentStatusDate == null)
-		{
-			demographic.setPatientStatusDate(new Date());
-		}
-
-		//save current demo
-		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
-		//remove control characters for existing records.
-		demographic.setPhone(oscar.util.StringUtils.filterControlCharacters(demographic.getPhone()));
-		demographic.setPhone2(oscar.util.StringUtils.filterControlCharacters(demographic.getPhone2()));
-
-		addRosterHistoryEntry(demographic, previousDemographic);
-
-		// update MyHealthAccess connection status.
-		demographicService.queueMHAPatientUpdates(demographic, previousDemographic, loggedInInfo);
-
-		newDemographicDao.merge(demographic);
-
-		if (demographic.getDemographicExtSet() != null)
-		{
-			for (DemographicExt ext : demographic.getDemographicExtSet())
-			{
-				DemographicExt existingExt = demographicExtDao.getLatestDemographicExt(demographic.getDemographicId(), ext.getKey()).orElse(null);
-				if (existingExt != null)
-				{
-					ext.setId(existingExt.getId());
-				}
-
-				updateExtension(loggedInInfo, ext);
-			}
-		}
-	}
-
 	@Deprecated // use JPA version where possible
 	public void updateDemographic(LoggedInInfo loggedInInfo, Demographic demographic) {
 		checkPrivilege(loggedInInfo, Permission.DEMOGRAPHIC_UPDATE);
@@ -662,35 +558,6 @@ public class DemographicManager {
 	}
 
 	/**
-	 * Creates a new roster history entry for a given demographic.
-	 * Only records changes if there is a difference between the two for any of the roster/enrollment fields.
-	 * @param currentDemo current revision of the demographic we want to record
-	 * @param previousDemo previous version of the demographic
-	 */
-	public void addRosterHistoryEntry(org.oscarehr.demographic.entity.Demographic currentDemo,
-									  org.oscarehr.demographic.entity.Demographic previousDemo)
-	{
-		boolean hasChanged = false;
-		
-		// If the roster status is valid, check if any fields changed from last time we edited
-		if (ConversionUtils.hasContent(currentDemo.getRosterStatus()))
-		{
-			DateTimeComparator dateComparator = DateTimeComparator.getDateOnlyInstance();
-
-			hasChanged = currentDemo.getFamilyDoctor() != null && !currentDemo.getFamilyDoctor().equals(previousDemo.getFamilyDoctor());
-			hasChanged |= currentDemo.getRosterDate() != null && dateComparator.compare(currentDemo.getRosterDate(), previousDemo.getRosterDate()) != 0;
-			hasChanged |= currentDemo.getRosterStatus() != null && !currentDemo.getRosterStatus().equals(previousDemo.getRosterStatus());
-			hasChanged |= currentDemo.getRosterTerminationDate() != null && dateComparator.compare(currentDemo.getRosterTerminationDate(), previousDemo.getRosterTerminationDate()) != 0;
-			hasChanged |= currentDemo.getRosterTerminationReason() != null && !currentDemo.getRosterTerminationReason().equals(previousDemo.getRosterTerminationReason());
-		}
-
-		if (hasChanged)
-		{
-			demographicRosterService.saveRosterHistory(currentDemo);
-		}
-	}
-
-	/**
 	 * Saves the list of demographicExt objects to the ext database and ext archive
 	 * @param demographicArchiveId - id of the archived demographic record
 	 * @param extensions - list of objects to update/insert
@@ -707,12 +574,6 @@ public class DemographicManager {
 			archive.setArchiveId(demographicArchiveId);
 			demographicExtArchiveDao.persist(archive);
 		}
-	}
-
-	public void createUpdateDemographicContact(LoggedInInfo loggedInInfo, DemographicContact demoContact) {
-		checkPrivilege(loggedInInfo, Permission.DEMOGRAPHIC_CREATE);
-		
-		demographicContactDao.merge(demoContact);
 	}
 
 	public void deleteDemographic(LoggedInInfo loggedInInfo, Demographic demographic) {
