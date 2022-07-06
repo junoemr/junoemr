@@ -130,16 +130,22 @@ angular.module('Record.Summary').component('encounterNoteList', {
 			else if (updatedNote.noteId && updatedNote.noteId > 0)
 			{
 				// force update a note without reference. happens after loading edit from tempsave etc.
-				// WARNING: could fail if the note is not already loaded by infinite-scroll
+				// WARNING: could cause weird behaviour if the note is not already loaded by infinite-scroll
 				let noteIndex = ctrl.noteList.findIndex((entry) => entry.noteId === updatedNote.noteId);
 				if(noteIndex >= 0) // -1 if not found
 				{
 					updatedNote.revision = Number(ctrl.noteList[noteIndex].revision) + 1;
 					ctrl.noteList[noteIndex] = updatedNote;
 				}
+				else // add new note to the list
+				{
+					updatedNote.revision = 1;
+					ctrl.noteList.unshift(updatedNote);
+				}
 			}
 			else // add new note
 			{
+				// not expected to execute, note should have been saved already and thus have an ID
 				updatedNote.revision = 1;
 				ctrl.noteList.unshift(updatedNote);
 			}
