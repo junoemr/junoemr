@@ -706,7 +706,6 @@ public class GDMLHandler extends ORU_R01MessageHandler
 				}
 				
 				if(hl7Body.equals(new String(base64.decode(l.message.getBytes("ASCII")), "ASCII"))){
-					logger.error("same message ");
 					break;
 				}
 			}
