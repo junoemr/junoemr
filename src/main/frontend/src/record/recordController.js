@@ -937,18 +937,18 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			if(controller.page.editingNoteId)
 			{
-				return "Delete";
+				return "Cancel";
 			}
-			return "Cancel";
+			return "Delete";
 		}
 
 		controller.cancelButtonTooltip = () =>
 		{
 			if(controller.page.editingNoteId)
 			{
-				return "Deletes saved draft, encounter text, and assigned issues.";
+				return "Cancel saved draft";
 			}
-			return "Cancel saved draft";
+			return "Deletes saved draft, encounter text, and assigned issues.";
 		}
 	}
 ]);
