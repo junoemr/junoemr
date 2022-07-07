@@ -130,7 +130,7 @@ public class BillingreferralDao extends AbstractDao<Billingreferral> {
 
 	public List<Billingreferral> getBillingreferralByLastName(String last_name, int limit, int offset)
 	{
-		String sql = "SELECT br FROM Billingreferral br WHERE br.lastName LIKE :lastName ORDER BY br.lastName";
+		String sql = "SELECT br FROM Billingreferral br WHERE br.lastName LIKE :lastName ORDER BY br.referralNo, br.lastName";
 		Query query = entityManager.createQuery(sql);
 		query.setParameter("lastName", "%" + last_name + "%");
 
