@@ -24,6 +24,7 @@ package org.oscarehr.fax.exception;
 
 /**
  * Indicate that something failed when connecting to the fax api.
+ * connection exceptions generally indicate that the action should be re-attempted later
  */
 public class FaxApiConnectionException extends FaxException
 {

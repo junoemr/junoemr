@@ -34,13 +34,15 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
+import org.oscarehr.fax.exception.FaxIntegrationException;
 import org.oscarehr.integration.SRFax.api.result.GetFaxInboxResult;
 import org.oscarehr.integration.SRFax.api.result.GetFaxOutboxResult;
-import org.oscarehr.integration.SRFax.api.result.SRFaxFaxStatusResult;
 import org.oscarehr.integration.SRFax.api.result.GetUsageResult;
+import org.oscarehr.integration.SRFax.api.result.SRFaxFaxStatusResult;
 import org.oscarehr.integration.SRFax.api.resultWrapper.ListWrapper;
 import org.oscarehr.integration.SRFax.api.resultWrapper.SingleWrapper;
 import org.oscarehr.util.MiscUtils;
@@ -443,27 +445,27 @@ public class SRFaxApiConnector
 		return false;
 	}
 
-	private static <T> ListWrapper processListResponse(String response, TypeReference typeReference)
+	protected static <T> ListWrapper processListResponse(String response, TypeReference typeReference)
 	{
 		ListWrapper<T> result = null;
-		try
+		if(response.trim().isEmpty())
 		{
-			if (response.trim().isEmpty())
-			{// if the response is empty. SRFax has locked the account
-				logger.warn("API Response Error: Account is blocked at this IP");
-				result = new ListWrapper<>();
-				result.setStatus("Error");
-				result.setError("Account is Blocked at this IP");
-			}
-			else
+			// if the response is empty. SRFax has locked the account
+			logger.warn("API Response Error: Account is blocked at this IP");
+			throw new FaxApiConnectionException("API Response Error: Account is blocked at this IP", "Account is Blocked at this IP");
+		}
+		else
+		{
+			try
 			{
 				JSONObject json = new JSONObject(response);
 				String status = json.getString("Status");
-				if (ListWrapper.STATUS_SUCCESS.equals(status))
+				if(ListWrapper.STATUS_SUCCESS.equals(status))
 				{
 					ObjectMapper mapper = new ObjectMapper();
 					result = (ListWrapper<T>) mapper.readValue(response, typeReference);
-				} else
+				}
+				else
 				{
 					logger.warn("API Response Failure: " + response);
 					result = new ListWrapper<>();
@@ -471,48 +473,61 @@ public class SRFaxApiConnector
 					result.setError(json.getString("Result"));
 				}
 			}
+			catch(JSONException e)
+			{
+				logger.error("API Response Failure: " + response);
+				throw new FaxApiConnectionException("API Response Error: could not parse json response", "Could not process response");
+			}
+			catch(IOException e)
+			{
+				logger.error("Response Mapping Error", e);
+				throw new FaxIntegrationException("Response Mapping Error: " + e.getMessage());
+			}
 		}
-		catch(IOException e)
-		{
-			logger.error("Error", e);
-		}
+
 		return result;
 	}
 
-	private static <T> SingleWrapper processSingleResponse(String response)
+	protected static <T> SingleWrapper processSingleResponse(String response)
 	{
 		return processSingleResponse(response, new TypeReference<SingleWrapper<T>>(){});
 	}
-	private static <T> SingleWrapper processSingleResponse(String response, TypeReference typeReference)
+	protected static <T> SingleWrapper processSingleResponse(String response, TypeReference typeReference)
 	{
 		SingleWrapper<T> result = null;
 		if (response.trim().isEmpty())
 		{// if the response is empty. SRFax has locked the account
 			logger.warn("API Response Error: Account is blocked at this IP");
-			result = new SingleWrapper<>();
-			result.setStatus("Error");
-			result.setError("Account is Blocked at this IP");
+			throw new FaxApiConnectionException("API Response Error: Account is blocked at this IP", "Account is Blocked at this IP");
 		}
 		else
 		{
-			JSONObject json = new JSONObject(response);
-			String status = json.getString("Status");
 			try
 			{
-				if (SingleWrapper.STATUS_SUCCESS.equals(status))
+				JSONObject json = new JSONObject(response);
+				String status = json.getString("Status");
+				if(SingleWrapper.STATUS_SUCCESS.equals(status))
 				{
 					ObjectMapper mapper = new ObjectMapper();
 					result = (SingleWrapper<T>) mapper.readValue(response, typeReference);
-				} else
+				}
+				else
 				{
 					logger.warn("API Response Failure: " + response);
 					result = new SingleWrapper<>();
 					result.setStatus(status);
 					result.setError(json.getString("Result"));
 				}
-			} catch (IOException e)
+			}
+			catch(JSONException e)
 			{
-				logger.error("Error", e);
+				logger.error("API Response Failure: " + response);
+				throw new FaxApiConnectionException("API Response Error: could not parse json response", "Could not process response");
+			}
+			catch(IOException e)
+			{
+				logger.error("Response Mapping Error", e);
+				throw new FaxIntegrationException("Response Mapping Error: " + e.getMessage());
 			}
 		}
 		return result;

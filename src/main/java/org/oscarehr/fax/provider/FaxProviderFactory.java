@@ -80,7 +80,7 @@ public class FaxProviderFactory
 		switch (faxAccount.getIntegrationType())
 		{
 			case SRFAX:
-				return new SRFaxUploadProvider();
+				return new SRFaxUploadProvider(faxAccount);
 			case RINGCENTRAL:
 				return new RingCentralUploadProvider(faxAccount);
 			default:

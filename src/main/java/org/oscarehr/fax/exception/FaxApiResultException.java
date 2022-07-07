@@ -22,6 +22,9 @@
  */
 package org.oscarehr.fax.exception;
 
+/**
+ * Indicate that the results of api response are in an error state.
+ */
 public class FaxApiResultException extends FaxException
 {
 	public FaxApiResultException(String message)
