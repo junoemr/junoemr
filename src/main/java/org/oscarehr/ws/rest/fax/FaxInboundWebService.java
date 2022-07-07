@@ -42,7 +42,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Path("/faxInbound")
@@ -62,7 +62,7 @@ public class FaxInboundWebService extends AbstractServiceImpl
 	@GET
 	@Path("/getNextPullTime")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<LocalDateTime> getNextPullTime()
+	public RestResponse<ZonedDateTime> getNextPullTime()
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_READ);
 

@@ -264,7 +264,8 @@ public class DemographicRosterServiceTest
 		Assert.assertEquals("termination reason should be present for non-rostered status",
 				RosterTerminationReason.getByCode(12), result.getRosterTerminationReason());
 		Assert.assertEquals("physician name should be present", physicianName, result.getRosteredPhysician());
-		Assert.assertEquals("physician ohip number should be present", physicianOhip, result.getOhipNo());	}
+		Assert.assertEquals("physician ohip number should be present", physicianOhip, result.getOhipNo());
+	}
 
 	@Test
 	public void testSaveRosterHistory_rosteredState_customTerminatedStatus()
@@ -291,6 +292,33 @@ public class DemographicRosterServiceTest
 				LocalDateTime.ofInstant(terminationDate.toInstant(), ZoneId.systemDefault()), result.getRosterTerminationDate());
 		Assert.assertEquals("termination reason should be present for non-rostered status",
 				RosterTerminationReason.getByCode(12), result.getRosterTerminationReason());
+		Assert.assertEquals("physician name should be present", physicianName, result.getRosteredPhysician());
+		Assert.assertEquals("physician ohip number should be present", physicianOhip, result.getOhipNo());
+	}
+
+	@Test
+	public void testSaveRosterHistory_NotRosteredNoReason()
+	{
+		String statusTerminated = RosterStatus.ROSTER_STATUS_NOT_ROSTERED;
+		Date rosterDate = new Date();
+		Date terminationDate = null;
+		String terminationReason = null;
+		String physicianName = "test, famdoc";
+		String physicianOhip = "12345";
+		Demographic newDemographic = buildRosterDemographic(statusTerminated,
+				rosterDate,
+				terminationDate,
+				terminationReason,
+				MessageFormat.format("<fd>{0}</fd><fdname>{1}</fdname>", physicianOhip, physicianName));
+		RosterStatus rosterStatusMock = mockRosterStatusLookup(statusTerminated, false);
+
+		DemographicRoster result = demographicRosterService.saveRosterHistory(newDemographic);
+
+		Assert.assertEquals("roster status should match", rosterStatusMock, result.getRosterStatus());
+		Assert.assertEquals("roster date should be present for non-rostered status",
+				LocalDateTime.ofInstant(rosterDate.toInstant(), ZoneId.systemDefault()), result.getRosterDate());
+		Assert.assertNull("no termination date when status is not rostered", result.getRosterTerminationDate());
+		Assert.assertNull("termination reason should not be present when not rostered", result.getRosterTerminationReason());
 		Assert.assertEquals("physician name should be present", physicianName, result.getRosteredPhysician());
 		Assert.assertEquals("physician ohip number should be present", physicianOhip, result.getOhipNo());
 	}
