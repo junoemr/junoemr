@@ -54,7 +54,7 @@ import javax.ws.rs.core.Response;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Path("/faxOutbound")
@@ -139,7 +139,7 @@ public class FaxOutboundWebService extends AbstractServiceImpl
 	@GET
 	@Path("/getNextPushTime")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<LocalDateTime> getNextPushTime()
+	public RestResponse<ZonedDateTime> getNextPushTime()
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.FAX_READ);
 

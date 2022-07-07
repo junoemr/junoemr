@@ -142,7 +142,7 @@ public class DemographicRosterService
 		if (!rosterStatus.isRostered())
 		{
 			demographicRoster.setRosterTerminationDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterTerminationDate()));
-			RosterTerminationReason terminationReason = RosterTerminationReason.getByCode(Integer.parseInt(demographic.getRosterTerminationReason()));
+			RosterTerminationReason terminationReason = demographic.getRosterTerminationReasonCode().map(RosterTerminationReason::getByCode).orElse(null);
 			demographicRoster.setRosterTerminationReason(terminationReason);
 		}
 		

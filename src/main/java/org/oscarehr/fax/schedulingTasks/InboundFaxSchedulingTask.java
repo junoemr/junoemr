@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 import oscar.util.ConversionUtils;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -74,11 +74,11 @@ public class InboundFaxSchedulingTask
 		}
 	}
 
-	public LocalDateTime getNextRunTime()
+	public ZonedDateTime getNextRunTime()
 	{
 		if(faxStatus.canPullFaxes())
 		{
-			return ConversionUtils.toLocalDateTime(cronTrigger.next(new Date()));
+			return ConversionUtils.toZonedDateTime(cronTrigger.next(new Date()));
 		}
 		return null;
 	}
