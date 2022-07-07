@@ -944,6 +944,32 @@ public class DemographicManager {
 		createUpdateDemographicCust(loggedInInfo, demoCust);
 	}
 
+	/**
+	 * Updates demographicExt entry from SoapApi
+	 * @param loggedInInfo current user using soap api
+	 * @param demographicTransfer demographic to update
+	 * @param key key of demographic to update
+	 * @param value value to update to for demographic
+	 */
+	public void updateDemographicExt(LoggedInInfo loggedInInfo, DemographicTransfer demographicTransfer, String key, String value){
+		checkPrivilege(loggedInInfo, Permission.DEMOGRAPHIC_UPDATE);
+
+		DemographicExt demographicExt = demographicExtDao.getDemographicExt(demographicTransfer.getDemographicNo(), key);
+
+		if(demographicExt != null)
+		{
+			demographicExt.setValue(value);
+			demographicExtDao.updateDemographicExt(demographicExt);
+		}
+		else
+		{
+			demographicExtDao.addKey(demographicTransfer.getProviderNo(),
+				demographicTransfer.getDemographicNo(),
+				key,
+				value);
+		}
+	}
+
 	// When adding a demographic, entries are required in other tables.  This
 	// method adds those entries.
 	public void addDemographicExtras(LoggedInInfo loggedInInfo, Demographic demographic, DemographicTransfer demographicTransfer)

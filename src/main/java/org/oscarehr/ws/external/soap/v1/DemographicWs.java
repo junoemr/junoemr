@@ -36,6 +36,7 @@ import org.oscarehr.common.model.PHRVerification;
 import org.oscarehr.ws.external.soap.v1.converter.DemographicModelToSoapTransferConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.entity.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographic.service.HinValidationService;
 import org.oscarehr.managers.DemographicManager;
@@ -327,7 +328,13 @@ public class DemographicWs extends AbstractWs
 
 		demographicManager.addDemographicWithValidation(loggedInInfo, demographic);
 		demographicManager.updateDemographicExtras(loggedInInfo, demographic, demographicTransfer);
-		demographicManager.addDemographicExts(loggedInInfo, demographic, demographicTransfer);
+
+		//Update demographicExt table entry if needed
+		//Currently SOAP api only accesses cellphone of demographicExt table
+		if(demographicTransfer.getCellPhone() != null)
+		{
+			demographicManager.updateDemographicExt(loggedInInfo, demographicTransfer, DemographicExt.KEY_DEMO_CELL, demographicTransfer.getCellPhone());
+		}
 
 	}
 
