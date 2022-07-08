@@ -937,36 +937,42 @@ public class DemographicManager {
 
 	public void updateDemographicExtras(LoggedInInfo loggedInInfo, Demographic demographic, DemographicTransfer demographicTransfer)
 	{
-		checkPrivilege(loggedInInfo, Permission.DEMOGRAPHIC_CREATE);
+		// Upsert values into demographicExt table and demographicCust table
+		// currently only cellphone is being called in the demographicExt table for the soapApi
+		String cellphone = demographicTransfer.getCellPhone();
+		if(cellphone == null)
+		{
+			cellphone = "";
+		}
 
+		upsertDemographicExt(loggedInInfo, demographicTransfer.getDemographicNo(), DemographicExt.KEY_DEMO_CELL, cellphone);
 		DemographicCust demoCust = getDemographicCust(loggedInInfo, demographic.getDemographicNo());
 		demoCust.setParsedNotes(demographicTransfer.getNotes());
 		createUpdateDemographicCust(loggedInInfo, demoCust);
 	}
 
 	/**
-	 * Updates demographicExt entry from SoapApi
-	 * @param loggedInInfo current user using soap api
-	 * @param demographicTransfer demographic to update
-	 * @param key key of demographic to update
-	 * @param value value to update to for demographic
+	 * Upserts into demographicExt table
+	 * @param loggedInInfo User currently accessing api
+	 * @param demographicNo Demographic to update
+	 * @param demographicExtKey Key to add into table
+	 * @param demographicExtValue value of key to add
 	 */
-	public void updateDemographicExt(LoggedInInfo loggedInInfo, DemographicTransfer demographicTransfer, String key, String value){
-		checkPrivilege(loggedInInfo, Permission.DEMOGRAPHIC_UPDATE);
-
-		DemographicExt demographicExt = demographicExtDao.getDemographicExt(demographicTransfer.getDemographicNo(), key);
+	public void upsertDemographicExt(LoggedInInfo loggedInInfo, Integer demographicNo, String demographicExtKey, String demographicExtValue)
+	{
+		DemographicExt demographicExt = demographicExtDao.getDemographicExt(demographicNo, demographicExtKey);
 
 		if(demographicExt != null)
 		{
-			demographicExt.setValue(value);
+			demographicExt.setValue(demographicExtValue);
 			demographicExtDao.updateDemographicExt(demographicExt);
 		}
 		else
 		{
-			demographicExtDao.addKey(demographicTransfer.getProviderNo(),
-				demographicTransfer.getDemographicNo(),
-				key,
-				value);
+			demographicExtDao.addKey(loggedInInfo.getLoggedInProviderNo(),
+				demographicNo,
+				demographicExtKey,
+				demographicExtValue);
 		}
 	}
 

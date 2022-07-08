@@ -328,14 +328,6 @@ public class DemographicWs extends AbstractWs
 
 		demographicManager.addDemographicWithValidation(loggedInInfo, demographic);
 		demographicManager.updateDemographicExtras(loggedInInfo, demographic, demographicTransfer);
-
-		//Update demographicExt table entry if needed
-		//Currently SOAP api only accesses cellphone of demographicExt table
-		if(demographicTransfer.getCellPhone() != null)
-		{
-			demographicManager.updateDemographicExt(loggedInInfo, demographicTransfer, DemographicExt.KEY_DEMO_CELL, demographicTransfer.getCellPhone());
-		}
-
 	}
 
 	/**
