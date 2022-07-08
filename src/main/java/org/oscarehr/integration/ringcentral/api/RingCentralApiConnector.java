@@ -132,7 +132,7 @@ public class RingCentralApiConnector extends RESTClient
 		return doGet(url, getAuthorizationBearerHeaders(), RingCentralAccountInfoResult.class);
 	}
 
-	public RingCentralSendFaxResult sendFax(String accountId, String extensionId, RingCentralSendFaxInput input) throws IOException
+	public RingCentralSendFaxResult sendFax(String accountId, String extensionId, RingCentralSendFaxInput input)
 	{
 		String endpoint = REST_API_URL + "/account/{0}/extension/{1}/fax";
 		String url = buildUrl(DEFAULT_PROTOCOL, MessageFormat.format(endpoint, accountId, extensionId));

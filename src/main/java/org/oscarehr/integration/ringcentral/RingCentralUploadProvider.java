@@ -49,7 +49,7 @@ public class RingCentralUploadProvider implements FaxUploadProvider
 	}
 
 	@Override
-	public FaxOutbound sendQueuedFax(FaxOutbound faxOutbound, GenericFile file) throws Exception
+	public FaxOutbound sendQueuedFax(FaxOutbound faxOutbound, GenericFile file)
 	{
 		RingCentralSendFaxInput input = new RingCentralSendFaxInput();
 		input.setAttachment(file);
