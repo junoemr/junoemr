@@ -552,7 +552,7 @@ angular.module('Record.Details').component('detailsCtrl', {
 		//billing buttons
 		controller.billingDo = function billingDo(func)
 		{
-			var now = new Date();
+			var now = new moment();
 			var url = null;
 			if (func === "BillingHistory")
 			{
@@ -581,7 +581,7 @@ angular.module('Record.Details').component('detailsCtrl', {
 					"&demographic_no=" + controller.page.demo.id +
 					"&providerview=" + controller.page.demo.mrpProvider?.id +
 					"&user_no=" + controller.user.providerNo +
-					"&apptProvider_no=none&appointment_date=" + now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() +
+					"&apptProvider_no=none&appointment_date=" + encodeURIComponent(Juno.Common.Util.formatMomentDate(now)) +
 					"&start_time=00:00:00&bNewForm=1&status=t";
 			}
 			else if (func === "FluBilling")
@@ -605,7 +605,7 @@ angular.module('Record.Details').component('detailsCtrl', {
 					"&demographic_no=" + controller.page.demo.id +
 					"&providerview=" + controller.page.demo.mrpProvider?.id +
 					"&user_no=" + controller.user.providerNo +
-					"&apptProvider_no=none&appointment_date=" + now.getFullYear + "-" + (now.getMonth() + 1) + "-" + now.getDate() +
+					"&apptProvider_no=none&appointment_date=" + encodeURIComponent(Juno.Common.Util.formatMomentDate(now)) +
 					"&start_time=00:00:00&bNewForm=1&status=t";
 			}
 			else if (func === "AddBatchBilling")
@@ -614,7 +614,7 @@ angular.module('Record.Details').component('detailsCtrl', {
 					"&creator=" + controller.user.providerNo +
 					"&demographic_name=" + encodeURIComponent(controller.page.demo.lastName + "," + controller.page.demo.firstName) +
 					"&hin=" + controller.page.demo.healthNumber + controller.page.demo.healthNumberVersion +
-					"&dob=" + controller.page.demo.dobYear + controller.page.demo.dobMonth + controller.page.demo.dobDay;
+					"&dob=" + encodeURIComponent(Juno.Common.Util.formatMomentDate(controller.page.demo.dateOfBirth));
 			}
 			else if (func === "AddINR")
 			{

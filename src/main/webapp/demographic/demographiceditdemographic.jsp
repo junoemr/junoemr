@@ -199,10 +199,7 @@ if(!authed) {
 	
 	boolean showConsentsThisTime = false;
 	
-    GregorianCalendar now=new GregorianCalendar();
-    int curYear = now.get(Calendar.YEAR);
-    int curMonth = (now.get(Calendar.MONTH)+1);
-    int curDay = now.get(Calendar.DAY_OF_MONTH);
+	String currentDateString = ConversionUtils.toDateString(LocalDate.now(), DEFAULT_DATE_PATTERN);
     
 	java.util.ResourceBundle oscarResources = ResourceBundle.getBundle("oscarResources", request.getLocale());
     String noteReason = oscarResources.getString("oscarEncounter.noteReason.TelProgress");
@@ -298,6 +295,8 @@ if(!authed) {
 <%@ page import="org.oscarehr.demographicRoster.entity.RosterTerminationReason" %>
 <%@ page import="org.oscarehr.rosterStatus.service.RosterStatusService" %>
 <%@ page import="org.oscarehr.rosterStatus.model.RosterStatusModel" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="static oscar.util.ConversionUtils.DEFAULT_DATE_PATTERN" %>
 <html:html locale="true">
 
 <head>
@@ -636,7 +635,7 @@ function hideItem(id){
 
 <security:oscarSec roleName="<%= roleName$ %>" objectName="_eChart" rights="r" reverse="<%= false %>" >
 var numMenus = 1;
-var encURL = "<c:out value="${ctx}"/>/oscarEncounter/IncomingEncounter.do?providerNo=<%=curProvider_no%>&appointmentNo=&demographicNo=<%=demographic_no%>&curProviderNo=&reason=<%=URLEncoder.encode(noteReason)%>&encType=<%=URLEncoder.encode("telephone encounter with client")%>&userName=<%=URLEncoder.encode( userfirstname+" "+userlastname) %>&curDate=<%=""+curYear%>-<%=""+curMonth%>-<%=""+curDay%>&appointmentDate=&startTime=&status=";
+var encURL = "<c:out value="${ctx}"/>/oscarEncounter/IncomingEncounter.do?providerNo=<%=curProvider_no%>&appointmentNo=&demographicNo=<%=demographic_no%>&curProviderNo=&reason=<%=URLEncoder.encode(noteReason)%>&encType=<%=URLEncoder.encode("telephone encounter with client")%>&userName=<%=URLEncoder.encode( userfirstname+" "+userlastname) %>&curDate=<%=currentDateString%>&appointmentDate=&startTime=&status=";
 function showMenu(menuNumber, eventObj) {
     var menuId = 'menu' + menuNumber;
     return showPopup(menuId, eventObj);
@@ -894,7 +893,6 @@ jQuery(document).ready(function(){
 
 					// Demographic demographic=demographicDao.getDemographic(demographic_no);
 
-					String dateString = curYear + "-" + curMonth + "-" + curDay;
 					int age = 0, dob_year = 0, dob_month = 0, dob_date = 0;
 					String birthYear = "0000", birthMonth = "00", birthDate = "00";
 
@@ -1078,7 +1076,7 @@ if(wLReadonly.equals("")){
 					}
 				%>
 				<td><a
-					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(defaultBillingView)%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName()) + URLEncoder.encode(", ") + URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t<%=referral_no_parameter%>"
+					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(defaultBillingView)%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName()) + URLEncoder.encode(", ") + URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=currentDateString%>&start_time=00:00:00&bNewForm=1&status=t<%=referral_no_parameter%>"
 					target="_blank"
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></td>
 			</tr>
@@ -1098,7 +1096,7 @@ if(wLReadonly.equals("")){
 				<tr>
 					<td><a
 						href="javascript: function myFunction() {return false; }"
-						onClick="popupS('../billing/CA/ON/billingShortcutPg1.jsp?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("hospital_view", default_view))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t');return false;"
+						onClick="popupS('../billing/CA/ON/billingShortcutPg1.jsp?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("hospital_view", default_view))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=currentDateString%>&start_time=00:00:00&bNewForm=1&status=t');return false;"
 						title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgHospitalBilling"/></a></td>
 				</tr>
 				<tr>
@@ -1613,7 +1611,7 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
                                              String sdb = relHash.get("subDecisionMaker") == null?"":((Boolean) relHash.get("subDecisionMaker")).booleanValue()?"<span title=\"SDM\" >/SDM</span>":"";
                                              String ec = relHash.get("emergencyContact") == null?"":((Boolean) relHash.get("emergencyContact")).booleanValue()?"<span title=\"Emergency Contact\">/EC</span>":"";
 											 String masterLink = "<a target=\"demographic"+dNo+"\" href=\"" + request.getContextPath() + "/demographic/demographiccontrol.jsp?demographic_no="+dNo+"&displaymode=edit&dboperation=search_detail\">M</a>";
-											 String encounterLink = "<a target=\"encounter"+dNo+"\" href=\"javascript: function myFunction() {return false; }\" onClick=\"popupEChart(710,1024,'" + request.getContextPath() + "/oscarEncounter/IncomingEncounter.do?demographicNo="+dNo+"&providerNo="+loggedInInfo.getLoggedInProviderNo()+"&appointmentNo=&curProviderNo=&reason=&appointmentDate=&startTime=&status=&userName="+URLEncoder.encode( userfirstname+" "+userlastname)+"&curDate="+curYear+"-"+curMonth+"-"+curDay+"');return false;\">E</a>";												 
+											 String encounterLink = "<a target=\"encounter"+dNo+"\" href=\"javascript: function myFunction() {return false; }\" onClick=\"popupEChart(710,1024,'" + request.getContextPath() + "/oscarEncounter/IncomingEncounter.do?demographicNo="+dNo+"&providerNo="+loggedInInfo.getLoggedInProviderNo()+"&appointmentNo=&curProviderNo=&reason=&appointmentDate=&startTime=&status=&userName="+URLEncoder.encode( userfirstname+" "+userlastname)+"&curDate="+currentDateString+"');return false;\">E</a>";
                                           %>
 							<li><span class="label"><%=relHash.get("relation")%><%=sdb%><%=ec%>:</span>
                             	<span class="info"><%=relHash.get("lastName")%>, <%=relHash.get("firstName")%>, H:<%=relHash.get("phone")== null?"":relHash.get("phone")%><%=formattedWorkPhone%> <%=masterLink%> <%=encounterLink %></span>
@@ -1655,7 +1653,7 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
 											"&providerNo=" + loggedInInfo.getLoggedInProviderNo() +
 											"&appointmentNo=&curProviderNo=&reason=&appointmentDate=&startTime=&status=" +
 											"&userName=" + URLEncoder.encode(userfirstname + " " + userlastname) +
-											"&curDate=" + curYear + "-" + curMonth + "-" + curDay + "');return false;\">E</a>";
+											"&curDate=" + currentDateString + "');return false;\">E</a>";
 								}
 						%>
 							<li>
