@@ -552,7 +552,7 @@ angular.module('Record.Details').component('detailsCtrl', {
 		//billing buttons
 		controller.billingDo = function billingDo(func)
 		{
-			var now = new moment();
+			var now = moment();
 			var url = null;
 			if (func === "BillingHistory")
 			{
