@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.encounterNote.model.TempNoteModel;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
 import org.oscarehr.encounterNote.service.TempNoteService;
+import org.oscarehr.encounterNote.transfer.TempNoteCreateInput;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -39,7 +40,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.Optional;
 
@@ -69,13 +69,12 @@ public class DemographicNoteWebService extends AbstractServiceImpl
 	@POST
 	@Path("/temp")
 	public RestResponse<TempNoteModel> saveTempNote(@PathParam("demographicId") Integer demographicId,
-	                                                @QueryParam("noteId") Integer noteId,
-	                                                String noteInput)
+	                                                TempNoteCreateInput noteInput)
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), demographicId,
 				Permission.ENCOUNTER_NOTE_CREATE, Permission.ENCOUNTER_NOTE_UPDATE);
 
-		TempNoteModel model = tempNoteService.setTempNote(getLoggedInProviderId(), demographicId, noteInput, noteId);
+		TempNoteModel model = tempNoteService.setTempNote(getLoggedInProviderId(), demographicId, noteInput);
 		return RestResponse.successResponse(model);
 	}
 

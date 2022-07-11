@@ -23,13 +23,12 @@
  */
 package org.oscarehr.encounterNote.dao;
 
-import java.util.Date;
-import java.util.Optional;
-import javax.persistence.Query;
-
 import org.oscarehr.common.dao.AbstractDao;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.Optional;
 
 @Repository
 public class CaseManagementTmpSaveDao extends AbstractDao<CaseManagementTmpSave>
@@ -51,7 +50,7 @@ public class CaseManagementTmpSaveDao extends AbstractDao<CaseManagementTmpSave>
 
 	public CaseManagementTmpSave find(String providerNo, Integer demographicNo)
 	{
-		Query query = entityManager.createQuery("SELECT x FROM CaseManagementTmpSave x WHERE x.providerNo = :providerId and x.demographicNo= :demographicId order by x.updateDate DESC");
+		Query query = entityManager.createQuery("SELECT x FROM CaseManagementTmpSave x WHERE x.providerNo = :providerId and x.demographicNo= :demographicId order by x.updateDateTime DESC");
 		query.setParameter("providerId", providerNo);
 		query.setParameter("demographicId", demographicNo);
 
@@ -65,21 +64,10 @@ public class CaseManagementTmpSaveDao extends AbstractDao<CaseManagementTmpSave>
 
 	@Deprecated // programId being phased out
     public CaseManagementTmpSave find(String providerNo, Integer demographicNo, Integer programId) {
-    	Query query = entityManager.createQuery("SELECT x FROM CaseManagementTmpSave x WHERE x.providerNo = ?1 and x.demographicNo=?2 and x.programId = ?3 order by x.updateDate DESC");
+    	Query query = entityManager.createQuery("SELECT x FROM CaseManagementTmpSave x WHERE x.providerNo = ?1 and x.demographicNo=?2 and x.programId = ?3 order by x.updateDateTime DESC");
 		query.setParameter(1,providerNo);
 		query.setParameter(2,demographicNo);
 		query.setParameter(3,programId);
-		
-		return this.getSingleResultOrNull(query);
-    }
-
-	@Deprecated // programId being phased out
-    public CaseManagementTmpSave find(String providerNo, Integer demographicNo, Integer programId, Date date) {
-    	Query query = entityManager.createQuery("SELECT x FROM CaseManagementTmpSave x WHERE x.providerNo = ?1 and x.demographicNo=?2 and x.programId = ?3 and x.updateDate >= ?4 order by x.updateDate DESC");
-		query.setParameter(1,providerNo);
-		query.setParameter(2,demographicNo);
-		query.setParameter(3,programId);
-		query.setParameter(4, date);
 		
 		return this.getSingleResultOrNull(query);
     }

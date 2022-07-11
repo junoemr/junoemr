@@ -27,7 +27,6 @@ import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.encounterNote.model.TempNoteModel;
 import org.springframework.stereotype.Component;
-import oscar.util.ConversionUtils;
 
 @Component
 public class TempNoteToModelConverter extends AbstractModelConverter<CaseManagementTmpSave, TempNoteModel>
@@ -44,9 +43,11 @@ public class TempNoteToModelConverter extends AbstractModelConverter<CaseManagem
 		model.setNoteId(entity.getNoteId());
 		model.setDemographicId(entity.getDemographicNo());
 		model.setProgramId(entity.getProgramId());
-		model.setUpdateDateTime(ConversionUtils.toZonedDateTime(entity.getUpdateDate()));
+		model.setUpdateDateTime(entity.getUpdateDateTime());
+		model.setObservationDate(entity.getObservationDate());
 		model.setProviderId(entity.getProviderNo());
 		model.setNote(entity.getNote());
+		model.setEncounterType(entity.getEncounterType());
 
 		return model;
 	}
