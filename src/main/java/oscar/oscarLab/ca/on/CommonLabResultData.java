@@ -25,14 +25,6 @@
 
 package oscar.oscarLab.ca.on;
 
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.caisi_integrator.CaisiIntegratorManager;
 import org.oscarehr.PMmodule.caisi_integrator.IntegratorFallBackManager;
@@ -68,13 +60,19 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import oscar.oscarDB.ArchiveDeletedRecords;
-import oscar.oscarDB.DBPreparedHandler;
 import oscar.oscarLab.ca.all.Hl7textResultsData;
 import oscar.oscarLab.ca.all.upload.ProviderLabRouting;
 import oscar.oscarLab.ca.bc.PathNet.PathnetResultsData;
 import oscar.oscarMDS.data.MDSResultsData;
 import oscar.oscarMDS.data.ReportStatus;
 import oscar.util.ConversionUtils;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 public class CommonLabResultData {
 
@@ -166,68 +164,69 @@ public class CommonLabResultData {
 		return result;
 	}
 
-	public static void updateReportStatus(int labNo, String providerNo, String status, String comment, String labType) throws SQLException
+	@Deprecated
+	public static void updateReportStatus(int labNo, String providerNo, String status, String comment, String labType)
 	{
-		try {
-			DBPreparedHandler db = new DBPreparedHandler();
-			// handles the case where this provider/lab combination is not already in providerLabRouting table
-			String sql = "select id, status from providerLabRouting where lab_type = '" + labType + "' and provider_no = '" + providerNo + "' and lab_no = '" + labNo + "'";
+		updateReportStatus(labNo, providerNo, status, comment, labType, null);
+	}
 
-			ResultSet rs = db.queryResults(sql);
-			boolean empty = true;
-			while (rs.next()) {
-				empty = false;
-				String id = oscar.Misc.getString(rs, "id");
-				if (!oscar.Misc.getString(rs, "status").equals(ProviderInboxItem.ACK)) {
-					ProviderLabRoutingModel plr  = providerLabRoutingDao.find(Integer.parseInt(id));
-					if(plr != null) {
-						plr.setStatus(""+status);
-						//we don't want to clobber existing comments when filing labs
-						if( !status.equals(ProviderInboxItem.FILE) ) {
-							plr.setComment(comment);
-						}
-						plr.setTimestamp(new Date());
-						providerLabRoutingDao.merge(plr);
-					}
-				}
-			} 
-			if (empty) {
-				ProviderLabRoutingModel p = new ProviderLabRoutingModel();
-				p.setProviderNo(providerNo);
-				p.setLabNo(labNo);
-				p.setStatus(String.valueOf(status));
-				p.setComment(comment);
-				p.setLabType(labType);
-				p.setTimestamp(new Date());
-				providerLabRoutingDao.persist(p);
-			}
+	public static void updateReportStatus(int labNo, String providerNo, String status, String comment, String labType, Date ObrDate)
+	{
+		// handles the case where this provider/lab combination is not already in providerLabRouting table
+		List<ProviderLabRoutingModel> results = providerLabRoutingDao.findByLabNoAndLabTypeAndProviderNo(labNo, labType, providerNo);
 
-			if (!NOT_ASSIGNED_PROVIDER_NO.equals(providerNo)) {
-				List<ProviderLabRoutingModel> modelRecords = providerLabRoutingDao.findByLabNoAndLabTypeAndProviderNo(labNo, labType, providerNo);
-				ArchiveDeletedRecords adr = new ArchiveDeletedRecords();
-				adr.recordRowsToBeDeleted(modelRecords, "" + providerNo, "providerLabRouting");
-				
-				for(ProviderLabRoutingModel plr : providerLabRoutingDao.findByLabNoAndLabTypeAndProviderNo(labNo, labType, NOT_ASSIGNED_PROVIDER_NO)) {
-					providerLabRoutingDao.remove(plr.getId());
-				}
-			}
-
-			// If we updated the status to X, then we want to see if all other statuses for the labNo are also X.
-			// If they are then there are no more providers associated with the document, so move the document to the unclaimed inbox
-			if (status.equals(ProviderInboxItem.ARCHIVED))
+		if(results.isEmpty())
+		{
+			ProviderLabRoutingModel p = new ProviderLabRoutingModel();
+			p.setProviderNo(providerNo);
+			p.setLabNo(labNo);
+			p.setStatus(status);
+			p.setComment(comment);
+			p.setLabType(labType);
+			p.setTimestamp(new Date());
+			p.setObrDate(ObrDate);
+			providerLabRoutingDao.persist(p);
+		}
+		else
+		{
+			for(ProviderLabRoutingModel providerLabRouting : results)
 			{
-				List<ProviderLabRoutingModel> allDocsWithLabNo = providerLabRoutingDao.getProviderLabRoutingDocuments(labNo);
-				List<ProviderLabRoutingModel> docsWithStatusX = providerLabRoutingDao.findByStatusANDLabNoType(labNo, labType, ProviderInboxItem.ARCHIVED);
-
-				if(allDocsWithLabNo.size() == docsWithStatusX.size())
+				if(!ProviderInboxItem.ACK.equals(providerLabRouting.getStatus()))
 				{
-					inboxManager.addToProviderInbox(labNo, labType, NOT_ASSIGNED_PROVIDER_NO);
+					providerLabRouting.setStatus(status);
+					//we don't want to clobber existing comments when filing labs
+					if(!status.equals(ProviderInboxItem.FILE))
+					{
+						providerLabRouting.setComment(comment);
+					}
+					providerLabRouting.setTimestamp(new Date());
+					providerLabRoutingDao.merge(providerLabRouting);
 				}
 			}
 		}
-		finally
+
+		if (!NOT_ASSIGNED_PROVIDER_NO.equals(providerNo))
 		{
-			DbConnectionFilter.releaseThreadLocalDbConnection();
+			ArchiveDeletedRecords adr = new ArchiveDeletedRecords();
+			adr.recordRowsToBeDeleted(results, "" + providerNo, "providerLabRouting");
+
+			for(ProviderLabRoutingModel plr : providerLabRoutingDao.findByLabNoAndLabTypeAndProviderNo(labNo, labType, NOT_ASSIGNED_PROVIDER_NO))
+			{
+				providerLabRoutingDao.remove(plr.getId());
+			}
+		}
+
+		// If we updated the status to X, then we want to see if all other statuses for the labNo are also X.
+		// If they are then there are no more providers associated with the document, so move the document to the unclaimed inbox
+		if (status.equals(ProviderInboxItem.ARCHIVED))
+		{
+			List<ProviderLabRoutingModel> allDocsWithLabNo = providerLabRoutingDao.getProviderLabRoutingDocuments(labNo);
+			List<ProviderLabRoutingModel> docsWithStatusX = providerLabRoutingDao.findByStatusANDLabNoType(labNo, labType, ProviderInboxItem.ARCHIVED);
+
+			if(allDocsWithLabNo.size() == docsWithStatusX.size())
+			{
+				inboxManager.addToProviderInbox(labNo, labType, NOT_ASSIGNED_PROVIDER_NO);
+			}
 		}
 	}
 
@@ -389,7 +388,7 @@ public class CommonLabResultData {
 				}
 			}
 		}
-		catch (SQLException e)
+		catch (Exception e)
 		{
 			logger.error("Error filing labs.", e);
 			return false;

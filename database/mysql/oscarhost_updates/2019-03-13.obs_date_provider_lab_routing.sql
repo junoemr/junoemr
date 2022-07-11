@@ -74,16 +74,20 @@ CREATE TRIGGER cacheObrDate_plr_insert
 BEFORE INSERT ON providerLabRouting
 FOR EACH ROW
 BEGIN
+IF NEW.lab_type IN ('DOC', 'HL7') THEN
   CALL getObrDate_plr(NEW.lab_no, NEW.lab_type, @obr_date);
   SET NEW.obr_date = @obr_date;
+END IF;
 END //
 
 CREATE TRIGGER cacheObrDate_plr_update
 BEFORE UPDATE ON providerLabRouting
 FOR EACH ROW
 BEGIN
+IF NEW.lab_type IN ('DOC', 'HL7') THEN
   CALL getObrDate_plr(NEW.lab_no, NEW.lab_type, @obr_date);
   SET NEW.obr_date = @obr_date;
+END IF;
 END //
 
 CREATE TRIGGER cacheObrDate_doc_insert
