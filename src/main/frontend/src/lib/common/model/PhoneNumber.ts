@@ -15,6 +15,11 @@ export default class PhoneNumber
 		this.primaryContactNumber = primaryContactNumber;
 	}
 
+	protected stripInvalidCharacters(value: string): string
+	{
+		return value?.replace(/[^a-zA-Z0-9]/g, "");
+	}
+
 	get formattedForDisplay(): string
 	{
 		let display = "";
@@ -27,6 +32,11 @@ export default class PhoneNumber
 			else if(this.number.length > 7 && this.number.length <= 10)
 			{
 				display = "(" + this.number.substring(0,3) + ") " + this.number.substring(3,6) + "-" + this.number.substring(6);
+			}
+			else if(this.number.length === 11)
+			{
+				display = this.number.substring(0, 1) + " (" + this.number.substring(1, 4) + ") " +
+					this.number.substring(4, 7) + "-" + this.number.substring(7);
 			}
 			else
 			{
@@ -48,7 +58,8 @@ export default class PhoneNumber
 
 	set number(value: string)
 	{
-		this._number = value;
+		// strip invalid character when setting the number
+		this._number = this.stripInvalidCharacters(value);
 	}
 
 	get extension(): string
@@ -58,7 +69,8 @@ export default class PhoneNumber
 
 	set extension(value: string)
 	{
-		this._extension = value;
+		// strip invalid character when setting the extension
+		this._extension = this.stripInvalidCharacters(value);
 	}
 
 	get primaryContactNumber(): boolean

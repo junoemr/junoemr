@@ -304,6 +304,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			request.setLetterheadName(defaultLetterhead.getId());
 			request.setLetterheadAddress(defaultLetterhead.getAddress());
 			request.setLetterheadPhone(defaultLetterhead.getPhone());
+			request.setLetterheadFax(defaultLetterhead.getFax());
 		}
 		catch(Exception e)
 		{
