@@ -9,8 +9,7 @@
 
 package org.oscarehr.common.model;
 
-import java.io.Serializable;
-import java.util.Date;
+import org.apache.commons.lang.StringUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,8 +21,8 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.apache.commons.lang.StringUtils;
+import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "providerLabRouting")
@@ -59,7 +58,7 @@ public class ProviderLabRoutingModel extends AbstractModel<Integer> implements S
 	private String labType;
 	
 	@Column(name = "obr_date")
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date obrDate;
 	
 	@Override

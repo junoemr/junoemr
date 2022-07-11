@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.oscarLab.ca.on.LabResultData;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -234,15 +233,7 @@ public class InboxManager
 				//If the document is archived for the provider, move the document from the archive back to their inbox as they've been re-linked to the document
 				if(inboxItem.getStatus().equals(ProviderInboxItem.ARCHIVED))
 				{
-					try
-					{
-						//TODO this could be refactored to reduce queries
-						CommonLabResultData.updateReportStatus(labNo, providerId, routeStatus, null, labType);
-					}
-					catch(SQLException throwable)
-					{
-						throw new RuntimeException(throwable);
-					}
+					CommonLabResultData.updateReportStatus(labNo, providerId, routeStatus, null, labType ,inboxItem.getTimestamp());
 				}
 			}
 		}

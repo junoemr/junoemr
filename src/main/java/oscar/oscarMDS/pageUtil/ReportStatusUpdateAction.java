@@ -25,16 +25,7 @@
 
 package oscar.oscarMDS.pageUtil;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Calendar;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import net.sf.json.JSONObject;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -47,11 +38,16 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
-
 import oscar.log.LogAction;
 import oscar.log.LogConst;
 import oscar.oscarLab.ca.on.CommonLabResultData;
 import oscar.util.ConversionUtils;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Calendar;
 
 public class ReportStatusUpdateAction extends DispatchAction {
 
@@ -109,7 +105,7 @@ public class ReportStatusUpdateAction extends DispatchAction {
             else
                 return mapping.findForward("success");
 		}
-		catch (SQLException e)
+		catch(Exception e)
 		{
 			logger.error("Error updating report status.", e);
 			return mapping.findForward("failure");
@@ -127,7 +123,9 @@ public class ReportStatusUpdateAction extends DispatchAction {
 
 			CommonLabResultData.updateReportStatus(labNo, providerNo, status, comment, lab_type);
 
-        } catch(SQLException e) {
+        }
+        catch(Exception e)
+        {
         	logger.error("exception in setting comment",e);
             return mapping.findForward("failure");
         }

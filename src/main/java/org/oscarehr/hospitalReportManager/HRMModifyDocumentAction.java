@@ -19,16 +19,16 @@ import org.oscarehr.dataMigration.model.hrm.HrmDocument;
 import org.oscarehr.dataMigration.model.hrm.HrmDocument.ReportClass;
 import org.oscarehr.dataMigration.model.hrm.HrmObservation;
 import org.oscarehr.dataMigration.model.hrm.HrmSubClassModel;
-import org.oscarehr.hospitalReportManager.model.HRMDocument;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
-import org.oscarehr.hospitalReportManager.model.HRMObservation;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
-import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentCommentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentSubClassDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToDemographicDao;
 import org.oscarehr.hospitalReportManager.dao.HRMDocumentToProviderDao;
+import org.oscarehr.hospitalReportManager.model.HRMDocument;
+import org.oscarehr.hospitalReportManager.model.HRMDocumentComment;
+import org.oscarehr.hospitalReportManager.model.HRMDocumentToDemographic;
+import org.oscarehr.hospitalReportManager.model.HRMDocumentToProvider;
+import org.oscarehr.hospitalReportManager.model.HRMObservation;
 import org.oscarehr.hospitalReportManager.service.HRMCategoryService;
 import org.oscarehr.hospitalReportManager.service.HRMDocumentService;
 import org.oscarehr.hospitalReportManager.service.HRMSubClassService;
@@ -140,6 +140,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 			String signedOffParam = request.getParameter("signedOff");
 			boolean isSignedOff = Integer.parseInt(signedOffParam) == 1;
 
+			HRMDocument hrmDocument = hrmDocumentDao.find(Integer.parseInt(reportId));
 			HRMDocumentToProvider providerMapping = hrmDocumentToProviderDao.findByHrmDocumentIdAndProviderNo(Integer.parseInt(reportId), providerNo);
 			if (providerMapping == null) {
 				// No longer required for Juno data, but keeping this in for now in case removing it does something
@@ -156,13 +157,12 @@ public class HRMModifyDocumentAction extends DispatchAction {
 				providerMapping.setSignedOff(isSignedOff);
 				providerMapping.setSignedOffTimestamp(new Date());
 				hrmDocumentToProviderDao.merge(providerMapping);
-
 			}
 			else
 			{
 				// In case of unmatched providers, then the current provider will ack
 				HRMDocumentToProvider hrmDocumentToProvider = new HRMDocumentToProvider();
-				hrmDocumentToProvider.setHrmDocument(hrmDocumentDao.find(Integer.parseInt(reportId)));
+				hrmDocumentToProvider.setHrmDocument(hrmDocument);
 				hrmDocumentToProvider.setProviderNo(providerNo);
 				hrmDocumentToProvider.setSignedOff(isSignedOff);
 				hrmDocumentToProvider.setSignedOffTimestamp(new Date());
@@ -172,7 +172,13 @@ public class HRMModifyDocumentAction extends DispatchAction {
 			if (isSignedOff)
 			{
 				// Once the provider has signed off, try to ack the report in their inbox
-				CommonLabResultData.updateReportStatus(Integer.parseInt(reportId), providerNo, ProviderInboxItem.ACK, "", InboxManager.INBOX_TYPE_HRM);
+				CommonLabResultData.updateReportStatus(
+						Integer.parseInt(reportId),
+						providerNo,
+						ProviderInboxItem.ACK,
+						"",
+						InboxManager.INBOX_TYPE_HRM,
+						hrmDocument.getReportDate());
 			}
 
 			request.setAttribute("success", true);
