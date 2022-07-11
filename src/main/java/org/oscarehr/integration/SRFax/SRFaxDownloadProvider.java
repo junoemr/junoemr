@@ -43,7 +43,8 @@ public class SRFaxDownloadProvider implements FaxDownloadProvider
 {
 	private final SRFaxApiConnector srFaxApiConnector;
 
-	public SRFaxDownloadProvider(FaxAccount faxAccount) {
+	public SRFaxDownloadProvider(FaxAccount faxAccount)
+	{
 		this.srFaxApiConnector = new SRFaxApiConnector(faxAccount.getLoginId(), faxAccount.getLoginPassword());
 	}
 
