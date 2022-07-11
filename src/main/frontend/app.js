@@ -606,7 +606,7 @@ oscarApp.config([
 			})
 		.state('settings.tracker',
 			{
-				url: '/healthTracker',
+				url: '/patientHealth',
 				component: 'careTrackerManager',
 				params: {
 					pref: null,
@@ -623,7 +623,7 @@ oscarApp.config([
 			})
 		.state('settings.editCareTracker',
 			{
-				url: '/healthTracker/careTracker/:careTrackerId',
+				url: '/patientHealth/ct/:careTrackerId',
 				component: 'careTrackerEdit',
 			})
 		.state('support',
@@ -643,6 +643,10 @@ oscarApp.config([
 			url: '/record/:demographicNo',
 			templateUrl: 'src/record/record.jsp',
 			controller: 'Record.RecordController as recordCtrl',
+			params:
+			{
+				appointmentNo: null
+			},
 			resolve:
 			{
 				user: ['providerService', function(providerService)
@@ -689,7 +693,7 @@ oscarApp.config([
 		})
 		.state('record.summary.tracker',
 		{
-			url: '/tracker',
+			url: '/patientHealth',
 			component: 'healthTracker',
 			resolve:
 			{
@@ -722,7 +726,7 @@ oscarApp.config([
 			})
 		.state('record.summary.tracker.careTracker',
 		{
-			url: '/careTracker/:careTrackerId',
+			url: '/ct/:careTrackerId',
 			component: 'careTracker',
 			meta:
 				{
@@ -833,8 +837,7 @@ oscarApp.config([
 		.state('record.consultRequest',
 		{
 			url: '/consult/:requestId',
-			templateUrl: 'src/consults/consultRequest.jsp',
-			controller: 'Consults.ConsultRequestController as consultRequestCtrl',
+			component: 'consultRequest',
 			resolve:
 			{
 				consult: ['$stateParams', 'consultService', function($stateParams, consultService)
@@ -844,10 +847,6 @@ oscarApp.config([
 					}
 					return consultService.getRequest($stateParams.requestId);
 				}],
-				user: ['providerService', function(providerService)
-				{
-					return providerService.getMe();
-				}]
 			},
 			meta:
 			{
@@ -892,7 +891,7 @@ oscarApp.config([
 		})
 		.state('record.tracker',
 		{
-			url: '/tracker',
+			url: '/patientHealth',
 			component: 'healthTrackerPage',
 			resolve:
 			{
@@ -921,7 +920,7 @@ oscarApp.config([
 			})
 		.state('record.tracker.careTracker',
 		{
-			url: '/careTracker/:careTrackerId',
+			url: '/ct/:careTrackerId',
 			component: 'careTracker',
 			meta:
 				{
@@ -932,7 +931,7 @@ oscarApp.config([
 		})
 		.state('record.configureHealthTracker',
 		{
-			url: '/configureHealthTracker',
+			url: '/configurePatientHealth',
 			component: 'careTrackerManager',
 			resolve: {
 				user: ['providerService', function(providerService)
@@ -943,7 +942,7 @@ oscarApp.config([
 		})
 		.state('record.editCareTracker',
 			{
-				url: '/configureHealthTracker/careTracker/:careTrackerId',
+				url: '/configurePatientHealth/ct/:careTrackerId',
 				component: 'careTrackerEdit',
 			})
         .state('record.patientEducation',

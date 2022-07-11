@@ -30,6 +30,31 @@ $navbar-default-toggle-icon-bar-bg: $color-neutral-white;
 // Tabs
 // Pills
 // Pagination
+$pagination-color:                  var(--color-primary-base);
+$pagination-bg:                     var(--color-neutral-white);
+//$pagination-border-width:           $border-width;
+//$pagination-border-radius:          $border-radius;
+//$pagination-margin-start:           -$pagination-border-width;
+$pagination-border:                 var(--color-neutral-light);
+
+$pagination-focus-color:            var(--color-primary-dark);
+$pagination-focus-bg:               var(--color-neutral-lightest);
+$pagination-focus-border:           var(--color-neutral-lighter);
+//$pagination-focus-box-shadow:       $input-btn-focus-box-shadow;
+//$pagination-focus-outline:          0;
+
+$pagination-hover-color:            var(--color-primary-dark);
+$pagination-hover-bg:               var(--color-neutral-lightest);
+$pagination-hover-border:           var(--color-primary-dark);
+
+$pagination-active-color:           var(--color-primary-base);
+$pagination-active-bg:              var(--color-neutral-lighter);
+$pagination-active-border:          var(--color-primary-base);
+
+$pagination-disabled-color:         var(--color-neutral-light-grey);
+$pagination-disabled-bg:            var(--color-neutral-lightest);
+$pagination-disabled-border:        var(--color-neutral-lighter);
+
 // Pager
 // Jumbotron
 // Form states and alerts

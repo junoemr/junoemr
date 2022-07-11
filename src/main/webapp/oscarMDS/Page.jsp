@@ -337,8 +337,19 @@ String curUser_no = (String) session.getAttribute("user");
                                     <%=result.isDocument() ? result.description == null ? "" : result.description : result.getDisciplineDisplayString()%>
                                 </td>
                                 <td nowrap> <!--  -->
-									<% if (result.isHRM()) {%>
-                                        <%= result.getReportStatus() != null ? HrmDocument.ReportStatus.fromValueString(result.getReportStatus()).toDisplayName() : ""%>
+									<% if (result.isHRM())
+									{
+										String displayStatus = "";
+										if(result.getReportStatus() != null)
+										{
+											HrmDocument.ReportStatus reportStatus = HrmDocument.ReportStatus.fromValueString(result.getReportStatus());
+											if(reportStatus != null)
+											{
+												displayStatus = reportStatus.toDisplayName();
+											}
+										}
+									%>
+                                        <%= displayStatus %>
 									<% } else { %>
                                     	<%= (Hl7TextInfoService.getReportStatusDisplayString(Hl7TextInfoService.getReportStatusFromString(result.getReportStatus())))%>
 									<% } %>

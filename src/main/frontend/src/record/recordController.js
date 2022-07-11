@@ -23,14 +23,15 @@
     Ontario, Canada
 
 */
-import {AppointmentApi} from "../../generated/api/AppointmentApi";
 import MhaConfigService from "../lib/integration/myhealthaccess/service/MhaConfigService";
 import MhaPatientService from "../lib/integration/myhealthaccess/service/MhaPatientService";
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../common/components/junoComponentConstants";
 import {MhaCallPanelEvents} from "./components/mhaCallPanel/mhaCallPanelEvents";
-import {API_BASE_PATH} from "../lib/constants/ApiConstants";
-import {netcareService} from "../lib/integration/netcare/service/NetcareService";
+import moment from "moment";
+import AppointmentService from "../lib/appointment/service/AppointmentService";
+import ToastErrorHandler from "../lib/error/handler/ToastErrorHandler";
+import {LogLevel} from "../lib/error/handler/LogLevel";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -77,7 +78,6 @@ angular.module('Record').controller('Record.RecordController', [
 		billingService,
 		focusService)
 	{
-
 		var controller = this;
 
 		const PATIENT_MESSENGER_NAV_ID = 432543;
@@ -85,13 +85,14 @@ angular.module('Record').controller('Record.RecordController', [
 		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
 
-		controller.appointmentApi = new AppointmentApi($http, $httpParamSerializer, API_BASE_PATH);
+		controller.appointmentService = new AppointmentService();
 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.demographic = null;
 		controller.page = {};
 		controller.page.assignedCMIssues = [];
 		controller.SecurityPermissions = SecurityPermissions;
+		controller.errorHandler = new ToastErrorHandler(false, LogLevel.WARN);
 
 		/*
 		 * handle concurrent note edit - EditingNoteFlag
@@ -100,24 +101,17 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.page.itvCheck = null;
 		controller.page.editingNoteId = null;
 		controller.page.isNoteSaved = false; // Track save state of note TODO-legacy: Potentially add this to the encounterNote object on the backend
+		controller.page.currentNoteConfig = {};
 
 		controller.$storage = $localStorage; // Define persistent storage
-		controller.recordtabs2 = [];
 		controller.working = false;
 		controller.noteDirty = false;
+		controller.draftSavedDate = null;
 		controller.displayPhone = null;
 		controller.page.cannotChange = true;
 		controller.canMHACallPatient = false;
 		controller.mhaCallPanelOpen = false;
 		controller.netcareModuleEnabled = false;
-
-		// phone related constants
-		controller.phone = {
-			cellExtKey: "demo_cell",
-			workPhoneExtensionKey: "wPhoneExt",
-			homePhoneExtensionKey: "hPhoneExt",
-			preferredIndicator: "*",
-		};
 
 		controller.$onInit = async () =>
 		{
@@ -135,19 +129,12 @@ angular.module('Record').controller('Record.RecordController', [
 				controller.skipTmpSave = false;
 				controller.noteDirty = false;
 
-
-				let saveUpdates = function saveUpdates()
+				if($stateParams.appointmentNo && securityRolesService.hasSecurityPrivileges(SecurityPermissions.AppointmentRead))
 				{
-					if (controller.page.encounterNote.note === controller.page.initNote) return; //user did not input anything, don't save
+					controller.page.appointment = await controller.appointmentService.getAppointment($stateParams.appointmentNo);
+				}
 
-					console.log("save", controller.page.encounterNote);
-					noteService.tmpSave($stateParams.demographicNo, controller.page.encounterNote).then(() =>
-					{
-						controller.noteDirty = false;
-					});
-				};
-
-				await controller.getCurrentNote(true);
+				await controller.getCurrentNote(controller.page.appointment);
 
 				let delayTmpSave = function delayTmpSave(newVal, oldVal)
 				{
@@ -156,11 +143,12 @@ angular.module('Record').controller('Record.RecordController', [
 						if (newVal !== oldVal)
 						{
 							controller.noteDirty = true;
+							controller.draftSavedDate = null;
 							if (timeout)
 							{
 								$timeout.cancel(timeout);
 							}
-							timeout = $timeout(saveUpdates, saveIntervalSeconds * 1000);
+							timeout = $timeout(controller.saveUpdates, saveIntervalSeconds * 1000);
 						}
 						else
 						{
@@ -189,9 +177,43 @@ angular.module('Record').controller('Record.RecordController', [
 
 			}
 
+			try
+			{
+				let billingResults = await Promise.all([
+					billingService.getBillingRegion(),
+					billingService.getDefaultView(),
+				]);
+
+				controller.page.billregion = billingResults[0].message;
+				controller.page.defaultView = billingResults[1].message;
+			}
+			catch (e)
+			{
+				controller.errorHandler.handleError(e);
+			}
+
 			//TODO re-enable once conformance is passed and prod credentials set
 			controller.netcareModuleEnabled = false; //await netcareService.loadEnabledState();
 		}
+
+		controller.saveUpdates = async () =>
+		{
+			if (controller.page.encounterNote.note === controller.page.initNote) return; //user did not input anything, don't save
+
+			try
+			{
+				await noteService.tempSave($stateParams.demographicNo,
+					controller.page.encounterNote.note,
+					controller.page.encounterNote.noteId);
+
+				controller.noteDirty = false;
+				controller.draftSavedDate = new moment();
+			}
+			catch (e)
+			{
+				controller.errorHandler.handleError(e);
+			}
+		};
 
 		/**
 		 * check if patient has the MHA app & they have a strong enough connection to be called from the eChart.
@@ -246,11 +268,7 @@ angular.module('Record').controller('Record.RecordController', [
 			// If the encounter note is not null/undefined and the new state is not a child of record, continue
 			if (controller.inUnsavedNoteState() && data.name.indexOf('record.') === -1)
 			{
-				const discard = confirm("You have unsaved note data. Are you sure you want to leave?");
-				if (!discard)
-				{
-					event.preventDefault();
-				}
+				controller.saveUpdates(); // force temp-save current note
 			}
 		});
 
@@ -340,17 +358,17 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-		// TODO-legacy
-		controller.cancelNoteEdit = function cancelNoteEdit()
+		controller.cancelNoteEdit = async () =>
 		{
-			console.log('CANCELLING EDIT');
 			controller.page.encounterNote = null;
+			controller.page.assignedCMIssues = [];
 			$scope.$broadcast('stopEditingNote');
 			controller.skipTmpSave = true;
-			controller.getCurrentNote(false);
-			controller.removeEditingNoteFlag();
 			controller.$storage.hideNote = true;
-		};
+			await noteService.clearTempSave($stateParams.demographicNo);
+			await controller.getCurrentNote();
+			controller.removeEditingNoteFlag();
+		}
 
 		// This is a hack wrapper until we figure out a more sane way to check the DOM for updated content
 		// Right now this is being called from anywhere that directly manipulates the DOM
@@ -395,7 +413,7 @@ angular.module('Record').controller('Record.RecordController', [
 					controller.skipTmpSave = true;
 					controller.page.encounterNote = results;
 					controller.$storage.hideNote = true;
-					controller.getCurrentNote(false);
+					controller.getCurrentNote();
 					controller.page.assignedCMIssues = [];
 					controller.working = false;
 				},
@@ -428,37 +446,6 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.saveNote();
 		};
 
-		billingService.getBillingRegion().then(
-			function success(results)
-			{
-				controller.page.billregion = results.message;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-		billingService.getDefaultView().then(
-			function success(results)
-			{
-				controller.page.defaultView = results.message;
-			},
-			function error(errors)
-			{
-				console.log(errors);
-			});
-		if ($location.search().appointmentNo != null)
-		{
-			controller.appointmentApi.getAppointment($location.search().appointmentNo).then(
-				function success(results)
-				{
-					controller.page.appointment = results.data.body;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-		}
-
 		controller.saveSignBillNote = function saveSignBillNote()
 		{
 			if(controller.isWorking())
@@ -483,9 +470,9 @@ angular.module('Record').controller('Record.RecordController', [
 				apptNo = controller.page.appointment.id;
 				apptProvider = controller.page.appointment.providerNo;
 				var dt = moment(controller.page.appointment.appointmentDate).toDate();
-				apptDate = dt.getFullYear() + "-" + zero(dt.getMonth() + 1) + "-" + zero(dt.getDate());
+				apptDate = dt.getFullYear() + "-" + Juno.Common.Util.pad0(dt.getMonth() + 1) + "-" + Juno.Common.Util.pad0(dt.getDate());
 				dt = new Date(controller.page.appointment.startTime);
-				apptStartTime = zero(dt.getHours()) + ":" + zero(dt.getMinutes()) + ":" + zero(dt.getSeconds());
+				apptStartTime = Juno.Common.Util.pad0(dt.getHours()) + ":" + Juno.Common.Util.pad0(dt.getMinutes()) + ":" + Juno.Common.Util.pad0(dt.getSeconds());
 			}
 
 			var url = "../billing.do?billRegion=" + encodeURIComponent(controller.page.billregion);
@@ -500,9 +487,6 @@ angular.module('Record').controller('Record.RecordController', [
 			window.open(url, "billingWin", "scrollbars=yes, location=no, width=" + screen.width + ", height=" + screen.height);
 		};
 
-		controller.page.currentNoteConfig = {};
-
-
 		controller.getIssueNote = function getIssueNote()
 		{
 			if (controller.page.encounterNote.noteId != null)
@@ -510,7 +494,7 @@ angular.module('Record').controller('Record.RecordController', [
 				noteService.getIssueNote(controller.page.encounterNote.noteId).then(
 					function success(results)
 					{
-						if (results != null) controller.page.assignedCMIssues = toArray(results.assignedCMIssues);
+						if (results != null) controller.page.assignedCMIssues = Juno.Common.Util.toArray(results.assignedCMIssues);
 					},
 					function error(errors)
 					{
@@ -519,15 +503,15 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-		controller.getCurrentNote = async function getCurrentNote(showNoteAfterLoadingFlag)
+		controller.getCurrentNote = async function getCurrentNote(appointment = null)
 		{
 			let results = await noteService.getCurrentNote($stateParams.demographicNo, $location.search());
 			controller.page.encounterNote = results;
 			controller.page.initNote = results.note; //compare this with current note content to determine tmpsave or not
 			controller.getIssueNote();
 			$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
-			controller.initAppendNoteEditor();
-			controller.initObservationDate();
+			controller.initAppendNoteEditor(appointment);
+			controller.initObservationDate(appointment);
 			return results.note;
 		};
 
@@ -545,15 +529,16 @@ angular.module('Record').controller('Record.RecordController', [
 				controller.displayWarning(data);
 				return;
 			}
+			controller.removeEditingNoteFlag();
+
 			controller.page.encounterNote = angular.copy(data);
 			controller.getIssueNote();
 
 			//Need to check if note has been saved yet.
 			controller.$storage.hideNote = false;
 			focusService.focusRef(controller.encounterNoteTextAreaRef);
+			controller.setEditingNoteFlag();
 			$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
-
-			controller.removeEditingNoteFlag();
 		});
 
 		$scope.$on('appendToCurrentNote', (event, message) =>
@@ -573,20 +558,31 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.removeEditingNoteFlag();
 		})
 
-		controller.initAppendNoteEditor = function initAppendNoteEditor()
+		controller.initAppendNoteEditor = function initAppendNoteEditor(appointment = null)
 		{
 			if ($location.search().noteEditorText != null)
 			{
 				controller.page.encounterNote.note = controller.page.encounterNote.note + $location.search().noteEditorText;
 			}
+			else if(appointment && appointment.reason && Juno.Common.Util.isBlank(controller.page.encounterNote.note))
+			{
+				controller.page.encounterNote.note = "Reason: " + appointment.reason;
+			}
 		};
 
 		// Initialize the observationDate for new notes
-		controller.initObservationDate = function initObservationDate()
+		controller.initObservationDate = function initObservationDate(appointment = null)
 		{
 			if (controller.page.encounterNote.observationDate === null)
 			{
-				controller.page.encounterNote.observationDate = new Date();
+				if(appointment && appointment.appointmentDate)
+				{
+					controller.page.encounterNote.observationDate = moment(appointment.appointmentDate).toDate();
+				}
+				else
+				{
+					controller.page.encounterNote.observationDate = new Date();
+				}
 			}
 		};
 
@@ -862,18 +858,34 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			controller.mhaCallPanelOpen = false;
 		});
+
+		controller.draftSavedMessage = () =>
+		{
+			if(controller.draftSavedDate)
+			{
+				return "Draft saved on " + Juno.Common.Util.formatMomentDateTime(
+					controller.draftSavedDate,
+					Juno.Common.Util.DisplaySettings.dateTimeFormat);
+			}
+			return "";
+		}
+
+		controller.cancelButtonText = () =>
+		{
+			if(controller.page.editingNoteId === null)
+			{
+				return "Delete";
+			}
+			return "Cancel";
+		}
+
+		controller.cancelButtonTooltip = () =>
+		{
+			if(controller.page.editingNoteId === null)
+			{
+				return "Deletes saved draft, encounter text, and assigned issues.";
+			}
+			return "Cancel saved draft";
+		}
 	}
 ]);
-
-function toArray(obj)
-{ //convert single object to array
-	if (obj instanceof Array) return obj;
-	if (obj == null) return [];
-	return [obj];
-}
-
-function zero(n)
-{
-	if (n < 10) n = "0" + n;
-	return n;
-}

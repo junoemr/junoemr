@@ -44,10 +44,9 @@
 <%@page import="org.oscarehr.PMmodule.service.ProgramManager"%>
 <%@page import="org.oscarehr.PMmodule.web.GenericIntakeEditAction"%>
 <%@page import="org.oscarehr.common.OtherIdManager"%>
-<%@page import="org.oscarehr.common.dao.DemographicArchiveDao"%>
-<%@page import="org.oscarehr.common.dao.DemographicDao"%>
+<%@page import="org.oscarehr.demographic.dao.DemographicDao"%>
 <%@page import="org.oscarehr.common.model.ConsentType" %>
-<%@page import="org.oscarehr.common.model.Demographic" %>
+<%@page import="org.oscarehr.demographic.entity.Demographic" %>
 <%@page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
 <%@page import="org.oscarehr.demographic.entity.DemographicCust" %>
 <%@page import="org.oscarehr.demographic.entity.DemographicExt" %>
@@ -80,8 +79,8 @@
 <%
 	OscarProperties oscarVariables = oscar.OscarProperties.getInstance();
 
-	DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
-	DemographicArchiveDao demographicArchiveDao = (DemographicArchiveDao)SpringUtils.getBean("demographicArchiveDao");
+	org.oscarehr.common.dao.DemographicDao legacyDemographicDao = (org.oscarehr.common.dao.DemographicDao) SpringUtils.getBean("demographicDao");
+	DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
 	DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
 	RecentDemographicAccessService recentDemographicAccessService = SpringUtils.getBean(RecentDemographicAccessService.class);
@@ -111,7 +110,7 @@
 	int demographicNo = Integer.parseInt(demographicNoStr);
 
 	/* Prepare the demographic model */
-	Demographic demographic = demographicDao.getDemographic(demographicNoStr);
+	Demographic demographic = demographicDao.find(demographicNo);
 
 	String hin = request.getParameter("hin").replaceAll("[^0-9a-zA-Z]", "");
 	String ver = request.getParameter("ver");
@@ -128,10 +127,9 @@
 	demographic.setPhone(filterControlCharacters(request.getParameter("phone")));
 	demographic.setPhone2(filterControlCharacters(request.getParameter("phone2")));
 	demographic.setEmail(StringUtils.trimToNull(request.getParameter("email")));
-	demographic.setMyOscarUserName(StringUtils.trimToNull(request.getParameter("myOscarUserName")));
 	demographic.setYearOfBirth(request.getParameter("year_of_birth"));
 	demographic.setMonthOfBirth(request.getParameter("month_of_birth")!=null && request.getParameter("month_of_birth").length()==1 ? "0"+request.getParameter("month_of_birth") : request.getParameter("month_of_birth"));
-	demographic.setDateOfBirth(request.getParameter("date_of_birth")!=null && request.getParameter("date_of_birth").length()==1 ? "0"+request.getParameter("date_of_birth") : request.getParameter("date_of_birth"));
+	demographic.setDayOfBirth(request.getParameter("date_of_birth")!=null && request.getParameter("date_of_birth").length()==1 ? "0"+request.getParameter("date_of_birth") : request.getParameter("date_of_birth"));
 	demographic.setHin(hin);
 	demographic.setVer(ver);
 	demographic.setRosterStatus(request.getParameter("roster_status"));
@@ -141,9 +139,9 @@
 	demographic.setSex(request.getParameter("sex"));
 	demographic.setPcnIndicator(request.getParameter("pcn_indicator"));
 	demographic.setHcType(hcType);
-	demographic.setFamilyDoctor("<rdohip>" + StringUtils.trimToEmpty(request.getParameter("referral_doctor_no")) + "</rdohip>" +
+	demographic.setReferralDoctor("<rdohip>" + StringUtils.trimToEmpty(request.getParameter("referral_doctor_no")) + "</rdohip>" +
 			"<rd>" + StringUtils.trimToEmpty(request.getParameter("referral_doctor_name")) + "</rd>");
-	demographic.setFamilyDoctor2("<fd>" + StringUtils.trimToEmpty(request.getParameter("family_doctor_no")) + "</fd>" +
+	demographic.setFamilyDoctor("<fd>" + StringUtils.trimToEmpty(request.getParameter("family_doctor_no")) + "</fd>" +
 			"<fdname>" + StringUtils.trimToEmpty(request.getParameter("family_doctor_name")) + "</fdname>");
 	demographic.setCountryOfOrigin(("-1".equals(countryOfOrigin)) ? null : countryOfOrigin);
 	demographic.setNewsletter(request.getParameter("newsletter"));
@@ -183,7 +181,7 @@
 	dayTmp = StringUtils.trimToNull(request.getParameter("eff_date_date"));
 	if(yearTmp != null && monthTmp != null && dayTmp != null)
 	{
-		demographic.setEffDate(MyDateFormat.getSysDate(yearTmp + '-' + monthTmp + '-' + dayTmp));
+		demographic.setHcEffectiveDate(MyDateFormat.getSysDate(yearTmp + '-' + monthTmp + '-' + dayTmp));
 	}
 
 	yearTmp = StringUtils.trimToNull(request.getParameter("hc_renew_date_year"));
@@ -239,7 +237,7 @@
 			// checked box means add or edit consent. 
 			if(consentTypeId != null)
 			{
-				patientConsentManager.addConsent(loggedInInfo, demographic.getDemographicNo(), Integer.parseInt(consentTypeId));
+				patientConsentManager.addConsent(loggedInInfo, demographic.getDemographicId(), Integer.parseInt(consentTypeId));
 				// unchecked and patientConsentId > 0 could mean the patient opted out.
 			}
 			else if(patientConsentIdInt > 0)
@@ -306,7 +304,8 @@
 	}
 
 	//save
-	demographicService.updateLegacyDemographicRecord(demographic, extensions, loggedInInfo);
+	demographic.setDemographicExtSet(new HashSet<>(extensions));
+	demographicService.updateDemographicRecord(demographic, loggedInInfo);
 
 	// save custom licensed producer if enabled
 	if(oscarVariables.isPropertyActive("show_demographic_licensed_producers")) {
@@ -314,12 +313,12 @@
 			int licensedProducerID = Integer.parseInt(request.getParameter("licensed_producer"));
 			int licensedProducerID2 = Integer.parseInt(request.getParameter("licensed_producer2"));
 			int licensedProducerAddressID = Integer.parseInt(request.getParameter("licensed_producer_address"));
-			demographicDao.saveDemographicLicensedProducer(demographic.getDemographicNo(), licensedProducerID, licensedProducerID2, licensedProducerAddressID);
+			legacyDemographicDao.saveDemographicLicensedProducer(demographic.getDemographicId(), licensedProducerID, licensedProducerID2, licensedProducerAddressID);
 		}
 		catch(NumberFormatException e) {
 			// unable to save licensed producer info
 			MiscUtils.getLogger().warn(
-					String.format("Failed to save licensed producer for demographic %d.", demographic.getDemographicNo())
+					String.format("Failed to save licensed producer for demographic %d.", demographic.getDemographicId())
 			);
 		}
 	}
@@ -365,7 +364,7 @@
 	{
 		try
 		{
-			gieat.admitBedCommunityProgram(demographic.getDemographicNo(), currentUserNoStr, Integer.parseInt(bedComProgramId), "", "(Master record change)", new java.util.Date());
+			gieat.admitBedCommunityProgram(demographic.getDemographicId(), currentUserNoStr, Integer.parseInt(bedComProgramId), "", "(Master record change)", new java.util.Date());
 		}
 		catch(Exception e)
 		{
@@ -383,7 +382,7 @@
 		}
 		try
 		{
-			gieat.admitServicePrograms(demographic.getDemographicNo(), currentUserNoStr, s, "(Master record change)", new java.util.Date());
+			gieat.admitServicePrograms(demographic.getDemographicId(), currentUserNoStr, s, "(Master record change)", new java.util.Date());
 		}
 		catch(Exception e)
 		{
@@ -398,7 +397,7 @@
 		{
 			try
 			{
-				am.processDischarge(p.getId(), demographic.getDemographicNo(), "(Master record change)", "0");
+				am.processDischarge(p.getId(), demographic.getDemographicId(), "(Master record change)", "0");
 			}
 			catch(org.oscarehr.PMmodule.exception.AdmissionException e)
 			{

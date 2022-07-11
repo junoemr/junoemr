@@ -24,7 +24,7 @@ angular.module("Admin.Section.Fax").component('faxConfiguration', {
 		          systemPreferenceService)
 		{
 			const ctrl = this;
-			ctrl.faxAccountService = new FaxAccountService(new ToastErrorHandler());
+			ctrl.faxAccountService = new FaxAccountService(new ToastErrorHandler(true));
 			ctrl.toastService = new ToastService();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;

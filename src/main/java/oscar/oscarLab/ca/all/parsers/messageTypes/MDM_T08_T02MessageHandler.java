@@ -24,6 +24,7 @@ package oscar.oscarLab.ca.all.parsers.messageTypes;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
+import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
 import org.oscarehr.common.model.Hl7TextInfo;
 import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
@@ -156,7 +157,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getHealthNum()
 	{
-		return getString(get("/.PID-3(1)-1"));
+		return getString(get("/.PID-3-1"));
 	}
 
 	/**
@@ -255,15 +256,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	protected String getOrderingProvider(int i, int k) throws HL7Exception
 	{
-		String familyName = getString(get("/.TXA-5(" + k + ")-2"));
-		String givenName = getString(get("/.TXA-5(" + k + ")-3"));
-		String middleName = getString(get("/.TXA-5("+ k + ")-4"));
-		String suffix = getString(get("/.TXA-5(" + k + ")-5"));
-		String prefix = getString(get("/.TXA-5(" + k + ")-6"));
-		String degree = getString(get("/.TXA-5(" + k + ")-7"));
-
-		String fullName = prefix + " " + givenName + " " + middleName + " " + familyName + " " + suffix + " " + degree;
-		return fullName.trim().replaceAll("\\s+", " ");
+		return getFullDocName("/.TXA", 5, k);
 	}
 
 	/**
@@ -276,15 +269,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	protected String getResultCopiesTo(int i, int k) throws HL7Exception
 	{
-		String familyName = getString(get("/.TXA-23(" + k + ")-2"));
-		String givenName = getString(get("/.TXA-23(" + k + ")-3"));
-		String middleName = getString(get("/.TXA-23("+ k + ")-4"));
-		String suffix = getString(get("/.TXA-23(" + k + ")-5"));
-		String prefix = getString(get("/.TXA-23(" + k + ")-6"));
-		String degree = getString(get("/.TXA-23(" + k + ")-7"));
-
-		String fullName = prefix + " " + givenName + " " + middleName + " " + familyName + " " + suffix + " " + degree;
-		return fullName.trim().replaceAll("\\s+", " ");
+		return getFullDocName("/.TXA", 23, k);
 	}
 
 
@@ -370,25 +355,24 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public List<EmbeddedDocument> getEmbeddedDocuments()
 	{
-		List<EmbeddedDocument> embeddedDocuments = new LinkedList<>();
-		String[] referenceStrings = "^TEXT^PDF^Base64^MSG".split("\\^");
-		// Every PDF should be prefixed with this due to b64 encoding of PDF header
-
 		int count = 0;
-		for(int j = 0; j < getOBXCount(0); j++)
+		List<EmbeddedDocument> embeddedDocuments = new LinkedList<>();
+		for(int j=0; j < getOBXCount(0); j++)
 		{
-			if(getOBXValueType(0, j).equals("ED"))
+			String docData = getOBXResult(0, j);
+			switch(getOBXContentType(0, j))
 			{
-				// Some embedded PDFs simply have the lab as-is, some have it split up like above
-				for (int k = 1; k <= referenceStrings.length; k++)
+				case PDF:
 				{
-					String embeddedPdf = getOBXResult(0, j, k);
-					if (embeddedPdf.startsWith(MessageHandler.embeddedPdfPrefix))
-					{
-						logger.info("Found embedded PDF in lab upload, pulling it out");
-						embeddedDocuments.add(toEmbeddedPdf(embeddedPdf, count));
-						count++;
-					}
+					embeddedDocuments.add(toEmbeddedPdf(docData, count));
+					count++;
+					break;
+				}
+				case JPEG:
+				{
+					embeddedDocuments.add(toEmbeddedJpeg(docData, count));
+					count++;
+					break;
 				}
 			}
 		}
@@ -442,7 +426,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public int getOBXCount(int i)
 	{
-		return getReps("OBX");
+		return getReps(getObservationGroup());
 	}
 
 	/**
@@ -454,7 +438,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXValueType(int i, int j)
 	{
-		return getString(get("/.OBX("+j+")-2"));
+		return getString(get(getObservationOBXPath(j) + "-2"));
 	}
 
 	/**
@@ -466,7 +450,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXIdentifier(int i, int j)
 	{
-		return getString(get("/.OBX("+j+")-3-1"));
+		return getString(get(getObservationOBXPath(j) + "-3-1"));
 	}
 
 	/**
@@ -480,7 +464,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXName( int i, int j)
 	{
-		return getString(get("/.OBX("+j+")-3-2"));
+		return getString(get(getObservationOBXPath(j) + "-3-2"));
 	}
 
 	/**
@@ -493,7 +477,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXResult(int i, int j, int k)
 	{
-		return getString(get("/.OBX("+j+")-5-"+k));
+		return getString(get(getObservationOBXPath(j) + "-5-" + k));
 	}
 
 	/**
@@ -505,7 +489,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXUnits( int i, int j)
 	{
-		return getString(get("/.OBX("+j+")-6"));
+		return getString(get(getObservationOBXPath(j) + "-6"));
 	}
 
 	/**
@@ -517,7 +501,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXReferenceRange( int i, int j)
 	{
-		return getString(get("/.OBX("+j+")-7"));
+		return getString(get(getObservationOBXPath(j) + "-7"));
 	}
 
 	/**
@@ -529,7 +513,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXAbnormalFlag( int i, int j)
 	{
-		String ab = getString(get("/.OBX("+j+")-8"));
+		String ab = getString(get(getObservationOBXPath(j) + "-8"));
 		if (ab == null || ab.isEmpty())
 		{// no ab string means normal
 			return "N";
@@ -546,7 +530,36 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getOBXResultStatus( int i, int j)
 	{
-		return getString(get("/.OBX("+j+")-11"));
+		return getString(get(getObservationOBXPath(j) + "-11"));
+	}
+
+	/**
+	 * Return the number of comments (NTE segments) following the jth OBX segment.
+	 * @param i ignored
+	 * @return the number of NTE segments
+	 */
+	@Override
+	public int getOBXCommentCount( int i, int j)
+	{
+		if(getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		{
+			return getReps(getObservationGroup(), j, "NTE");
+		}
+		return 0;
+	}
+
+	/**
+	 *  Return the kth comment of the ith OBR segment.
+	 *  @param i ignored
+	 */
+	@Override
+	public String getOBXComment(int i, int j, int k)
+	{
+		if(getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		{
+			return getString(get(getObservationNTEPath(k) + "(" + k + ")-3"));
+		}
+		return "";
 	}
 
 	/**
@@ -559,7 +572,38 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 	@Override
 	public String getTimeStamp(int i, int j)
 	{
-		return formatDateTime(get("/.OBX("+j+")-14"));
+		return formatDateTime(get(getObservationOBXPath(j) + "-14"));
+	}
+
+	protected String getObservationGroup()
+	{
+		if (getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		{
+			return "OBSERVATION";
+		}
+		else
+		{
+			return "";
+		}
+	}
+	protected String getObservationOBXPath(int rep)
+	{
+		if(getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		{
+			return "/.OBSERVATION(" + rep + ")/OBX";
+		}
+		else
+		{
+			return "/.OBX(" + rep + ")";
+		}
+	}
+	protected String getObservationNTEPath(int rep)
+	{
+		if(getMsgVersion() == DataTypeUtils.HL7_VERSION.VERSION_251)
+		{
+			return "/.OBSERVATION(" + rep + ")/NTE";
+		}
+		throw new IllegalStateException("NTE does not exist for message version " + getMsgVersion());
 	}
 
 }

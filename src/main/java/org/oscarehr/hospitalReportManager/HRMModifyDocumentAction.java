@@ -444,7 +444,7 @@ public class HRMModifyDocumentAction extends DispatchAction {
 	 * @param form
 	 * @param request
 	 * @param response
-	 * @return
+	 * @return forwarding action
 	 */
 	public ActionForward recategorizeFuture(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{

@@ -24,7 +24,7 @@
 package org.oscarehr.demographicRoster.dao;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
+import org.oscarehr.demographicRoster.entity.DemographicRoster;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

@@ -40,7 +40,9 @@
 	}
 %>
 
-<%@ page import="java.net.URLDecoder, oscar.form.data.*" errorPage="../errorpage.jsp"%>
+<%@ page import="java.net.URLDecoder" errorPage="../errorpage.jsp"%>
+<%@ page import="org.apache.commons.lang3.StringUtils" %>
+<%@ page import="oscar.form.data.FrmData" %>
 
 <%
 
@@ -52,14 +54,15 @@
         String[] formPath = (new FrmData()).getShortcutFormValue(request.getParameter("demographic_no"), strFrm);
         formPath[0] = formPath[0].trim();
         
-        String remoteFacilityIdString=request.getParameter("remoteFacilityId");
-        String appointmentNo=request.getParameter("appointmentNo");
+        String remoteFacilityIdString =  StringUtils.trimToNull(request.getParameter("remoteFacilityId"));
+        String appointmentNo= StringUtils.trimToNull(request.getParameter("appointmentNo"));
+        String formId = StringUtils.trimToNull(request.getParameter("formId"));
         
         String nextPage = formPath[0] + 
         				 request.getParameter("demographic_no")  + 
         				 ((remoteFacilityIdString!=null)?"&remoteFacilityId="+remoteFacilityIdString:"") + 
         				 ((appointmentNo!=null)?"&appointmentNo="+appointmentNo:"") + 
-        				 ((request.getParameter("formId") != null)?"&formId="+request.getParameter("formId"):"&formId=" + formPath[1]);
+        				 ((formId != null)?"&formId="+formId:"&formId=" + formPath[1]);
         MiscUtils.getLogger().info("Forwarding to page : "+nextPage);
         pageContext.forward(nextPage);
         return;

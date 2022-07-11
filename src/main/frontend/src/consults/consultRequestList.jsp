@@ -71,7 +71,7 @@
 				<div class="col-lg-3 col-xs-6">
 					<select class="form-control" ng-model="consultRequestListCtrl.search.status"
 							name="status" id="status"
-							ng-options="status.value as status.name for status in consultRequestListCtrl.statuses">
+							ng-options="status.value as status.label for status in consultRequestListCtrl.statuses">
 						<option value=""><bean:message key="consult.list.status.all" bundle="ui"/></option>
 					</select>
 				</div>

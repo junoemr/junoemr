@@ -23,7 +23,7 @@
 
 import {SecurityPermissions} from "../common/security/securityConstants";
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, LABEL_POSITION} from "../common/components/junoComponentConstants";
-import CareTrackerModel from "../lib/careTracker/model/CareTrackerModel";
+import CareTracker from "../lib/careTracker/model/CareTracker";
 
 angular.module('CareTracker').component('careTrackerManager',
 	{
@@ -81,7 +81,7 @@ angular.module('CareTracker').component('careTrackerManager',
 					ctrl.isLoading = false;
 				}
 
-				ctrl.separateCareTrackerLevels = (careTrackers: CareTrackerModel[]): void =>
+				ctrl.separateCareTrackerLevels = (careTrackers: CareTracker[]): void =>
 				{
 					ctrl.tablesConfig = [
 						{
@@ -110,7 +110,7 @@ angular.module('CareTracker').component('careTrackerManager',
 						}
 					];
 					// sort all careTrackers by level (clinic, provider, demographic)
-					careTrackers.forEach((careTracker: CareTrackerModel) =>
+					careTrackers.forEach((careTracker: CareTracker) =>
 					{
 						if (careTracker.isDemographicLevel())
 						{
@@ -171,7 +171,7 @@ angular.module('CareTracker').component('careTrackerManager',
 					ctrl.toCareTrackerEdit(careTracker.id);
 				}
 
-				ctrl.onCareTrackerDelete = async (careTracker: CareTrackerModel): Promise<void> =>
+				ctrl.onCareTrackerDelete = async (careTracker: CareTracker): Promise<void> =>
 				{
 					const userOk : boolean = await Juno.Common.Util.confirmationDialog($uibModal,
 						"Confirm Delete",
@@ -194,7 +194,7 @@ angular.module('CareTracker').component('careTrackerManager',
 					}
 				}
 
-				ctrl.onCloneCareTracker = async (careTracker: CareTrackerModel): Promise<void> =>
+				ctrl.onCloneCareTracker = async (careTracker: CareTracker): Promise<void> =>
 				{
 					const options = ctrl.getCloneOptions(careTracker);
 					let selection = null;
@@ -229,7 +229,7 @@ angular.module('CareTracker').component('careTrackerManager',
 						ctrl.isLoading = true;
 						try
 						{
-							let careTrackerClone: CareTrackerModel = null;
+							let careTrackerClone: CareTracker = null;
 							if(selection === accessLevels.CLINIC)
 							{
 								careTrackerClone = await careTrackerApiService.cloneCareTrackerForClinic(careTracker.id);
@@ -256,7 +256,7 @@ angular.module('CareTracker').component('careTrackerManager',
 					}
 				}
 
-				ctrl.getCloneOptions = (careTracker: CareTrackerModel): object[] =>
+				ctrl.getCloneOptions = (careTracker: CareTracker): object[] =>
 				{
 					const options = [];
 					if(!careTracker.isDemographicLevel() && !careTracker.isProviderLevel() && ctrl.userCanCreateClinicLevel())
@@ -274,7 +274,7 @@ angular.module('CareTracker').component('careTrackerManager',
 					return options;
 				}
 
-				ctrl.onToggleCareTrackerEnabled = async (careTracker: CareTrackerModel): Promise<void> =>
+				ctrl.onToggleCareTrackerEnabled = async (careTracker: CareTracker): Promise<void> =>
 				{
 					ctrl.isLoading = true;
 					try
@@ -287,7 +287,7 @@ angular.module('CareTracker').component('careTrackerManager',
 					}
 				}
 
-				ctrl.toggleCareTrackerEnabledLabel = (careTracker: CareTrackerModel): string =>
+				ctrl.toggleCareTrackerEnabledLabel = (careTracker: CareTracker): string =>
 				{
 					return careTracker.enabled ? "Disable" : "Enable";
 				}

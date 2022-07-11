@@ -130,6 +130,12 @@ public class PageUtil
 			ExpectedConditions.presenceOfElementLocated(element));
 	}
 
+	public static void clickSwitchToWindow(WebDriver driver, WebDriverWait webDriverWait, By clickTarget, String windowHandle)
+	{
+		findWaitClick(driver, webDriverWait, clickTarget);
+		switchToWindow(windowHandle, driver);
+	}
+
 	public static void clickWaitSwitchToLast(WebDriver driver, WebDriverWait webDriverWait, By clickTarget)
 	{
 		int handleCount = driver.getWindowHandles().size();

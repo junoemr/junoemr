@@ -23,6 +23,7 @@
  */
 package org.oscarehr.ws.rest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
@@ -92,6 +93,7 @@ import java.util.List;
 
 @Path("/consults")
 @Component("consultationWebService")
+@Tag(name = "consultation")
 public class ConsultationWebService extends AbstractServiceImpl {
 
 	private static Logger logger = Logger.getLogger(ConsultationWebService.class);
@@ -259,13 +261,6 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			request.setAttachments(getRequestAttachments(requestId, request.getDemographicId(), ConsultationAttachmentTo1.ATTACHED).getBody());
 
 			request.setFaxList(getFaxList());
-			List<ConsultationServices> consultationServices = consultationManager.getConsultationServices();
-			List<ConsultationServiceTo1> serviceTransfers = new ArrayList<>();
-			for (ConsultationServices consultationService : consultationServices)
-			{
-				serviceTransfers.add(servicesToTransferConverter.convert(consultationService));
-			}
-			request.setServiceList(serviceTransfers);
 			request.setSendToList(providerDao.getActiveTeams());
 		}
 		catch(Exception e)
@@ -301,9 +296,6 @@ public class ConsultationWebService extends AbstractServiceImpl {
 			if(StringUtils.isNotBlank(info)) request.setCurrentMeds(info);
 
 			request.setFaxList(getFaxList());
-			List<ConsultationServices> consultationServices = consultationManager.getConsultationServices();
-			List<ConsultationServiceTo1> serviceTransfers = servicesToTransferConverter.convert(consultationServices);
-			request.setServiceList(serviceTransfers);
 			request.setSendToList(providerDao.getActiveTeams());
 			request.setProviderNo(loggedInProviderNo);
 			request.setPatientWillBook(true);
@@ -624,7 +616,7 @@ public class ConsultationWebService extends AbstractServiceImpl {
 	}
 
 	@GET
-	@Path("/getLetterheadList")
+	@Path("/letterheads")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<LetterheadTo1> getLetterheadList()
 	{
@@ -632,6 +624,19 @@ public class ConsultationWebService extends AbstractServiceImpl {
 
 		List<LetterheadTo1> letterheadList = consultationService.getLetterheadList();
 		return RestSearchResponse.successResponse(letterheadList, 1, letterheadList.size(), letterheadList.size());
+	}
+
+	@GET
+	@Path("/serviceList")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestSearchResponse<ConsultationServiceTo1> getServiceList()
+	{
+		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.CONSULTATION_READ);
+
+		List<ConsultationServices> consultationServices = consultationManager.getConsultationServices();
+		List<ConsultationServiceTo1> serviceTransfers = servicesToTransferConverter.convert(consultationServices);
+
+		return RestSearchResponse.successResponseOnePage(serviceTransfers);
 	}
 
 	/*******************

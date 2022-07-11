@@ -506,10 +506,10 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 		{
 
 			var url = "../form/forwardshortcutname.jsp" +
-				"?formname=" + encodeURIComponent(note.note) +
-				"&demographic_no=" + encodeURIComponent(demographicNo) +
-				"&appointmentNo=" + encodeURIComponent(appointmentNo) +
-				"&formId=" + encodeURIComponent(note.noteId);
+				"?formname=" + encodeURIComponent(note.note || "") +
+				"&demographic_no=" + encodeURIComponent(demographicNo || "") +
+				"&appointmentNo=" + encodeURIComponent(appointmentNo || "") +
+				"&formId=" + encodeURIComponent(note.noteId || "");
 
 			onClickString = "popupPage(700,800,'" + winName + "','" + url + "');";
 		}
@@ -737,8 +737,8 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			type: "POST",
 			contentType: "application/json",
 			dataType: "json",
-			url: "../ws/rs/notes/" + demographicNo + "/tmpSave",
-			data: JSON.stringify(noteData),
+			url: "../ws/rs/demographic/" + demographicNo + "/note/temp?noteId=" + encodeURIComponent(noteId),
+			data: noteData.note,
 			success: function (response)
 			{
 				me.setNoteStatus("Draft saved " + moment().format("DD-MMM-YYYY HH:mm:ss"));
@@ -1061,7 +1061,7 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			type: "GET",
 			contentType: "application/json",
 			dataType: "json",
-			url: "../ws/rs/notes/" + demographicNo + "/tmpSave",
+			url: "../ws/rs/demographic/" + demographicNo + "/note/temp",
 		});
 
 		var me = this;
@@ -1076,6 +1076,10 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 				if(tmpSaveResponse[1] === "success")
 				{
 					tmpSave = tmpSaveResponse[0].body;
+					if(tmpSave)
+					{
+						tmpSave.noteId = tmpSave.noteId || 0; //handle null note id
+					}
 				}
 
 				var noteToEdit = null;

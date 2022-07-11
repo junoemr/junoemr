@@ -46,6 +46,7 @@ import org.apache.log4j.Logger;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -521,7 +522,9 @@ public class DefaultGenericHandler extends ORU_R01MessageHandler
         }
     }
 
-    public ArrayList<String> getDocNums(){
+    @Override
+    public List<String> getDocNums()
+    {
         ArrayList<String> nums = new ArrayList<String>();
         String docNum;
         try{

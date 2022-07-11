@@ -28,12 +28,12 @@ import org.oscarehr.common.dao.AdmissionDao;
 import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Admission;
 import org.oscarehr.common.model.DemographicArchive;
+import org.oscarehr.demographic.converter.ApiDemographicUpdateTransferToUpdateInputConverter;
 import org.oscarehr.demographic.converter.DemographicCreateInputToEntityConverter;
 import org.oscarehr.demographic.converter.DemographicDbToModelConverter;
-import org.oscarehr.demographic.converter.DemographicModelToDbConverter;
 import org.oscarehr.demographic.converter.DemographicModelToApiResponseTransferConverter;
+import org.oscarehr.demographic.converter.DemographicModelToDbConverter;
 import org.oscarehr.demographic.converter.DemographicUpdateInputToEntityConverter;
-import org.oscarehr.demographic.converter.ApiDemographicUpdateTransferToUpdateInputConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.dao.DemographicIntegrationDao;
@@ -46,7 +46,8 @@ import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.transfer.DemographicCreateInput;
 import org.oscarehr.demographic.transfer.DemographicUpdateInput;
 import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
+import org.oscarehr.demographicRoster.entity.DemographicRoster;
+import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.integration.service.IntegrationPushUpdateService;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.model.ProviderData;
@@ -88,10 +89,6 @@ public class DemographicService
 	@Autowired
 	private DemographicCustDao demographicCustDao;
 
-	// ONLY FOR LEGACY SUPPORT. DO NOT USE
-	@Autowired
-	private org.oscarehr.common.dao.DemographicDao legacyDemographicDao;
-
 	@Autowired
 	private DemographicIntegrationDao demographicIntegrationDao;
 
@@ -106,6 +103,9 @@ public class DemographicService
 
 	@Autowired
 	private DemographicRosterDao demographicRosterDao;
+
+	@Autowired
+	private DemographicRosterService demographicRosterService;
 
 	@Autowired
 	private IntegrationPushUpdateService integrationPushUpdateService;
@@ -497,6 +497,7 @@ public class DemographicService
 	{
 		Demographic oldDemographic = demographicDao.find(demographic.getId());
 		archiveDemographicRecord(oldDemographic);
+		demographicRosterService.addRosterHistoryEntry(demographic, oldDemographic);
 
 		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
 
@@ -544,36 +545,13 @@ public class DemographicService
 			demographicCustDao.persist(demoCustom);
 		}
 
-		demographicManager.addRosterHistoryEntry(demographic, oldDemographic);
+		demographicRosterService.addRosterHistoryEntry(demographic, oldDemographic);
 		if(updateInput.getWaitList() != null)
 		{
 			waitListService.updateDemographicWaitList(demographic.getId(), updateInput.getWaitList());
 		}
 
 		return demographicDbToModelConverter.convert(demographic);
-	}
-
-	/**
-	 * DO NOT USE IN NEW CODE.
-	 * Provides legacy saving support for old demographic objects
-	 * @param demographic - legacy demographic to save
-	 * @param extensions - extension entries to archive.
-	 * @param loggedInInfo - logged in info
-	 * @return - the save demographic
-	 */
-	@Deprecated
-	public org.oscarehr.common.model.Demographic updateLegacyDemographicRecord(org.oscarehr.common.model.Demographic demographic,
-																			   List<DemographicExt> extensions,
-																			   LoggedInInfo loggedInInfo)
-	{
-		org.oscarehr.common.model.Demographic oldDemographic = legacyDemographicDao.getDemographicById(demographic.getDemographicNo());
-		Long archiveId = demographicArchiveDao.archiveRecord(oldDemographic);
-		legacyDemographicDao.save(demographic);
-		demographicManager.saveAndArchiveDemographicExt(archiveId, extensions);
-
-		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
-
-		return demographic;
 	}
 
 	public void addDemographicIntegrationRecord(Integer demographicNo, DemographicIntegrationTransfer transfer)

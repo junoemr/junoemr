@@ -342,10 +342,11 @@ public class EaapsHandler extends DefaultGenericHandler implements oscar.oscarLa
 		return doc;
 	}
 
-	private int countPages(String fileName) {
+	private Integer countPages(String fileName) {
 		PdfReader reader = null;
 		try {
 			reader = new PdfReader(EDocUtil.resovePath(fileName));
+
 			return reader.getNumberOfPages();
 		} catch (IOException e) {
 			logger.debug("Unable to count pages in " + fileName + " due to " + e.getMessage());

@@ -56,24 +56,23 @@ public class HRMReportParser
 	public static HRMReport parseReport(GenericFile hrmFile, String schemaVersion) throws IOException, SAXException, JAXBException
 	{
 		String hrmXML = FileUtils.getStringFromFile(hrmFile.getFileObject());
-		
-		if (schemaVersion.equals("4.3"))
+		HRMReport report;
+
+		// schema may be null in legacy data
+		if (HRMFileParser.SCHEMA_VERSION.equals(schemaVersion))
 		{
 			HRMFileParser hrmParser = new HRMFileParser();
 			xml.hrm.v4_3.OmdCds root = hrmParser.parse(hrmFile);
-			HRMReport_4_3 report = new HRMReport_4_3(root, hrmFile.getPath(), hrmXML);
-			
-			return report;
+			report = new HRMReport_4_3(root, hrmFile.getPath(), hrmXML);
 		}
 		else
 		{
 			// Legacy Implementation for HRM v4.1
 			HRMFileParser4_1 hrmParser = new HRMFileParser4_1();
 			xml.hrm.v4_1.OmdCds root = hrmParser.parse(hrmFile);
-			HRMReport_4_1 report = new HRMReport_4_1(root, hrmFile.getPath(), hrmXML);
-			
-			return report;
+			report = new HRMReport_4_1(root, hrmFile.getPath(), hrmXML);
 		}
+		return report;
 	}
 	
 	public static HRMReport parseRelativeLocation(String relativeLocation, String schemaVersion) throws IOException, SAXException, JAXBException

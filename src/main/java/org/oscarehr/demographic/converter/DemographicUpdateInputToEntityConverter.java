@@ -36,7 +36,7 @@ import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.transfer.DemographicUpdateInput;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
+import org.oscarehr.demographicRoster.entity.RosterTerminationReason;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -284,7 +284,7 @@ public class DemographicUpdateInputToEntityConverter
 			dbDemographic.setRosterDate(ConversionUtils.toNullableLegacyDateTime(currentRosterData.getRosterDateTime()));
 			dbDemographic.setRosterTerminationDate(ConversionUtils.toNullableLegacyDateTime(currentRosterData.getTerminationDateTime()));
 
-			DemographicRoster.ROSTER_TERMINATION_REASON reason = currentRosterData.getTerminationReason();
+			RosterTerminationReason reason = currentRosterData.getTerminationReason();
 			dbDemographic.setRosterTerminationReason((reason != null) ? String.valueOf(reason.getTerminationCode()) : null);
 		}
 

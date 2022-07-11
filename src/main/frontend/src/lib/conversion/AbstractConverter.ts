@@ -30,4 +30,13 @@ export default abstract class AbstractConverter<F, T>
 		return null;
 	}
 
+	protected serializeZonedDateTime(moment: Moment): string
+	{
+		if(moment && moment.isValid())
+		{
+			return Juno.Common.Util.formatZonedMomentDateTime(moment);
+		}
+		return null;
+	}
+
 }

@@ -25,6 +25,9 @@
  Ontario, Canada
 
  */
+import {DemographicNoteApi} from "../../../generated";
+import {API_BASE_PATH} from "../../lib/constants/ApiConstants";
+
 angular.module("Common.Services").service("noteService", [
 	'$http',
 	'$httpParamSerializer',
@@ -39,6 +42,7 @@ angular.module("Common.Services").service("noteService", [
 		var service = {};
 
 		service.apiPath = '../ws/rs/notes';
+		service.demographicNoteApi = new DemographicNoteApi($http, $httpParamSerializer, API_BASE_PATH);
 
 		service.getNotesFrom = function getNotesFrom(demographicNo, offset, numberToReturn, noteConfig)
 		{
@@ -126,24 +130,15 @@ angular.module("Common.Services").service("noteService", [
 			return deferred.promise;
 		};
 
-		service.tmpSave = function tmpSave(demographicNo, note)
+		service.tempSave = async (demographicNo, note, noteId = null) =>
 		{
-			var deferred = $q.defer();
+			return service.demographicNoteApi.saveTempNote(demographicNo, noteId, note);
+		}
 
-			$http.post(service.apiPath + '/' +
-				encodeURIComponent(demographicNo) + '/tmpSave', note).then(
-				function success(results)
-				{
-					deferred.resolve(results.data);
-				},
-				function error(errors)
-				{
-					console.log("noteService::tmpSave error", errors);
-					deferred.reject("An error occurred while posting tmp save");
-				});
-
-			return deferred.promise;
-		};
+		service.clearTempSave = async (demographicNo) =>
+		{
+			return service.demographicNoteApi.deleteTempNote(demographicNo);
+		}
 
 		service.getNoteExt = function getNoteExt(noteId)
 		{

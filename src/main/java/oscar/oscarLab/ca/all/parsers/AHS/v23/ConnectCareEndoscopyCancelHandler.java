@@ -26,6 +26,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.message.ORM_O01;
 import ca.uhn.hl7v2.model.v23.segment.MSH;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareLabType;
 import oscar.oscarLab.ca.all.parsers.AHS.ORM_O01ConnectCareCancelHandler;
 
 public class ConnectCareEndoscopyCancelHandler extends ORM_O01ConnectCareCancelHandler
@@ -46,10 +47,16 @@ public class ConnectCareEndoscopyCancelHandler extends ORM_O01ConnectCareCancelH
 			String sendingApplication = messageHeaderSegment.getMsh3_SendingApplication().getNamespaceID().getValue();
 			String sendingFacility = messageHeaderSegment.getMsh4_SendingFacility().getNamespaceID().getValue();
 
-			return "CCENDO".equalsIgnoreCase(sendingApplication) &&
+			return ConnectCareLabType.CCENDO.name().equalsIgnoreCase(sendingApplication) &&
 					"AHS".equalsIgnoreCase(sendingFacility);
 		}
 		return false;
+	}
+
+	@Override
+	public String getMsgType()
+	{
+		return ConnectCareLabType.CCENDO.name();
 	}
 
 	@Override
@@ -72,12 +79,6 @@ public class ConnectCareEndoscopyCancelHandler extends ORM_O01ConnectCareCancelH
 	@Override
 	public void init(String hl7Body) throws HL7Exception
 	{
-	}
-
-	@Override
-	public String getMsgType()
-	{
-		return "CCENDO";
 	}
 
 	/**

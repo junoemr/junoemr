@@ -158,7 +158,7 @@ public abstract class DaoTestFixtures extends DatabaseTestBase
 					try {
 						m.invoke(daoObject);
 					}catch(Exception e) {
-						logger.error("error",e);
+						logger.error("error invoking " + m.getName(), e);
 						fail(e.getMessage());
 					}
 				} else {
@@ -228,7 +228,7 @@ public abstract class DaoTestFixtures extends DatabaseTestBase
 	    String[] excludes = {"notify","notifyAll","remove","persist","merge","refresh","saveEntity","wait","equals",
 				"toString","hashCode","getClass","getModelClass","find","getCountAll","findAll",
 			    "runNativeQuery","getExplainResultList", "save","removeAll", "criteriaSearch", "criteriaSearchCount",
-				"removeProgram", "afterPropertiesSet"
+				"removeProgram", "afterPropertiesSet", "getReadOnlySession"
 	    };
 	    return new ArrayList<>(Arrays.asList(excludes));
     }

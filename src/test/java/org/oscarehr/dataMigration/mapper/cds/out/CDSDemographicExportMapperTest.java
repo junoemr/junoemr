@@ -30,7 +30,7 @@ import org.oscarehr.dataMigration.mapper.cds.CDSConstants;
 import org.oscarehr.dataMigration.model.common.Person;
 import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.ProviderModel;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
+import org.oscarehr.demographicRoster.entity.RosterTerminationReason;
 import org.springframework.beans.factory.annotation.Autowired;
 import xml.cds.v5_0.Demographics;
 import xml.cds.v5_0.Gender;
@@ -117,7 +117,7 @@ public class CDSDemographicExportMapperTest
 
 		// add invalid properties that should not appear in exported results
 		rosterData.setTerminationDateTime(LocalDateTime.of(2021, 1, 1, 10, 0, 0));
-		rosterData.setTerminationReason(DemographicRoster.ROSTER_TERMINATION_REASON.ASSIGNED_IN_ERROR);
+		rosterData.setTerminationReason(RosterTerminationReason.ASSIGNED_IN_ERROR);
 
 		Demographics.Enrolment.EnrolmentHistory enrolmentHistory = cdsDemographicExportMapper.getEnrollmentHistory(rosterData);
 
@@ -141,7 +141,7 @@ public class CDSDemographicExportMapperTest
 
 		rosterData.setRosterDateTime(LocalDateTime.of(2021, 12, 24, 12, 0, 0));
 		rosterData.setTerminationDateTime(LocalDateTime.of(2021, 1, 1, 10, 0, 0));
-		rosterData.setTerminationReason(DemographicRoster.ROSTER_TERMINATION_REASON.ASSIGNED_IN_ERROR);
+		rosterData.setTerminationReason(RosterTerminationReason.ASSIGNED_IN_ERROR);
 
 
 		Demographics.Enrolment.EnrolmentHistory enrolmentHistory = cdsDemographicExportMapper.getEnrollmentHistory(rosterData);

@@ -108,22 +108,22 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="row vertical-align">
-                            <div class="col-xs-4" id="note-editor-enc-date">
+                        <div class="grid-column-3 grid-gap-4 m-b-4">
+                            <div id="note-editor-enc-date" class="flex-row align-items-center justify-content-start">
                                 <p>Encounter:
                                     <span>
-                                        <juno-datepicker-popup juno-model="recordCtrl.page.encounterNote.observationDate" type="Link">
-                                        </juno-datepicker-popup>
+                                    <juno-datepicker-popup juno-model="recordCtrl.page.encounterNote.observationDate" type="Link">
+                                    </juno-datepicker-popup>
                                     </span>
                                 </p>
                             </div>
-                            <div class="col-xs-4 dropup">
+                            <div class="dropup">
                                 <input type="text" ng-model="recordCtrl.options.magicVal" placeholder="Template"
                                 uib-typeahead="t.encounterTemplateName as t.encounterTemplateName for t in recordCtrl.searchTemplates($viewValue)"
                                 typeahead-on-select="recordCtrl.insertTemplate($item, $model, $label)"
                                 class="form-control">
                             </div>
-                            <div class="col-xs-4 dropup">
+                            <div class="dropup">
                                 <juno-security-check permissions="recordCtrl.SecurityPermissions.EncounterIssueRead">
                                     <input type="text" class="form-control" placeholder="Assign Issue"
                                            ng-disabled="!recordCtrl.canSaveIssues()"
@@ -162,15 +162,24 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="row" id="note-editor-footer">
-                            <div class="col-sm-12">
-
+                        <div id="note-editor-footer" class="flex-row flex-gap-4 flex-wrap justify-content-between m-b-8">
+                            <div class="flex-row">
                                 <input type="hidden" id="startTag" value="<bean:message key="oscarEncounter.Index.startTime"/>">
                                 <input type="hidden" id="endTag" value="<bean:message key="oscarEncounter.Index.endTime"/>">
                                 <div class="pull-left">
-                                    <button class="btn btn-danger" ng-click="recordCtrl.cancelNoteEdit()">
-                                        Cancel
+                                    <button class="btn btn-danger"
+                                            title="{{recordCtrl.cancelButtonTooltip()}}"
+                                            ng-click="recordCtrl.cancelNoteEdit()">
+                                        {{recordCtrl.cancelButtonText()}}
                                     </button>
+                                </div>
+                            </div>
+                            <div class="flex-row justify-content-end align-items-center">
+                                <div ng-if="!recordCtrl.noteDirty" class="m-r-4">
+                                    <span class="body-smallest"
+                                          title="{{recordCtrl.draftSavedMessage()}}">
+                                        Draft Saved
+                                    </span>
                                 </div>
                                 <div class="btn-group btn-group-md pull-right">
                                     <button type="button" class="btn btn-default" ng-click="recordCtrl.pasteTimer()" id="aTimer" title="<bean:message key="oscarEncounter.Index.pasteTimer"/>">

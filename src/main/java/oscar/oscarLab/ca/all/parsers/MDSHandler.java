@@ -464,7 +464,7 @@ public class MDSHandler extends ORU_R01MessageHandler
 	                        if (comment.equals(""))
 	                            comment = getString(DynamicHapiLoaderUtils.terserGet(terser,"/.ZMC("+m+")-6-1"));
 	                        else
-	                            comment = comment+"<br />"+getString(DynamicHapiLoaderUtils.terserGet(terser,"/.ZMC("+m+")-6-1"));
+	                            comment = comment+"\n"+getString(DynamicHapiLoaderUtils.terserGet(terser,"/.ZMC("+m+")-6-1"));
 	                    }
 
 	                    m++;
@@ -478,7 +478,7 @@ public class MDSHandler extends ORU_R01MessageHandler
 	            	String comment = null;
 					for (int x=0; x < nteSegs.length; x++){
 						String commentCode = getString(DynamicHapiLoaderUtils.terserGet(terser,nteSegs[x],3,0,2,1));
-						comment = (comment==null) ? commentCode : comment+"<br/>"+commentCode;
+						comment = (comment==null) ? commentCode : comment+"\n"+commentCode;
 					}
 					return comment;
 	            }

@@ -361,8 +361,8 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.AppService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.BatchOperationService"/>
             <bean autowire="byName" class="org.oscarehr.ws.rest.BillingService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.CareTrackerWebService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.CareTrackersWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.careTracker.CareTrackerWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.careTracker.CareTrackersWebService"/>
             <bean autowire="byName" class="org.oscarehr.ws.rest.ClinicService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ConsultationWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DecisionSupportWebService"/>
@@ -376,6 +376,7 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicContactsWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicDxWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicMeasurementsWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicNoteWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicWaitListWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DiseaseRegistryService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DocumentTypesWebService"/>
