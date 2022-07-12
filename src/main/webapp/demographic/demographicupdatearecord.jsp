@@ -149,7 +149,7 @@
 	demographic.setTitle(request.getParameter("title"));
 	demographic.setOfficialLanguage(request.getParameter("official_lang"));
 	demographic.setSpokenLanguage(request.getParameter("spoken_lang"));
-	demographic.setRosterTerminationReason(request.getParameter("roster_termination_reason"));
+	demographic.setRosterTerminationReason(StringUtils.trimToNull(request.getParameter("roster_termination_reason")));
 	demographic.setLastUpdateUser(currentUserNoStr);
 	demographic.setLastUpdateDate(new java.util.Date());
 	demographic.setNameOfMother(StringUtils.trimToNull(request.getParameter("nameOfMother")));
