@@ -23,29 +23,36 @@
 
 package org.oscarehr.demographicArchive.entity;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.common.model.AbstractModel;
 import org.oscarehr.demographic.entity.DemographicExt;
 
-import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import java.io.Serializable;
+import java.util.Date;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "demographicExtArchive")
-public class DemographicExtArchive extends AbstractModel<Integer> implements Serializable {
+public class DemographicExtArchive extends AbstractModel<Integer> implements Serializable
+{
 	private static final long serialVersionUID = -2981357879423093412L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	@Column(name = "archiveId")
-	private Long archiveId;
 	@Column(name = "demographic_no")
 	private Integer demographicNo;
 	@Column(name = "provider_no")
@@ -55,8 +62,12 @@ public class DemographicExtArchive extends AbstractModel<Integer> implements Ser
 	private String value;
 	@Column(name = "date_time")
 	@Temporal(TemporalType.TIMESTAMP)
-	private java.util.Date dateCreated;
+	private Date dateCreated;
 	private boolean hidden;
+
+	@ManyToOne(fetch= FetchType.LAZY)
+	@JoinColumn(name="archiveId")
+	private DemographicArchive demographicArchive;
 
 	// constructors
 	public DemographicExtArchive() {}
@@ -145,7 +156,7 @@ public class DemographicExtArchive extends AbstractModel<Integer> implements Ser
 	/**
 	 * Return the value associated with the column: date_time
 	 */
-	public java.util.Date getDateCreated() {
+	public Date getDateCreated() {
 		return dateCreated;
 	}
 
@@ -153,7 +164,8 @@ public class DemographicExtArchive extends AbstractModel<Integer> implements Ser
 	 * Set the value related to the column: date_time
 	 * @param dateCreated the date_time value
 	 */
-	public void setDateCreated(java.util.Date dateCreated) {
+	public void setDateCreated(Date dateCreated)
+	{
 		this.dateCreated = dateCreated;
 	}
 
@@ -170,20 +182,6 @@ public class DemographicExtArchive extends AbstractModel<Integer> implements Ser
 	 */
 	public void setHidden(boolean hidden) {
 		this.hidden = hidden;
-	}
-
-	/**
-	 * @return the archiveId
-	 */
-	public Long getArchiveId() {
-		return archiveId;
-	}
-
-	/**
-	 * @param archiveId the archiveId to set
-	 */
-	public void setArchiveId(Long archiveId) {
-		this.archiveId = archiveId;
 	}
 
 }

@@ -30,9 +30,12 @@ import org.oscarehr.demographic.entity.DemographicCust;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Getter
@@ -62,6 +65,10 @@ public class DemographicCustArchive extends AbstractModel<Integer>
 
 	@Column(name="content")
 	private String notes;
+
+	@OneToOne(fetch= FetchType.LAZY)
+	@JoinColumn(name="archive_id")
+	private DemographicArchive demographicArchive;
 
 	
 	@Override

@@ -131,7 +131,7 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 	private String hcType = null;
 	@Column(name = "hc_renew_date")
 	@Temporal(TemporalType.DATE)
-	Date hcRenewDate = null;
+	private Date hcRenewDate = null;
 	@Column(name = "family_doctor")
 	private String familyDoctor = null;
 	@Column(name = "family_doctor_2")
@@ -168,10 +168,10 @@ public class DemographicArchive extends AbstractModel<Long> implements Serializa
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date electronicMessagingConsentRejectedAt;
 
-	@OneToOne(fetch= FetchType.LAZY, mappedBy = "demographicNo", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToOne(fetch= FetchType.LAZY, mappedBy = "demographicArchive", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private DemographicCustArchive demographicCustArchive;
 
-	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicNo", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@OneToMany(fetch=FetchType.LAZY, mappedBy = "demographicArchive", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<DemographicExtArchive> demographicExtArchiveSet;
 
 	public DemographicArchive()

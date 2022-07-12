@@ -22,15 +22,17 @@
  */
 package org.oscarehr.demographicArchive.service;
 
+import org.oscarehr.demographic.entity.Demographic;
+import org.oscarehr.demographic.entity.DemographicCust;
+import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.demographicArchive.dao.DemographicArchiveDao;
 import org.oscarehr.demographicArchive.entity.DemographicArchive;
-import org.oscarehr.demographicArchive.dao.DemographicCustArchiveDao;
-import org.oscarehr.demographicArchive.dao.DemographicExtArchiveDao;
-import org.oscarehr.demographic.entity.Demographic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -39,15 +41,26 @@ public class DemographicArchiveService
 	@Autowired
 	private DemographicArchiveDao demographicArchiveDao;
 
-	@Autowired
-	private DemographicExtArchiveDao demographicExtArchiveDao;
-
-	@Autowired
-	private DemographicCustArchiveDao demographicCustArchiveDao;
-
 	public void archiveDemographic(Demographic demographic)
 	{
 		DemographicArchive archive = new DemographicArchive(demographic);
+		archiveDemographic(archive);
+	}
+
+	@Deprecated
+	public void archiveDemographic(org.oscarehr.common.model.Demographic demographic,
+	                               DemographicCust demographicCust,
+	                               List<DemographicExt> extList)
+	{
+		DemographicArchive archive = new DemographicArchive(demographic);
+		archive.setDemographicExtArchiveSet(null);//TODO
+		archive.setDemographicCustArchive(null);
+		archiveDemographic(archive);
+	}
+
+	protected void archiveDemographic(DemographicArchive archive)
+	{
+		// cascading persist will save any linked ext / cust entries attached
 		demographicArchiveDao.persist(archive);
 	}
 }

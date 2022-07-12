@@ -34,6 +34,7 @@ import org.oscarehr.demographic.converter.DemographicModelToDbConverter;
 import org.oscarehr.demographic.converter.DemographicUpdateInputToEntityConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.dao.DemographicIntegrationDao;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.entity.DemographicCust;
@@ -48,7 +49,6 @@ import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
 import org.oscarehr.demographicRoster.entity.DemographicRoster;
 import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.integration.service.IntegrationPushUpdateService;
-import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -81,10 +81,10 @@ import java.util.Set;
 public class DemographicService
 {
 	@Autowired
-	private DemographicManager demographicManager;
+	private DemographicDao demographicDao;
 
 	@Autowired
-	private DemographicDao demographicDao;
+	private DemographicExtDao demographicExtDao;
 
 	@Autowired
 	private DemographicCustDao demographicCustDao;
@@ -432,7 +432,7 @@ public class DemographicService
 			//save the extension fields
 			extension.setDemographicNo(demographicNo);
 			extension.setProviderNo(providerNoStr);
-			demographicManager.createExtension(providerNoStr, extension);
+			demographicExtDao.saveEntity(extension);
 		}
 		
 		List<DemographicRoster> rosterHistory = demographic.getRosterHistory();
