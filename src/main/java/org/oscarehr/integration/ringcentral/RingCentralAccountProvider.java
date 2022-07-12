@@ -112,4 +112,10 @@ public class RingCentralAccountProvider implements FaxAccountProvider
 			throw new FaxIntegrationException("Error logging out" + e.getMessage());
 		}
 	}
+
+	@Override
+	public boolean requiresKeepAlive()
+	{
+		return true;
+	}
 }

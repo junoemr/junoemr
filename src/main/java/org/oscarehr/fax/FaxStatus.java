@@ -24,8 +24,8 @@ package org.oscarehr.fax;
 
 import org.oscarehr.common.server.ServerStateHandler;
 import org.oscarehr.fax.dao.FaxAccountDao;
-import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.search.FaxAccountCriteriaSearch;
+import org.oscarehr.preferences.SystemPreferenceConstants;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -50,7 +50,7 @@ public class FaxStatus
 	public boolean canSendFaxes()
 	{
 		// the master setting must be enabled.
-		Boolean masterSettingEnabled = systemPreferenceService.isPreferenceEnabled(FaxAccount.PROP_MASTER_FAX_ENABLED_OUTBOUND, false);
+		Boolean masterSettingEnabled = systemPreferenceService.isPreferenceEnabled(SystemPreferenceConstants.MASTER_FAX_ENABLED_OUTBOUND, false);
 		if(outboundPropEnabled && masterSettingEnabled)
 		{
 			// at least one fax account must have the outgoing route turned on
@@ -73,7 +73,7 @@ public class FaxStatus
 	public boolean canPullFaxes()
 	{
 		// the master setting must be enabled.
-		Boolean masterSettingEnabled = systemPreferenceService.isPreferenceEnabled(FaxAccount.PROP_MASTER_FAX_ENABLED_INBOUND, false);
+		Boolean masterSettingEnabled = systemPreferenceService.isPreferenceEnabled(SystemPreferenceConstants.MASTER_FAX_ENABLED_INBOUND, false);
 		if(inboundPropEnabled && masterSettingEnabled)
 		{
 			// at least one fax account must have the incoming route turned on

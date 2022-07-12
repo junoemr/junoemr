@@ -79,4 +79,10 @@ public class SRFaxAccountProvider implements FaxAccountProvider
 	public void disconnectAccount()
 	{
 	}
+
+	@Override
+	public boolean requiresKeepAlive()
+	{
+		return false;
+	}
 }
