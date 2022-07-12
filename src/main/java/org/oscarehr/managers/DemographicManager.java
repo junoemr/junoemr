@@ -937,11 +937,43 @@ public class DemographicManager {
 
 	public void updateDemographicExtras(LoggedInInfo loggedInInfo, Demographic demographic, DemographicTransfer demographicTransfer)
 	{
-		checkPrivilege(loggedInInfo, Permission.DEMOGRAPHIC_CREATE);
+		// Upsert values into demographicExt table and demographicCust table
+		// currently only cellphone is being called in the demographicExt table for the soapApi
+		String cellphone = demographicTransfer.getCellPhone();
+		if(cellphone == null)
+		{
+			cellphone = "";
+		}
 
+		upsertDemographicExt(loggedInInfo, demographicTransfer.getDemographicNo(), DemographicExt.KEY_DEMO_CELL, cellphone);
 		DemographicCust demoCust = getDemographicCust(loggedInInfo, demographic.getDemographicNo());
 		demoCust.setParsedNotes(demographicTransfer.getNotes());
 		createUpdateDemographicCust(loggedInInfo, demoCust);
+	}
+
+	/**
+	 * Upserts into demographicExt table
+	 * @param loggedInInfo User currently accessing api
+	 * @param demographicNo Demographic to update
+	 * @param demographicExtKey Key to add into table
+	 * @param demographicExtValue value of key to add
+	 */
+	public void upsertDemographicExt(LoggedInInfo loggedInInfo, Integer demographicNo, String demographicExtKey, String demographicExtValue)
+	{
+		DemographicExt demographicExt = demographicExtDao.getDemographicExt(demographicNo, demographicExtKey);
+
+		if(demographicExt != null)
+		{
+			demographicExt.setValue(demographicExtValue);
+			demographicExtDao.updateDemographicExt(demographicExt);
+		}
+		else
+		{
+			demographicExtDao.addKey(loggedInInfo.getLoggedInProviderNo(),
+				demographicNo,
+				demographicExtKey,
+				demographicExtValue);
+		}
 	}
 
 	// When adding a demographic, entries are required in other tables.  This
