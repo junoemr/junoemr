@@ -40,11 +40,11 @@
 
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="org.oscarehr.PMmodule.service.AdmissionManager, org.oscarehr.PMmodule.service.ProgramManager, org.oscarehr.PMmodule.web.GenericIntakeEditAction, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
-<%@ page import="org.oscarehr.common.dao.DemographicArchiveDao"%>
+<%@ page import="org.oscarehr.demographicArchive.dao.DemographicArchiveDao"%>
 <%@ page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicDao"%>
 
-<%@ page import="org.oscarehr.demographic.dao.DemographicExtArchiveDao" %>
+<%@ page import="org.oscarehr.demographicArchive.dao.DemographicExtArchiveDao" %>
 
 <%@ page import="org.oscarehr.demographic.dao.DemographicExtDao" %>
 <%@ page import="org.oscarehr.common.model.ConsentType" %>
@@ -52,7 +52,7 @@
 <%@ page import="org.oscarehr.demographic.entity.Demographic" %>
 <%@ page import="org.oscarehr.demographic.entity.DemographicCust" %>
 <%@ page import="org.oscarehr.demographic.entity.DemographicExt" %>
-<%@ page import="org.oscarehr.demographic.entity.DemographicExtArchive" %>
+<%@ page import="org.oscarehr.demographicArchive.entity.DemographicExtArchive" %>
 
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
 <%@page import="org.oscarehr.provider.service.RecentDemographicAccessService" %>

@@ -36,12 +36,9 @@ import org.oscarehr.PMmodule.web.GenericIntakeEditAction;
 import org.oscarehr.common.OtherIdManager;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.ConsentType;
-import org.oscarehr.demographic.dao.DemographicExtArchiveDao;
-import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.entity.DemographicExt;
-import org.oscarehr.demographic.entity.DemographicExtArchive;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.document.model.Document;
 import org.oscarehr.document.service.DocumentService;
@@ -74,8 +71,6 @@ public class AddDemographicAction extends Action
 	private OscarProperties oscarVariables = oscar.OscarProperties.getInstance();
 
 	private DemographicDao demographicDao = (DemographicDao)SpringUtils.getBean("demographicDao");
-	DemographicExtArchiveDao demographicExtArchiveDao = SpringUtils.getBean(DemographicExtArchiveDao.class);
-	DemographicExtDao demographicExtDao = SpringUtils.getBean(DemographicExtDao.class);
 
 	private DemographicService demographicService = (DemographicService) SpringUtils.getBean("demographic.service.DemographicService");
 	private ProgramManager pm = SpringUtils.getBean(ProgramManager.class);
@@ -99,7 +94,9 @@ public class AddDemographicAction extends Action
 		LocalDate dateOfBirth;
 		try
 		{
-			dateOfBirth = LocalDate.of(Integer.parseInt(request.getParameter("year_of_birth")), Integer.parseInt(request.getParameter("month_of_birth")), Integer.parseInt(request.getParameter("date_of_birth")));
+			dateOfBirth = LocalDate.of(Integer.parseInt(request.getParameter("year_of_birth")),
+					Integer.parseInt(request.getParameter("month_of_birth")),
+					Integer.parseInt(request.getParameter("date_of_birth")));
 		}
 		catch (NumberFormatException | DateTimeException e)
 		{
@@ -342,16 +339,6 @@ public class AddDemographicAction extends Action
 		String ip = request.getRemoteAddr();
 		LogAction.addLogEntry(curUser_no, demographic.getDemographicId(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, demographic.getDemographicId().toString(), ip);
 		recentDemographicAccessService.updateAccessRecord(Integer.parseInt(curUser_no), demographic.getDemographicId());
-
-		//archive the original too
-		Long archiveId = demographicService.archiveDemographicRecord(demographic);
-		List<DemographicExt> demoExtensions = demographicExtDao.getDemographicExtByDemographicNo(Integer.parseInt(demoNo));
-		for (DemographicExt extension : demoExtensions) {
-			DemographicExtArchive archive = new DemographicExtArchive(extension);
-			archive.setArchiveId(archiveId);
-			archive.setValue(StringUtils.trimToEmpty(request.getParameter(archive.getKey())));
-			demographicExtArchiveDao.saveEntity(archive);
-		}
 
 		// Assign the patient to a waitlist if necessary
 		String waitListIdStr = request.getParameter("list_id");

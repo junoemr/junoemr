@@ -29,9 +29,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.common.dao.DemographicArchiveDao;
+import org.oscarehr.demographicArchive.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.DemographicArchive;
+import org.oscarehr.demographicArchive.entity.DemographicArchive;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;

@@ -21,9 +21,10 @@
  * Toronto, Ontario, Canada
  */
 
-package org.oscarehr.demographic.entity;
+package org.oscarehr.demographicArchive.entity;
 
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.demographic.entity.DemographicExt;
 
 import java.io.Serializable;
 import javax.persistence.Column;
