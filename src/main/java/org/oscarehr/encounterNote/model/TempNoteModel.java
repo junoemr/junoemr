@@ -37,7 +37,9 @@ public class TempNoteModel
     private Integer programId;
     private String note;
     private ZonedDateTime updateDateTime;
+    private ZonedDateTime observationDate;
     private Integer noteId;
+    private String encounterType;
 
     public Optional<Integer> getOptionalNoteId()
     {

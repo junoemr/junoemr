@@ -20,25 +20,18 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.fax.exception;
 
-/**
- * Indicate that the results of api response are in an error state.
- */
-public class FaxApiResultException extends FaxException
+package org.oscarehr.encounterNote.transfer;
+
+import lombok.Data;
+
+import java.time.ZonedDateTime;
+
+@Data
+public class TempNoteCreateInput
 {
-	public FaxApiResultException(String message)
-	{
-		super(message);
-	}
-
-	public FaxApiResultException(Exception e)
-	{
-		super(e);
-	}
-
-	public FaxApiResultException(Exception e, String userMessageResourceKey)
-	{
-		super(e, userMessageResourceKey);
-	}
+    private String note;
+    private ZonedDateTime observationDate;
+    private String encounterType;
+    private Integer noteId; // optionally links draft to existing note
 }

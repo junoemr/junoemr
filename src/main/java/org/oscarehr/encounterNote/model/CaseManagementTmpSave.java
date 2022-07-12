@@ -33,9 +33,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -58,10 +56,15 @@ public class CaseManagementTmpSave extends AbstractModel<Integer>
 	
 	private String note;
 	
-	@Column(name="update_date")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date updateDate;
+	@Column(name="update_date", columnDefinition = "TIMESTAMP")
+	private ZonedDateTime updateDateTime;
 	
 	@Column(name="note_id")
 	private Integer noteId;
+
+	@Column(name = "observation_date", columnDefinition = "TIMESTAMP")
+	private ZonedDateTime observationDate;
+
+	@Column(name = "encounter_type")
+	private String encounterType;
 }

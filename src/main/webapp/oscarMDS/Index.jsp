@@ -202,7 +202,7 @@
 				</dt>
 			<%
 				}
-				if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM) && info.getHrmCount() > 0)
+				if (hrmService.isHRMEnabled() && info.getHrmCount() > 0)
 				{
 			%>
 				<dt>
@@ -274,7 +274,7 @@
 				</dt>
 			<%
 				}
-				if (oscarProperties.isModuleEnabled(OscarProperties.Module.MODULE_HRM) && unmatchedHrm > 0)
+				if (hrmService.isHRMEnabled() && unmatchedHrm > 0)
 				{
 			%>
 				<dt>

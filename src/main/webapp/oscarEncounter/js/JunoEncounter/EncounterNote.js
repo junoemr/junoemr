@@ -575,7 +575,9 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 
 	  if(tmpSave && tmpSave.noteId === note.noteId)
 		{
-			note.note = tmpSave.note
+			note.note = tmpSave.note;
+			note.observationDate = tmpSave.observationDate;
+			note.encounterType = tmpSave.encounterType;
 		}
 
 		var date = moment(note.observationDate);
@@ -737,8 +739,13 @@ if (!Juno.OscarEncounter.JunoEncounter.EncounterNote) Juno.OscarEncounter.JunoEn
 			type: "POST",
 			contentType: "application/json",
 			dataType: "json",
-			url: "../ws/rs/demographic/" + demographicNo + "/note/temp?noteId=" + encodeURIComponent(noteId),
-			data: noteData.note,
+			url: "../ws/rs/demographic/" + demographicNo + "/note/temp",
+			data: JSON.stringify({
+				noteId: noteId,
+				note: noteData.note,
+				observationDate: moment(noteData.observationDate),
+				encounterType: noteData.encounterType,
+			}),
 			success: function (response)
 			{
 				me.setNoteStatus("Draft saved " + moment().format("DD-MMM-YYYY HH:mm:ss"));

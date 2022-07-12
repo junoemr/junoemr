@@ -27,6 +27,7 @@
  */
 import {DemographicNoteApi} from "../../../generated";
 import {API_BASE_PATH} from "../../lib/constants/ApiConstants";
+import TempSaveInputConverter from "../../lib/note/converter/TempSaveInputConverter";
 
 angular.module("Common.Services").service("noteService", [
 	'$http',
@@ -130,9 +131,10 @@ angular.module("Common.Services").service("noteService", [
 			return deferred.promise;
 		};
 
-		service.tempSave = async (demographicNo, note, noteId = null) =>
+		service.tempSave = async (demographicNo, note) =>
 		{
-			return service.demographicNoteApi.saveTempNote(demographicNo, noteId, note);
+			let tmpSaveConverter = new TempSaveInputConverter();
+			return service.demographicNoteApi.saveTempNote(demographicNo, tmpSaveConverter.convert(note));
 		}
 
 		service.clearTempSave = async (demographicNo) =>

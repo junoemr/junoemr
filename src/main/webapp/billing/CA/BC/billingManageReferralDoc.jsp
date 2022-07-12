@@ -55,7 +55,8 @@ if(!authed) {
 <head>
 <title><bean:message key="admin.admin.ManageReferralDoc"/></title>
 <link href="<%=request.getContextPath() %>/css/bootstrap.min.css" rel="stylesheet">
-
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/jquery-ui-1.10.2.custom.min.js"></script>
 <script type="text/javascript">
 
 function isNumeric(strString){
@@ -109,10 +110,26 @@ function registerFormSubmit(formId, divId)
 	});
 }
 
+function openAddReferralDoc(referralDocNumber)
+{
+	var queryString = $.param({
+		id: referralDocNumber
+	});
+	var url = "<%=request.getContextPath() %>/billing/CA/BC/billingAddReferralDoc.jsp?" + queryString;
+	window.open(url, "_self");
+}
+
 </script>
 
 <style>
 table td{font-size:10px;}
+
+.referral-doctor-link:hover {
+	background-color: lightblue;
+	color: blue;
+	cursor: pointer;
+	text-decoration: underline;
+}
 </style>
 
 <body>
@@ -178,9 +195,10 @@ table td{font-size:10px;}
 				{
 					Billingreferral billingReferral = alist.get(i);
             %>
-			<tr>
-				<!--td><%=billingReferral.getBillingreferralNo()%></td-->
-				<td><a href="<%=request.getContextPath() %>/billing/CA/BC/billingAddReferralDoc.jsp?id=<%=billingReferral.getBillingreferralNo()%>" class="contentLink"><%=billingReferral.getReferralNo()%></a></td>
+			<tr onclick="openAddReferralDoc(<%=billingReferral.getBillingreferralNo()%>)"
+				class="referral-doctor-link"
+			>
+				<td><%=billingReferral.getReferralNo()%></td>
 				<td><%if(billingReferral.getLastName()!=null){out.print(billingReferral.getLastName());}%></td>
 				<td><%if(billingReferral.getFirstName()!=null){out.print(billingReferral.getFirstName());}%></td>
 				<td><%if(billingReferral.getSpecialty()!=null){out.print(billingReferral.getSpecialty());}%></td>

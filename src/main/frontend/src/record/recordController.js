@@ -26,12 +26,17 @@
 import MhaConfigService from "../lib/integration/myhealthaccess/service/MhaConfigService";
 import MhaPatientService from "../lib/integration/myhealthaccess/service/MhaPatientService";
 import {SecurityPermissions} from "../common/security/securityConstants";
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN} from "../common/components/junoComponentConstants";
+import {
+	JUNO_BUTTON_COLOR,
+	JUNO_BUTTON_COLOR_PATTERN,
+	LABEL_POSITION
+} from "../common/components/junoComponentConstants";
 import {MhaCallPanelEvents} from "./components/mhaCallPanel/mhaCallPanelEvents";
 import moment from "moment";
 import AppointmentService from "../lib/appointment/service/AppointmentService";
 import ToastErrorHandler from "../lib/error/handler/ToastErrorHandler";
 import {LogLevel} from "../lib/error/handler/LogLevel";
+import TempNoteInput from "../lib/note/model/TempNoteInput";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -84,6 +89,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		$scope.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 		$scope.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+		$scope.LABEL_POSITION = LABEL_POSITION;
 
 		controller.appointmentService = new AppointmentService();
 
@@ -112,6 +118,33 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.canMHACallPatient = false;
 		controller.mhaCallPanelOpen = false;
 		controller.netcareModuleEnabled = false;
+
+		controller.encounterTypeOptions = [
+			{
+				label: "",
+				value: "",
+			},
+			{
+				label: "face to face encounter with client",
+				value: "face to face encounter with client",
+			},
+			{
+				label: "telephone encounter with client",
+				value: "telephone encounter with client",
+			},
+			{
+				label: "email encounter with client",
+				value: "email encounter with client",
+			},
+			{
+				label: "video encounter with client",
+				value: "video encounter with client",
+			},
+			{
+				label: "encounter without client",
+				value: "encounter without client",
+			},
+		];
 
 		controller.$onInit = async () =>
 		{
@@ -159,7 +192,10 @@ angular.module('Record').controller('Record.RecordController', [
 				};
 
 				controller.checkIfMhaCallAvailable();
-				$scope.$watch('recordCtrl.page.encounterNote.note', delayTmpSave);
+				$scope.$watchGroup(["recordCtrl.page.encounterNote.note",
+					"recordCtrl.page.encounterNote.encounterType",
+					"recordCtrl.page.encounterNote.observationDate",
+				], delayTmpSave);
 
 				//////
 
@@ -196,15 +232,24 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.netcareModuleEnabled = false; //await netcareService.loadEnabledState();
 		}
 
+		controller.noteChanged = () =>
+		{
+			return (controller.page.encounterNote.note !== controller.page.initNote);
+		}
+
 		controller.saveUpdates = async () =>
 		{
-			if (controller.page.encounterNote.note === controller.page.initNote) return; //user did not input anything, don't save
+			if (!controller.noteChanged()) return; //user did not input anything, don't save
 
 			try
 			{
-				await noteService.tempSave($stateParams.demographicNo,
-					controller.page.encounterNote.note,
-					controller.page.encounterNote.noteId);
+				let tmpInput = new TempNoteInput();
+				tmpInput.noteId = controller.page.encounterNote.noteId;
+				tmpInput.noteText = controller.page.encounterNote.note;
+				tmpInput.observationDate = moment(controller.page.encounterNote.observationDate);
+				tmpInput.encounterType = controller.page.encounterNote.encounterType;
+
+				await noteService.tempSave($stateParams.demographicNo, tmpInput);
 
 				controller.noteDirty = false;
 				controller.draftSavedDate = new moment();
@@ -507,6 +552,7 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			let results = await noteService.getCurrentNote($stateParams.demographicNo, $location.search());
 			controller.page.encounterNote = results;
+			controller.page.encounterNote.encounterType = Juno.Common.Util.noNull(controller.page.encounterNote.encounterType);
 			controller.page.initNote = results.note; //compare this with current note content to determine tmpsave or not
 			controller.getIssueNote();
 			$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
@@ -863,6 +909,23 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			if(controller.draftSavedDate)
 			{
+				return "Draft saved";
+			}
+			else if (controller.page.encounterNote
+				&& controller.page.encounterNote.note
+				&& !controller.noteChanged()
+				&& controller.page.encounterNote.updateDate)
+			{
+				return "Draft loaded from " + Juno.Common.Util.formatMomentDateTime(
+					moment(controller.page.encounterNote.updateDate),
+					Juno.Common.Util.DisplaySettings.dateTimeFormat);
+			}
+			return "";
+		}
+		controller.draftSavedTooltip = () =>
+		{
+			if(controller.draftSavedDate)
+			{
 				return "Draft saved on " + Juno.Common.Util.formatMomentDateTime(
 					controller.draftSavedDate,
 					Juno.Common.Util.DisplaySettings.dateTimeFormat);
@@ -872,20 +935,20 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.cancelButtonText = () =>
 		{
-			if(controller.page.editingNoteId === null)
+			if(controller.page.editingNoteId)
 			{
-				return "Delete";
+				return "Cancel";
 			}
-			return "Cancel";
+			return "Delete";
 		}
 
 		controller.cancelButtonTooltip = () =>
 		{
-			if(controller.page.editingNoteId === null)
+			if(controller.page.editingNoteId)
 			{
-				return "Deletes saved draft, encounter text, and assigned issues.";
+				return "Cancel saved draft";
 			}
-			return "Cancel saved draft";
+			return "Deletes saved draft, encounter text, and assigned issues.";
 		}
 	}
 ]);

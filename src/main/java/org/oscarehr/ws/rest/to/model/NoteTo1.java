@@ -23,14 +23,13 @@
  */
 package org.oscarehr.ws.rest.to.model;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 @XmlRootElement(name="encounterNote")
 public class NoteTo1 implements Serializable{
@@ -70,8 +69,8 @@ public class NoteTo1 implements Serializable{
 	private Integer appointmentNo;
 	private String summaryCode;
 
-	private ArrayList<String> editorNames;
-	private ArrayList<String> issueDescriptions;
+	private List<String> editorNames;
+	private List<String> issueDescriptions;
 
 	//not controlled by note attributes / business logic like "editable".
 	//use this for a category of notes - like integrator, group notes, etc
@@ -328,19 +327,23 @@ public class NoteTo1 implements Serializable{
 		this.encounterType = encounterType;
 	}
 
-	public ArrayList<String> getEditorNames() {
+	public List<String> getEditorNames()
+	{
 		return editorNames;
 	}
 
-	public void setEditorNames(ArrayList<String> editorNames) {
+	public void setEditorNames(List<String> editorNames)
+	{
 		this.editorNames = editorNames;
 	}
 
-	public ArrayList<String> getIssueDescriptions() {
+	public List<String> getIssueDescriptions()
+	{
 		return issueDescriptions;
 	}
 
-	public void setIssueDescriptions(ArrayList<String> issueDescriptions) {
+	public void setIssueDescriptions(List<String> issueDescriptions)
+	{
 		this.issueDescriptions = issueDescriptions;
 	}
 

@@ -39,9 +39,9 @@ import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 import oscar.util.StringUtils;
+
 
 @Service
 public class EncounterHRMService extends EncounterSectionService
@@ -98,7 +98,7 @@ public class EncounterHRMService extends EncounterSectionService
 	public EncounterNotes getNotes(SectionParameters sectionParams, Integer limit, Integer offset)
 	{
 		Integer demographicNo = Integer.parseInt(sectionParams.getDemographicNo());
-		if(!OscarProperties.getInstance().isModuleEnabled(OscarProperties.Module.MODULE_HRM) || !securityInfoManager.hasPrivileges(
+		if(!hrmService.isHRMEnabled() || !securityInfoManager.hasPrivileges(
 				sectionParams.getLoggedInInfo().getLoggedInProviderNo(), demographicNo, Permission.HRM_READ))
 		{
 			return EncounterNotes.noNotes();

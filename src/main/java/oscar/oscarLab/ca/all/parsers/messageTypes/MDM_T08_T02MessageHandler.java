@@ -583,7 +583,7 @@ public abstract class MDM_T08_T02MessageHandler extends MessageHandler
 		}
 		else
 		{
-			return "";
+			return "OBX";
 		}
 	}
 	protected String getObservationOBXPath(int rep)

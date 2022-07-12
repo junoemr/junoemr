@@ -68,6 +68,7 @@ import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.EncounterTemplate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.hospitalReportManager.service.HRMService;
 import org.oscarehr.integration.model.CmeJs;
 import org.oscarehr.preferences.service.SystemPreferenceService;
 import org.oscarehr.provider.dao.ProviderDataDao;
@@ -222,6 +223,9 @@ public class JunoEncounterAction extends DispatchActionSupport
 
 	@Autowired
 	private UserPropertyDAO userPropertyDAO;
+
+	@Autowired
+	private HRMService hrmService;
 
 	public ActionForward execute(
 		ActionMapping mapping,
@@ -504,7 +508,7 @@ public class JunoEncounterAction extends DispatchActionSupport
 		leftSections.add(EncounterSection.TYPE_MEASUREMENTS);
 		leftSections.add(EncounterSection.TYPE_CONSULTATIONS);
 
-		if(OscarProperties.getInstance().isModuleEnabled(OscarProperties.Module.MODULE_HRM))
+		if (hrmService.isHRMEnabled())
 		{
 			leftSections.add(EncounterSection.TYPE_HRM);
 		}

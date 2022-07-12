@@ -32,6 +32,7 @@ import org.oscarehr.fax.converter.FaxOutboundToModelConverter;
 import org.oscarehr.fax.dao.FaxAccountDao;
 import org.oscarehr.fax.dao.FaxOutboundDao;
 import org.oscarehr.fax.exception.FaxApiConnectionException;
+import org.oscarehr.fax.exception.FaxApiResultException;
 import org.oscarehr.fax.exception.FaxApiValidationException;
 import org.oscarehr.fax.exception.FaxException;
 import org.oscarehr.fax.exception.FaxIntegrationException;
@@ -75,12 +76,12 @@ import java.util.List;
 public class FaxUploadService
 {
 	public static final String STATUS_MESSAGE_IN_TRANSIT = "Sending";
-	private static final String STATUS_MESSAGE_COMPLETED = "Success";
-	private static final String STATUS_MESSAGE_ERROR_UNKNOWN = "See integration for details";
-	private static final String DEFAULT_MAX_SEND_COUNT = "5";
+	protected static final String STATUS_MESSAGE_COMPLETED = "Success";
+	protected static final String STATUS_MESSAGE_ERROR_UNKNOWN = "See integration for details";
+	protected static final String DEFAULT_MAX_SEND_COUNT = "5";
 
-	private static final Logger logger = MiscUtils.getLogger();
-	private static final OscarProperties props = OscarProperties.getInstance();
+	protected static Logger logger = MiscUtils.getLogger();
+	protected static final OscarProperties props = OscarProperties.getInstance();
 
 	private static final HashMap<Long, Integer> faxAttemptCounterMap = new HashMap<>();
 	private static final int MAX_SEND_COUNT = Integer.parseInt(props.getProperty("fax.max_send_attempts", DEFAULT_MAX_SEND_COUNT));
@@ -99,7 +100,6 @@ public class FaxUploadService
 
 	@Autowired
 	private FaxStatus faxStatus;
-
 
 	@Autowired
 	private FaxOutboundToModelConverter faxOutboundToModelConverter;
@@ -347,43 +347,60 @@ public class FaxUploadService
 		{
 			for(FaxOutbound faxOutbound : pendingList)
 			{
-				logger.info("Checking status for outbound record id:" + faxOutbound.getId() +
-					" (Current status: " + faxOutbound.getExternalStatus() + ")");
-				try
-				{
-					FaxStatusResult apiResult = uploadProvider.getFaxStatus(faxOutbound);
-
-					String externalStatus = apiResult.getRemoteSentStatus();
-					faxOutbound.setExternalStatus(externalStatus);
-
-					// if the remote status is sent, update accordingly.
-					if(uploadProvider.isFaxInRemoteSentState(externalStatus))
-					{
-						apiResult.getRemoteSendTime().ifPresent(faxOutbound::setExternalDeliveryDate);
-						faxOutbound.setRemoteStatusSent();
-						faxOutbound.setStatusMessage(STATUS_MESSAGE_COMPLETED);
-						faxOutbound.setArchived(true);
-					}
-					// if the remote status is failed, update accordingly.
-					else if(uploadProvider.isFaxInRemoteFailedState(externalStatus))
-					{
-						faxOutbound.setRemoteStatusError();
-						faxOutbound.setStatusMessage(apiResult.getError().orElse(STATUS_MESSAGE_ERROR_UNKNOWN));
-					}
-					faxOutboundDao.merge(faxOutbound);
-					logger.info("Updated external status to: " + externalStatus);
-				}
-				/* Don't change fax status if there is an error here. The fax has been sent to the remote service successfully,
-				 * we just don't know what remote state it's in. */
-				catch (FaxApiConnectionException e)
-				{
-					logger.error("Api connection error", e);
-				}
-				catch (Exception e)
-				{
-					logger.error("Unknown faxing exception", e);
-				}
+				requestPendingStatusUpdate(uploadProvider, faxOutbound);
 			}
+		}
+	}
+
+	protected void requestPendingStatusUpdate(FaxUploadProvider uploadProvider, FaxOutbound faxOutbound)
+	{
+		logger.info("Checking status for outbound record id: " + faxOutbound.getId() +
+				" (Current status: " + faxOutbound.getExternalStatus() + ")");
+		try
+		{
+			FaxStatusResult apiResult = uploadProvider.getFaxStatus(faxOutbound);
+
+			String externalStatus = apiResult.getRemoteSentStatus();
+			faxOutbound.setExternalStatus(externalStatus);
+
+			// if the remote status is sent, update accordingly.
+			if(uploadProvider.isFaxInRemoteSentState(externalStatus))
+			{
+				apiResult.getRemoteSendTime().ifPresent(faxOutbound::setExternalDeliveryDate);
+				faxOutbound.setRemoteStatusSent();
+				faxOutbound.setStatusMessage(STATUS_MESSAGE_COMPLETED);
+				faxOutbound.setArchived(true);
+			}
+			// if the remote status is failed, update accordingly.
+			else if(uploadProvider.isFaxInRemoteFailedState(externalStatus))
+			{
+				faxOutbound.setRemoteStatusError();
+				faxOutbound.setStatusMessage(apiResult.getError().orElse(STATUS_MESSAGE_ERROR_UNKNOWN));
+			}
+		}
+		/* In this case we got a response back from the api indicating an error, this should put the fax into an error state.
+		 * This should be a very rare occurrence */
+		catch (FaxApiResultException e)
+		{
+			logger.error("Api error response", e);
+			faxOutbound.setRemoteStatusError();
+			faxOutbound.setStatusMessage(e.getMessage());
+		}
+		/* Don't change fax status if there is a connection error. this could be resolved by re-attempting */
+		catch (FaxApiConnectionException e)
+		{
+			logger.error("Api connection error", e);
+		}
+		/* Don't change fax status if there is an error here. The fax has been sent to the remote service successfully,
+		 * we just don't know what remote state it's in. */
+		catch (Exception e)
+		{
+			logger.error("Unknown faxing exception", e);
+		}
+		finally
+		{
+			faxOutboundDao.merge(faxOutbound);
+			logger.info("Updated external status to: " + faxOutbound.getExternalStatus());
 		}
 	}
 
@@ -482,7 +499,7 @@ public class FaxUploadService
 				faxOutbound.setStatusError();
 			}
 		}
-		catch(FaxApiValidationException | FaxIntegrationException e)
+		catch(FaxApiValidationException | FaxIntegrationException | FaxApiResultException e)
 		{
 			logger.warn("Fax API failure: " + e.getMessage());
 			logData = e.getMessage();
