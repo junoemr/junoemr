@@ -25,6 +25,9 @@ package org.oscarehr.demographicArchive.service;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.entity.DemographicExt;
+import org.oscarehr.demographicArchive.converter.DemographicCustToArchiveConverter;
+import org.oscarehr.demographicArchive.converter.DemographicExtToArchiveConverter;
+import org.oscarehr.demographicArchive.converter.DemographicToArchiveConverter;
 import org.oscarehr.demographicArchive.dao.DemographicArchiveDao;
 import org.oscarehr.demographicArchive.entity.DemographicArchive;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -41,10 +45,18 @@ public class DemographicArchiveService
 	@Autowired
 	private DemographicArchiveDao demographicArchiveDao;
 
+	@Autowired
+	private DemographicToArchiveConverter demographicToArchiveConverter;
+
+	@Autowired
+	private DemographicExtToArchiveConverter demographicExtToArchiveConverter;
+
+	@Autowired
+	private DemographicCustToArchiveConverter demographicCustToArchiveConverter;
+
 	public void archiveDemographic(Demographic demographic)
 	{
-		DemographicArchive archive = new DemographicArchive(demographic);
-		archiveDemographic(archive);
+		archiveDemographic(demographicToArchiveConverter.convert(demographic));
 	}
 
 	@Deprecated
@@ -53,8 +65,8 @@ public class DemographicArchiveService
 	                               List<DemographicExt> extList)
 	{
 		DemographicArchive archive = new DemographicArchive(demographic);
-		archive.setDemographicExtArchiveSet(null);//TODO
-		archive.setDemographicCustArchive(null);
+		archive.setDemographicExtArchiveSet(new HashSet<>(demographicExtToArchiveConverter.convert(extList)));
+		archive.setDemographicCustArchive(demographicCustToArchiveConverter.convert(demographicCust));
 		archiveDemographic(archive);
 	}
 

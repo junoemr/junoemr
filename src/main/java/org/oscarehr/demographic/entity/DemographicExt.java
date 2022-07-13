@@ -24,14 +24,19 @@
 
 package org.oscarehr.demographic.entity;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.common.model.AbstractModel;
 import oscar.util.ConversionUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -43,6 +48,8 @@ import java.util.Date;
 
 import static oscar.util.StringUtils.filterControlCharacters;
 
+@Getter
+@Setter
 @Entity
 @Table(name="demographicExt")
 public class DemographicExt extends AbstractModel<Integer> implements Serializable {
@@ -83,6 +90,10 @@ public class DemographicExt extends AbstractModel<Integer> implements Serializab
     @Temporal(TemporalType.TIMESTAMP)
     private java.util.Date dateCreated;
     private boolean hidden;
+
+	@ManyToOne(fetch= FetchType.LAZY)
+	@JoinColumn(name="demographic_no", insertable=false, updatable=false)
+	private Demographic demographic;
 	
 	@PrePersist
 	@PreUpdate
