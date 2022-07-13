@@ -516,7 +516,6 @@ public class DemographicService
 	public DemographicModel updateDemographicRecord(DemographicUpdateInput updateInput, LoggedInInfo loggedInInfo)
 	{
 		Demographic oldDemographic = demographicDao.find(updateInput.getId());
-		demographicDao.detach(oldDemographic); // so it won't update when we set new values
 
 		// if hin changes, check duplication before update
 		if(!Objects.equals(oldDemographic.getHin(), updateInput.getHealthNumber()))
@@ -525,8 +524,10 @@ public class DemographicService
 		}
 
 		demographicArchiveService.archiveDemographic(oldDemographic);
+		demographicDao.detach(oldDemographic); // so it won't update when we set new values
 
 		Demographic demographic = demographicUpdateInputToEntityConverter.convert(updateInput);
+		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo()); // here until we can do this in the converter
 		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
 
 		demographicDao.merge(demographic);
