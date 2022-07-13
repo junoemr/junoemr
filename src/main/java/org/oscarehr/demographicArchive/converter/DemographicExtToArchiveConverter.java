@@ -34,8 +34,12 @@ public class DemographicExtToArchiveConverter extends AbstractModelConverter<Dem
 	@Override
 	public DemographicExtArchive convert(DemographicExt input)
 	{
+		if(input == null)
+		{
+			return null;
+		}
 		DemographicExtArchive archive = new DemographicExtArchive();
-		BeanUtils.copyProperties(input, archive, "demographic");
+		BeanUtils.copyProperties(input, archive, "id", "demographic");
 		return archive;
 	}
 }

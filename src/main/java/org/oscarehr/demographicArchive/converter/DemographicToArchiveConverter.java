@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.Optional;
 
 @Component
 public class DemographicToArchiveConverter extends AbstractModelConverter<Demographic, DemographicArchive>
@@ -43,6 +44,10 @@ public class DemographicToArchiveConverter extends AbstractModelConverter<Demogr
 	@Override
 	public DemographicArchive convert(Demographic input)
 	{
+		if(input == null)
+		{
+			return null;
+		}
 		DemographicArchive archive = new DemographicArchive();
 		BeanUtils.copyProperties(input, archive,
 				"demographicCust",
@@ -50,10 +55,21 @@ public class DemographicToArchiveConverter extends AbstractModelConverter<Demogr
 				"mergedDemographicsList",
 				"mergedToDemographicsList",
 				"rosterHistory",
-				"documents"
+				"documents",
+				"referralDoctor",
+				"familyDoctor"
 		);
+		archive.setDemographicNo(input.getDemographicId());
+		archive.setEffDate(input.getHcEffectiveDate());
+		archive.setFamilyDoctor(input.getReferralDoctor());
+		archive.setFamilyDoctor2(input.getFamilyDoctor());
+
 		archive.setDemographicExtArchiveSet(new HashSet<>(demographicExtToArchiveConverter.convert(input.getDemographicExtSet())));
 		archive.setDemographicCustArchive(demographicCustToArchiveConverter.convert(input.getDemographicCust()));
+
+		// reverse set relational links
+		archive.getDemographicExtArchiveSet().forEach((ext) -> ext.setDemographicArchive(archive));
+		Optional.ofNullable(archive.getDemographicCustArchive()).ifPresent((cust) -> cust.setDemographicArchive(archive));
 
 		return archive;
 	}

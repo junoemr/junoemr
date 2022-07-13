@@ -27,13 +27,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.oscarehr.common.converter.AbstractConverterTest;
+import org.oscarehr.common.converter.AbstractModelConverterTest;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographicArchive.entity.DemographicCustArchive;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class DemographicCustToArchiveConverterTest extends AbstractConverterTest<DemographicCust, DemographicCustArchive>
+public class DemographicCustToArchiveConverterTest extends AbstractModelConverterTest<DemographicCustToArchiveConverter, DemographicCust, DemographicCustArchive>
 {
 	@Autowired
 	@InjectMocks
@@ -64,6 +64,12 @@ public class DemographicCustToArchiveConverterTest extends AbstractConverterTest
 		source.setDemographic(demographic);
 
 		DemographicCustArchive destination = demographicCustToArchiveConverter.convert(source);
-		testPropertiesNotNull(destination,"demographicArchive");
+		testPropertiesNotNull(destination,"id", "demographicArchive");
+	}
+
+	@Override
+	protected DemographicCustToArchiveConverter getConverter()
+	{
+		return demographicCustToArchiveConverter;
 	}
 }

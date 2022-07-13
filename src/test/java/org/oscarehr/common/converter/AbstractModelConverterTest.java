@@ -24,6 +24,8 @@ package org.oscarehr.common.converter;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Test;
+import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.util.MiscUtils;
 
 import java.lang.reflect.Field;
@@ -31,9 +33,18 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class AbstractConverterTest<T, K>
+public abstract class AbstractModelConverterTest<C extends AbstractModelConverter<T, K>, T, K>
 {
 	private static final Logger logger = MiscUtils.getLogger();
+
+	protected abstract C getConverter();
+
+	@Test
+	public void test_convertNull()
+	{
+		Assert.assertNull("Converter should handle null input", getConverter().convert((T) null));
+	}
+
 	/**
 	 * ensure all fields on the destination object are not null
 	 * @param destination the destination object
@@ -70,6 +81,5 @@ public abstract class AbstractConverterTest<T, K>
 			}
 		}
 		Assert.assertTrue("null fields after conversion: " + errorFields, errorFields.isEmpty());
-
 	}
 }
