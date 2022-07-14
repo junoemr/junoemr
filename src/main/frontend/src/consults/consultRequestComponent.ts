@@ -398,7 +398,11 @@ angular.module('Consults').component('consultRequest',
 					{
 						throw new ArgumentError("Please select a Service");
 					}
-					if (ctrl.consult.demographicId == null || ctrl.consult.demographicId == "")
+					if (!ctrl.consult.referralDate)
+					{
+						throw new ArgumentError("Please set a referral date");
+					}
+					if (Juno.Common.Util.isBlank(ctrl.consult.demographicId))
 					{
 						throw new ArgumentError("Error! Invalid patient!");
 					}
