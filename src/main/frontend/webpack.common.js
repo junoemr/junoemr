@@ -354,7 +354,6 @@ module.exports = {
 			'./src/record/summary/module.js',
 			'./src/record/summary/summaryController.js',
 			'./src/record/summary/recordPrintController.js',
-			'./src/record/summary/saveWarningController.js',
 			'./src/record/summary/components/groupNotes/groupNotesComponent.js',
 			'./src/record/summary/components/summaryModule/summaryModuleComponent.js',
 			'./src/record/summary/components/encounterNote/encounterNoteComponent.js',

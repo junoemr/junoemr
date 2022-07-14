@@ -37,6 +37,7 @@ import AppointmentService from "../lib/appointment/service/AppointmentService";
 import ToastErrorHandler from "../lib/error/handler/ToastErrorHandler";
 import {LogLevel} from "../lib/error/handler/LogLevel";
 import TempNoteInput from "../lib/note/model/TempNoteInput";
+import ToastService from "../lib/alerts/service/ToastService";
 
 angular.module('Record').controller('Record.RecordController', [
 
@@ -83,7 +84,7 @@ angular.module('Record').controller('Record.RecordController', [
 		billingService,
 		focusService)
 	{
-		var controller = this;
+		const controller = this;
 
 		const PATIENT_MESSENGER_NAV_ID = 432543;
 
@@ -92,6 +93,7 @@ angular.module('Record').controller('Record.RecordController', [
 		$scope.LABEL_POSITION = LABEL_POSITION;
 
 		controller.appointmentService = new AppointmentService();
+		controller.toastService = new ToastService();
 
 		controller.demographicNo = $stateParams.demographicNo;
 		controller.demographic = null;
@@ -100,11 +102,6 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.SecurityPermissions = SecurityPermissions;
 		controller.errorHandler = new ToastErrorHandler(false, LogLevel.WARN);
 
-		/*
-		 * handle concurrent note edit - EditingNoteFlag
-		 */
-		controller.page.itvSet = null;
-		controller.page.itvCheck = null;
 		controller.page.editingNoteId = null;
 		controller.page.isNoteSaved = false; // Track save state of note TODO-legacy: Potentially add this to the encounterNote object on the backend
 		controller.page.currentNoteConfig = {};
@@ -168,6 +165,7 @@ angular.module('Record').controller('Record.RecordController', [
 				}
 
 				await controller.getCurrentNote(controller.page.appointment);
+				controller.setEditingNoteFlag();
 
 				let delayTmpSave = function delayTmpSave(newVal, oldVal)
 				{
@@ -315,6 +313,7 @@ angular.module('Record').controller('Record.RecordController', [
 			{
 				controller.saveUpdates(); // force temp-save current note
 			}
+			controller.removeEditingNoteFlag();
 		});
 
 		controller.inUnsavedNoteState = () =>
@@ -561,21 +560,14 @@ angular.module('Record').controller('Record.RecordController', [
 			return results.note;
 		};
 
-		controller.editNote = function editNote(note)
-		{
-			$scope.$broadcast('', note);
-		};
-
 		$rootScope.$on('loadNoteForEdit', function(event, data)
 		{
 			// Check if another note is currently being edited
-			if (controller.page.editingNoteId !== null)
+			if (controller.isEditingNote() || controller.inUnsavedNoteState())
 			{
-				console.log('Note is already being edited! Do you want to save changes?');
-				controller.displayWarning(data);
+				controller.toastService.warningToast("Please save or discard your encounter note before editing another note");
 				return;
 			}
-			controller.removeEditingNoteFlag();
 
 			controller.page.encounterNote = angular.copy(data);
 			controller.getIssueNote();
@@ -632,73 +624,22 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-
-		$rootScope.$on("$stateChangeStart", function()
-		{
-			controller.removeEditingNoteFlag();
-		});
-
-		controller.doSetEditingNoteFlag = function doSetEditingNoteFlag()
-		{
-			noteService.setEditingNoteFlag(controller.page.editingNoteId, user.providerNo).then(
-				function success(results)
-				{
-					if (!results.success)
-					{
-						if (results.message == "Parameter error") alert("Parameter Error: noteUUID[" + controller.page.editingNoteId + "] userId[" + user.providerNo + "]");
-						else alert("Warning! Another user is editing this note now.");
-					}
-				},
-				function error(errors)
-				{
-					console.log(errors);
-				});
-		};
-
 		controller.setEditingNoteFlag = function setEditingNoteFlag()
 		{
 			if (controller.page.encounterNote.uuid == null) return;
 			controller.page.isNoteSaved = false;
 			controller.page.editingNoteId = controller.page.encounterNote.uuid;
-			if (controller.page.itvSet == null)
-			{
-				controller.page.itvSet = $interval(controller.doSetEditingNoteFlag(), 30000); //set flag every 5 min until canceled
-			}
-			if (controller.page.itvCheck == null)
-			{ //warn once only when the 1st time another user tries to edit this note
-				controller.page.itvCheck = $interval(function()
-				{
-					noteService.checkEditNoteNew(controller.page.editingNoteId, user.providerNo).then(
-						function success(results)
-						{
-							if (!results.success)
-							{ //someone else wants to edit this note
-								alert("Warning! Another user tries to edit this note. Your update may be replaced by later revision(s).");
-								$interval.cancel(controller.page.itvCheck);
-								controller.page.itvCheck = null;
-							}
-						},
-						function error(errors)
-						{
-							console.log(errors);
-						});
-				}, 10000); //check for new edit every 10 seconds
-			}
 		};
 
 		controller.removeEditingNoteFlag = function removeEditingNoteFlag()
 		{
-			if (controller.page.editingNoteId != null)
-			{
-				noteService.removeEditingNoteFlag(controller.page.editingNoteId, user.providerNo);
-				$interval.cancel(controller.page.itvSet);
-				$interval.cancel(controller.page.itvCheck);
-				controller.page.itvSet = null;
-				controller.page.itvCheck = null;
-				controller.page.editingNoteId = null;
-			}
+			controller.page.editingNoteId = null;
 		};
 
+		controller.isEditingNote = () =>
+		{
+			return Boolean(controller.page.editingNoteId);
+		}
 
 		controller.searchTemplates = function searchTemplates(term)
 		{
@@ -760,43 +701,8 @@ angular.module('Record').controller('Record.RecordController', [
 			}
 		};
 
-		controller.displayWarning = function displayWarning(noteToEdit)
-		{
-			var modalInstance = $uibModal.open(
-			{
-				templateUrl: 'src/record/summary/saveWarning.jsp',
-				controller: 'Record.Summary.SaveWarningController as saveWarningCtrl',
-				backdrop: 'static',
-				size: 'md',
-				resolve:
-				{
-					saveSignNote: function()
-					{
-						return controller.saveSignNote;
-					},
-					cancelNoteEdit: function()
-					{
-						return controller.cancelNoteEdit;
-					}
-				}
-			});
-
-			// Might need to keep this to continue the original edit action
-			modalInstance.result.then(
-				function success(results)
-				{
-					console.log(results);
-				},
-				function error(errors)
-				{
-					console.log('Modal dismissed at: ' + new Date());
-					console.log(errors);
-				});
-		};
-
 		controller.searchIssues = function searchIssues(term)
 		{
-			console.log('SEARCHING FOR ISSUE: ', term);
 			var search = {
 				'term': term
 			};
@@ -935,7 +841,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.cancelButtonText = () =>
 		{
-			if(controller.page.editingNoteId)
+			if(controller.isEditingNote())
 			{
 				return "Cancel";
 			}
@@ -944,7 +850,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.cancelButtonTooltip = () =>
 		{
-			if(controller.page.editingNoteId)
+			if(controller.isEditingNote())
 			{
 				return "Cancel saved draft";
 			}
