@@ -232,7 +232,7 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.noteChanged = () =>
 		{
-			return (controller.page.encounterNote.note !== controller.page.initNote);
+			return (controller.page.encounterNote && controller.page.encounterNote.note !== controller.page.initNote);
 		}
 
 		controller.saveUpdates = async () =>
@@ -410,7 +410,7 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.skipTmpSave = true;
 			controller.$storage.hideNote = true;
 			await noteService.clearTempSave($stateParams.demographicNo);
-			await controller.getCurrentNote();
+			controller.noteDirty = false;
 			controller.removeEditingNoteFlag();
 		}
 
@@ -440,8 +440,14 @@ angular.module('Record').controller('Record.RecordController', [
 			// Need to find a better way of preventing this date overwrite
 			controller.page.encounterNote.assignedIssues = controller.page.assignedCMIssues;
 			controller.page.encounterNote.issueDescriptions = [];
-			if(!Juno.Common.Util.isInArray(user.displayName,  controller.page.encounterNote.editorNames))
+			if(!controller.page.encounterNote.editorNames)
+			{
+				controller.page.encounterNote.editorNames = [];
+			}
+			if(!Juno.Common.Util.isInArray(user.displayName, controller.page.encounterNote.editorNames))
+			{
 				controller.page.encounterNote.editorNames.push(user.displayName);
+			}
 
 			for (var i = 0; i < controller.page.assignedCMIssues.length; i++)
 			{
@@ -566,6 +572,7 @@ angular.module('Record').controller('Record.RecordController', [
 			if (controller.isEditingNote() || controller.inUnsavedNoteState())
 			{
 				controller.toastService.warningToast("Please save or discard your encounter note before editing another note");
+				$scope.$broadcast('stopEditingNote');
 				return;
 			}
 
