@@ -230,9 +230,48 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.netcareModuleEnabled = false; //await netcareService.loadEnabledState();
 		}
 
+		controller.clearNote = () =>
+		{
+			controller.page.assignedCMIssues = [];
+			controller.page.encounterNote = null;
+			controller.page.initNote = null;
+			controller.noteDirty = false;
+			controller.removeEditingNoteFlag();
+		}
+
+		controller.openNote = (noteModel = null) =>
+		{
+			if(!noteModel)
+			{
+				//initialize a new note
+				controller.page.encounterNote = {
+					noteId: null,
+					note: "",
+					uuid: null,
+					encounterType: null,
+					observationDate: new Date(),
+					isSigned: false,
+					assignedIssues: [],
+					issueDescriptions: [],
+					editorNames: [],
+				};
+			}
+			else
+			{
+				controller.page.encounterNote = noteModel;
+			}
+			controller.page.initNote = controller.page.encounterNote.note;
+			controller.page.encounterNote.encounterType = Juno.Common.Util.noNull(controller.page.encounterNote.encounterType);
+			controller.setEditingNoteFlag();
+		}
+
 		controller.noteChanged = () =>
 		{
-			return (controller.page.encounterNote && controller.page.encounterNote.note !== controller.page.initNote);
+			if(controller.page.encounterNote)
+			{
+				return (controller.page.encounterNote.note !== controller.page.initNote);
+			}
+			return false;
 		}
 
 		controller.saveUpdates = async () =>
@@ -394,6 +433,10 @@ angular.module('Record').controller('Record.RecordController', [
 			if (controller.$storage.hideNote)
 			{
 				controller.$storage.hideNote = false;
+				if(!controller.page.encounterNote)
+				{
+					controller.openNote();
+				}
 				focusService.focusRef(controller.encounterNoteTextAreaRef);
 			}
 			else
@@ -404,14 +447,12 @@ angular.module('Record').controller('Record.RecordController', [
 
 		controller.cancelNoteEdit = async () =>
 		{
-			controller.page.encounterNote = null;
 			controller.page.assignedCMIssues = [];
 			$scope.$broadcast('stopEditingNote');
 			controller.skipTmpSave = true;
 			controller.$storage.hideNote = true;
 			await noteService.clearTempSave($stateParams.demographicNo);
-			controller.noteDirty = false;
-			controller.removeEditingNoteFlag();
+			controller.clearNote();
 		}
 
 		// This is a hack wrapper until we figure out a more sane way to check the DOM for updated content
@@ -421,7 +462,7 @@ angular.module('Record').controller('Record.RecordController', [
 			controller.page.encounterNote.note = note;
 		};
 
-		controller.saveNote = function saveNote()
+		controller.saveNote = async function saveNote()
 		{
 			if(controller.isWorking())
 			{
@@ -454,25 +495,23 @@ angular.module('Record').controller('Record.RecordController', [
 				controller.page.encounterNote.issueDescriptions.push(controller.page.assignedCMIssues[i].issue.description);
 			}
 
-			noteService.saveNote($stateParams.demographicNo, controller.page.encounterNote).then(
-				function success(results)
-				{
-					controller.page.isNoteSaved = true;
-					controller.noteDirty = false;
-					$scope.$broadcast('noteSaved', results);
-					controller.skipTmpSave = true;
-					controller.page.encounterNote = results;
-					controller.$storage.hideNote = true;
-					controller.getCurrentNote();
-					controller.page.assignedCMIssues = [];
-					controller.working = false;
-				},
-				function error(errors)
-				{
-					console.log(errors);
-					controller.working = false;
-				});
-			controller.removeEditingNoteFlag();
+			try
+			{
+				let results = await noteService.saveNote($stateParams.demographicNo, controller.page.encounterNote);
+				controller.page.isNoteSaved = true;
+				controller.clearNote();
+				controller.openNote(results);
+				$scope.$broadcast('noteSaved', results);
+				controller.skipTmpSave = true;
+				controller.$storage.hideNote = true;
+				controller.getCurrentNote();
+				controller.working = false;
+			}
+			catch(e)
+			{
+				console.error(errors);
+				controller.working = false;
+			}
 		};
 
 		controller.saveSignNote = function saveSignNote()
@@ -556,9 +595,7 @@ angular.module('Record').controller('Record.RecordController', [
 		controller.getCurrentNote = async function getCurrentNote(appointment = null)
 		{
 			let results = await noteService.getCurrentNote($stateParams.demographicNo, $location.search());
-			controller.page.encounterNote = results;
-			controller.page.encounterNote.encounterType = Juno.Common.Util.noNull(controller.page.encounterNote.encounterType);
-			controller.page.initNote = results.note; //compare this with current note content to determine tmpsave or not
+			controller.openNote(results);
 			controller.getIssueNote();
 			$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
 			controller.initAppendNoteEditor(appointment);
@@ -569,20 +606,24 @@ angular.module('Record').controller('Record.RecordController', [
 		$rootScope.$on('loadNoteForEdit', function(event, data)
 		{
 			// Check if another note is currently being edited
-			if (controller.isEditingNote() || controller.inUnsavedNoteState())
+			if (controller.isEditingNote() && controller.noteChanged())
 			{
 				controller.toastService.warningToast("Please save or discard your encounter note before editing another note");
 				$scope.$broadcast('stopEditingNote');
 				return;
 			}
+			else if (controller.isEditingNote())
+			{
+				$scope.$broadcast('stopEditingNote');
+				controller.clearNote();
+			}
 
-			controller.page.encounterNote = angular.copy(data);
+			controller.openNote(angular.copy(data));
 			controller.getIssueNote();
 
 			//Need to check if note has been saved yet.
 			controller.$storage.hideNote = false;
 			focusService.focusRef(controller.encounterNoteTextAreaRef);
-			controller.setEditingNoteFlag();
 			$scope.$broadcast('currentlyEditingNote', controller.page.encounterNote);
 		});
 
@@ -590,9 +631,7 @@ angular.module('Record').controller('Record.RecordController', [
 		{
 			if(!controller.page.encounterNote)
 			{
-				controller.page.encounterNote = {
-					note: "",
-				}
+				controller.openNote();
 			}
 			controller.page.encounterNote.note = controller.page.encounterNote.note + "\n" + message;
 			controller.getIssueNote();
