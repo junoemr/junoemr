@@ -23,7 +23,7 @@
 package org.oscarehr.careTracker.converter;
 
 import org.apache.commons.lang.StringUtils;
-import org.oscarehr.careTracker.model.CareTrackerItemData;
+import org.oscarehr.careTracker.model.CareTrackerItemDataModel;
 import org.oscarehr.common.conversion.AbstractModelConverter;
 import org.oscarehr.prevention.model.Prevention;
 import org.oscarehr.prevention.model.PreventionExt;
@@ -34,20 +34,20 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class PreventionToCareTrackerItemDataConverter extends AbstractModelConverter<Prevention, CareTrackerItemData>
+public class PreventionToCareTrackerItemDataConverter extends AbstractModelConverter<Prevention, CareTrackerItemDataModel>
 {
 	@Override
-	public CareTrackerItemData convert(Prevention input)
+	public CareTrackerItemDataModel convert(Prevention input)
 	{
-		CareTrackerItemData careTrackerItemData = new CareTrackerItemData();
-		careTrackerItemData.setId(input.getId());
-		careTrackerItemData.setValue(input.getPreventionType());
-		careTrackerItemData.setComment(getCommentFromExt(input.getPreventionExtensionList()));
-		careTrackerItemData.setObservationDateTime(ConversionUtils.toLocalDateTime(input.getPreventionDate()));
-		careTrackerItemData.setCreatedDateTime(ConversionUtils.toLocalDateTime(input.getCreationDate()));
-		careTrackerItemData.setUpdatedDateTime(ConversionUtils.toLocalDateTime(input.getLastUpdateDate()));
+		CareTrackerItemDataModel careTrackerItemDataModel = new CareTrackerItemDataModel();
+		careTrackerItemDataModel.setId(input.getId());
+		careTrackerItemDataModel.setValue(input.getPreventionType());
+		careTrackerItemDataModel.setComment(getCommentFromExt(input.getPreventionExtensionList()));
+		careTrackerItemDataModel.setObservationDateTime(ConversionUtils.toLocalDateTime(input.getPreventionDate()));
+		careTrackerItemDataModel.setCreatedDateTime(ConversionUtils.toLocalDateTime(input.getCreationDate()));
+		careTrackerItemDataModel.setUpdatedDateTime(ConversionUtils.toLocalDateTime(input.getLastUpdateDate()));
 
-		return careTrackerItemData;
+		return careTrackerItemDataModel;
 	}
 
 	private String getCommentFromExt(List<PreventionExt> extList)

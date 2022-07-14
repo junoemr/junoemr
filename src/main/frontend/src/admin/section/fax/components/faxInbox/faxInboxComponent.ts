@@ -30,7 +30,7 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 		{
 			const ctrl = this;
 			ctrl.toastService = new ToastService();
-			ctrl.faxAccountService = new FaxAccountService(new ToastErrorHandler());
+			ctrl.faxAccountService = new FaxAccountService(new ToastErrorHandler(true));
 			ctrl.faxInboxService = new FaxInboxService();
 
 			ctrl.LABEL_POSITION = LABEL_POSITION;
@@ -97,20 +97,20 @@ angular.module("Admin.Section.Fax").component('faxInbox', {
 						total: 0,
 					},
 					{
-						getData: function (ngTableParams)
+						getData: function (ngTableParams): Promise<FaxInboxResult[]>
 						{
 							let tableParams = ngTableParams.url();
 							ctrl.searchParams.page = tableParams.page;
 							ctrl.searchParams.perPage = tableParams.count;
 
 							return ctrl.faxInboxService.getInbox(ctrl.searchParams).then(
-								function success(response: PagedResponse<FaxInboxResult>)
+								function success(response: PagedResponse<FaxInboxResult>): FaxInboxResult[]
 								{
 									ctrl.inboxItemList = response.body;
 									ctrl.tableParamsInbox.total(response.total);
 									return ctrl.inboxItemList;
 								},
-								function error(error)
+								function error(error): void
 								{
 									console.error(error);
 									ctrl.toastService.errorToast("Failed to load inbox");

@@ -26,6 +26,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v23.datatype.CX;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.hl7.AHS.model.v23.message.ORU_R01;
 import org.oscarehr.common.model.Hl7TextInfo;
@@ -37,6 +38,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 {
@@ -64,8 +66,7 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	 */
 	public static boolean isConnectCareHandler(MessageHandler handler)
 	{
-		String handlerType = handler.getMsgType();
-		return getConnectCareLabTypes().contains(handlerType);
+		return EnumUtils.isValidEnum(ConnectCareLabType.class, handler.getMsgType());
 	}
 
 	/**
@@ -74,7 +75,7 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	 */
 	public static List<String> getConnectCareLabTypes()
 	{
-		return Arrays.asList("CCLAB", "CCIMAGING", "CCCARDIOLOGY", "CCENDO", "CCDOC");
+		return Arrays.stream(ConnectCareLabType.values()).map(Enum::name).collect(Collectors.toList());
 	}
 
 	public ConnectCareHandler(Message msg) throws HL7Exception
@@ -152,7 +153,7 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 				return id.getRight();
 			}
 		}
-		return null;
+		return "";
 	}
 
 	@Override
@@ -175,6 +176,8 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	{
 		return "AHS";
 	}
+
+	/* ===================================== OBR ====================================== */
 
 	@Override
 	public String getUniqueIdentifier()
@@ -199,6 +202,95 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 		return getAssignedPatientLocation();
 	}
 
+	@Override
+	public List<String> getDocNums()
+	{
+		List<String> docIds = new ArrayList<>();
+		try
+		{
+			String providerId = getOrderingProviderNo(0, 0);
+			docIds.add(providerId);
+
+			for(int i = 0; i < getOBRCount(); i++)
+			{
+				int obr_28Count = getFieldReps("/.ORDER_OBSERVATION(" + i + ")/OBR", 28);
+				for(int k = 0; k < obr_28Count; k++)
+				{
+					String docId = getResultCopiesToProviderNo(i, k);
+					if(StringUtils.isNotBlank(docId))
+					{
+						docIds.add(docId);
+					}
+				}
+			}
+
+			// add pv1 provider to cc docs if not marked confidential
+			if(!isReportBlocked())
+			{
+				int pd1_4Count = getFieldReps("/.PD1", 4);
+				for(int k = 0; k < pd1_4Count; k++)
+				{
+					String docId = get("/.PD1-4(" + k + ")-1");
+					if(StringUtils.isNotBlank(docId))
+					{
+						docIds.add(docId);
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			logger.error("Could not return doctor nums", e);
+		}
+		return docIds;
+	}
+
+	@Override
+	public String getCCDocs()
+	{
+		try
+		{
+			return String.join(", ", getCCDocNames());
+		}
+		catch(HL7Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected List<String> getCCDocNames() throws HL7Exception
+	{
+		List<String> docNames = new ArrayList<>();
+		for(int i = 0; i < getOBRCount(); i++)
+		{
+			int obr_28Count = getFieldReps("/.ORDER_OBSERVATION(" + i + ")/OBR", 28);
+			for(int k = 0; k < obr_28Count; k++)
+			{
+				String docName = getResultCopiesTo(0, k);
+				if(StringUtils.isNotBlank(docName))
+				{
+					docNames.add(docName);
+				}
+			}
+		}
+
+		// add pv1 provider to cc docs if not marked confidential
+		if(!isReportBlocked())
+		{
+			int pd1_4Count = getFieldReps("/.PD1", 4);
+			for(int k = 0; k < pd1_4Count; k++)
+			{
+				String docName = getFullDocName("/.PD1", 4, k);
+				if(StringUtils.isNotBlank(docName))
+				{
+					docNames.add(docName);
+				}
+			}
+		}
+		return docNames;
+	}
+
+	/* ===================================== OBX ====================================== */
 
 	@Override
 	public String getNteForOBX(int i, int j)

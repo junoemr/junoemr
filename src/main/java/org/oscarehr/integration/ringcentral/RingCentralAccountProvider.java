@@ -25,6 +25,7 @@ package org.oscarehr.integration.ringcentral;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponseException;
+import org.apache.log4j.Logger;
 import org.oscarehr.fax.exception.FaxIntegrationException;
 import org.oscarehr.fax.model.FaxAccount;
 import org.oscarehr.fax.model.FaxAccountConnectionStatus;
@@ -33,6 +34,7 @@ import org.oscarehr.integration.ringcentral.api.RingCentralApiConnector;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralAccountInfoResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralCoverLetterListResult;
 import org.oscarehr.integration.ringcentral.api.result.RingCentralCoverLetterResult;
+import org.oscarehr.util.MiscUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -41,6 +43,7 @@ import java.util.stream.Collectors;
 
 public class RingCentralAccountProvider implements FaxAccountProvider
 {
+	protected final Logger logger = MiscUtils.getLogger();
 	protected final FaxAccount faxAccount;
 	protected final RingCentralApiConnector ringCentralApiConnector;
 
@@ -58,6 +61,7 @@ public class RingCentralAccountProvider implements FaxAccountProvider
 			if (!ringCentralApiConnector.getCredential().isPresent())
 			{
 				// No credential, probably logged out and never logged back in.
+				logger.info("RingCentral connection signed out. Reason: missing credential");
 				return FaxAccountConnectionStatus.SIGNED_OUT;
 			}
 			else
@@ -67,6 +71,7 @@ public class RingCentralAccountProvider implements FaxAccountProvider
 				if (!refreshed)
 				{
 					// Could not refresh for some reason that isn't a 4XX response or disk IO
+					logger.error("RingCentral connection signed out. Reason: unknown");
 					return FaxAccountConnectionStatus.SIGNED_OUT;
 				}
 
@@ -76,17 +81,20 @@ public class RingCentralAccountProvider implements FaxAccountProvider
 					return FaxAccountConnectionStatus.SUCCESS;
 				}
 
+				logger.info("RingCentral connection unknown state. token refreshed but account info is missing");
 				return FaxAccountConnectionStatus.UNKNOWN;
 			}
 		}
 		catch (TokenResponseException e)
 		{
 			// 4XX response to refresh request
+			logger.warn("RingCentral connection signed out. Reason: token exception", e);
 			return FaxAccountConnectionStatus.SIGNED_OUT;
 		}
 		catch (IOException e)
 		{
 			// Probably due to accessing credential store on disk
+			logger.error("RingCentral connection failure. Reason: IO exception", e);
 			return FaxAccountConnectionStatus.FAILURE;
 		}
 	}

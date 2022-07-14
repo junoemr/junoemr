@@ -38,7 +38,7 @@ export default class FaxInboxService
 			params.faxAccount?.id,
 		)).data;
 
-		return new PagedResponse(this.faxInboxResultToModelConverter.convertList(transfer.body, transfer.headers));
+		return new PagedResponse(this.faxInboxResultToModelConverter.convertList(transfer.body), transfer.headers);
 	}
 
 }

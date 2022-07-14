@@ -165,7 +165,7 @@ public class RingCentralMessageInfoResult implements RingCentralResult, FaxStatu
 	@JsonIgnore
 	public String getCallerId()
 	{
-		return from.getPhoneNumber();
+		return Optional.ofNullable(from).map(RingCentralSenderInformation::getPhoneNumber).orElse(null);
 	}
 
 	@JsonIgnore

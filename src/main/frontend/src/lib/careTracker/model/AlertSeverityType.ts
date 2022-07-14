@@ -25,5 +25,5 @@
 
  */
 
-import {CareTrackerItemAlert} from "../../../../generated";
-export import AlertSeverityType = CareTrackerItemAlert.SeverityLevelEnum;
+import {CareTrackerItemAlertModel} from "../../../../generated";
+export import AlertSeverityType = CareTrackerItemAlertModel.SeverityLevelEnum;

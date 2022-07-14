@@ -71,7 +71,6 @@
 <%@page import="org.oscarehr.PMmodule.service.ProgramManager" %>
 <%@page import="org.oscarehr.common.dao.WaitingListNameDao" %>
 <%@page import="org.oscarehr.eform.dao.EFormDao" %>
-<%@page import="org.oscarehr.PMmodule.dao.ProgramDao" %>
 <%@page import="org.oscarehr.common.model.Facility" %>
 <%@page import="oscar.OscarProperties" %>
 <%@page import="org.apache.commons.lang.StringEscapeUtils"%>
@@ -82,6 +81,9 @@
 <%@ page import="org.oscarehr.eform.model.EForm" %>
 <%@ page import="java.sql.ResultSet" %>
 <%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
+<%@ page import="static org.caisi.comp.web.WebComponentUtil.getServletContext" %>
+<%@ page import="org.oscarehr.rosterStatus.service.RosterStatusService" %>
+<%@ page import="org.oscarehr.rosterStatus.model.RosterStatusModel" %>
 
 
 <jsp:useBean id="apptMainBean" class="oscar.AppointmentMainBean" scope="session" />
@@ -90,6 +92,7 @@
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	ProgramManager pm = SpringUtils.getBean(ProgramManager.class);
 	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+	RosterStatusService rosterStatusService = SpringUtils.getBean(RosterStatusService.class);
 	WaitingListNameDao waitingListNameDao = SpringUtils.getBean(WaitingListNameDao.class);
 	EFormDao eformDao = (EFormDao)SpringUtils.getBean("EFormDao");
 	ProgramManager2 programManager2 = SpringUtils.getBean(ProgramManager2.class);
@@ -155,6 +158,8 @@
 	    PatientConsentManager patientConsentManager = SpringUtils.getBean( PatientConsentManager.class );
 		pageContext.setAttribute( "consentTypes", patientConsentManager.getConsentTypes() );
 	}
+
+	List<RosterStatusModel> rosterStatuses = rosterStatusService.getRosterStatusList(true);
 
 %>
 <html:html locale="true">
@@ -284,15 +289,6 @@ function newStatus() {
     if (newOpt != "") {
         document.adddemographic.patient_status.options[document.adddemographic.patient_status.length] = new Option(newOpt, newOpt);
         document.adddemographic.patient_status.options[document.adddemographic.patient_status.length-1].selected = true;
-    } else {
-        alert("Invalid entry");
-    }
-}
-function newStatus1() {
-    newOpt = prompt("Please enter the new status:", "");
-    if (newOpt != "") {
-        document.adddemographic.roster_status.options[document.adddemographic.roster_status.length] = new Option(newOpt, newOpt);
-        document.adddemographic.roster_status.options[document.adddemographic.roster_status.length-1].selected = true;
     } else {
         alert("Invalid entry");
     }
@@ -865,10 +861,7 @@ function ignoreDuplicates() {
 					key="demographic.demographicaddrecordhtm.formEMail" />: </b></td>
 				<td id="emailCell" align="left"><input type="text" id="email" name="email" value="">
 				</td>
-				<td id="myOscarLbl" align="right"><b><bean:message
-					key="demographic.demographicaddrecordhtm.formPHRUserName" />:</b></td>
-				<td id="myOscarCell"  align="left"><input type="text" name="myOscarUserName" value="">
-				</td>
+				<td colspan="2"></td>
 			</tr>
 			<tr valign="top">
 				<td id="dobLbl" align="right"><b><bean:message
@@ -1303,19 +1296,16 @@ document.forms[1].referral_doctor_no.value = refNo;
 			<tr valign="top">
 				<td align="right" id="rosterStatusLbl" nowrap><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPCNRosterStatus" />: </b></td>
-				<td id="rosterStatus" align="left"><!--input type="text" name="roster_status" onBlur="upCaseCtrl(this)"-->
-				<select id="roster_status"  name="roster_status" style="width: 160px;">
+				<td id="rosterStatus" align="left">
+				<select id="roster_status" name="roster_status">
 					<option value=""></option>
-					<option value="RO"><bean:message key="demographic.demographicaddrecordhtm.RO-rostered" /></option>
-					<option value="NR"><bean:message key="demographic.demographicaddrecordhtm.NR-notrostered" /></option>
-					<option value="TE"><bean:message key="demographic.demographicaddrecordhtm.TE-terminated" /></option>
-					<option value="FS"><bean:message key="demographic.demographicaddrecordhtm.FS-feeforservice" /></option>
 					<%
-					for(String status : demographicDao.getRosterStatuses()) {%>
-					<option value="<%=status%>"><%=status%></option>
-					<% } // end while %>
-				</select> <input type="button" onClick="newStatus1();" value="<bean:message
-					key="demographic.demographicaddrecordhtm.AddNewRosterStatus"/> " /></td>
+					for(RosterStatusModel rosterStatus : rosterStatuses) {%>
+					<option value="<%=rosterStatus.getRosterStatus()%>">
+						<%=rosterStatus.getRosterStatus() + "-" + rosterStatus.getStatusDescription()%>
+					</option>
+					<% } %>
+				</select></td>
 				<td id="rosterDateLbl" align="right" nowrap><b><bean:message
 					key="demographic.demographicaddrecordhtm.formPCNDateJoined" />: </b></td>
 				<td id="rosterDateCell" align="left"><input type="text" name="roster_date_year"

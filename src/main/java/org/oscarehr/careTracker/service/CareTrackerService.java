@@ -23,23 +23,24 @@
 package org.oscarehr.careTracker.service;
 
 
-import org.oscarehr.common.dao.Icd9Dao;
-import org.oscarehr.common.model.Icd9;
-import org.oscarehr.dataMigration.model.dx.DxCode;
-import org.oscarehr.careTrackerDecisionSupport.dao.DsRuleDao;
-import org.oscarehr.careTrackerDecisionSupport.transfer.DsRuleUpdateInput;
-import org.oscarehr.demographic.dao.DemographicDao;
-import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.careTracker.converter.CareTrackerEntityToModelConverter;
 import org.oscarehr.careTracker.dao.CareTrackerDao;
+import org.oscarehr.careTracker.entity.CareTracker;
 import org.oscarehr.careTracker.entity.CareTrackerItem;
 import org.oscarehr.careTracker.entity.CareTrackerItemGroup;
-import org.oscarehr.careTracker.model.CareTracker;
+import org.oscarehr.careTracker.model.CareTrackerModel;
 import org.oscarehr.careTracker.search.CareTrackerCriteriaSearch;
 import org.oscarehr.careTracker.transfer.CareTrackerCreateTransfer;
 import org.oscarehr.careTracker.transfer.CareTrackerItemCreateUpdateTransfer;
 import org.oscarehr.careTracker.transfer.CareTrackerItemGroupCreateUpdateTransfer;
 import org.oscarehr.careTracker.transfer.CareTrackerUpdateTransfer;
+import org.oscarehr.careTrackerDecisionSupport.dao.DsRuleDao;
+import org.oscarehr.careTrackerDecisionSupport.transfer.DsRuleUpdateInput;
+import org.oscarehr.common.dao.Icd9Dao;
+import org.oscarehr.common.model.Icd9;
+import org.oscarehr.dataMigration.model.dx.DxCode;
+import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
@@ -78,15 +79,15 @@ public class CareTrackerService
 	@Autowired
 	private CareTrackerEntityToModelConverter careTrackerEntityToModelConverter;
 
-	public RestSearchResponse<CareTracker> executeCriteriaSearch(CareTrackerCriteriaSearch criteriaSearch, int page, int perPage)
+	public RestSearchResponse<CareTrackerModel> executeCriteriaSearch(CareTrackerCriteriaSearch criteriaSearch, int page, int perPage)
 	{
-		List<org.oscarehr.careTracker.entity.CareTracker> careTrackers = careTrackerDao.criteriaSearch(criteriaSearch);
+		List<CareTracker> careTrackers = careTrackerDao.criteriaSearch(criteriaSearch);
 		int total = careTrackerDao.criteriaSearchCount(criteriaSearch);
 
 		return RestSearchResponse.successResponse(careTrackerEntityToModelConverter.convert(careTrackers), page, perPage, total);
 	}
 
-	public CareTracker addNewCareTrackerCopy(String creatingProviderId, Integer careTrackerIdToCopy)
+	public CareTrackerModel addNewCareTrackerCopy(String creatingProviderId, Integer careTrackerIdToCopy)
 	{
 		return addNewCareTrackerCopy(
 				creatingProviderId,
@@ -96,7 +97,7 @@ public class CareTrackerService
 				Optional.of(" (copy)"));
 	}
 
-	public CareTracker addNewProviderCareTrackerCopy(String creatingProviderId, Integer careTrackerIdToCopy, String ownerProviderId)
+	public CareTrackerModel addNewProviderCareTrackerCopy(String creatingProviderId, Integer careTrackerIdToCopy, String ownerProviderId)
 	{
 		ProviderData providerData = providerDao.find(ownerProviderId);
 		String suffix = " (copy for " + providerData.getDisplayName() + ")";
@@ -108,7 +109,7 @@ public class CareTrackerService
 				Optional.of(suffix));
 	}
 
-	public CareTracker addNewDemographicCareTrackerCopy(String creatingProviderId, Integer careTrackerIdToCopy, Integer ownerDemographicId)
+	public CareTrackerModel addNewDemographicCareTrackerCopy(String creatingProviderId, Integer careTrackerIdToCopy, Integer ownerDemographicId)
 	{
 		Demographic demographic = demographicDao.find(ownerDemographicId);
 		String suffix = " (copy for " + demographic.getDisplayName() + ")";
@@ -120,9 +121,9 @@ public class CareTrackerService
 				Optional.of(suffix));
 	}
 
-	public CareTracker addNewCareTracker(String creatingProviderId, CareTrackerCreateTransfer creationTransfer)
+	public CareTrackerModel addNewCareTracker(String creatingProviderId, CareTrackerCreateTransfer creationTransfer)
 	{
-		org.oscarehr.careTracker.entity.CareTracker entity = new org.oscarehr.careTracker.entity.CareTracker();
+		CareTracker entity = new CareTracker();
 		entity.setName(creationTransfer.getName());
 		entity.setDescription(creationTransfer.getDescription());
 		entity.setEnabled(creationTransfer.isEnabled());
@@ -144,9 +145,9 @@ public class CareTrackerService
 		return careTrackerEntityToModelConverter.convert(entity);
 	}
 
-	public CareTracker updateCareTracker(String updatingProviderId, Integer careTrackerId, CareTrackerUpdateTransfer updateTransfer)
+	public CareTrackerModel updateCareTracker(String updatingProviderId, Integer careTrackerId, CareTrackerUpdateTransfer updateTransfer)
 	{
-		org.oscarehr.careTracker.entity.CareTracker entity = careTrackerDao.find(careTrackerId);
+		CareTracker entity = careTrackerDao.find(careTrackerId);
 		if(entity.isSystemManaged())
 		{
 			throw new IllegalArgumentException("System managed care tracker can not be updated");
@@ -204,14 +205,14 @@ public class CareTrackerService
 		return careTrackerEntityToModelConverter.convert(entity);
 	}
 
-	public CareTracker getCareTracker(Integer careTrackerId)
+	public CareTrackerModel getCareTracker(Integer careTrackerId)
 	{
 		return careTrackerEntityToModelConverter.convert(careTrackerDao.find(careTrackerId));
 	}
 
 	public void deleteCareTracker(String deletingProviderId, Integer careTrackerId)
 	{
-		org.oscarehr.careTracker.entity.CareTracker careTrackerEntity = careTrackerDao.find(careTrackerId);
+		CareTracker careTrackerEntity = careTrackerDao.find(careTrackerId);
 		if(careTrackerEntity.isSystemManaged())
 		{
 			throw new IllegalArgumentException("System managed care tracker can not be deleted");
@@ -237,21 +238,21 @@ public class CareTrackerService
 
 	public boolean setCareTrackerEnabled(String updatingProviderId, Integer careTrackerId, boolean enabled)
 	{
-		org.oscarehr.careTracker.entity.CareTracker careTrackerEntity = careTrackerDao.find(careTrackerId);
+		CareTracker careTrackerEntity = careTrackerDao.find(careTrackerId);
 		careTrackerEntity.setEnabled(enabled);
 		careTrackerEntity.setUpdatedBy(updatingProviderId);
 		careTrackerDao.merge(careTrackerEntity);
 		return careTrackerEntity.isEnabled();
 	}
 
-	private CareTracker addNewCareTrackerCopy(String creatingProviderId,
-	                                          Integer careTrackerIdToCopy,
-	                                          Optional<ProviderData> providerOwner,
-	                                          Optional<Demographic> demographicOwner,
-	                                          Optional<String> nameSuffix)
+	private CareTrackerModel addNewCareTrackerCopy(String creatingProviderId,
+	                                               Integer careTrackerIdToCopy,
+	                                               Optional<ProviderData> providerOwner,
+	                                               Optional<Demographic> demographicOwner,
+	                                               Optional<String> nameSuffix)
 	{
-		org.oscarehr.careTracker.entity.CareTracker careTrackerToCopy = careTrackerDao.find(careTrackerIdToCopy);
-		org.oscarehr.careTracker.entity.CareTracker entity = new org.oscarehr.careTracker.entity.CareTracker(careTrackerToCopy); // copy constructor
+		CareTracker careTrackerToCopy = careTrackerDao.find(careTrackerIdToCopy);
+		CareTracker entity = new CareTracker(careTrackerToCopy); // copy constructor
 		entity.setCreatedBy(creatingProviderId);
 		entity.setUpdatedBy(creatingProviderId);
 		entity.setSystemManaged(false); // copies are never system managed
@@ -312,7 +313,7 @@ public class CareTrackerService
 		return existingGroupEntity;
 	}
 	private CareTrackerItemGroup createNewGroup(CareTrackerItemGroupCreateUpdateTransfer groupInput,
-	                                            org.oscarehr.careTracker.entity.CareTracker careTrackerEntity)
+	                                            CareTracker careTrackerEntity)
 	{
 		CareTrackerItemGroup group = new CareTrackerItemGroup();
 		group.setCareTracker(careTrackerEntity);
@@ -353,7 +354,7 @@ public class CareTrackerService
 	}
 
 	private CareTrackerItem createNewItem(CareTrackerItemCreateUpdateTransfer itemInput,
-	                                      org.oscarehr.careTracker.entity.CareTracker careTrackerEntity,
+	                                      CareTracker careTrackerEntity,
 	                                      CareTrackerItemGroup groupEntity)
 	{
 		CareTrackerItem item = new CareTrackerItem();

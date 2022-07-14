@@ -49,7 +49,7 @@ public class RingCentralUploadProvider implements FaxUploadProvider
 	}
 
 	@Override
-	public FaxOutbound sendQueuedFax(FaxOutbound faxOutbound, GenericFile file) throws Exception
+	public FaxOutbound sendQueuedFax(FaxOutbound faxOutbound, GenericFile file)
 	{
 		RingCentralSendFaxInput input = new RingCentralSendFaxInput();
 		input.setAttachment(file);
@@ -82,7 +82,7 @@ public class RingCentralUploadProvider implements FaxUploadProvider
 	}
 
 	@Override
-	public FaxStatusResult getFaxStatus(FaxOutbound faxOutbound) throws Exception
+	public FaxStatusResult getFaxStatus(FaxOutbound faxOutbound)
 	{
 		return ringcentralApiConnector.getMessage(faxAccount.getLoginId(), CURRENT_SESSION_INDICATOR, String.valueOf(faxOutbound.getExternalReferenceId()));
 	}

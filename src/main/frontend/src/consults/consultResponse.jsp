@@ -101,15 +101,15 @@
 						<div class="form-group">
 							<div class="col-sm-12">
 								<label>Address:</label>
-								{{consultResponseCtrl.consult.letterheadAddress}}
+								{{consultResponseCtrl.consult.letterhead.address.displayLine1of2}}
 							</div>
 							<div class="col-sm-12">
 								<label>Phone:</label>
-								{{consultResponseCtrl.consult.letterheadPhone}}
+								{{consultResponseCtrl.consult.letterhead.phone.formattedForDisplay}}
 							</div>
 							<div class="col-sm-12">
 								<label>Fax: </label>
-								{{consultResponseCtrl.consult.letterheadFax}}
+								{{consultResponseCtrl.consult.letterhead.fax.formattedForDisplay}}
 							</div>
 						</div>
 					</form>

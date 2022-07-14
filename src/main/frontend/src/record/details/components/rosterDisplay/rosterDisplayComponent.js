@@ -94,7 +94,7 @@ angular.module('Record.Details').component('rosterDisplaySection', {
 
                             if (familyDoctor.referralNo != null && familyDoctor.referralNo !== "")
                             {
-                                label += "[" + familyDoctor.referralNo + "]";
+                                label += " [" + familyDoctor.referralNo + "]";
                             }
 
                             familyDoctors.push({
@@ -116,7 +116,7 @@ angular.module('Record.Details').component('rosterDisplaySection', {
             {
                 let providerName = Juno.Common.Util.isBlank(value.value) ? null : value.value.trim();
                 ctrl.ngModel.familyDoctor = SimpleProvider.fromDisplayNameAndOhip(providerName, value.referralNo);
-                ctrl.selectedFamilyDoctorNo = value.referralNo;
+                ctrl.selectedFamilyDocNo = value.referralNo;
             }
 
             ctrl.openRosteredHistoryModal = async () =>

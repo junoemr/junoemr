@@ -25,19 +25,6 @@
 
 package oscar.oscarLab.ca.all.parsers;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.oscarehr.integration.hl7.model.PatientId;
-import org.oscarehr.util.MiscUtils;
-
-import oscar.Misc;
-import oscar.OscarProperties;
-import oscar.util.UtilDateUtilities;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Segment;
@@ -46,6 +33,19 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import org.apache.log4j.Logger;
+import org.oscarehr.integration.hl7.model.PatientId;
+import org.oscarehr.util.MiscUtils;
+import oscar.Misc;
+import oscar.OscarProperties;
+import oscar.util.UtilDateUtilities;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -683,8 +683,9 @@ public String getUniqueIdentifier(){
      *
      */
     @Override
-    public ArrayList<String> getDocNums(){
-        ArrayList<String> nums = new ArrayList<String>();
+    public List<String> getDocNums()
+    {
+	    ArrayList<String> nums = new ArrayList<>();
         String docNum;
         try{
             if ((docNum = terser.get("/.Z01-1-1")) != null){

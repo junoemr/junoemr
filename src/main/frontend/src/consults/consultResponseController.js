@@ -52,7 +52,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 			consultService.getLetterheadList().then(
 				function success(results)
 				{
-					consult.letterheadList = Juno.Common.Util.toArray(results.data);
+					consult.letterheadList = results;
 
 					//set default letterhead
 					if(consult.letterhead === null)
@@ -340,7 +340,7 @@ angular.module('Consults').controller('Consults.ConsultResponseController', [
 		{
 			var modalInstance = $uibModal.open(
 			{
-				templateUrl: "src/consults/consultAttachment.jsp",
+				templateUrl: "src/consults/consultResponseAttachment.jsp",
 				controller: "Consults.ConsultResponseAttachmentController as consultAttachmentCtrl",
 				windowClass: "attachment-modal-window",
 				backdrop: "static",

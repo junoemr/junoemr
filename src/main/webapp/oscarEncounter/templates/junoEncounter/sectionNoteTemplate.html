@@ -4,42 +4,48 @@
 {{!       changed at some point to share a template.                               }}
 {{! ============================================================================== }}
 <li class="encounterNote \${rowClass}">
-    {{if showExpand }}
-    <a href="#" class="expandCasemgmtSidebar" onclick="junoEncounter.getSectionRemote('\${sectionName}', true, false, getEChartUUID()); return false;" title="\${remainingNotes} more items">
-        <img id="imgpreventions5" src="\${contextPath}/oscarEncounter/graphics/expand.gif" />&nbsp;&nbsp;
-    </a>
-    {{else showCollapse }}
-    <a href="#" class="expandCasemgmtSidebar" onclick="junoEncounter.getSectionRemote('\${sectionName}', false, false, getEChartUUID()); return false;" title="\${remainingNotes} more items">
-        <img id="imgpreventions5" src="\${contextPath}/oscarMessenger/img/collapse.gif" />&nbsp;&nbsp;
-    </a>
-    {{else}}
-    <a border="0" class="expandCasemgmtSidebar">
-        <img id="img\${sectionName}1" src="\${contextPath}/images/clear.gif" />&nbsp;&nbsp;
-    </a>
-    {{/if}}
-    <span class="encounterNoteTitle">
+	{{if showExpand }}
+	<a href="#" class="expandCasemgmtSidebar" onclick="junoEncounter.getSectionRemote('\${sectionName}', true, false, getEChartUUID()); return false;" title="\${remainingNotes} more items">
+		<img id="imgpreventions5" src="\${contextPath}/oscarEncounter/graphics/expand.gif" />&nbsp;&nbsp;
+	</a>
+	{{else showCollapse }}
+	<a href="#" class="expandCasemgmtSidebar" onclick="junoEncounter.getSectionRemote('\${sectionName}', false, false, getEChartUUID()); return false;" title="\${remainingNotes} more items">
+		<img id="imgpreventions5" src="\${contextPath}/oscarMessenger/img/collapse.gif" />&nbsp;&nbsp;
+	</a>
+	{{else}}
+	<a border="0" class="expandCasemgmtSidebar">
+		<img id="img\${sectionName}1" src="\${contextPath}/images/clear.gif" />&nbsp;&nbsp;
+	</a>
+	{{/if}}
+	<span class="encounterNoteTitle {{if displayOnSingleLine}}singleLine{{/if}}">
 					<a
-                            class="links"
-                            style="color: \${colour};"
-                            onmouseover="this.className='linkhover'"
-                            onmouseout="this.className='links'"
-                            href="#"
-                            onclick="\${onClick};return false;"
-                            title="\${title}"
-                    >
-						\${text}
+							class="links"
+							style="color: \${colour};"
+							onmouseover="this.className='linkhover'"
+							onmouseout="this.className='links'"
+							href="#"
+							onclick="\${onClick};return false;"
+							title="\${title}"
+					>
+						{{if displayOnSingleLine}}
+							\${text}
+						{{else}}
+            						{{each textLineArray}}
+           							 \${$value}<br />
+            					{{/each}}
+						{{/if}}
 					</a>
 				</span>
-    <span class="encounterNoteDate \${rowClass}">
+	<span class="encounterNoteDate \${rowClass}">
 					{{if updateDateFormatted}}...{{/if}}<a
-            class="links"
-            style="margin-right: 2px; color: \${colour};"
-            onmouseover="this.className='linkhover'"
-            onmouseout="this.className='links'"
-            href="#"
-            onclick="\${onClick};return false;"
-            title="\${title}"
-    >
+			class="links"
+			style="margin-right: 2px; color: \${colour};"
+			onmouseover="this.className='linkhover'"
+			onmouseout="this.className='links'"
+			href="#"
+			onclick="\${onClick};return false;"
+			title="\${title}"
+	>
 						\${value}
 						\${updateDateFormatted}
 					</a>

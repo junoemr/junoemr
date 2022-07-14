@@ -23,11 +23,11 @@
 
 package org.oscarehr.rosterStatus.service;
 
+import org.oscarehr.rosterStatus.converter.RosterStatusToEntityConverter;
+import org.oscarehr.rosterStatus.converter.RosterStatusToModelConverter;
 import org.oscarehr.rosterStatus.dao.RosterStatusDao;
-import org.oscarehr.rosterStatus.model.RosterStatus;
-import org.oscarehr.rosterStatus.transfer.RosterStatusTransfer;
-import org.oscarehr.ws.conversion.RosterStatusToDomainConverter;
-import org.oscarehr.ws.conversion.RosterStatusToTransferConverter;
+import org.oscarehr.rosterStatus.entity.RosterStatus;
+import org.oscarehr.rosterStatus.model.RosterStatusModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.log.LogAction;
@@ -36,27 +36,21 @@ import oscar.log.LogConst;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class RosterStatusService
 {
 	@Autowired
-	RosterStatusDao rosterStatusDao;
+	protected RosterStatusDao rosterStatusDao;
 
 	@Autowired
-	RosterStatusToTransferConverter rosterStatusToTransferConverter;
+	protected RosterStatusToModelConverter rosterStatusToModelConverter;
 
 	@Autowired
-	RosterStatusToDomainConverter rosterStatusToDomainConverter;
+	protected RosterStatusToEntityConverter rosterStatusToEntityConverter;
 
-	public RosterStatus findByStatus(String status)
-	{
-		return rosterStatusDao.findByStatus(status);
-	}
-
-	public List<RosterStatusTransfer> getRosterStatusList(Boolean active)
+	public List<RosterStatusModel> getRosterStatusList(Boolean active)
 	{
 		List<RosterStatus> statuses;
 		if (active != null && active)
@@ -71,20 +65,12 @@ public class RosterStatusService
 		{
 			statuses = rosterStatusDao.findAll();
 		}
-		return rosterStatusToTransferConverter.convert(statuses);
+		return rosterStatusToModelConverter.convert(statuses);
 	}
 
-	public List<RosterStatusTransfer> getActiveRosterStatusList()
+	public RosterStatusModel addStatus(RosterStatusModel statusTransfer, String providerNo)
 	{
-		List<RosterStatus> statuses = rosterStatusDao.findAll();
-		return rosterStatusToTransferConverter.convert(statuses.stream()
-				.filter(status -> status.getDeletedAt() == null)
-				.collect(Collectors.toList()));
-	}
-
-	public RosterStatusTransfer addStatus(RosterStatusTransfer statusTransfer, String providerNo)
-	{
-		RosterStatus rosterStatus = rosterStatusToDomainConverter.convert(statusTransfer);
+		RosterStatus rosterStatus = rosterStatusToEntityConverter.convert(statusTransfer);
 		rosterStatus.setCreatedAt(LocalDateTime.now());
 		rosterStatus.setUpdatedAt(LocalDateTime.now());
 		rosterStatus.setUpdatedBy(providerNo);
@@ -106,12 +92,12 @@ public class RosterStatusService
 				LogConst.STATUS_SUCCESS,
 				"Roster Status: " + rosterStatus.getRosterStatus());
 
-		return rosterStatusToTransferConverter.convert(rosterStatus);
+		return rosterStatusToModelConverter.convert(rosterStatus);
 	}
 
-	public RosterStatusTransfer editStatus(RosterStatusTransfer statusTransfer, String editingProvider)
+	public RosterStatusModel editStatus(RosterStatusModel statusTransfer, String editingProvider)
 	{
-		RosterStatus rosterStatus = rosterStatusToDomainConverter.convert(statusTransfer);
+		RosterStatus rosterStatus = rosterStatusToEntityConverter.convert(statusTransfer);
 		rosterStatus.setUpdatedAt(LocalDateTime.now());
 		rosterStatus.setUpdatedBy(editingProvider);
 
@@ -132,7 +118,7 @@ public class RosterStatusService
 				LogConst.STATUS_SUCCESS,
 				"Roster Status EDITED: " + rosterStatus.getRosterStatus());
 
-		return rosterStatusToTransferConverter.convert(rosterStatus);
+		return rosterStatusToModelConverter.convert(rosterStatus);
 	}
 
 }

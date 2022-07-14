@@ -23,23 +23,8 @@
 
 package org.oscarehr.casemgmt.service;
 
-import java.net.MalformedURLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.quatro.model.security.Secrole;
+import com.quatro.service.security.RolesManager;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.util.LabelValueBean;
@@ -58,6 +43,8 @@ import org.oscarehr.PMmodule.service.AdmissionManager;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.PMmodule.utility.ProgramAccessCache;
 import org.oscarehr.PMmodule.utility.RoleCache;
+import org.oscarehr.allergy.dao.AllergyDao;
+import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicDrug;
 import org.oscarehr.caisi_integrator.ws.CachedDemographicNote;
 import org.oscarehr.caisi_integrator.ws.CachedFacility;
@@ -78,11 +65,8 @@ import org.oscarehr.casemgmt.model.CaseManagementSearchBean;
 import org.oscarehr.casemgmt.model.Issue;
 import org.oscarehr.casemgmt.model.ProviderExt;
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.allergy.dao.AllergyDao;
 import org.oscarehr.common.dao.AppointmentArchiveDao;
-import org.oscarehr.encounterNote.dao.CaseManagementTmpSaveDao;
 import org.oscarehr.common.dao.DemographicDao;
-import org.oscarehr.rx.dao.DrugDao;
 import org.oscarehr.common.dao.DxDao;
 import org.oscarehr.common.dao.DxresearchDAO;
 import org.oscarehr.common.dao.EChartDao;
@@ -92,14 +76,10 @@ import org.oscarehr.common.dao.MessageTblDao;
 import org.oscarehr.common.dao.MsgDemoMapDao;
 import org.oscarehr.common.dao.OscarAppointmentDao;
 import org.oscarehr.common.dao.ProviderExtDao;
-import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.common.dao.UserPropertyDAO;
 import org.oscarehr.common.model.Admission;
-import org.oscarehr.allergy.model.Allergy;
 import org.oscarehr.common.model.Appointment;
-import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
 import org.oscarehr.common.model.Demographic;
-import org.oscarehr.rx.model.Drug;
 import org.oscarehr.common.model.DxAssociation;
 import org.oscarehr.common.model.Dxresearch;
 import org.oscarehr.common.model.EncounterWindow;
@@ -108,21 +88,39 @@ import org.oscarehr.common.model.MessageTbl;
 import org.oscarehr.common.model.MsgDemoMap;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.UserProperty;
+import org.oscarehr.encounterNote.dao.CaseManagementTmpSaveDao;
+import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
+import org.oscarehr.rx.dao.DrugDao;
+import org.oscarehr.rx.model.Drug;
+import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import org.springframework.transaction.annotation.Transactional;
-
 import oscar.OscarProperties;
 import oscar.dms.EDocUtil;
 import oscar.log.LogAction;
 import oscar.log.LogConst;
-//import oscar.oscarEncounter.pageUtil.EctSessionBean;
 import oscar.util.ConversionUtils;
 import oscar.util.DateUtils;
 
-import com.quatro.model.security.Secrole;
-import com.quatro.service.security.RolesManager;
+import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Transactional
 public class CaseManagementManager {
@@ -1066,6 +1064,7 @@ public class CaseManagementManager {
 		return filteredNotes;
 	}
 
+	@Deprecated // use tempNoteService
 	public void tmpSave(String providerNo, String demographicNo, String programId, String noteId, String note) {
 		CaseManagementTmpSave tmp = new CaseManagementTmpSave();
 		tmp.setProviderNo(providerNo);
@@ -1076,24 +1075,20 @@ public class CaseManagementManager {
 		}
 		tmp.setNoteId(Integer.parseInt(noteId));
 		tmp.setNote(note);
-		tmp.setUpdateDate(new Date());
+		tmp.setUpdateDateTime(ZonedDateTime.now());
 		caseManagementTmpSaveDao.persist(tmp);
 	}
 
+	@Deprecated // use tempNoteService
 	public void deleteTmpSave(String providerNo, String demographicNo, String programId) {
 		Integer intDemoNo = ConversionUtils.fromIntString(demographicNo);
 		Integer intProgramId = ConversionUtils.fromIntString(programId);
 		caseManagementTmpSaveDao.remove(providerNo, intDemoNo, intProgramId);
 	}
 
+	@Deprecated // use tempNoteService
 	public CaseManagementTmpSave restoreTmpSave(String providerNo, String demographicNo, String programId) {
 		CaseManagementTmpSave obj = caseManagementTmpSaveDao.find(providerNo, new Integer(demographicNo), new Integer(programId));
-		return obj;
-	}
-
-	// we want to load a temp saved note only if it's more recent than date
-	public CaseManagementTmpSave restoreTmpSave(String providerNo, String demographicNo, String programId, Date date) {
-		CaseManagementTmpSave obj = caseManagementTmpSaveDao.find(providerNo, new Integer(demographicNo), new Integer(programId), date);
 		return obj;
 	}
 

@@ -23,7 +23,7 @@
 package org.oscarehr.dataMigration.converter.out;
 
 import org.oscarehr.dataMigration.model.demographic.RosterData;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
+import org.oscarehr.demographicRoster.entity.DemographicRoster;
 import org.springframework.stereotype.Component;
 
 @Component

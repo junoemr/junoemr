@@ -86,6 +86,7 @@ public class EncounterSection
 	private String colour;
 	private Integer remainingNotes;
 	private List<EncounterSectionNote> notes;
+	private boolean displayOnSingleLine = true;
 
 	public String getTitle()
 	{
@@ -225,5 +226,15 @@ public class EncounterSection
 	public void setNotes(List<EncounterSectionNote> notes)
 	{
 		this.notes = notes;
+	}
+
+	public boolean isDisplayOnSingleLine()
+	{
+		return displayOnSingleLine;
+	}
+
+	public void setDisplayOnSingleLine(boolean displayOnSingleLine)
+	{
+		this.displayOnSingleLine = displayOnSingleLine;
 	}
 }

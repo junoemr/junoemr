@@ -156,6 +156,12 @@ public class AHSRuralHandler extends AHSHandler
 		return false;
 	}
 
+	@Override
+	public boolean showStatusForUnstructured()
+	{
+		return true;
+	}
+
     /* ===================================== Hl7 Parsing ====================================== */
 
 	/* ===================================== MSH ====================================== */
@@ -248,7 +254,9 @@ public class AHSRuralHandler extends AHSHandler
 	@Override
 	public boolean isOBRUnstructured(int obr)
 	{
-		return isMicroLabResult(obr) || isBloodBankProductsResult(obr);
+		return isMicroLabResult(obr)
+				|| isBloodBankProductsResult(obr)
+				|| isPathologyCytologyResult(obr);
 	}
 
 	@Override
@@ -371,6 +379,11 @@ public class AHSRuralHandler extends AHSHandler
 	private boolean isBloodBankProductsResult(int obr)
 	{
 		return "BB-BP".equals(getDiagnosticServicesCode(obr));
+	}
+
+	private boolean isPathologyCytologyResult(int obr)
+	{
+		return "AP".equals(getDiagnosticServicesCode(obr));
 	}
 
 }

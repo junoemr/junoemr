@@ -56,6 +56,7 @@ import org.oscarehr.common.model.Hl7TextMessage;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
+import oscar.oscarLab.ca.all.parsers.AHS.ConnectCareLabType;
 import oscar.oscarLab.ca.all.parsers.AHS.v22.SpecimenGateHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.AHSMeditechHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.AHSRuralDIHandler;
@@ -80,6 +81,7 @@ import oscar.oscarLab.ca.all.parsers.AHS.v23.ProvlabHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v23.SunquestORMHandler;
 import oscar.oscarLab.ca.all.parsers.AHS.v251.ConnectCareLabHandler;
+import oscar.oscarLab.ca.all.parsers.AHS.v251.ConnectCareProviderCommunicationsHandler;
 import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
 import oscar.oscarLab.ca.all.parsers.other.JunoGenericLabHandler;
 
@@ -98,13 +100,14 @@ public final class Factory {
 		AHSRuralHandler.AHS_RURAL_LAB_TYPE,
 		AHSMeditechHandler.AHS_MEDITECH_LAB_TYPE,
 		AHSRuralDIHandler.AHS_RURAL_DI_LAB_TYPE,
-		"CCLAB",
-		"CCENDO",
-		"CCCARDIOLOGY",
-		"CCIMAGING",
-		"CCDOC",
-		"CLS",
-		"CLSDI",
+		ConnectCareLabType.CCCOMM.name(),
+		ConnectCareLabType.CCENDO.name(),
+		ConnectCareLabType.CCIMAGING.name(),
+		ConnectCareLabType.CCCARDIOLOGY.name(),
+		ConnectCareLabType.CCDOC.name(),
+		ConnectCareLabType.CCLAB.name(),
+		CLSHandler.CLS_MESSAGE_TYPE,
+		CLSDIHandler.CLSDI_MESSAGE_TYPE,
 		"EI",
 		OLISHL7Handler.OLIS_MESSAGE_TYPE,
 		JunoGenericLabHandler.LAB_TYPE_VALUE);
@@ -228,6 +231,10 @@ public final class Factory {
 			if (ConnectCareDocumentationAddHandler.handlerTypeMatch(msg))
 			{
 				handler = new ConnectCareDocumentationAddHandler(msg);
+			}
+			else if(ConnectCareProviderCommunicationsHandler.handlerTypeMatch(msg))
+			{
+				handler = new ConnectCareProviderCommunicationsHandler(msg);
 			}
 		}
 		else if(mshSplit[8].equals("MDM^T08"))

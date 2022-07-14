@@ -7,7 +7,7 @@ export default class PhoneNumber
 	private _primaryContactNumber: boolean;
 	private _phoneType: PhoneType;
 
-	constructor(number: string, extension: string, type: any, primaryContactNumber: boolean = true)
+	constructor(number: string, extension: string, type: PhoneType, primaryContactNumber: boolean = true)
 	{
 		this.number = number;
 		this.extension = extension;

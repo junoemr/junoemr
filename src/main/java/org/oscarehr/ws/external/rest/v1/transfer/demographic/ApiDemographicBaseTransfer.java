@@ -36,10 +36,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_FEE_SERVICE;
-import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_NOT_ROSTERED;
-import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_ROSTERED;
-import static org.oscarehr.rosterStatus.model.RosterStatus.ROSTER_STATUS_TERMINATED;
+import static org.oscarehr.rosterStatus.entity.RosterStatus.ROSTER_STATUS_FEE_SERVICE;
+import static org.oscarehr.rosterStatus.entity.RosterStatus.ROSTER_STATUS_NOT_ROSTERED;
+import static org.oscarehr.rosterStatus.entity.RosterStatus.ROSTER_STATUS_ROSTERED;
+import static org.oscarehr.rosterStatus.entity.RosterStatus.ROSTER_STATUS_TERMINATED;
 
 @Data
 @XmlRootElement

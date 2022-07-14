@@ -99,7 +99,7 @@ public class HRMService
 	
 	/**
 	 * Get the results of the last fetch operation
-	 * @return
+	 * @return object containing results of the operation
 	 */
 	@Synchronized
 	public HrmFetchResultsModel getLastFetchResults()

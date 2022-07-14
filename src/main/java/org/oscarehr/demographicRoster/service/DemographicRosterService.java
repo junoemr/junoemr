@@ -23,58 +23,127 @@
 
 package org.oscarehr.demographicRoster.service;
 
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTimeComparator;
 import org.oscarehr.demographic.entity.Demographic;
+import org.oscarehr.demographicRoster.converter.DemographicRosterToModelConverter;
 import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
-import org.oscarehr.demographicRoster.transfer.DemographicRosterTransfer;
-import org.oscarehr.rosterStatus.model.RosterStatus;
-import org.oscarehr.rosterStatus.service.RosterStatusService;
-import org.oscarehr.ws.conversion.DemographicRosterToTransferConverter;
+import org.oscarehr.demographicRoster.entity.DemographicRoster;
+import org.oscarehr.demographicRoster.entity.RosterTerminationReason;
+import org.oscarehr.demographicRoster.model.DemographicRosterModel;
+import org.oscarehr.rosterStatus.dao.RosterStatusDao;
+import org.oscarehr.rosterStatus.entity.RosterStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.util.ConversionUtils;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
 public class DemographicRosterService
 {
 	@Autowired
-	DemographicRosterDao demographicRosterDao;
+	protected DemographicRosterDao demographicRosterDao;
 
 	@Autowired
-	RosterStatusService rosterStatusService;
+	protected RosterStatusDao rosterStatusDao;
 
 	@Autowired
-	DemographicRosterToTransferConverter demographicRosterToTransferConverter;
+	protected DemographicRosterToModelConverter demographicRosterToModelConverter;
+
+	/**
+	 * get the list of roster history models for the given demographic
+	 * @param demographicId the demographic id
+	 * @return the list
+	 */
+	public List<DemographicRosterModel> getRosteredHistory(Integer demographicId)
+	{
+		return demographicRosterToModelConverter.convert(demographicRosterDao.findByDemographic(demographicId));
+	}
+
+	/**
+	 * Creates a new roster history entry for a given demographic.
+	 * should be used for new demographic creation only
+	 * @param currentDemo current revision of the demographic we want to record
+	 * @return optional new roster model
+	 */
+	public Optional<DemographicRosterModel> addRosterHistoryEntry(Demographic currentDemo)
+	{
+		return Optional.ofNullable(saveRosterHistoryGetModel(currentDemo, null));
+	}
+
+	/**
+	 * Creates a new roster history entry for a given demographic.
+	 * Only records changes if there is a difference between the two for any of the roster/enrollment fields.
+	 * @param currentDemo current revision of the demographic we want to record
+	 * @param previousDemo previous version of the demographic
+	 * @return optional new roster model
+	 */
+	public Optional<DemographicRosterModel> addRosterHistoryEntry(Demographic currentDemo, Demographic previousDemo)
+	{
+		return Optional.ofNullable(saveRosterHistoryGetModel(currentDemo, previousDemo));
+	}
+
+	/** If the roster status is valid, check if any fields changed from last time we edited */
+	protected boolean shouldSaveRosterEntry(@Nonnull Demographic currentDemo, @Nullable Demographic previousDemo)
+	{
+		boolean hasChanged = false;
+		if(previousDemo == null && StringUtils.isNotBlank(currentDemo.getRosterStatus()))
+		{
+			hasChanged = true;
+		}
+		else if(previousDemo != null && StringUtils.isNotBlank(currentDemo.getRosterStatus()))
+		{
+			DateTimeComparator dateComparator = DateTimeComparator.getDateOnlyInstance();
+
+			hasChanged = currentDemo.getFamilyDoctor() != null && !currentDemo.getFamilyDoctor().equals(previousDemo.getFamilyDoctor());
+			hasChanged |= dateComparator.compare(currentDemo.getRosterDate(), previousDemo.getRosterDate()) != 0;
+			hasChanged |= currentDemo.getRosterStatus() != null && !currentDemo.getRosterStatus().equals(previousDemo.getRosterStatus());
+			hasChanged |= dateComparator.compare(currentDemo.getRosterTerminationDate(), previousDemo.getRosterTerminationDate()) != 0;
+			hasChanged |= currentDemo.getRosterTerminationReason() != null && !currentDemo.getRosterTerminationReason().equals(previousDemo.getRosterTerminationReason());
+		}
+		return hasChanged;
+	}
+
+	protected DemographicRosterModel saveRosterHistoryGetModel(@Nonnull Demographic currentDemo, @Nullable Demographic previousDemo)
+	{
+		return demographicRosterToModelConverter.convert(saveRosterHistory(currentDemo, previousDemo));
+	}
+
+	protected DemographicRoster saveRosterHistory(@Nonnull Demographic currentDemo, @Nullable Demographic previousDemo)
+	{
+		DemographicRoster rosterEntry = null;
+		if(shouldSaveRosterEntry(currentDemo, previousDemo))
+		{
+			rosterEntry = saveRosterHistory(currentDemo);
+		}
+		return rosterEntry;
+	}
 
 	/**
 	 * Create a demographic roster history entry, given a demographic record.
 	 * @param demographic reference that we're recording history for
 	 * @return a newly made history entry
 	 */
-	public DemographicRoster saveRosterHistory(Demographic demographic)
+	protected DemographicRoster saveRosterHistory(Demographic demographic)
 	{
 		DemographicRoster demographicRoster = new DemographicRoster();
 		demographicRoster.setDemographicId(demographic.getDemographicId());
 		demographicRoster.setRosterDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterDate()));
 
-		RosterStatus rosterStatus = rosterStatusService.findByStatus(demographic.getRosterStatus());
+		RosterStatus rosterStatus = rosterStatusDao.findByStatus(demographic.getRosterStatus());
 		demographicRoster.setRosterStatus(rosterStatus);
 		
 		if (!rosterStatus.isRostered())
 		{
-			// Set the date in all non-rostered cases, and the reason only if the status is terminated.  This is due to the front
-			// end only displaying the termination reason select on status TE.
-			
-			if (RosterStatus.ROSTER_STATUS_TERMINATED.equals(rosterStatus.getRosterStatus()))
-			{
-				demographicRoster.setRosterTerminationDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterTerminationDate()));
-				DemographicRoster.ROSTER_TERMINATION_REASON terminationReason = DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(Integer.parseInt(demographic.getRosterTerminationReason()));
-				demographicRoster.setRosterTerminationReason(terminationReason);
-			}
+			demographicRoster.setRosterTerminationDate(ConversionUtils.toNullableLocalDateTime(demographic.getRosterTerminationDate()));
+			RosterTerminationReason terminationReason = demographic.getRosterTerminationReasonCode().map(RosterTerminationReason::getByCode).orElse(null);
+			demographicRoster.setRosterTerminationReason(terminationReason);
 		}
 		
 		demographicRoster.setRosteredPhysician(demographic.getFamilyDoctorName());
@@ -83,10 +152,5 @@ public class DemographicRosterService
 		demographicRosterDao.persist(demographicRoster);
 
 		return demographicRoster;
-	}
-
-	public List<DemographicRosterTransfer> getRosteredHistory(Integer demographicNo)
-	{
-		return demographicRosterToTransferConverter.convert(demographicRosterDao.findByDemographic(demographicNo));
 	}
 }

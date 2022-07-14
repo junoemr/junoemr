@@ -27,6 +27,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.model.Group;
 import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.util.SegmentFinder;
 import ca.uhn.hl7v2.util.Terser;
@@ -68,12 +69,14 @@ public abstract class MessageHandler
 	public static final String embeddedPdfPrefix = "JVBERi0xLj";
 	public static final String pdfReplacement = "embedded_doc_id_";
 
-	public enum OBX_CONTENT_TYPE {
+	public enum ObxContentType
+	{
 		UNKNOWN,
 		TEXT,
 		SUSCEPTIBILITY,
 		STRUCTURED_NUMERIC,
-		PDF
+		PDF,
+		JPEG,
 	}
 
 	/**
@@ -192,6 +195,11 @@ public abstract class MessageHandler
 	protected EmbeddedDocument toEmbeddedPdf(String base64String, int index)
 	{
 		return toEmbeddedDocument(base64String, "application/pdf", "pdf", index, "embedded_pdf");
+	}
+
+	protected EmbeddedDocument toEmbeddedJpeg(String base64String, int index)
+	{
+		return toEmbeddedDocument(base64String, "application/jpeg", "jpg", index, "embedded_jpeg");
 	}
 
 	protected EmbeddedDocument toEmbeddedDocument(String base64String, String mimeType, String extension, int index, String description)
@@ -672,10 +680,11 @@ public abstract class MessageHandler
 	}
 
 	/**
-	 *  Return an ArrayList of the requesting doctors billing number and the
+	 *  Return a List of the requesting doctors billing number and the
 	 *  billing numbers of the cc'd docs
 	 */
-	public ArrayList<String> getDocNums() {
+	public List<String> getDocNums()
+	{
 		ArrayList<String> docNums = new ArrayList<>();
 		String id;
 		int i;
@@ -702,6 +711,7 @@ public abstract class MessageHandler
 
 	/**
 	 * check if the report is marked as blocked. mostly related to OLIS and custom lab imports
+	 * indicates blocked, sensitive, or confidential data within the report
 	 * @return true if blocked
 	 */
 	public boolean isReportBlocked()
@@ -774,9 +784,27 @@ public abstract class MessageHandler
 	 * @param j - obx rep
 	 * @return - the content type of this obx segment
 	 */
-	public OBX_CONTENT_TYPE getOBXContentType(int i, int j)
+	public ObxContentType getOBXContentType(int i, int j)
 	{
-		return OBX_CONTENT_TYPE.TEXT;
+		if(getOBXValueType(i, j).equals("ED")) // Encapsulated Data type
+		{
+			String docType = getOBXResult(i, j, 2).toUpperCase();
+			switch(docType)
+			{
+				case "PDF": return ObxContentType.PDF;
+				case "JPG":
+				case "JPEG": return ObxContentType.JPEG;
+				default: return ObxContentType.UNKNOWN;
+			}
+		}
+		return ObxContentType.TEXT;
+	}
+
+	public boolean isOBXEmbeddedDocument(int i, int j)
+	{
+		ObxContentType contentType = getOBXContentType(i, j);
+		return (contentType == ObxContentType.JPEG
+				|| contentType == ObxContentType.PDF);
 	}
 
 	/**
@@ -1169,6 +1197,11 @@ public abstract class MessageHandler
 		return false;
 	}
 
+	public boolean showStatusForUnstructured()
+	{
+		return false;
+	}
+
 
 	/* ================================== Extra Methods and helpers ==================================== */
 
@@ -1316,6 +1349,23 @@ public abstract class MessageHandler
 	}
 
 	/**
+	 * get the reps count of a segment field
+	 * @param path - the full terser path (IE "/.PID" or "ORDER_OBSERVATION(0)/OBX" etc.)
+	 * @param field - field id - 1 indexed, to match hl7 segment convention (IE PID-1 here is ("/.PID", 1))
+	 * @return the number of reps
+	 * @throws HL7Exception if there is an error
+	 */
+	protected int getFieldReps(String path, int field) throws HL7Exception
+	{
+		if(isComponentPresent(path + "-" + field))
+		{
+			Segment segment = terser.getSegment(path);
+			return segment.getField(field).length;
+		}
+		return 0;
+	}
+
+	/**
 	 * convenient way to always search the entire hl7 message for the given group
 	 */
 	private Group findGroupFromTop(String groupName, int groupRep) throws HL7Exception
@@ -1449,6 +1499,22 @@ public abstract class MessageHandler
 	protected String getString(String retrieve)
 	{
 		return StringUtils.trimToEmpty(retrieve);
+	}
+
+	protected String getFullDocName(String path, int field, int rep)
+	{
+		String basePath = path + "-" + field + "(" + rep + ")";
+
+		String familyName = getString(get(basePath + "-2"));
+		String givenName = getString(get(basePath + "-3"));
+		String middleName = getString(get(basePath + "-4"));
+		String suffix = getString(get(basePath + "-5"));
+		String prefix = getString(get(basePath + "-6"));
+		String degree = getString(get(basePath + "-7"));
+
+		String fullName = String.join(" ", prefix, givenName, middleName, familyName, suffix, degree).trim().replaceAll("\\s+", " ");
+		logger.debug("getFullDocName -> " + basePath + ": " + fullName);
+		return fullName;
 	}
 
 	// kept for older parsers

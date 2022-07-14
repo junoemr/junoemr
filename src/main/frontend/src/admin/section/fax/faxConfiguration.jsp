@@ -41,6 +41,7 @@
 				<juno-toggle
 						label="<bean:message bundle="ui" key="admin.fax.acct.masterFaxEnabledInbound"/>"
 						label-position="$ctrl.LABEL_POSITION.RIGHT"
+						label-class-list="['label-custom-style']"
 						ng-model="$ctrl.masterFaxEnabledInbound"
 						change="$ctrl.saveMasterFaxEnabledStateInbound(value)"
 						round="true"
@@ -49,6 +50,7 @@
 				<juno-toggle
 						label="<bean:message bundle="ui" key="admin.fax.acct.masterFaxEnabledOutbound"/>"
 						label-position="$ctrl.LABEL_POSITION.RIGHT"
+						label-class-list="['label-custom-style']"
 						ng-model="$ctrl.masterFaxEnabledOutbound"
 						change="$ctrl.saveMasterFaxEnabledStateOutbound(value)"
 						round="true"

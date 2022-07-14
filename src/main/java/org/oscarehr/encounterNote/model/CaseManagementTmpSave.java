@@ -23,9 +23,9 @@
  */
 package org.oscarehr.encounterNote.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.common.model.AbstractModel;
-
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,14 +33,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import java.time.ZonedDateTime;
 
+@Getter
+@Setter
 @Entity
 @Table(name="casemgmt_tmpsave")
 public class CaseManagementTmpSave extends AbstractModel<Integer>
 {
-
 	@Id
    	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -56,68 +56,15 @@ public class CaseManagementTmpSave extends AbstractModel<Integer>
 	
 	private String note;
 	
-	@Column(name="update_date")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date updateDate;
+	@Column(name="update_date", columnDefinition = "TIMESTAMP")
+	private ZonedDateTime updateDateTime;
 	
 	@Column(name="note_id")
 	private Integer noteId;
 
-	public Integer getId() {
-		return id;
-	}
+	@Column(name = "observation_date", columnDefinition = "TIMESTAMP")
+	private ZonedDateTime observationDate;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public Integer getDemographicNo() {
-		return demographicNo;
-	}
-
-	public void setDemographicNo(Integer demographicNo) {
-		this.demographicNo = demographicNo;
-	}
-
-	public String getProviderNo() {
-		return providerNo;
-	}
-
-	public void setProviderNo(String providerNo) {
-		this.providerNo = providerNo;
-	}
-
-	public Integer getProgramId() {
-		return programId;
-	}
-
-	public void setProgramId(Integer programId) {
-		this.programId = programId;
-	}
-
-	public String getNote() {
-		return note;
-	}
-
-	public void setNote(String note) {
-		this.note = note;
-	}
-
-	public Date getUpdateDate() {
-		return updateDate;
-	}
-
-	public void setUpdateDate(Date updateDate) {
-		this.updateDate = updateDate;
-	}
-
-	public Integer getNoteId() {
-		return noteId;
-	}
-
-	public void setNoteId(Integer noteId) {
-		this.noteId = noteId;
-	}
-	
-	
+	@Column(name = "encounter_type")
+	private String encounterType;
 }

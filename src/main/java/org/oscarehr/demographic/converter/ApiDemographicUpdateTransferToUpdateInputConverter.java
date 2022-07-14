@@ -31,7 +31,7 @@ import org.oscarehr.dataMigration.model.demographic.RosterData;
 import org.oscarehr.dataMigration.model.provider.ProviderModel;
 import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.transfer.DemographicUpdateInput;
-import org.oscarehr.demographicRoster.model.DemographicRoster;
+import org.oscarehr.demographicRoster.entity.RosterTerminationReason;
 import org.oscarehr.ws.external.rest.v1.transfer.demographic.ApiDemographicUpdateTransfer;
 import org.springframework.stereotype.Component;
 
@@ -107,7 +107,7 @@ public class ApiDemographicUpdateTransferToUpdateInputConverter
 			rosterData.setTerminationDateTime(Optional.ofNullable(transfer.getRosterTerminationDate()).map(LocalDate::atStartOfDay).orElse(null));
 			if(transfer.getRosterTerminationReason() != null)
 			{
-				rosterData.setTerminationReason(DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(Integer.parseInt(transfer.getRosterTerminationReason())));
+				rosterData.setTerminationReason(RosterTerminationReason.getByCode(Integer.parseInt(transfer.getRosterTerminationReason())));
 			}
 			input.setCurrentRosterData(rosterData);
 		}

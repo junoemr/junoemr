@@ -47,7 +47,7 @@ public interface FaxUploadProvider
 	 */
 	List<String> getRemoteFinalStatusIndicators();
 
-	FaxStatusResult getFaxStatus(FaxOutbound faxOutbound) throws Exception;
+	FaxStatusResult getFaxStatus(FaxOutbound faxOutbound);
 
 	boolean isFaxInRemoteSentState(String externalStatus);
 

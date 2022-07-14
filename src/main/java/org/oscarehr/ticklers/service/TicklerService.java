@@ -24,30 +24,28 @@
 
 package org.oscarehr.ticklers.service;
 
-import java.util.Date;
-import java.util.List;
-
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.PaginationQuery;
 import org.oscarehr.ticklers.dao.TicklerCategoryDao;
-import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.ticklers.dao.TicklersDao;
+import org.oscarehr.ticklers.entity.Tickler;
 import org.oscarehr.ticklers.search.TicklerCriteriaSearch;
 import org.oscarehr.ticklers.web.TicklerQuery;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import oscar.log.LogAction;
 
 import javax.validation.ValidationException;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class TicklerService extends AbstractServiceImpl
 {
 	@Autowired
-	private TicklersDao TicklerDao;
+	private TicklersDao ticklerDao;
 
 	@Autowired
 	private TicklerCategoryDao ticklerCategoryDao;
@@ -61,7 +59,7 @@ public class TicklerService extends AbstractServiceImpl
 	 * @return int count of ticklers
 	 */
 	public int getTicklersCount(PaginationQuery paginationQuery) {
-		return this.TicklerDao.getTicklersCount(paginationQuery);
+		return this.ticklerDao.getTicklersCount(paginationQuery);
 	}
 	
 	/**
@@ -72,7 +70,7 @@ public class TicklerService extends AbstractServiceImpl
 	public List<Tickler> getTicklers(LoggedInInfo loggedInInfo, PaginationQuery paginationQuery) {
 		TicklerQuery query = (TicklerQuery) paginationQuery;
 
-		List<Tickler> results = TicklerDao.getTicklers(query);
+		List<Tickler> results = ticklerDao.getTicklers(query);
 		//--- log action ---
 		if (results.size()>0) {
 			String resultIds=Tickler.getIdsAsStringList(results);
@@ -80,6 +78,21 @@ public class TicklerService extends AbstractServiceImpl
 		}
 				
 		return results;
+	}
+
+	public int getOverdueTicklerCount(String providerId, Integer demographicId)
+	{
+		return ticklerDao.criteriaSearchCount(buildOverdueTicklerSearch(providerId, demographicId));
+	}
+
+	private TicklerCriteriaSearch buildOverdueTicklerSearch(String providerId, Integer demographicId)
+	{
+		TicklerCriteriaSearch ticklerCriteriaSearch = new TicklerCriteriaSearch();
+		ticklerCriteriaSearch.setTaskAssignedTo(providerId);
+		ticklerCriteriaSearch.setDemographicNo(demographicId);
+		ticklerCriteriaSearch.setEndDate(new Date());
+		ticklerCriteriaSearch.setStatus(Tickler.STATUS.A);
+		return ticklerCriteriaSearch;
 	}
 
 	/**
@@ -99,7 +112,7 @@ public class TicklerService extends AbstractServiceImpl
 		tickler.setProgramId(programManager.getDefaultProgramId());
 
 		validateAndDefaultTickler(tickler);
-		TicklerDao.persist(tickler);
+		ticklerDao.persist(tickler);
 		return tickler;
 	}
 
@@ -114,7 +127,7 @@ public class TicklerService extends AbstractServiceImpl
 		validateAndDefaultTickler(tickler);
 		tickler.setUpdateDate(new Date());
 
-		TicklerDao.merge(tickler);
+		ticklerDao.merge(tickler);
 		return tickler;
 	}
 
@@ -167,11 +180,11 @@ public class TicklerService extends AbstractServiceImpl
 		criteriaSearch.setLimit(perPage);
 		criteriaSearch.setOffset(offset);
 
-		return TicklerDao.criteriaSearch(criteriaSearch);
+		return ticklerDao.criteriaSearch(criteriaSearch);
 	}
 
 	public int getTicklerCount(TicklerCriteriaSearch criteriaSearch)
 	{
-		return TicklerDao.criteriaSearchCount(criteriaSearch);
+		return ticklerDao.criteriaSearchCount(criteriaSearch);
 	}
 }

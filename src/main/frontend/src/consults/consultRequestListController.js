@@ -357,9 +357,9 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 							//add statusDescription
 							for (var j = 0; j < controller.statuses.length; j++)
 							{
-								if (consult.status == controller.statuses[j].value)
+								if (consult.status === controller.statuses[j].value)
 								{
-									consult.statusDescription = controller.statuses[j].name;
+									consult.statusDescription = controller.statuses[j].label;
 									break;
 								}
 							}
@@ -367,9 +367,9 @@ angular.module('Consults').controller('Consults.ConsultRequestListController', [
 							//add urgencyDescription
 							for (var j = 0; j < controller.urgencies.length; j++)
 							{
-								if (consult.urgency == controller.urgencies[j].value)
+								if (consult.urgency === controller.urgencies[j].value)
 								{
-									consult.urgencyDescription = controller.urgencies[j].name;
+									consult.urgencyDescription = controller.urgencies[j].label;
 									break;
 								}
 							}

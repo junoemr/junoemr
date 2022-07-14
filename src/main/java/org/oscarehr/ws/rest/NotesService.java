@@ -55,10 +55,9 @@ import org.oscarehr.common.model.PartialDate;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.Document;
-import org.oscarehr.encounterNote.converter.CaseManagementTmpSaveConverter;
-import org.oscarehr.encounterNote.dao.CaseManagementTmpSaveDao;
-import org.oscarehr.encounterNote.model.CaseManagementTmpSave;
+import org.oscarehr.encounterNote.model.TempNoteModel;
 import org.oscarehr.encounterNote.service.EncounterNoteService;
+import org.oscarehr.encounterNote.service.TempNoteService;
 import org.oscarehr.managers.ProgramManager2;
 import org.oscarehr.managers.SecurityInfoManager;
 import org.oscarehr.security.model.Permission;
@@ -73,7 +72,6 @@ import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;
 import org.oscarehr.ws.rest.to.TicklerNoteResponse;
 import org.oscarehr.ws.rest.to.model.CaseManagementIssueTo1;
-import org.oscarehr.ws.rest.to.model.CaseManagementTmpSaveTo1;
 import org.oscarehr.ws.rest.to.model.IssueTo1;
 import org.oscarehr.ws.rest.to.model.NoteExtTo1;
 import org.oscarehr.ws.rest.to.model.NoteIssueTo1;
@@ -104,7 +102,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static org.oscarehr.encounterNote.model.Issue.SUMMARY_CODE_TICKLER_NOTE;
 
@@ -165,10 +165,7 @@ public class NotesService extends AbstractServiceImpl
 	private EncounterNoteService encounterNoteService;
 
 	@Autowired
-	CaseManagementTmpSaveDao caseManagementTmpSaveDao;
-
-	@Autowired
-	CaseManagementTmpSaveConverter caseManagementTmpSaveConverter;
+	private TempNoteService tempNoteService;
 
 	@Autowired
 	private PartialDateDao partialDateDao;
@@ -232,46 +229,6 @@ public class NotesService extends AbstractServiceImpl
 		NoteSelectionTo1 returnResult  = noteService.searchEncounterNotes(loggedInInfo, criteria);
 
 		return RestResponse.successResponse(returnResult);
-	}
-	
-	
-	
-	@POST
-	@Path("/{demographicNo}/tmpSave")
-	@Consumes("application/json")
-	@Produces("application/json")
-	public NoteTo1 tmpSaveNote(@PathParam("demographicNo") Integer demographicNo, NoteTo1 note)
-	{
-		LoggedInInfo loggedInInfo = getLoggedInInfo();//  LoggedInInfo.loggedInInfo.get();
-		String providerNo = loggedInInfo.getLoggedInProviderNo();
-
-		securityInfoManager.requireAllPrivilege(providerNo, demographicNo, Permission.ENCOUNTER_NOTE_CREATE);
-
-		logger.debug("autosave "+note);
-
-		String programId = getProgram(loggedInInfo, providerNo);
-		String noteStr = note.getNote();
-		String noteId  = ""+note.getNoteId();
-		
-		try{  
-			Integer.parseInt(noteId);
-		}catch(Exception e){
-			noteId = null;
-		}
-
-		if (noteStr == null || noteStr.length() == 0) {
-			return null;
-		}		
-		
-		//delete from tmp save and then add another
-		try {
-			caseManagementMgr.deleteTmpSave(providerNo, ""+demographicNo, programId);
-			caseManagementMgr.tmpSave(providerNo, ""+demographicNo, programId, noteId, noteStr);
-		} catch (Throwable e) {
-			logger.error("AutoSave Error: ", e);
-		}
-
-		return note;
 	}
 
 	/**
@@ -413,6 +370,7 @@ public class NotesService extends AbstractServiceImpl
 				remoteAddr, lastSavedNoteString);
 
 		caseManagementMgr.getEditors(caseMangementNote);
+		note.setEditorNames(caseMangementNote.getEditors().stream().map(Provider::getDisplayName).collect(Collectors.toList()));
 
 		note.setNoteId(Integer.parseInt("" + caseMangementNote.getId()));
 		note.setUuid(caseMangementNote.getUuid());
@@ -427,15 +385,7 @@ public class NotesService extends AbstractServiceImpl
 
 		if(deleteTmpSave)
 		{
-			try
-			{
-				String programId = getProgram(loggedInInfo, providerNo);
-				caseManagementMgr.deleteTmpSave(note.getProviderNo(), demographicNo.toString(), programId);
-			}
-			catch (Exception e)
-			{
-				logger.warn("Error deleting tmpSave", e);
-			}
+			tempNoteService.deleteTempNote(note.getProviderNo(), demographicNo);
 		}
 
 		return RestResponse.successResponse(note);
@@ -941,25 +891,6 @@ public class NotesService extends AbstractServiceImpl
 	}
 
 	@GET
-	@Path("/{demographicNo}/tmpSave")
-	@Consumes("application/json")
-	@Produces("application/json")
-	public RestResponse<CaseManagementTmpSaveTo1> getTmpSave(@PathParam("demographicNo") Integer demographicNo)
-	{
-		LoggedInInfo loggedInInfo = getLoggedInInfo();
-		String providerNo = loggedInInfo.getLoggedInProviderNo();
-		securityInfoManager.requireAllPrivilege(providerNo, demographicNo, Permission.ENCOUNTER_NOTE_READ);
-
-		Integer programId = getProgramId(loggedInInfo, providerNo);
-
-		CaseManagementTmpSave tmpSave = caseManagementTmpSaveDao.find(providerNo, demographicNo, programId);
-
-		CaseManagementTmpSaveTo1 note = caseManagementTmpSaveConverter.convertCasemanagementTmpSaveToCaseManagementTmpSaveTo1(tmpSave);
-
-		return RestResponse.successResponse(note);
-	}
-
-	@GET
 	@Path("/{demographicNo}/getNoteToEdit/{noteId}")
 	@Consumes("application/json")
 	@Produces("application/json")
@@ -1030,8 +961,7 @@ public class NotesService extends AbstractServiceImpl
 
 		logger.debug("NoteId " + nId);
 
-		CaseManagementTmpSave tmpsavenote = this.caseManagementMgr.restoreTmpSave(providerNo, ""+demographicNo, programIdString);
-		
+		Optional<TempNoteModel> tempNoteModelOptional = tempNoteService.getTempNote(providerNo, demographicNo);
 
 		logger.debug("Get Note for editing");
 		String strBeanName = "casemgmt_oscar_bean" + demographicNo;
@@ -1077,12 +1007,15 @@ public class NotesService extends AbstractServiceImpl
 
 		}
 		// get the last temp note?
-		else if (tmpsavenote != null && !forceNote.equals("true")) {
-			logger.debug("tempsavenote is NOT NULL == noteId :"+tmpsavenote.getNoteId());
-			if (tmpsavenote.getNoteId() > 0) {
+		else if (tempNoteModelOptional.isPresent() && !forceNote.equals("true"))
+		{
+			TempNoteModel tempNoteModel = tempNoteModelOptional.get();
+			logger.debug("tempsavenote is NOT NULL == noteId :"+tempNoteModel.getNoteId());
+			if (tempNoteModel.getOptionalNoteId().isPresent())
+			{
 //				session.setAttribute("newNote", "false");
-				note = caseManagementMgr.getNote(String.valueOf(tmpsavenote.getNoteId()));
-				logger.debug("Restoring " + String.valueOf(note.getId()));
+				note = caseManagementMgr.getNote(String.valueOf(tempNoteModel.getOptionalNoteId().get()));
+				logger.debug("Restoring " + note.getId());
 			} else {
 				logger.debug("creating new note");
 //				session.setAttribute("newNote", "true");
@@ -1095,7 +1028,10 @@ public class NotesService extends AbstractServiceImpl
 				note.setDemographic_no(""+demographicNo);
 			}
 			
-			note.setNote(tmpsavenote.getNote());
+			note.setNote(tempNoteModel.getNote());
+			note.setObservation_date(ConversionUtils.toNullableLegacyDateTime(tempNoteModel.getObservationDate()));
+			note.setUpdate_date(ConversionUtils.toNullableLegacyDateTime(tempNoteModel.getUpdateDateTime()));
+			note.setEncounter_type(tempNoteModel.getEncounterType());
 			logger.debug("Setting note to " + note.getNote());
 
 		}
@@ -1199,6 +1135,7 @@ public class NotesService extends AbstractServiceImpl
 		returnNote.setEncounterTime(nd.getEncounterTime());	
 		returnNote.setEncounterTransportationTime(nd.getEncounterTransportationTime());
 		returnNote.setAppointmentNo(nd.getAppointmentNo());
+		returnNote.setUpdateDate(nd.getUpdateDate());
 		
 		return returnNote;
 	}

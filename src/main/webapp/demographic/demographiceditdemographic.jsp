@@ -106,7 +106,7 @@ if(!authed) {
 <%@ page import="org.oscarehr.common.model.WaitingListName" %>
 <%@ page import="org.oscarehr.common.web.ContactAction,org.oscarehr.managers.DemographicManager" %>
 <%@ page import="org.oscarehr.managers.PatientConsentManager"%>
-<%@ page import="org.oscarehr.managers.ProgramManager2,org.oscarehr.myoscar.utils.MyOscarLoggedInInfo" %>
+<%@ page import="org.oscarehr.managers.ProgramManager2" %>
 <%@ page import="org.oscarehr.provider.service.RecentDemographicAccessService" %>
 <%@ page import="org.oscarehr.sharingcenter.SharingCenterUtil" %>
 <%@ page import="org.oscarehr.util.LoggedInInfo" %>
@@ -128,6 +128,7 @@ if(!authed) {
 	ProfessionalSpecialistDao professionalSpecialistDao = (ProfessionalSpecialistDao) SpringUtils.getBean("professionalSpecialistDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
 	DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
+	RosterStatusService rosterStatusService = SpringUtils.getBean(RosterStatusService.class);
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	ProviderPreferenceDao providerPreferenceDao = SpringUtils.getBean(ProviderPreferenceDao.class);
 	List<Provider> doctors = providerDao.getActiveProvidersByType("doctor");
@@ -198,10 +199,7 @@ if(!authed) {
 	
 	boolean showConsentsThisTime = false;
 	
-    GregorianCalendar now=new GregorianCalendar();
-    int curYear = now.get(Calendar.YEAR);
-    int curMonth = (now.get(Calendar.MONTH)+1);
-    int curDay = now.get(Calendar.DAY_OF_MONTH);
+	String currentDateString = ConversionUtils.toDateString(LocalDate.now(), DEFAULT_DATE_PATTERN);
     
 	java.util.ResourceBundle oscarResources = ResourceBundle.getBundle("oscarResources", request.getLocale());
     String noteReason = oscarResources.getString("oscarEncounter.noteReason.TelProgress");
@@ -238,6 +236,8 @@ if(!authed) {
 		pageContext.setAttribute( "consentTypes", patientConsentManager.getConsentTypes() );
 		pageContext.setAttribute( "patientConsents", patientConsentManager.getAllConsentsByDemographic( loggedInInfo, demographicNo ) );
 	}
+
+	List<RosterStatusModel> rosterStatuses = rosterStatusService.getRosterStatusList(true);
 
 	// Custom licensed producer fields
 	String licensedProducerDefault = "None";
@@ -289,10 +289,14 @@ if(!authed) {
 <%@ page import="java.sql.ResultSet" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicMergedDao" %>
 <%@ page import="org.oscarehr.demographic.entity.DemographicMerged" %>
-<%@ page import="org.oscarehr.demographicRoster.model.DemographicRoster" %>
 <%@ page import="org.oscarehr.preferences.service.SystemPreferenceService" %>
 <%@ page import="static org.oscarehr.contact.entity.DemographicContact.TYPE_DEMOGRAPHIC" %>
 <%@ page import="static org.oscarehr.contact.entity.DemographicContact.CATEGORY_PERSONAL" %>
+<%@ page import="org.oscarehr.demographicRoster.entity.RosterTerminationReason" %>
+<%@ page import="org.oscarehr.rosterStatus.service.RosterStatusService" %>
+<%@ page import="org.oscarehr.rosterStatus.model.RosterStatusModel" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="static oscar.util.ConversionUtils.DEFAULT_DATE_PATTERN" %>
 <html:html locale="true">
 
 <head>
@@ -564,18 +568,6 @@ function newStatus() {
     }
 }
 
-function newStatus1() {
-    newOpt = prompt("<bean:message key="demographic.demographiceditdemographic.msgPromptStatus"/>:", "");
-    if (newOpt == null) {
-    	return;
-    } else if(newOpt != "") {
-        document.updatedelete.roster_status.options[document.updatedelete.roster_status.length] = new Option(newOpt, newOpt);
-        document.updatedelete.roster_status.options[document.updatedelete.roster_status.length-1].selected = true;
-    } else {
-        alert("<bean:message key="demographic.demographiceditdemographic.msgInvalidEntry"/>");
-    }
-}
-
 </script>
 <script language="JavaScript">
 function showEdit(){
@@ -643,7 +635,7 @@ function hideItem(id){
 
 <security:oscarSec roleName="<%= roleName$ %>" objectName="_eChart" rights="r" reverse="<%= false %>" >
 var numMenus = 1;
-var encURL = "<c:out value="${ctx}"/>/oscarEncounter/IncomingEncounter.do?providerNo=<%=curProvider_no%>&appointmentNo=&demographicNo=<%=demographic_no%>&curProviderNo=&reason=<%=URLEncoder.encode(noteReason)%>&encType=<%=URLEncoder.encode("telephone encounter with client")%>&userName=<%=URLEncoder.encode( userfirstname+" "+userlastname) %>&curDate=<%=""+curYear%>-<%=""+curMonth%>-<%=""+curDay%>&appointmentDate=&startTime=&status=";
+var encURL = "<c:out value="${ctx}"/>/oscarEncounter/IncomingEncounter.do?providerNo=<%=curProvider_no%>&appointmentNo=&demographicNo=<%=demographic_no%>&curProviderNo=&reason=<%=URLEncoder.encode(noteReason)%>&encType=<%=URLEncoder.encode("telephone encounter with client")%>&userName=<%=URLEncoder.encode( userfirstname+" "+userlastname) %>&curDate=<%=currentDateString%>&appointmentDate=&startTime=&status=";
 function showMenu(menuNumber, eventObj) {
     var menuId = 'menu' + menuNumber;
     return showPopup(menuId, eventObj);
@@ -846,7 +838,7 @@ jQuery(document).ready(function(){
 	catch (NumberFormatException ignored) {}
 
 	pageContext.setAttribute("rosterTerminationCode", rosterTerminationCode);
-	pageContext.setAttribute("terminationReasons", DemographicRoster.ROSTER_TERMINATION_REASON.values());
+	pageContext.setAttribute("terminationReasons", RosterTerminationReason.values());
 
 	AdmissionManager admissionManager = SpringUtils.getBean(AdmissionManager.class);
      	Admission bedAdmission = admissionManager.getCurrentBedProgramAdmission(demographic.getDemographicNo());
@@ -901,7 +893,6 @@ jQuery(document).ready(function(){
 
 					// Demographic demographic=demographicDao.getDemographic(demographic_no);
 
-					String dateString = curYear + "-" + curMonth + "-" + curDay;
 					int age = 0, dob_year = 0, dob_month = 0, dob_date = 0;
 					String birthYear = "0000", birthMonth = "00", birthDate = "00";
 
@@ -1085,7 +1076,7 @@ if(wLReadonly.equals("")){
 					}
 				%>
 				<td><a
-					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(defaultBillingView)%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName()) + URLEncoder.encode(", ") + URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t<%=referral_no_parameter%>"
+					href="../billing.do?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(defaultBillingView)%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName()) + URLEncoder.encode(", ") + URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=currentDateString%>&start_time=00:00:00&bNewForm=1&status=t<%=referral_no_parameter%>"
 					target="_blank"
 					title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgCreateInvoice"/></a></td>
 			</tr>
@@ -1105,7 +1096,7 @@ if(wLReadonly.equals("")){
 				<tr>
 					<td><a
 						href="javascript: function myFunction() {return false; }"
-						onClick="popupS('../billing/CA/ON/billingShortcutPg1.jsp?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("hospital_view", default_view))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=dateString%>&start_time=00:00:00&bNewForm=1&status=t');return false;"
+						onClick="popupS('../billing/CA/ON/billingShortcutPg1.jsp?billRegion=<%=URLEncoder.encode(billRegion)%>&billForm=<%=URLEncoder.encode(oscarVariables.getProperty("hospital_view", default_view))%>&hotclick=&appointment_no=0&demographic_name=<%=URLEncoder.encode(demographic.getLastName())%>%2C<%=URLEncoder.encode(demographic.getFirstName())%>&demographic_no=<%=demographic.getDemographicNo()%>&providerview=<%=demographic.getProviderNo()%>&user_no=<%=curProvider_no%>&apptProvider_no=none&appointment_date=<%=currentDateString%>&start_time=00:00:00&bNewForm=1&status=t');return false;"
 						title="<bean:message key="demographic.demographiceditdemographic.msgBillPatient"/>"><bean:message key="demographic.demographiceditdemographic.msgHospitalBilling"/></a></td>
 				</tr>
 				<tr>
@@ -1255,40 +1246,6 @@ if(wLReadonly.equals("")){
                </td>
            </tr>
            <% } %>
-				<phr:indivoRegistered provider="<%=curProvider_no%>"
-					demographic="<%=demographic_no%>">
-                                <tr class="Header">
-				     <td style="font-weight: bold"><bean:message key="global.personalHealthRecord"/></td>
-                                </tr>
-					<tr>
-						<td>
-							<%
-								String onclickString="alert('Please login to MyOscar first.')";
-
-								MyOscarLoggedInInfo myOscarLoggedInInfo=MyOscarLoggedInInfo.getLoggedInInfo(session);
-								if (myOscarLoggedInInfo!=null && myOscarLoggedInInfo.isLoggedIn()) onclickString="popupOscarRx(600,900,'../phr/PhrMessage.do?method=createMessage&providerNo="+curProvider_no+"&demographicNo="+demographic_no+"')";
-							%>
-							<a href="javascript: function myFunction() {return false; }" ONCLICK="<%=onclickString%>"	title="myOscar">
-								<bean:message key="demographic.demographiceditdemographic.msgSendMsgPHR"/>
-							</a>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<a href="" onclick="popup(600, 1000, '<%=request.getContextPath()%>/demographic/viewPhrRecord.do?demographic_no=<%=demographic_no%>', 'viewPatientPHR'); return false;">View PHR Record</a>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<%
-								if (myOscarLoggedInInfo!=null && myOscarLoggedInInfo.isLoggedIn()) onclickString="popupOscarRx(600,900,'"+request.getContextPath()+"/admin/oscar_myoscar_sync_config_redirect.jsp')";
-							%>
-							<a href="javascript: function myFunction() {return false; }" ONCLICK="<%=onclickString%>"	title="myOscar">
-								<bean:message key="demographic.demographiceditdemographic.MyOscarDataSync"/>
-							</a>
-						</td>
-					</tr>
-				</phr:indivoRegistered>
 			
 <% if (oscarProps.getProperty("clinic_no", "").startsWith("1022")) { // quick hack to make Dr. Hunter happy
 %>
@@ -1654,7 +1611,7 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
                                              String sdb = relHash.get("subDecisionMaker") == null?"":((Boolean) relHash.get("subDecisionMaker")).booleanValue()?"<span title=\"SDM\" >/SDM</span>":"";
                                              String ec = relHash.get("emergencyContact") == null?"":((Boolean) relHash.get("emergencyContact")).booleanValue()?"<span title=\"Emergency Contact\">/EC</span>":"";
 											 String masterLink = "<a target=\"demographic"+dNo+"\" href=\"" + request.getContextPath() + "/demographic/demographiccontrol.jsp?demographic_no="+dNo+"&displaymode=edit&dboperation=search_detail\">M</a>";
-											 String encounterLink = "<a target=\"encounter"+dNo+"\" href=\"javascript: function myFunction() {return false; }\" onClick=\"popupEChart(710,1024,'" + request.getContextPath() + "/oscarEncounter/IncomingEncounter.do?demographicNo="+dNo+"&providerNo="+loggedInInfo.getLoggedInProviderNo()+"&appointmentNo=&curProviderNo=&reason=&appointmentDate=&startTime=&status=&userName="+URLEncoder.encode( userfirstname+" "+userlastname)+"&curDate="+curYear+"-"+curMonth+"-"+curDay+"');return false;\">E</a>";												 
+											 String encounterLink = "<a target=\"encounter"+dNo+"\" href=\"javascript: function myFunction() {return false; }\" onClick=\"popupEChart(710,1024,'" + request.getContextPath() + "/oscarEncounter/IncomingEncounter.do?demographicNo="+dNo+"&providerNo="+loggedInInfo.getLoggedInProviderNo()+"&appointmentNo=&curProviderNo=&reason=&appointmentDate=&startTime=&status=&userName="+URLEncoder.encode( userfirstname+" "+userlastname)+"&curDate="+currentDateString+"');return false;\">E</a>";
                                           %>
 							<li><span class="label"><%=relHash.get("relation")%><%=sdb%><%=ec%>:</span>
                             	<span class="info"><%=relHash.get("lastName")%>, <%=relHash.get("firstName")%>, H:<%=relHash.get("phone")== null?"":relHash.get("phone")%><%=formattedWorkPhone%> <%=masterLink%> <%=encounterLink %></span>
@@ -1696,7 +1653,7 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
 											"&providerNo=" + loggedInInfo.getLoggedInProviderNo() +
 											"&appointmentNo=&curProviderNo=&reason=&appointmentDate=&startTime=&status=" +
 											"&userName=" + URLEncoder.encode(userfirstname + " " + userlastname) +
-											"&curDate=" + curYear + "-" + curMonth + "-" + curDay + "');return false;\">E</a>";
+											"&curDate=" + currentDateString + "');return false;\">E</a>";
 								}
 						%>
 							<li>
@@ -1733,7 +1690,7 @@ if(oscarProps.getProperty("new_label_print") != null && oscarProps.getProperty("
 %>
 													<li><span class="label"><bean:message
                                                             key="demographic.demographiceditdemographic.RosterTerminationReason" />:</span>
-                                                        <span class="info"><%=DemographicRoster.ROSTER_TERMINATION_REASON.getByCode(terminationCode).description%></span>
+                                                        <span class="info"><%=RosterTerminationReason.getByCode(terminationCode).description%></span>
                                                     </li>
 <%} %>
                                                     <li><span class="label"><bean:message
@@ -2711,21 +2668,7 @@ if ( Dead.equals(PatStat) ) {%>
 								<td align="left"><input type="text" name="email" size="30" <%=getDisabled("email")%>
 									value="<%=demographic.getEmail()!=null? demographic.getEmail() : ""%>">
 								</td>
-								<td align="right"><b><bean:message
-									key="demographic.demographiceditdemographic.formPHRUserName" />: </b></td>
-								<td align="left"><input type="text" name="myOscarUserName" size="30" <%=getDisabled("myOscarUserName")%>
-									value="<%=demographic.getMyOscarUserName()!=null? demographic.getMyOscarUserName() : ""%>"><br />
-								<%if (demographic.getMyOscarUserName()==null ||demographic.getMyOscarUserName().equals("")) {%>
-
-								<%
-									String onclickString="popup(900, 800, '../phr/indivo/RegisterIndivo.jsp?demographicNo="+demographic_no+"', 'indivoRegistration');";
-									MyOscarLoggedInInfo myOscarLoggedInInfo=MyOscarLoggedInInfo.getLoggedInInfo(session);
-									if (myOscarLoggedInInfo==null || !myOscarLoggedInInfo.isLoggedIn()) onclickString="alert('Please login to MyOscar first.')";
-								%>
-								<a href="javascript:"
-									onclick="<%=onclickString%>"><sub
-									style="white-space: nowrap;"><bean:message key="demographic.demographiceditdemographic.msgRegisterPHR"/></sub></a> <%}%>
-								</td>
+								<td colspan="2"></td>
 							</tr>
 							<tr valign="top">
 								<td align="right"><b><bean:message
@@ -3151,35 +3094,24 @@ document.updatedelete.referral_doctor_no.value = refNo;
 									key="demographic.demographiceditdemographic.formRosterStatus" />:
 								</b></td>
 								<td align="left">
-								<%String rosterStatus = demographic.getRosterStatus();
-                                  if (rosterStatus == null) {
-                                     rosterStatus = "";
+								<%String currentRosterStatus = demographic.getRosterStatus();
+                                  if (currentRosterStatus == null) {
+	                                  currentRosterStatus = "";
                                   }
                                   %>
-                                <input type="hidden" name="initial_rosterstatus" value="<%=rosterStatus%>"/>
-								<select id="roster_status" name="roster_status" style="width: 120" <%=getDisabled("roster_status")%> onchange="checkRosterStatus2()">
+                                <input type="hidden" name="initial_rosterstatus" value="<%=currentRosterStatus%>"/>
+								<select id="roster_status" name="roster_status" <%=getDisabled("roster_status")%> onchange="checkRosterStatus2()">
 									<option value=""></option>
-									<option value="RO"
-										<%="RO".equals(rosterStatus)?" selected":""%>>
-									<bean:message key="demographic.demographiceditdemographic.optRostered"/></option>
-									<option value="NR"
-										<%=rosterStatus.equals("NR")?" selected":""%>>
-									<bean:message key="demographic.demographiceditdemographic.optNotRostered"/></option>
-									<option value="TE"
-										<%=rosterStatus.equals("TE")?" selected":""%>>
-									<bean:message key="demographic.demographiceditdemographic.optTerminated"/></option>
-									<option value="FS"
-										<%=rosterStatus.equals("FS")?" selected":""%>>
-									<bean:message key="demographic.demographiceditdemographic.optFeeService"/></option>
-									<% 
-									for(String status: demographicDao.getRosterStatuses()) {
+									<%
+									for(RosterStatusModel rosterStatus : rosterStatuses)
+									{
+										String statusCode = rosterStatus.getRosterStatus();
 									%>
-									<option value="<%=status%>"
-										<%=rosterStatus.equals(status)?" selected":""%>><%=status%></option>
-									<% }
-                                    
-                                   // end while %>
-								</select> <input type="button" onClick="newStatus1();" value="<bean:message key="demographic.demographiceditdemographic.btnAddNew"/>">
+									<option value="<%=statusCode%>" <%=statusCode.equals(currentRosterStatus) ? " selected":""%>>
+										<%=statusCode + "-" + rosterStatus.getStatusDescription()%>
+									</option>
+									<% } %>
+								</select>
 								</td>
                                                                     <%
                                                              // Put 0 on the left on dates
