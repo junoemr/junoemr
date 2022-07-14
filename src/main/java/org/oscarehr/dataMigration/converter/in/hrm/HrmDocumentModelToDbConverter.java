@@ -89,13 +89,8 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 			hrmDocument.setReportLessTransactionInfoHash(matchingData.getReportLessTransactionInfoHash());
 		}
 		
-		List<HRMDocumentToProvider> providerLinks = new ArrayList<>();
-		HRMDocumentToProvider deliverToProviderLink = createDeliverToLink(hrmDocument, input.getDeliverToUserId());
-		if (deliverToProviderLink != null)
-		{
-			providerLinks.add(deliverToProviderLink);
-		}
-		
+		List<HRMDocumentToProvider> providerLinks = createDeliverToLink(hrmDocument, input.getDeliverToUserId());
+
 		if (input.getReviewers() != null && !input.getReviewers().isEmpty())
 		{
 			providerLinks.addAll(convertReviewerLinks(hrmDocument, input.getReviewers()));
@@ -197,42 +192,47 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 	
 	/**
 	 * Find the provider associated with the deliverToID.  If the ID starts with a "D", the id refers to the CPSID
-	 * of a physician.  If it starts with an "N", then it's the CNO number of a nurse.
+	 * of a physician.  If it starts with an "N", then it's the CNO number of a nurse.  If multiple share the same
+	 * CPSID or CNO, then all matching providers will be linked
+	 *
 	 * @param deliverToID Practitioner No of the provider for the link
 	 * @return provider link if provider exists in the system, otherwise null
 	 */
-	protected HRMDocumentToProvider createDeliverToLink(HRMDocument document, String deliverToID)
+	protected List<HRMDocumentToProvider> createDeliverToLink(HRMDocument document, String deliverToID)
 	{
-		HRMDocumentToProvider link = null;
+		List<HRMDocumentToProvider> deliverToLinks = new ArrayList<>();
 
 		if (ConversionUtils.hasContent(deliverToID))
 		{
 			ProviderCriteriaSearch searchParams = buildCriteriaSearch(deliverToID);
 			List<ProviderData> providers = searchProviders(searchParams);
 
-			if (providers == null || providers.size() == 0)
+			if (providers == null || providers.isEmpty())
 			{
-				logger.info(String.format("Could not match provider (%s) for HRM document (unlinked): %s",
-					document.getDeliverToUserId(),
-					document.getReportFile()));
-			}
-			else if (providers.size() == 1)
+				logger.info(String
+					.format("Could not match provider (%s) for HRM document (left unlinked) %s",
+						document.getDeliverToUserId(),
+						document.getReportFile()));
+			} else
 			{
-				ProviderData foundProvider = providers.get(0);
+				for (ProviderData matchingProvider : providers)
+				{
+					logger.info(String
+						.format("Provider no (%s) matched deliverTo id (%s) for HRM Document %s ",
+							matchingProvider.getProviderNo(),
+							document.getDeliverToUserId(),
+							document.getReportFile()));
 
-				link = new HRMDocumentToProvider();
-				link.setProviderNo(String.valueOf(foundProvider.getProviderNo()));
-				link.setHrmDocument(document);
-			}
-			else
-			{
-				logger.info(String.format("Multiple providers (%s) matched for HRM document (unlinked): %s",
-					document.getDeliverToUserId(),
-					document.getReportFile()));
+					HRMDocumentToProvider link = new HRMDocumentToProvider();
+					link.setProviderNo(String.valueOf(matchingProvider.getProviderNo()));
+					link.setHrmDocument(document);
+
+					deliverToLinks.add(link);
+				}
 			}
 		}
 
-		return link;
+		return deliverToLinks;
 	}
 
 	private ProviderCriteriaSearch buildCriteriaSearch(String deliverToID)
