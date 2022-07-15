@@ -22,6 +22,7 @@
  */
 package org.oscarehr.dataMigration.converter.in.hrm;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.dataMigration.converter.in.BaseModelToDbConverter;
@@ -192,8 +193,8 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 	
 	/**
 	 * Find the provider associated with the deliverToID.  If the ID starts with a "D", the id refers to the CPSID
-	 * of a physician.  If it starts with an "N", then it's the CNO number of a nurse.  If multiple share the same
-	 * CPSID or CNO, then all matching providers will be linked
+	 * of a physician.  If it starts with an "N", then it's the CNO number of a nurse.  If multiple records
+	 * share the same CPSID or CNO, then all matching providers will be linked
 	 *
 	 * @param deliverToID Practitioner No of the provider for the link
 	 * @return provider link if provider exists in the system, otherwise null
@@ -207,13 +208,13 @@ public class HrmDocumentModelToDbConverter extends BaseModelToDbConverter<HrmDoc
 			ProviderCriteriaSearch searchParams = buildCriteriaSearch(deliverToID);
 			List<ProviderData> providers = searchProviders(searchParams);
 
-			if (providers == null || providers.isEmpty())
+			if (CollectionUtils.isEmpty(providers))
 			{
-				logger.info(String
-					.format("Could not match provider (%s) for HRM document (left unlinked) %s",
+				logger.info(String.format("Could not match provider (%s) for HRM document (left unlinked) %s",
 						document.getDeliverToUserId(),
 						document.getReportFile()));
-			} else
+			}
+			else
 			{
 				for (ProviderData matchingProvider : providers)
 				{
