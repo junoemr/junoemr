@@ -231,9 +231,7 @@ public class HRMService
 		for(HRMDocumentToProvider documentToProvider : providerLinks)
 		{
 			hrmDocumentToProviderDao.persist(documentToProvider);
-			
-			
-			
+
 			ProviderLabRouting inboxRouting = new ProviderLabRouting();
 			inboxRouting.routeMagic(documentToProvider.getHrmDocument().getId(),
 			                        documentToProvider.getProviderNo(),
