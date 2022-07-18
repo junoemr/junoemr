@@ -25,4 +25,6 @@ package org.oscarehr.preferences;
 public class SystemPreferenceConstants
 {
 	public static final String HRM_DECRYPTION_KEY = "omd.hrm.decryption_key";
+	public static final String MASTER_FAX_ENABLED_INBOUND = "masterFaxEnabledInbound";
+	public static final String MASTER_FAX_ENABLED_OUTBOUND = "masterFaxEnabledOutbound";
 }

@@ -36,4 +36,10 @@ public interface FaxAccountProvider
 	List<String> getCoverLetterOptions();
 
 	void disconnectAccount();
+
+	/**
+	 * indicate if the account requires keep-alive polling to maintain a logged-in state
+	 * @return if the account needs keep-alive connection checks
+	 */
+	boolean requiresKeepAlive();
 }
