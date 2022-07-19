@@ -42,6 +42,8 @@ public class JunoProperties
 	private Test test;
 	private FaxConfig faxConfig;
 	private Hrm hrm;
+	private Aqs aqs;
+	private Myhealthaccess myhealthaccess;
 
 	@Data
 	public static class JunoPropertiesConfig
@@ -117,5 +119,24 @@ public class JunoProperties
 		private boolean localOverrideEnabled;
 		private String localOverrideDirectory;
 		private boolean decryptLocalFiles;
+	}
+
+	@Data
+	public static class Aqs
+	{
+		private String aqsDomain;
+		private String aqsProtocol;
+		private String aqsApiUri;
+	}
+
+	@Data
+	public static class Myhealthaccess
+	{
+		private boolean myhealthaccessTelehealthEnabled;
+		private String myhealthaccessProtocol;
+		private boolean myhealthaccessDevMode;
+		private String myhealthaccessApiUri;
+		private String myhealthaccessDomain;
+		private String cloudmdDomain;
 	}
 }

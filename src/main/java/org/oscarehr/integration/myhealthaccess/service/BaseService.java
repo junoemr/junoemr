@@ -23,9 +23,11 @@
 
 package org.oscarehr.integration.myhealthaccess.service;
 
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.exception.InvalidIntegrationException;
 import org.oscarehr.integration.service.IntegrationService;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import oscar.OscarProperties;
@@ -34,6 +36,8 @@ import oscar.OscarProperties;
 @Service("mha_BaseService")
 public class BaseService extends org.oscarehr.integration.BaseService
 {
+	private static final JunoProperties junoProps = SpringUtils.getBean(JunoProperties.class);
+
 	// ==========================================================================
 	// MHA Endpoints
 	// ==========================================================================
@@ -54,7 +58,7 @@ public class BaseService extends org.oscarehr.integration.BaseService
 	IntegrationService integrationService;
 
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
-	protected final String MYHEALTHACCESS_PROTOCOL = oscarProps.getProperty("myhealthaccess_protocol");
+	protected final String MYHEALTHACCESS_PROTOCOL = junoProps.getMyhealthaccess().getMyhealthaccessProtocol();
 
 	public String buildUrl(String endPoint)
 	{

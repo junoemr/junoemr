@@ -23,6 +23,8 @@
 
 package org.oscarehr.common;
 
+import org.oscarehr.config.JunoProperties;
+import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
 
 public class IsPropertiesOn {
@@ -54,7 +56,9 @@ public class IsPropertiesOn {
 	}
 
 	public static boolean isTelehealthEnabled() {
-		return propertiesOn("myhealthaccess_telehealth_enabled");
+		JunoProperties junoProps = SpringUtils.getBean(JunoProperties.class);
+
+		return junoProps.getMyhealthaccess().isMyhealthaccessTelehealthEnabled();
 	}
 
 

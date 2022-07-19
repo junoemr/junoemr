@@ -665,5 +665,4 @@ public class DefaultNoteService implements NoteService {
 		}
 		return null;
 	}
-
 }

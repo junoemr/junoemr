@@ -23,15 +23,16 @@
 
 package org.oscarehr.integration.myhealthaccess.client;
 
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.myhealthaccess.service.DevelopmentTrustManager;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
-import oscar.OscarProperties;
 import oscar.util.RESTClient;
 
 import javax.annotation.Nullable;
@@ -45,6 +46,7 @@ import java.util.Map;
 public abstract class RestClientBase extends RESTClient
 {
 	private Integration integration = null;
+	JunoProperties junoProps = SpringUtils.getBean(JunoProperties.class);
 
 
 	//==========================================================================
@@ -177,7 +179,8 @@ public abstract class RestClientBase extends RESTClient
 
 	private void IgnoreSSLVerifyInDevMode()
 	{
-		if (OscarProperties.getInstance().isPropertyActive("myhealthaccess_dev_mode"))
+		JunoProperties.Myhealthaccess mhaConfig = junoProps.getMyhealthaccess();
+		if (mhaConfig.isMyhealthaccessDevMode())
 		{
 			try
 			{

@@ -20,54 +20,37 @@
  * Victoria, British Columbia
  * Canada
  */
+package org.oscarehr.document.factory;
 
-package org.oscarehr.integration.myhealthaccess.model;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+import org.oscarehr.document.model.Document;
+import org.oscarehr.util.LoggedInInfo;
+import org.springframework.stereotype.Component;
+import java.util.Date;
 
-public enum MhaUserType
+@Component
+public class DocumentFactory
 {
-	// ==== MHA types ====
-	MHA_CLINIC("Clinic::Profile"),
-	MHA_CLINIC_USER("Clinic::User"),
-	MHA_PATIENT_USER("Patient::User"),
-	MHA_SYSTEM_USER("system");
-
-	// other types here... demographic, provider...
-
 	// ==========================================================================
-	// Boilerplate
+	// Class Methods
 	// ==========================================================================
 
-	public static MhaUserType fromString(String name)
+	/**
+	 * Create a new simple document
+	 * @param loggedInInfo - the logged in provider info
+	 * @param name - the name of the document
+	 */
+	public Document create(LoggedInInfo loggedInInfo, String name)
 	{
-		for (MhaUserType type : MhaUserType.values())
-		{
-			if (type.name.equals(name))
-			{
-				return type;
-			}
-		}
-		throw new IllegalArgumentException("MhaUserType has no enum value for [" + name + "]");
-	}
+		Document document = new Document();
+		document.setPublic1(false);
+		document.setDocdesc(name);
+		document.setDoctype("");
+		document.setDocCreator(loggedInInfo.getLoggedInProviderNo());
+		document.setDocfilename(name);
+		document.setSource("");
+		document.setObservationdate(new Date());
 
-	private final String name;
-
-	MhaUserType(String name)
-	{
-		this.name = name;
-	}
-
-	@JsonValue
-	public String getName()
-	{
-		return this.name;
-	}
-
-	@Override
-	public String toString()
-	{
-		return this.getName();
+		return document;
 	}
 }
-

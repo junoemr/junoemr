@@ -26,6 +26,7 @@ package org.oscarehr.telehealth.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Security;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.integration.dao.UserIntegrationAccessDao;
 import org.oscarehr.integration.model.Integration;
 import org.oscarehr.integration.model.IntegrationData;
@@ -43,6 +44,7 @@ import org.oscarehr.integration.service.IntegrationService;
 import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -78,9 +80,11 @@ public class MyHealthAccessService
 	@Autowired
 	IntegrationPushUpdateService integrationPushUpdateService;
 
+	private static final JunoProperties junoProps = SpringUtils.getBean(JunoProperties.class);
+
 	protected static OscarProperties oscarProps = OscarProperties.getInstance();
-	protected static final String MHA_DOMAIN = oscarProps.getProperty("myhealthaccess_domain");
-	protected static final String CLOUD_MD_DOMAIN = oscarProps.getProperty("cloudmd_domain");
+	protected static final String MHA_DOMAIN = junoProps.getMyhealthaccess().getMyhealthaccessDomain();
+	protected static final String CLOUD_MD_DOMAIN = junoProps.getMyhealthaccess().getCloudmdDomain();
 	public static final String MHA_HOME_URL = "/clinic/home";
 	public static final String MHA_BASE_TELEHEALTH_URL = "/patient/#/clinic/%s/telehealth/appointment/%s";
 	public static final String MHA_BASE_AQS_TELEHEALTH_URL = "/patient/#/clinic_user/aqs/queue/%s/queued_appointment/%s/session";
