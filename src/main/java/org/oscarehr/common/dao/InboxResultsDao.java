@@ -153,6 +153,7 @@ public class InboxResultsDao
 			String filterSql = "";
 			String proLrSql = "";
 			String labSql = "";
+			String hrmJoinSql = "";
 			
 			if (labType != null && !"".equals(labType))
 			{
@@ -180,17 +181,19 @@ public class InboxResultsDao
 			if ("-1".equals(providerNo) || "".equals(providerNo))
 			{
 				// any provider
+				hrmJoinSql += "AND false ";
 			}
 			else if ("0".equals(providerNo))
 			{
 				// unclaimed
-				filterSql += "AND (proLR.provider_no = '0') ";
+				filterSql += "AND (proLR.provider_no = '0') AND (hrmProv.providerNo IS NULL) ";
 				proLrSql += "AND (proLR_filter.provider_no = '0') ";
 			}
 			else
 			{
 				filterSql += "AND (proLR.provider_no = :provider_no) ";
 				proLrSql += "AND (proLR_filter.provider_no = :provider_no) ";
+				hrmJoinSql += "AND (hrmProv.providerNo = :provider_no) ";
 				qp_provider_no = true;
 			}
 			
@@ -445,7 +448,7 @@ public class InboxResultsDao
 				+ labSql
 
 				+ "LEFT JOIN HRMDocument hrm ON ( proLR.lab_type ='HRM' AND proLR.lab_no = hrm.id ) "
-				+ "LEFT JOIN HRMDocumentToProvider hrmProv ON hrm.id = hrmProv.hrmDocumentId "
+				+ "LEFT JOIN HRMDocumentToProvider hrmProv ON (hrm.id = hrmProv.hrmDocumentId " + hrmJoinSql + ") "
 				+ "LEFT JOIN HRMDocumentToDemographic hrmDemo ON hrm.id = hrmDemo.hrmDocumentId "
 				+ "LEFT JOIN demographic d3 ON hrmDemo.demographicNo = d3.demographic_no "
 
