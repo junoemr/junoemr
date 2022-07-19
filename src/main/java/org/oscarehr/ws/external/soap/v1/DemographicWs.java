@@ -327,8 +327,6 @@ public class DemographicWs extends AbstractWs
 
 		demographicManager.addDemographicWithValidation(loggedInInfo, demographic);
 		demographicManager.updateDemographicExtras(loggedInInfo, demographic, demographicTransfer);
-		demographicManager.addDemographicExts(loggedInInfo, demographic, demographicTransfer);
-
 	}
 
 	/**
