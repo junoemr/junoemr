@@ -1,0 +1,1 @@
+ALTER TABLE demographiccustArchive ADD COLUMN IF NOT EXISTS archive_id bigint(20) AFTER id;

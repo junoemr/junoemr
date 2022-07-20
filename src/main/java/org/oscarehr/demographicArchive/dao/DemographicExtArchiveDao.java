@@ -22,24 +22,38 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.demographic.dao;
+package org.oscarehr.demographicArchive.dao;
+
+import java.util.List;
+
+import javax.persistence.Query;
 
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.demographic.entity.DemographicCust;
-import org.oscarehr.demographic.entity.DemographicCustArchive;
+import org.oscarehr.demographic.entity.DemographicExt;
+import org.oscarehr.demographicArchive.entity.DemographicExtArchive;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class DemographicCustArchiveDao extends AbstractDao<DemographicCustArchive>
+public class DemographicExtArchiveDao extends AbstractDao<DemographicExtArchive>
 {
+	public DemographicExtArchiveDao()
+	{
+		super(DemographicExtArchive.class);
+	}
 
-	public DemographicCustArchiveDao() {
-		super(DemographicCustArchive.class);
+	
+	public List<DemographicExtArchive> getDemographicExtArchiveByArchiveId(Long archiveId) {
+		Query query = entityManager.createQuery("SELECT d from DemographicExtArchive d where d.archiveId=?1");
+		query.setParameter(1, archiveId);
+		
+		@SuppressWarnings("unchecked")
+		List<DemographicExtArchive> results = query.getResultList();
+		return results;
 	}
 	
-	public Integer archiveDemographicCust(DemographicCust dc) {
-		DemographicCustArchive dca = new DemographicCustArchive(dc);
-		persist(dca);
-		return dca.getId();
+	public Integer archiveDemographicExt(DemographicExt de) {
+		DemographicExtArchive dea = new DemographicExtArchive(de);
+		persist(dea);
+		return dea.getId();
 	}
 }

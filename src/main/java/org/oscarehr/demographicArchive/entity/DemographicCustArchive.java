@@ -21,24 +21,29 @@
  * Hamilton
  * Ontario, Canada
  */
+package org.oscarehr.demographicArchive.entity;
 
-
-package org.oscarehr.demographic.entity;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.demographic.entity.DemographicCust;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+@Getter
+@Setter
 @Entity
 @Table(name="demographiccustArchive")
 public class DemographicCustArchive extends AbstractModel<Integer>
 {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -61,64 +66,23 @@ public class DemographicCustArchive extends AbstractModel<Integer>
 	@Column(name="content")
 	private String notes;
 
+	@OneToOne(fetch= FetchType.LAZY)
+	@JoinColumn(name="archive_id")
+	private DemographicArchive demographicArchive;
+
 	
 	@Override
 	public Integer getId() {
 		return id;
 	}
-	
-	public Integer getDemographicNo() {
-		return demographicNo;
-	}
-	
-	public void setDemographicNo(Integer demographicNo) {
-		this.demographicNo = demographicNo;
-	}
 
-	public String getNurse() {
-    	return nurse;
-    }
-
-	public void setNurse(String nurse) {
-    	this.nurse = nurse;
-    }
-
-	public String getResident() {
-    	return resident;
-    }
-
-	public void setResident(String resident) {
-    	this.resident = resident;
-    }
-
-	public String getAlert() {
-    	return alert;
-    }
-
-	public void setAlert(String alert) {
-    	this.alert = alert;
-    }
-
-	public String getMidwife() {
-    	return midwife;
-    }
-
-	public void setMidwife(String midwife) {
-    	this.midwife = midwife;
-    }
-
-	public String getNotes() {
-    	return notes;
-    }
-
-	public void setNotes(String notes) {
-    	this.notes = notes;
-    }
-	
 	//constructors
-	public DemographicCustArchive() {}
-	
-	public DemographicCustArchive(DemographicCust dc) {
+	public DemographicCustArchive()
+	{
+	}
+
+	public DemographicCustArchive(DemographicCust dc)
+	{
 		this.demographicNo = dc.getId();
 		this.alert = dc.getAlert();
 		this.midwife = dc.getMidwife();

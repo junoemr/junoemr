@@ -21,22 +21,21 @@
  * Toronto, Ontario, Canada
  */
 
-package org.oscarehr.common.dao;
+package org.oscarehr.demographicArchive.dao;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.Query;
-
-import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.DemographicArchive;
+import org.oscarehr.common.dao.AbstractDao;
+import org.oscarehr.demographicArchive.entity.DemographicArchive;
 import org.springframework.stereotype.Repository;
-
 import oscar.util.StringUtils;
 import oscar.util.UtilDateUtilities;
 
+import javax.persistence.Query;
+import java.util.Date;
+import java.util.List;
+
 @Repository
-public class DemographicArchiveDao extends AbstractDao<DemographicArchive> {
+public class DemographicArchiveDao extends AbstractDao<DemographicArchive>
+{
 
 	public DemographicArchiveDao() {
 		super(DemographicArchive.class);
@@ -85,19 +84,6 @@ public class DemographicArchiveDao extends AbstractDao<DemographicArchive> {
         }
         return (results);
     }
-
-    public Long archiveRecord(Demographic d) {
-    	DemographicArchive da = new DemographicArchive(d);
-		persist(da);
-		return da.getId();
-    }
-
-    public DemographicArchive archiveDemographic(org.oscarehr.demographic.entity.Demographic demographic)
-	{
-		DemographicArchive demographicArchive = new DemographicArchive(demographic);
-		persist(demographicArchive);
-		return demographicArchive;
-	}
     
     public List<DemographicArchive> findByDemographicNoChronologically(Integer demographicNo) {
 

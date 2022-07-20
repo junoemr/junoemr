@@ -30,7 +30,6 @@ import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.Gender;
 import org.oscarehr.common.dao.AdmissionDao;
-import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.PHRVerificationDao;
 import org.oscarehr.common.dao.ProfessionalSpecialistDao;
@@ -45,18 +44,17 @@ import org.oscarehr.contact.dao.DemographicContactDao;
 import org.oscarehr.contact.entity.Contact;
 import org.oscarehr.contact.entity.DemographicContact;
 import org.oscarehr.contact.transfer.DemographicContactFewTo1;
-import org.oscarehr.demographic.dao.DemographicCustArchiveDao;
 import org.oscarehr.demographic.dao.DemographicCustDao;
-import org.oscarehr.demographic.dao.DemographicExtArchiveDao;
 import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.dao.DemographicMergedDao;
 import org.oscarehr.demographic.entity.DemographicCust;
 import org.oscarehr.demographic.entity.DemographicExt;
-import org.oscarehr.demographic.entity.DemographicExtArchive;
 import org.oscarehr.demographic.entity.DemographicMerged;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.service.DemographicService;
 import org.oscarehr.demographic.service.HinValidationService;
+import org.oscarehr.demographicArchive.dao.DemographicCustArchiveDao;
+import org.oscarehr.demographicArchive.service.DemographicArchiveService;
 import org.oscarehr.provider.dao.RecentDemographicAccessDao;
 import org.oscarehr.provider.model.RecentDemographicAccess;
 import org.oscarehr.security.model.Permission;
@@ -95,6 +93,7 @@ import static org.oscarehr.provider.model.ProviderData.SYSTEM_PROVIDER_NO;
  *
  */
 @Service
+@Deprecated // use demographicService
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class DemographicManager {
 	public static final String PHR_VERIFICATION_LEVEL_3 = "+3";
@@ -155,13 +154,10 @@ public class DemographicManager {
 	private ProfessionalSpecialistDao specialistDao;
 
 	@Autowired
-	private DemographicArchiveDao demographicArchiveDao;
-
-	@Autowired
-	private DemographicExtArchiveDao demographicExtArchiveDao;
-
-	@Autowired
 	private DemographicCustArchiveDao demographicCustArchiveDao;
+
+	@Autowired
+	private DemographicArchiveService demographicArchiveService;
 
 	@Autowired
 	private DemographicMergedDao demographicMergedDao;
@@ -311,11 +307,6 @@ public class DemographicManager {
 		}
 	}
 
-	public List<DemographicContact> getDemographicContacts(LoggedInInfo loggedInInfo, Integer id) {
-		checkPrivilege(loggedInInfo, Permission.DEMOGRAPHIC_READ);
-		return demographicContactDao.findActiveByDemographicNo(id);
-	}
-
 	/**
 	 * Given a demographic and the type of contact, get all active demographic contact entries
 	 * @param loggedInInfo user's logged in information so we can authenticate
@@ -453,7 +444,8 @@ public class DemographicManager {
 
 		//Archive previous demo
 		Demographic prevDemo = demographicDao.getDemographicById(demographic.getDemographicNo());
-		demographicArchiveDao.archiveRecord(prevDemo);
+		DemographicCust demographicCust = getDemographicCust(loggedInInfo, demographic.getDemographicNo());
+		demographicArchiveService.archiveDemographic(prevDemo, demographicCust, Arrays.asList(prevDemo.getExtras()));
 
 		String previousStatus = prevDemo.getPatientStatus();
 		Date previousStatusDate = prevDemo.getPatientStatusDate();
@@ -489,19 +481,6 @@ public class DemographicManager {
 		// update MyHealthAccess connection status.
 		demographicService.queueMHAPatientUpdates(demographic, prevDemo, loggedInInfo);
 
-		if (demographic.getExtras() != null) {
-			for (DemographicExt ext : demographic.getExtras()) {
-
-				DemographicExt existingExt = demographicExtDao.getLatestDemographicExt(demographic.getDemographicNo(), ext.getKey()).orElse(null);
-				if (existingExt != null)
-				{
-					ext.setId(existingExt.getId());
-				}
-
-				updateExtension(loggedInInfo, ext);
-			}
-		}
-
 		// log consent status change.
 		if (prevDemo.getElectronicMessagingConsentStatus() != demographic.getElectronicMessagingConsentStatus())
 		{
@@ -530,69 +509,25 @@ public class DemographicManager {
 
 		if (demographic.getExtras() != null) {
 			for (DemographicExt ext : demographic.getExtras()) {
-				updateExtension(loggedInInfo, ext);
-			}
-		}
-	}
-	
-
-	public void createExtension(String providerNo, DemographicExt ext) {
-		checkPrivilege(providerNo, Permission.DEMOGRAPHIC_CREATE);
-		demographicExtDao.saveEntity(ext);
-	}
-
-	public void updateExtension(LoggedInInfo loggedInInfo, DemographicExt ext) {
-		checkPrivilege(loggedInInfo, Permission.DEMOGRAPHIC_UPDATE);
-		archiveExtension(ext);
-		demographicExtDao.saveEntity(ext);
-	}
-
-	public void archiveExtension(DemographicExt ext) {
-		//TODO-legacy: this needs a loggedInInfo
-		if (ext != null && ext.getId() != null && ext.getValue() != null) {
-			DemographicExt prevExt = demographicExtDao.find(ext.getId());
-			if (!(ext.getKey().equals(prevExt.getKey()) && ext.getValue().equals(prevExt.getValue()))) {
-				demographicExtArchiveDao.archiveDemographicExt(prevExt);
+				demographicExtDao.saveEntity(ext);
 			}
 		}
 	}
 
-	/**
-	 * Saves the list of demographicExt objects to the ext database and ext archive
-	 * @param demographicArchiveId - id of the archived demographic record
-	 * @param extensions - list of objects to update/insert
-	 */
-	public void saveAndArchiveDemographicExt(Long demographicArchiveId, List<DemographicExt> extensions)
+	public void deleteDemographic(LoggedInInfo loggedInInfo, Demographic demographic)
 	{
-		for(DemographicExt extension : extensions)
-		{
-			// update/insert extension entries
-			demographicExtDao.saveEntity(extension);
+		List<DemographicExt> extEntries = getDemographicExts(loggedInInfo, demographic.getDemographicNo());
+		DemographicCust demographicCust = getDemographicCust(loggedInInfo, demographic.getDemographicNo());
+		demographicArchiveService.archiveDemographic(demographic, demographicCust, extEntries);
 
-			// save the demographic extension in the archive
-			DemographicExtArchive archive = new DemographicExtArchive(extension);
-			archive.setArchiveId(demographicArchiveId);
-			demographicExtArchiveDao.persist(archive);
-		}
-	}
-
-	public void deleteDemographic(LoggedInInfo loggedInInfo, Demographic demographic) {
-		checkPrivilege(loggedInInfo, Permission.DEMOGRAPHIC_CREATE);
-		
-		demographicArchiveDao.archiveRecord(demographic);
 		demographic.setPatientStatus(Demographic.PatientStatus.DE.name());
 		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo());
 		demographicDao.save(demographic);
 
-		for (DemographicExt ext : getDemographicExts(loggedInInfo, demographic.getDemographicNo())) {
-			deleteExtension(loggedInInfo, ext);
+		for(DemographicExt ext : extEntries)
+		{
+			demographicExtDao.removeDemographicExt(ext.getId());
 		}
-	}
-
-	public void deleteExtension(LoggedInInfo loggedInInfo, DemographicExt ext) {
-		checkPrivilege(loggedInInfo, Permission.DEMOGRAPHIC_CREATE);
-		archiveExtension(ext);
-		demographicExtDao.removeDemographicExt(ext.getId());
 	}
 
 	public void mergeDemographics(LoggedInInfo loggedInInfo, Integer parentId, List<Integer> children) {

@@ -25,9 +25,7 @@ package org.oscarehr.demographic.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.oscarehr.PMmodule.service.ProgramManager;
 import org.oscarehr.common.dao.AdmissionDao;
-import org.oscarehr.common.dao.DemographicArchiveDao;
 import org.oscarehr.common.model.Admission;
-import org.oscarehr.common.model.DemographicArchive;
 import org.oscarehr.demographic.converter.ApiDemographicUpdateTransferToUpdateInputConverter;
 import org.oscarehr.demographic.converter.DemographicCreateInputToEntityConverter;
 import org.oscarehr.demographic.converter.DemographicDbToModelConverter;
@@ -36,6 +34,7 @@ import org.oscarehr.demographic.converter.DemographicModelToDbConverter;
 import org.oscarehr.demographic.converter.DemographicUpdateInputToEntityConverter;
 import org.oscarehr.demographic.dao.DemographicCustDao;
 import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.dao.DemographicExtDao;
 import org.oscarehr.demographic.dao.DemographicIntegrationDao;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.entity.DemographicCust;
@@ -45,11 +44,11 @@ import org.oscarehr.demographic.model.DemographicModel;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
 import org.oscarehr.demographic.transfer.DemographicCreateInput;
 import org.oscarehr.demographic.transfer.DemographicUpdateInput;
+import org.oscarehr.demographicArchive.service.DemographicArchiveService;
 import org.oscarehr.demographicRoster.dao.DemographicRosterDao;
 import org.oscarehr.demographicRoster.entity.DemographicRoster;
 import org.oscarehr.demographicRoster.service.DemographicRosterService;
 import org.oscarehr.integration.service.IntegrationPushUpdateService;
-import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
@@ -63,6 +62,7 @@ import org.oscarehr.ws.rest.to.model.DemographicSearchResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
@@ -77,14 +77,14 @@ import java.util.Objects;
 import java.util.Set;
 
 @Service("demographic.service.DemographicService")
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class DemographicService
 {
 	@Autowired
-	private DemographicManager demographicManager;
+	private DemographicDao demographicDao;
 
 	@Autowired
-	private DemographicDao demographicDao;
+	private DemographicExtDao demographicExtDao;
 
 	@Autowired
 	private DemographicCustDao demographicCustDao;
@@ -93,7 +93,7 @@ public class DemographicService
 	private DemographicIntegrationDao demographicIntegrationDao;
 
 	@Autowired
-	private DemographicArchiveDao demographicArchiveDao;
+	private DemographicArchiveService demographicArchiveService;
 
 	@Autowired
 	private ProgramManager programManager;
@@ -432,7 +432,7 @@ public class DemographicService
 			//save the extension fields
 			extension.setDemographicNo(demographicNo);
 			extension.setProviderNo(providerNoStr);
-			demographicManager.createExtension(providerNoStr, extension);
+			demographicExtDao.saveEntity(extension);
 		}
 		
 		List<DemographicRoster> rosterHistory = demographic.getRosterHistory();
@@ -478,13 +478,6 @@ public class DemographicService
 		admissionDao.saveAdmission(admission);
 	}
 
-	public Long archiveDemographicRecord(Demographic demographic)
-	{
-		DemographicArchive da = new DemographicArchive(demographic);
-		demographicArchiveDao.persist(da);
-		return da.getId();
-	}
-
 	/**
 	 * Apply a demographic update (save changes to demo + create a demographic archive record)
 	 * @param demographic - the demographic to update.
@@ -496,7 +489,7 @@ public class DemographicService
 	public Demographic updateDemographicRecord(Demographic demographic, LoggedInInfo loggedInInfo)
 	{
 		Demographic oldDemographic = demographicDao.find(demographic.getId());
-		archiveDemographicRecord(oldDemographic);
+		demographicArchiveService.archiveDemographic(oldDemographic);
 		demographicRosterService.addRosterHistoryEntry(demographic, oldDemographic);
 
 		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
@@ -523,7 +516,6 @@ public class DemographicService
 	public DemographicModel updateDemographicRecord(DemographicUpdateInput updateInput, LoggedInInfo loggedInInfo)
 	{
 		Demographic oldDemographic = demographicDao.find(updateInput.getId());
-		demographicDao.detach(oldDemographic); // so it won't update when we set new values
 
 		// if hin changes, check duplication before update
 		if(!Objects.equals(oldDemographic.getHin(), updateInput.getHealthNumber()))
@@ -531,9 +523,11 @@ public class DemographicService
 			hinValidationService.validateNoDuplication(updateInput.getHealthNumber(), updateInput.getHealthNumberVersion(), updateInput.getHealthNumberProvinceCode());
 		}
 
-		archiveDemographicRecord(oldDemographic);
+		demographicArchiveService.archiveDemographic(oldDemographic);
+		demographicDao.detach(oldDemographic); // so it won't update when we set new values
 
 		Demographic demographic = demographicUpdateInputToEntityConverter.convert(updateInput);
+		demographic.setLastUpdateUser(loggedInInfo.getLoggedInProviderNo()); // here until we can do this in the converter
 		queueMHAPatientUpdates(demographic, oldDemographic, loggedInInfo);
 
 		demographicDao.merge(demographic);

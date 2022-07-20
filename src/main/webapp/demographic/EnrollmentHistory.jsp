@@ -47,8 +47,8 @@
 <%@page import="org.oscarehr.common.dao.DemographicDao"%>
 <%@page import="org.oscarehr.common.model.Provider"%>
 <%@page import="org.oscarehr.common.model.Demographic"%>
-<%@page import="org.oscarehr.common.dao.DemographicArchiveDao" %>
-<%@page import="org.oscarehr.common.model.DemographicArchive" %>
+<%@page import="org.oscarehr.demographicArchive.dao.DemographicArchiveDao" %>
+<%@page import="org.oscarehr.demographicArchive.entity.DemographicArchive" %>
 <%@page import="java.util.List" %>
 <%@page import="java.util.Date" %>
 <%@page import="oscar.util.DateUtils" %>

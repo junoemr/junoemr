@@ -40,19 +40,14 @@
 
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@ page import="org.oscarehr.PMmodule.service.AdmissionManager, org.oscarehr.PMmodule.service.ProgramManager, org.oscarehr.PMmodule.web.GenericIntakeEditAction, org.oscarehr.common.OtherIdManager" errorPage="errorpage.jsp"%>
-<%@ page import="org.oscarehr.common.dao.DemographicArchiveDao"%>
 <%@ page import="org.oscarehr.demographic.dao.DemographicCustDao" %>
 <%@ page import="org.oscarehr.demographic.dao.DemographicDao"%>
-
-<%@ page import="org.oscarehr.demographic.dao.DemographicExtArchiveDao" %>
 
 <%@ page import="org.oscarehr.demographic.dao.DemographicExtDao" %>
 <%@ page import="org.oscarehr.common.model.ConsentType" %>
 
 <%@ page import="org.oscarehr.demographic.entity.Demographic" %>
 <%@ page import="org.oscarehr.demographic.entity.DemographicCust" %>
-<%@ page import="org.oscarehr.demographic.entity.DemographicExt" %>
-<%@ page import="org.oscarehr.demographic.entity.DemographicExtArchive" %>
 
 <%@page import="org.oscarehr.managers.PatientConsentManager" %>
 <%@page import="org.oscarehr.provider.service.RecentDemographicAccessService" %>
@@ -87,9 +82,6 @@
 	org.oscarehr.common.dao.DemographicDao legacyDemographicDao = (org.oscarehr.common.dao.DemographicDao) SpringUtils.getBean("demographicDao");
 	DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
 	DemographicCustDao demographicCustDao = (DemographicCustDao)SpringUtils.getBean("demographicCustDao");
-
-	DemographicExtArchiveDao demographicExtArchiveDao = SpringUtils.getBean(DemographicExtArchiveDao.class);
-	DemographicArchiveDao demographicArchiveDao = (DemographicArchiveDao)SpringUtils.getBean("demographicArchiveDao");
 
 	RecentDemographicAccessService recentDemographicAccessService = SpringUtils.getBean(RecentDemographicAccessService.class);
 	DemographicRosterService demographicRosterService = SpringUtils.getBean(DemographicRosterService.class);
@@ -348,16 +340,6 @@
 				String ip = request.getRemoteAddr();
 				LogAction.addLogEntry(curUser_no, demographic.getDemographicId(), LogConst.ACTION_ADD, LogConst.CON_DEMOGRAPHIC, LogConst.STATUS_SUCCESS, param2[0], ip);
 				recentDemographicAccessService.updateAccessRecord(Integer.parseInt(curUser_no), demographic.getDemographicId());
-
-				//archive the original too
-				Long archiveId = demographicArchiveDao.archiveDemographic(demographic).getId();
-				List<DemographicExt> extensions = demographicExtDao.getDemographicExtByDemographicNo(Integer.parseInt(dem));
-				for (DemographicExt extension : extensions) {
-					DemographicExtArchive archive = new DemographicExtArchive(extension);
-					archive.setArchiveId(archiveId);
-					archive.setValue(request.getParameter(archive.getKey()));
-					demographicExtArchiveDao.saveEntity(archive);
-				}
 
 				// Assign the patient to a waitlist if necessary
 				String waitListIdStr = request.getParameter("list_id");
