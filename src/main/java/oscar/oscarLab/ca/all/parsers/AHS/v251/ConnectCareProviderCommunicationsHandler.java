@@ -81,6 +81,26 @@ public class ConnectCareProviderCommunicationsHandler extends MDM_T08_T02Connect
 	{
 	}
 
+	/* ================================= TXA ======================================= */
+
+	@Override
+	protected String getOrderingProvider(int i, int k) throws HL7Exception
+	{
+		return getFullDocName("/.TXA", 9, k);
+	}
+
+	@Override
+	protected String getClientRef(int i, int k) throws HL7Exception
+	{
+		return getString(get("/.TXA-9(" + k + ")-1"));
+	}
+
+	@Override
+	protected String getOrderingProviderNo(int i, int k) throws HL7Exception
+	{
+		return getString(get("/.TXA-9(" + k + ")-1"));
+	}
+
 	/* ================================= OBX ======================================= */
 
 	@Override
