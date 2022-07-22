@@ -37,7 +37,6 @@ import org.oscarehr.PMmodule.model.ProgramProvider;
 import org.oscarehr.common.dao.DocumentStorageDao;
 import org.oscarehr.common.dao.QueueDocumentLinkDao;
 import org.oscarehr.common.model.DocumentStorage;
-import org.oscarehr.common.model.Provider;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.document.model.CtlDocument;
 import org.oscarehr.document.model.Document;
@@ -325,7 +324,7 @@ public class AddEditDocumentAction extends DispatchAction {
 				if (module.equals(CtlDocument.MODULE_DEMOGRAPHIC))
 				{
 					// doc is uploaded under a patient,moduleId become demo no.
-					ProviderData systemProvider = providerDao.find(ProviderData.SYSTEM_PROVIDER_NO);
+					ProviderData creator = providerDao.find(fm.getDocCreator());
 	
 					Date now = EDocUtil.getDmsDateTimeAsDate();
 					String docDesc = document.getDocdesc();
@@ -336,21 +335,13 @@ public class AddEditDocumentAction extends DispatchAction {
 					cmn.setObservationDate(od1);
 					cmn.setDemographic(demographicDao.find(demoNo));
 					String prog_no = new EctProgram(request.getSession()).getProgram(userId);
-					cmn.setProvider(systemProvider);// set the provider no to be -1 so the editor appear as 'System'.
+					cmn.setProvider(creator);
 	
-					Provider provider = EDocUtil.getProvider(fm.getDocCreator());
-					String provFirstName = "";
-					String provLastName = "";
-					if(provider!=null) {
-						provFirstName=provider.getFirstName();
-						provLastName=provider.getLastName();
-					}
-	
-					String strNote = "Document" + " " + docDesc + " " + "created at " + now + " by " + provFirstName + " " + provLastName + ".";
+					String strNote = "Document" + " " + docDesc + " " + "created at " + now + " by " + creator.getDisplayName() + ".";
 	
 					cmn.setNote(strNote);
 					cmn.setSigned(true);
-					cmn.setSigningProvider(systemProvider);
+					cmn.setSigningProvider(creator);
 					cmn.setProgramNo(prog_no);
 					cmn.setHistory(strNote);
 
