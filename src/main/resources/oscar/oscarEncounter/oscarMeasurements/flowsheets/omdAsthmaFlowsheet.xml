@@ -74,7 +74,7 @@
             </rule>
         </ruleset>
     </item>
-    <measurement type="FEV1" typeDesc="Forced Expiratory Volume 1 Second" typeDisplayName="" measuringInstrc="Forced Expiratory Volume 1 Second">
+    <measurement type="FEV1" typeDesc="Forced Expiratory Volume 1 Second" typeDisplayName="Forced Expiratory Volume 1 Second" measuringInstrc="Forced Expiratory Volume 1 Second">
         <validationRule name="Yes/No" maxValue="" minValue="" isDate="" isNumeric="" regularExp="YES|yes|Yes|Y|NO|no|No|N" maxLength="" minLength="" />
     </measurement>
     <item measurement_type="AELV" display_name="Exacerbations since last visit" guideline="Requiring clinical evaluations" graphable="yes" value_name="Has" >
@@ -105,11 +105,11 @@
         <validationRule name="Numeric Value: 0 to 2500" maxValue="2500" minValue="0" isDate="" isNumeric="1" regularExp="" maxLength="" minLength="" />
     </measurement>
     <item measurement_type="ARAD" display_name="Asthma Definition" guideline="" graphable="yes" value_name="Reviewed" />
-    <measurement type="ARAD" typeDesc="Review Asthma Definition" typeDisplayName="" measuringInstrc="Review Asthma Definition">
+    <measurement type="ARAD" typeDesc="Review Asthma Definition" typeDisplayName="Review Asthma Definition" measuringInstrc="Review Asthma Definition">
         <validationRule name="Yes/No" maxValue="" minValue="" isDate="" isNumeric="" regularExp="YES|yes|Yes|Y|NO|no|No|N" maxLength="" minLength="" />
     </measurement>
     <item measurement_type="ARMA" display_name="Medication Adherence" guideline="" graphable="yes" value_name="Reviewed" />
-    <measurement type="ARMA" typeDesc="Asthma Review Med Adherence" typeDisplayName="" measuringInstrc="Asthma Review Med Adherence">
+    <measurement type="ARMA" typeDesc="Asthma Review Med Adherence" typeDisplayName="Asthma Review Med Adherence" measuringInstrc="Asthma Review Med Adherence">
         <validationRule name="Yes/No" maxValue="" minValue="" isDate="" isNumeric="" regularExp="YES|yes|Yes|Y|NO|no|No|N" maxLength="" minLength="" />
     </measurement>
     <item measurement_type="ARDT" display_name="Device Technique Optimal" guideline="" graphable="no" value_name="Reviewed" />
