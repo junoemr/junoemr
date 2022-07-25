@@ -23,6 +23,8 @@
 
 import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../components/junoComponentConstants";
 import {AqsQueuesApi} from "../../../../generated";
+import ToastErrorHandler from "../../../lib/error/handler/ToastErrorHandler";
+import {API_BASE_PATH} from "../../../lib/constants/ApiConstants";
 
 angular.module('Common.Components').component('appointmentQueueModal',
 	{
@@ -47,7 +49,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 				let ctrl = this;
 
 				// load appointment queue api
-				let aqsQueuesApi = new AqsQueuesApi($http, $httpParamSerializer, '../ws/rs');
+				ctrl.aqsQueuesApi = new AqsQueuesApi($http, $httpParamSerializer, API_BASE_PATH);
 
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
@@ -68,13 +70,13 @@ angular.module('Common.Components').component('appointmentQueueModal',
 					if(ctrl.editMode)
 					{
 						ctrl.queueModel = angular.copy(ctrl.resolve.queue);
-						ctrl.queueContacts = (await aqsQueuesApi.getQueueContacts(ctrl.queueModel.id)).data.body;
+						ctrl.queueContacts = (await ctrl.aqsQueuesApi.getQueueContacts(ctrl.queueModel.id)).data.body;
 						ctrl.notifyPhoneNumbers = ctrl.queueContacts.map((contact) => contact.phone).join(", ");
 						ctrl.isLoading = false;
 					}
 					else
 					{
-						aqsQueuesApi.getNewAppointmentQueue().then((response) =>
+						ctrl.aqsQueuesApi.getNewAppointmentQueue().then((response) =>
 						{
 							ctrl.queueModel = response.data.body;
 						}).catch((error) =>
@@ -116,11 +118,11 @@ angular.module('Common.Components').component('appointmentQueueModal',
 
 					if (ctrl.editMode)
 					{
-						aqsQueuesApi.updateAppointmentQueue(ctrl.queueModel.id, ctrl.queueModel).then(onSaveSuccess).catch(onSaveError);
+						ctrl.aqsQueuesApi.updateAppointmentQueue(ctrl.queueModel.id, ctrl.queueModel).then(onSaveSuccess).catch(onSaveError);
 					}
 					else
 					{
-						aqsQueuesApi.createAppointmentQueue(ctrl.queueModel).then(onSaveSuccess).catch(onSaveError);
+						ctrl.aqsQueuesApi.createAppointmentQueue(ctrl.queueModel).then(onSaveSuccess).catch(onSaveError);
 					}
 
 					ctrl.saveQueueContacts();
@@ -138,7 +140,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
           });
 
 					// delete removed contacts
-					deleteContacts.forEach((contact) => aqsQueuesApi.removeQueueContact(ctrl.queueModel.id, contact.remoteId));
+					deleteContacts.forEach((contact) => ctrl.aqsQueuesApi.removeQueueContact(ctrl.queueModel.id, contact.remoteId));
 
 					// add new ones
 					newContactPhones.forEach((phone) =>
@@ -146,7 +148,7 @@ angular.module('Common.Components').component('appointmentQueueModal',
 						const newContact = {
 							phone,
 						}
-						aqsQueuesApi.addQueueContact(ctrl.queueModel.id, newContact);
+						ctrl.aqsQueuesApi.addQueueContact(ctrl.queueModel.id, newContact);
 					})
 				}
 

@@ -24,16 +24,14 @@
 import {
 	JUNO_BUTTON_COLOR,
 	JUNO_BUTTON_COLOR_PATTERN,
-	JUNO_STYLE, LABEL_POSITION
+	JUNO_STYLE,
+	LABEL_POSITION
 } from "../../../../../common/components/junoComponentConstants";
-import {
-	AqsQueuedAppointmentApi,
-	SitesApi,
-	SystemPreferenceApi,
-	BookQueuedAppointmentTransfer,
-	MhaIntegrationApi
-} from "../../../../../../generated";
+import {AqsQueuedAppointmentApi, MhaIntegrationApi, SitesApi, SystemPreferenceApi} from "../../../../../../generated";
 import {SystemProperties} from "../../../../../common/services/systemPreferenceServiceConstants";
+import {API_BASE_PATH} from "../../../../../lib/constants/ApiConstants";
+import ToastErrorHandler from "../../../../../lib/error/handler/ToastErrorHandler";
+import ToastService from "../../../../../lib/alerts/service/ToastService";
 
 angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 {
@@ -47,20 +45,21 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		"$httpParamSerializer",
 		"$uibModal",
 		"providerService",
-		function ($scope,
-							$http,
-							$httpParamSerializer,
-							$uibModal,
-							providerService)
+		function($scope,
+		         $http,
+		         $httpParamSerializer,
+		         $uibModal,
+		         providerService)
 	{
 		let ctrl = this;
 
 		// load api
-		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer,
-				'../ws/rs');
-		let sitesApi = new SitesApi($http, $httpParamSerializer, "../ws/rs");
-		let aqsQueuedAppointmentApi = new AqsQueuedAppointmentApi($http, $httpParamSerializer, "../ws/rs");
-		let mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer, "../ws/rs");
+		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, API_BASE_PATH);
+		let sitesApi = new SitesApi($http, $httpParamSerializer, API_BASE_PATH);
+		let aqsQueuedAppointmentApi = new AqsQueuedAppointmentApi($http, $httpParamSerializer, API_BASE_PATH);
+		let mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer, API_BASE_PATH);
+		ctrl.errorHandler = new ToastErrorHandler();
+		ctrl.toastService = new ToastService();
 
 		ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 		ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
@@ -69,28 +68,36 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		ctrl.bookProviderNo = null;
 		ctrl.providerOptions = [];
 		ctrl.isMultisiteEnabled = false;
-		ctrl.isLoading = false;
+		ctrl.isLoading = true;
 		ctrl.providerHasSite = false;
 
 		ctrl.$onInit = async () =>
 		{
-			ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
+			try
+			{
+				ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
 
-			ctrl.isMultisiteEnabled = (await systemPreferenceApi.getPropertyEnabled(SystemProperties.Multisites)).data.body;
-			ctrl.loadProviderList();
+				ctrl.isMultisiteEnabled = (await systemPreferenceApi.getPropertyEnabled(SystemProperties.Multisites)).data.body;
+				ctrl.providerOptions = await ctrl.loadProviderList();
+			}
+			catch(err)
+			{
+				ctrl.errorHandler.handleError(err);
+			}
+			ctrl.isLoading = false;
 		}
 
 		ctrl.loadProviderList = async () =>
 		{
-			try
+			let providers = (await providerService.searchProviders({active: true}));
+
+			return providers.map((provider) =>
 			{
-				const providers = (await providerService.searchProviders({active: true}));
-				ctrl.providerOptions = providers.map((provider) => {return {value: provider.providerNo, label: `${provider.name} (${provider.providerNo})`}});
-			}
-			catch (err)
-			{
-				console.error("Could not fetch provider list with error", err)
-			}
+				return {
+					value: provider.providerNo,
+					label: `${provider.name} (${provider.providerNo})`,
+				};
+			});
 		}
 
 		ctrl.checkProviderSite = async () =>
@@ -119,16 +126,31 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 
 		ctrl.assignToMe = async () =>
 		{
-			ctrl.bookProviderNo = (await providerService.getMe()).providerNo;
-			ctrl.providerHasSite = false;
-			ctrl.providerHasSite = await ctrl.checkProviderSite();
+			try
+			{
+				ctrl.bookProviderNo = (await providerService.getMe()).providerNo;
+				ctrl.providerHasSite = false;
+				ctrl.providerHasSite = await ctrl.checkProviderSite();
+			}
+			catch(e)
+			{
+				ctrl.errorHandler.handleError(e);
+			}
 		}
 
-		ctrl.onProviderSelect = async () =>
+		ctrl.onProviderSelect = async (option) =>
 		{
-			ctrl.providerHasSite = false;
-			ctrl.providerHasSite = await ctrl.checkProviderSite();
-			$scope.$digest();
+			try
+			{
+				ctrl.bookProviderNo = option.value;
+				ctrl.providerHasSite = false;
+				ctrl.providerHasSite = await ctrl.checkProviderSite();
+				$scope.$digest();
+			}
+			catch(e)
+			{
+				ctrl.errorHandler.handleError(e);
+			}
 		}
 
 		ctrl.bookQueuedAppointment = async () =>
@@ -218,6 +240,16 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 				return "Provider is not assigned to the site of this appointment";
 			}
 			return okMsg;
+		}
+
+		ctrl.bookButtonDisabled = () =>
+		{
+			return !ctrl.bookProviderNo || ctrl.isLoading || !ctrl.providerHasSite;
+		}
+
+		ctrl.bookVirtualButtonDisabled = () =>
+		{
+			return !ctrl.bookProviderNo || ctrl.isLoading || !ctrl.providerHasSite || !ctrl.resolve.isVirtual;
 		}
 
 	}]

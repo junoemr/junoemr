@@ -8,6 +8,12 @@ export default class BasicErrorHandler implements ErrorHandler
 	private readonly _rethrow: boolean;
 	private readonly _logLevel: LogLevel;
 
+	/**
+	 * constructor with global options initialization
+	 * @param rethrow - rethrow errors after handing them. for use where rejecting a promise is
+	 * still required (ie service layer). default false.
+	 * @param logLevel - default log level for console logging. default LogLevel.ERROR
+	 */
 	constructor(rethrow: boolean = false, logLevel: LogLevel = LogLevel.ERROR)
 	{
 		this._rethrow = rethrow;
@@ -26,11 +32,13 @@ export default class BasicErrorHandler implements ErrorHandler
 
 	/**
 	 * Pass through error handler.  The error is logged, and the service function is called.
-	 * Finally, the error is re-thrown.
+	 * Finally, the error is re-thrown (if the rethrow option is true).
+	 * @param response - the error object
+	 * @param logLevel - log level for console logging. defaults to the global log level
 	 */
-	public handleError(response: any): any
+	public handleError(response: any, logLevel: LogLevel = this._logLevel): any
 	{
-		this.logError(response);
+		this.logError(response, logLevel);
 		this.serviceError(response);
 
 		if(this.rethrow)
@@ -50,9 +58,9 @@ export default class BasicErrorHandler implements ErrorHandler
 		}
 	}
 
-	protected logError(message: any)
+	protected logError(message: any, logLevel: LogLevel)
 	{
-		switch (this.logLevel)
+		switch (logLevel)
 		{
 			case LogLevel.CRITICAL: console.error(message); break;
 			case LogLevel.ERROR: console.error(message); break;
