@@ -76,6 +76,7 @@ public class ProvidersWebService extends AbstractServiceImpl
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestSearchResponse<ProviderModel> searchProviders(@QueryParam("firstName") String firstName,
 	                                                         @QueryParam("lastName") String lastName,
+	                                                         @QueryParam("active") Boolean active,
 	                                                         @QueryParam("type") String type,
 	                                                         @QueryParam("practitionerNumber") String practitionerNumber,
 	                                                         @QueryParam("siteId") Integer siteId,
@@ -87,6 +88,7 @@ public class ProvidersWebService extends AbstractServiceImpl
 		criteriaSearch.setLastName(lastName);
 		criteriaSearch.setPractitionerNo(practitionerNumber);
 		criteriaSearch.setSiteId(siteId);
+		criteriaSearch.setActiveStatus(active);
 
 		if(perPage != null)
 		{
@@ -106,6 +108,7 @@ public class ProvidersWebService extends AbstractServiceImpl
 	@GET
 	@Path("/bySecurityRole")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Deprecated
 	public RestResponse<List<ProviderTo1>> getBySecurityRole(@QueryParam("role") String role)
 	{
 		try
@@ -124,6 +127,7 @@ public class ProvidersWebService extends AbstractServiceImpl
 	@GET
 	@Path("/byType")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Deprecated
 	public RestResponse<List<ProviderTo1>> getByType(@QueryParam("type") String type)
 	{
 		try
@@ -142,6 +146,7 @@ public class ProvidersWebService extends AbstractServiceImpl
 	@GET
 	@Path("/all")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Deprecated
 	public RestSearchResponse<ProviderTo1> getAll()
 	{
 		List<Provider> providers = providerDao.getProviders();
@@ -167,6 +172,7 @@ public class ProvidersWebService extends AbstractServiceImpl
 	@GET
 	@Path("/active")
 	@Produces(MediaType.APPLICATION_JSON)
+	@Deprecated
 	public RestSearchResponse<ProviderTo1> getActive()
 	{
 		List<Provider> providers = providerDao.getActiveProviders();

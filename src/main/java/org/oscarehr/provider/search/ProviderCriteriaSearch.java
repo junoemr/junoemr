@@ -27,6 +27,7 @@ import lombok.Setter;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
+import org.oscarehr.provider.model.ProviderData;
 
 @Getter
 @Setter
@@ -38,6 +39,7 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 	private String firstName = null;
 	private Integer siteId = null;
 	private String providerType = null;
+	private Boolean activeStatus = null;
 	
 	private String practitionerNo = null;
 	private String ontarioCnoNumber = null;
@@ -51,6 +53,10 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 		if (getProviderNo() != null)
 		{
 			criteria.add(Restrictions.eq("id", String.valueOf(getProviderNo())));
+		}
+		if (getActiveStatus() != null)
+		{
+			criteria.add(Restrictions.eq("status", getActiveStatus() ? ProviderData.PROVIDER_STATUS_ACTIVE : ProviderData.PROVIDER_STATUS_INACTIVE));
 		}
 		if (getFirstName() != null)
 		{
@@ -77,10 +83,6 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 
 		if(getSiteId() != null)
 		{
-//			criteria.add(Restrictions.eq("siteId", getSiteId()));
-
-//			Criteria siteCriteria = criteria.createCriteria("assignedSites", JoinType.INNER_JOIN);
-//			siteCriteria.add(Restrictions.eq("siteId", getSiteId()));
 			criteria.createAlias(alias + ".assignedSites", "s");
 			criteria.add(Restrictions.eq("s.siteId", getSiteId()));
 		}

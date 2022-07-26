@@ -21,17 +21,16 @@
  * Canada
  */
 
-import {
-	JUNO_BUTTON_COLOR,
-	JUNO_BUTTON_COLOR_PATTERN,
-	JUNO_STYLE,
-	LABEL_POSITION
-} from "../../../../../common/components/junoComponentConstants";
-import {AqsQueuedAppointmentApi, MhaIntegrationApi, ProvidersServiceApi, SitesApi, SystemPreferenceApi} from "../../../../../../generated";
+import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../../common/components/junoComponentConstants";
+import {AqsQueuedAppointmentApi, MhaIntegrationApi, SitesApi, SystemPreferenceApi} from "../../../../../../generated";
 import {SystemProperties} from "../../../../../common/services/systemPreferenceServiceConstants";
 import {API_BASE_PATH} from "../../../../../lib/constants/ApiConstants";
 import ToastErrorHandler from "../../../../../lib/error/handler/ToastErrorHandler";
 import ToastService from "../../../../../lib/alerts/service/ToastService";
+import ProviderSearchParams from "../../../../../lib/provider/model/ProviderSearchParams";
+import PagedResponse from "../../../../../lib/common/response/PagedResponse";
+import Provider from "../../../../../lib/provider/model/Provider";
+import {JunoSelectOption} from "../../../../../lib/common/junoSelectOption";
 
 angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 {
@@ -58,7 +57,6 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		ctrl.sitesApi = new SitesApi($http, $httpParamSerializer, API_BASE_PATH);
 		ctrl.aqsQueuedAppointmentApi = new AqsQueuedAppointmentApi($http, $httpParamSerializer, API_BASE_PATH);
 		ctrl.mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer, API_BASE_PATH);
-		ctrl.providersApi = new ProvidersServiceApi($http, $httpParamSerializer, API_BASE_PATH);
 		ctrl.errorHandler = new ToastErrorHandler();
 		ctrl.toastService = new ToastService();
 
@@ -92,16 +90,14 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			ctrl.isLoading = false;
 		}
 
-		ctrl.loadProviderList = async () =>
+		ctrl.loadProviderList = async (): Promise<JunoSelectOption[]> =>
 		{
-			let providers = (await ctrl.providersApi.searchProviders(null, null, null, null, ctrl.bookingSiteId)).data.body;
-			return providers.map((provider) =>
-			{
-				return {
-					value: provider.id,
-					label: `${provider.lastName}, ${provider.firstName} (${provider.id})`,
-				};
-			});
+			const searchParams = new ProviderSearchParams();
+			searchParams.siteId = ctrl.bookingSiteId;
+			searchParams.active = true;
+
+			const pagedResults: PagedResponse<Provider> = await providerService.searchProvidersNew(searchParams);
+			return pagedResults.body;
 		}
 
 		ctrl.checkProviderSite = async () =>
