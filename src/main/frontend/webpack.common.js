@@ -319,7 +319,7 @@ module.exports = {
 			'./src/layout/components/appointmentQueue/appointmentQueueComponent.js',
 			'./src/layout/components/appointmentQueue/components/appointmentCard/appointmentCardComponent.js',
 			'./src/layout/components/appointmentQueue/modals/module.js',
-			'./src/layout/components/appointmentQueue/modals/addQueuedAppointmentModal/addQueuedAppointmentModalComponent.js',
+			'./src/layout/components/appointmentQueue/modals/addQueuedAppointmentModal/addQueuedAppointmentModalComponent.ts',
 
 			'./src/messaging/module.js',
 			'./src/messaging/inbox/components/module.js',

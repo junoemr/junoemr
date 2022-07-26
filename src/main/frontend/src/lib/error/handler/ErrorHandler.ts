@@ -5,5 +5,5 @@ import {LogLevel} from "./LogLevel";
  */
 export interface ErrorHandler
 {
-	handleError(error: any, logLevel: LogLevel): any;
+	handleError(error: any, logLevel?: LogLevel): any;
 }

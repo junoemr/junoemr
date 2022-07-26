@@ -36,6 +36,8 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 	private String providerNo = null;
 	private String lastName = null;
 	private String firstName = null;
+	private Integer siteId = null;
+	private String providerType = null;
 	
 	private String practitionerNo = null;
 	private String ontarioCnoNumber = null;
@@ -43,6 +45,8 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 	@Override
 	public Criteria setCriteriaProperties(Criteria criteria)
 	{
+		String alias = criteria.getAlias();
+
 		// set the search filters
 		if (getProviderNo() != null)
 		{
@@ -56,6 +60,10 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 		{
 			criteria.add(Restrictions.eq("lastName", getLastName()));
 		}
+		if (getProviderType() != null)
+		{
+			criteria.add(Restrictions.eq("providerType", getProviderType()));
+		}
 		
 		if (getPractitionerNo() != null)
 		{
@@ -65,6 +73,16 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 		if (getOntarioCnoNumber() != null)
 		{
 			criteria.add(Restrictions.eq("ontarioCnoNumber", getOntarioCnoNumber()));
+		}
+
+		if(getSiteId() != null)
+		{
+//			criteria.add(Restrictions.eq("siteId", getSiteId()));
+
+//			Criteria siteCriteria = criteria.createCriteria("assignedSites", JoinType.INNER_JOIN);
+//			siteCriteria.add(Restrictions.eq("siteId", getSiteId()));
+			criteria.createAlias(alias + ".assignedSites", "s");
+			criteria.add(Restrictions.eq("s.siteId", getSiteId()));
 		}
 
 		return criteria;

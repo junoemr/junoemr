@@ -22,15 +22,19 @@
  * Ontario, Canada
  */
 
-package org.oscarehr.ws.rest;
+package org.oscarehr.ws.rest.provider;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.common.model.Provider;
+import org.oscarehr.dataMigration.model.provider.ProviderModel;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
+import org.oscarehr.provider.service.ProviderSearchService;
+import org.oscarehr.security.dao.SecRoleDao;
 import org.oscarehr.security.model.SecRole;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
@@ -52,7 +56,7 @@ import java.util.List;
 @Path("/providers")
 @Component("providersService")
 @Tag(name = "providersService")
-public class ProvidersService extends AbstractServiceImpl
+public class ProvidersWebService extends AbstractServiceImpl
 {
 	private static Logger logger = MiscUtils.getLogger();
 
@@ -62,26 +66,41 @@ public class ProvidersService extends AbstractServiceImpl
 	@Autowired
 	private SecRoleDao secRoleDao;
 
+	@Autowired
+	private ProviderSearchService providerSearchService;
+
 	private ProviderConverter providerConverter = new ProviderConverter();
 
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestResponse<ProviderTo1> search(@QueryParam("searchText") String searchText,
-	                                        @QueryParam("searchMode") @DefaultValue("NAME") String searchMode,
-	                                        @QueryParam("page") @DefaultValue("1") Integer page,
-	                                        @QueryParam("perPage") @DefaultValue("10") Integer perPage)
+	public RestSearchResponse<ProviderModel> searchProviders(@QueryParam("firstName") String firstName,
+	                                                         @QueryParam("lastName") String lastName,
+	                                                         @QueryParam("type") String type,
+	                                                         @QueryParam("practitionerNumber") String practitionerNumber,
+	                                                         @QueryParam("siteId") Integer siteId,
+	                                                         @QueryParam("page") @DefaultValue("1") Integer page,
+	                                                         @QueryParam("perPage") Integer perPage)
 	{
-		try
+		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+		criteriaSearch.setFirstName(firstName);
+		criteriaSearch.setLastName(lastName);
+		criteriaSearch.setPractitionerNo(practitionerNumber);
+		criteriaSearch.setSiteId(siteId);
+
+		if(perPage != null)
 		{
-			//TODO - standardized provider search
-			return RestResponse.errorResponse("Error - not yet implemented");
+			criteriaSearch.setPaging(validPageNo(page), limitedResultCount(perPage));
+			int total = providerSearchService.providerCriteriaSearchCount(criteriaSearch);
+			List<ProviderModel> providers = providerSearchService.providerCriteriaSearch(criteriaSearch);
+			return RestSearchResponse.successResponse(providers, page, perPage, total);
 		}
-		catch (Exception e)
+		else
 		{
-			logger.error("Error", e);
+			criteriaSearch.setNoLimit();
+			List<ProviderModel> providers = providerSearchService.providerCriteriaSearch(criteriaSearch);
+			return RestSearchResponse.successResponseOnePage(providers);
 		}
-		return RestResponse.errorResponse("Error");
 	}
 
 	@GET

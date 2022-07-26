@@ -392,9 +392,9 @@
             <bean autowire="byName" class="org.oscarehr.ws.rest.ClinicService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ConsultationWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.DecisionSupportWebService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicMergeService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.DemographicsService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicMergeService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicCareTrackerWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicDocumentsWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.demographic.DemographicDocumentWebService"/>
@@ -455,9 +455,9 @@
 			<bean autowire="byName" class="org.oscarehr.ws.rest.PreventionService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ProductDispensingService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ProgramService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.ProviderService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.ProviderPreferenceWebService"/>
-			<bean autowire="byName" class="org.oscarehr.ws.rest.ProvidersService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.provider.ProviderWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.provider.ProviderPreferenceWebService"/>
+			<bean autowire="byName" class="org.oscarehr.ws.rest.provider.ProvidersWebService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.RecordUxService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ReferralDoctorsService"/>
 			<bean autowire="byName" class="org.oscarehr.ws.rest.ReportByTemplateService"/>

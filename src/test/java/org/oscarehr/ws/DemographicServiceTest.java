@@ -28,16 +28,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.oscarehr.ws.rest.DemographicMergeService;
-import org.oscarehr.ws.rest.DemographicService;
-import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
-import org.oscarehr.ws.rest.to.model.DemographicMergedTo1;
 import org.oscarehr.ws.rest.to.model.DemographicTo1;
 
 public class DemographicServiceTest extends BaseRestServiceTest {

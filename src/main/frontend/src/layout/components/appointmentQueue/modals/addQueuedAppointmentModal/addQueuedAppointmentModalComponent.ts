@@ -27,7 +27,7 @@ import {
 	JUNO_STYLE,
 	LABEL_POSITION
 } from "../../../../../common/components/junoComponentConstants";
-import {AqsQueuedAppointmentApi, MhaIntegrationApi, SitesApi, SystemPreferenceApi} from "../../../../../../generated";
+import {AqsQueuedAppointmentApi, MhaIntegrationApi, ProvidersServiceApi, SitesApi, SystemPreferenceApi} from "../../../../../../generated";
 import {SystemProperties} from "../../../../../common/services/systemPreferenceServiceConstants";
 import {API_BASE_PATH} from "../../../../../lib/constants/ApiConstants";
 import ToastErrorHandler from "../../../../../lib/error/handler/ToastErrorHandler";
@@ -51,13 +51,14 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		         $uibModal,
 		         providerService)
 	{
-		let ctrl = this;
+		const ctrl = this;
 
 		// load api
-		let systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, API_BASE_PATH);
-		let sitesApi = new SitesApi($http, $httpParamSerializer, API_BASE_PATH);
-		let aqsQueuedAppointmentApi = new AqsQueuedAppointmentApi($http, $httpParamSerializer, API_BASE_PATH);
-		let mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer, API_BASE_PATH);
+		ctrl.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, API_BASE_PATH);
+		ctrl.sitesApi = new SitesApi($http, $httpParamSerializer, API_BASE_PATH);
+		ctrl.aqsQueuedAppointmentApi = new AqsQueuedAppointmentApi($http, $httpParamSerializer, API_BASE_PATH);
+		ctrl.mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer, API_BASE_PATH);
+		ctrl.providersApi = new ProvidersServiceApi($http, $httpParamSerializer, API_BASE_PATH);
 		ctrl.errorHandler = new ToastErrorHandler();
 		ctrl.toastService = new ToastService();
 
@@ -68,6 +69,7 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		ctrl.bookProviderNo = null;
 		ctrl.providerOptions = [];
 		ctrl.isMultisiteEnabled = false;
+		ctrl.bookingSiteId = null;
 		ctrl.isLoading = true;
 		ctrl.providerHasSite = false;
 
@@ -76,26 +78,28 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			try
 			{
 				ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
-
-				ctrl.isMultisiteEnabled = (await systemPreferenceApi.getPropertyEnabled(SystemProperties.Multisites)).data.body;
+				ctrl.isMultisiteEnabled = (await ctrl.systemPreferenceApi.getPropertyEnabled(SystemProperties.Multisites)).data.body;
+				if(ctrl.isMultisiteEnabled)
+				{
+					ctrl.bookingSiteId = ctrl.resolve.siteId || await ctrl.siteFromClinicId(ctrl.resolve.clinicId);
+				}
 				ctrl.providerOptions = await ctrl.loadProviderList();
 			}
-			catch(err)
+			catch(e)
 			{
-				ctrl.errorHandler.handleError(err);
+				ctrl.errorHandler.handleError(e);
 			}
 			ctrl.isLoading = false;
 		}
 
 		ctrl.loadProviderList = async () =>
 		{
-			let providers = (await providerService.searchProviders({active: true}));
-
+			let providers = (await ctrl.providersApi.searchProviders(null, null, null, null, ctrl.bookingSiteId)).data.body;
 			return providers.map((provider) =>
 			{
 				return {
-					value: provider.providerNo,
-					label: `${provider.name} (${provider.providerNo})`,
+					value: provider.id,
+					label: `${provider.lastName}, ${provider.firstName} (${provider.id})`,
 				};
 			});
 		}
@@ -112,7 +116,7 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			{
 				bookingSiteId = await ctrl.siteFromClinicId(ctrl.resolve.clinicId);
 			}
-			const siteList = (await sitesApi.getSitesByProvider(ctrl.bookProviderNo)).data.body;
+			const siteList = (await ctrl.sitesApi.getSitesByProvider(ctrl.bookProviderNo)).data.body;
 
 			for (let providerSite of siteList)
 			{
@@ -173,7 +177,7 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			try
 			{
 				ctrl.isLoading = true;
-				return (await aqsQueuedAppointmentApi.bookQueuedAppointment(ctrl.resolve.queueId, ctrl.resolve.queuedAppointmentId, bookQueuedAppointmentTransfer)).data.body;
+				return (await ctrl.aqsQueuedAppointmentApi.bookQueuedAppointment(ctrl.resolve.queueId, ctrl.resolve.queuedAppointmentId, bookQueuedAppointmentTransfer)).data.body;
 			}
 			catch(error)
 			{
@@ -198,7 +202,7 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		// get the appointment site from the clinic id
 		ctrl.siteFromClinicId = async (clinicId) =>
 		{
-			let integrationList = (await mhaIntegrationApi.searchIntegrations(null, true)).data.body;
+			let integrationList = (await ctrl.mhaIntegrationApi.searchIntegrations(null, true)).data.body;
 
 			for (let integration of integrationList)
 			{

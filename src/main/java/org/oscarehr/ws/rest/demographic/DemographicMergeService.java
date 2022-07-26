@@ -21,11 +21,12 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest;
+package org.oscarehr.ws.rest.demographic;
 
 import org.oscarehr.demographic.entity.DemographicMerged;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.security.model.Permission;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.conversion.DemographicMergedConverter;
 import org.oscarehr.ws.rest.to.OscarSearchResponse;
 import org.oscarehr.ws.rest.to.model.DemographicMergedTo1;

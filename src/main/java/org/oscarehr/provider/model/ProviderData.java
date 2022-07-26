@@ -29,6 +29,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.oscarehr.common.model.AbstractModel;
+import org.oscarehr.common.model.Site;
 import org.oscarehr.encounterNote.model.CaseManagementNote;
 import org.oscarehr.providerBilling.model.ProviderBilling;
 
@@ -38,6 +39,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
@@ -51,6 +54,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
@@ -175,7 +179,7 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 	private boolean superAdmin = false;
 
     // this mapping allows jpa relational query joins in the dao
-	@OneToMany(fetch=FetchType.LAZY , mappedBy="provider")
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="provider")
 	private List<CaseManagementNote> caseManagementNotes;
 
 	/* -- Province specific -- */
@@ -205,6 +209,10 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 	
 	@Column(name = "ontario_cno_number")
 	private String ontarioCnoNumber;
+
+	@ManyToMany(fetch=FetchType.LAZY)
+	@JoinTable(name = "providersite", joinColumns = @JoinColumn(name="provider_no"), inverseJoinColumns = @JoinColumn(name="site_id"))
+	private Set<Site> assignedSites;
 
 	/** returns a formatted name String in the form of 'first_name, last_name' */
 	public String getDisplayName()

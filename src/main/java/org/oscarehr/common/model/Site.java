@@ -18,6 +18,10 @@
 
 package org.oscarehr.common.model;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.oscarehr.provider.model.ProviderData;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,6 +38,8 @@ import javax.persistence.Transient;
 import java.util.Set;
 
 @Entity
+@Getter
+@Setter
 @Table(name="site")
 public class Site extends AbstractModel<Integer> implements java.io.Serializable
 {
@@ -92,6 +98,10 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	@Column(name="uuid")
 	private String uuid;
 
+	@ManyToMany(fetch=FetchType.LAZY)
+	@JoinTable(name = "providersite", joinColumns = @JoinColumn(name="site_id"), inverseJoinColumns = @JoinColumn(name="provider_no"))
+	private Set<ProviderData> assignedProviders;
+
 	@Transient
 	private String siteLogoDesc = null;
 	
@@ -104,7 +114,7 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	 * </pre>
 	 */
 
-	@ManyToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER)
+	@ManyToMany(cascade=CascadeType.ALL,fetch=FetchType.LAZY)
 	@JoinTable(name = "providersite",
 	joinColumns = {
 	@JoinColumn(name="site_id")
