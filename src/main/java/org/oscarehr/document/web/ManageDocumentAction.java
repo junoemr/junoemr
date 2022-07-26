@@ -45,6 +45,7 @@ import org.oscarehr.common.dao.ProviderInboxRoutingDao;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.demographic.dao.DemographicDao;
+import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.document.dao.CtlDocumentDao;
 import org.oscarehr.document.dao.DocumentDao;
 import org.oscarehr.document.model.CtlDocument;
@@ -101,15 +102,18 @@ import java.util.ResourceBundle;
 /**
  * @author jaygallagher
  */
-public class ManageDocumentAction extends DispatchAction {
+public class ManageDocumentAction extends DispatchAction
+{
+	private static final Logger logger = MiscUtils.getLogger();
 
-	private static Logger logger = MiscUtils.getLogger();
-
-	private DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
-	private CtlDocumentDao ctlDocumentDao = SpringUtils.getBean(CtlDocumentDao.class);
-	private ProviderInboxRoutingDao providerInboxRoutingDAO = SpringUtils.getBean(ProviderInboxRoutingDao.class);
-	private SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
-	private DocumentService documentService = SpringUtils.getBean(DocumentService.class);
+	private final DocumentDao documentDao = SpringUtils.getBean(DocumentDao.class);
+	private final DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
+	private final EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
+	private final ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
+	private final CtlDocumentDao ctlDocumentDao = SpringUtils.getBean(CtlDocumentDao.class);
+	private final ProviderInboxRoutingDao providerInboxRoutingDAO = SpringUtils.getBean(ProviderInboxRoutingDao.class);
+	private final SecurityInfoManager securityInfoManager = SpringUtils.getBean(SecurityInfoManager.class);
+	private final DocumentService documentService = SpringUtils.getBean(DocumentService.class);
 	private final InboxManager inboxManager = SpringUtils.getBean(InboxManager.class);
 
 	public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
@@ -162,7 +166,11 @@ public class ManageDocumentAction extends DispatchAction {
 				// Removes the link to the "0" provider so that the document no longer shows up as "unclaimed"
 				providerInboxRoutingDAO.removeLinkFromDocument(documentId, "0");
 			}
-			saveDocNote(request, document.getDocdesc(), Integer.parseInt(demographicNoStr), Integer.parseInt(documentIdStr));
+			// sometimes routes to -1, which indicates unassigned
+			if(demographicNo > 0)
+			{
+				saveDocNote(request, document.getDocdesc(), demographicDao.find(demographicNo), Integer.parseInt(documentIdStr));
+			}
 		}
 		catch(Exception e)
 		{
@@ -267,35 +275,26 @@ public class ManageDocumentAction extends DispatchAction {
 		return demoName;
 	}
 
-	private void saveDocNote(final HttpServletRequest request, String docDesc, Integer demog, Integer documentId)
+	private void saveDocNote(final HttpServletRequest request, String docDesc, Demographic demographic, Integer documentId)
 	{
-		EncounterNoteService encounterNoteService = SpringUtils.getBean(EncounterNoteService.class);
-		DemographicDao demographicDao = (DemographicDao) SpringUtils.getBean("demographic.dao.DemographicDao");
-		ProviderDataDao providerDao = SpringUtils.getBean(ProviderDataDao.class);
-
 		Date now = EDocUtil.getDmsDateTimeAsDate();
 
 		HttpSession se = request.getSession();
 		String user_no = (String) se.getAttribute("user");
 		String prog_no = new EctProgram(se).getProgram(user_no);
 
-		ProviderData systemProvider = providerDao.find("-1");
-		ProviderData provider = systemProvider;
-		if(user_no != null)
-		{
-			provider = providerDao.find(user_no);
-		}
+		ProviderData provider = providerDao.find(user_no);
 
-		String strNote = "Document " + docDesc + " created at " + now + " by " + provider.getFirstName() + " " + provider.getLastName() + ".";
+		String strNote = "Document " + docDesc + " created at " + now + " by " + provider.getDisplayName() + ".";
 
 		CaseManagementNote cmn = new CaseManagementNote();
 		cmn.setUpdateDate(now);
 		cmn.setObservationDate(now);
-		cmn.setDemographic(demographicDao.find(demog));
+		cmn.setDemographic(demographic);
 		cmn.setNote(strNote);
 		cmn.setProvider(provider);
 		cmn.setSigned(true);
-		cmn.setSigningProvider(systemProvider);
+		cmn.setSigningProvider(provider);
 		cmn.setProgramNo(prog_no);
 		cmn.setHistory(strNote);
 
