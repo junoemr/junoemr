@@ -83,6 +83,7 @@
 		updateParent = "true";
 
 	ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	ProviderSearchService providerSearchService = SpringUtils.getBean(ProviderSearchService.class);
 	OscarAppointmentDao appointmentDao = SpringUtils.getBean(OscarAppointmentDao.class);
 
 	GregorianCalendar now = new GregorianCalendar();
@@ -109,6 +110,8 @@
 <%@page import="java.util.GregorianCalendar" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.oscarehr.provider.service.ProviderSearchService" %>
+<%@ page import="org.oscarehr.provider.model.ProviderData" %>
 
 <%@ taglib uri="/WEB-INF/struts-bean.tld" prefix="bean" %>
 <%@ taglib uri="/WEB-INF/struts-html.tld" prefix="html" %>
@@ -449,11 +452,11 @@
 		Site site = null;
 		for (int i=0; i<sites.size(); i++)
 		{ %>
-			_providers["<%= sites.get(i).getSiteId() %>"] = "<% Iterator<Provider> iter = sites.get(i).getProviders().iterator();
+			_providers["<%= sites.get(i).getSiteId() %>"] = "<% Iterator<ProviderData> iter = providerSearchService.getBySite(sites.get(i).getSiteId()).iterator();
 			while (iter.hasNext())
 			 {
-				Provider p=iter.next();
-				if ("1".equals(p.getStatus()))
+				ProviderData p=iter.next();
+				if (p.isActive())
 				{
 					%><option value='<%= p.getProviderNo() %>'><%= p.getLastName() %>, <%= p.getFirstName() %></option><%
 				}

@@ -346,4 +346,9 @@ public class ProviderData extends AbstractModel<String> implements Serializable
 		}
 		return this.getPractitionerNo();
 	}
+
+	public boolean isActive()
+	{
+		return this.status.equals(PROVIDER_STATUS_ACTIVE);
+	}
 }

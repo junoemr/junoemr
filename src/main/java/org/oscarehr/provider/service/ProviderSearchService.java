@@ -32,7 +32,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service("provider.service.ProviderSearchService")
 @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -53,6 +55,21 @@ public class ProviderSearchService
 	public int providerCriteriaSearchCount(ProviderCriteriaSearch criteriaSearch)
 	{
 		return providerDataDao.criteriaSearchCount(criteriaSearch);
+	}
+
+	/**
+	 * @return providers assigned to the given site, ordered by lastName, firstName
+	 * @deprecated for legacy use only
+	 */
+	@Deprecated
+	public List<ProviderData> getBySite(Integer siteId)
+	{
+		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+		criteriaSearch.setSiteId(siteId);
+		return providerDataDao.criteriaSearch(criteriaSearch)
+				.stream()
+				.sorted(Comparator.comparing((ProviderData o) -> (o.getLastName() + o.getFirstName())))
+				.collect(Collectors.toList());
 	}
 
 }

@@ -60,6 +60,7 @@
 
 <%
 	ProfessionalSpecialistDao professionalSpecialistDao = (ProfessionalSpecialistDao) SpringUtils.getBean("professionalSpecialistDao");
+	ProviderSearchService providerSearchService = SpringUtils.getBean(ProviderSearchService.class);
     LoggedInInfo loggedInInfo = LoggedInInfo.getLoggedInInfoFromSession(request);
 %>
 <jsp:useBean id="providerBean" class="java.util.Properties"
@@ -545,7 +546,10 @@
 <%@page import="org.oscarehr.util.MiscUtils"%>
 <%@page import="org.oscarehr.common.dao.ProviderPreferenceDao"%>
 <%@page import="org.oscarehr.util.SpringUtils"%>
-<%@page import="org.oscarehr.common.model.ProviderPreference"%><html>
+<%@page import="org.oscarehr.common.model.ProviderPreference"%>
+<%@ page import="org.oscarehr.provider.service.ProviderSearchService" %>
+<%@ page import="org.oscarehr.provider.model.ProviderData" %>
+<html>
 <head>
 <title>Ontario Billing</title>
 <style type="text/css">
@@ -1363,14 +1367,13 @@ if(checkFlag == null) checkFlag = "0";
       %> <script>
 var _providers = [];
 <%	for (int i=0; i<sites.size(); i++) { 
-	Set<Provider> siteProviders = sites.get(i).getProviders();
-	List<Provider>  siteProvidersList = new ArrayList<Provider> (siteProviders);
-     Collections.sort(siteProvidersList,(new Provider()).ComparatorName());%>
-	_providers["<%= sites.get(i).getName() %>"]="<% Iterator<Provider> iter = siteProvidersList.iterator();
+	List<ProviderData> siteProvidersList = providerSearchService.getBySite(sites.get(i).getSiteId());
+    %>
+	_providers["<%= sites.get(i).getName() %>"]="<% Iterator<ProviderData> iter = siteProvidersList.iterator();
 	while (iter.hasNext()) {
-		Provider p=iter.next();
-		if ("1".equals(p.getStatus()) && StringUtils.isNotBlank(p.getOhipNo())) {
-	%><option value='<%= p.getProviderNo() %>|<%= p.getOhipNo() %>' ><%=p.getLastName()%>, <%=p.getFirstName()%></option><%}}%>";
+		ProviderData p=iter.next();
+		if (p.isActive() && StringUtils.isNotBlank(p.getOhipNo())) {
+	%><option value='<%= p.getId() %>|<%= p.getOhipNo() %>' ><%=p.getLastName()%>, <%=p.getFirstName()%></option><%}}%>";
 <%}%>
 function changeSite(sel) {
 	sel.form.xml_provider.innerHTML=sel.value=="none"?"":_providers[sel.value];
