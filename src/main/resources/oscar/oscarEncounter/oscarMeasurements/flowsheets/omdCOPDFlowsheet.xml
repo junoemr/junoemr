@@ -6,7 +6,7 @@
     <indicator key="HIGH 1" colour="#E00000" />
     
     <item measurement_type="FEV1" display_name="Spirometry Results" guideline="FEV 1 percent of Predicted" graphable="no" value_name="Value" />
-    <measurement type="FEV1" typeDesc="Forced Expiratory Volume 1 Second" typeDisplayName="" measuringInstrc="Forced Expiratory Volume 1 Second">
+    <measurement type="FEV1" typeDesc="Forced Expiratory Volume 1 Second" typeDisplayName="Forced Expiratory Volume 1 Second" measuringInstrc="Forced Expiratory Volume 1 Second">
         <validationRule name="Yes/No" maxValue="" minValue="" isDate="" isNumeric="" regularExp="YES|yes|Yes|Y|NO|no|No|N" maxLength="" minLength="" />
     </measurement>
     <item measurement_type="CODC" display_name="COD Classification" guideline="" graphable="no" value_name="Class" />

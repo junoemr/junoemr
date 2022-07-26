@@ -308,7 +308,7 @@
 	<validationRule name="Numeric Value: 0 to 50" maxValue="50" minValue="0" isDate="" isNumeric="1" regularExp="" maxLength="" minLength=""/>
 	</measurement>
 	    
-	<measurement type="RETI" typeDesck="Retinopathy" typeDisplayName="Retinopathy" measuringInstrc="Discussed">
+	<measurement type="RETI" typeDesc="Retinopathy" typeDisplayName="Retinopathy" measuringInstrc="Discussed">
 		<validationRule name="Yes/No" maxValue="" minValue="" isDate="" isNumeric="" regularExp="YES|yes|Yes|Y|NO|no|No|N" maxLength="" minLength="" />
 	</measurement>
 	    
