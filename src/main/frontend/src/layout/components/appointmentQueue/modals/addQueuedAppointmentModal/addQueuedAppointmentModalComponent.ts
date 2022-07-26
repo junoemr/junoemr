@@ -70,8 +70,10 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		ctrl.bookingSiteId = null;
 		ctrl.isLoading = true;
 		ctrl.providerHasSite = false;
+		ctrl.currentUser = null;
+		ctrl.currentUserSiteAssignable = false;
 
-		ctrl.$onInit = async () =>
+		ctrl.$onInit = async (): Promise<void> =>
 		{
 			try
 			{
@@ -81,7 +83,16 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 				{
 					ctrl.bookingSiteId = ctrl.resolve.siteId || await ctrl.siteFromClinicId(ctrl.resolve.clinicId);
 				}
-				ctrl.providerOptions = await ctrl.loadProviderList();
+
+				let responses = await Promise.all([
+					providerService.getMe(),
+					ctrl.loadProviderList(),
+				]);
+
+				ctrl.currentUser = responses[0];
+				ctrl.providerOptions = responses[1];
+
+				ctrl.currentUserSiteAssignable = Boolean(ctrl.providerOptions.find(option => option.value === ctrl.currentUser.providerNo));
 			}
 			catch(e)
 			{
@@ -100,60 +111,20 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			return pagedResults.body;
 		}
 
-		ctrl.checkProviderSite = async () =>
+		ctrl.assignToMe = (): void =>
 		{
-			if (!ctrl.isMultisiteEnabled)
+			if(ctrl.currentUserSiteAssignable)
 			{
-				return true;
-			}
-
-			let bookingSiteId = ctrl.resolve.siteId;
-			if (!ctrl.resolve.siteId)
-			{
-				bookingSiteId = await ctrl.siteFromClinicId(ctrl.resolve.clinicId);
-			}
-			const siteList = (await ctrl.sitesApi.getSitesByProvider(ctrl.bookProviderNo)).data.body;
-
-			for (let providerSite of siteList)
-			{
-				if (providerSite.siteId === bookingSiteId)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-
-		ctrl.assignToMe = async () =>
-		{
-			try
-			{
-				ctrl.bookProviderNo = (await providerService.getMe()).providerNo;
-				ctrl.providerHasSite = false;
-				ctrl.providerHasSite = await ctrl.checkProviderSite();
-			}
-			catch(e)
-			{
-				ctrl.errorHandler.handleError(e);
+				ctrl.bookProviderNo = ctrl.currentUser.providerNo;
 			}
 		}
 
-		ctrl.onProviderSelect = async (option) =>
+		ctrl.onProviderSelect = (option: JunoSelectOption): void =>
 		{
-			try
-			{
-				ctrl.bookProviderNo = option.value;
-				ctrl.providerHasSite = false;
-				ctrl.providerHasSite = await ctrl.checkProviderSite();
-				$scope.$digest();
-			}
-			catch(e)
-			{
-				ctrl.errorHandler.handleError(e);
-			}
+			ctrl.bookProviderNo = option.value;
 		}
 
-		ctrl.bookQueuedAppointment = async () =>
+		ctrl.bookQueuedAppointment = async (): Promise<void> =>
 		{
 			let siteId = null;
 			if (ctrl.isMultisiteEnabled)
@@ -196,7 +167,7 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		}
 
 		// get the appointment site from the clinic id
-		ctrl.siteFromClinicId = async (clinicId) =>
+		ctrl.siteFromClinicId = async (clinicId): Promise<number> =>
 		{
 			let integrationList = (await ctrl.mhaIntegrationApi.searchIntegrations(null, true)).data.body;
 
@@ -215,7 +186,7 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			throw "No integration for clinicId [" + clinicId + "]";
 		}
 
-		ctrl.bookAndStartTelehealth = async () =>
+		ctrl.bookAndStartTelehealth = async (): Promise<void> =>
 		{
 			let appointment = await ctrl.bookQueuedAppointment();
 			if (appointment)
@@ -224,12 +195,12 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			}
 		}
 
-		ctrl.onCancel = () =>
+		ctrl.onCancel = (): void =>
 		{
 			ctrl.modalInstance.close();
 		};
 
-		ctrl.bookTooltip = (okMsg) =>
+		ctrl.bookTooltip = (okMsg: string): string =>
 		{
 			if (!ctrl.bookProviderNo)
 			{
@@ -242,14 +213,27 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			return okMsg;
 		}
 
-		ctrl.bookButtonDisabled = () =>
+		ctrl.assignToMeTooltip = (): string =>
 		{
-			return !ctrl.bookProviderNo || ctrl.isLoading || !ctrl.providerHasSite;
+			if(ctrl.assignToMeButtonDisabled())
+			{
+				return "Provider and queued appointment need to have the same site";
+			}
 		}
 
-		ctrl.bookVirtualButtonDisabled = () =>
+		ctrl.bookButtonDisabled = (): boolean =>
 		{
-			return !ctrl.bookProviderNo || ctrl.isLoading || !ctrl.providerHasSite || !ctrl.resolve.isVirtual;
+			return !ctrl.bookProviderNo || ctrl.isLoading;
+		}
+
+		ctrl.bookVirtualButtonDisabled = (): boolean =>
+		{
+			return !ctrl.bookProviderNo || ctrl.isLoading || !ctrl.resolve.isVirtual;
+		}
+
+		ctrl.assignToMeButtonDisabled = (): boolean =>
+		{
+			return !ctrl.currentUserSiteAssignable || ctrl.isLoading;
 		}
 
 	}]

@@ -4,10 +4,10 @@
 
 	<div class="content">
 		<div ng-if="!$ctrl.isLoading">
-			<h5 class="title juno-text-primary">Move Queued Appointment to Schedule </h5>
+			<h5 class="title juno-text-primary">Move Queued Appointment to Schedule</h5>
 
 			<p class="juno-text">
-				Select which schedule you want to move the queued appointment to.
+				Assign the queued appointment to selected provider's schedule.
 			</p>
 
 			<div class="center-options flex-row align-items-flex-end">
@@ -20,12 +20,17 @@
 				</juno-typeahead>
 
 				<juno-button ng-click="$ctrl.assignToMe()"
+				             disabled="$ctrl.assignToMeButtonDisabled()"
+				             title="{{$ctrl.assignToMeTooltip()}}"
 				             component-style="$ctrl.resolve.style"
 				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
 					Assign To Me
 				</juno-button>
 			</div>
+			<span class="body-smallest">
+				Note: Check that provider and queue are set to the same site if unavailable
+			</span>
 		</div>
 		<juno-loading-indicator ng-if="$ctrl.isLoading"
 		                        class="loading-indicator-container"
