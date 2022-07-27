@@ -42,6 +42,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.log4j.Logger;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.oscarLab.ca.all.spireHapiExt.v23.message.ORU_R01;
 
@@ -964,4 +965,13 @@ public class SpireHandler extends ORU_R01MessageHandler
     	
     	return "";
     }
+
+	public ProviderCriteriaSearch getProviderMatchingCriteria(String routingId)
+	{
+		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+		criteriaSearch.setProviderNo(routingId);
+		criteriaSearch.setActiveStatus(true);
+		criteriaSearch.setLimit(1);
+		return criteriaSearch;
+	}
 }

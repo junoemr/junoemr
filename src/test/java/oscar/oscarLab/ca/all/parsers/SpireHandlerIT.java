@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package oscar.oscarLab.ca.all.parsers.AHS.v251;
+package oscar.oscarLab.ca.all.parsers;
 
 import com.google.common.collect.Lists;
 import integration.tests.config.TestConfig;
@@ -30,8 +30,6 @@ import org.oscarehr.JunoApplication;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import oscar.oscarLab.ca.all.parsers.AbstractMessageHandlerTestBase;
-import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,15 +39,13 @@ import java.util.Map;
 @SpringBootTest(
 		classes = {JunoApplication.class, TestConfig.class},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ConnectCareProviderCommunicationsHandlerIT extends AbstractMessageHandlerTestBase
+public class SpireHandlerIT extends AbstractMessageHandlerTestBase
 {
-	private static final String OHIP_1 = "12345";
-
 	@Override
 	protected MessageHandler getTestHandler()
 	{
 		// use Mockito to avoid needing to parse an HL7 message in the real handler construction etc.
-		MessageHandler testHandler = Mockito.mock(ConnectCareProviderCommunicationsHandler.class);
+		MessageHandler testHandler = Mockito.mock(SpireHandler.class);
 		Mockito.doCallRealMethod().when(testHandler).getProviderMatchingCriteria(Mockito.anyString());
 		return testHandler;
 	}
@@ -57,13 +53,9 @@ public class ConnectCareProviderCommunicationsHandlerIT extends AbstractMessageH
 	@Override
 	protected List<ProviderData> getTestProviders()
 	{
-		ProviderData provider1 = buildSimpleProvider("1", "match_ohip", "one");
-		provider1.setOhipNo(OHIP_1);
-
+		ProviderData provider1 = buildSimpleProvider("1", "match_provider", "one");
 		ProviderData provider2 = buildSimpleProvider("2", "match_none_inactive", "two");
-		provider2.setOhipNo(OHIP_1);
 		provider2.setStatus(ProviderData.PROVIDER_STATUS_INACTIVE);
-
 		ProviderData provider3 = buildSimpleProvider("3", "match_none_unset_numbers", "three");
 
 		return Lists.newArrayList(provider1, provider2, provider3);
@@ -73,7 +65,7 @@ public class ConnectCareProviderCommunicationsHandlerIT extends AbstractMessageH
 	protected Map<String, List<String>> getProviderMatchingMap()
 	{
 		Map<String, List<String>> matchingMap = new HashMap<>();
-		matchingMap.put(OHIP_1, Lists.newArrayList("1"));
+		matchingMap.put("1", Lists.newArrayList("1"));
 
 		return matchingMap;
 	}
