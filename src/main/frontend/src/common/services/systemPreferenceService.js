@@ -25,14 +25,20 @@
 
  */
 
+import {SystemPreferenceApi} from "../../../generated";
+import {API_BASE_PATH} from "../../lib/constants/ApiConstants";
+
 angular.module("Common.Services").service("systemPreferenceService", [
 	'$q',
+	'$http',
+	'$httpParamSerializer',
 	'junoHttp',
-	function($q, junoHttp)
+	function($q, $http, $httpParamSerializer, junoHttp)
 	{
 		var service = {};
 
 		service.apiPath = '../ws/rs/systemPreference';
+		service.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, API_BASE_PATH);
 
 		service.getPreference = function getPreference(key, defaultValue)
 		{
@@ -86,6 +92,11 @@ angular.module("Common.Services").service("systemPreferenceService", [
 				});
 			return deferred.promise;
 		};
+
+		service.getPropertyEnabled = async (key) =>
+		{
+			return (await service.systemPreferenceApi.getPropertyEnabled(key)).data.body;
+		}
 
 		return service;
 	}

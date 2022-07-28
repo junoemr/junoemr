@@ -88,6 +88,7 @@ public class ProvidersWebService extends AbstractServiceImpl
 		criteriaSearch.setLastName(lastName);
 		criteriaSearch.setPractitionerNo(practitionerNumber);
 		criteriaSearch.setSiteId(siteId);
+		criteriaSearch.setProviderType(type);
 		criteriaSearch.setActiveStatus(active);
 
 		if(perPage != null)

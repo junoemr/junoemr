@@ -3,7 +3,7 @@
 									 modal-instance="$ctrl.modalInstance">
 
 	<div class="content">
-		<div ng-if="!$ctrl.isLoading">
+		<div ng-if="!$ctrl.loadingQueue.isLoading">
 			<h5 class="title juno-text-primary">Move Queued Appointment to Schedule</h5>
 
 			<p class="juno-text">
@@ -32,7 +32,7 @@
 				Note: Check that provider and queue are set to the same site if unavailable
 			</span>
 		</div>
-		<juno-loading-indicator ng-if="$ctrl.isLoading"
+		<juno-loading-indicator ng-if="$ctrl.loadingQueue.isLoading"
 		                        class="loading-indicator-container"
 		                        message="Scheduling..."
 		                        message-alignment="vertical"

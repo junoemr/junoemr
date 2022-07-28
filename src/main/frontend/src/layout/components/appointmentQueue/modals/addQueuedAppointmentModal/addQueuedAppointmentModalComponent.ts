@@ -21,8 +21,13 @@
  * Canada
  */
 
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../../../common/components/junoComponentConstants";
-import {AqsQueuedAppointmentApi, MhaIntegrationApi, SitesApi, SystemPreferenceApi} from "../../../../../../generated";
+import {
+	JUNO_BUTTON_COLOR,
+	JUNO_BUTTON_COLOR_PATTERN,
+	JUNO_STYLE,
+	LABEL_POSITION
+} from "../../../../../common/components/junoComponentConstants";
+import {AqsQueuedAppointmentApi, MhaIntegrationApi, SitesApi} from "../../../../../../generated";
 import {SystemProperties} from "../../../../../common/services/systemPreferenceServiceConstants";
 import {API_BASE_PATH} from "../../../../../lib/constants/ApiConstants";
 import ToastErrorHandler from "../../../../../lib/error/handler/ToastErrorHandler";
@@ -31,6 +36,7 @@ import ProviderSearchParams from "../../../../../lib/provider/model/ProviderSear
 import PagedResponse from "../../../../../lib/common/response/PagedResponse";
 import Provider from "../../../../../lib/provider/model/Provider";
 import {JunoSelectOption} from "../../../../../lib/common/junoSelectOption";
+import LoadingQueue from "../../../../../lib/util/LoadingQueue";
 
 angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 {
@@ -44,21 +50,23 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		"$httpParamSerializer",
 		"$uibModal",
 		"providerService",
+		"systemPreferenceService",
 		function($scope,
 		         $http,
 		         $httpParamSerializer,
 		         $uibModal,
-		         providerService)
+		         providerService,
+		         systemPreferenceService)
 	{
 		const ctrl = this;
 
 		// load api
-		ctrl.systemPreferenceApi = new SystemPreferenceApi($http, $httpParamSerializer, API_BASE_PATH);
 		ctrl.sitesApi = new SitesApi($http, $httpParamSerializer, API_BASE_PATH);
 		ctrl.aqsQueuedAppointmentApi = new AqsQueuedAppointmentApi($http, $httpParamSerializer, API_BASE_PATH);
 		ctrl.mhaIntegrationApi = new MhaIntegrationApi($http, $httpParamSerializer, API_BASE_PATH);
 		ctrl.errorHandler = new ToastErrorHandler();
 		ctrl.toastService = new ToastService();
+		ctrl.loadingQueue = new LoadingQueue();
 
 		ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 		ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
@@ -68,7 +76,6 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		ctrl.providerOptions = [];
 		ctrl.isMultisiteEnabled = false;
 		ctrl.bookingSiteId = null;
-		ctrl.isLoading = true;
 		ctrl.providerHasSite = false;
 		ctrl.currentUser = null;
 		ctrl.currentUserSiteAssignable = false;
@@ -77,8 +84,9 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 		{
 			try
 			{
+				ctrl.loadingQueue.pushLoadingState();
 				ctrl.resolve.style = ctrl.resolve.style || JUNO_STYLE.DEFAULT;
-				ctrl.isMultisiteEnabled = (await ctrl.systemPreferenceApi.getPropertyEnabled(SystemProperties.Multisites)).data.body;
+				ctrl.isMultisiteEnabled = await systemPreferenceService.getPropertyEnabled(SystemProperties.Multisites);
 				if(ctrl.isMultisiteEnabled)
 				{
 					ctrl.bookingSiteId = ctrl.resolve.siteId || await ctrl.siteFromClinicId(ctrl.resolve.clinicId);
@@ -92,13 +100,16 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 				ctrl.currentUser = responses[0];
 				ctrl.providerOptions = responses[1];
 
-				ctrl.currentUserSiteAssignable = Boolean(ctrl.providerOptions.find(option => option.value === ctrl.currentUser.providerNo));
+				ctrl.currentUserSiteAssignable = ctrl.providerOptions.some(option => option.value === ctrl.currentUser.providerNo);
 			}
 			catch(e)
 			{
 				ctrl.errorHandler.handleError(e);
 			}
-			ctrl.isLoading = false;
+			finally
+			{
+				ctrl.loadingQueue.popLoadingState();
+			}
 		}
 
 		ctrl.loadProviderList = async (): Promise<JunoSelectOption[]> =>
@@ -126,25 +137,18 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 
 		ctrl.bookQueuedAppointment = async (): Promise<void> =>
 		{
-			let siteId = null;
-			if (ctrl.isMultisiteEnabled)
-			{
-				siteId = ctrl.resolve.siteId
-				if (!siteId)
-				{
-					siteId = await ctrl.siteFromClinicId(ctrl.resolve.clinicId);
-				}
-			}
-
+			ctrl.loadingQueue.pushLoadingState();
 			let bookQueuedAppointmentTransfer = {
-				siteId: siteId,
+				siteId: ctrl.bookingSiteId,
 				providerNo: ctrl.bookProviderNo,
 			};
 
 			try
 			{
-				ctrl.isLoading = true;
-				return (await ctrl.aqsQueuedAppointmentApi.bookQueuedAppointment(ctrl.resolve.queueId, ctrl.resolve.queuedAppointmentId, bookQueuedAppointmentTransfer)).data.body;
+				return (await ctrl.aqsQueuedAppointmentApi.bookQueuedAppointment(
+					ctrl.resolve.queueId,
+					ctrl.resolve.queuedAppointmentId,
+					bookQueuedAppointmentTransfer)).data.body;
 			}
 			catch(error)
 			{
@@ -152,7 +156,7 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 			}
 			finally
 			{
-				ctrl.isLoading = false;
+				ctrl.loadingQueue.popLoadingState();
 
 				// refresh the queued appointment list
 				if (ctrl.resolve.loadQueuesCallback)
@@ -223,17 +227,17 @@ angular.module('Layout.Components.Modal').component('addQueuedAppointmentModal',
 
 		ctrl.bookButtonDisabled = (): boolean =>
 		{
-			return !ctrl.bookProviderNo || ctrl.isLoading;
+			return !ctrl.bookProviderNo || ctrl.loadingQueue.isLoading;
 		}
 
 		ctrl.bookVirtualButtonDisabled = (): boolean =>
 		{
-			return !ctrl.bookProviderNo || ctrl.isLoading || !ctrl.resolve.isVirtual;
+			return !ctrl.bookProviderNo || ctrl.loadingQueue.isLoading || !ctrl.resolve.isVirtual;
 		}
 
 		ctrl.assignToMeButtonDisabled = (): boolean =>
 		{
-			return !ctrl.currentUserSiteAssignable || ctrl.isLoading;
+			return !ctrl.currentUserSiteAssignable || ctrl.loadingQueue.isLoading;
 		}
 
 	}]
