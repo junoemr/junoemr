@@ -442,7 +442,7 @@ module.exports = {
 			'./src/admin/section/know2act/Know2actNotificationController.js',
 			'./src/admin/section/know2act/Know2actTemplateController.js',
 			'./src/admin/section/frameContent/frameContentController.js',
-			'./src/admin/section/manageAppointmentQueuesPage/manageAppointmentQueuesComponent.js',
+			'./src/admin/section/manageAppointmentQueuesPage/manageAppointmentQueuesComponent.ts',
 			'./src/admin/section/mhaConfig/components/module.js',
 			'./src/admin/section/mhaConfig/components/integrationList/integrationListComponent.js',
 			'./src/admin/section/mhaConfig/components/integrationSettings/integrationSettingsComponent.js',
