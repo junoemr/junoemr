@@ -53,11 +53,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PatientCharts_DetailsJUNOUIIT extends SeleniumTestBase
 {
-	static String patientFName = "Test";
-	static String patientLName = "Test";
-	static String patientName = patientLName + "," + patientFName;
-	String patientNameJUNO = patientLName + ", " + patientFName;
-
 	@Override
 	protected String[] getTablesToRestore()
 	{
@@ -75,7 +70,6 @@ public class PatientCharts_DetailsJUNOUIIT extends SeleniumTestBase
 		databaseUtil.createTestDemographic();
 		databaseUtil.createTestProvider();
 		databaseUtil.createProviderSite();
-
 	}
 
 	@Test
