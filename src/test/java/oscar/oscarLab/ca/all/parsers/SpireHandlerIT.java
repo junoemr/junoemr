@@ -33,7 +33,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(
 		classes = {JunoApplication.class, TestConfig.class},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class SpireHandlerIT extends AbstractMessageHandlerOhipMatchTestBase
+public class SpireHandlerIT extends AbstractMessageHandlerOhipMatchITBase
 {
 	@Override
 	protected MessageHandler getTestHandler()

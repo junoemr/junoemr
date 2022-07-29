@@ -30,7 +30,7 @@ import org.oscarehr.JunoApplication;
 import org.oscarehr.provider.model.ProviderData;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import oscar.oscarLab.ca.all.parsers.AbstractMessageHandlerTestBase;
+import oscar.oscarLab.ca.all.parsers.AbstractMessageHandlerITBase;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
 import java.util.HashMap;
@@ -41,7 +41,7 @@ import java.util.Map;
 @SpringBootTest(
 		classes = {JunoApplication.class, TestConfig.class},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CLSHandlerIT extends AbstractMessageHandlerTestBase
+public class CLSHandlerIT extends AbstractMessageHandlerITBase
 {
 	private static final String E_DELIVERY_ID_A= "A1111";
 	private static final String E_DELIVERY_ID_B= "B2222";

@@ -24,13 +24,13 @@ package oscar.oscarLab.ca.all.parsers.AHS;
 
 import com.google.common.collect.Lists;
 import org.oscarehr.provider.model.ProviderData;
-import oscar.oscarLab.ca.all.parsers.AbstractMessageHandlerTestBase;
+import oscar.oscarLab.ca.all.parsers.AbstractMessageHandlerITBase;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractMessageHandlerEDeliveryIdMatchTestBase extends AbstractMessageHandlerTestBase
+public abstract class AbstractMessageHandlerEDeliveryIdMatchITBase extends AbstractMessageHandlerITBase
 {
 	private static final String E_DELIVERY_ID_A= "A1111";
 	private static final String E_DELIVERY_ID_B= "B2222";

@@ -28,14 +28,14 @@ import org.mockito.Mockito;
 import org.oscarehr.JunoApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import oscar.oscarLab.ca.all.parsers.AHS.AbstractMessageHandlerConnectCareMatchTestBase;
+import oscar.oscarLab.ca.all.parsers.AHS.AbstractMessageHandlerConnectCareMatchITBase;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
 		classes = {JunoApplication.class, TestConfig.class},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ConnectCareDiagnosticImagingHandlerIT extends AbstractMessageHandlerConnectCareMatchTestBase
+public class ConnectCareDiagnosticImagingHandlerIT extends AbstractMessageHandlerConnectCareMatchITBase
 {
 	@Override
 	protected MessageHandler getTestHandler()

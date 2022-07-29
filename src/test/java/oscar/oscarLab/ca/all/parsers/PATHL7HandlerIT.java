@@ -33,7 +33,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(
 		classes = {JunoApplication.class, TestConfig.class},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class PATHL7HandlerIT extends AbstractMessageHandlerOhipMatchTestBase
+public class PATHL7HandlerIT extends AbstractMessageHandlerOhipMatchITBase
 {
 	@Override
 	protected MessageHandler getTestHandler()

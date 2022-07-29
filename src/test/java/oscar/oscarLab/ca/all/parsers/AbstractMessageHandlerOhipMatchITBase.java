@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractMessageHandlerOhipMatchTestBase extends AbstractMessageHandlerTestBase
+public abstract class AbstractMessageHandlerOhipMatchITBase extends AbstractMessageHandlerITBase
 {
 	private static final String OHIP_1 = "12345";
 

@@ -28,14 +28,14 @@ import org.mockito.Mockito;
 import org.oscarehr.JunoApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import oscar.oscarLab.ca.all.parsers.AbstractMessageHandlerOhipMatchTestBase;
+import oscar.oscarLab.ca.all.parsers.AbstractMessageHandlerOhipMatchITBase;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(
 		classes = {JunoApplication.class, TestConfig.class},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class OLISHL7HandlerIT extends AbstractMessageHandlerOhipMatchTestBase
+public class OLISHL7HandlerIT extends AbstractMessageHandlerOhipMatchITBase
 {
 	@Override
 	protected MessageHandler getTestHandler()

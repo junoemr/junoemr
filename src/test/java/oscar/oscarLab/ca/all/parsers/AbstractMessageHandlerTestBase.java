@@ -22,106 +22,94 @@
  */
 package oscar.oscarLab.ca.all.parsers;
 
-import ca.uhn.hl7v2.HL7Exception;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.oscarehr.common.dao.DaoTestFixtures;
-import org.oscarehr.common.dao.utils.SchemaUtils;
-import org.oscarehr.dataMigration.model.common.Person;
-import org.oscarehr.provider.dao.ProviderDataDao;
-import org.oscarehr.provider.model.ProviderData;
-import org.oscarehr.provider.search.ProviderCriteriaSearch;
-import org.oscarehr.util.DatabaseTestBase;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.oscarehr.util.MiscUtils;
+import oscar.oscarLab.ca.all.model.EmbeddedDocument;
+import oscar.oscarLab.ca.all.util.Utilities;
 
+import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class AbstractMessageHandlerTestBase extends DatabaseTestBase
+public abstract class AbstractMessageHandlerTestBase<T extends MessageHandler>
 {
-	@Autowired
-	protected ProviderDataDao providerDataDao;
+	protected abstract Map<MessageHandler, String> getExpectedAccessionMap();
+	protected abstract Map<MessageHandler, Integer> getExpectedDocumentCountMap();
+	protected abstract Map<MessageHandler, List<String>> getExpectedRoutingIdsMap();
 
-	@Override
-	protected String[] getTablesToRestore()
+	protected static List<MessageHandler> loadResourceFile(ClassLoader classLoader, String messageType, String name) throws IOException
 	{
-		return new String[]{
-				"provider"
-		};
+		File file = new File(Objects.requireNonNull(classLoader.getResource(name)).getFile());
+		MiscUtils.getLogger().info("loaded resource file success " + file.getName());
+
+		List<String> messages = Utilities.separateMessages(file);
+		return messages.stream().map((msg) -> Factory.getHandler(messageType, msg)).collect(Collectors.toList());
 	}
-
-	@BeforeClass
-	public static void classSetUp() throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException
-	{
-		if(!SchemaUtils.inited)
-		{
-			SchemaUtils.dropAndRecreateDatabase();
-		}
-		DaoTestFixtures.setupBeanFactory();
-	}
-
-	@Before
-	public void setup()
-	{
-		List<ProviderData> sampleProviders = getTestProviders();
-		for(ProviderData provider : sampleProviders)
-		{
-			providerDataDao.persist(provider);
-		}
-	}
-
-	protected abstract MessageHandler getTestHandler() throws HL7Exception;
-
-	protected abstract List<ProviderData> getTestProviders();
-
-	protected abstract Map<String, List<String>> getProviderMatchingMap();
-
 
 	@Test
-	public void test_getProviderMatchingCriteria() throws HL7Exception
+	public void testAccessionNumbers()
 	{
-		MessageHandler handler = getTestHandler();
-		Map<String, List<String>> expectedMatchingMap = getProviderMatchingMap();
-
-		for(Map.Entry<String, List<String>> entry : expectedMatchingMap.entrySet())
+		Map<MessageHandler, String> accessionMap = getExpectedAccessionMap();
+		int index = 0;
+		for(Map.Entry<MessageHandler, String> entry : accessionMap.entrySet())
 		{
-			String routingId = entry.getKey();
-			List<String> expectedProviderIds = entry.getValue();
+			MessageHandler handler = entry.getKey();
+			String expectedAccession = entry.getValue();
 
-			ProviderCriteriaSearch criteriaSearch = handler.getProviderMatchingCriteria(routingId);
-			List<ProviderData> matchingProviders = providerDataDao.criteriaSearch(criteriaSearch);
+			Assert.assertEquals("[" + index + "] Incorrect accession number", expectedAccession, handler.getAccessionNumber());
+			index++;
+		}
 
-			List<String> matchingProviderIds = matchingProviders.stream().map(ProviderData::getId).collect(Collectors.toList());
+	}
 
-			Assert.assertEquals(handler.getClass().getSimpleName() + " provider matching criteria does not match expected number of providers.\n" +
-					"ProviderMatchingMap test key: " + routingId,
-					expectedProviderIds.size(), matchingProviderIds.size());
+	@Test
+	public void testEmbeddedDocuments()
+	{
+		Map<MessageHandler, Integer> documentCountMap = getExpectedDocumentCountMap();
+		int index = 0;
+		for(Map.Entry<MessageHandler, Integer> entry : documentCountMap.entrySet())
+		{
+			MessageHandler handler = entry.getKey();
+			Integer expectedCount = entry.getValue();
 
-			for(String providerId: expectedProviderIds)
-			{
-				Assert.assertTrue("expected providerId not present in the actual results", matchingProviderIds.contains(providerId));
-			}
+			List<EmbeddedDocument> embeddedDocuments = handler.getEmbeddedDocuments();
+
+			Assert.assertEquals("[" + index + "] Incorrect number of embedded documents", (int) expectedCount, embeddedDocuments.size());
+			index++;
 		}
 	}
 
-	protected ProviderData buildSimpleProvider(String id, String firstName, String lastName)
+	@Test
+	public void testProviderRoutingIds()
 	{
-		ProviderData providerData = new ProviderData();
-		providerData.setId(id);
-		providerData.setFirstName(firstName);
-		providerData.setLastName(lastName);
-		providerData.setSex(Person.SEX.FEMALE.getValue());
-		providerData.setLastUpdateDate(new Date());
-		providerData.setSpecialty("");
-		providerData.setStatus(ProviderData.PROVIDER_STATUS_ACTIVE);
-		providerData.setProviderType(ProviderData.PROVIDER_TYPE_DOCTOR);
-		return providerData;
-	}
+		Map<MessageHandler, List<String>> routingIdsMap = getExpectedRoutingIdsMap();
+		int index = 0;
+		for(Map.Entry<MessageHandler, List<String>> entry : routingIdsMap.entrySet())
+		{
+			MessageHandler handler = entry.getKey();
+			List<String> expectedRoutingIds = entry.getValue();
+			List<String> actualRouteIds = handler.getDocNums();
 
+			for(String expectedRouteId: expectedRoutingIds)
+			{
+				Assert.assertTrue("[" + index + "] expected routeId '" + expectedRouteId + "' not present in the actual results\n" +
+								"  Expected: " + expectedRoutingIds + "\n" +
+								"    Actual: " + actualRouteIds,
+						actualRouteIds.contains(expectedRouteId));
+			}
+			for(String actualRouteId: actualRouteIds)
+			{
+				Assert.assertTrue("[" + index + "] actual routeId '" + actualRouteId + "' not present in the expected results.\n" +
+								"  Expected: " + expectedRoutingIds + "\n" +
+								"    Actual: " + actualRouteIds,
+						expectedRoutingIds.contains(actualRouteId));
+			}
+			Assert.assertEquals("[" + index + "] Incorrect number of provider routing ids", expectedRoutingIds.size(), actualRouteIds.size());
+			index++;
+		}
+	}
 }
