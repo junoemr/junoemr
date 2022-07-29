@@ -24,14 +24,12 @@
 
 package org.oscarehr.demographicArchive.dao;
 
-import java.util.List;
-
-import javax.persistence.Query;
-
 import org.oscarehr.common.dao.AbstractDao;
-import org.oscarehr.demographic.entity.DemographicExt;
 import org.oscarehr.demographicArchive.entity.DemographicExtArchive;
 import org.springframework.stereotype.Repository;
+
+import javax.persistence.Query;
+import java.util.List;
 
 @Repository
 public class DemographicExtArchiveDao extends AbstractDao<DemographicExtArchive>
@@ -41,19 +39,13 @@ public class DemographicExtArchiveDao extends AbstractDao<DemographicExtArchive>
 		super(DemographicExtArchive.class);
 	}
 
-	
-	public List<DemographicExtArchive> getDemographicExtArchiveByArchiveId(Long archiveId) {
-		Query query = entityManager.createQuery("SELECT d from DemographicExtArchive d where d.archiveId=?1");
-		query.setParameter(1, archiveId);
-		
+	public List<DemographicExtArchive> getDemographicExtArchiveByArchiveId(Long archiveId)
+	{
+		Query query = entityManager.createQuery("SELECT d FROM DemographicExtArchive d WHERE d.demographicArchive.id=:archiveId");
+		query.setParameter("archiveId", archiveId);
+
 		@SuppressWarnings("unchecked")
 		List<DemographicExtArchive> results = query.getResultList();
 		return results;
-	}
-	
-	public Integer archiveDemographicExt(DemographicExt de) {
-		DemographicExtArchive dea = new DemographicExtArchive(de);
-		persist(dea);
-		return dea.getId();
 	}
 }
