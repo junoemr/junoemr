@@ -99,14 +99,24 @@ public abstract class AbstractMessageHandlerITBase extends DatabaseTestBase
 
 			List<String> matchingProviderIds = matchingProviders.stream().map(ProviderData::getId).collect(Collectors.toList());
 
-			Assert.assertEquals(handler.getClass().getSimpleName() + " provider matching criteria does not match expected number of providers.\n" +
-					"ProviderMatchingMap test key: " + routingId,
-					expectedProviderIds.size(), matchingProviderIds.size());
-
-			for(String providerId: expectedProviderIds)
+			for(String expectedProviderId: expectedProviderIds)
 			{
-				Assert.assertTrue("expected providerId not present in the actual results", matchingProviderIds.contains(providerId));
+				Assert.assertTrue("[" + routingId + "] expected providerId '" + expectedProviderId + "' not present in the actual results\n" +
+								"  Expected: " + expectedProviderIds + "\n" +
+								"    Actual: " + matchingProviderIds,
+						matchingProviderIds.contains(expectedProviderId));
 			}
+
+			for(String actualProviderId: matchingProviderIds)
+			{
+				Assert.assertTrue("[" + routingId + "] actual providerId '" + actualProviderId + "' not present in the expected results\n" +
+								"  Expected: " + expectedProviderIds + "\n" +
+								"    Actual: " + matchingProviderIds,
+						expectedProviderIds.contains(actualProviderId));
+			}
+
+			Assert.assertEquals("[" + routingId + "] provider matching criteria does not match expected number of providers.",
+					expectedProviderIds.size(), matchingProviderIds.size());
 		}
 	}
 

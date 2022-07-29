@@ -692,7 +692,10 @@ public abstract class MessageHandler
 
 		try {
 			String providerId = getOrderingProviderNo(0, 0);
-			docNums.add(providerId);
+			if(StringUtils.isNotBlank(providerId))
+			{
+				docNums.add(providerId);
+			}
 
 			i = 0;
 			id = getResultCopiesToProviderNo(0, i);

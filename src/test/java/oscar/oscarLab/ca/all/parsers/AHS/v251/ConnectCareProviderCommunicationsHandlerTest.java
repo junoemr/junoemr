@@ -44,7 +44,7 @@ public class ConnectCareProviderCommunicationsHandlerTest extends AbstractMessag
 	public static void loadResourceFiles() throws IOException
 	{
 		conformance1Handlers = loadResourceFile(
-				ConnectCareProviderCommunicationsHandler.class.getClassLoader(),
+				ConnectCareProviderCommunicationsHandlerTest.class.getClassLoader(),
 				ConnectCareLabType.CCCOMM.name(),
 				conformanceFile1);
 	}

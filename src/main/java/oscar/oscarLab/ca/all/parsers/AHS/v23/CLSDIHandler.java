@@ -44,7 +44,6 @@ public class CLSDIHandler extends CLSHandler
 	public static final String CLSDI_MESSAGE_TYPE = "CLSDI";
 
 	private static Logger logger = Logger.getLogger(CLSDIHandler.class);
-	private static Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
 
 	protected static final String CLSDI_SENDING_APPLICATION = "OPEN ENGINE";
 	protected static final String CLSDI_SENDING_FACILITY = "DI";
@@ -85,6 +84,7 @@ public class CLSDIHandler extends CLSHandler
 	@Override
 	public boolean canUpload()
 	{
+		Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
 		String accessionNumber = this.getUniqueIdentifier();
 		Hl7TextInfo hl7TextInfo = hl7TextInfoDao.findLatestVersionByAccessionNo(accessionNumber, this.getMsgType());
 

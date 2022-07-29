@@ -24,7 +24,6 @@ package oscar.oscarLab.ca.all.parsers;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.oscarehr.util.MiscUtils;
 import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.oscarLab.ca.all.util.Utilities;
 
@@ -44,8 +43,6 @@ public abstract class AbstractMessageHandlerTestBase<T extends MessageHandler>
 	protected static List<MessageHandler> loadResourceFile(ClassLoader classLoader, String messageType, String name) throws IOException
 	{
 		File file = new File(Objects.requireNonNull(classLoader.getResource(name)).getFile());
-		MiscUtils.getLogger().info("loaded resource file success " + file.getName());
-
 		List<String> messages = Utilities.separateMessages(file);
 		return messages.stream().map((msg) -> Factory.getHandler(messageType, msg)).collect(Collectors.toList());
 	}
@@ -54,14 +51,13 @@ public abstract class AbstractMessageHandlerTestBase<T extends MessageHandler>
 	public void testAccessionNumbers()
 	{
 		Map<MessageHandler, String> accessionMap = getExpectedAccessionMap();
-		int index = 0;
 		for(Map.Entry<MessageHandler, String> entry : accessionMap.entrySet())
 		{
 			MessageHandler handler = entry.getKey();
 			String expectedAccession = entry.getValue();
+			String identifier = getHandlerId(handler);
 
-			Assert.assertEquals("[" + index + "] Incorrect accession number", expectedAccession, handler.getAccessionNumber());
-			index++;
+			Assert.assertEquals("[" + identifier + "] Incorrect accession number", expectedAccession, handler.getAccessionNumber());
 		}
 
 	}
@@ -70,16 +66,15 @@ public abstract class AbstractMessageHandlerTestBase<T extends MessageHandler>
 	public void testEmbeddedDocuments()
 	{
 		Map<MessageHandler, Integer> documentCountMap = getExpectedDocumentCountMap();
-		int index = 0;
 		for(Map.Entry<MessageHandler, Integer> entry : documentCountMap.entrySet())
 		{
 			MessageHandler handler = entry.getKey();
 			Integer expectedCount = entry.getValue();
+			String identifier = getHandlerId(handler);
 
 			List<EmbeddedDocument> embeddedDocuments = handler.getEmbeddedDocuments();
 
-			Assert.assertEquals("[" + index + "] Incorrect number of embedded documents", (int) expectedCount, embeddedDocuments.size());
-			index++;
+			Assert.assertEquals("[" + identifier + "] Incorrect number of embedded documents", (int) expectedCount, embeddedDocuments.size());
 		}
 	}
 
@@ -87,29 +82,33 @@ public abstract class AbstractMessageHandlerTestBase<T extends MessageHandler>
 	public void testProviderRoutingIds()
 	{
 		Map<MessageHandler, List<String>> routingIdsMap = getExpectedRoutingIdsMap();
-		int index = 0;
 		for(Map.Entry<MessageHandler, List<String>> entry : routingIdsMap.entrySet())
 		{
 			MessageHandler handler = entry.getKey();
 			List<String> expectedRoutingIds = entry.getValue();
 			List<String> actualRouteIds = handler.getDocNums();
+			String identifier = getHandlerId(handler);
 
 			for(String expectedRouteId: expectedRoutingIds)
 			{
-				Assert.assertTrue("[" + index + "] expected routeId '" + expectedRouteId + "' not present in the actual results\n" +
+				Assert.assertTrue("[" + identifier + "] expected routeId '" + expectedRouteId + "' not present in the actual results\n" +
 								"  Expected: " + expectedRoutingIds + "\n" +
 								"    Actual: " + actualRouteIds,
 						actualRouteIds.contains(expectedRouteId));
 			}
 			for(String actualRouteId: actualRouteIds)
 			{
-				Assert.assertTrue("[" + index + "] actual routeId '" + actualRouteId + "' not present in the expected results.\n" +
+				Assert.assertTrue("[" + identifier + "] actual routeId '" + actualRouteId + "' not present in the expected results.\n" +
 								"  Expected: " + expectedRoutingIds + "\n" +
 								"    Actual: " + actualRouteIds,
 						expectedRoutingIds.contains(actualRouteId));
 			}
-			Assert.assertEquals("[" + index + "] Incorrect number of provider routing ids", expectedRoutingIds.size(), actualRouteIds.size());
-			index++;
+			Assert.assertEquals("[" + identifier + "] Incorrect number of provider routing ids", expectedRoutingIds.size(), actualRouteIds.size());
 		}
+	}
+
+	private String getHandlerId(MessageHandler handler)
+	{
+		return handler.getUniqueIdentifier() + ":" + handler.getUniqueVersionIdentifier();
 	}
 }
