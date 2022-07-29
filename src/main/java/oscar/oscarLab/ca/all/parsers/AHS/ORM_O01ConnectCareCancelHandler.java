@@ -28,6 +28,7 @@ import ca.uhn.hl7v2.model.v23.datatype.CX;
 import ca.uhn.hl7v2.model.v23.message.ORM_O01;
 import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORM_O01MessageHandler;
 
 import java.util.ArrayList;
@@ -70,6 +71,15 @@ public abstract class ORM_O01ConnectCareCancelHandler extends ORM_O01MessageHand
 	public boolean isUnstructured()
 	{
 		return true;
+	}
+
+	public ProviderCriteriaSearch getProviderMatchingCriteria(String routingId)
+	{
+		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+		criteriaSearch.setJunctionTypeOR();
+		criteriaSearch.setAlbertaEDeliveryId(routingId);
+		criteriaSearch.setAlbertaConnectCareId(routingId);
+		return criteriaSearch;
 	}
 
 	/* ======================== PID =============================== */

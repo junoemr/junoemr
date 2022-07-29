@@ -20,7 +20,7 @@
  * Victoria, British Columbia
  * Canada
  */
-package oscar.oscarLab.ca.all.parsers.AHS.v251;
+package oscar.oscarLab.ca.all.parsers.AHS.v23;
 
 import integration.tests.config.TestConfig;
 import org.junit.runner.RunWith;
@@ -35,13 +35,13 @@ import oscar.oscarLab.ca.all.parsers.MessageHandler;
 @SpringBootTest(
 		classes = {JunoApplication.class, TestConfig.class},
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ConnectCareProviderCommunicationsHandlerIT extends AbstractMessageHandlerConnectCareMatchTestBase
+public class ConnectCareDocumentationEditHandlerIT extends AbstractMessageHandlerConnectCareMatchTestBase
 {
 	@Override
 	protected MessageHandler getTestHandler()
 	{
 		// use Mockito to avoid needing to parse an HL7 message in the real handler construction etc.
-		MessageHandler testHandler = Mockito.mock(ConnectCareProviderCommunicationsHandler.class);
+		MessageHandler testHandler = Mockito.mock(ConnectCareDocumentationEditHandler.class);
 		Mockito.doCallRealMethod().when(testHandler).getProviderMatchingCriteria(Mockito.anyString());
 		return testHandler;
 	}

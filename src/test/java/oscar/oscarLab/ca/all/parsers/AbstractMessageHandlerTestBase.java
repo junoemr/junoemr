@@ -99,7 +99,8 @@ public abstract class AbstractMessageHandlerTestBase extends DatabaseTestBase
 
 			List<String> matchingProviderIds = matchingProviders.stream().map(ProviderData::getId).collect(Collectors.toList());
 
-			Assert.assertEquals("MessageHandler provider matching criteria does not match expected number of providers",
+			Assert.assertEquals(handler.getClass().getSimpleName() + " provider matching criteria does not match expected number of providers.\n" +
+					"ProviderMatchingMap test key: " + routingId,
 					expectedProviderIds.size(), matchingProviderIds.size());
 
 			for(String providerId: expectedProviderIds)

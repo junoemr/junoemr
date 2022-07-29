@@ -30,6 +30,7 @@ import ca.uhn.hl7v2.model.v23.segment.MSH;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
 import org.oscarehr.util.SpringUtils;
 
 /**
@@ -89,6 +90,13 @@ public class CLSDIHandler extends CLSHandler
 
 		// if the report exists the new version must be a correction
 		return (hl7TextInfo == null || this.getOrderStatus().equals("C"));
+	}
+
+	public ProviderCriteriaSearch getProviderMatchingCriteria(String routingId)
+	{
+		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+		criteriaSearch.setHsoNo(routingId);
+		return criteriaSearch;
 	}
 
     /* ===================================== Hl7 Parsing ====================================== */

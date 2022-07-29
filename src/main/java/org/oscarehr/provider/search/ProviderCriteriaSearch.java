@@ -25,6 +25,8 @@ package org.oscarehr.provider.search;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Junction;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
 import org.oscarehr.provider.model.ProviderData;
@@ -42,47 +44,68 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 	
 	private String practitionerNo = null;
 	private String ohipNo = null;
+	private String hsoNo = null;
 	private String ontarioCnoNumber = null;
+	private String albertaEDeliveryId = null;
+	private String albertaConnectCareId = null;
 
 	@Override
 	public Criteria setCriteriaProperties(Criteria criteria)
 	{
+		// determine criteria join mode ('AND' filter criteria vs 'OR' filter criteria)
+		Junction junction = getEmptyJunction();
+
 		// set the search filters
 		if (getProviderNo() != null)
 		{
-			criteria.add(Restrictions.eq("id", String.valueOf(getProviderNo())));
+			junction.add(Restrictions.eq("id", String.valueOf(getProviderNo())));
 		}
 		if (getActiveStatus() != null)
 		{
-			criteria.add(Restrictions.eq("status", getActiveStatus() ? ProviderData.PROVIDER_STATUS_ACTIVE : ProviderData.PROVIDER_STATUS_INACTIVE));
+			junction.add(Restrictions.eq("status", getActiveStatus() ? ProviderData.PROVIDER_STATUS_ACTIVE : ProviderData.PROVIDER_STATUS_INACTIVE));
 		}
 		if (getFirstName() != null)
 		{
-			criteria.add(Restrictions.eq("firstName", getFirstName()));
+			junction.add(Restrictions.eq("firstName", getFirstName()));
 		}
 		if (getLastName() != null)
 		{
-			criteria.add(Restrictions.eq("lastName", getLastName()));
+			junction.add(Restrictions.eq("lastName", getLastName()));
 		}
 		if (getProviderType() != null)
 		{
-			criteria.add(Restrictions.eq("providerType", getProviderType()));
+			junction.add(Restrictions.eq("providerType", getProviderType()));
 		}
 		
 		if (getPractitionerNo() != null)
 		{
-			criteria.add(Restrictions.eq("practitionerNo", getPractitionerNo()));
+			junction.add(Restrictions.eq("practitionerNo", getPractitionerNo()));
 		}
 		if (getOhipNo() != null)
 		{
-			criteria.add(Restrictions.eq("ohipNo", getOhipNo()));
+			junction.add(Restrictions.eq("ohipNo", getOhipNo()));
+		}
+		if (getHsoNo() != null)
+		{
+			junction.add(Restrictions.eq("hsoNo", getHsoNo()));
 		}
 		
 		if (getOntarioCnoNumber() != null)
 		{
-			criteria.add(Restrictions.eq("ontarioCnoNumber", getOntarioCnoNumber()));
+			junction.add(Restrictions.eq("ontarioCnoNumber", getOntarioCnoNumber()));
 		}
 
+		if (getAlbertaEDeliveryId() != null)
+		{
+			junction.add(Restrictions.like("albertaEDeliveryIds", getAlbertaEDeliveryId(), MatchMode.ANYWHERE));
+		}
+
+		if (getAlbertaConnectCareId() != null)
+		{
+			junction.add(Restrictions.eq("albertaConnectCareId", getAlbertaConnectCareId()));
+		}
+
+		criteria.add(junction);
 		return criteria;
 	}
 }

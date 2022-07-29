@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
 import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
 import org.oscarehr.util.SpringUtils;
 import oscar.oscarLab.ca.all.parsers.AHS.AHSHandler;
 
@@ -84,6 +85,15 @@ public class CLSHandler extends AHSHandler
 	{
 		super(msg);
 		this.msg = (ORU_R01) this.message;
+	}
+
+	public ProviderCriteriaSearch getProviderMatchingCriteria(String routingId)
+	{
+		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+		criteriaSearch.setJunctionTypeOR();
+		criteriaSearch.setHsoNo(routingId);
+		criteriaSearch.setAlbertaEDeliveryId(routingId);
+		return criteriaSearch;
 	}
 
 	/* ===================================== MSH ====================================== */

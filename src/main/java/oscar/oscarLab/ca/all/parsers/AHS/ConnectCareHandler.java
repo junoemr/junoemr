@@ -30,6 +30,7 @@ import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.oscarehr.common.hl7.AHS.model.v23.message.ORU_R01;
 import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 
@@ -103,6 +104,15 @@ public abstract class ConnectCareHandler extends ORU_R01MessageHandler
 	@Override
 	public void init(String hl7Body) throws HL7Exception
 	{
+	}
+
+	public ProviderCriteriaSearch getProviderMatchingCriteria(String routingId)
+	{
+		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+		criteriaSearch.setJunctionTypeOR();
+		criteriaSearch.setAlbertaEDeliveryId(routingId);
+		criteriaSearch.setAlbertaConnectCareId(routingId);
+		return criteriaSearch;
 	}
 
 	/**

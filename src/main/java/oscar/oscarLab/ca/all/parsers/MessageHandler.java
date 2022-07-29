@@ -1601,7 +1601,6 @@ public abstract class MessageHandler
 	{
 		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
 		criteriaSearch.setOhipNo(routingId);
-		criteriaSearch.setActiveStatus(true);
 		return criteriaSearch;
 	}
 }
