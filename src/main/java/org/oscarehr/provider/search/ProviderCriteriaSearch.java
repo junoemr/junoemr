@@ -24,6 +24,7 @@ package org.oscarehr.provider.search;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Junction;
 import org.hibernate.criterion.MatchMode;
@@ -56,7 +57,7 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 		Junction junction = getEmptyJunction();
 
 		// set the search filters
-		if (getProviderNo() != null)
+		if (StringUtils.isNotBlank(getProviderNo()))
 		{
 			junction.add(Restrictions.eq("id", String.valueOf(getProviderNo())));
 		}
@@ -64,43 +65,43 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 		{
 			junction.add(Restrictions.eq("status", getActiveStatus() ? ProviderData.PROVIDER_STATUS_ACTIVE : ProviderData.PROVIDER_STATUS_INACTIVE));
 		}
-		if (getFirstName() != null)
+		if (StringUtils.isNotBlank(getFirstName()))
 		{
 			junction.add(Restrictions.eq("firstName", getFirstName()));
 		}
-		if (getLastName() != null)
+		if (StringUtils.isNotBlank(getLastName()))
 		{
 			junction.add(Restrictions.eq("lastName", getLastName()));
 		}
-		if (getProviderType() != null)
+		if (StringUtils.isNotBlank(getProviderType()))
 		{
 			junction.add(Restrictions.eq("providerType", getProviderType()));
 		}
 		
-		if (getPractitionerNo() != null)
+		if (StringUtils.isNotBlank(getPractitionerNo()))
 		{
 			junction.add(Restrictions.eq("practitionerNo", getPractitionerNo()));
 		}
-		if (getOhipNo() != null)
+		if (StringUtils.isNotBlank(getOhipNo()))
 		{
 			junction.add(Restrictions.eq("ohipNo", getOhipNo()));
 		}
-		if (getHsoNo() != null)
+		if (StringUtils.isNotBlank(getHsoNo()))
 		{
 			junction.add(Restrictions.eq("hsoNo", getHsoNo()));
 		}
 		
-		if (getOntarioCnoNumber() != null)
+		if (StringUtils.isNotBlank(getOntarioCnoNumber()))
 		{
 			junction.add(Restrictions.eq("ontarioCnoNumber", getOntarioCnoNumber()));
 		}
 
-		if (getAlbertaEDeliveryId() != null)
+		if (StringUtils.isNotBlank(getAlbertaEDeliveryId()))
 		{
 			junction.add(Restrictions.like("albertaEDeliveryIds", getAlbertaEDeliveryId(), MatchMode.ANYWHERE));
 		}
 
-		if (getAlbertaConnectCareId() != null)
+		if (StringUtils.isNotBlank(getAlbertaConnectCareId()))
 		{
 			junction.add(Restrictions.eq("albertaConnectCareId", getAlbertaConnectCareId()));
 		}
