@@ -54,7 +54,7 @@ public class QueueDocumentLinkDao extends AbstractDao<QueueDocumentLink> {
 
     public  List<QueueDocumentLink> getActiveQueueDocLink(){
     	Query query = entityManager.createQuery("SELECT q from QueueDocumentLink q where q.status=?1");
-    	query.setParameter(1, "A");
+    	query.setParameter(1, QueueDocumentLink.ACTIVE);
 
     	@SuppressWarnings("unchecked")
         List<QueueDocumentLink> queues = query.getResultList();
@@ -103,9 +103,9 @@ public class QueueDocumentLinkDao extends AbstractDao<QueueDocumentLink> {
         if(!queuedDocuments.isEmpty())
 		{
             QueueDocumentLink document = queuedDocuments.get(0);
-            if(document.getStatus() != null && !document.getStatus().equals("I"))
+            if(document.getStatus() != null && !document.getStatus().equals(QueueDocumentLink.INACTIVE))
 			{
-				document.setStatus("I");
+				document.setStatus(QueueDocumentLink.INACTIVE);
                 merge(document);
             }
         }
@@ -115,7 +115,7 @@ public class QueueDocumentLinkDao extends AbstractDao<QueueDocumentLink> {
             if(!hasQueueBeenLinkedWithDocument(dId,qId)){
                QueueDocumentLink qdl = new QueueDocumentLink();
                qdl.setDocId(dId);
-               qdl.setStatus("A");
+               qdl.setStatus(QueueDocumentLink.ACTIVE);
                qdl.setQueueId(qId);
                persist(qdl);
            }
