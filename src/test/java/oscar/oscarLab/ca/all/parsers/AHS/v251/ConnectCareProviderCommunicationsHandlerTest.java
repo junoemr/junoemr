@@ -63,6 +63,19 @@ public class ConnectCareProviderCommunicationsHandlerTest extends AbstractMessag
 	}
 
 	@Override
+	protected Map<MessageHandler, String> getExpectedHinMap()
+	{
+		Map<MessageHandler, String> matchingMap = new HashMap<>();
+		matchingMap.put(conformance1Handlers.get(0), "880097009");
+		matchingMap.put(conformance1Handlers.get(1), "880790109");
+		matchingMap.put(conformance1Handlers.get(2), "880783009");
+		matchingMap.put(conformance1Handlers.get(3), "880790109");
+		matchingMap.put(conformance1Handlers.get(4), "880783009");
+
+		return matchingMap;
+	}
+
+	@Override
 	protected Map<MessageHandler, Integer> getExpectedDocumentCountMap()
 	{
 		Map<MessageHandler, Integer> matchingMap = new HashMap<>();

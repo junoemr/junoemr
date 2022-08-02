@@ -84,6 +84,22 @@ public class AHSRuralDIHandlerTest extends AbstractMessageHandlerTestBase<AHSRur
 	}
 
 	@Override
+	protected Map<MessageHandler, String> getExpectedHinMap()
+	{
+		Map<MessageHandler, String> matchingMap = new HashMap<>();
+		matchingMap.put(conformance1Handlers.get(0), "100005101");
+		matchingMap.put(conformance2Handlers.get(0), "100025119");
+		matchingMap.put(conformance2Handlers.get(1), "100025119");
+		matchingMap.put(conformance3Handlers.get(0), "100035109");
+		matchingMap.put(conformance4Handlers.get(0), "100015105");
+		matchingMap.put(conformance5Handlers.get(0), "100005115");
+		matchingMap.put(conformance6Handlers.get(0), "100045104");
+		matchingMap.put(conformance7Handlers.get(0), "100055108");
+
+		return matchingMap;
+	}
+
+	@Override
 	protected Map<MessageHandler, Integer> getExpectedDocumentCountMap()
 	{
 		Map<MessageHandler, Integer> matchingMap = new HashMap<>();

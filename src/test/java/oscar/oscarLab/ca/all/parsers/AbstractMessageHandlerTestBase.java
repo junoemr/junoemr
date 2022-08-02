@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractMessageHandlerTestBase<T extends MessageHandler>
 {
 	protected abstract Map<MessageHandler, String> getExpectedAccessionMap();
+	protected abstract Map<MessageHandler, String> getExpectedHinMap();
 	protected abstract Map<MessageHandler, Integer> getExpectedDocumentCountMap();
 	protected abstract Map<MessageHandler, List<String>> getExpectedRoutingIdsMap();
 
@@ -59,7 +60,20 @@ public abstract class AbstractMessageHandlerTestBase<T extends MessageHandler>
 
 			Assert.assertEquals("[" + identifier + "] Incorrect accession number", expectedAccession, handler.getAccessionNumber());
 		}
+	}
 
+	@Test
+	public void testPatientHin()
+	{
+		Map<MessageHandler, String> hinMap = getExpectedHinMap();
+		for(Map.Entry<MessageHandler, String> entry : hinMap.entrySet())
+		{
+			MessageHandler handler = entry.getKey();
+			String expectedHin = entry.getValue();
+			String identifier = getHandlerId(handler);
+
+			Assert.assertEquals("[" + identifier + "] Incorrect hin", expectedHin, handler.getHealthNum());
+		}
 	}
 
 	@Test

@@ -69,6 +69,20 @@ public class AHSMeditechHandlerTest extends AbstractMessageHandlerTestBase<AHSMe
 	}
 
 	@Override
+	protected Map<MessageHandler, String> getExpectedHinMap()
+	{
+		Map<MessageHandler, String> matchingMap = new HashMap<>();
+		matchingMap.put(conformance1Handlers.get(0), "483409009");
+		matchingMap.put(conformance1Handlers.get(1), "483409009");
+		matchingMap.put(conformance1Handlers.get(2), "483409009");
+		matchingMap.put(conformance2Handlers.get(0), "483409009");
+		matchingMap.put(conformance3Handlers.get(0), "483409009");
+		matchingMap.put(conformance3Handlers.get(1), "483409009");
+
+		return matchingMap;
+	}
+
+	@Override
 	protected Map<MessageHandler, Integer> getExpectedDocumentCountMap()
 	{
 		Map<MessageHandler, Integer> matchingMap = new HashMap<>();
