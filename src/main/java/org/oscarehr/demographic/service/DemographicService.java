@@ -68,7 +68,6 @@ import oscar.OscarProperties;
 import oscar.util.ConversionUtils;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
