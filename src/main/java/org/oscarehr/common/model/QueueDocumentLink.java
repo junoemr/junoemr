@@ -40,6 +40,9 @@ import javax.persistence.Table;
 @Table(name="queue_document_link")
 public class QueueDocumentLink extends AbstractModel<Integer>{
 
+	public static final String ACTIVE = "A";
+	public static final String INACTIVE = "I";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
