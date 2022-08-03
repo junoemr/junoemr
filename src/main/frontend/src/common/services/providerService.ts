@@ -28,6 +28,10 @@
 
 import {ProvidersServiceApi, SitesApi} from "../../../generated";
 import {API_BASE_PATH} from "../../lib/constants/ApiConstants";
+import ProviderSearchParams from "../../lib/provider/model/ProviderSearchParams";
+import PagedResponse from "../../lib/common/response/PagedResponse";
+import Provider from "../../lib/provider/model/Provider";
+import ProviderToModelConverter from "../../lib/provider/converter/ProviderToModelConverter";
 
 angular.module("Common.Services").service("providerService", [
 	'$http',
@@ -37,12 +41,14 @@ angular.module("Common.Services").service("providerService", [
 	function($http, $q, junoHttp, $httpParamSerializer)
 	{
 
-		var service = {};
+		const service = this;
 
 		service.apiPath = '../ws/rs/providerService';
 
 		service.sitesApi = new SitesApi($http, $httpParamSerializer, API_BASE_PATH);
 		service.providersServiceApi = new ProvidersServiceApi($http, $httpParamSerializer, API_BASE_PATH);
+
+		service.providerToModelConverter = new ProviderToModelConverter();
 
 		service.getMe = function getMe()
 		{
@@ -84,6 +90,21 @@ angular.module("Common.Services").service("providerService", [
 		service.getActiveProviders = async () =>
 		{
 			return (await service.providersServiceApi.getActive()).data.body;
+		}
+
+		service.searchProvidersNew = async (providerSearchParams: ProviderSearchParams): Promise<PagedResponse<Provider>> =>
+		{
+			let transfer = (await service.providersServiceApi.searchProviders(
+				providerSearchParams.firstName,
+				providerSearchParams.lastName,
+				providerSearchParams.active,
+				providerSearchParams.type,
+				providerSearchParams.practitionerNo,
+				providerSearchParams.siteId,
+				providerSearchParams.page,
+				providerSearchParams.perPage,
+			)).data;
+			return new PagedResponse(service.providerToModelConverter.convertList(transfer.body), transfer.headers);
 		}
 
 		service.searchProviders = function searchProviders(filter)

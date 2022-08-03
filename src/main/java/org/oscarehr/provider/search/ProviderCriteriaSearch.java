@@ -40,9 +40,10 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 	private String providerNo = null;
 	private String lastName = null;
 	private String firstName = null;
+	private Integer siteId = null;
 	private String providerType = null;
 	private Boolean activeStatus = null;
-	
+
 	private String practitionerNo = null;
 	private String ohipNo = null;
 	private String hsoNo = null;
@@ -53,6 +54,8 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 	@Override
 	public Criteria setCriteriaProperties(Criteria criteria)
 	{
+		String alias = criteria.getAlias();
+
 		// determine criteria join mode ('AND' filter criteria vs 'OR' filter criteria)
 		Junction junction = getEmptyJunction();
 
@@ -77,7 +80,6 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 		{
 			junction.add(Restrictions.eq("providerType", getProviderType()));
 		}
-		
 		if (StringUtils.isNotBlank(getPractitionerNo()))
 		{
 			junction.add(Restrictions.eq("practitionerNo", getPractitionerNo()));
@@ -90,20 +92,22 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 		{
 			junction.add(Restrictions.eq("hsoNo", getHsoNo()));
 		}
-		
 		if (StringUtils.isNotBlank(getOntarioCnoNumber()))
 		{
 			junction.add(Restrictions.eq("ontarioCnoNumber", getOntarioCnoNumber()));
 		}
-
 		if (StringUtils.isNotBlank(getAlbertaEDeliveryId()))
 		{
 			junction.add(Restrictions.like("albertaEDeliveryIds", getAlbertaEDeliveryId(), MatchMode.ANYWHERE));
 		}
-
 		if (StringUtils.isNotBlank(getAlbertaConnectCareId()))
 		{
 			junction.add(Restrictions.eq("albertaConnectCareId", getAlbertaConnectCareId()));
+		}
+		if(getSiteId() != null)
+		{
+			criteria.createAlias(alias + ".assignedSites", "s");
+			junction.add(Restrictions.eq("s.siteId", getSiteId()));
 		}
 
 		criteria.add(junction);

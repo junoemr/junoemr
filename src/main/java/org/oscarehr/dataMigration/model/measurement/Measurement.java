@@ -23,6 +23,7 @@
 package org.oscarehr.dataMigration.model.measurement;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.oscarehr.dataMigration.model.AbstractTransientModel;
 import org.oscarehr.dataMigration.model.appointment.Appointment;
 import org.oscarehr.dataMigration.model.provider.ProviderModel;
@@ -54,9 +55,9 @@ public abstract class Measurement extends AbstractTransientModel
 	public Measurement(org.oscarehr.common.model.Measurement dbModel)
 	{
 		this.id = dbModel.getId();
-		this.measurementValue = dbModel.getDataField();
-		this.measuringInstruction = dbModel.getMeasuringInstruction();
-		this.comments = dbModel.getComments();
+		this.measurementValue = StringUtils.trimToNull(dbModel.getDataField());
+		this.measuringInstruction = StringUtils.trimToNull(dbModel.getMeasuringInstruction());
+		this.comments = StringUtils.trimToNull(dbModel.getComments());
 		this.observationDateTime = ConversionUtils.toNullableLocalDateTime(dbModel.getDateObserved());
 		this.createdDateTime = ConversionUtils.toLocalDateTime(dbModel.getCreateDate());
 	}

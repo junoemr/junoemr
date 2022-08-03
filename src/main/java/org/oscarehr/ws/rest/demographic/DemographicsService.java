@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest;
+package org.oscarehr.ws.rest.demographic;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -56,6 +56,7 @@ import org.oscarehr.util.MiscUtils;
 import org.oscarehr.web.DemographicSearchHelper;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingInbound;
 import org.oscarehr.ws.common.annotation.SkipContentLoggingOutbound;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.response.RestSearchResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;

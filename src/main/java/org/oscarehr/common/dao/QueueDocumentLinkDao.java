@@ -54,7 +54,7 @@ public class QueueDocumentLinkDao extends AbstractDao<QueueDocumentLink> {
 
     public  List<QueueDocumentLink> getActiveQueueDocLink(){
     	Query query = entityManager.createQuery("SELECT q from QueueDocumentLink q where q.status=?1");
-    	query.setParameter(1, "A");
+    	query.setParameter(1, QueueDocumentLink.ACTIVE);
 
     	@SuppressWarnings("unchecked")
         List<QueueDocumentLink> queues = query.getResultList();
@@ -91,29 +91,31 @@ public class QueueDocumentLinkDao extends AbstractDao<QueueDocumentLink> {
 
         return (queues.size()>0);
     }
-    public boolean setStatusInactive(Integer docId){
-    	if(docId == null) return false;
-    	
-        List<QueueDocumentLink> qs=getQueueFromDocument(docId);
-        if(qs.size()>0){
-            QueueDocumentLink q=qs.get(0);
-            if(q.getStatus() != null && !q.getStatus().equals("I")){
-                q.setStatus("I");
-                merge(q);
-                return true;
-            }else{
-                return false;
+
+	/**
+	 * Sets status of document to inactive "I" in queue_document_link table
+	 * @param docId id of document to set to inactive
+	 */
+    public void setStatusInactive(Integer docId)
+	{
+        List<QueueDocumentLink> queuedDocuments = getQueueFromDocument(docId);
+
+        if(!queuedDocuments.isEmpty())
+		{
+            QueueDocumentLink document = queuedDocuments.get(0);
+            if(document.getStatus() != null && !document.getStatus().equals(QueueDocumentLink.INACTIVE))
+			{
+				document.setStatus(QueueDocumentLink.INACTIVE);
+                merge(document);
             }
-        }return false;
-        //if status is not I, change to I
-        //if status is I, do nothing
+        }
     }
     public void addActiveQueueDocumentLink(Integer qId,Integer dId){
         try{
             if(!hasQueueBeenLinkedWithDocument(dId,qId)){
                QueueDocumentLink qdl = new QueueDocumentLink();
                qdl.setDocId(dId);
-               qdl.setStatus("A");
+               qdl.setStatus(QueueDocumentLink.ACTIVE);
                qdl.setQueueId(qId);
                persist(qdl);
            }

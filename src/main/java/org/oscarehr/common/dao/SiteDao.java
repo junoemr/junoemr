@@ -18,6 +18,15 @@
 
 package org.oscarehr.common.dao;
 
+import org.oscarehr.common.model.ProviderSite;
+import org.oscarehr.common.model.Site;
+import org.oscarehr.provider.dao.ProviderDataDao;
+import org.oscarehr.provider.model.ProviderData;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import oscar.util.ConversionUtils;
+
+import javax.persistence.Query;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,16 +37,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Query;
-
-import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.common.model.Provider;
-import org.oscarehr.common.model.ProviderSite;
-import org.oscarehr.common.model.Site;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-import oscar.util.ConversionUtils;
-
 @Repository
 public class SiteDao extends AbstractDao<Site> {
 
@@ -45,7 +44,7 @@ public class SiteDao extends AbstractDao<Site> {
 	private ProviderSiteDao providerSiteDao;
 
 	@Autowired
-	private ProviderDao providerDao;
+	private ProviderDataDao providerDao;
 
 	public SiteDao() {
 		super(Site.class);
@@ -83,14 +82,14 @@ public class SiteDao extends AbstractDao<Site> {
 			}
 		}
 
-		Set<Provider> providers = new HashSet<Provider>();
+		Set<ProviderData> providers = new HashSet<>();
 
 		List<ProviderSite> psList = providerSiteDao.findBySiteId(s.getSiteId());
 		for(ProviderSite ps : psList) {
-			Provider p = providerDao.getProvider(ps.getId().getProviderNo());
+			ProviderData p = providerDao.find(ps.getId().getProviderNo());
 			providers.add(p);
 		}
-		s.setProviders(providers);
+		s.setAssignedProviders(providers);
 		
 		if(s.getSiteLogoId() != null && s.getSiteLogoId().intValue()==0)
 			s.setSiteLogoId(null);

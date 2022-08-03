@@ -21,7 +21,7 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest;
+package org.oscarehr.ws.rest.demographic;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
@@ -40,6 +40,7 @@ import org.oscarehr.provider.service.RecentDemographicAccessService;
 import org.oscarehr.security.model.Permission;
 import org.oscarehr.util.LoggedInInfo;
 import org.oscarehr.util.MiscUtils;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.conversion.CaseManagementIssueConverter;
 import org.oscarehr.ws.rest.conversion.DemographicConverter;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -76,7 +77,8 @@ import java.util.List;
 @Path("/demographic")
 @Component("demographicService")
 @Tag(name = "demographic")
-public class DemographicService extends AbstractServiceImpl {
+public class DemographicService extends AbstractServiceImpl
+{
 
 	private static Logger logger = MiscUtils.getLogger();
 
