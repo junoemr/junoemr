@@ -202,15 +202,8 @@ public class DemographicService
 
 		if (searchMode == SEARCH_MODE.demographicNo)
 		{
-			try
-			{
-				Integer demoNo = Integer.parseInt(keyword);
-				demoCS.setDemographicNo(demoNo);
-			}
-			catch (NumberFormatException nfe)
-			{
-				MiscUtils.getLogger().warn("could not convert demographic no to int with error: " + nfe.getMessage());
-			}
+			Integer demoNo = Integer.parseInt(keyword);
+			demoCS.setDemographicNo(demoNo);
 		}
 		else if(searchMode == SEARCH_MODE.name)
 		{
@@ -232,15 +225,8 @@ public class DemographicService
 		}
 		else if(searchMode == SEARCH_MODE.dob)
 		{
-			try
-			{
-				LocalDate dob = LocalDate.parse(keyword);
-				demoCS.setDateOfBirth(dob);
-			}
-			catch (DateTimeParseException ex)
-			{
-				MiscUtils.getLogger().error(ex.getMessage());
-			}
+			LocalDate dob = LocalDate.parse(keyword);
+			demoCS.setDateOfBirth(dob);
 		}
 		else if(searchMode == SEARCH_MODE.address)
 		{
