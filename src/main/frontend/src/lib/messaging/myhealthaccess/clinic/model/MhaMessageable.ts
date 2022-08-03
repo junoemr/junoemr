@@ -47,7 +47,7 @@ export default class MhaMessageable extends Messageable
 				this.profiles = (await mhaPatientService.getProfiles(this.id));
 			}
 
-			const profile: MhaPatient = this.profiles.find((profile) => profile.isConfirmed);
+			const profile: MhaPatient = this.profiles.find((profile) => profile.isConfirmed && profile.demographicNo != null);
 			return !!profile;
 		}
 		return false;
