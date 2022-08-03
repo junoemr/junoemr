@@ -21,15 +21,11 @@
  * Hamilton
  * Ontario, Canada
  */
-package org.oscarehr.ws.rest;
+package org.oscarehr.ws.rest.provider;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import net.sf.json.JSONObject;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.rs.security.oauth.data.OAuthContext;
-import org.apache.cxf.security.SecurityContext;
 import org.apache.log4j.Logger;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.exception.NoSuchRecordException;
@@ -49,6 +45,7 @@ import org.oscarehr.security.service.SecurityRolesService;
 import org.oscarehr.security.service.SecuritySetsService;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.ws.external.soap.v1.transfer.ProviderTransfer;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.conversion.ProviderConverter;
 import org.oscarehr.ws.rest.exception.SecurityRecordAlreadyExistsException;
 import org.oscarehr.ws.rest.response.RestResponse;
@@ -84,7 +81,8 @@ import java.util.List;
 @Path("/providerService/")
 @Tag(name = "provider")
 @Transactional
-public class ProviderService extends AbstractServiceImpl {
+public class ProviderWebService extends AbstractServiceImpl
+{
 
 	private static final Logger logger = MiscUtils.getLogger();
 
@@ -114,22 +112,6 @@ public class ProviderService extends AbstractServiceImpl {
 
 	@Autowired
 	private SecuritySetsService securitySetsService;
-
-
-	protected SecurityContext getSecurityContext() {
-		Message m = PhaseInterceptorChain.getCurrentMessage();
-    	org.apache.cxf.security.SecurityContext sc = m.getContent(org.apache.cxf.security.SecurityContext.class);
-    	return sc;
-	}
-	
-	protected OAuthContext getOAuthContext() {
-		Message m = PhaseInterceptorChain.getCurrentMessage();
-		OAuthContext sc = m.getContent(OAuthContext.class);
-    	return sc;
-	}
-	
-    public ProviderService() {
-    }
 
     @GET
     @Path("/providers")

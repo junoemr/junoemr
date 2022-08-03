@@ -2014,8 +2014,8 @@
 								org.oscarehr.ws.rest.careTracker.CareTrackersWebService
 								org.oscarehr.ws.rest.ConsultationWebService
 								org.oscarehr.ws.rest.DecisionSupportWebService
-								org.oscarehr.ws.rest.DemographicService
-								org.oscarehr.ws.rest.DemographicsService
+								org.oscarehr.ws.rest.demographic.DemographicService
+								org.oscarehr.ws.rest.demographic.DemographicsService
 								org.oscarehr.ws.rest.demographic.DemographicCareTrackerWebService
 								org.oscarehr.ws.rest.demographic.DemographicContactWebService
 								org.oscarehr.ws.rest.demographic.DemographicContactsWebService
@@ -2063,9 +2063,9 @@
 								org.oscarehr.ws.rest.myhealthaccess.SSOWebService
 								org.oscarehr.ws.rest.NotesService
 								org.oscarehr.ws.rest.PreventionService
-								org.oscarehr.ws.rest.ProviderPreferenceWebService
-								org.oscarehr.ws.rest.ProviderService
-								org.oscarehr.ws.rest.ProvidersService
+								org.oscarehr.ws.rest.provider.ProviderPreferenceWebService
+								org.oscarehr.ws.rest.provider.ProviderWebService
+								org.oscarehr.ws.rest.provider.ProvidersWebService
 								org.oscarehr.ws.rest.ReferralDoctorsService
 								org.oscarehr.ws.rest.RosterWebService
 								org.oscarehr.ws.rest.ScheduleService

@@ -1,7 +1,6 @@
 import {Moment} from "moment";
 import FaxAccount from "./FaxAccount";
 import {FaxStatusCombinedType} from "./FaxStatusCombinedType";
-import moment from "moment/moment";
 
 export default class FaxOutboxSearchParams
 {
@@ -44,22 +43,22 @@ export default class FaxOutboxSearchParams
 		this._perPage = value;
 	}
 
-	get startDate(): moment.Moment
+	get startDate(): Moment
 	{
 		return this._startDate;
 	}
 
-	set startDate(value: moment.Moment)
+	set startDate(value: Moment)
 	{
 		this._startDate = value;
 	}
 
-	get endDate(): moment.Moment
+	get endDate(): Moment
 	{
 		return this._endDate;
 	}
 
-	set endDate(value: moment.Moment)
+	set endDate(value: Moment)
 	{
 		this._endDate = value;
 	}

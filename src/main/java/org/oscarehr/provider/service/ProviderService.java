@@ -325,6 +325,9 @@ public class ProviderService
 			// transfer super admin flag
 			newProviderData.setSuperAdmin(providerData.isSuperAdmin());
 
+			// transfer existing sites assignment
+			newProviderData.setAssignedSites(providerData.getAssignedSites());
+
 			// edit provider
 			newProviderData.setProviderNo(providerNo);
 

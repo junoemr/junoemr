@@ -51,6 +51,18 @@ public abstract class AbstractCriteriaSearch
 
 	public abstract Criteria setCriteriaProperties(Criteria criteria);
 
+	public void setPaging(int page, int perPage)
+	{
+		setLimit(perPage);
+		setOffset(calculatedOffset(page, perPage));
+	}
+
+	protected int calculatedOffset(int pageNo, int resultsPerPage)
+	{
+		return resultsPerPage * (pageNo - 1);
+	}
+
+
 	public int getLimit()
 	{
 		return limit;

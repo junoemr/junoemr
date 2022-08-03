@@ -3,41 +3,44 @@
 									 modal-instance="$ctrl.modalInstance">
 
 	<div class="content">
-		<div ng-if="!$ctrl.isLoading">
-			<h5 class="title juno-text-primary">Move Queued Appointment to Schedule </h5>
+		<div ng-if="!$ctrl.loadingQueue.isLoading">
+			<h5 class="title juno-text-primary">Move Queued Appointment to Schedule</h5>
 
 			<p class="juno-text">
-				Select which schedule you want to move the queued appointment to.
+				Assign the queued appointment to selected provider's schedule.
 			</p>
 
 			<div class="center-options flex-row align-items-flex-end">
-				<juno-typeahead
-								name="Provider"
-								model="$ctrl.bookProviderNo"
-								options="$ctrl.providerOptions"
-								placeholder="Assign to provider"
-								component-style="$ctrl.resolve.style"
-								on-selected="$ctrl.onProviderSelect()">
+				<juno-typeahead name="Provider"
+				                model="$ctrl.bookProviderNo"
+				                options="$ctrl.providerOptions"
+				                placeholder="Assign to provider"
+				                component-style="$ctrl.resolve.style"
+				                on-selected="$ctrl.onProviderSelect(value)">
 				</juno-typeahead>
 
 				<juno-button ng-click="$ctrl.assignToMe()"
-										 component-style="$ctrl.resolve.style"
-										 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
-										 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
+				             disabled="$ctrl.assignToMeButtonDisabled()"
+				             title="{{$ctrl.assignToMeTooltip()}}"
+				             component-style="$ctrl.resolve.style"
+				             button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
+				             button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL">
 					Assign To Me
 				</juno-button>
 			</div>
+			<span class="body-smallest">
+				Note: Check that provider and queue are set to the same site if unavailable
+			</span>
 		</div>
-		<juno-loading-indicator ng-if="$ctrl.isLoading"
-														class="loading-indicator-container"
-														message = "Scheduling..."
-														message-alignment="vertical"
-														indicator-type="dot-pulse">
+		<juno-loading-indicator ng-if="$ctrl.loadingQueue.isLoading"
+		                        class="loading-indicator-container"
+		                        message="Scheduling..."
+		                        message-alignment="vertical"
+		                        indicator-type="dot-pulse">
 		</juno-loading-indicator>
 	</div>
 
-	<juno-divider component-style="$ctrl.resolve.style"
-								slim="true">
+	<juno-divider component-style="$ctrl.resolve.style" slim="true">
 	</juno-divider>
 
 	<div class="buttons">
@@ -52,7 +55,7 @@
 								 component-style="$ctrl.resolve.style"
 								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.DEFAULT"
-								 disabled="!$ctrl.bookProviderNo || $ctrl.isLoading || !$ctrl.providerHasSite">
+								 disabled="$ctrl.bookButtonDisabled()">
 			Assign
 		</juno-button>
 		<juno-button click="$ctrl.bookAndStartTelehealth()"
@@ -60,7 +63,7 @@
 								 component-style="$ctrl.resolve.style"
 								 button-color="$ctrl.JUNO_BUTTON_COLOR.PRIMARY"
 								 button-color-pattern="$ctrl.JUNO_BUTTON_COLOR_PATTERN.FILL"
-								 disabled="!$ctrl.bookProviderNo || $ctrl.isLoading || !$ctrl.providerHasSite || !$ctrl.resolve.isVirtual">
+								 disabled="$ctrl.bookVirtualButtonDisabled()">
 			Start
 		</juno-button>
 	</div>

@@ -18,7 +18,10 @@
 
 package org.oscarehr.common.model;
 
-import javax.persistence.CascadeType;
+import lombok.Getter;
+import lombok.Setter;
+import org.oscarehr.provider.model.ProviderData;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -28,12 +31,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.util.Set;
 
 @Entity
+@Getter
+@Setter
 @Table(name="site")
 public class Site extends AbstractModel<Integer> implements java.io.Serializable
 {
@@ -92,29 +96,12 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	@Column(name="uuid")
 	private String uuid;
 
+	@ManyToMany(fetch=FetchType.LAZY)
+	@JoinTable(name = "providersite", joinColumns = @JoinColumn(name="site_id"), inverseJoinColumns = @JoinColumn(name="provider_no"))
+	private Set<ProviderData> assignedProviders;
+
 	@Transient
 	private String siteLogoDesc = null;
-	
-	/**
-	 * <pre>
-	 * &lt;set name="providers" table="providersite" cascade="all" lazy="false" fetch="join" inverse="true">
-     *   &lt;key column="site_id"/>
-     *   &lt;many-to-many column="provider_no" class="Provider"/>
-     * &lt;/set>
-	 * </pre>
-	 */
-
-	@ManyToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER)
-	@JoinTable(name = "providersite",
-	joinColumns = {
-	@JoinColumn(name="site_id")
-	},
-	inverseJoinColumns = {
-	@JoinColumn(name="provider_no")
-	}
-	)
-	@OrderBy(value="LastName, FirstName ASC")
-	private Set<Provider> providers;
 
 	public Site()
 	{
@@ -278,15 +265,6 @@ public class Site extends AbstractModel<Integer> implements java.io.Serializable
 	public void setProviderIdTo(Integer providerIdTo)
 	{
 		this.providerIdTo = providerIdTo;
-	}
-
-	public Set<Provider> getProviders()
-	{
-		return providers;
-	}
-	public void setProviders(Set<Provider> providers)
-	{
-		this.providers = providers;
 	}
 
 	public Integer getSiteLogoId()

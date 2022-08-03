@@ -55,6 +55,8 @@
 <%@ page import="org.oscarehr.common.model.UserProperty" %>
 <%@ page import="org.json.JSONObject" %>
 <%@ page import="java.util.Optional" %>
+<%@ page import="org.oscarehr.provider.service.ProviderSearchService" %>
+<%@ page import="org.oscarehr.provider.model.ProviderData" %>
 
 <%
 	String roleName$ = (String) session.getAttribute("userrole") + "," + (String) session.getAttribute("user");
@@ -73,6 +75,7 @@
 
 <%
 	TicklerManager ticklerManager = SpringUtils.getBean(TicklerManager.class);
+	ProviderSearchService providerSearchService = SpringUtils.getBean(ProviderSearchService.class);
 
 	String labReqVer = oscar.OscarProperties.getInstance().getProperty("onare_labreqver", "07");
 	if (labReqVer.equals(""))
@@ -916,11 +919,11 @@
                             _providers[all] = "<option value='all' <%=assignedTo.equals("all") ? "selected" : ""%>>All Providers</option>";
                             _providers[all] += "<% for (Provider pr : prov){%> <option value='<%=pr.getProviderNo()%>' <%=assignedTo.equals(pr.getProviderNo()) ? "selected" : ""%> > <%=pr.getLastName()%>, <%=pr.getFirstName()%></option><%}%>";
                             <%for (int i=0; i<sites.size(); i++) {%>
-                            _providers["<%=sites.get(i).getSiteId()%>"] = "<option value=<%=sites.get(i).getName()%> <%=assignedTo.equals(sites.get(i).getName()) ? "selected" : ""%>>All Providers</option><%Iterator<Provider> iter = sites.get(i).getProviders().iterator();
+                            _providers["<%=sites.get(i).getSiteId()%>"] = "<option value=<%=sites.get(i).getName()%> <%=assignedTo.equals(sites.get(i).getName()) ? "selected" : ""%>>All Providers</option><%Iterator<ProviderData> iter = providerSearchService.getBySite(sites.get(i).getSiteId()).iterator();
 	while (iter.hasNext()) {
-		Provider p=iter.next();
-		if ("1".equals(p.getStatus())) {
-			%><option value='<%=p.getProviderNo()%>' <%=p.getProviderNo().equals(assignedTo) ? "selected" : ""%>><%=p.getLastName()%>, <%=p.getFirstName()%></option><%
+		ProviderData p=iter.next();
+		if (p.isActive()) {
+			%><option value='<%=p.getId()%>' <%=p.getId().equals(assignedTo) ? "selected" : ""%>><%=p.getLastName()%>, <%=p.getFirstName()%></option><%
 		}
 	}%>";
                             <%}%>

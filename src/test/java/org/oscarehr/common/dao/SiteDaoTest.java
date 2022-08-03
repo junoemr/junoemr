@@ -23,17 +23,10 @@
  */
 package org.oscarehr.common.dao;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.util.Date;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.utils.EntityDataGenerator;
-import org.oscarehr.common.dao.utils.SchemaUtils;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderSite;
 import org.oscarehr.common.model.ProviderSitePK;
@@ -42,6 +35,11 @@ import org.oscarehr.util.SpringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Date;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -117,8 +115,8 @@ public class SiteDaoTest extends DaoTestFixtures
 		providerSiteDao.persist(ps);
 
 		Site s = siteDao.find(siteId1);
-		assertNotNull(s.getProviders());
-		assertEquals(s.getProviders().size(),1);
+		assertNotNull(s.getAssignedProviders());
+		assertEquals(s.getAssignedProviders().size(),1);
 	}
 
 

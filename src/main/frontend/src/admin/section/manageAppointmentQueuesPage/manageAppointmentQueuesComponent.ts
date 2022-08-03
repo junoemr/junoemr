@@ -1,6 +1,15 @@
-import {JUNO_BUTTON_COLOR, JUNO_BUTTON_COLOR_PATTERN, JUNO_STYLE, LABEL_POSITION} from "../../../common/components/junoComponentConstants";
+import {
+	JUNO_BUTTON_COLOR,
+	JUNO_BUTTON_COLOR_PATTERN,
+	JUNO_STYLE,
+	LABEL_POSITION
+} from "../../../common/components/junoComponentConstants";
 import {AqsQueuesApi} from "../../../../generated";
 import {SystemPreferences} from "../../../common/services/systemPreferenceServiceConstants";
+import {API_BASE_PATH} from "../../../lib/constants/ApiConstants";
+import ToastErrorHandler from "../../../lib/error/handler/ToastErrorHandler";
+import {SecurityPermissions} from "../../../common/security/securityConstants";
+import ToastService from "../../../lib/alerts/service/ToastService";
 
 angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 	{
@@ -16,6 +25,7 @@ angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 			'staticDataService',
 			'NgTableParams',
 			'securityService',
+			'securityRolesService',
 			'systemPreferenceService',
 			function (
 				$q,
@@ -27,22 +37,25 @@ angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 				staticDataService,
 				NgTableParams,
 				securityService,
+				securityRolesService,
 				systemPreferenceService,
 			)
 			{
-				let ctrl = this;
+				const ctrl = this;
 
 				// load appointment queue api
-				let aqsQueuesApi = new AqsQueuesApi($http, $httpParamSerializer, '../ws/rs');
+				ctrl.aqsQueuesApi = new AqsQueuesApi($http, $httpParamSerializer, API_BASE_PATH);
+				ctrl.errorHandler = new ToastErrorHandler();
+				ctrl.toastService = new ToastService();
 
 				ctrl.componentStyle = JUNO_STYLE.GREY;
-
-				ctrl.sortMode = "id";
-				ctrl.queueList = [];
-
 				ctrl.LABEL_POSITION = LABEL_POSITION;
 				ctrl.JUNO_BUTTON_COLOR = JUNO_BUTTON_COLOR;
 				ctrl.JUNO_BUTTON_COLOR_PATTERN = JUNO_BUTTON_COLOR_PATTERN;
+				ctrl.SecurityPermissions = SecurityPermissions;
+
+				ctrl.sortMode = "id";
+				ctrl.queueList = [];
 				ctrl.userIsSuperAdmin = securityService.getUser().superAdmin;
 				ctrl.showAdvancedOptions = false;
 				ctrl.organizationName = null;
@@ -68,9 +81,21 @@ angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 						}
 					);
 
-					ctrl.organizationName = await systemPreferenceService.getPreference(SystemPreferences.AqsOrganizationId, null);
-
-					ctrl.loadQueuesList();
+					try
+					{
+						if(securityRolesService.hasSecurityPrivileges(ctrl.SecurityPermissions.AqsQueueConfigRead))
+						{
+							ctrl.organizationName = await systemPreferenceService.getPreference(SystemPreferences.AqsOrganizationId, null);
+							if(ctrl.organizationName)
+							{
+								ctrl.loadQueuesList();
+							}
+						}
+					}
+					catch(e)
+					{
+						ctrl.errorHandler.handleError(e);
+					}
 				};
 
 				ctrl.addQueue = () =>
@@ -83,29 +108,29 @@ angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 					ctrl.openQueueModal(queue, true);
 				}
 
-				ctrl.deleteQueue = async (queue) =>
+				ctrl.deleteQueue = async (queue): Promise<void> =>
 				{
-					const userOk = await Juno.Common.Util.confirmationDialog(
+					const userOk: boolean = await Juno.Common.Util.confirmationDialog(
 						$uibModal,
 						"Delete Queue?",
 						"Are you sure you want to delete this queue?",
 						ctrl.componentStyle);
 					if (userOk)
 					{
-						aqsQueuesApi.deleteAppointmentQueue(queue.id).then(
-							(response) =>
-							{
-								// remove queue from queue list
-								ctrl.queueList = ctrl.queueList.filter((obj) =>
-								{
-									return obj.id !== queue.id;
-								});
-							}
-						).catch((error) =>
+						try
 						{
-							console.error(error);
-							alert("Failed to delete the queue");
-						});
+							await ctrl.aqsQueuesApi.deleteAppointmentQueue(queue.id);
+
+							// remove queue from queue list
+							ctrl.queueList = ctrl.queueList.filter((obj) =>
+							{
+								return obj.id !== queue.id;
+							});
+						}
+						catch(error)
+						{
+							ctrl.errorHandler.handleError(error);
+						}
 					}
 				}
 
@@ -150,37 +175,31 @@ angular.module('Admin.Section').component('manageAppointmentQueuesAdmin',
 				// update AQS credentials
 				ctrl.updateAqsCredentials = async () =>
 				{
-					if (ctrl.organizationName)
+					try
 					{
-						systemPreferenceService.setPreference(SystemPreferences.AqsOrganizationId, ctrl.organizationName);
-					}
+						if(ctrl.organizationName)
+						{
+							await systemPreferenceService.setPreference(SystemPreferences.AqsOrganizationId, ctrl.organizationName);
+						}
 
-					if (ctrl.organizationSecret)
+						if(ctrl.organizationSecret)
+						{
+							await systemPreferenceService.setPreference(SystemPreferences.AqsOrganizationSecret, ctrl.organizationSecret);
+						}
+
+						// reload queues.
+						ctrl.queueList = [];
+						await ctrl.loadQueuesList();
+					}
+					catch(e)
 					{
-						systemPreferenceService.setPreference(SystemPreferences.AqsOrganizationSecret, ctrl.organizationSecret);
+						ctrl.errorHandler.handleError(e);
 					}
-
-					// reload queues.
-					ctrl.queueList = [];
-					ctrl.loadQueuesList();
 				}
 
-				ctrl.loadQueuesList = () =>
+				ctrl.loadQueuesList = async (): Promise<void> =>
 				{
-					const deferred = $q.defer();
-					aqsQueuesApi.getAppointmentQueues().then(
-						(response) =>
-						{
-							ctrl.queueList = response.data.body;
-							deferred.resolve();
-						}
-					).catch((error) =>
-					{
-						console.error(error);
-						alert("Failed to load appointment queue list");
-						deferred.reject(error);
-					});
-					return deferred.promise;
+					ctrl.queueList = (await ctrl.aqsQueuesApi.getAppointmentQueues()).data.body;
 				}
 			}]
 	});

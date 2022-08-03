@@ -27,6 +27,7 @@ import lombok.Setter;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 import org.oscarehr.common.search.AbstractCriteriaSearch;
+import org.oscarehr.provider.model.ProviderData;
 
 @Getter
 @Setter
@@ -36,6 +37,9 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 	private String providerNo = null;
 	private String lastName = null;
 	private String firstName = null;
+	private Integer siteId = null;
+	private String providerType = null;
+	private Boolean activeStatus = null;
 	
 	private String practitionerNo = null;
 	private String ontarioCnoNumber = null;
@@ -43,10 +47,16 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 	@Override
 	public Criteria setCriteriaProperties(Criteria criteria)
 	{
+		String alias = criteria.getAlias();
+
 		// set the search filters
 		if (getProviderNo() != null)
 		{
 			criteria.add(Restrictions.eq("id", String.valueOf(getProviderNo())));
+		}
+		if (getActiveStatus() != null)
+		{
+			criteria.add(Restrictions.eq("status", getActiveStatus() ? ProviderData.PROVIDER_STATUS_ACTIVE : ProviderData.PROVIDER_STATUS_INACTIVE));
 		}
 		if (getFirstName() != null)
 		{
@@ -55,6 +65,10 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 		if (getLastName() != null)
 		{
 			criteria.add(Restrictions.eq("lastName", getLastName()));
+		}
+		if (getProviderType() != null)
+		{
+			criteria.add(Restrictions.eq("providerType", getProviderType()));
 		}
 		
 		if (getPractitionerNo() != null)
@@ -65,6 +79,12 @@ public class ProviderCriteriaSearch extends AbstractCriteriaSearch
 		if (getOntarioCnoNumber() != null)
 		{
 			criteria.add(Restrictions.eq("ontarioCnoNumber", getOntarioCnoNumber()));
+		}
+
+		if(getSiteId() != null)
+		{
+			criteria.createAlias(alias + ".assignedSites", "s");
+			criteria.add(Restrictions.eq("s.siteId", getSiteId()));
 		}
 
 		return criteria;
