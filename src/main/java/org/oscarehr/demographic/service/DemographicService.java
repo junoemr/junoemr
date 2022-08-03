@@ -239,6 +239,7 @@ public class DemographicService
 			}
 			catch (DateTimeParseException ex)
 			{
+				MiscUtils.getLogger().error(ex.getMessage());
 			}
 		}
 		else if(searchMode == SEARCH_MODE.address)

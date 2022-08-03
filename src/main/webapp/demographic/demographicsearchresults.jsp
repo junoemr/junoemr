@@ -123,6 +123,7 @@
 <head>
 <script type="text/javascript" src="<%= request.getContextPath() %>/js/global.js"></script>
 <script type="text/javascript" src="<c:out value="${ctx}/share/javascript/Oscar.js"/>"></script>
+<script type="text/javascript" src="<%= request.getContextPath() %>/js/moment.min.js"></script>
 <title><bean:message key="demographic.demographicsearchresults.title" /></title>
 
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.js"></script>
@@ -159,34 +160,36 @@
 		document.titlesearch.keyword.select();
 	}
 
-	function checkTypeIn() {
-		var dob = document.titlesearch.keyword;
-		typeInOK = true;
+	function checkTypeIn()
+	{
+		var typeInOK = true;
+		var searchText = document.titlesearch.keyword;
 
-		if (dob.value.indexOf('%b610054') == 0 && dob.value.length > 18) {
-			document.titlesearch.keyword.value = dob.value.substring(8, 18);
-			document.titlesearch.search_mode[4].checked = true;
+		if (searchText.value.indexOf('%b610054') == 0 && searchText.value.length > 18)
+		{
+			document.titlesearch.keyword.value = searchText.value.substring(8, 18);
+			document.titlesearch.search_mode[4].selected = true;
 		}
-		if (document.titlesearch.search_mode[0].checked) {
+
+		if (document.titlesearch.search_mode[0].selected)
+		{
 			var keyword = document.titlesearch.keyword.value;
 			var keywordLowerCase = keyword.toLowerCase();
 			document.titlesearch.keyword.value = keywordLowerCase;
 		}
-		if (document.titlesearch.search_mode[2].checked) {
-			if (dob.value.length == 8) {
-				dob.value = dob.value.substring(0, 4) + "-"
-						+ dob.value.substring(4, 6) + "-"
-						+ dob.value.substring(6, 8);
-			}
-			if (dob.value.length != 10) {
+
+		if (document.titlesearch.search_mode[2].selected)
+		{
+			var searchTextMoment = moment(searchText.value, 'YYYY-MM-DD', true);
+
+			if (!searchTextMoment.isValid())
+			{
 				alert("<bean:message key="demographic.search.msgWrongDOB"/>");
 				typeInOK = false;
 			}
-
-			return typeInOK;
-		} else {
-			return true;
 		}
+
+		return typeInOK;
 	}
 
 	function popup(vheight, vwidth, varpage) {
