@@ -125,7 +125,6 @@ angular.module("Messaging.Modals").component('messageCompose', {
 			 * make the text area  expand as the user types
 			 */
 			ctrl.onTextareaChange = () => {
-				console.log(ctrl.messageTextArea.get(0).scrollHeight);
 				ctrl.messageTextArea.css("min-height", "auto");
 				ctrl.messageTextArea.css("min-height", `${ctrl.messageTextArea.get(0).scrollHeight}px`);
 			}
