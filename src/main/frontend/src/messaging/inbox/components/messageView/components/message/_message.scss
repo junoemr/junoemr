@@ -8,6 +8,15 @@
 		text-decoration: underline;
 	}
 
+	.message-container {
+		pre {
+			background-color: transparent;
+			border: none;
+			padding: 0;
+			white-space: pre-wrap;
+		}
+	}
+
 	&.compact {
 
 		&.indent-level-1 {

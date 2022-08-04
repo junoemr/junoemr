@@ -60,7 +60,7 @@
 		<div class="message-area flex-item-grow flex-col">
 			<div class="flex-col h-100 overflow-y-auto p-16">
 				<!-- message textarea -->
-				<div class="message-body" ng-ref="$ctrl.messageTextarea" ng-on-input="$ctrl.onMessageChange()" contenteditable="true"></div>
+				<textarea class="message-body body-smallest" ng-keydown="$ctrl.onTextareaChange()" ng-ref="$ctrl.messageTextArea" ng-model="$ctrl.messageBody"></textarea>
 
 				<!-- message attachments -->
 				<attachment-list ng-if="$ctrl.attachments.length > 0"
