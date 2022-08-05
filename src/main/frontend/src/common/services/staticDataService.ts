@@ -795,11 +795,6 @@ angular.module("Common.Services").service("staticDataService", [
 			});
 			provinces.push(
 			{
-				"value": USStateCode.NU,
-				"label": "US-NU-Nunavut"
-			});
-			provinces.push(
-			{
 				"value": USStateCode.NV,
 				"label": "US-NV-Nevada"
 			});

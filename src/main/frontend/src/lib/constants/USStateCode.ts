@@ -35,7 +35,6 @@ export enum USStateCode {
 	NH = "NH",
 	NJ = "NJ",
 	NM = "NM",
-	NU = "NU",
 	NV = "NV",
 	NY = "NY",
 	OH = "OH",
