@@ -57,7 +57,6 @@ import java.util.Map;
 @Component
 public class SystemReadinessProbe implements HealthIndicator
 {
-
     private static final Logger logger = MiscUtils.getLogger();
     private static final Health.Builder warning = Health.status("WARNING");
     private final CaseManagementNoteDao caseManagementNoteDao;
@@ -119,18 +118,13 @@ public class SystemReadinessProbe implements HealthIndicator
      */
     private Health.Builder systemHealthCheck()
     {
+        Map<String, Object> healthWarningDetails = new HashMap<>();
         try
         {
             Security security = loginHealthCheck();
-
-            String providerNo = security.getProviderNo();
-            scheduleHealthCheck(providerNo);
-
-            Map<String, Object> healthWarningDetails = new HashMap<>();
-            demographicHealthCheck(healthWarningDetails);
-
-            boolean isExpireSet = security.isExpireSet();
-            oscarHostHealthCheck(healthWarningDetails, providerNo, isExpireSet);
+            scheduleHealthCheck(security.getProviderNo());
+            demographicHealthCheck();
+            adminUserHealthCheck(healthWarningDetails, security);
 
             if (healthWarningDetails.isEmpty())
             {
@@ -181,7 +175,7 @@ public class SystemReadinessProbe implements HealthIndicator
      * Test DAOs for demographics/notes/echarts
      *
      */
-    private void demographicHealthCheck(Map<String, Object> healthWarningDetails)
+    private void demographicHealthCheck()
     {
         DemographicCriteriaSearch criteriaSearch = new DemographicCriteriaSearch();
         criteriaSearch.setPaging(1, 1);
@@ -197,42 +191,37 @@ public class SystemReadinessProbe implements HealthIndicator
             noteCriteriaSearch.setDemographicId(demographic.getId());
             caseManagementNoteDao.criteriaSearch(noteCriteriaSearch);
         }
-        else
-        {
-            logger.warn("No demographic found in health check");
-            healthWarningDetails.put("demographics", "No Demographics");
-        }
     }
 
     /**
-     * Check the health of the oscar_host record
+     * Check the health of the admin record
      * 1) Security record is active
      * 2) Is a super_admin
-     * 3) Not expired
+     * 3) login permission has not expired
      *
-     * @param healthWarningDetails map of health warning details to add to the health builder
-     * @param providerNo           the oscar_host provider number
-     * @param isExpireSet          the security object for oscar_host
+     * @param healthWarningDetails  map of health warning details to add to the health builder
+     * @param security              the admin user security record
      */
-    private void oscarHostHealthCheck(Map<String, Object> healthWarningDetails, String providerNo, boolean isExpireSet)
+    private void adminUserHealthCheck(Map<String, Object> healthWarningDetails, Security security)
     {
-        ProviderData oscarHostUser = providerDao.find(providerNo);
-        if (!oscarHostUser.isActive())
+        String userName = security.getUserName();
+        ProviderData adminProvider = providerDao.find(security.getProviderNo());
+        if (!adminProvider.isActive())
         {
-            logger.warn("oscar_host security record is not active, status is set to 0 in provider");
-            healthWarningDetails.put("oscar_host_security_record", "Security record is not active");
+            logger.warn(userName + " provider record is not active, status is set to " + ProviderData.PROVIDER_STATUS_INACTIVE + " in provider");
+            healthWarningDetails.put("administrator_provider_record_inactive", "Provider record is not active");
         }
 
-        if (!oscarHostUser.isSuperAdmin())
+        if (!adminProvider.isSuperAdmin())
         {
-            logger.warn("oscar_host is not a super_admin, super_admin is set to 0 in provider");
-            healthWarningDetails.put("oscar_host_super_admin", "Is not a super_admin");
+            logger.warn(userName + " is not a super_admin, super_admin is set to 0 in provider");
+            healthWarningDetails.put("administrator_super_admin_false", "Provider record is not super_admin");
         }
 
-        if (isExpireSet)
+        if (security.isExpireSet())
         {
-            logger.warn("oscar_host is expired, b_ExpiredSet is set to 1 in security");
-            healthWarningDetails.put("oscar_host_expired", "Is expired");
+            logger.warn(userName + " is expired, b_ExpiredSet is set to 1 in security");
+            healthWarningDetails.put("administrator_login_expired", "Security record is expired");
         }
     }
 
