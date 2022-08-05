@@ -53,6 +53,7 @@ angular.module("Messaging.Modals").component('messageCompose', {
 			$scope.LABEL_POSITION = LABEL_POSITION;
 
 			ctrl.subject = "";
+			ctrl.messageBody = "";
 			ctrl.sending = false;
 			ctrl.messageSourceOptions = [];
 			ctrl.attachments = [];
@@ -87,7 +88,7 @@ angular.module("Messaging.Modals").component('messageCompose', {
 			{
 				ctrl.validations = {
 					messageText: Juno.Validations.validationFieldRequired(ctrl, "subject",
-						Juno.Validations.validationCustom(() => ctrl.messageTextarea.text().length > 0)),
+						Juno.Validations.validationCustom(() => ctrl.messageBody.length > 0)),
 
 					sourceSelected: Juno.Validations.validationFieldOr(
 						Juno.Validations.validationCustom(() => ctrl.messageSourceOptions.find((sourceOpt) => sourceOpt.value === ctrl.sourceId)),
@@ -120,6 +121,14 @@ angular.module("Messaging.Modals").component('messageCompose', {
 				return sourceOptions;
 			}
 
+			/**
+			 * make the text area  expand as the user types
+			 */
+			ctrl.onTextareaChange = () => {
+				ctrl.messageTextArea.css("min-height", "auto");
+				ctrl.messageTextArea.css("min-height", `${ctrl.messageTextArea.get(0).scrollHeight}px`);
+			}
+
 			ctrl.uploadAttachment = async () =>
 			{
 				const newFiles = await $uibModal.open({
@@ -148,7 +157,7 @@ angular.module("Messaging.Modals").component('messageCompose', {
 					ctrl.sending = true;
 					let message = MessageFactory.build(
 						ctrl.subject,
-						ctrl.messageTextarea.text(),
+						ctrl.messageBody,
 						ctrl.recipient ? [ctrl.recipient] : [],
 						ctrl.attachments,
 						ctrl.isReply ? ctrl.conversation : null);
