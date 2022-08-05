@@ -30,6 +30,7 @@ import org.oscarehr.common.dao.ProviderSiteDao;
 import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.dao.SiteDao;
 import org.oscarehr.common.model.Security;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.demographic.dao.DemographicDao;
 import org.oscarehr.demographic.entity.Demographic;
 import org.oscarehr.demographic.search.DemographicCriteriaSearch;
@@ -61,6 +62,7 @@ public class SystemReadinessProbe implements HealthIndicator
     private static final Health.Builder warning = Health.status("WARNING");
     private final CaseManagementNoteDao caseManagementNoteDao;
     private final DemographicDao demographicDao;
+    private final JunoProperties junoProperties;
     private final MyGroupDao myGroupDao;
     private final MyGroupAccessRestrictionDao myGroupAccessRestrictionDao;
     private final ProviderDataDao providerDao;
@@ -74,6 +76,7 @@ public class SystemReadinessProbe implements HealthIndicator
     public SystemReadinessProbe(
             CaseManagementNoteDao caseManagementNoteDao,
             DemographicDao demographicDao,
+            JunoProperties junoProperties,
             MyGroupDao myGroupDao,
             MyGroupAccessRestrictionDao myGroupAccessRestrictionDao,
             ProviderDataDao providerDao,
@@ -86,6 +89,7 @@ public class SystemReadinessProbe implements HealthIndicator
     {
         this.caseManagementNoteDao = caseManagementNoteDao;
         this.demographicDao = demographicDao;
+        this.junoProperties = junoProperties;
         this.myGroupDao = myGroupDao;
         this.myGroupAccessRestrictionDao = myGroupAccessRestrictionDao;
         this.providerDao = providerDao;
@@ -151,7 +155,7 @@ public class SystemReadinessProbe implements HealthIndicator
      */
     private Security loginHealthCheck()
     {
-        String userName = "oscar_host";
+        String userName = junoProperties.getAdministratorConfig().getLoginName();
         Security security = securityDao.findByUserName(userName);
         String providerNo = security.getProviderNo();
         secUserRoleDao.getUserRoles(providerNo);
@@ -196,7 +200,7 @@ public class SystemReadinessProbe implements HealthIndicator
         else
         {
             logger.warn("No demographic found in health check");
-            healthWarningDetails.put("demographics", "No Demogrphics");
+            healthWarningDetails.put("demographics", "No Demographics");
         }
     }
 

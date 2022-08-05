@@ -30,27 +30,27 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.cloudresourcemanager.CloudResourceManager;
 import com.google.api.services.cloudresourcemanager.model.Binding;
 import com.google.api.services.cloudresourcemanager.model.GetIamPolicyRequest;
 import com.google.api.services.cloudresourcemanager.model.Policy;
-
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.oscarehr.PMmodule.dao.ProviderDao;
-import org.oscarehr.security.dao.SecUserRoleDao;
-import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.common.dao.SecurityDao;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.Security;
+import org.oscarehr.config.JunoProperties;
 import org.oscarehr.login.dto.LoginForwardURL;
 import org.oscarehr.login.service.LoginService;
+import org.oscarehr.security.dao.SecUserRoleDao;
+import org.oscarehr.security.model.SecUserRole;
 import org.oscarehr.util.MiscUtils;
 import org.oscarehr.util.SpringUtils;
 import oscar.OscarProperties;
@@ -73,6 +73,7 @@ public final class OAuthLoginAction extends DispatchAction
 	private ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 	private SecurityDao securityDao = SpringUtils.getBean(SecurityDao.class);
 	private SecUserRoleDao secUserRoleDao = SpringUtils.getBean(SecUserRoleDao.class);
+	private JunoProperties junoProperties = SpringUtils.getBean(JunoProperties.class);
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
 	{
@@ -108,7 +109,7 @@ public final class OAuthLoginAction extends DispatchAction
 
 				if (isProjectMember(email))
 				{
-					String userName = "oscar_host";
+					String userName = junoProperties.getAdministratorConfig().getLoginName();
 					Security security = securityDao.findByUserName(userName);
 					Provider provider = providerDao.getProvider(security.getProviderNo());
 					List<SecUserRole> roles = secUserRoleDao.getUserRoles(security.getProviderNo());
