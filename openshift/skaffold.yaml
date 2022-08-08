@@ -1,0 +1,29 @@
+apiVersion: skaffold/v2beta28
+kind: Config
+metadata:
+  name: juno
+build:
+  tagPolicy:
+    sha256: { }
+  local:
+    useDockerCLI: false
+    useBuildkit: true
+  artifacts:
+    - image: juno
+      context: ../
+      docker:
+        dockerfile: ./Dockerfile
+    - image: juno-util
+      context: ../../openshift-tools/juno-images/juno-util/
+      docker:
+        dockerfile: ../../openshift-tools/juno-images/juno-util/Dockerfile
+deploy:
+  kubectl:
+    manifests:
+      - manifests/mariadb-service.yaml
+      - manifests/mariadb-deployment.yaml
+      - manifests/tomcat-pvc.yaml
+      - manifests/tomcat-configmap.yaml
+      - manifests/tomcat-deployment.yaml
+      - manifests/tomcat-service.yaml
+      - manifests/tomcat-ingress.yaml

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment # what to create?
+metadata:
+  name: mariadb-deployment
+  namespace: juno
+spec: # specification for deployment resource
+  replicas: 1 # how many replicas of pods we want to create
+  selector:
+    matchLabels:
+      app: mariadb
+  template: # blueprint for pods
+    metadata:
+      labels:
+        app: mariadb # service will look for this label
+    spec: # specification for pods
+      containers:
+      - name: mariadb
+        image: mariadb:10.5
+        ports:
+        - containerPort: 3306 #default one
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: admin # works, don't use strings
+        - name: MYSQL_USER
+          value: juno_u
+        - name: MYSQL_PASSWORD
+          value: juno_u_password
+        - name: MYSQL_DATABASE
+          value: juno_db
+        - name: TZ
+          value: America/Vancouver

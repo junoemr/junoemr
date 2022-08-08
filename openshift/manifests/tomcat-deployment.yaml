@@ -1,0 +1,266 @@
+﻿kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: tomcat
+  namespace: juno
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: tomcat
+  template:
+    metadata:
+      labels:
+        name: tomcat
+    spec:
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      initContainers:
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: copy-files
+          command:
+            - bash
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: juno-data
+              mountPath: /opt/juno/
+          terminationMessagePolicy: File
+          image: juno
+          args:
+            - '-c'
+            - >-
+              rm -rf /opt/juno/create_instance && mkdir -p
+              /opt/juno/create_instance && cp -R
+              /workspace/WEB-INF/classes/create_instance /opt/juno/ && echo
+              'Copied create_instance folder to /opt/juno'
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: initialize-instance
+          command:
+            - ruby
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: >-
+                --illegal-access=permit -Dfile.encoding=UTF8
+                -Djava.io.tmpdir=/opt/juno/tmp
+                -Djuno.propertiesFilename=/opt/juno/juno.properties
+                -Dlogging.config=/opt/app-root/src/properties/logback.xml
+                -Dserver.http2.enabled=true -Dlog4j2.formatMsgNoLookups=true
+                -XX:+UseZGC -XX:ZCollectionInterval=30 -XX:ZUncommitDelay=30
+                -XX:MinRAMPercentage=20.0 -XX:MaxRAMPercentage=50.0
+                -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/juno/dumps
+                -Dspring.profiles.active=openshift,osdev
+                -Dspring.config.additional-location=/opt/app-root/src/properties/additional-properties.yml
+            - name: OPENSHIFT_INSTANCE_NAME
+              value: juno 
+            - name: JUNO_INSTANCE_NAME
+              value: juno
+            - name: MYSQL_USER
+              value: juno_u
+            - name: MYSQL_USER_READ_ONLY
+              value: juno_u
+            - name: MYSQL_DATABASE
+              value: juno_db
+            - name: MYSQL_ROOT_PASSWORD
+              value: admin
+            - name: MYSQL_PASSWORD
+              value: juno_u_password
+            - name: MYSQL_READONLY_PASSWORD
+              value: juno_u_password
+            - name: MYSQL_HOST
+              value: mariadb
+            - name: METRICS_PASSWORD
+              value: juno_u_password
+            - name: OSCARHOST_PASSWORD
+              value: admin
+            - name: OSCARHOST_PIN
+              value: '1234'
+            - name: OSCARHOST_SETUP_DIR
+              value: /opt/juno/create_instance
+            - name: USER_LOGIN
+              value: user
+            - name: USER_PASSWORD
+              value: admin
+            - name: USER_PIN
+              value: '1234'
+            - name: ENCRYPTION_KEY
+              value: encryption_key
+            # XXX: drugref?
+            - name: DRUGREF_URL
+              value: >-
+                http://drugref.drugref.svc.cluster.local:8080/drugref/DrugrefService
+            - name: ENVIRONMENT
+              value: dev
+            - name: FAXING_ENABLED
+              value: 'true'
+            - name: CLOUD_HOST
+              value: gateway-cloud-services-test.apps.osdev.internal.cloudpractice.ca
+            - name: DRUGREF_LOOKUP_SERVICE
+              value: cloud
+            - name: SMARTCODE_FILE_LOCATION
+              value: 'classpath:smartcodes.json'
+            - name: SPRING_DATASOURCE_URL
+              value: >-
+                jdbc:mariadb://mariadb:3306/juno_db?sessionVariables=sql_mode='NO_ENGINE_SUBSTITUTION,NO_AUTO_CREATE_USER'
+            - name: SPRING_PROFILES_ACTIVE
+              value: openshift-dev
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_CLIENT-ID
+              value: cloud-add
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_CLIENT-SECRET
+              value: a1fe11f8-2089-11eb-adc1-0242ac120002
+            - name: CLINICAID_URL
+            - name: JUNO_ERRORS_CHANNEL
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: tomcat-configmap-volume
+              mountPath: /usr/src/app/scripts/initialize_instance.rb
+              subPath: initialize_instance.rb
+            - name: juno-data
+              mountPath: /opt/juno/
+          terminationMessagePolicy: File
+          image: juno-util
+          args:
+            - /usr/src/app/scripts/initialize_instance.rb
+      containers:
+        - resources:
+            limits:
+              cpu: '1'
+              memory: 2000Mi
+            requests:
+              cpu: 10m
+              memory: 800Mi
+          readinessProbe:
+            httpGet:
+              path: /juno/actuator/health/readiness
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 10
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 12
+          terminationMessagePath: /dev/termination-log
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/bash
+                  - '-c'
+                  - sleep 20
+          name: juno
+          livenessProbe:
+            httpGet:
+              path: /juno/actuator/health/liveness
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 10
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 12
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: >-
+                --illegal-access=permit -Dfile.encoding=UTF8
+                -Djava.io.tmpdir=/opt/juno/tmp
+                -Djuno.propertiesFilename=/opt/juno/juno.properties
+                -Dlogging.config=/opt/app-root/src/properties/logback.xml
+                -Dserver.http2.enabled=true -Dlog4j2.formatMsgNoLookups=true
+                -XX:+UseZGC -XX:ZCollectionInterval=30 -XX:ZUncommitDelay=30
+                -XX:MinRAMPercentage=20.0 -XX:MaxRAMPercentage=50.0
+                -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/juno/dumps
+                -Dspring.profiles.active=openshift,osdev
+                -Dspring.config.additional-location=/opt/app-root/src/properties/additional-properties.yml
+            - name: OPENSHIFT_INSTANCE_NAME
+              value: juno 
+            - name: JUNO_INSTANCE_NAME
+              value: juno
+            - name: MYSQL_USER
+              value: juno_u
+            - name: MYSQL_USER_READ_ONLY
+              value: juno_u
+            - name: MYSQL_DATABASE
+              value: juno_db
+            - name: MYSQL_ROOT_PASSWORD
+              value: admin
+            - name: MYSQL_PASSWORD
+              value: juno_u_password
+            - name: MYSQL_READONLY_PASSWORD
+              value: juno_u_password
+            - name: MYSQL_HOST
+              value: mariadb
+            - name: METRICS_PASSWORD
+              value: juno_u_password
+            - name: OSCARHOST_PASSWORD
+              value: admin
+            - name: OSCARHOST_PIN
+              value: '1234'
+            - name: OSCARHOST_SETUP_DIR
+              value: /opt/juno/create_instance
+            - name: USER_LOGIN
+              value: user
+            - name: USER_PASSWORD
+              value: admin
+            - name: USER_PIN
+              value: '1234'
+            - name: ENCRYPTION_KEY
+              value: encryption_key
+            # XXX: drugref?
+            - name: DRUGREF_URL
+              value: >-
+                http://drugref.drugref.svc.cluster.local:8080/drugref/DrugrefService
+            - name: ENVIRONMENT
+              value: dev
+            - name: FAXING_ENABLED
+              value: 'true'
+            - name: CLOUD_HOST
+              value: gateway-cloud-services-test.apps.osdev.internal.cloudpractice.ca
+            - name: DRUGREF_LOOKUP_SERVICE
+              value: cloud
+            - name: SMARTCODE_FILE_LOCATION
+              value: 'classpath:smartcodes.json'
+            - name: SPRING_DATASOURCE_URL
+              value: >-
+                jdbc:mariadb://mariadb:3306/juno_db?sessionVariables=sql_mode='NO_ENGINE_SUBSTITUTION,NO_AUTO_CREATE_USER'
+            - name: SPRING_PROFILES_ACTIVE
+              value: openshift-dev
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_CLIENT-ID
+              value: cloud-add
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_CLIENT-SECRET
+              value: a1fe11f8-2089-11eb-adc1-0242ac120002
+            - name: CLINICAID_URL
+            - name: JUNO_ERRORS_CHANNEL
+          ports:
+            - name: juno
+              containerPort: 8080
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: juno-data
+              mountPath: /opt/juno/
+            - name: tomcat-configmap-volume
+              mountPath: /usr/local/tomcat/scripts/initialize_instance.rb
+              subPath: initialize_instance.rb
+            - name: tomcat-configmap-volume
+              mountPath: /opt/app-root/src/.my.cnf
+              subPath: .my.cnf
+            - name: tomcat-configmap-volume
+              mountPath: /opt/app-root/src/.bashrc
+              subPath: .bashrc
+            - name: tomcat-configmap-volume
+              mountPath: /opt/app-root/src/properties/logback.xml
+              subPath: logback.xml
+            - name: tomcat-configmap-volume
+              mountPath: /opt/app-root/src/properties/additional-properties.yml
+              subPath: additional-properties.yml
+          terminationMessagePolicy: File
+          image: juno
+      volumes:
+        - name: juno-data
+          persistentVolumeClaim:
+            claimName: tomcat
+        - name: tomcat-configmap-volume
+          configMap:
+            name: tomcat
+            defaultMode: 493

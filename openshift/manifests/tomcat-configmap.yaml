@@ -1,0 +1,904 @@
+﻿kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: tomcat
+  namespace: juno 
+  labels:
+    name: tomcat
+data:
+  .bashrc: "# .bashrc\n\n# User specific aliases and functions\n\nalias rm='rm -i'\nalias cp='cp -i'\nalias mv='mv -i'\nalias vi='vim'\nalias ll='ls -l --color=auto'\nalias mysql='mysql --i-am-a-dummy'\n\nexport EDITOR=vim\nif [ \"$ENVIRONMENT\" == \"prod\" ]; then\n\texport PS1=\"\\[\\e[41m\\]$PRACTICE_ID $ENVIRONMENT\\[\\e[0m\\] \\[\\e[0;31m\\]\\h\\[\\e[m\\] \\$ \"\nelse\n\texport PS1=\"\\[\\e[44m\\]$PRACTICE_ID $ENVIRONMENT\\[\\e[0m\\] \\[\\e[0;34m\\]\\h\\[\\e[m\\] \\$ \"\nfi\n\n# Source global definitions\nif [ -f /etc/bashrc ]; then\n\t. /etc/bashrc\nfi\n"
+  .my.cnf: |-
+    [client]
+    user=juno_u
+    password=juno_u_password
+
+    [mysql]
+    no-auto-rehash
+  additional-properties.yml: |-
+    logging:
+      level:
+        org.springframework.web: warn
+        org.oscarehr.integration: debug
+        org.springframework: warn
+        org.hibernate: warn
+        org.aspectj: warn
+        org.apache.xmlrpc: warn
+    juno:
+      redis-session-store:
+        enabled: false 
+  initialize_instance.rb: >
+    #!/usr/bin/env ruby
+
+
+    # Based on the oscarhost_api_ruby Oscarhost::Instance::Creator class in
+    creator.rb
+
+    require 'digest/sha1'
+
+    require 'fileutils'
+
+    require 'json'
+
+    require 'logger'
+
+    require 'mysql2'
+
+    require 'zip'
+
+
+    class MultiLogger
+      def initialize(*targets)
+        @targets = targets
+      end
+
+      def write(*args)
+        @targets.each { |t| t.write(*args) }
+      end
+
+      def close
+        @targets.each(&:close)
+      end
+    end
+
+
+    class InitializeInstance
+
+      PROVINCES = {
+        AB: "AB",
+        BC: "BC",
+        ON: "ON",
+        SK: "SK"
+      }
+
+      EFORM_CREATOR = '999900'
+      PRACTICE_ID_REGEX = /[a-zA-Z0-9_]{4,14}/
+      OSCARHOST_LOGIN = 'oscar_host'
+      OSCARHOST_PASSWORD = ENV["OSCARHOST_PASSWORD"]
+      OSCARHOST_PIN = ENV["OSCARHOST_PIN"]
+      INITIAL_USER_PROVIDER_NO = '999998'
+      INITIAL_USER_LOGIN = 'tempuser'
+      USER_LOGIN = ENV["USER_LOGIN"]
+      USER_PASSWORD = ENV["USER_PASSWORD"]
+      USER_PIN = ENV["USER_PIN"]
+      PROVINCE = ENV["PROVINCE"]
+      FIRST_NAME = ENV["FIRST_NAME"]
+      LAST_NAME = ENV["LAST_NAME"]
+      ENVIRONMENT = ENV["ENVIRONMENT"]
+      JUNO_INSTANCE_NAME = ENV["JUNO_INSTANCE_NAME"]
+      OPENSHIFT_INSTANCE_NAME = ENV["OPENSHIFT_INSTANCE_NAME"]
+      DRUGREF_URL = ENV["DRUGREF_URL"]
+      ENCRYPTION_KEY = ENV["ENCRYPTION_KEY"]
+      BILLING_TYPE = ENV["BILLING_TYPE"]
+      CLINICAID_IDENTIFIER = ENV["CLINICAID_IDENTIFIER"]
+      CLINICAID_API_KEY = ENV["CLINICAID_API_KEY"]
+      MHA_DOMAIN_STAGING = 'staging.myhealthaccess.ca'
+      CLOUDMD_DOMAIN_STAGING = 'cloudmd1.myhealthaccess.ca'
+      AQS_DOMAIN_STAGING = 'staging.aqs.cloudpractice.ca'
+      AQS_API_SECRET_KEY = ENV['AQS_API_SECRET_KEY']
+      AQS_ORGANIZATION_ID = ENV['AQS_ORGANIZATION_ID']
+
+      OPENSHIFT_VOLUME_DIR = '/opt/juno'
+      OPENSHIFT_OSCAR_DOCUMENT = OPENSHIFT_VOLUME_DIR + '/OscarDocument'
+      OPENSHIFT_PROPERTIES_FILE = OPENSHIFT_VOLUME_DIR + "/juno.properties"
+
+      OSCARHOST_SETUP_DIR = ENV['OSCARHOST_SETUP_DIR']
+      OSCARHOST_UPDATES_DIR = OSCARHOST_SETUP_DIR + '/database/mysql/oscarhost_updates/'
+      OSCARHOST_INIT_DIR = OSCARHOST_SETUP_DIR + '/database/mysql/oscarhost_init/'
+      OSCARHOST_PROPERTIES_FILENAME = OSCARHOST_SETUP_DIR + '/package_files/oscar.properties'
+      OSCARHOST_CREATION_DB_FILENAME = OSCARHOST_SETUP_DIR + "/database/mysql/oscar_15.creation_db.*.sql"
+      DOCUMENTS_DIR = OSCARHOST_SETUP_DIR + '/package_files/OscarDocument/'
+      EFORM_IMAGES = 'eform/images/'
+      OPENSHIFT_JUNO_EFORM_PRELOAD_SOURCE = OSCARHOST_SETUP_DIR + '/scripts/juno_instance_creation/eforms/preload/'
+
+      JUNO_ERRORS_WEBHOOK="https://hooks.slack.com/services/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"
+      JUNO_ERRORS_CHANNEL="#juno-errors"
+
+      PROPERTY_DB_URI = 'db_uri'
+      PROPERTY_DB_URI_READONLY = 'db_uri_readonly'
+      PROPERTY_FORCE_FAXING = 'common.server.master_check.force_master_domain'
+      PROPERTY_OSCARHOST_LOGIN = "oscarhost_login"
+      PROPERTY_BILLING_TYPE = 'billing_type'
+      PROPERTY_INSTANCE_TYPE = 'instance_type'
+      PROPERTY_HC_TYPE = 'hctype'
+      PROPERTY_CLINICAID_DOMAIN = 'clinicaid_domain'
+      PROPERTY_CLINICAID_API_DOMAIN = 'clinicaid_api_domain'
+      PROPERTY_CLINICAID_API_KEY = 'clinicaid_api_key'
+      PROPERTY_CLINICAID_INSTANCE_NAME = 'clinicaid_instance_name'
+      PROPERTY_CLINICAID_SYNC_PATIENTS = 'clinicaid_sync_patients'
+      PROPERTY_CLINICAID_DEV_MODE = 'clinicaid_dev_mode'
+      PROPERTY_MHA_DOMAIN = 'myhealthaccess_domain'
+      PROPERTY_CLOUDMD_DOMAIN = 'cloudmd_domain'
+      PROPERTY_AQS_DOMAIN = 'aqs_domain'
+      PROPERTY_STRING_ENCRYPTION_KEY = 'STRING_ENCRYPTION_KEY'
+
+      def initialize(logger)
+        begin
+          @logger = logger
+          @logger.info("Creating instance for new practice: #{JUNO_INSTANCE_NAME}")
+
+          @instance_config = create_instance_config
+          @database_config = { host: ENV["MYSQL_HOST"], username: ENV["MYSQL_USER"], password: ENV["MYSQL_PASSWORD"] }
+
+          # Wait for database to become ready
+          wait_for_db
+
+          # @type [Mysql2::Client]
+          @mysql_client = ::Mysql2::Client.new(
+            :host => @database_config[:host],
+            :username => @database_config[:username],
+            :password => @database_config[:password])
+        rescue => e
+          handle_error(e, "Failed to connect to database")
+        end
+      end
+
+      def create
+
+        unless JUNO_INSTANCE_NAME.match(PRACTICE_ID_REGEX)
+          @logger.info("Not a valid practice id.")
+          @logger.info("Skipping...")
+          return
+        end
+
+        # Update instance config with files
+        begin
+          @logger.info("Update instance config")
+          @instance_config[:creation_db_filename] = get_creation_db_filename
+          @instance_config[:properties_filename] = get_properties_filename
+          log_instance_info
+        rescue => e
+          handle_error(e, "Update instance config")
+        end
+
+        # Create database, db user, add login records and apply db updates
+        begin
+          if database_schema_exists?
+            @logger.info("Database schema already exists for this client, only running patches.")
+            run_updates
+          else
+            init_db
+          end
+        rescue => e
+          handle_error(e, "Init DB")
+        end
+
+        # Update oscar_host user details (always update, as a move instance will cause this to be overwritten)
+        begin
+          init_oscar_host_user
+        rescue => e
+          handle_error(e, "init_oscar_host_user")
+        end
+
+        # Create mysql readonly user if they don't already exist
+        begin
+          create_mysql_readonly_user
+        rescue => e
+          handle_error(e, "create_mysql_readonly_user")
+        end
+
+        # Create metrics user if they don't already exist
+        begin
+          create_metrics_user
+        rescue => e
+          handle_error(e, "create_metrics_user", false)
+        end
+
+        # Create or update AQS secret key and organization
+        begin
+          if is_aqs_enabled
+            @logger.info("Creating or updating AQS values")
+            init_aqs_values
+          else
+            @logger.info("AQS values not set, skipping...")
+          end
+        rescue => e
+          handle_error(e, "Initializing AQS")
+        end
+
+        # Create or update province specific database entries
+        begin
+          init_db_settings_by_province
+        rescue => e
+          handle_error(e, "Province-specific (#{PROVINCE}) db settings")
+        end
+
+        # Create OscarDocument folder
+        begin
+          if document_dir_exists?
+            @logger.info("Document folder already exists for this client!")
+            clear_tmp_folder
+          else
+            create_oscar_document
+            preload_provincial_eforms(PROVINCE)
+          end
+        rescue => e
+          handle_error(e, "Create Document")
+        end
+
+        # Populate properties file
+        begin
+          if File.exist?(OPENSHIFT_PROPERTIES_FILE) && !File.zero?(OPENSHIFT_PROPERTIES_FILE)
+            update_properties_file
+          else
+            create_properties_file
+          end
+        rescue => e
+          handle_error(e, "Create/Update Properties")
+        end
+
+      end
+
+      def database_schema_exists?
+        sql = "SELECT COUNT(DISTINCT table_name) as num_of_tables FROM information_schema.columns WHERE table_schema = ?;"
+
+        query = @mysql_client.prepare(sql)
+        results = query.execute(@instance_config[:oscar_host_db_name])
+
+        results.each do |row|
+          if row["num_of_tables"] > 0
+            return true
+          end
+        end
+
+        return false
+      end
+
+      def document_dir_exists?
+        doc_dir = get_output_document_dir_name(JUNO_INSTANCE_NAME)
+        if Dir.exists?(doc_dir) || File.exists?(doc_dir)
+          return true
+        end
+        return false
+      end
+
+      # Waits up to 150 seconds for mariadb and exits if not
+      def wait_for_db
+        timeout = 180
+        time_start = Time.now
+        begin
+          time_running = Time.now - time_start
+          begin
+            # @type [Mysql2::Client]
+            ::Mysql2::Client.new(
+              :host => @database_config[:host],
+              :username => @database_config[:username],
+              :password => @database_config[:password])
+
+            return
+          rescue Mysql2::Error => e
+            @logger.info("Database not ready, #{time_running} out of #{timeout}")
+            sleep 10
+          end
+        end until (time_running.to_i >= timeout)
+        raise("Failed to connect to database")
+      end
+
+      def init_db
+
+        # Load creation db
+        load_creation_db
+        run_updates
+        run_init
+
+        # Update initial user details
+        init_user
+      end
+
+      def load_creation_db
+        @logger.info("Loading database")
+
+        command = "mysql #{@instance_config[:oscar_host_db_name]} " +
+          "-u root " +
+          "-p#{ENV['MYSQL_ROOT_PASSWORD']}" +
+          " < \"#{@instance_config[:creation_db_filename]}\""
+        `#{command}`
+      end
+
+      def run_updates
+        # Run for each, sorted by filename (they should have the date up front)
+        @logger.info("Updating DB with all patches")
+        Dir.glob(OSCARHOST_UPDATES_DIR + "*.sql").sort().each do |file|
+          command = "mysql #{@instance_config[:oscar_host_db_name]} " +
+            "-u root " +
+            "-p#{ENV['MYSQL_ROOT_PASSWORD']}" +
+            "< #{file}"
+          `#{command}`
+        end
+      end
+
+      def run_init
+        # Run for each, sorted by filename (they should have the date up front)
+        Dir.glob(OSCARHOST_INIT_DIR + "*.sql").sort().each do |file|
+          command = "mysql #{@instance_config[:oscar_host_db_name]} " +
+            "-u#{@database_config[:username]} " +
+            "-p#{@database_config[:password]}" +
+            "< #{file}"
+          `#{command}`
+        end
+      end
+
+      def hash_password(password)
+        hash_array = Digest::SHA1.digest(password).unpack('cccccccccccccccccccc')
+        hashed_password = ''
+        for num in hash_array
+          hashed_password += num.to_s
+        end
+        return hashed_password
+      end
+
+      def is_aqs_enabled
+        if AQS_API_SECRET_KEY.to_s.empty? || AQS_ORGANIZATION_ID.to_s.empty?
+          return false
+        else
+          return true
+        end
+      end
+
+      def init_aqs_values
+        sql = "INSERT INTO #{@instance_config[:oscar_host_db_name]}.property (name, value) " +
+          "VALUES ('aqs_api_secret_key', ?) ON DUPLICATE KEY UPDATE value=?"
+        query = @mysql_client.prepare(sql)
+        query.execute(AQS_API_SECRET_KEY, AQS_API_SECRET_KEY)
+
+        sql = "INSERT INTO #{@instance_config[:oscar_host_db_name]}.property (name, value) " +
+          "VALUES ('aqs_organization_id', ?) ON DUPLICATE KEY UPDATE value=?"
+        query = @mysql_client.prepare(sql)
+        query.execute(AQS_ORGANIZATION_ID, AQS_ORGANIZATION_ID)
+      end
+
+      def init_db_settings_by_province
+        case PROVINCE
+        when PROVINCES[:AB]
+          init_db_settings_ab
+        when PROVINCES[:ON]
+          init_db_settings_on
+        end
+      end
+
+      def init_db_settings_ab
+        @logger.info("Enabling netcare for AB")
+        set_default_system_juno_db_property("integration.netcare.enabled", "true")
+      end
+
+      def init_db_settings_on
+        @logger.info("Enabling OLIS for ON")
+        set_default_system_juno_db_property("integration.olis.enabled", "true")
+
+        @logger.info("Enabling HRM for ON")
+        set_default_system_juno_db_property("integration.hrm.enabled", "true")
+      end
+
+      def set_default_system_juno_db_property(name, value)
+        sql = "INSERT INTO #{@instance_config[:oscar_host_db_name]}.property (name, value, provider_no) " +
+        "VALUES ('#{name}', '#{value}', '-1') ON DUPLICATE KEY UPDATE value=value"
+        query = @mysql_client.prepare(sql)
+        query.execute()
+      end
+
+      def init_oscar_host_user
+        @logger.info("Initializing oscar_host user")
+
+        password_hash = hash_password(OSCARHOST_PASSWORD)
+
+        sql = "UPDATE #{@instance_config[:oscar_host_db_name]}.security " +
+          "SET password = ?, pin = ? WHERE user_name = ?"
+        query = @mysql_client.prepare(sql)
+        query.execute(password_hash, OSCARHOST_PIN, OSCARHOST_LOGIN)
+      end
+
+      def init_user
+        mysql_db = @instance_config[:oscar_host_db_name]
+
+        sql = "UPDATE #{mysql_db}.security SET user_name = ?, password = ?, " +
+          "pin = ?, forcePasswordReset=1 WHERE user_name = ?"
+        query = @mysql_client.prepare(sql)
+
+        password_hash = hash_password(USER_PASSWORD)
+        query.execute(USER_LOGIN, password_hash, USER_PIN, INITIAL_USER_LOGIN)
+
+        sql = "UPDATE #{mysql_db}.provider SET first_name = ?, last_name = ? WHERE provider_no = ?"
+        query = @mysql_client.prepare(sql)
+        query.execute(FIRST_NAME, LAST_NAME, INITIAL_USER_PROVIDER_NO)
+      end
+
+      def create_mysql_readonly_user
+        @logger.info("Creating readonly database user if they don't already exist")
+
+        mysql_root_client = ::Mysql2::Client.new(
+          :host => @database_config[:host],
+          :username => 'root',
+          :password => ENV['MYSQL_ROOT_PASSWORD'])
+
+        mysql_ro_db = @instance_config[:oscar_host_db_readonly_name]
+        mysql_ro_user = @instance_config[:oscar_host_db_readonly_user]
+        sql = "CREATE USER IF NOT EXISTS '#{mysql_ro_user}'@'%' identified by " +
+          "'#{@instance_config[:oscar_host_db_readonly_password]}';"
+        mysql_root_client.query(sql)
+
+        sql = "GRANT SELECT ON #{mysql_ro_db}.* TO '#{mysql_ro_user}'@'%';"
+        mysql_root_client.query(sql)
+      end
+
+      def create_metrics_user
+        @logger.info("Creating metrics user if they don't already exist")
+
+        mysql_root_client = ::Mysql2::Client.new(
+          :host => @database_config[:host],
+          :username => 'root',
+          :password => ENV['MYSQL_ROOT_PASSWORD'])
+
+        sql = "CREATE USER IF NOT EXISTS 'metrics'@'%' identified by '#{ENV['METRICS_PASSWORD']}' WITH MAX_USER_CONNECTIONS 3;"
+        mysql_root_client.query(sql)
+
+        sql = "GRANT PROCESS, REPLICATION CLIENT, REPLICATION SLAVE ADMIN, SELECT ON *.* to 'metrics'@'%';"
+        mysql_root_client.query(sql)
+      end
+
+      def clear_tmp_folder
+        @logger.info("Clearing tmp dir")
+        FileUtils.rm_r(Dir.glob(OPENSHIFT_VOLUME_DIR + "/tmp/*"), force: true, secure: true)
+      end
+
+      def create_oscar_document
+        @logger.info("Creating documents dir, tmp dir and dumps dir")
+
+        # Create directories and copy the oscar documents to the document folder
+        document_dir = get_output_document_dir_name(JUNO_INSTANCE_NAME)
+        FileUtils.mkdir_p(OPENSHIFT_VOLUME_DIR + "/tmp")
+         FileUtils.mkdir_p(OPENSHIFT_VOLUME_DIR + "/dumps")
+        FileUtils.mkdir_p(document_dir)
+        FileUtils.cp_r(DOCUMENTS_DIR + ".", document_dir)
+      end
+
+      def disable_property(contents, key, value)
+        contents.gsub!(/^#{key}.*$/, "\##{key}=#{value}")
+      end
+
+      def update_property(contents, key, value)
+        contents.gsub!(/^#{key}[ ]{0,1}=.*$/, "#{key}=#{value}")
+      end
+
+      def create_or_update_property(contents, key, value)
+        if contents.match(/^#{key}[ ]{0,1}=.*$/)
+          update_property(contents, key, value)
+        else
+          contents << "\n#{key}=#{value}"
+        end
+      end
+
+      # If URLs set specifically in the environment, set manually
+      # elsif dev/osdev, set login, MHA and CloudMD links to staging/dev URLs
+      # Otherwise, disable if switching from dev to default to prod URLs
+      def set_urls_by_environment(contents)
+        if not ENV["CLOUDMD_DOMAIN"].to_s.empty?
+          create_or_update_property(contents, PROPERTY_CLOUDMD_DOMAIN, ENV["CLOUDMD_DOMAIN"])
+        elsif ENVIRONMENT == 'dev'
+          create_or_update_property(contents, PROPERTY_CLOUDMD_DOMAIN, CLOUDMD_DOMAIN_STAGING)
+        else
+          disable_property(contents, PROPERTY_CLOUDMD_DOMAIN, CLOUDMD_DOMAIN_STAGING)
+        end
+
+        if not ENV["AQS_DOMAIN"].to_s.empty?
+          create_or_update_property(contents, PROPERTY_AQS_DOMAIN, ENV["AQS_DOMAIN"])
+        elsif ENVIRONMENT == 'dev'
+          create_or_update_property(contents, PROPERTY_AQS_DOMAIN, AQS_DOMAIN_STAGING)
+        else
+          disable_property(contents, PROPERTY_AQS_DOMAIN, AQS_DOMAIN_STAGING)
+        end
+
+        # If custom set, use specified URL for myhealthaccess,
+        if not ENV["MYHEALTHACCESS_DOMAIN"].to_s.empty?
+          create_or_update_property(contents, PROPERTY_MHA_DOMAIN, ENV["MYHEALTHACCESS_DOMAIN"])
+        elsif ENVIRONMENT == 'dev'
+          create_or_update_property(contents, PROPERTY_MHA_DOMAIN, MHA_DOMAIN_STAGING)
+        else
+          disable_property(contents, PROPERTY_MHA_DOMAIN, MHA_DOMAIN_STAGING)
+        end
+      end
+
+      def is_clinicaid_enabled()
+        if CLINICAID_IDENTIFIER.to_s.empty? || CLINICAID_API_KEY.to_s.empty?
+          return false
+        else
+          return true
+        end
+      end
+
+      def setup_clinicaid_properties(contents)
+        if is_clinicaid_enabled()
+          create_or_update_property(contents, PROPERTY_BILLING_TYPE, BILLING_TYPE)
+          create_or_update_property(contents, PROPERTY_CLINICAID_SYNC_PATIENTS, "true")
+          create_or_update_property(contents, PROPERTY_CLINICAID_INSTANCE_NAME, CLINICAID_IDENTIFIER)
+          create_or_update_property(contents, PROPERTY_CLINICAID_API_KEY, CLINICAID_API_KEY)
+          if not ENV["CLINICAID_URL"].to_s.empty?
+            create_or_update_property(contents, PROPERTY_CLINICAID_DOMAIN, ENV["CLINICAID_URL"])
+            create_or_update_property(contents, PROPERTY_CLINICAID_API_DOMAIN, ENV["CLINICAID_URL"])
+            create_or_update_property(contents, PROPERTY_CLINICAID_DEV_MODE, "true")
+          elsif ENVIRONMENT == 'dev'
+            create_or_update_property(contents, PROPERTY_CLINICAID_DOMAIN, "https://demo.clinicaid.ca")
+            create_or_update_property(contents, PROPERTY_CLINICAID_API_DOMAIN, "https://demo.clinicaid.ca")
+            create_or_update_property(contents, PROPERTY_CLINICAID_DEV_MODE, "true")
+          else
+            create_or_update_property(contents, PROPERTY_CLINICAID_DOMAIN, "https://billing.clinicaid.ca")
+            create_or_update_property(contents, PROPERTY_CLINICAID_API_DOMAIN, "https://api.clinicaid.ca")
+            create_or_update_property(contents, PROPERTY_CLINICAID_DEV_MODE, "false")
+          end
+        else
+          @logger.info("Clinicaid not enabled, skipping setting up Clinicaid billing and URLs")
+        end
+      end
+
+      def setup_faxing(contents)
+        if ENV["FAXING_ENABLED"] == "true"
+          faxing_enabled = "true"
+          @logger.info("Faxing enabled, setting up properties and folders")
+          faxing_folder = "#{get_output_document_dir_name(JUNO_INSTANCE_NAME)}fax/outgoing/"
+          FileUtils.mkdir_p("#{faxing_folder}/sent")
+          FileUtils.mkdir_p("#{faxing_folder}/unsent")
+          create_or_update_property(contents, "fax_file_location", faxing_folder)
+          create_or_update_property(contents, "RXFAX", "yes")
+          create_or_update_property(contents, "faxEnable", "yes")
+        else
+          faxing_enabled = "false"
+          create_or_update_property(contents, "RXFAX", "no")
+          create_or_update_property(contents, "faxEnable", "no")
+        end
+        # Force faxing domain, as only one tomcat pod and there will be errors in the master_check otherwise
+        create_or_update_property(contents, PROPERTY_FORCE_FAXING, ENV["HOSTNAME"])
+
+        # Set all properties to either true or false
+        create_or_update_property(contents, "rx_enhance", faxing_enabled)
+        create_or_update_property(contents, "rx_signature_enabled", faxing_enabled)
+        create_or_update_property(contents, "rx_fax_enabled", faxing_enabled)
+        create_or_update_property(contents, "consultation_fax_enabled", faxing_enabled)
+        create_or_update_property(contents, "consultation_signature_enabled", faxing_enabled)
+        create_or_update_property(contents, "form_fax_enabled", faxing_enabled)
+        create_or_update_property(contents, "eform_fax_enabled", faxing_enabled)
+        create_or_update_property(contents, "eform_signature_enabled", faxing_enabled)
+        create_or_update_property(contents, "eform_generator_indivica_signature_enabled", faxing_enabled)
+        create_or_update_property(contents, "eform_generator_indivica_print_enabled", faxing_enabled)
+        create_or_update_property(contents, "eform_generator_indivica_fax_enabled", faxing_enabled)
+        create_or_update_property(contents, "document_fax_enabled", faxing_enabled)
+        create_or_update_property(contents, "indivica_rich_text_letter_enabled", faxing_enabled)
+      end
+
+      def setup_openshift_properties(contents)
+        # Set DB properties
+        create_or_update_property(contents, PROPERTY_DB_URI, "jdbc:mysql://#{ENV["MYSQL_HOST"]}:3306/")
+        create_or_update_property(contents, PROPERTY_DB_URI_READONLY, "jdbc:mysql://#{ENV["MYSQL_HOST"]}:3307/")
+        create_or_update_property(contents, "db_password", ENV["MYSQL_PASSWORD"])
+        create_or_update_property(contents, "db_password_readonly", ENV["MYSQL_READONLY_PASSWORD"])
+
+        # Switch documents folder to volume on Juno pod
+        contents.gsub!(/\/var\/lib\/OscarDocument/, OPENSHIFT_OSCAR_DOCUMENT)
+
+        # Set OpenShift to use x-forwarded-for
+        create_or_update_property(contents, "web_service_allowed_ips.has_proxy", "false")
+
+        # Update drugref properties
+        create_or_update_property(contents, "drugref_url", DRUGREF_URL)
+
+        # Update project_home and https_endpoint_url_base to be juno, as we are using /juno as a base URL and the properties file is named juno.properties
+        create_or_update_property(contents, "project_home", "juno")
+        create_or_update_property(contents, "https_endpoint_url_base", "/juno/ws")
+
+        # Adds a Google OAuth endpoint that allows login as oscar_host for users in the gcp project (google_resource).  The site needs to be added to the credentials (google_client_id)."
+        create_or_update_property(contents, "google_client_id", "787906808612-6jmqr8si5seadtor2b7m3ruqpa7njma1.apps.googleusercontent.com")
+        create_or_update_property(contents, "google_resource", "juno-283421")
+
+        # Needed for wkhtmltopdf in OpenShift
+        create_or_update_property(contents, "oscar_port", "8080")
+        create_or_update_property(contents, "oscar_protocol", "http")
+
+        # Set province properties
+        create_or_update_property(contents, PROPERTY_INSTANCE_TYPE, PROVINCE)
+        create_or_update_property(contents, PROPERTY_HC_TYPE, PROVINCE)
+
+        # Set oscarhost_login for proper login/logout url
+        create_or_update_property(contents, PROPERTY_OSCARHOST_LOGIN, "https://login.junoemr.com/login/#{OPENSHIFT_INSTANCE_NAME}")
+      end
+
+      def create_properties_file
+        @logger.info("Creating properties file")
+
+        # Load file contents
+        file = File.open(OSCARHOST_PROPERTIES_FILENAME, "rb")
+        contents = file.read
+
+        # Replace tags in contents
+        contents.gsub!(/\{oscar_db_name\}/, @instance_config[:oscar_host_db_name])
+        contents.gsub!(/\{oscar_db_username\}/, @instance_config[:oscar_host_db_user])
+        contents.gsub!(/\{oscar_db_user_password\}/, @instance_config[:oscar_host_db_password])
+        contents.gsub!(/\{oscar_db_ro_name\}/, @instance_config[:oscar_host_db_readonly_name])
+        contents.gsub!(/\{oscar_db_ro_username\}/, @instance_config[:oscar_host_db_readonly_user])
+        contents.gsub!(/\{oscar_db_ro_user_password\}/, @instance_config[:oscar_host_db_readonly_password])
+        contents.gsub!(/\{oscar_practice_id\}/, JUNO_INSTANCE_NAME)
+
+        setup_clinicaid_properties(contents)
+        setup_faxing(contents)
+        setup_openshift_properties(contents)
+        set_urls_by_environment(contents)
+
+        # Set phoneprefix only on create
+        if PROVINCE == PROVINCES[:AB]
+          create_or_update_property(contents, "phoneprefix", "413-")
+        elsif PROVINCE == PROVINCES[:ON]
+          create_or_update_property(contents, "phoneprefix", "416-")
+        end
+
+        # Set encryption key for string encryption of select database values
+        create_or_update_property(contents, PROPERTY_STRING_ENCRYPTION_KEY, ENCRYPTION_KEY)
+
+        # Write file
+        File.open(OPENSHIFT_PROPERTIES_FILE, "w") {
+          |file| file.write(contents) }
+      end
+
+      def update_properties_file
+        @logger.info("Updating properties file for any properties that are pod specific or based on environment variables or would cause errors if changed")
+
+        # Load file contents
+        file = File.open(OPENSHIFT_PROPERTIES_FILE, "rb")
+        contents = file.read
+
+        setup_clinicaid_properties(contents)
+        setup_faxing(contents)
+        setup_openshift_properties(contents)
+        set_urls_by_environment(contents)
+
+        # Write file
+        File.open(OPENSHIFT_PROPERTIES_FILE, "w") {
+          |file| file.write(contents) }
+      end
+
+      def preload_provincial_eforms(province_code)
+        if OSCARHOST_SETUP_DIR == "/opt/juno/create_instance"
+          @logger.info("Copying over juno_instance_creation from juno-util pod")
+          FileUtils.mkdir_p(OSCARHOST_SETUP_DIR + "/scripts")
+          FileUtils.cp_r("/usr/src/app/juno_instance_creation", OSCARHOST_SETUP_DIR + "/scripts")
+        end
+        load_eforms(OPENSHIFT_JUNO_EFORM_PRELOAD_SOURCE)
+        load_eforms(File.join(OPENSHIFT_JUNO_EFORM_PRELOAD_SOURCE, province_code))
+      end
+
+      def load_eforms(dir)
+        if File.directory?(dir)
+          @logger.info("Loading eforms from #{dir}")
+        else
+          @logger.info("Warning, could not find eforms in #{dir}")
+          return
+        end
+
+        Dir.foreach(dir) do |file|
+          if File.extname(file) == ".zip"
+            begin
+              ::Zip::File.open(File.join(dir, file)) do |zipfile|
+                load_eform_from_zipfile(zipfile)
+              end
+            rescue StandardError => e
+              @logger.info("Failed to load eform package: #{file}")
+              @logger.info(e)
+            end
+          end
+        end
+      end
+
+      def load_eform_from_zipfile(zipfile)
+
+        properties_content = nil
+        properties_hash = {}
+        html_content = nil
+        # find eform properties
+        zipfile.each do |entry|
+          if entry.name.end_with?("eform.properties")
+            properties_content = zipfile.read(entry)
+            properties_hash = parse_props(properties_content)
+          elsif entry.name.end_with?(".html")
+            html_content = entry.get_input_stream.read
+          end
+        end
+
+        if properties_content.nil?
+          raise("eform package missing properties: #{zipfile}")
+        elsif File.zero?(html_content)
+          raise("invalid/missing html content")
+        end
+
+        # copy remaining file to eform images
+        zipfile.each do |entry|
+          if entry.file? && !entry.name.end_with?(".html") && !entry.name.end_with?(".properties")
+
+            filename = File.join(get_output_document_dir_name(JUNO_INSTANCE_NAME), EFORM_IMAGES, File.basename(entry.name))
+            unless File.file?(filename) # don't overwrite existing files
+              entry.extract(filename)
+            end
+          end
+        end
+
+        # add entry to eforms table
+        mysql_db = @instance_config[:oscar_host_db_name]
+
+        sql = "INSERT INTO #{mysql_db}.eform "
+        sql += "(form_name,file_name,subject,form_date,form_time,form_creator,status,showLatestFormOnly,patient_independent,instanced,form_html) "
+        sql += "VALUES (?,?,?,CURDATE(),NOW(),?,'1',?,?,?,?);"
+
+        query = @mysql_client.prepare(sql)
+        query.execute(prepare_prop(properties_hash[:name], File.basename(properties_hash[:htmlFilename], ".html")),
+                      prepare_prop(properties_hash[:htmlFilename]),
+                      prepare_prop(properties_hash[:details]),
+                      EFORM_CREATOR,
+                      prepare_boolean_prop(properties_hash[:showLatestFormOnly], 0),
+                      prepare_boolean_prop(properties_hash[:patient_independent], 0),
+                      prepare_boolean_prop(properties_hash[:instanced], 1),
+                      html_content)
+      end
+
+      def parse_props(string)
+        pairs = string.scan(/(\w+)=\s*(.*)$/).map { |k, v| [k.to_sym, v.strip] }
+        return Hash[pairs]
+      end
+
+      def prepare_prop(prop, default = nil)
+        if prop.nil? || prop.empty?
+          return default
+        end
+        return prop
+      end
+
+      def prepare_boolean_prop(prop, default = 0)
+        if prop == "true"
+          return 1
+        elsif prop == "false"
+          return 0
+        else
+          return default
+        end
+      end
+
+      def get_creation_db_filename()
+        # database file has a date in it
+        Dir.glob(OSCARHOST_CREATION_DB_FILENAME).sort().reverse().each do |file|
+          return file
+        end
+
+        @logger.info("No creation db file found")
+      end
+
+      def get_properties_filename()
+        Dir.glob(OSCARHOST_PROPERTIES_FILENAME).each do |file|
+          return file
+        end
+
+        @logger.info("No properties file found")
+      end
+
+      def get_output_document_dir_name(practice_id)
+        return OPENSHIFT_OSCAR_DOCUMENT + '/' + practice_id + '/'
+      end
+
+      def create_instance_config
+        {
+          oscar_host_db_name: ENV["MYSQL_DATABASE"],
+          oscar_host_db_user: ENV["MYSQL_USER"],
+          oscar_host_db_readonly_name: ENV["MYSQL_DATABASE"],
+          oscar_host_db_readonly_user: ENV["MYSQL_USER_READ_ONLY"],
+          oscar_host_db_password: ENV["MYSQL_PASSWORD"],
+          oscar_host_db_readonly_password: ENV["MYSQL_READONLY_PASSWORD"]
+        }
+      end
+
+      def log_instance_info
+        @logger.info("---------------------------------------------------------------------")
+        @logger.info("Setting up a new oscar instance")
+        @logger.info("---------------------------------------------------------------------")
+        @logger.info("practice_id:             #{JUNO_INSTANCE_NAME}")
+        @logger.info("first_name:              #{FIRST_NAME}")
+        @logger.info("last_name:               #{LAST_NAME}")
+        @logger.info("province:                #{PROVINCE}")
+        @logger.info("environment:             #{ENVIRONMENT}")
+        @logger.info("mysql_db:                #{@instance_config[:oscar_host_db_name]}")
+        @logger.info("mysql_user:              #{@instance_config[:oscar_host_db_user]}")
+        @logger.info("mysql_readonly_user:     #{@instance_config[:oscar_host_db_readonly_user]}")
+        @logger.info("creation_db_filename:    #{@instance_config[:creation_db_filename]}")
+        @logger.info("properties_filename:     #{@instance_config[:properties_filename]}")
+        @logger.info("---------------------------------------------------------------------")
+      end
+
+      def notify_slack(webhook_url, channel, text)
+        payload = {
+          :channel  => channel,
+          :text     => text
+        }.to_json
+        cmd = "curl -X POST --data-urlencode 'payload=#{payload}' #{webhook_url}"
+        system(cmd)
+      end
+
+      def handle_error(exception, stage, exit_on_error=true)
+        message = "Error initializing Juno for #{OPENSHIFT_INSTANCE_NAME} (#{ENVIRONMENT}) occurred in stage (#{stage}). #{exception}"
+        @logger.error(message)
+        @logger.error(exception.backtrace.join("\n"))
+        if ENV["JUNO_ERRORS_CHANNEL"] == "#juno-errors" and exit_on_error
+          notify_slack(JUNO_ERRORS_WEBHOOK, JUNO_ERRORS_CHANNEL, message)
+          @logger.info("Exiting in 30s...")
+          sleep 30
+          exit 1
+        end
+      end
+    end
+
+
+    # ------------------------------------------------------ Start
+    ---------------------------------------------------------
+
+    # Setup logging to output to stdout and
+    /opt/juno/logs/initialize_instance.log
+
+    FileUtils.mkdir_p('/opt/juno/logs')
+
+    log_file =
+    File.open("/opt/juno/logs/initialize_instance.log.#{Time.now.to_i}", "a")
+
+    # Disable output buffering, as it will only print log message when the
+    script finishes otherwise
+
+    $stdout.sync = true
+
+    logger = Logger.new MultiLogger.new($stdout, log_file)
+
+    logger.level = Logger::INFO
+
+
+    # Initialize instance and either create or update based on various checks
+
+    instance_initializer = InitializeInstance.new(logger)
+
+    instance_initializer.create
+  logback.xml: |-
+    <configuration>
+        <appender name="Console"
+                  class="ch.qos.logback.core.ConsoleAppender">
+            <layout class="ch.qos.logback.classic.PatternLayout">
+                <Pattern>
+                    %d %-5p [%t:%C{1.}:%L]: %msg%n%throwable
+                </Pattern>
+            </layout>
+        </appender>
+
+        <logger name="org.oscarehr" level="INFO"/>
+        <logger name="org.oscarehr.common.io.PDFFile" level="WARN"/>
+        <logger name="org.apache.cxf.transport.https.HttpsURLConnectionFactory" level="WARN"/>
+        <logger name="org.apache.cxf.interceptor.LoggingOutInterceptor" level="WARN"/>
+        <logger name="org.apache.cxf.interceptor.LoggingInInterceptor" level="WARN"/>
+        <logger name="org.apache.cxf.bus.spring.BusApplicationContext" level="WARN"/>
+        <logger name="org.apache.cxf.service.factory.ReflectionServiceFactoryBean" level="WARN"/>
+        <logger name="org.hibernate.cfg" level="WARN"/>
+        <logger name="org.hibernate.ejb.Ejb3Configuration" level="WARN"/>
+        <logger name="org.apache.jasper.compiler" level="INFO"/>
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.oscarehr.integration.born" level="DEBUG"/>
+        <logger name="ca.uhn.hl7v2.model.v26.segment.UAC" level="FATAL"/>
+
+        <root level="info">
+            <appender-ref ref="Console" />
+        </root>
+    </configuration>

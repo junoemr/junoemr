@@ -1,0 +1,23 @@
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: tomcat
+  namespace: juno
+  annotations:
+    cert-manager.io/cluster-issuer: ca-issuer
+spec:
+  rules:
+    - host: juno.cpdev.ca
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: tomcat 
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - juno.cpdev.ca
+      secretName: tomcat-ingress-cert
