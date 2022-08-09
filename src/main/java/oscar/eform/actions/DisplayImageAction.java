@@ -25,20 +25,21 @@
 
 package oscar.eform.actions;
 
-import java.io.File;
-import java.util.ArrayList;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DownloadAction;
 import org.oscarehr.common.io.FileFactory;
 import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.util.MiscUtils;
-
 import oscar.OscarProperties;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Optional;
 
 /**
  * eform_image
@@ -56,31 +57,25 @@ public class DisplayImageAction extends DownloadAction
 	}
 
 	protected StreamInfo getStreamInfo(ActionMapping mapping,
-									   ActionForm form,
-									   HttpServletRequest request,
-									   HttpServletResponse response)
-			throws Exception
+	                                   ActionForm form,
+	                                   HttpServletRequest request,
+	                                   HttpServletResponse response) throws IOException
 	{
-
-
 		String fileName = request.getParameter("imagefile");
-		//if (fileName.indexOf('/') != -1) return null;  //prevents navigating away from the page.
-		response.setHeader("Content-disposition", "inline; filename=" + fileName);
+		Optional<GenericFile> optionalFile = FileFactory.getEformImage(fileName);
 
-		GenericFile file = FileFactory.getEformImage(fileName);
-		//String canonicalPath = file.getParentFile().getCanonicalPath(); //absolute path of the retrieved file
-
-		String contentType;
-		try
+		if(optionalFile.isPresent())
 		{
-			contentType = file.getContentType();
+			GenericFile file = optionalFile.get();
+			response.setHeader("Content-disposition", "inline; filename=" + fileName);
+			return new FileStreamInfo(file.getContentType(), file.getFileObject());
 		}
-		catch (Exception e)
+		else
 		{
-			MiscUtils.getLogger().error("Error", e);
-			contentType = "application/octet-stream";
+			MiscUtils.getLogger().warn("Could not load eForm image file: '" + fileName + "'");
+			// return an empty stream, as throwing an exception here causes errors that are expected in the case where image files don't exist.
+			return new EmptyStreamInfo();
 		}
-		return new FileStreamInfo(contentType, file.getFileObject());
 	}
 
 	/**
@@ -168,5 +163,30 @@ public class DisplayImageAction extends DownloadAction
 			}
 		}
 		return files;
+	}
+
+	/**
+	 * An empty stream implementation of the struts DownloadAction StreamInfo interface
+	 */
+	protected static class EmptyStreamInfo implements StreamInfo
+	{
+		@Override
+		public String getContentType()
+		{
+			return "application/octet-stream";
+		}
+
+		@Override
+		public InputStream getInputStream() throws IOException
+		{
+			return new InputStream()
+			{
+				@Override
+				public int read()
+				{
+					return -1;  // end of stream
+				}
+			};
+		}
 	}
 }
