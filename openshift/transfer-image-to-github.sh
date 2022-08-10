@@ -10,13 +10,15 @@ print_usage() {
   echo "-p - project to use \(e.g. juno-build, juno-images\)"
   echo "-i - image stream to transfer from" 
   echo "-t - tag within the image stream to transfer"
+  echo "-u - github user name"
   echo ""
   echo "Requires that oc be logged in to the relevant cluster and a local docker be accessible."
-  echo "Also please provide a github token in \"/root/.ghcr.io_token\" that can has write access to the CloudMD-SSI package repository."
+  echo "Also please provide a github token in \"/root/.ghcr.io_token\" that can has write access to the CloudMD-SSI "
+  echo "package repository.  The token needs to be for the specified GitHub username (-u option)."
   echo "e.g. sudo vi ~/.ghcr.io_token"
 }
 
-while getopts 'h?e:p:i:t:' option; do
+while getopts 'h?e:p:i:t:u:' option; do
   case "${option}" in
   h | [?])
     print_usage
@@ -26,6 +28,7 @@ while getopts 'h?e:p:i:t:' option; do
   p) project="${OPTARG}" ;;
   i) image_name="${OPTARG}" ;;
   t) image_tag="${OPTARG}" ;;
+  u) github_username="${OPTARG}" ;;
   *)
     echo "Unexpected option ${option}"
     exit 1
@@ -55,7 +58,7 @@ echo "Logging into registries..."
 echo -e "\033[1;33m"
 
 echo "GitHub"
-sudo cat ~/.ghcr.io_token | sudo docker login ghcr.io --username jordan-nicholas --password-stdin
+sudo cat ~/.ghcr.io_token | sudo docker login ghcr.io --username $github_username --password-stdin
 RESULT=$?
 if [ $RESULT -ne 0 ]; then
 	echo "Error logging into ghcr.io.  Please provide a valid token in the /root/.ghcr.io_token file"
