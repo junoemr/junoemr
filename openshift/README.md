@@ -49,13 +49,13 @@ transfer-image-to-github.sh
 Copies an image from an openshift image stream to the packages section of the CloudMD-SSI GitHub repository.
 
 Prerequisites: 
-* Provide a GitHub Personal Access Token with package write permission to CloudMD-SSI repository.  The token is expected to be in the `/root/.ghcr.io_token` file.
+* Provide a GitHub Personal Access Token with package write permission to CloudMD-SSI repository.  The token is expected to be in the `/root/.ghcr.io_token`file and is associated with the github username provided to the command.
 * successfully run build-openshift-image.sh or otherwise have an image available in the openshift image stream.
 
 Common usage.  Run these two commands to copy the images required for booting Juno in Kubernetes:
 ```bash
-./transfer_image_to_github.sh -e osdev -p juno-build -i juno-spring-boot -t juno_spring_boot_2022-08-08.0
-./transfer_image_to_github.sh -e osdev -p juno-images -i juno-util -t v1.0.1
+./transfer_image_to_github.sh -e osdev -p juno-build -i juno-spring-boot -t juno_spring_boot_2022-08-08.0 -u <github username>
+./transfer_image_to_github.sh -e osdev -p juno-images -i juno-util -t v1.0.1 -u <github username>
 ```
 
 skaffold.yaml
