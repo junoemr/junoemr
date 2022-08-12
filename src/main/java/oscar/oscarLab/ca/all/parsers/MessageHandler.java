@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.oscarehr.common.hl7.v2.oscar_to_oscar.DataTypeUtils;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.labs.service.Hl7TextInfoService;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
 import oscar.oscarLab.ca.all.model.EmbeddedDocument;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
@@ -691,7 +692,10 @@ public abstract class MessageHandler
 
 		try {
 			String providerId = getOrderingProviderNo(0, 0);
-			docNums.add(providerId);
+			if(StringUtils.isNotBlank(providerId))
+			{
+				docNums.add(providerId);
+			}
 
 			i = 0;
 			id = getResultCopiesToProviderNo(0, i);
@@ -1594,5 +1598,12 @@ public abstract class MessageHandler
 	protected DataTypeUtils.HL7_VERSION getMsgVersion()
 	{
 		return DataTypeUtils.getHL7Version(this.message);
+	}
+
+	public ProviderCriteriaSearch getProviderMatchingCriteria(String routingId)
+	{
+		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+		criteriaSearch.setOhipNo(routingId);
+		return criteriaSearch;
 	}
 }

@@ -39,13 +39,15 @@ import org.oscarehr.util.MiscUtils;
 import oscar.OscarProperties;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -63,8 +65,17 @@ public class Utilities
 
 	public static ArrayList<String> separateMessages(String fileName) throws IOException
 	{
+		return separateMessages(Files.newInputStream(Paths.get(fileName)));
+	}
+
+	public static ArrayList<String> separateMessages(File file) throws IOException
+	{
+		return separateMessages(Files.newInputStream(file.toPath()));
+	}
+
+	public static ArrayList<String> separateMessages(InputStream is) throws IOException
+	{
 		ArrayList<String> messages = new ArrayList<>();
-		InputStream is = new FileInputStream(fileName);
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 

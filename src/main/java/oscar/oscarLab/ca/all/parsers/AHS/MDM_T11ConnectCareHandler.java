@@ -28,6 +28,7 @@ import ca.uhn.hl7v2.model.v23.datatype.CX;
 import ca.uhn.hl7v2.model.v23.message.MDM_T11;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
 import oscar.oscarLab.ca.all.parsers.messageTypes.MDM_T11MessageHandler;
 
 import java.util.ArrayList;
@@ -38,6 +39,15 @@ public abstract class MDM_T11ConnectCareHandler extends MDM_T11MessageHandler
 	public MDM_T11ConnectCareHandler(Message msg) throws HL7Exception
 	{
 		super(msg);
+	}
+
+	public ProviderCriteriaSearch getProviderMatchingCriteria(String routingId)
+	{
+		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+		criteriaSearch.setJunctionTypeOR();
+		criteriaSearch.setAlbertaEDeliveryId(routingId);
+		criteriaSearch.setAlbertaConnectCareId(routingId);
+		return criteriaSearch;
 	}
 
 	/* ================================= PID ============================== */

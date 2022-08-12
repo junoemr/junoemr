@@ -37,9 +37,7 @@ package oscar.oscarLab.ca.all.upload;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.Gender;
-import org.oscarehr.common.OtherIdManager;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.dao.Hl7TextMessageDao;
@@ -51,7 +49,6 @@ import org.oscarehr.common.io.GenericFile;
 import org.oscarehr.common.model.Demographic;
 import org.oscarehr.common.model.Hl7TextInfo;
 import org.oscarehr.common.model.Hl7TextMessage;
-import org.oscarehr.common.model.OtherId;
 import org.oscarehr.common.model.PatientLabRouting;
 import org.oscarehr.common.model.Provider;
 import org.oscarehr.common.model.ProviderLabRoutingModel;
@@ -62,6 +59,7 @@ import org.oscarehr.labs.model.Hl7DocumentLink;
 import org.oscarehr.managers.DemographicManager;
 import org.oscarehr.olis.dao.OLISSystemPreferencesDao;
 import org.oscarehr.olis.model.OLISSystemPreferences;
+import org.oscarehr.provider.dao.ProviderDataDao;
 import org.oscarehr.provider.model.ProviderData;
 import org.oscarehr.util.DbConnectionFilter;
 import org.oscarehr.util.LoggedInInfo;
@@ -77,7 +75,6 @@ import oscar.oscarLab.ca.all.parsers.HHSEmrDownloadHandler;
 import oscar.oscarLab.ca.all.parsers.MessageHandler;
 import oscar.oscarLab.ca.all.parsers.OLIS.OLISHL7Handler;
 import oscar.oscarLab.ca.all.parsers.PATHL7Handler;
-import oscar.oscarLab.ca.all.parsers.SpireHandler;
 import oscar.util.ConversionUtils;
 import oscar.util.UtilDateUtilities;
 
@@ -94,7 +91,13 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.oscarehr.common.dao.ProviderLabRoutingDao.LAB_TYPE_HL7;
+import static oscar.oscarLab.ca.all.parsers.PATHL7Handler.LIFELABS_MESSAGE_TYPE;
 
 public final class MessageUploader {
 
@@ -105,7 +108,7 @@ public final class MessageUploader {
 	private static final Hl7TextMessageDao hl7TextMessageDao = (Hl7TextMessageDao) SpringUtils.getBean("hl7TextMessageDao");
 	private static final Hl7DocumentLinkDao hl7DocumentLinkDao = SpringUtils.getBean(Hl7DocumentLinkDao.class);
 	private static final DemographicManager demographicManager = SpringUtils.getBean(DemographicManager.class);
-	private static final ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
+	private static final ProviderDataDao providerDataDao = SpringUtils.getBean(ProviderDataDao.class);
 	private static final DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
 	private static final DocumentService documentService = SpringUtils.getBean(DocumentService.class);
 
@@ -191,20 +194,6 @@ public final class MessageUploader {
 				catch(Exception e)
 				{
 					logger.error("HHS ERROR",e);
-				}
-			}
-
-			// get actual ohip numbers based on doctor first and last name for spire lab
-			if (messageHandler instanceof SpireHandler)
-			{
-				List<String> docNames = ((SpireHandler)messageHandler).getDocNames();
-				for (int i = 0; i < docNames.size(); i++)
-				{
-					logger.info(i + " " + docNames.get(i));
-				}
-				if (docNames != null)
-				{
-					docNums = findProvidersForSpireLab(docNames);
 				}
 			}
 
@@ -349,39 +338,21 @@ public final class MessageUploader {
 				if (olisPreferences.isFilterPatients())
 				{
 					//set as unclaimed
-					providerRouteReport(String.valueOf(insertID), null, DbConnectionFilter.getThreadLocalDbConnection(), String.valueOf(0), type);
+					providerRouteReport(String.valueOf(insertID), DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo);
 				}
 				else
 				{
-					providerRouteReport(String.valueOf(insertID), docNums, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type);
+					providerRouteReport(String.valueOf(insertID), DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, findProviderIds(messageHandler, docNums));
 				}
 			}
 			else
 			{
-				Integer limit = null;
-				String custom_lab_route="";
-				boolean orderByLength = false;
-				String search = null;
-				if (type.equals("Spire"))
-				{
-					limit = 1;
-					orderByLength = true;
-					search = "provider_no";
-				}
-				else if(type.equals("CLS") || type.equals("CLSDI"))
-				{
-					search = "hso_no";
-				}
-				else if(type.equals("IHA"))
-				{
-					search = "alberta_e_delivery_ids";
-				}
-				else if (type.equals("PATHL7"))
+				if (type.equals(LIFELABS_MESSAGE_TYPE))
 				{
 					//custom lab routing for excelleris labs
 					//Parses custom_lab_routeX properties (starting at 1)
 					//Property format: custom_lab_routeX=<excelleris_lab_account>,<provider_no>
-					custom_lab_route = OscarProperties.getInstance().getProperty("custom_lab_route1");
+					String custom_lab_route = OscarProperties.getInstance().getProperty("custom_lab_route1");
 
 					if (custom_lab_route != null && !custom_lab_route.equals(""))
 					{
@@ -395,9 +366,9 @@ public final class MessageUploader {
 						// Loop through each custom_lab_routeX in the properties file
 						while (custom_lab_route != null && !custom_lab_route.equals(""))
 						{
-							ArrayList<String> cust_route = new ArrayList<String>(Arrays.asList(custom_lab_route.split(",")));
-							account = cust_route.get(0);
-							ArrayList<String> to_provider = new ArrayList<String>(Arrays.asList(cust_route.get(1)));
+							ArrayList<String> custRoute = new ArrayList<>(Arrays.asList(custom_lab_route.split(",")));
+							account = custRoute.get(0);
+							String toProvider = custRoute.get(1);
 
 							// Get the receiving facility from the MSH segment
 							lab_user = handler.getLabUser();
@@ -408,7 +379,7 @@ public final class MessageUploader {
 							{
 								// We have a match, so we have a custom route. Route to the custom provider not the ordering provider
 								custom_route_enabled = true;
-								providerRouteReport(String.valueOf(insertID), to_provider, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, "provider_no", limit, orderByLength);
+								providerRouteReport(String.valueOf(insertID), DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, toProvider);
 							}
 
 							k++;
@@ -417,12 +388,12 @@ public final class MessageUploader {
 					}
 				}
 
-				// If we don't have a custom route then route as normal. Route to the the ordering provider
+				// If we don't have a custom route then route as normal. Route to the ordering provider
 				if(!custom_route_enabled)
 				{
 					/* allow property override setting to route all labs to a specific inbox or list of inboxes. */
-					List<String> providers = OscarProperties.getInstance().getRouteLabsToProviders(docNums);
-					providerRouteReport(String.valueOf(insertID), providers, DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, type, search, limit, orderByLength);
+					List<String> routingIds = OscarProperties.getInstance().getRouteLabsToProviders(docNums);
+					providerRouteReport(String.valueOf(insertID), DbConnectionFilter.getThreadLocalDbConnection(), demProviderNo, findProviderIds(messageHandler, routingIds));
 				}
 			}
 			retVal = messageHandler.audit();
@@ -442,94 +413,37 @@ public final class MessageUploader {
 	}
 
 	/**
-	 * Method findProvidersForSpireLab
-	 * Finds the providers that are associated with a spire lab.  (need to do this using doctor names, as
-	 * spire labs don't have a valid ohip number associated with them).
+	 * use the lab specific search criteria to find system providers
+	 * @param handler the lab MessageHandler
+	 * @param docNums the routingIds for the lab
+	 * @return the provider table Ids to route to
 	 */
-	private static ArrayList<String> findProvidersForSpireLab(List<String> docNames) {
-		List<String> docNums = new ArrayList<String>();
-		ProviderDao providerDao = (ProviderDao)SpringUtils.getBean("providerDao");
-
-		for (int i=0; i < docNames.size(); i++) {
-			String[] firstLastName = docNames.get(i).split("\\s");
-			if (firstLastName != null && firstLastName.length >= 2) {
-				//logger.debug("Searching for provider with first and last name: " + firstLastName[0] + " " + firstLastName[firstLastName.length-1]);
-				List<Provider> provList = providerDao.getProviderLikeFirstLastName("%"+firstLastName[0]+"%", firstLastName[firstLastName.length-1]);
-				if (provList != null) {
-					int provIndex = findProviderWithShortestFirstName(provList);
-					if (provIndex != -1 && provList.size() >= 1 && !provList.get(provIndex).getProviderNo().equals(DEFAULT_BLANK_PROVIDER_NO)) {
-						docNums.add( provList.get(provIndex).getProviderNo() );
-						//logger.debug("ADDED1: " + provList.get(provIndex).getProviderNo());
-					} else {
-						// prepend 'dr ' to first name and try again
-						provList = providerDao.getProviderLikeFirstLastName("dr " + firstLastName[0], firstLastName[1]);
-						if (provList != null) {
-							provIndex = findProviderWithShortestFirstName(provList);
-							if (provIndex != -1 && provList.size() == 1 && !provList.get(provIndex).getProviderNo().equals(DEFAULT_BLANK_PROVIDER_NO)) {
-								//logger.debug("ADDED2: " + provList.get(provIndex).getProviderNo());
-								docNums.add( provList.get(provIndex).getProviderNo() );
-							}
-						}
-					}
-				}
+	private static String[] findProviderIds(MessageHandler handler, List<String> docNums)
+	{
+		// use a set to filter duplicates
+		Set<String> providerNos = new HashSet<>();
+		if(docNums != null)
+		{
+			for(String routeId : docNums)
+			{
+				List<ProviderData> providers = providerDataDao.criteriaSearch(handler.getProviderMatchingCriteria(routeId));
+				providerNos.addAll(providers.stream().map(ProviderData::getId).collect(Collectors.toList()));
 			}
 		}
-
-		return (ArrayList<String>)docNums;
-	}
-
-	/**
-	 * Method findProviderWithShortestFirstName
-	 * Finds the provider with the shortest first name in a list of providers.
-	 */
-	private static int findProviderWithShortestFirstName(List<Provider> provList) {
-		if (provList == null || provList.isEmpty())
-			return -1;
-
-		int index = 0;
-		int shortestLength = provList.get(0).getFirstName().length();
-		for (int i=1; i < provList.size(); i++) {
-			int curLength = provList.get(i).getFirstName().length();
-			if (curLength < shortestLength) {
-				index = i;
-				shortestLength = curLength;
-			}
-		}
-
-		return index;
+		return providerNos.toArray(new String[]{});
 	}
 
 	/**
 	 * Attempt to match the doctors from the lab to a provider
+	 * @param labId the id of the lab
+	 * @param conn the database connection
+	 * @param altProviderNo the alternate provider ID to route to, in the case that there are no valid providerIds
+	 * @param providerIds the database providerIds to route to.
 	 */
-	private static void providerRouteReport(String labId, List<String> docNums, Connection conn, String altProviderNo, String labType, String search_on, Integer limit, boolean orderByLength) throws Exception {
-		ArrayList<String> providerNums = new ArrayList<String>();
-		String sqlSearchOn = "ohip_no";
+	private static void providerRouteReport(String labId, Connection conn, String altProviderNo, String ... providerIds) throws Exception
+	{
+		List<String> providerNums = new ArrayList<>(Arrays.asList(providerIds));
 		String routeToProvider = OscarProperties.getInstance().getProperty("route_labs_to_provider", "");
-
-		if (search_on != null && search_on.length() > 0) {
-			sqlSearchOn = search_on;
-		}
-
-		if (docNums != null) {
-			for (int i = 0; i < docNums.size(); i++) {
-				if (docNums.get(i) != null && !(docNums.get(i)).trim().equals("")) {
-
-					List<Provider> results = providerDao.getProvidersByFieldId(docNums.get(i), labType, sqlSearchOn, limit, orderByLength);
-					for(Provider p: results) {
-						providerNums.add(p.getProviderNo());
-					}
-
-					String otherIdMatchKey = OscarProperties.getInstance().getProperty("lab.other_id_matching", "");
-					if(otherIdMatchKey.length()>0) {
-						OtherId otherId = OtherIdManager.searchTable(OtherIdManager.PROVIDER, otherIdMatchKey, docNums.get(i));
-						if(otherId != null) {
-							providerNums.add(otherId.getTableId());
-						}
-					}
-				}
-			}
-		}
 
 		// If we're not routing all labs to the unclaimed inbox, then route to all providers assigned to the most recent version of the lab
 		if (!Provider.UNCLAIMED_PROVIDER_NO.equals(routeToProvider))
@@ -560,23 +474,18 @@ public final class MessageUploader {
 		}
 
 		ProviderLabRouting routing = new ProviderLabRouting();
-		if (providerNums.size() > 0) {
-			for (int i = 0; i < providerNums.size(); i++) {
-				String provider_no = providerNums.get(i);
-				routing.route(labId, provider_no, conn, "HL7");
+		if (!providerNums.isEmpty())
+		{
+			for(String provider_no : providerNums)
+			{
+				routing.route(labId, provider_no, conn, LAB_TYPE_HL7);
 			}
 		}
-		else {
-			routing.route(labId, DEFAULT_BLANK_PROVIDER_NO, conn, "HL7");
-			routing.route(labId, altProviderNo, conn, "HL7");
+		else
+		{
+			routing.route(labId, DEFAULT_BLANK_PROVIDER_NO, conn, LAB_TYPE_HL7);
+			routing.route(labId, altProviderNo, conn, LAB_TYPE_HL7);
 		}
-	}
-
-	/**
-	 * Attempt to match the doctors from the lab to a provider
-	 */
-	private static void providerRouteReport(String labId, List<String> docNums, Connection conn, String altProviderNo, String labType) throws Exception {
-		providerRouteReport(labId, docNums, conn, altProviderNo, labType, null, null, false);
 	}
 
 	/**
