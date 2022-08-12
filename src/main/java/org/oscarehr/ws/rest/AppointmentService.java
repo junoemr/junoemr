@@ -77,7 +77,7 @@ public class AppointmentService extends AbstractServiceImpl
 	{
 		securityInfoManager.requireAllPrivilege(getLoggedInProviderId(), Permission.APPOINTMENT_READ);
 
-		AppointmentConverter converter = new AppointmentConverter(true, true);
+		AppointmentConverter converter = new AppointmentConverter();
 		Appointment appointment = appointmentManager.getAppointment(getLoggedInInfo(), appointmentNo);
 		return RestResponse.successResponse(converter.getAsTransferObject(getLoggedInInfo(), appointment));
 	}

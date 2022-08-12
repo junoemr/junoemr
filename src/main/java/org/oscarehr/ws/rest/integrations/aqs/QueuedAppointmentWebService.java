@@ -117,7 +117,7 @@ public class QueuedAppointmentWebService extends AbstractServiceImpl
 		Appointment newAppointment = queuedAppointmentService.scheduleQueuedAppointment(appointmentId, queueId, bookQueuedAppointmentTransfer.getProviderNo(),
 		                                                                                bookQueuedAppointmentTransfer.getSiteId(), getLoggedInInfo(), getHttpServletRequest());
 		// return newly created appointment
-		AppointmentConverter converter = new AppointmentConverter(true, true);
+		AppointmentConverter converter = new AppointmentConverter();
 		return RestResponse.successResponse(converter.getAsTransferObject(getLoggedInInfo(), newAppointment));
 	}
 }
