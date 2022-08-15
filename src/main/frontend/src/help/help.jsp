@@ -26,11 +26,11 @@
 <h2>Help</h2>
 
 <p>
-Thank you for using Juno EMR. The following resources have been assembled to help you find answers to your questions. For technical issues, please contact your OSP on the <a ui-sref="support">support</a> page.
+	Thank you for using OSCAR. The following resources have been assembled to help you find answers to your questions. For technical issues, please contact your OSP on the <a ui-sref="support">support</a> page.
 </p>
 
 <p>
-Juno help site <a target="_blank" href="https://help.junoemr.com">here</a>.
+	Oscarhost help site <a target="_blank" href="https://help.oscarhost.ca">here</a>.
 </p>
 
 <p>
