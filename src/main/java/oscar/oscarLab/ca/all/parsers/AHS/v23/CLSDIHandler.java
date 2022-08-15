@@ -30,6 +30,7 @@ import ca.uhn.hl7v2.model.v23.segment.MSH;
 import org.apache.log4j.Logger;
 import org.oscarehr.common.dao.Hl7TextInfoDao;
 import org.oscarehr.common.model.Hl7TextInfo;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
 import org.oscarehr.util.SpringUtils;
 
 /**
@@ -43,7 +44,6 @@ public class CLSDIHandler extends CLSHandler
 	public static final String CLSDI_MESSAGE_TYPE = "CLSDI";
 
 	private static Logger logger = Logger.getLogger(CLSDIHandler.class);
-	private static Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
 
 	protected static final String CLSDI_SENDING_APPLICATION = "OPEN ENGINE";
 	protected static final String CLSDI_SENDING_FACILITY = "DI";
@@ -84,11 +84,19 @@ public class CLSDIHandler extends CLSHandler
 	@Override
 	public boolean canUpload()
 	{
+		Hl7TextInfoDao hl7TextInfoDao = (Hl7TextInfoDao) SpringUtils.getBean("hl7TextInfoDao");
 		String accessionNumber = this.getUniqueIdentifier();
 		Hl7TextInfo hl7TextInfo = hl7TextInfoDao.findLatestVersionByAccessionNo(accessionNumber, this.getMsgType());
 
 		// if the report exists the new version must be a correction
 		return (hl7TextInfo == null || this.getOrderStatus().equals("C"));
+	}
+
+	public ProviderCriteriaSearch getProviderMatchingCriteria(String routingId)
+	{
+		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+		criteriaSearch.setHsoNo(routingId);
+		return criteriaSearch;
 	}
 
     /* ===================================== Hl7 Parsing ====================================== */

@@ -18,10 +18,9 @@
     Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 --%>
-<%@page import="org.oscarehr.common.dao.BillingOnItemPaymentDao"%>
 <%@page import="org.oscarehr.managers.SecurityInfoManager"%>
 <%@page import="org.oscarehr.util.LoggedInInfo"%>
-<%@page import="java.math.*,java.util.*,java.sql.*,oscar.*,java.net.*" %> <!-- errorPage="errorpage.jsp" -->
+<%@page import="java.math.*,java.util.*,java.sql.*,oscar.*" %> <!-- errorPage="errorpage.jsp" -->
 <%@page import="oscar.oscarBilling.ca.on.data.*"%>
 <%@page import="oscar.oscarBilling.ca.on.pageUtil.*"%>
 <%@page import="oscar.oscarDemographic.data.*"%>
@@ -31,7 +30,7 @@
 <%@page import="oscar.util.DateUtils"%>
 <%@page import="org.oscarehr.common.model.BillingONItem"%>
 <%@page import="org.oscarehr.common.model.BillingONErrorCode, org.oscarehr.common.dao.BillingONErrorCodeDao"%>
-<%@page import="org.oscarehr.common.dao.BillingONEAReportDao, org.oscarehr.common.model.BillingONEAReport"%>
+<%@page import="org.oscarehr.common.dao.BillingONEAReportDao"%>
 <%@page import="org.oscarehr.common.model.RaDetail, org.oscarehr.common.dao.RaDetailDao"%>
 <%@page import="org.oscarehr.common.model.ClinicLocation, org.oscarehr.common.dao.ClinicLocationDao"%>
 <%@page import="org.oscarehr.common.dao.BillingONPaymentDao, org.oscarehr.common.model.BillingONPayment"%>
@@ -46,6 +45,8 @@
 <%@page import="org.oscarehr.common.dao.ProfessionalSpecialistDao" %>
 <%@page import="org.oscarehr.common.service.BillingONService"%> 
 <%@page import="java.text.NumberFormat" %>
+<%@ page import="org.oscarehr.provider.service.ProviderSearchService" %>
+<%@ page import="org.oscarehr.provider.model.ProviderData" %>
 
 <%@taglib uri="/WEB-INF/security.tld" prefix="security"%>
 <%@taglib uri="/WEB-INF/struts-bean.tld" prefix="bean"%>
@@ -60,6 +61,7 @@
     String userProviderNo = (String) session.getAttribute("user");
     ProviderDao providerDao = (ProviderDao) SpringUtils.getBean("providerDao");
     BillingONExtDao bExtDao = (BillingONExtDao) SpringUtils.getBean("billingONExtDao");
+	ProviderSearchService providerSearchService = SpringUtils.getBean(ProviderSearchService.class);
     
     BillingONPaymentDao billingOnPaymentDao = SpringUtils.getBean(BillingONPaymentDao.class);
     Provider userProvider = providerDao.getProvider(userProviderNo);
@@ -916,14 +918,13 @@ Pay Program:<br>
       <script>
 var _providers = [];
 <%	for (int i=0; i<sites.size(); i++) {  
-	Set<Provider> siteProviders = sites.get(i).getProviders();
-	List<Provider>  siteProvidersList = new ArrayList<Provider> (siteProviders);
-     Collections.sort(siteProvidersList,(new Provider()).ComparatorName());%>
-	_providers["<%= sites.get(i).getName() %>"]="<% Iterator<Provider> iter = siteProvidersList.iterator();
+	List<ProviderData> siteProvidersList = providerSearchService.getBySite(sites.get(i).getSiteId());
+     %>
+	_providers["<%= sites.get(i).getName() %>"]="<% Iterator<ProviderData> iter = siteProvidersList.iterator();
 	while (iter.hasNext()) {
-		Provider p=iter.next();
-		if (pros.contains(p.getProviderNo())) {
-	%><option value='<%= p.getProviderNo() %>'><%= p.getLastName() %>, <%= p.getFirstName() %></option><% }} %>";
+		ProviderData p=iter.next();
+		if (pros.contains(p.getId())) {
+	%><option value='<%= p.getId() %>'><%= p.getLastName() %>, <%= p.getFirstName() %></option><% }} %>";
 <% } %>
 function changeSite(sel) {
 	sel.form.provider_no.innerHTML=sel.value=="none"?"":_providers[sel.value];

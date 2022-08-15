@@ -1317,26 +1317,17 @@ public class RxPrescriptionData {
 			this.outsideProviderOhip = outsideProviderOhip;
 		}
 
-        public void setSpecial(String RHS) {
-
-        	/* 
-        	 * Error if setting a null or empty special
-        	 * only if it wasn't already null, as the special is initialized to null 
-        	 * and sometimes it gets set to its current value.
-        	 * We should never set the special to empty string (empty string should mean bad client-side input checking).
-        	 */
-			if ((RHS == null && special != null) || (RHS != null && RHS.trim().length() == 0)) {
-			    logger.error("The drug special has been set to a bad value:'" + RHS + "'; "+
-			    		"The old value was:'"+special+"';");
-			}
-        	
-			if (RHS != null && !RHS.equals("null")) {
+		public void setSpecial(String RHS)
+		{
+			if(RHS != null && !RHS.equals("null"))
+			{
 				special = RHS;
-            }
-			else {
-                special = null;
-            }
-        }
+			}
+			else
+			{
+				special = null;
+			}
+		}
 
 		public String getSpecialDisplay() {
 			String ret = "";

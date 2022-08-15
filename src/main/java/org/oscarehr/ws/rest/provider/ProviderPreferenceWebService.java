@@ -20,12 +20,13 @@
  * Victoria, British Columbia
  * Canada
  */
-package org.oscarehr.ws.rest;
+package org.oscarehr.ws.rest.provider;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.oscarehr.managers.ProviderManager2;
 import org.oscarehr.managers.model.ProviderSettings;
 import org.oscarehr.security.model.Permission;
+import org.oscarehr.ws.rest.AbstractServiceImpl;
 import org.oscarehr.ws.rest.response.RestResponse;
 import org.oscarehr.ws.rest.to.AbstractSearchResponse;
 import org.oscarehr.ws.rest.to.GenericRESTResponse;

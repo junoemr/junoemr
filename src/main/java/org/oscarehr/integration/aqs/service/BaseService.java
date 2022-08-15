@@ -106,7 +106,7 @@ public abstract class BaseService extends org.oscarehr.integration.BaseService
 		}
 		else
 		{
-			throw new RuntimeException("The property [" + AQS_INTEGRATION_ORGANIZATION_ID + "] is not set in the [property] table! AQS integration will not function until corrected");
+			throw new IllegalStateException("The property [" + AQS_INTEGRATION_ORGANIZATION_ID + "] is not set in the [property] table! AQS integration will not function until corrected");
 		}
 
 		if (userPropertyDao.getProp(AQS_PROPERTY_API_SECRET_KEY) != null)
@@ -115,7 +115,7 @@ public abstract class BaseService extends org.oscarehr.integration.BaseService
 		}
 		else
 		{
-			throw new RuntimeException("The property [" + AQS_PROPERTY_API_SECRET_KEY + "] is not set in the [property] table! " +
+			throw new IllegalStateException("The property [" + AQS_PROPERTY_API_SECRET_KEY + "] is not set in the [property] table! " +
 							                           "AQS integration will not function until corrected!");
 		}
 	}

@@ -36,6 +36,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class JunoProperties
 {
 	private JunoPropertiesConfig properties;
+	private AdministratorConfig administratorConfig;
 	private RedisSessionStore redisSessionStore;
 	private NetcareConfig netcareConfig;
 	private Olis olis;
@@ -49,6 +50,12 @@ public class JunoProperties
 	public static class JunoPropertiesConfig
 	{
 		private String filename;
+	}
+
+	@Data
+	public static class AdministratorConfig
+	{
+		private String loginName;
 	}
 
 	@Data

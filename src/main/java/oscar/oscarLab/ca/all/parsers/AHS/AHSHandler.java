@@ -28,6 +28,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.oscarehr.provider.search.ProviderCriteriaSearch;
 import oscar.oscarLab.ca.all.parsers.messageTypes.ORU_R01MessageHandler;
 import oscar.util.ConversionUtils;
 
@@ -65,6 +66,13 @@ public abstract class AHSHandler extends ORU_R01MessageHandler
 	}
 	@Override
 	public void postUpload() {}
+
+	public ProviderCriteriaSearch getProviderMatchingCriteria(String routingId)
+	{
+		ProviderCriteriaSearch criteriaSearch = new ProviderCriteriaSearch();
+		criteriaSearch.setAlbertaEDeliveryId(routingId);
+		return criteriaSearch;
+	}
 
 	/* ===================================== MSH ====================================== */
 

@@ -25,8 +25,8 @@
  Ontario, Canada
 
  */
-import {AppointmentApi} from '../../generated/api/AppointmentApi';
 import {ScheduleApi} from '../../generated/api/ScheduleApi';
+import {API_BASE_PATH} from "../lib/constants/ApiConstants";
 
 angular.module("Schedule").service("scheduleService", [
 	'$http',
@@ -41,10 +41,7 @@ angular.module("Schedule").service("scheduleService", [
 	{
 		var service = {
 
-			appointmentApi: new AppointmentApi($http, $httpParamSerializer,
-			'../ws/rs'),
-			scheduleApi: new ScheduleApi($http, $httpParamSerializer,
-			'../ws/rs'),
+			scheduleApi: new ScheduleApi($http, $httpParamSerializer, API_BASE_PATH),
 
 			eventStatuses: {},
 			rotateStatuses: [],

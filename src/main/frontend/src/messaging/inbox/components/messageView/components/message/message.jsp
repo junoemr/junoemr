@@ -46,7 +46,7 @@
 		<!-- Message Body -->
 		<div class="message-container m-t-24">
 			<div class="text-grey m-b-8">Message</div>
-			<p>{{$ctrl.message.message}}</p>
+			<pre class="body-smallest">{{$ctrl.message.message}}</pre>
 		</div>
 
 

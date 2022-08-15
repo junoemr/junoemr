@@ -244,10 +244,9 @@ public class IMDHealthService
 
 		for (Site activeSite: sites)
 		{
-			Set<ProviderData> siteProviders = activeSite.getProviders()
+			Set<ProviderData> siteProviders = activeSite.getAssignedProviders()
 					.stream()
-					.filter(provider -> provider.isActive())
-					.map(provider -> provider.convertToProviderData())
+					.filter(ProviderData::isActive)
 					.collect(Collectors.toSet());
 
 			if ((!SSOOrganization.canMapSite(activeSite)))

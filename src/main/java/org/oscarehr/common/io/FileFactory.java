@@ -44,6 +44,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -72,7 +73,7 @@ public class FileFactory
 	 */
 	public static GenericFile createEformImage(InputStream fileInputStream, String fileName) throws IOException, InterruptedException
 	{
-		if(!isFileInDirectory(fileName, GenericFile.EFORM_IMAGE_DIR))
+		if(!isFileInDirectory(GenericFile.EFORM_IMAGE_DIR, fileName))
 		{
 			throw new IOException("SECURITY WARNING: Illegal file path detected, client attempted to navigate away from the eform images directory");
 		}
@@ -315,20 +316,26 @@ public class FileFactory
 	}
 
 	/**
-	 * load an existing eform image with the given name
+	 * load an existing eform image with the given name, if it exists.
+	 * it is expected that some eforms reference files not in the eforms directory,
+	 * since users can modify their own eforms and manage their own eform image files
 	 * @param fileName - name of the file to load
-	 * @return - the file
+	 * @return - the optional file
 	 */
-	public static GenericFile getEformImage(String fileName) throws IOException
+	public static Optional<GenericFile> getEformImage(String fileName) throws IOException
 	{
-		if(!isFileInDirectory(fileName, GenericFile.EFORM_IMAGE_DIR))
+		if(!isFileInDirectory(GenericFile.EFORM_IMAGE_DIR, fileName))
 		{
 			throw new IOException("SECURITY WARNING: Illegal file path detected, client attempted to navigate away from the eform images directory");
 		}
-		GenericFile file = getExistingFile(GenericFile.EFORM_IMAGE_DIR, fileName);
-		file.restrictContentType = false;
-		file.forceSetValidation(true);
-		return file;
+		if(fileExists(GenericFile.EFORM_IMAGE_DIR, fileName))
+		{
+			GenericFile file = getExistingFile(GenericFile.EFORM_IMAGE_DIR, fileName);
+			file.restrictContentType = false;
+			file.forceSetValidation(true);
+			return Optional.of(file);
+		}
+		return Optional.empty();
 	}
 
 	/**
@@ -685,7 +692,7 @@ public class FileFactory
 		return file.exists() && file.isDirectory();
 	}
 
-	private static boolean isFileInDirectory(String fileName, String directory)
+	private static boolean isFileInDirectory(String directory, String fileName)
 	{
 		File directoryFile = new File(directory);
 		File file = new File(directory, fileName);

@@ -24,7 +24,6 @@
 package org.oscarehr.ws.rest.conversion;
 
 import org.apache.log4j.Logger;
-import org.oscarehr.PMmodule.dao.ProviderDao;
 import org.oscarehr.common.dao.DemographicDao;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Demographic;
@@ -48,22 +47,12 @@ import java.util.TimeZone;
 
 public class AppointmentConverter extends AbstractConverter<Appointment, AppointmentTo1> {
 
-	private boolean includeDemographic;
-	private boolean includeProvider;
-
 	private DemographicDao demographicDao = SpringUtils.getBean(DemographicDao.class);
-
-	private ProviderDao providerDao = SpringUtils.getBean(ProviderDao.class);
 
 	protected Logger logger = MiscUtils.getLogger();
 
 	public AppointmentConverter() {
 		
-	}
-	
-	public AppointmentConverter(boolean includeDemographic, boolean includeProvider) {
-		this.includeDemographic = includeDemographic;
-		this.includeProvider = includeProvider;
 	}
 
 	public Appointment getAsDomainObject(CalendarAppointment t) throws ConversionException
@@ -314,15 +303,6 @@ public class AppointmentConverter extends AbstractConverter<Appointment, Appoint
 	   AppointmentTo1 t = new AppointmentTo1();
 	   
 	   BeanUtils.copyProperties(d, t);
-	   
-	   if(includeDemographic && t.getDemographicNo() > 0) {
-		   t.setDemographic(demographicDao.getDemographicById(t.getDemographicNo()));
-	   }
-	   
-	   if(includeProvider && t.getProviderNo() != null) {
-		   t.setProvider(providerDao.getProvider(t.getProviderNo()));
-	   }
-	  
 	   return t;
     }
 

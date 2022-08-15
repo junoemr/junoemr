@@ -73,6 +73,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
     		siteShortName.put(st.getName(),st.getShortName());
     	}
 	}
+	ProviderSearchService providerSearchService = SpringUtils.getBean(ProviderSearchService.class);
 %>
 
 <%//
@@ -170,7 +171,10 @@ NumberFormat formatter = new DecimalFormat("#0.00");
 <%@page import="org.oscarehr.common.dao.SiteDao"%>
 <%@page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
 <%@page import="org.oscarehr.common.model.Site"%>
-<%@page import="org.oscarehr.common.model.Provider"%><html>
+<%@ page import="org.oscarehr.provider.service.ProviderSearchService" %>
+<%@ page import="org.oscarehr.util.SpringUtils" %>
+<%@ page import="org.oscarehr.provider.model.ProviderData" %>
+<html>
     <head>
         <title><bean:message key="admin.admin.invoiceRpts"/></title>
         
@@ -403,14 +407,13 @@ if (bMultisites)
       <script>
 var _providers = [];
 <%	for (int i=0; i<sites.size(); i++) {  
-	Set<Provider> siteProviders = sites.get(i).getProviders();
-	List<Provider>  siteProvidersList = new ArrayList<Provider> (siteProviders);
-	Collections.sort(siteProvidersList,(new Provider()).ComparatorName());%>
-	_providers["<%= sites.get(i).getName() %>"]="<% Iterator<Provider> iter = siteProvidersList.iterator();
+	List<ProviderData> siteProvidersList = providerSearchService.getBySite(sites.get(i).getSiteId());
+	%>
+	_providers["<%= sites.get(i).getName() %>"]="<% Iterator<ProviderData> iter = siteProvidersList.iterator();
 	while (iter.hasNext()) {
-		Provider p=iter.next();
-		if (pros.contains(p.getProviderNo())) {
-	%><option value='<%= p.getProviderNo() %>'><%= p.getLastName() %>, <%= p.getFirstName() %></option><% }} %>";
+		ProviderData p=iter.next();
+		if (pros.contains(p.getId())) {
+	%><option value='<%= p.getId() %>'><%= p.getLastName() %>, <%= p.getFirstName() %></option><% }} %>";
 <% } %>
 function changeSite(sel) {
 	sel.form.providerview.innerHTML=sel.value=="none"?"":"<option value='none'>---select provider---</option>"+_providers[sel.value];

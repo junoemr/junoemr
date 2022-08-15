@@ -23,15 +23,13 @@
  */
 package org.oscarehr.ws.rest.to.model;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.oscarehr.common.model.Appointment;
 import org.oscarehr.common.model.Appointment.BookingSource;
-import org.oscarehr.common.model.Demographic;
-import org.oscarehr.common.model.Provider;
+
+import java.io.Serializable;
+import java.util.Date;
 
 public class AppointmentTo1 implements Serializable {
 
@@ -79,9 +77,6 @@ public class AppointmentTo1 implements Serializable {
 	private BookingSource bookingSource;
 	
 	private Integer reasonCode;
-
-	private Demographic demographic;
-	private Provider provider;
 
 	@Getter
 	@Setter
@@ -295,23 +290,5 @@ public class AppointmentTo1 implements Serializable {
 	public void setReasonCode(Integer reasonCode) {
 		this.reasonCode = reasonCode;
 	}
-
-	public Demographic getDemographic() {
-		return demographic;
-	}
-
-	public void setDemographic(Demographic demographic) {
-		this.demographic = demographic;
-	}
-
-	public Provider getProvider() {
-		return provider;
-	}
-
-	public void setProvider(Provider provider) {
-		this.provider = provider;
-	}
-
-
 
 }

@@ -24,6 +24,7 @@ package org.oscarehr.ws.rest.transfer.providerManagement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -122,6 +123,7 @@ public class ProviderEditFormTo1 implements Serializable
 	private String connectCareProviderId;
 	private String takNumber;
 	private String lifeLabsClientId;
+	@JsonProperty("eDeliveryIds")
 	private String eDeliveryIds;
 	private String imdHealthUuid;
 	private String olisOfficialFirstName;
