@@ -200,6 +200,8 @@ spec:
               value: /opt/juno/create_instance
             - name: USER_LOGIN
               value: user
+            - name: ADMIN_USER_LOGIN
+              value: oscar_host
             - name: USER_PASSWORD
               value: admin
             - name: USER_PIN
