@@ -276,7 +276,7 @@ public class PersonaService extends AbstractServiceImpl {
 	
 		MenuTo1 userMenu = new MenuTo1()
 		.addWithState(0,bundle.getString("navbar.menu.settings"),null,"settings")
-		.addNewWindow(1,bundle.getString("navbar.menu.help"),null,"https://help.oscarhost.ca")
+		.addNewWindow(1,bundle.getString("navbar.menu.help"),null,"https://help.junoemr.com")
 		.addWithState(2,bundle.getString("navbar.menu.logout"),null,"logout");
 		navBarMenu.setUserMenu(userMenu);
 
