@@ -50,11 +50,15 @@ public class Navigation
 		"&appointmentDate=" +
 		"&startTime=" +
 		"&status=";//"&curDate=2019-4-17" +
-	public static final String SUMMARY_URL = "/web/#!/record/1/summary";//https://ele-bcdemo15.dev.junoemr.com/juno/web/#!/record/140/summary
-	//http://localhost:8080/test_ailin/web/#!/record/1/summary
+
 	public static final String Consultation_URL = "/oscarEncounter/IncomingConsultation.do?providerNo=" + AuthUtils.TEST_PROVIDER_ID + "&userName=doctor+" + AuthUtils.TEST_USER_NAME;
 	public static final String EFORM_URL = "/eform/efmformslistadd.jsp?demographic_no=1&appointment=&parentAjaxId=eforms";
 	public static final String Details_URL = "/web/#!/record/" + "1" + "/details";
+	public static final String SUMMARY_URL = "/web/#!/record/1/summary";//https://ele-bcdemo15.dev.junoemr.com/juno/web/#!/record/140/summary
+	//http://localhost:8080/test_ailin/web/#!/record/1/summary
+	public static final String PREVENTION_URL = "/oscarPrevention/index.jsp?demographic_no=1";
+	public static final String PREVENTION_INJECTION_URL = "/oscarPrevention/AddPreventionData.jsp?prevention=COVID-19&demographic_no=1&prevResultDesc=";
+	public static final String EXAM_PREVENTION_URL = "/oscarPrevention/AddPreventionData.jsp?prevention=Smoking&demographic_no=1&prevResultDesc=";
 	private static Logger logger = MiscUtils.getLogger();
 
 	/**
