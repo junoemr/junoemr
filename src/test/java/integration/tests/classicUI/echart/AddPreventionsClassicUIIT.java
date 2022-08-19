@@ -54,17 +54,17 @@ public class AddPreventionsClassicUIIT extends SeleniumTestBase
 {
 	// Reused URLs to navigate to
 
-	public static String ORIGINAL_NAME = "A vaccine";
-	public static String ORIGINAL_LOCATION = "The clinic";
-	public static String ORIGINAL_ROUTE = "that way";
-	public static String ORIGINAL_DOSE = "1 of 2";
-	public static String ORIGINAL_LOT = "lot id would go here!";
-	public static String ORIGINAL_MANUFACTURE = "Moderna";
-	public static String ORIGINAL_COMMENTS = "Hello, world! I'm a vaccination comment saying that the patient got sick after!";
-	public static LocalDate NEXT_DATE = LocalDate.now().plusMonths(1);
-	public static String ORIGINAL_NEVERREASON = "well this is sure clear";
-	public static String EDITED_COMMENT = "Updated: I'm a smoking check!";
-	public static String XPATH = "//div[contains(@onclick, 'AddPreventionData.jsp?id=')]" +
+	public static final String ORIGINAL_NAME = "A vaccine";
+	public static final String ORIGINAL_LOCATION = "The clinic";
+	public static final String ORIGINAL_ROUTE = "that way";
+	public static final String ORIGINAL_DOSE = "1 of 2";
+	public static final String ORIGINAL_LOT = "lot id would go here!";
+	public static final String ORIGINAL_MANUFACTURE = "Moderna";
+	public static final String ORIGINAL_COMMENTS = "Hello, world! I'm a vaccination comment saying that the patient got sick after!";
+	public static final LocalDate NEXT_DATE = LocalDate.now().plusMonths(1);
+	public static final String ORIGINAL_NEVERREASON = "well this is sure clear";
+	public static final String EDITED_COMMENT = "Updated: I'm a smoking check!";
+	public static final String XPATH = "//div[contains(@onclick, 'AddPreventionData.jsp?id=')]" +
 		"//preceding::div[@class='headPrevention _nifty']//" +
 		"child::p//" +
 		"child::a[contains(@onclick, 'AddPreventionData.jsp?prevention=Smoking')]";
