@@ -54,17 +54,17 @@ public class AddPreventionsClassicUIIT extends SeleniumTestBase
 {
 	// Reused URLs to navigate to
 
-	public static String originalName = "A vaccine";
-	public static String originalLocation = "The clinic";
-	public static String originalRoute = "that way";
-	public static String originalDose = "1 of 2";
-	public static String originalLot = "lot id would go here!";
-	public static String originalManufacture = "Moderna";
-	public static String originalComments = "Hello, world! I'm a vaccination comment saying that the patient got sick after!";
-	public static LocalDate nextDate = LocalDate.now().plusMonths(1);
-	public static String originalNeverReason = "well this is sure clear";
-	public static String editedComment = "Updated: I'm a smoking check!";
-	public static String xpath = "//div[contains(@onclick, 'AddPreventionData.jsp?id=')]" +
+	public static String ORIGINAL_NAME = "A vaccine";
+	public static String ORIGINAL_LOCATION = "The clinic";
+	public static String ORIGINAL_ROUTE = "that way";
+	public static String ORIGINAL_DOSE = "1 of 2";
+	public static String ORIGINAL_LOT = "lot id would go here!";
+	public static String ORIGINAL_MANUFACTURE = "Moderna";
+	public static String ORIGINAL_COMMENTS = "Hello, world! I'm a vaccination comment saying that the patient got sick after!";
+	public static LocalDate NEXT_DATE = LocalDate.now().plusMonths(1);
+	public static String ORIGINAL_NEVERREASON = "well this is sure clear";
+	public static String EDITED_COMMENT = "Updated: I'm a smoking check!";
+	public static String XPATH = "//div[contains(@onclick, 'AddPreventionData.jsp?id=')]" +
 		"//preceding::div[@class='headPrevention _nifty']//" +
 		"child::p//" +
 		"child::a[contains(@onclick, 'AddPreventionData.jsp?prevention=Smoking')]";
@@ -127,14 +127,14 @@ public class AddPreventionsClassicUIIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//a[contains(@onclick, 'showHideNextDate')]")).click();
 		String currentNeverReason = driver.findElement(By.xpath("//input[@name='neverReason']")).getAttribute("value");;
 
-		Assert.assertEquals("Prevention name not updated successfully", originalName, currentName);
-		Assert.assertEquals("Prevention location not updated successfully", originalLocation, currentLocation);
-		Assert.assertEquals("Prevention route not updated successfully", originalRoute, currentRoute);
-		Assert.assertEquals("Prevention dose not updated successfully", originalDose, currentDose);
-		Assert.assertEquals("Prevention lot not updated successfully", originalLot, currentLot);
-		Assert.assertEquals("Prevention manufacture not updated successfully", originalManufacture, currentManufacture);
-		Assert.assertEquals("Prevention comments not updated successfully", originalComments, currentComments);
-		Assert.assertEquals("Prevention never reason field not updated successfully", originalNeverReason, currentNeverReason);
+		Assert.assertEquals("Prevention name not updated successfully", ORIGINAL_NAME, currentName);
+		Assert.assertEquals("Prevention location not updated successfully", ORIGINAL_LOCATION, currentLocation);
+		Assert.assertEquals("Prevention route not updated successfully", ORIGINAL_ROUTE, currentRoute);
+		Assert.assertEquals("Prevention dose not updated successfully", ORIGINAL_DOSE, currentDose);
+		Assert.assertEquals("Prevention lot not updated successfully", ORIGINAL_LOT, currentLot);
+		Assert.assertEquals("Prevention manufacture not updated successfully", ORIGINAL_MANUFACTURE, currentManufacture);
+		Assert.assertEquals("Prevention comments not updated successfully", ORIGINAL_COMMENTS, currentComments);
+		Assert.assertEquals("Prevention never reason field not updated successfully", ORIGINAL_NEVERREASON, currentNeverReason);
 	}
 
 	@Test
@@ -147,40 +147,40 @@ public class AddPreventionsClassicUIIT extends SeleniumTestBase
 		// window closes, find following URL and verify entry shows
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + PREVENTION_URL);
 		Set<String> oldWindowHandles = driver.getWindowHandles();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(XPATH)));
 
 		// Click on prevention to edit it
 		Assert.assertTrue("Can't find anything resembling an added exam prevention on page", PageUtil.isExistsBy(
-				By.xpath(xpath), driver));
+				By.xpath(XPATH), driver));
 
 		PageUtil.switchToNewWindow(driver,
 				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), oldWindowHandles,
 			webDriverWait);
 
-		findWaitEdit(driver, webDriverWait, By.xpath("//textarea[@name='comments']"), editedComment);
+		findWaitEdit(driver, webDriverWait, By.xpath("//textarea[@name='comments']"), EDITED_COMMENT);
 
 		String currentComment = driver.findElement(By.xpath("//textarea[@name='comments']")).getAttribute("value");
-		Assert.assertEquals("Exam-style prevention comments not updated successfully", editedComment, currentComment);
+		Assert.assertEquals("Exam-style prevention comments not updated successfully", EDITED_COMMENT, currentComment);
 	}
 
 	public static void addPrevention()
 	{
 		// fill in various empty fields on page
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='name']")));
-		driver.findElement(By.xpath("//input[@name='name']")).sendKeys(originalName);
-		driver.findElement(By.xpath("//input[@name='location']")).sendKeys(originalLocation);
-		driver.findElement(By.xpath("//input[@name='route']")).sendKeys(originalRoute);
-		driver.findElement(By.xpath("//input[@name='dose']")).sendKeys(originalDose);
+		driver.findElement(By.xpath("//input[@name='name']")).sendKeys(ORIGINAL_NAME);
+		driver.findElement(By.xpath("//input[@name='location']")).sendKeys(ORIGINAL_LOCATION);
+		driver.findElement(By.xpath("//input[@name='route']")).sendKeys(ORIGINAL_ROUTE);
+		driver.findElement(By.xpath("//input[@name='dose']")).sendKeys(ORIGINAL_DOSE);
 		// UI indicates there should be a select here??
-		driver.findElement(By.xpath("//input[@name='lot']")).sendKeys(originalLot);
-		driver.findElement(By.xpath("//input[@name='manufacture']")).sendKeys(originalManufacture);
-		driver.findElement(By.xpath("//textarea[@name='comments']")).sendKeys(originalComments);
+		driver.findElement(By.xpath("//input[@name='lot']")).sendKeys(ORIGINAL_LOT);
+		driver.findElement(By.xpath("//input[@name='manufacture']")).sendKeys(ORIGINAL_MANUFACTURE);
+		driver.findElement(By.xpath("//textarea[@name='comments']")).sendKeys(ORIGINAL_COMMENTS);
 		driver.findElement(By.xpath("//a[contains(@onclick, 'showHideNextDate')]")).click();
-		driver.findElement(By.xpath("//input[@name='neverReason']")).sendKeys(originalNeverReason);
+		driver.findElement(By.xpath("//input[@name='neverReason']")).sendKeys(ORIGINAL_NEVERREASON);
 
 		// NOTE: This does not work. The input doesn't actually accept text input, it forces usage of calendar.
 		// Probably a good thing in reality, but it means I have to get more creative when attempting to input a date.
-		driver.findElement(By.xpath("//input[@name='nextDate']")).sendKeys(nextDate.toString());
+		driver.findElement(By.xpath("//input[@name='nextDate']")).sendKeys(NEXT_DATE.toString());
 
 		// save
 		driver.findElement(By.xpath("//input[@type='submit']")).click();
@@ -188,10 +188,10 @@ public class AddPreventionsClassicUIIT extends SeleniumTestBase
 
 	public static void addExamPreventions()
 	{
-		String originalComments = "I'm a smoking check!";
+		String ORIGINAL_COMMENTS = "I'm a smoking check!";
 
 		// you should be able to do nothing here and hit save, but for testing purposes we'll fill in comments
-		findWaitSendKeysByXpath(driver, webDriverWait, "//textarea[@name='comments']", originalComments);
+		findWaitSendKeysByXpath(driver, webDriverWait, "//textarea[@name='comments']", ORIGINAL_COMMENTS);
 		driver.findElement(By.xpath("//input[@type='submit']")).click();
 
 	}

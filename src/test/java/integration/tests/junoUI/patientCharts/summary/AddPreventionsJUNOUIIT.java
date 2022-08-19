@@ -25,16 +25,16 @@ package integration.tests.junoUI.patientCharts.summary;
 
 import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.addExamPreventions;
 import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.addPrevention;
-import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.editedComment;
-import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.originalComments;
-import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.originalDose;
-import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.originalLocation;
-import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.originalLot;
-import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.originalManufacture;
-import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.originalName;
-import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.originalNeverReason;
-import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.originalRoute;
-import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.xpath;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.EDITED_COMMENT;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_COMMENTS;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_DOSE;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_LOCATION;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_LOT;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_MANUFACTURE;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_NAME;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_NEVERREASON;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_ROUTE;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.XPATH;
 import static integration.tests.util.junoUtil.Navigation.EXAM_PREVENTION_URL;
 import static integration.tests.util.junoUtil.Navigation.PREVENTION_INJECTION_URL;
 import static integration.tests.util.junoUtil.Navigation.PREVENTION_URL;
@@ -119,14 +119,14 @@ public class AddPreventionsJUNOUIIT extends SeleniumTestBase
 		driver.findElement(By.xpath("//a[contains(@onclick, 'showHideNextDate')]")).click();
 		String currentNeverReason = driver.findElement(By.xpath("//input[@name='neverReason']")).getAttribute("value");;
 
-		Assert.assertEquals("Prevention name not updated successfully", originalName, currentName);
-		Assert.assertEquals("Prevention location not updated successfully", originalLocation, currentLocation);
-		Assert.assertEquals("Prevention route not updated successfully", originalRoute, currentRoute);
-		Assert.assertEquals("Prevention dose not updated successfully", originalDose, currentDose);
-		Assert.assertEquals("Prevention lot not updated successfully", originalLot, currentLot);
-		Assert.assertEquals("Prevention manufacture not updated successfully", originalManufacture, currentManufacture);
-		Assert.assertEquals("Prevention comments not updated successfully", originalComments, currentComments);
-		Assert.assertEquals("Prevention never reason field not updated successfully", originalNeverReason, currentNeverReason);
+		Assert.assertEquals("Prevention name not updated successfully", ORIGINAL_NAME, currentName);
+		Assert.assertEquals("Prevention location not updated successfully", ORIGINAL_LOCATION, currentLocation);
+		Assert.assertEquals("Prevention route not updated successfully", ORIGINAL_ROUTE, currentRoute);
+		Assert.assertEquals("Prevention dose not updated successfully", ORIGINAL_DOSE, currentDose);
+		Assert.assertEquals("Prevention lot not updated successfully", ORIGINAL_LOT, currentLot);
+		Assert.assertEquals("Prevention manufacture not updated successfully", ORIGINAL_MANUFACTURE, currentManufacture);
+		Assert.assertEquals("Prevention comments not updated successfully", ORIGINAL_COMMENTS, currentComments);
+		Assert.assertEquals("Prevention never reason field not updated successfully", ORIGINAL_NEVERREASON, currentNeverReason);
 
 		//Verify on summary page.
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + SUMMARY_URL);
@@ -146,17 +146,17 @@ public class AddPreventionsJUNOUIIT extends SeleniumTestBase
 		// window closes, find following URL and verify entry shows
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + PREVENTION_URL);
 		Set<String> oldWindowHandles = driver.getWindowHandles();
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
+		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(XPATH)));
 
 		// Click on prevention to edit it
 		Assert.assertTrue("Can't find anything resembling an added exam prevention on page", PageUtil.isExistsBy(
-				By.xpath(xpath), driver));
+				By.xpath(XPATH), driver));
 
 		PageUtil.switchToNewWindow(driver,
 				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), oldWindowHandles,
 			webDriverWait);
-		findWaitEdit(driver, webDriverWait, By.xpath("//textarea[@name='comments']"), editedComment);
+		findWaitEdit(driver, webDriverWait, By.xpath("//textarea[@name='comments']"), EDITED_COMMENT);
 		String currentComment = driver.findElement(By.xpath("//textarea[@name='comments']")).getAttribute("value");
-		Assert.assertEquals("Exam-style prevention comments not updated successfully", editedComment, currentComment);
+		Assert.assertEquals("Exam-style prevention comments not updated successfully", EDITED_COMMENT, currentComment);
 	}
 }

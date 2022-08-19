@@ -24,7 +24,7 @@
 package integration.tests.junoUI.patientCharts.details;
 
 import static integration.tests.classicUI.administration.userManagement.AddProvidersIT.drApple;
-import static integration.tests.util.junoUtil.Navigation.Details_URL;
+import static integration.tests.util.junoUtil.Navigation.DETAILS_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByLinkText;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
@@ -79,7 +79,7 @@ public class AddContactsJUNOUIIT extends SeleniumTestBase
 	public void addInternalProfessionalContactTest()
 	{
 		// open JUNO UI Patient Details page
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Details_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + DETAILS_URL);
 
 		// Add Dr. Apple as Internal Professional Contacts
 		String detailPageHandle = driver.getWindowHandle();
@@ -105,7 +105,7 @@ public class AddContactsJUNOUIIT extends SeleniumTestBase
 		String phone = "2502502500";
 		String address = "31 ABC Ave";
 		// open JUNO UI Patient Details page
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Details_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + DETAILS_URL);
 
 		// Add Dr. Smith as an External Professional Contacts
 		String detailPageHandle = driver.getWindowHandle();
