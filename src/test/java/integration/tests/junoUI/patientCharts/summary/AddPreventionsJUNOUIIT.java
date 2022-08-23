@@ -21,20 +21,31 @@
  * Canada
  */
 
-package integration.tests.classicUI.echart;
+package integration.tests.junoUI.patientCharts.summary;
 
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.addExamPreventions;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.addPrevention;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.EDITED_COMMENT;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_COMMENTS;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_DOSE;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_LOCATION;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_LOT;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_MANUFACTURE;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_NAME;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_NEVERREASON;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.ORIGINAL_ROUTE;
+import static integration.tests.classicUI.echart.AddPreventionsClassicUIIT.XPATH;
 import static integration.tests.util.junoUtil.Navigation.EXAM_PREVENTION_URL;
 import static integration.tests.util.junoUtil.Navigation.PREVENTION_INJECTION_URL;
 import static integration.tests.util.junoUtil.Navigation.PREVENTION_URL;
+import static integration.tests.util.junoUtil.Navigation.SUMMARY_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitEdit;
-import static integration.tests.util.seleniumUtil.ActionUtil.findWaitSendKeysByXpath;
 
 import integration.tests.util.SeleniumTestBase;
 import integration.tests.util.junoUtil.Navigation;
 import integration.tests.util.seleniumUtil.PageUtil;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,31 +61,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:integration-test.properties")
 @SpringBootTest(classes = JunoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AddPreventionsClassicUIIT extends SeleniumTestBase
+public class AddPreventionsJUNOUIIT extends SeleniumTestBase
 {
-	// Reused URLs to navigate to
-
-	public static final String ORIGINAL_NAME = "A vaccine";
-	public static final String ORIGINAL_LOCATION = "The clinic";
-	public static final String ORIGINAL_ROUTE = "that way";
-	public static final String ORIGINAL_DOSE = "1 of 2";
-	public static final String ORIGINAL_LOT = "lot id would go here!";
-	public static final String ORIGINAL_MANUFACTURE = "Moderna";
-	public static final String ORIGINAL_COMMENTS = "Hello, world! I'm a vaccination comment saying that the patient got sick after!";
-	public static final LocalDate NEXT_DATE = LocalDate.now().plusMonths(1);
-	public static final String ORIGINAL_NEVERREASON = "well this is sure clear";
-	public static final String EDITED_COMMENT = "Updated: I'm a smoking check!";
-	public static final String XPATH = "//div[contains(@onclick, 'AddPreventionData.jsp?id=')]" +
-		"//preceding::div[@class='headPrevention _nifty']//" +
-		"child::p//" +
-		"child::a[contains(@onclick, 'AddPreventionData.jsp?prevention=Smoking')]";
-
 	@Override
 	protected String[] getTablesToRestore()
 	{
 		return new String[]{
 			"admission", "demographic", "demographicArchive", "demographiccust", "log", "preventions",
-			"preventionsExt", "property"
+			"preventionsExt", "property", "provider_recent_demographic_access"
 		};
 	}
 
@@ -87,7 +81,7 @@ public class AddPreventionsClassicUIIT extends SeleniumTestBase
 	}
 
 	@Test
-	public void handleInjectionPreventions()
+	public void addPreventionsTest()
 	{
 		// *** Add prevention ***
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + PREVENTION_INJECTION_URL);
@@ -95,8 +89,6 @@ public class AddPreventionsClassicUIIT extends SeleniumTestBase
 
 		// window closes, find following URL and verify entry shows
 		driver.get(Navigation.getOscarUrl(randomTomcatPort) + PREVENTION_URL);
-
-		Set<String> oldWindowHandles = driver.getWindowHandles();
 
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]")));
 		Assert.assertTrue("Can't find anything resembling an added prevention on page",
@@ -135,6 +127,13 @@ public class AddPreventionsClassicUIIT extends SeleniumTestBase
 		Assert.assertEquals("Prevention manufacture not updated successfully", ORIGINAL_MANUFACTURE, currentManufacture);
 		Assert.assertEquals("Prevention comments not updated successfully", ORIGINAL_COMMENTS, currentComments);
 		Assert.assertEquals("Prevention never reason field not updated successfully", ORIGINAL_NEVERREASON, currentNeverReason);
+
+		//Verify on summary page.
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + SUMMARY_URL);
+		webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.linkText("Notes")));
+		findWaitClickByXpath(driver, webDriverWait, "//button[@ng-click='$ctrl.addBtnCallback()']");
+		findWaitClickByXpath(driver, webDriverWait, "//button[@ng-click='$ctrl.toggleShowAllItems()']");
+		Assert.assertTrue("Prevention not added successfully on Summary page.", PageUtil.isExistsBy(By.xpath("//a[@title='COVID-19 ']"), driver));
 	}
 
 	@Test
@@ -156,43 +155,8 @@ public class AddPreventionsClassicUIIT extends SeleniumTestBase
 		PageUtil.switchToNewWindow(driver,
 				By.xpath("//div[contains(@onclick, 'AddPreventionData.jsp?id=')]"), oldWindowHandles,
 			webDriverWait);
-
 		findWaitEdit(driver, webDriverWait, By.xpath("//textarea[@name='comments']"), EDITED_COMMENT);
-
 		String currentComment = driver.findElement(By.xpath("//textarea[@name='comments']")).getAttribute("value");
 		Assert.assertEquals("Exam-style prevention comments not updated successfully", EDITED_COMMENT, currentComment);
-	}
-
-	public static void addPrevention()
-	{
-		// fill in various empty fields on page
-		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='name']")));
-		driver.findElement(By.xpath("//input[@name='name']")).sendKeys(ORIGINAL_NAME);
-		driver.findElement(By.xpath("//input[@name='location']")).sendKeys(ORIGINAL_LOCATION);
-		driver.findElement(By.xpath("//input[@name='route']")).sendKeys(ORIGINAL_ROUTE);
-		driver.findElement(By.xpath("//input[@name='dose']")).sendKeys(ORIGINAL_DOSE);
-		// UI indicates there should be a select here??
-		driver.findElement(By.xpath("//input[@name='lot']")).sendKeys(ORIGINAL_LOT);
-		driver.findElement(By.xpath("//input[@name='manufacture']")).sendKeys(ORIGINAL_MANUFACTURE);
-		driver.findElement(By.xpath("//textarea[@name='comments']")).sendKeys(ORIGINAL_COMMENTS);
-		driver.findElement(By.xpath("//a[contains(@onclick, 'showHideNextDate')]")).click();
-		driver.findElement(By.xpath("//input[@name='neverReason']")).sendKeys(ORIGINAL_NEVERREASON);
-
-		// NOTE: This does not work. The input doesn't actually accept text input, it forces usage of calendar.
-		// Probably a good thing in reality, but it means I have to get more creative when attempting to input a date.
-		driver.findElement(By.xpath("//input[@name='nextDate']")).sendKeys(NEXT_DATE.toString());
-
-		// save
-		driver.findElement(By.xpath("//input[@type='submit']")).click();
-	}
-
-	public static void addExamPreventions()
-	{
-		String ORIGINAL_COMMENTS = "I'm a smoking check!";
-
-		// you should be able to do nothing here and hit save, but for testing purposes we'll fill in comments
-		findWaitSendKeysByXpath(driver, webDriverWait, "//textarea[@name='comments']", ORIGINAL_COMMENTS);
-		driver.findElement(By.xpath("//input[@type='submit']")).click();
-
 	}
 }

@@ -23,7 +23,7 @@
 
 package integration.tests.classicUI.echart;
 
-import static integration.tests.util.junoUtil.Navigation.Consultation_URL;
+import static integration.tests.util.junoUtil.Navigation.CONSULTATION_URL;
 import static integration.tests.util.junoUtil.Navigation.ECHART_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByXpath;
@@ -83,7 +83,7 @@ public class AddConsultationsClassicUIIT extends SeleniumTestBase
 				PageUtil.isExistsBy(By.linkText(serviceName), driver));
 
 		//** Verify from Consultations top menu. **
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Consultation_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + CONSULTATION_URL);
 		webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(serviceName)));
 		Assert.assertTrue(serviceName + " is NOT added under Consultations successfully.",
 				PageUtil.isExistsBy(By.linkText(serviceName), driver));

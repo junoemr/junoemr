@@ -25,7 +25,7 @@ package integration.tests.junoUI.patientCharts.details;
 
 import static integration.tests.classicUI.administration.userManagement.AddProvidersIT.drApple;
 import static integration.tests.classicUI.administration.userManagement.AssignRolesIT.optionSelected;
-import static integration.tests.util.junoUtil.Navigation.Details_URL;
+import static integration.tests.util.junoUtil.Navigation.DETAILS_URL;
 import static integration.tests.util.seleniumUtil.ActionUtil.dropdownSelectByVisibleText;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickById;
 import static integration.tests.util.seleniumUtil.ActionUtil.findWaitClickByLinkText;
@@ -84,7 +84,7 @@ public class PatientCharts_DetailsJUNOUIIT extends SeleniumTestBase
 		String aliasNames = "TestQA";
 
 		// open JUNO UI Patient Details page
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Details_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + DETAILS_URL);
 
 		// Edit Demographic information
 		findWaitSendKeysByXpath(driver, webDriverWait, "//juno-input[@label='Middle Name']//input", middleName );
@@ -135,7 +135,7 @@ public class PatientCharts_DetailsJUNOUIIT extends SeleniumTestBase
 		String phoneCheckedStatus = "btn primary checked";
 
 		// open JUNO UI Patient Details page
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Details_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + DETAILS_URL);
 
 		// Edit Contact information
 		findWaitClickByXpath(driver, webDriverWait, "//button[contains(., 'Cancel')]");
@@ -204,7 +204,7 @@ public class PatientCharts_DetailsJUNOUIIT extends SeleniumTestBase
 		String validationMessage = "Some fields are invalid, Please correct the highlighted fields";
 
 		// open JUNO UI Patient Details page
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Details_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + DETAILS_URL);
 
 		// Edit Health Care information
 		findWaitClickByXpath(driver, webDriverWait, "//button[contains(., 'Cancel')]");
@@ -309,7 +309,7 @@ public class PatientCharts_DetailsJUNOUIIT extends SeleniumTestBase
 		String cytology = "654321";
 
 		// open JUNO UI Patient Details page
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Details_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + DETAILS_URL);
 
 		// Edit Health Care information
 		findWaitClickByXpath(driver, webDriverWait, "//button[contains(., 'Cancel')]");
@@ -441,7 +441,7 @@ public class PatientCharts_DetailsJUNOUIIT extends SeleniumTestBase
 		String securityAnswer = "Mount Douglas Secondary";
 
 		// open JUNO UI Patient Details page
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Details_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + DETAILS_URL);
 
 		// Edit Additional information
 		findWaitClickByXpath(driver, webDriverWait, "//button[contains(., 'Cancel')]");
