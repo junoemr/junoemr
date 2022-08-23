@@ -143,7 +143,7 @@ public class AddContactsJUNOUIIT extends SeleniumTestBase
 	public void addInternalPersonalContactTest()
 	{
 		// open JUNO UI Patient Details page
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Details_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + DETAILS_URL);
 
 		// Add Momlname, Momfname as Internal Personal Contacts
 		String detailPageHandle = driver.getWindowHandle();
@@ -165,7 +165,7 @@ public class AddContactsJUNOUIIT extends SeleniumTestBase
 	public void addExternalPersonalContactTest()
 	{
 		// open JUNO UI Patient Details page
-		driver.get(Navigation.getOscarUrl(randomTomcatPort) + Details_URL);
+		driver.get(Navigation.getOscarUrl(randomTomcatPort) + DETAILS_URL);
 
 		// Add Dr. Smith as an External Professional Contacts
 		String detailPageHandle = driver.getWindowHandle();
