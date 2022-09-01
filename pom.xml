@@ -1770,7 +1770,7 @@
 			<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>5.1.0</version>
 				<executions>
 					<execution>
 						<id>generate-typescript-api</id>
