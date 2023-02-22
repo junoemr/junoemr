@@ -49,7 +49,7 @@
     "angular-resource": "~1.6.0",
     "angular-ui-bootstrap": "^2.5.0",
     "angular-ui-router": "^1.0.3",
-    "bootstrap-sass": "^3.3.7",
+    "bootstrap-sass": "^3.4.1",
     "bootstrap-sass-loader": "^1.0.10",
     "bootstrap-timepicker": "^0.5.2",
     "components-font-awesome": "^4.7.0",
