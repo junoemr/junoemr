@@ -56,10 +56,6 @@
 			<id>local_repo</id>
 			<url>file://${basedir}/local_repo</url>
 		</repository>
-		<repository>
-			<id>archiva.internal</id>
-			<url>https://mvn.cloudpractice.ca/repository/internal</url>
-		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -392,6 +388,29 @@
 		<!-- rtf / lowagie -->
 		<dependency>
 			<groupId>com.lowagie</groupId>
+			<artifactId>itext</artifactId>
+			<version>2.1.7</version>
+			<exclusions>
+				<exclusion>
+					<groupId>bouncycastle</groupId>
+					<artifactId>bcprov-jdk14</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>bouncycastle</groupId>
+					<artifactId>bcmail-jdk14</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bcprov-jdk14</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bctsp-jdk14</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.lowagie</groupId>
 			<artifactId>itext-rtf</artifactId>
 			<version>2.1.7</version>
 			<exclusions>
@@ -459,6 +478,10 @@
 				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>
 					<artifactId>jackson-annotations</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.lowagie</groupId>
+					<artifactId>itext</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -1307,13 +1330,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.12</version>
-		</dependency>
-		<!-- AQS -->
-		<dependency>
-			<groupId>ca.cloudpractice</groupId>
-			<artifactId>aqs-java-client</artifactId>
-			<version>0.3.6</version>
+			<version>1.18.30</version>
 		</dependency>
 	</dependencies>
 
@@ -1937,6 +1954,9 @@
 						<goals>
 							<goal>npm</goal>
 						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
 					</execution>
 					<execution>
 						<id>webpack {webpack.env}</id>
@@ -2026,6 +2046,7 @@
 		<profile>
 			<id>jdk6</id>
 			<activation>
+				<activeByDefault>false</activeByDefault>
 				<jdk>1.6</jdk>
 			</activation>
 			<dependencies>
@@ -2068,7 +2089,7 @@
 		<profile>
 			<id>jdk7</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
+				<activeByDefault>false</activeByDefault>
 				<jdk>1.7</jdk>
 			</activation>
 			<dependencies>
@@ -2111,7 +2132,7 @@
 		<profile>
 			<id>jdk8</id>
 			<activation>
-				<activeByDefault>false</activeByDefault>
+				<activeByDefault>true</activeByDefault>
 				<jdk>1.8</jdk>
 			</activation>
 			<dependencies>

@@ -23,15 +23,11 @@
 
 package org.oscarehr.common.model;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.oscarehr.common.annotation.SiteLocation;
 import org.oscarehr.common.listeners.BeanValidationEventListener;
-import org.oscarehr.integration.aqs.model.QueuedAppointmentLink;
 import org.oscarehr.provider.model.ProviderData;
 import oscar.util.ConversionUtils;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -43,7 +39,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -143,11 +138,6 @@ public class Appointment extends AbstractModel<Integer> implements Serializable 
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="lastupdateuser", referencedColumnName="provider_no", insertable=false, updatable=false)
 	private ProviderData lastUpdateUserRecord;
-
-	@Getter
-	@Setter
-	@OneToOne(mappedBy="appointment", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
-	private QueuedAppointmentLink queuedAppointmentLink;
 
 	private String remarks = "";
 	private String urgency = "";

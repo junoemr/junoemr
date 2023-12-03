@@ -424,11 +424,6 @@ public class AdminNavService
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.btnGroupPreference"), "frame?frameUrl=" + contextPath + "/admin/groupPreferences.jsp"));
 		scheduleItems.add(new AdminNavItemTo1(resourceBundle.getString("admin.admin.preventionNotification.title"), "frame?frameUrl=" + contextPath + "/oscarPrevention/PreventionManager.jsp"));
 
-		if(systemPreferenceService.isPreferenceEnabled(UserProperty.AQS_INTEGRATION_ENABLED, false))
-		{
-			scheduleItems.add(new AdminNavItemTo1("Manage Appointment Queues", "manageAppointmentQueues"));
-		}
-
 		scheduleGroup.setItems(scheduleItems);
 		return scheduleGroup;
 	}
