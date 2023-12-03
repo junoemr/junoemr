@@ -25,7 +25,6 @@ package oscar.login.jaas;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -65,11 +64,11 @@ public class BaseLoginModule implements LoginModule {
 
 	private OscarPrincipal principal;
 
-	private Group rolesGroup;
+	private OscarGroup rolesGroup;
 
-	private Group callerPrincipal;
+	private OscarGroup callerPrincipal;
 
-	private Group authPrincipal;
+	private OscarGroup authPrincipal;
 
 	private boolean authorizationEnabled = false;
 
@@ -163,7 +162,7 @@ public class BaseLoginModule implements LoginModule {
 			authPrincipal.addMember(getPrincipal());
 			setAuthPrincipal(authPrincipal);
 
-			Group rolesGroup = new OscarGroup("Roles");
+			OscarGroup rolesGroup = new OscarGroup("Roles");
 			for (OscarRole role : getRoles(loginName)) {
 				rolesGroup.addMember(role);
 			}
@@ -274,27 +273,27 @@ public class BaseLoginModule implements LoginModule {
 		this.sharedState = sharedState;
 	}
 
-	public Group getRolesGroup() {
+	public OscarGroup getRolesGroup() {
 		return rolesGroup;
 	}
 
-	public void setRolesGroup(Group rolesGroup) {
+	public void setRolesGroup(OscarGroup rolesGroup) {
 		this.rolesGroup = rolesGroup;
 	}
 
-	public Group getCallerPrincipal() {
+	public OscarGroup getCallerPrincipal() {
 		return callerPrincipal;
 	}
 
-	public void setCallerPrincipal(Group callerPrincipal) {
+	public void setCallerPrincipal(OscarGroup callerPrincipal) {
 		this.callerPrincipal = callerPrincipal;
 	}
 
-	public Group getAuthPrincipal() {
+	public OscarGroup getAuthPrincipal() {
 		return authPrincipal;
 	}
 
-	public void setAuthPrincipal(Group authPrincipal) {
+	public void setAuthPrincipal(OscarGroup authPrincipal) {
 		this.authPrincipal = authPrincipal;
 	}
 

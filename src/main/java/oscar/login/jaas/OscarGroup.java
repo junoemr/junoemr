@@ -25,13 +25,12 @@ package oscar.login.jaas;
 
 import java.io.Serializable;
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
-public class OscarGroup implements Group, Serializable {
+public class OscarGroup implements Principal, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -55,25 +54,21 @@ public class OscarGroup implements Group, Serializable {
 		this.name = name;
 	}
 
-	@Override
 	public boolean addMember(Principal user) {
 		if (!principals.contains(user))
 			principals.add(user);
 		return true;
 	}
 
-	@Override
 	public boolean removeMember(Principal user) {
 		principals.remove(user);
 		return true;
 	}
 
-	@Override
 	public boolean isMember(Principal member) {
 		return principals.contains(member);
 	}
 
-	@Override
 	public Enumeration<? extends Principal> members() {
 		return Collections.enumeration(principals);
 	}
