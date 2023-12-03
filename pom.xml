@@ -388,29 +388,6 @@
 		<!-- rtf / lowagie -->
 		<dependency>
 			<groupId>com.lowagie</groupId>
-			<artifactId>itext</artifactId>
-			<version>2.1.7</version>
-			<exclusions>
-				<exclusion>
-					<groupId>bouncycastle</groupId>
-					<artifactId>bcprov-jdk14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>bouncycastle</groupId>
-					<artifactId>bcmail-jdk14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bcprov-jdk14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bctsp-jdk14</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.lowagie</groupId>
 			<artifactId>itext-rtf</artifactId>
 			<version>2.1.7</version>
 			<exclusions>
@@ -478,10 +455,6 @@
 				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>
 					<artifactId>jackson-annotations</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.lowagie</groupId>
-					<artifactId>itext</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -1954,9 +1927,6 @@
 						<goals>
 							<goal>npm</goal>
 						</goals>
-						<configuration>
-							<arguments>install</arguments>
-						</configuration>
 					</execution>
 					<execution>
 						<id>webpack {webpack.env}</id>
