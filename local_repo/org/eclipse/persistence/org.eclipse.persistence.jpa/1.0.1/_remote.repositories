@@ -1,0 +1,4 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Sat Dec 02 10:53:38 EST 2023
+org.eclipse.persistence.jpa-1.0.1.jar>=
+org.eclipse.persistence.jpa-1.0.1.pom>=

@@ -1,0 +1,4 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Sat Dec 02 10:56:10 EST 2023
+activation-1.0.2.jar>=
+activation-1.0.2.pom>=

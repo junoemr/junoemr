@@ -1,0 +1,4 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Sat Dec 02 11:17:34 EST 2023
+jdbc-stdext-2.0.jar>=
+jdbc-stdext-2.0.pom>=
