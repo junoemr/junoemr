@@ -20,7 +20,7 @@ module.exports = merge(common, {
 				use: [
 					'style-loader',
 					'css-loader?sourceMap',
-					'sass-loader?sourceMap&precision=8'
+					'sass-loader?sourceMap'
 				]
 			}
 		]

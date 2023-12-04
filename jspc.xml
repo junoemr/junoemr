@@ -55,7 +55,7 @@
 			</else>
 		</if>
 
-		<javac srcdir="${jspc.generatedDir}" source="7" target="7" debug="on" memoryInitialSize="128m" compiler="modern" includeantruntime="false" memoryMaximumSize="1024m" fork="yes" encoding="UTF8">
+		<javac srcdir="${jspc.generatedDir}" source="8" target="8" debug="on" memoryInitialSize="1024m" compiler="modern" includeantruntime="false" memoryMaximumSize="4096m" fork="yes" encoding="UTF8">
 			<classpath>
 				<pathelement location="${jspc.expandedWarDir}/WEB-INF/classes" />
 				<pathelement path="${jspc.expandedWarDir}/WEB-INF/lib/*" />
