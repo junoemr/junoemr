@@ -18,3 +18,6 @@ COPY fix_openapi_generate_hack.sh jspc.xml ./
 
 COPY build.sh .
 RUN ./build.sh
+
+FROM tomcat:9-jre8-temurin
+COPY --from=build /opt/app/target/*.war /usr/local/tomcat/webapps/ROOT.war

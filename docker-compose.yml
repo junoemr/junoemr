@@ -1,0 +1,35 @@
+services:
+  database:
+    image: mariadb:10
+    environment:
+      - MYSQL_ROOT_PASSWORD=liyi
+      - MARIADB_MYSQL_LOCALHOST_USER=1
+      - MARIADB_MYSQL_LOCALHOST_GRANTS=USAGE
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized"]
+      start_period: 5s
+      start_interval: 1s
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    ports:
+      - 3306:3306
+  database_migration:
+    image: flyway/flyway:10
+    command: -url=jdbc:mysql://database:3306 -schemas=oscar_mcmaster -user=root -password=liyi -placeholderReplacement=false migrate
+    volumes:
+      - ./database/mysql/migrations/on:/flyway/sql
+    depends_on:
+      database:
+        condition: service_healthy
+  emr:
+    build: .
+    depends_on:
+      database:
+        condition: service_healthy
+      database_migration:
+        condition: service_completed_successfully
+    ports:
+      - 8080:8080
+    volumes:
+      - ./catalina_base/conf/context.xml:/usr/local/tomcat/conf/context.xml

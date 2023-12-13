@@ -1,0 +1,1 @@
+DELETE FROM mygroup WHERE provider_no NOT IN (SELECT provider_no from provider);

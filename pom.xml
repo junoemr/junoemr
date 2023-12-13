@@ -1741,9 +1741,6 @@
                                 org.oscarehr.ws.rest.myhealthaccess.DemographicWebService
 								org.oscarehr.ws.rest.myhealthaccess.AppointmentWebService
 								org.oscarehr.ws.rest.myhealthaccess.IntegrationWebService
-								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentWebService
-								org.oscarehr.ws.rest.integrations.aqs.QueuedAppointmentsWebService
-								org.oscarehr.ws.rest.integrations.aqs.QueueWebService
                             </value>
 						</systemProperty>
 						<systemProperty>

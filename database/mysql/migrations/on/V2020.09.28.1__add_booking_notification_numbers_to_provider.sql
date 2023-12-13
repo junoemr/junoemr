@@ -1,0 +1,1 @@
+ALTER TABLE provider ADD COLUMN IF NOT EXISTS booking_notification_numbers TEXT;
