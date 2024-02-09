@@ -2,5 +2,10 @@
 # up a production environment. This user/password/pin is mentioned
 # throughout the documentation.
 
-update security set date_ExpireDate=DATE_ADD(CURDATE(), INTERVAL 1 MONTH), b_ExpireSet=1 where user_name='oscardoc';
-
+update security
+set
+    date_ExpireDate = DATE_ADD(CURDATE(), INTERVAL 1 MONTH),
+    b_ExpireSet = 1,
+    forcePasswordReset = 0
+where
+    user_name = 'oscardoc';
